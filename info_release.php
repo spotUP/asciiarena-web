@@ -1,0 +1,1136 @@
+<?php
+require_once "session.php";
+require_once "header.php"; ?>
+<div class="modal-body row">
+	<div class="col-lg-2">
+		<?php include('sidebar.php'); ?>
+	</div>
+	<div class="col-lg-8">
+		<?php
+		$decoded_filename = $_GET[ 'filename' ] ?? "";
+		$filename = base64_decode($decoded_filename);
+		$_SESSION[ 'filename' ] = $filename;
+
+		$time = time();
+		$comment = $_POST[ 'comment' ] ?? "";
+
+		$user_added_rating = $_POST[ 'user_added_rating' ] ?? "";
+
+		if (isset($_POST[ 'favourite' ]) && is_logged_in()) {
+			$decoded_filename = $_GET[ 'filename' ] ?? "";
+			$filename = base64_decode($decoded_filename);
+			doQuery("INSERT INTO favourites VALUES (:nick, :filename)", [":nick" => $nick, ":filename" => $filename]);
+		}
+
+		if (isset($_POST[ 'broken' ])) {
+			$filename = $_GET[ 'filename' ] ?? "";
+			$decoded_filename = base64_decode($filename);
+
+			?>
+			<form enctype="multipart/form-data" action="info_release.php?filename=<?=$filename?>" method="post">
+				<div class="headline">
+					Enter a comment describing the problem.
+				</div>
+				<div class="content_with_blenk">
+					<textarea rows="5" cols="82" id="broken_comment" name="broken_comment"></textarea>
+					<input type="submit" class="btn btn-primary" name="do_report_broken" value="Report">
+				</div>
+			</form>
+			<?php
+		}
+		if (isset($_POST[ 'do_report_broken' ])) {
+			$filename = $_GET[ 'filename' ] ?? "";
+			$decoded_filename = base64_decode($filename);
+			$broken_comment = $_POST[ 'broken_comment' ] ?? "";
+			doQuery("UPDATE collys SET broken = 1, broken_comment = :comment WHERE filename = :filename", [
+				":comment" => $broken_comment,
+				":filename" => $decoded_filename
+			]);
+			?>
+			<div class="headline">
+				Status
+			</div>
+
+			<div class="content_with_blenk">
+				You reported <?=$decoded_filename?> as broken!
+			</div>
+
+			<?php
+			echo "<meta http-equiv='Refresh' content='2; url=$_SERVER[PHP_SELF]?filename=$filename'>";
+			exit;
+		}
+
+			//-----------------------------------------------------------------------------
+			// WRITE EDITED MESSAGE TO DB
+			//-----------------------------------------------------------------------------
+
+		if (isset($_POST[ 'edit_message' ]) && (isset($_GET[ 'comment' ]))) {
+			$commentid = $_POST[ 'commentid' ] ?? "";
+			$edit_message = $_POST[ 'edit_message' ] ?? "";
+
+			if (is_numeric($commentid)) {
+				doQuery("UPDATE comments SET comment = :comment, base64 = 1 WHERE commentid = :commentid", [
+					":comment" => $edit_message,
+					":commentid" => $commentid
+				]);
+			}
+
+			header("Location: {$_SERVER[PHP_SELF]}?filename={$decoded_filename}");
+			exit;
+		}
+
+		if ((isset($_POST[ 'add_comment' ]) || (isset($_POST[ 'Delete' ])))) {
+			$crew = $_POST[ 'crew' ];
+			$crew = cleanInsert($crew);
+
+			$ask = "SELECT nick from author_of where filename='$filename'";
+			$result = mysql_query($ask, $dbh);
+			while ($row = mysql_fetch_array($result)) {
+				$artist = $row[ 0 ];
+			}
+
+			$ask = "SELECT crew from crew_of where filename='$filename'";
+			$result = mysql_query($ask, $dbh);
+			while ($row = mysql_fetch_array($result)) {
+				$crew = $row[ 0 ];
+			}
+
+//-----------------------------------------------------------------------------
+// WRITE COMMENT TO DATABASE
+//-----------------------------------------------------------------------------
+
+			if (isset($_POST[ 'comment' ]) && (isset($_GET[ 'comment' ]))) {
+				$comment = cleanInsertPost($comment);
+
+				if (empty($comment)) {
+					$comment = "$nick voted $user_added_rating";
+					$comment = cleanInsertPost($comment);
+				}
+
+				$ask = "select nick from author_of where filename='$filename'";
+				$result = mysql_query($ask, $dbh);
+				while ($row = mysql_fetch_array($result)) {
+					$artist = $row[ 'nick' ];
+				}
+
+				$ask_crew = "select crew from crew_of where filename='$filename'";
+				$result_crew = mysql_query($ask_crew, $dbh);
+				while ($row_crew = mysql_fetch_array($result_crew)) {
+					$commentcrew = $row_crew[ 'crew' ];
+				}
+
+				if (empty($user_added_rating)) {
+					$ask = "insert into comments values (0,'$filename','$commentcrew','$artist','$comment',(null),'$nick',$time,1)";
+					mysql_query($ask, $dbh);
+					echo "<meta http-equiv='Refresh' content='0; url=$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
+				} else {
+					$ask = "insert into comments values (0,'$filename','$commentcrew','$artist','$comment',$user_added_rating,'$nick',$time,1)";
+					mysql_query($ask, $dbh);
+					echo "<meta http-equiv='Refresh' content='0; url=$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
+				}
+			}
+
+//-----------------------------------------------------------------------------
+// CALCULATE RATING FOR COLLY
+//-----------------------------------------------------------------------------
+
+			$ask_rate_amount = "SELECT COUNT(rating) from comments where filename='$filename' and rating>0";
+			$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
+			while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) {
+				$rate_amount = $row_rate_amount[ 0 ];
+			}
+
+			if ($rate_amount > 2) {
+				$ask = "select avg(rating) from comments where filename='$filename' and rating>0";
+				$result = mysql_query($ask, $dbh);
+				while ($row = mysql_fetch_array($result)) {
+					$avgrating = $row[ 0 ];
+				}
+
+				$ask = "update collys set rating=$avgrating where filename='$filename'";
+				mysql_query($ask, $dbh);
+			}
+
+//-----------------------------------------------------------------------------
+// CALCULATE RATING FOR CREW
+//-----------------------------------------------------------------------------
+
+			$ask_rate_amount = "SELECT COUNT(rating) from comments where crew='$crew' and rating>0";
+			$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
+			while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) {
+				$rate_amount = $row_rate_amount[ 0 ];
+			}
+			if ($rate_amount > 2) {
+				$ask = "select avg(rating) from comments where crew='$crew' and rating>0";
+				$result = mysql_query($ask, $dbh);
+				while ($row = mysql_fetch_array($result)) {
+					$avgcrewrating = $row[ 0 ];
+				}
+
+				$ask = "update crews set rating=$avgcrewrating where name='$crew'";
+				mysql_query($ask, $dbh);
+			}
+
+//-----------------------------------------------------------------------------
+// CALCULATE RATING FOR ARTISTS
+//-----------------------------------------------------------------------------
+
+			$ask = "select nick from author_of where filename='$filename'";
+			$result = mysql_query($ask, $dbh);
+			while ($row = mysql_fetch_array($result)) {
+				$artist = $row[ 0 ];
+			}
+			$ask = "select avg(rating) from comments where artist='$artist' and rating>0";
+			$result = mysql_query($ask, $dbh);
+			while ($row = mysql_fetch_array($result)) {
+				$avg_artist_rating = $row[ 0 ];
+			}
+			$ask_rate_amount = "SELECT COUNT(rating) from comments where artist='$artist' and rating>0";
+			$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
+			while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) {
+				$rate_amount = $row_rate_amount[ 0 ];
+			}
+			if ($rate_amount > 2) {
+				$ask = "update artists set rating=$avg_artist_rating where nick='$artist'";
+				mysql_query($ask, $dbh);
+			}
+			echo "<meta http-equiv='Refresh' content='0; url=$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
+		}
+
+			//-----------------------------------------------------------------------------
+			// DELETE COMMENTS
+			//-----------------------------------------------------------------------------
+
+		if (isset($_POST[ 'Delete' ])) {
+			if ($rank = "Admin") {
+				$commentid = $_POST[ 'commentid' ];
+				$commentid = cleanInsert($commentid);
+				mysql_query("DELETE FROM comments where filename='$filename' and commentid='$commentid'", $dbh);
+			}
+
+			$ask = "select nick from author_of where filename='$filename'";
+			$result = mysql_query($ask, $dbh);
+			while ($row = mysql_fetch_array($result)) {
+				$artist = $row[ 0 ];
+			}
+
+			$ask = "select avg(rating) from comments where artist='$artist' and rating>0";
+			$result = mysql_query($ask, $dbh);
+			while ($row = mysql_fetch_array($result)) {
+				$avg_artist_rating = $row[ 0 ];
+			}
+			if (!isset($avg_artist_rating)) {
+				$avg_artist_rating = 0;
+			}
+
+			$ask_rate_amount = "SELECT COUNT(rating) from comments where artist='$artist' and rating>0";
+			$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
+			while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) {
+				$rate_amount = $row_rate_amount[ 0 ];
+			}
+			if ($rate_amount > 2) {
+				$ask = "update artists set rating=$avg_artist_rating where nick='$artist'";
+				mysql_query($ask, $dbh);
+			}
+			$ask = "select avg(rating) from comments where filename='$filename' and rating>0";
+			$result = mysql_query($ask, $dbh);
+			while ($row = mysql_fetch_array($result)) {
+				$avg_colly_rating = $row[ 0 ];
+			}
+			if (!isset($avg_colly_rating)) {
+				$avg_colly_rating = 0;
+			}
+
+			$ask = "select crew from crew_of where filename='$filename'";
+			$result = mysql_query($ask, $dbh);
+			while ($row = mysql_fetch_array($result)) {
+				$crew = $row[ 0 ];
+			}
+
+			$ask = "select avg(rating) from comments where crew='$crew' and rating>0";
+			$result = mysql_query($ask, $dbh);
+			while ($row = mysql_fetch_array($result)) {
+				$avg_crew_rating = $row[ 0 ];
+			}
+			if (!isset($avg_crew_rating)) {
+				$avg_crew_rating = 0;
+			}
+
+			$ask_rate_amount = "SELECT COUNT(rating) from comments where crew='$crew' and rating>0";
+			$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
+			while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) {
+				$rate_amount = $row_rate_amount[ 0 ];
+			}
+
+			if ($rate_amount > 2) {
+				$ask = "update crews set rating=$avg_crew_rating where name='$crew'";
+				mysql_query($ask, $dbh);
+
+			}
+		}
+
+			//---------------------------------------------------------------------------------------------------------------
+			// WRITE COLLY INFO TO DB
+			//---------------------------------------------------------------------------------------------------------------
+
+		if (isset($_POST[ 'do_edit_colly' ])) {
+			$filename = $_POST[ 'filename' ];
+			$filename = cleanInsert($filename);
+			$ask = "select uploader from collys where filename='$filename'";
+			$result = mysql_query($ask);
+			while ($row = mysql_fetch_array($result)) {
+				$uploader = $row[ 0 ];
+			}
+			if (isset($_POST[ 'edit_colly_name' ]) && $nick == "$uploader") {
+				$filename = $_POST[ 'filename' ];
+				$filename = cleanInsert($filename);
+
+				$edit_colly_name = $_POST[ 'edit_colly_name' ];
+				$edit_colly_name = cleanInsert($edit_colly_name);
+
+				$ask = "update collys set name='$edit_colly_name' where filename='$filename'";
+				mysql_query($ask, $dbh);
+			}
+
+			if (isset($_POST[ 'old_colly_authors' ]) || (isset($_POST[ 'colly_author' ]) && $nick == "$uploader") || (isset($_POST[ 'colly_author' ]) && $rank == "Admin")) {
+				$filename = $_POST[ 'filename' ];
+				$filename = cleanInsert($filename);
+
+				$ask = "delete from author_of where filename='$filename'";
+				mysql_query($ask, $dbh);
+
+				if (isset($_POST[ old_colly_authors ])) {
+					foreach ($_POST[ old_colly_authors ] as $colly_author) {
+						$colly_author = cleanInsert($colly_author);
+						$ask = "insert into author_of values ('$colly_author','$filename')";
+						mysql_query($ask, $dbh);
+					}
+					$ask = "delete from author_of where filename='$filename' and nick='Delete'";
+					mysql_query($ask, $dbh);
+				}
+			}
+
+			if (isset($_POST[ colly_author ])) {
+				foreach ($_POST[ colly_author ] as $new_colly_author) {
+					$new_colly_author = cleanInsert($new_colly_author);
+					$ask = "insert into author_of values ('$new_colly_author','$filename')";
+					mysql_query($ask, $dbh);
+				}
+
+				$ask = "delete from author_of where filename='$filename' and nick='Delete'";
+				mysql_query($ask, $dbh);
+			}
+
+			if (isset($_POST[ 'old_colly_crews' ]) || (isset($_POST[ 'colly_crew' ]))) {
+				$filename = $_POST[ 'filename' ];
+				$filename = cleanInsert($filename);
+
+				$ask = "delete from crew_of where filename='$filename'";
+				mysql_query($ask, $dbh);
+
+				if (isset($_POST[ old_colly_crews ])) {
+					foreach ($_POST[ old_colly_crews ] as $colly_crew) {
+						$colly_crew = cleanInsert($colly_crew);
+						$ask = "insert into crew_of values ('$colly_crew','$filename')";
+						mysql_query($ask, $dbh);
+					}
+				}
+
+				if (isset($_POST[ colly_crew ])) {
+					foreach ($_POST[ colly_crew ] as $new_colly_crew) {
+						$new_colly_crew = cleanInsert($new_colly_crew);
+						$ask = "insert into crew_of values ('$new_colly_crew','$filename')";
+						mysql_query($ask, $dbh);
+					}
+				}
+				$ask = "delete from crew_of where filename='$filename' and crew='Delete'";
+				mysql_query($ask, $dbh);
+			}
+
+			if (isset($_POST[ 'edit_colly_year' ]) && $nick == "$uploader") {
+				$filename = $_POST[ 'filename' ];
+				$filename = cleanInsert($filename);
+				$edit_colly_year = $_POST[ 'edit_colly_year' ];
+				$edit_colly_year = cleanInsert($edit_colly_year);
+				$ask = "update collys set year='$edit_colly_year' where filename='$filename'";
+				mysql_query($ask, $dbh);
+			}
+
+			if (isset($_POST[ 'edit_colly_type' ]) && $nick == "$uploader") {
+				$filename = $_POST[ 'filename' ];
+				$filename = cleanInsert($filename);
+
+				$edit_colly_type = $_POST[ 'edit_colly_type' ];
+				$edit_colly_type = cleanInsert($edit_colly_type);
+
+				$ask = "update collys set type='$edit_colly_type' where filename='$filename'";
+				mysql_query($ask, $dbh);
+			}
+			if (isset($_POST[ 'edit_colly_month' ]) && $nick == "$uploader") {
+				$filename = $_POST[ 'filename' ];
+				$filename = cleanInsert($filename);
+
+				$edit_colly_month = $_POST[ 'edit_colly_month' ];
+				$edit_colly_month = cleanInsert($edit_colly_month);
+				$ask = "update collys set month='$edit_colly_month' where filename='$filename'";
+				mysql_query($ask, $dbh);
+			}
+			if (isset($_POST[ 'edit_colly_day' ]) && $nick == "$uploader") {
+				$filename = $_POST[ 'filename' ];
+				$filename = cleanInsert($filename);
+
+				$edit_colly_day = $_POST[ 'edit_colly_day' ];
+				$edit_colly_day = cleanInsert($edit_colly_day);
+
+				$ask = "update collys set day=$edit_colly_day where filename='$filename'";
+				mysql_query($ask, $dbh);
+			}
+
+			if (isset($_POST[ 'colors' ])) {
+				$colors = cleanInsert($_POST[ 'colors' ]);
+				$filename = cleanInsert($_POST[ 'filename' ]);
+
+				$dirname = explode(".", $filename);
+				$dirname = $dirname[ 0 ];
+
+				$ask = "DELETE FROM image_of WHERE filename LIKE '$filename%'";
+				mysql_query($ask, $dbh);
+
+				$imagenames = load_ansi("collections/$dirname/$filename", "collections/$dirname/$filename-mosoul", "mosoul", "$colors", 0);
+				if ($imagenames != -1) {
+					for ($i = 0; $i < count($imagenames); $i++) {
+						$imagenames[ $i ] = str_replace("'", "&#39;", $imagenames[ $i ]);
+						$ask = "insert into image_of values ('$filename-mosoul','$imagenames[$i]')";
+						mysql_query($ask, $dbh);
+					}
+				} else {
+					?>
+					<div class="headline">
+						Error
+					</div>
+
+					<div class="content_with_blenk">
+						There was an error during the conversion, please inform an admin!
+					</div>
+					<?php
+
+					$ask = "DELETE from image_of WHERE filename LIKE '$filename%'";
+					mysql_query($ask, $dbh);
+
+					$ask = "DELETE from collys WHERE filename='$filename'";
+					mysql_query($ask, $dbh);
+
+					exit;
+				}
+				$imagenames = load_ansi("collections/$dirname/$filename", "collections/$dirname/$filename-microknight", "microknight", "$colors", 0);
+				if ($imagenames != -1) {
+					for ($i = 0; $i < count($imagenames); $i++) {
+						$imagenames[ $i ] = str_replace("'", "&#39;", $imagenames[ $i ]);
+						$ask = "insert into image_of values ('$filename-microknight','$imagenames[$i]')";
+						mysql_query($ask, $dbh);
+					}
+				} else {
+					?>
+					<div class="headline">
+						Error
+					</div>
+
+					<div class="content_with_blenk">
+						There was an error during the conversion, please inform an admin!
+					</div>
+					<?php
+					$ask = "DELETE from image_of WHERE filename LIKE '$filename%'";
+					mysql_query($ask, $dbh);
+
+					$ask = "DELETE from collys WHERE filename='$filename'";
+					mysql_query($ask, $dbh);
+
+					exit;
+				}
+				$imagenames = load_ansi("collections/$dirname/$filename", "collections/$dirname/$filename-pot-noodle", "pot-noodle", "$colors", 0);
+				if ($imagenames != -1) {
+					for ($i = 0; $i < count($imagenames); $i++) {
+						$imagenames[ $i ] = str_replace("'", "&#39;", $imagenames[ $i ]);
+						$ask = "insert into image_of values ('$filename-pot-noodle','$imagenames[$i]')";
+						mysql_query($ask, $dbh);
+					}
+				} else {
+					?>
+					<div class="headline">
+						Error
+					</div>
+
+					<div class="content_with_blenk">
+						There was an error during the conversion, please inform an admin!
+					</div>
+					<?php
+
+					$ask = "DELETE from image_of WHERE filename LIKE '$filename%'";
+					mysql_query($ask, $dbh);
+
+					$ask = "DELETE from collys WHERE filename='$filename'";
+					mysql_query($ask, $dbh);
+
+					exit;
+				}
+				$imagenames = load_ansi("collections/$dirname/$filename", "collections/$dirname/$filename-topaz", "pot-topaz", "$colors", 0);
+				if ($imagenames != -1) {
+					for ($i = 0; $i < count($imagenames); $i++) {
+						$imagenames[ $i ] = str_replace("'", "&#39;", $imagenames[ $i ]);
+						$ask = "insert into image_of values ('$filename-topaz','$imagenames[$i]')";
+						mysql_query($ask, $dbh);
+					}
+				} else {
+					?>
+					<div class="headline">
+						Error
+					</div>
+
+					<div class="content_with_blenk">
+						There was an error during the conversion, please inform an admin!
+					</div>
+					<?php
+					$ask = "DELETE from image_of WHERE filename LIKE '$filename%'";
+					mysql_query($ask, $dbh);
+
+					$ask = "DELETE from collys WHERE filename='$filename'";
+					mysql_query($ask, $dbh);
+
+					exit;
+				}
+				$imagenames = load_ansi("collections/$dirname/$filename", "collections/$dirname/$filename-topazplus", "topazplus", "$colors", 0);
+				if ($imagenames != -1) {
+					for ($i = 0; $i < count($imagenames); $i++) {
+						{
+							$imagenames[ $i ] = str_replace("'", "&#39;", $imagenames[ $i ]);
+							$ask = "insert into image_of values ('$filename-topazplus','$imagenames[$i]')";
+							mysql_query($ask, $dbh);
+						}
+					}
+				} else {
+					?>
+					<div class="headline">
+						Error
+					</div>
+
+					<div class="content_with_blenk">
+						There was an error during the conversion, please inform an admin!
+					</div>
+					<?php
+					$ask = "DELETE from image_of WHERE filename LIKE '$filename%'";
+					mysql_query($ask, $dbh);
+
+					$ask = "DELETE from collys WHERE filename='$filename'";
+					mysql_query($ask, $dbh);
+
+					exit;
+				}
+			}
+//---------------------------------------------------------------------------------------------------------------
+// RECALCULATE RATINGS
+//---------------------------------------------------------------------------------------------------------------
+
+			$ask = "select nick from author_of";
+			$result = mysql_query($ask, $dbh);
+			while ($row = mysql_fetch_array($result)) {
+				$artist = $row[ 0 ];
+
+				$ask_rating = "select avg(rating) from comments where artist='$artist' and rating>0";
+				$result_rating = mysql_query($ask_rating, $dbh);
+				while ($row_rating = mysql_fetch_array($result_rating)) {
+					$avg_artist_rating = $row_rating[ 0 ];
+				}
+				if (!isset($avg_artist_rating)) {
+					$avg_artist_rating = 0;
+				}
+
+				$ask_rate_amount = "SELECT COUNT(rating) from comments where artist='$artist' and rating>0";
+				$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
+				while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) {
+					$rate_amount = $row_rate_amount[ 0 ];
+				}
+				if ($rate_amount > 2) {
+					$ask_update = "update artists set rating=$avg_artist_rating where nick='$artist'";
+					mysql_query($ask_update, $dbh);
+				}
+			}
+			$ask = "select crew from crew_of";
+			$result = mysql_query($ask, $dbh);
+			while ($row = mysql_fetch_array($result)) {
+				$crew = $row[ 0 ];
+
+				$ask_rating = "select avg(rating) from comments where crew='$crew' and rating>0";
+				$result_rating = mysql_query($ask_rating, $dbh);
+				while ($row = mysql_fetch_array($result_rating)) {
+					$avg_crew_rating = $row_rating[ 0 ];
+				}
+				if (!isset($avg_crew_rating)) {
+					$avg_crew_rating = 0;
+				}
+
+				$ask_rate_amount = "SELECT COUNT(rating) from comments where crew='$crew' and rating>0";
+				$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
+				while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) {
+					$rate_amount = $row_rate_amount[ 0 ];
+				}
+				if ($rate_amount > 2) {
+
+					$ask_update = "update crews set rating=$avg_crew_rating where name='$crew'";
+					mysql_query($ask_update, $dbh);
+				}
+				echo "<meta http-equiv='Refresh' content='0; url=$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
+				exit;
+			}
+		}
+
+			//-----------------------------------------------------------------------------
+			// EDIT COLLY FIELD
+			//-----------------------------------------------------------------------------
+
+		if (isset($_POST[ 'edit_colly' ])) {
+			$getcollyname = $_POST[ 'filename' ];
+			$getcollyname = cleanInsert($getcollyname);
+
+			$ask = "select * from collys where filename='$getcollyname'";
+			$result = mysql_query($ask);
+			while ($row = mysql_fetch_array($result)) {
+				$show_colly_name = $row[ 'filename' ];
+				$show_colly_name = $row[ 'name' ];
+				$show_colly_crew = $row[ 'crew' ];
+				$show_colly_year = $row[ 'year' ];
+				$show_colly_month = $row[ 'month' ];
+				$show_colly_day = $row[ 'day' ];
+				$show_colly_type = $row[ 'type' ];
+				$encoded_filename = base64_encode($row[ 'filename' ]);
+			}
+			?>
+			<form enctype="multipart/form-data" action="info_release.php?filename=<?=$encoded_filename?>" method="post">
+
+				<div class="headline">
+					Edit ASCII Collection
+				</div>
+
+				<div class="content_with_blenk">
+					&nbsp;
+				</div>
+
+				<div
+				style="float: left; height: 25px; width: 135px; text-align: left; padding-right: 4px; padding-bottom: 2px; padding-top: 2px;">
+				Name
+			</div>
+
+			<div
+			style="float: right; width: 510px; height: 25px; text-align: left; padding-bottom: 2px; padding-top: 2px;">
+			<input type="text" size="32" name="edit_colly_name" value="<?=$show_colly_name?>">
+		</div>
+
+		<div class="info_release_left">
+			Type
+		</div>
+
+		<div class="info_release_right">
+			<select name="edit_colly_type" class="btn-primary">
+				<option><?=$show_colly_type?></option>
+				<option>ASCII</option>
+				<option>ANSI</option>
+			</select>
+		</div>
+
+		<div class="info_release_left">
+			ANSI Colors
+		</div>
+
+		<div class="info_release_right">
+			<select name="colors" class="btn-primary">
+				<option value="transparent">ANSI</option>
+				<option>Workbench</option>
+			</select>
+		</div>
+
+		<div class="info_release_left">
+			Release Date
+		</div>
+
+		<div class="info_release_right">
+			<?php
+			echo "<select name='edit_colly_year' class='btn-primary'>";
+			$countyear = 1986;
+			$maxyear = date("Y");
+			echo "<option>$show_colly_year</option>";
+			while ($countyear <= $maxyear) {
+				echo "<option>$countyear</option>";
+				$countyear++;
+			}
+
+			?>
+		</select>
+		<select name="edit_colly_month" class="btn-primary">
+			<option selected='selected'><?=$show_colly_month?></option>
+			<option value="0">Unknown</option>
+			<option value="1">January</option>
+			<option value="2">February</option>
+			<option value="3">Mars</option>
+			<option value="4">April</option>
+			<option value="5">May</option>
+			<option value="6">June</option>
+			<option value="7">July</option>
+			<option value="8">August</option>
+			<option value="9">September</option>
+			<option value="10">October</option>
+			<option value="11">November</option>
+			<option value="12">December</option>
+		</select>
+		<select name="edit_colly_day" class="btn-primary">
+			<?php
+			echo "<option selected='selected' value='0'>$show_colly_day</option>";
+			echo "<option value='0'>Unknown</option>";
+			$min_day = 1;
+			$max_day = 31;
+			while ($min_day <= $max_day) {
+				echo "<option>$min_day</option>";
+				$min_day++;
+			}
+			?>
+		</select>
+	</div>
+
+	<div class="info_release_left">
+		Artist(s)
+	</div>
+
+	<div class="info_release_right">
+		<?php
+		$ask = "select nick from author_of where filename='$getcollyname'";
+		$result = mysql_query($ask, $dbh);
+		while ($row = mysql_fetch_array($result)) {
+			$colly_author = $row[ 0 ];
+			echo "<select name=\"old_colly_authors[]\" class='btn-primary'>";
+			echo "<option selected=\"selected\">$colly_author</option>";
+			echo "<option value='Delete'>Remove Author</option>";
+
+			$ask_authors = "select nick from artists";
+			$result_authors = mysql_query($ask_authors, $dbh);
+			while ($row_authors = mysql_fetch_array($result_authors)) {
+				$authors = $row_authors[ 0 ];
+				echo "<option>$authors</option>";
+			}
+			echo "</select>";
+		}
+		?>
+		<span id="new_colly_author_field"></span> <span onclick="add_colly_author_field();"
+		style="cursor: pointer; cursor: hand;"><button
+		type="button">Add Author!</button></span>
+		<input type="hidden" name="total_colly_authors" id="total_colly_authors" value="0">
+	</div>
+
+	<div class="info_release_left">
+		Crew(s)
+	</div>
+
+	<div class="info_release_right">
+
+		<?php
+		$ask = "select crew from crew_of where filename='$getcollyname'";
+		$result = mysql_query($ask, $dbh);
+		while ($row = mysql_fetch_array($result)) {
+			$colly_crew = $row[ 0 ];
+			echo "<select name=\"old_colly_crews[]\" class='btn-primary'>";
+			echo "<option selected=\"selected\">$colly_crew</option>";
+			echo "<option value='Delete'>Remove Crew</option>";
+			$ask_crews = "select name from crews";
+			$result_crews = mysql_query($ask_crews, $dbh);
+			while ($row_crews = mysql_fetch_array($result_crews)) {
+				$crews = $row_crews[ 0 ];
+				echo "<option>$crews</option>";
+			}
+			echo "</select>";
+		}
+		?>
+
+		<span id="new_colly_crew_field"></span> <span onclick="add_colly_crew_field();"
+		style="cursor: pointer; cursor: hand;"><button type="button">Add Crew!</button></span>
+		<input type="hidden" name="total_colly_crews" id="total_colly_crews" value="0">
+	</div>
+
+	<div class="content">
+		<input type="hidden" name="filename" value="<?=$getcollyname?>">
+		<input type="submit" class="btn-primary" name="do_edit_colly" value="Change">
+	</div>
+</form>
+<?php
+}
+include('info_release_summary.php');
+
+			//-----------------------------------------------------------------------------
+			// TOP CONTROL TABLE
+			//-----------------------------------------------------------------------------
+if (!isset($_POST[ 'edit_colly' ])) {
+	$type = fetchOne("SELECT type FROM collys WHERE filename = :filename", [":filename" => $filename])->type ?? "";
+
+	echo "<form action='$_SERVER[PHP_SELF]?filename=$decoded_filename' method='post' enctype='multipart/form-data'>";
+
+	?>
+	<div class="headline"></div>
+	<div class="content_with_blenk"><br></div>
+	<div class="content"><?php
+	if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) {
+		echo "<input type='submit' class='btn-primary amb-1' name='hide' value='Hide Colly!'> ";
+	}
+	if (!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) {
+		echo "<input type='submit' class='btn-primary amb-1' name='view' value='View Colly'> ";
+	}
+	if (is_logged_in()) {
+		echo "<input type='submit' class='btn-primary amb-1' name=addcomment value='Comment'> ";
+		echo "<input type='submit' class='btn-primary amb-1' name=favourite value='Favourite'> ";
+		echo "<input type='submit' class='btn-primary amb-1' name=broken value='Report Broken'> ";
+		if ($_user[ "nick" ] === $uploader || is_admin()) {
+			echo "<input type='hidden' name='filename' value=$filename>";
+			echo "<input type='submit' class='btn btn-primary amb-1' name=edit_colly value='Edit Colly'> ";
+		}
+	}
+	if (!isset($_POST[ 'download' ])) {
+		echo "<input type='submit' class='btn btn-primary amb-1' name=download value='Download'> ";
+	} elseif (isset($_POST[ 'download' ])) {
+					$ask = "select downloads from collys where filename='$filename'"; // download counter
+					$result = mysql_query($ask, $dbh);
+					while ($row = mysql_fetch_array($result)) {
+						$downloads = $row[ 'downloads' ];
+						$downloads++;
+					}
+
+					$ask = "update collys set downloads=$downloads where filename='$filename'";
+					mysql_query($ask, $dbh);
+
+					?>
+					<meta content="1; URL=<?=$filenameandpath?>" http-equiv="Refresh">
+					<?php
+				}
+				echo "</div>";
+				if ($type != "ANSI") {
+					?>
+					<div>
+						<select name="font" class="btn-primary amb-1">
+							<option value='mosoul' selected='selected'>Font</option>
+							<option value='topaz'>Topaz</option>
+							<option value='microknight'>MicroKnight</option>
+							<option value='mosoul'>mO'sOul</option>
+							<option value='pot-noodle'>P0T-NOoDLE</option>
+						</select>
+						<select name="background_color" class="btn-primary amb-1">
+							<option selected="selected" value="#aaaaaa">BG Color</option>
+							<option class='black' value="#000000">Black</option>
+							<option class='darkblue' value="#0000aa">Dark Blue</option>
+							<option class='darkgreen' value="#00aa00">Dark Green</option>
+							<option class='darkcyan' value="#00aaaa">Dark Cyan</option>
+							<option class='darkred' value="#aa0000">Dark Red</option>
+							<option class='magenta' value="#aa00aa">Magenta</option>
+							<option class='brown' value="#aa5500">Brown</option>
+							<option class='darkgrey' value="#555555">Dark Grey</option>
+							<option class='grey' value="#aaaaaa">Grey</option>
+							<option class='blue' value="#5555ff">Blue</option>
+							<option class='green' value="#55ff55">Green</option>
+							<option class='cyan' value="#5555ff">Cyan</option>
+							<option class='red' value="#ff5555">Red</option>
+							<option class='magenta' value="#ff55ff">Magenta</option>
+							<option class='yellow' value="#ffff55">Yellow</option>
+							<option class='white' value="#ffffff">White</option>
+						</select>
+						<select name="foreground_color" class="btn-primary amb-1">
+							<option SELECTED value="0,0,0">FG Color</option>
+							<option class='black' value="0,0,0">Black</option>
+							<option class='darkblue' value="0,0,170">Dark Blue</option>
+							<option class='darkgreen' value="0,170,0">Dark Green</option>
+							<option class='darkcyan' value="0,170,170">Dark Cyan</option>
+							<option class='darkred' value="170,0,0">Dark Red</option>
+							<option class='magenta' value="170,0,170">Magenta</option>
+							<option class='brown' value="170,85,0">Brown</option>
+							<option class='darkgrey' value="85,85,85">Dark Grey</option>
+							<option class='grey' value="170,170,170">Grey</option>
+							<option class='blue' value="85,85,255">Blue</option>
+							<option class='green' value="85,255,85">Green</option>
+							<option class='cyan' value="85,85,255">Cyan</option>
+							<option class='red' value="255,85,85">Red</option>
+							<option class='magenta' value="255,85,255">Magenta</option>
+							<option class='yellow' value="255,255,85">Yellow</option>
+							<option class='white' value="255,255,255">White</option>
+						</select>
+						<input type="submit" class='btn-primary amb-1' name="change" value="Change!">
+					</div>
+				</form>
+				<?php
+			}
+
+				//-----------------------------------------------------------------------------
+				// SHOW COLLY?
+				//-----------------------------------------------------------------------------
+
+			if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) {
+				$fgcolor = $_POST[ 'foreground_color' ];
+
+				$font = fetchOne("SELECT def_font FROM users WHERE nick = :nick", [":nick" => $nick])->def_font ?? "mosoul";
+
+				if (isset($_POST[ 'change' ])) {
+					$bgcolor = $_POST[ 'background_color' ];
+
+					$font = $_POST[ 'font' ];
+				}
+				$row = fetchOne("SELECT view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
+				$type = $row->type;
+				$counter = $row->view_counter;
+				$counter++;
+
+				doQuery("UPDATE collys SET view_counter = :counter WHERE filename = :filename", [
+					":counter" => $counter,
+					":filename" => $filename
+				]);
+
+				if ($type == "ASCII") {
+					if (empty($bgcolor)) {
+						$def_color = fetchOne("SELECT def_bg_col FROM users WHERE nick = :nick", [":nick" => $nick])->def_bg_col;
+						$bgcolor = (empty($def_color)) ? "#000000" : $def_color;
+					}
+					?>
+					<div class="content">
+						<div class="row m-0 p-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>; color: <?=$fgcolor?>;"><pre><?php
+						if (file_exists(__DIR__ . "/collections/{$dirname}/{$filename}")) {
+							$content = file_get_contents(__DIR__ . "/collections/{$dirname}/{$filename}");
+							echo utf8_encode($content);
+						}
+						?></pre>
+					</div>
+				</div>
+			<?php }
+		}
+
+				//-----------------------------------------------------------------------------
+				//SHOW COMMENTS
+				//-----------------------------------------------------------------------------
+		if (!isset($_POST[ 'edit' ])) {
+			foreach (fetchAll("SELECT comment, rating, nick, timestamp, commentid, base64 FROM comments WHERE filename = :filename ORDER BY timestamp ASC", [":filename" => $filename]) as $row) {
+				$comment = $row->comment;
+				$userrating = $row->rating;
+				$commentnick = $row->nick;
+				$commentid = $row->commentid;
+				$commenttime = date("Y-m-d H:i", $row->timestamp);
+				$comment = fixOutputPost($comment, (boolean)$row->base64);
+
+				echo "<form action='$_SERVER[PHP_SELF]?filename=$decoded_filename&post' method='post'>";
+				if ($userrating > 0) {
+					if (!is_admin()) {
+						if ($commentnick === $_user[ "nick" ]) {
+							?>
+							<div class="header bg-header col-12 ap-1">
+								<span class="yellow"> BY:</span>
+								<span class="white"><?=$commentnick?></span>
+								<span class="yellow">DATE:</span>
+								<span class="white"><?=$commenttime?></span>
+								<span class="yellow">RATING:</span>
+								<span class="white"><?=$userrating?></span>
+							</div>
+							<div class="bg-secondary col-12 ap-1 amb-1">
+								<span class="cyan"><?=$comment?></span>
+								<div class="col-12 p-0 m-0 apt-1">
+								<input type="hidden" name="commentid" value="<?=$commentid?>"/><input type="submit" class="btn btn-primary" name="edit" value="Edit">
+								</div>
+							</div>
+							<?php
+						} else {
+							?>
+							<div class="header bg-header col-12 ap-1">
+								<span class="yellow"> BY:</span>
+								<span class="white"><?=$commentnick?></span>
+								<span class="yellow">DATE:</span>
+								<span class="white"><?=$commenttime?></span>
+								<span class="yellow">RATING:</span>
+								<span class="white"><?=$userrating?></span>
+							</div>
+							<div class="bg-secondary col-12 ap-1 amb-1">
+								<span class="cyan"><?=$comment?></span>
+							</div>
+							<?php
+						}
+					}
+					if (is_admin()) {
+						?>
+						<div class="header bg-header col-12 ap-1">
+							<span class="yellow"> BY:</span>
+							<span class="white"><?=$commentnick?></span>
+							<span class="yellow">DATE:</span>
+							<span class="white"><?=$commenttime?></span>
+							<span class="yellow">RATING:</span>
+							<span class="white"><?=$userrating?></span>
+						</div>
+						<div class="bg-secondary col-12 ap-1 amb-1">
+							<span class="cyan"><?=$comment?></span>
+							<div class="col-12 p-0 m-0 apt-1">
+							<input type="hidden" class="btn btn-primary" name="commentid" value="<?=$commentid?>">
+							<input type="submit" class="btn btn-primary" name="edit" value="Edit">
+							<input type="submit" class="btn btn-primary" name="Delete" value="Delete">
+							</div>
+						</div>
+
+						<?php
+					}
+				} else {
+					if (!is_admin()) {
+						if ($commentnick === $_user[ "nick" ]) {
+							?>
+							<div class="header bg-header col-12 ap-1">
+								<span class="yellow"> BY:</span>
+								<span class="white"><?=$commentnick?></span>
+								<span class="yellow">DATE:</span>
+								<span class="white"><?=$commenttime?></span>
+							</div>
+							<div class="col-12 ap-1 amb-1">
+								<span class="cyan"><?=$comment?></span>
+								<div class="col-12 p-0 m-0 apt-1">
+								<input type="hidden" class="btn btn-primary" name="commentid" value="<?=$commentid?>">
+								<input type="submit" class="btn btn-primary" name="edit" value="Edit">
+								</div>
+							</div>
+							<?php
+						} else {
+							?>
+							<div class="header bg-header col-12 ap-1">
+								<span class="yellow"> BY:</span>
+								<span class="white"><?=$commentnick?></span>
+								<span class="yellow">DATE:</span>
+								<span class="white"><?=$commenttime?></span>
+							</div>
+							<div class="bg-secondary col-12 ap-1 amb-1">
+								<span class="cyan"><?=$comment?></span>
+							</div>
+							<?php
+						}
+					}
+					if (is_admin()) {
+						?>
+						<div class="bg-header header col-12 ap-1">
+							<span class="yellow"> BY:</span>
+							<span class="white"><?=$commentnick?></span>
+							<span class="yellow">DATE:</span>
+							<span class="white"><?=$commenttime?></span>
+						</div>
+						<div class="bg-secondary col-12 ap-1 amb-1">
+							<span class="cyan"><?=$comment?></span>
+							<input type="hidden" name="commentid" value="<?=$commentid?>">
+							<div class="col-12 p-0 m-0 apt-1">
+							<input type="submit" class="btn btn-primary" name="edit" value="Edit">
+							<input type="submit" class="btn btn-primary" name="Delete" value="Delete">
+							</div>
+						</div>
+						<?php
+					}
+				}
+				echo "</form>";
+			}
+		}
+	}
+
+				//-----------------------------------------------------------------------------
+				// ADD COMMENT FIELD
+				//-----------------------------------------------------------------------------
+
+	if (isset($_POST[ 'addcomment' ])) {
+		$ask = "SELECT crew FROM crew_of WHERE filename='$filename'";
+		$result = mysql_query($ask, $dbh);
+		if ($row = mysql_fetch_array($result)) {
+			$crew = $row[ 0 ];
+		}
+
+		$ask = "SELECT nick FROM author_of WHERE filename='$filename'";
+		$result = mysql_query($ask, $dbh);
+		if ($row = mysql_fetch_array($result)) {
+			$artist = $row[ 0 ];
+		}
+
+		if (!isset($_POST[ 'edit' ])) {
+			$ask = "select sum(rating) from comments where filename='$filename' and nick='$nick' and rating>0";
+			$result = mysql_query($ask, $dbh);
+			if ($row = mysql_fetch_array($result)) {
+				$hasrated = $row[ 0 ];
+			}
+			if ($hasrated > 0) {
+				echo "<form action=\"info_release.php?filename=$decoded_filename&comment\" method=\"post\">";
+				?>
+				<div class="headline">
+					Enter your comment...
+				</div>
+				<div class="content_with_blenk"><br></div>
+
+				<div class="content">
+					<textarea rows="5" cols="82" id="commentvote" name="comment"></textarea>
+					<input type="hidden" name="crew" align="right" value="<?=$crew?>"><input type="hidden" name="artist" align="right" value="<?=$artist?>">
+					<input type="submit" class="btn btn-primary" name="add_comment" align="right" value="Comment">
+				</div>
+			</form>
+			<script type="text/javascript">
+				document.getElementById('commentvote').focus();
+			</script>
+			<?php
+		}
+		else
+		{
+			echo "<form action=$_SERVER[PHP_SELF]?filename=$decoded_filename&comment method=\"post\">";
+			?>
+			<div class="headline">
+				Enter your comment...
+			</div>
+
+			<div class="content">
+				<textarea rows="5" cols="82" id="comment" name="comment"></textarea>
+			</div>
+
+			RATING
+			<select name="user_added_rating">
+				<option value="0" selected="selected">Blank</option><?php
+				for ($i = 1; $i < 11; $i++) {
+					echo "<option value=$i>$i</option>";
+				} ?>
+			</select>
+			<input type="hidden" name="crew" align="right" value="<?=$crew?>"><input type="hidden" name="artist"
+			align="right" value="<?=$artist?>">
+			<input type="submit" class="btn btn-primary" name="add_comment" align="right" value="Comment">
+		</form>
+		<script type="text/javascript">
+			document.getElementById('comment').focus();
+			</script><?php
+		}
+	}
+}
+
+				//-----------------------------------------------------------------------------
+				// EDIT COMMENT FIELD
+				//-----------------------------------------------------------------------------
+
+if (isset($_POST[ 'edit' ])) {
+	echo "<form action=\"$_SERVER[PHP_SELF]?filename=$decoded_filename&comment\" method=\"post\">";
+	$commentid = cleanInsert($_POST[ 'commentid' ]);
+
+	$ask = "select comment, base64 from comments where commentid='$commentid'";
+	$result = mysql_query($ask, $dbh);
+	while ($row = mysql_fetch_array($result)) {
+		$base64 = $row[ 'base64' ];
+		$comment = fixOutputEdit($row[ 'comment' ]);
+	}
+	echo "<form action=$_SERVER[PHP_SELF]?filename=$decoded_filename&comment method=\"post\">";
+	?>
+	<div class="headline">
+		Edit Your Comment...
+	</div>
+
+	<div class="content">
+		<textarea rows="5" cols="82" name="edit_message"><?=$comment?></textarea>
+		<input type="hidden" name="commentid" value="<?=$commentid?>"/>
+		<input type="submit" class="btn btn-primary" name="writeedit" align="right" value="Submit">
+	</form>
+</div>
+<?php
+}
+?>
+</div>
+
+<div class="col-lg-2">
+	<?php include('sidebar_right.php'); ?>
+</div>
+<?php include('footer.php'); ?>

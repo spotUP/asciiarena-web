@@ -1,0 +1,109 @@
+/*
+    Controls
+*/
+.fig-chardropdown {
+    width:320px;
+    box-sizing:border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.fig-txt {
+    height:250px;
+    width:320px;
+    box-sizing:border-box;
+}
+
+.fig-pad {
+    margin-bottom:16px;
+}
+
+.fig-data-txt {
+    width:100%;
+    height:200px;
+    margin: 0;
+    padding: 0;
+}
+
+.fig-font {
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
+}
+
+.fig-icon {
+    font-size: 1.5em;
+}
+
+.txt-single-input {
+    width:30px;
+    margin: 0;
+    padding: 0;
+}
+
+.fig-draw-label {
+    margin: 0;
+    padding: 0;
+}
+
+#myTab li {
+    margin-right: 16px;
+}
+
+.fig-error {
+    color: #ff0000;
+    font-weight:bold;
+}
+
+/*
+    Options
+*/
+
+.fig-opt-entry {
+    margin-left: 0;
+    margin-right: 0;
+    padding: 0;
+}
+
+.fig-opt-label {
+    margin: 0;
+    padding: 0;
+    width:150px;
+    text-align:right;
+}
+
+.fig-opt {
+    float:left;
+}
+
+.fig-opt-info {
+    float:left;
+    margin: 0;
+    padding: 0;
+}
+
+.fig-opt-info2 {
+    float:left;
+    margin: 0;
+    padding: 0;
+}
+
+/*
+    Test
+*/
+
+.fig-test-txt {
+    width:100%;
+    box-sizing:border-box;
+}
+
+.fig-test-output {
+    font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
+    background-color: #1a1a1a;
+    border: none;
+    margin: 0;
+    padding: 0;
+    min-height:200px;
+    width:100%;
+    box-sizing:border-box;
+    white-space:pre;
+    overflow:auto;
+}
