@@ -265,7 +265,7 @@ include "header.php";
   	text-align: right;
   	padding-right: 8px;
   	margin-top: 4px;
-    color: #000;
+  	color: #000;
   }
   input.tight{
   	font-family: 'Topaz_a1200';
@@ -416,12 +416,12 @@ include "header.php";
   	border-left: 2px solid #fff !important;
   	border-right: 2px solid #000 !important;
   	border-bottom: 2px solid #000 !important;
-    margin-left: 0px;
-    margin-right: 0px;
-    padding-left: 2px;
-    padding-right: 2px;
-    padding-top: 3px !important;
-    padding-bottom: 19px;
+  	margin-left: 0px;
+  	margin-right: 0px;
+  	padding-left: 2px;
+  	padding-right: 2px;
+  	padding-top: 3px !important;
+  	padding-bottom: 19px;
   }
   .hip-2-button{
   	position: relative;
@@ -436,10 +436,10 @@ include "header.php";
   	border-bottom: 2px solid #000 !important;
   	padding-left: 4px;
   	padding-right: 4px;
-    padding-top: 3px;
-    padding-bottom: 19px;
-    margin-left: 0px;
-    margin-right: 0px;
+  	padding-top: 3px;
+  	padding-bottom: 19px;
+  	margin-left: 0px;
+  	margin-right: 0px;
   }
   .hip-1-button{
   	position: relative;
@@ -456,8 +456,8 @@ include "header.php";
   	padding-right: 2px;
   	margin-left: 0px;
   	margin-right: 0px;
-    padding-top: 3px !important;
-    padding-bottom: 19px;
+  	padding-top: 3px !important;
+  	padding-bottom: 19px;
   }
 
   .hip-3-button:active{
@@ -824,7 +824,7 @@ include "header.php";
   	padding:0;
   	border-radius: 0px;
   	padding-bottom: 18px;
-    margin-bottom: 2px;
+  	margin-bottom: 2px;
   }
   .checkbox > input:checked {
   	border-top: 2px solid #fff !important;
@@ -842,6 +842,56 @@ include "header.php";
   	left: 6px;
   	top: 1px;
   }
+
+  .checkbox-hip {
+  	display: inline-flex;
+  	cursor: pointer;
+  	position: relative;
+  	margin:0;
+  	padding:0;
+  }
+  .checkbox-hip > span {
+  	color: #000;
+  	user-select: none;
+  	width: 178px;
+  	height: 20px;
+  	padding-top: 4px;
+  	padding-left: 8px;
+  }
+  .checkbox-hip > input {
+  	height: 25px;
+  	width: 30px;
+  	-webkit-appearance: none;
+  	-moz-appearance: none;
+  	-o-appearance: none;
+  	appearance: none;
+  	border-top: 2px solid #fff !important;
+  	border-left: 2px solid #fff !important;
+  	border-bottom: 2px solid #000 !important;
+  	border-right: 2px solid #000 !important;
+  	outline: none;
+  	cursor: pointer;
+  	margin:0;
+  	padding:0;
+  	border-radius: 0px;
+  	padding-bottom: 25px;
+  	margin-bottom: 2px;
+  }
+  .checkbox-hip > input:checked {
+  	background: url(assets/data/cedd/checkmark.png);
+  	background-repeat: no-repeat;
+	background-position: center;
+
+  }
+  .checkbox-hip > input:checked + span::before {
+  	display: block;
+  	text-align: center;
+  	color: #000;
+  	position: absolute;
+  	left: 6px;
+  	top: 1px;
+  }
+
   ::-webkit-input-placeholder { /* Edge */
   	color: #000;
   	font-smooth: never !important;
@@ -883,43 +933,43 @@ include "header.php";
 	pointer-events: none;
 }
 .hip-scrollbar-border {
-  position: absolute;
-  width: 19px;
-  height: 368px;
-  top: 135px;
-  left: 8px;
-  border-top: 2px solid #fff !important;
-  border-bottom: 2px solid #fff !important;
-  border-left: 1px solid #fff !important;
-  border-right: 1px solid #fff !important;
-  pointer-events: none;
-  background: transparent;
-  z-index: 100;
+	position: absolute;
+	width: 19px;
+	height: 368px;
+	top: 135px;
+	left: 8px;
+	border-top: 2px solid #fff !important;
+	border-bottom: 2px solid #fff !important;
+	border-left: 1px solid #fff !important;
+	border-right: 1px solid #fff !important;
+	pointer-events: none;
+	background: transparent;
+	z-index: 100;
 }
 .hip-scrollbar-border-offset {
-  position: absolute;
-  width: 19px;
-  height: 368px;
-  top: 137px;
-  left: 9px;
-  border-top: 2px solid #000 !important;
-  border-bottom: 2px solid #000 !important;
-  border-left: 1px solid #000 !important;
-  border-right: 1px solid #000 !important;
-  pointer-events: none;
-  background: transparent;
-  z-index: 100;
+	position: absolute;
+	width: 19px;
+	height: 368px;
+	top: 137px;
+	left: 9px;
+	border-top: 2px solid #000 !important;
+	border-bottom: 2px solid #000 !important;
+	border-left: 1px solid #000 !important;
+	border-right: 1px solid #000 !important;
+	pointer-events: none;
+	background: transparent;
+	z-index: 100;
 }
 
 .hip-scrollbar-divider {
-  position: absolute;
-  width: 5px;
-  height: 370px;
-  top: 135px;
-  left: 28px;
-  background-image: url(assets/data/hippo/hippobg.png);
-  border-right: 2px solid #fff !important;
-  z-index: 100;
+	position: absolute;
+	width: 5px;
+	height: 370px;
+	top: 135px;
+	left: 28px;
+	background-image: url(assets/data/hippo/hippobg.png);
+	border-right: 2px solid #fff !important;
+	z-index: 100;
 }
 
 .hip-scrollbar-tight-border:before {
@@ -1048,12 +1098,12 @@ include "header.php";
 	direction: rtl !important; /*This cause the division content to be displayed from right to left */ 
 } 
 ul.ced-filelist {
-  padding-left: 0px;
-  margin-bottom: 0px;
-  margin-top: 2px;
-  margin-left: -3px;
-  margin-right: 3px;
-  direction: ltr;
+	padding-left: 0px;
+	margin-bottom: 0px;
+	margin-top: 2px;
+	margin-left: -3px;
+	margin-right: 3px;
+	direction: ltr;
 }
 ul li a.ced-filelist:hover{
 	background: #6688bb;
@@ -1077,12 +1127,12 @@ ul li a.ced-filelist :focus{
 	background: #6688bb;
 }
 .hip-playlist ul{
-  padding-left: 0px;
-  margin-bottom: 4px;
-  margin-top: 2px;
-  margin-left: 0px;
-  margin-right: 3px;
-  direction: ltr !important;
+	padding-left: 0px;
+	margin-bottom: 4px;
+	margin-top: 2px;
+	margin-left: 0px;
+	margin-right: 3px;
+	direction: ltr !important;
 } 
 
 .hip-playlist li{
@@ -1166,6 +1216,161 @@ and (max-device-width : 480px)
 }
 </style>
 
+<!-- HIPPOPLAYER PREFS (PLAYBACK TAB)-->
+
+<div class="req-container hippo hip-dialogue-width"> <!-- original width: 264px -->
+	<div class="req-title-padding">HippoPrefs</div>
+	<div class="req-close-button"></div>
+	<div class="req-size-gadget"></div>
+	<div class="req-cycle-gadget"></div>
+
+	<div class="req-border-3">
+		<div class="req-border-2">
+			<div class="req-border-1">
+
+				<div class="req-content nobottomborder">
+
+					<div class="req-button-container">
+						<button class="hip-3-button" value="General">General</button>
+						<button class="hip-3-button" value="Display">Display</button>
+						<button class="hip-3-button" style="color: #ffffff;" value="Playing">Playback</button>
+					</div>
+
+					<div class="hip-header">
+						<div class="req-button-container">
+							<p class="req" style="margin-top: 8px; margin-right: 4px;">Player</p>
+							<button class="hip-3-button" value="playmode">UADE</button>
+						</div>
+
+						<div class="req-button-container">
+							<p class="req" style="margin-top: 8px; margin-right: 4px; white-space: nowrap;">Stereo Separation</p>
+							<button class="hip-3-button" value="playmode">None</button>
+						</div>
+
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<!-- HIPPOPLAYER PREFS (DISPLAY TAB)-->
+
+<div class="req-container hippo hip-dialogue-width"> <!-- original width: 264px -->
+	<div class="req-title-padding">HippoPrefs</div>
+	<div class="req-close-button"></div>
+	<div class="req-size-gadget"></div>
+	<div class="req-cycle-gadget"></div>
+
+	<div class="req-border-3">
+		<div class="req-border-2">
+			<div class="req-border-1">
+
+				<div class="req-content nobottomborder">
+
+					<div class="req-button-container">
+						<button class="hip-3-button" value="General">General</button>
+						<button class="hip-3-button" style="color: #ffffff;" value="Display">Display</button>
+						<button class="hip-3-button" value="Playing">Playback</button>
+					</div>
+
+					<div class="hip-header">
+						<div class="req-button-container">
+							<p class="req" style="margin-top: 8px; margin-right: 4px;">Show</p>
+							<button class="hip-3-button" value="playmode">Time, pos/len, song</button>
+						</div>
+
+						<div class="req-button-container">
+							<p class="req" style="margin-top: 8px; margin-right: 4px;">Font</p>
+							<button class="hip-3-button" value="playmode">Topaz</button>
+						</div>
+
+						<label class="checkbox-hip">							
+							<span style="margin-right: 36px; margin-left: -8px;">Scope</span>
+							<input type="checkbox" checked/>
+						</label>
+
+						<label class="checkbox-hip">							
+							<span style="margin-right: 36px; margin-left: -8px;">Scope bars</span>
+							<input type="checkbox" checked/>
+						</label>
+
+						<div class="req-button-container">
+							<p class="req" style="margin-top: 8px; margin-right: 4px;">Type</p>
+							<button class="hip-3-button" value="playmode">Patternscope</button>
+						</div>
+
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+<!-- HIPPOPLAYER PREFS (GENERAL TAB) -->
+
+<div class="req-container hippo hip-dialogue-width"> <!-- original width: 264px -->
+	<div class="req-title-padding">HippoPrefs</div>
+	<div class="req-close-button"></div>
+	<div class="req-size-gadget"></div>
+	<div class="req-cycle-gadget"></div>
+
+	<div class="req-border-3">
+		<div class="req-border-2">
+			<div class="req-border-1">
+
+				<div class="req-content nobottomborder">
+
+					<div class="req-button-container">
+						<button class="hip-3-button" style="color: #ffffff;" value="General">General</button>
+						<button class="hip-3-button" value="Display">Display</button>
+						<button class="hip-3-button" value="Playing">Playback</button>
+					</div>
+
+					<div class="hip-header">
+						<div class="req-button-container">
+							<p class="req" style="margin-top: 8px; margin-right: 4px;">Play</p>
+							<button class="hip-3-button" value="playmode">List Repeatedly</button>
+						</div>
+
+						<div class="req-button-container">
+							<button class="hip-3-button" value="Timeout">Timeout</button>
+							<p class="req" style="margin-top: 6px; margin-right: 4px; margin-left: 90px;">Off</p>
+							<div class="range-border"><input type="range" orient="horizontal" /></div>
+						</div>
+
+						<div class="req-button-container">
+							<p class="req" style="margin-top: 6px; margin-right: -8px;">Alarm</p>
+							<p class="req" style="margin-top: 8px; margin-right: 4px; margin-left: 122px;">Off</p>
+							<div class="range-border"><input type="range" orient="horizontal" /></div>
+						</div>
+
+						<label class="checkbox-hip">
+							<div class=button><input class="req" value="Startup" type="button" style="margin-right: 134px;"></div>
+							<input type="checkbox" checked/>
+						</label>
+
+						<label class="checkbox-hip">							
+							<span style="margin-right: 36px; margin-left: -8px;">Divider / dir</span>
+							<input type="checkbox" checked/>
+						</label>
+
+						<label class="checkbox-hip">
+							<span style="margin-right: 36px; margin-left: -8px;">Auto sort</span>
+							<input type="checkbox" checked/>
+						</label>
+
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
 
 <!-- LINE # DIALOGUE -->
 
@@ -1416,254 +1621,24 @@ and (max-device-width : 480px)
 		</div>
 
 	</div>
-</div>
 
-<!-- ABOUT DIALOGUE -->
+	<!-- ABOUT DIALOGUE -->
 
-<div class="req-container about-dialogue-width"> <!-- original width: 640px -->
-	<div class="req-title">CygnusEdd</div>
-	<div class="req-cycle-gadget"></div>
-
-	<div class="req-border-3">
-		<div class="req-border-2">
-			<div class="req-border-1">
-
-				<div class="req-content nobottomborder">
-					<p class="req center-text">CygnusEdd Professional V4.20<br>Copyright 2016-2020 Up Rough & Divine Stylers<br>
-						Written by Fred, Origo and Spot<br><br>Published by<br><br>aSCIIaRENA<br>(www.asciiarena.se)</br></p>
-						<div class="req-divider"></div>
-						<div class="req-button-container">
-							<div class="req-double-border center-align"><input class="req" value="Continue" type="button"></div>
-						</div>
-					</div>
-				</div>
-
-			</div>
-		</div>
-	</div>
-
-</div>
-
-<!-- HIPPOPLAYER EMPTY -->
-
-<div class="req-container hippo hip-dialogue-width"> <!-- original width: 264px -->
-	<div class="req-title-padding">00:00</div>
-	<div class="req-close-button"></div>
-	<div class="req-size-gadget"></div>
-	<div class="req-cycle-gadget"></div>
-
-	<div class="req-border-3">
-		<div class="req-border-2">
-			<div class="req-border-1">
-
-				<div class="req-content nobottomborder">
-
-					<div class="hip-header">
-						<p class="req nomargin">HippoPlayer v3.45 (10.1.2000)<br>Programmed by K-P Koljonen</p>
-					</div>
-
-					<div class="req-button-container">
-						<button class="hip-button hip-prev-song"></button>
-						<button class="hip-button hip-startof-song"></button>
-						<button class="hip-button hip-rewind-song"></button>
-						<button class="hip-button hip-play-song"></button>
-						<button class="hip-button hip-forward-song"></button>
-						<button class="hip-button hip-endof-song"></button>
-						<button class="hip-button hip-next-song"></button>
-						<button class="hip-button hip-pause-song"></button>
-						<button class="hip-button hip-eject-song"></button>
-						<button class="hip-button hip-info-song"></button>
-					</div>
-
-					<div class="req-button-container">
-						<div class="range-border"><input type="range" orient="horizontal" /></div>
-						<button class="hip-3-button" value="New">New</button>
-						<button class="hip-3-button" value="New">Add</button>
-						<button class="hip-3-button" value="New">Del</button>
-						<button class="hip-3-button" value="New">Prg</button>
-						<button class="hip-1-button" value="New">M</button>
-						<button class="hip-1-button" value="New">S</button>
-						<button class="hip-2-button" value="New">Pr</button>
-					</div>
-
-					<div class="hip-playlist flipped nooverflow">
-						<ul>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-							<li></li>
-						</ul>
-					</div>
-
-				</div>
-			</div>
-		</div>
-
-	</div>
-</div>
-
-<!-- HIPPOPLAYER -->
-
-<div class="req-container hippo hip-dialogue-width"> <!-- original width: 264px -->
-	<div class="req-title-padding">00:00</div>
-	<div class="req-close-button"></div>
-	<div class="req-size-gadget"></div>
-	<div class="req-cycle-gadget"></div>
-
-	<div class="req-border-3">
-		<div class="req-border-2">
-			<div class="req-border-1">
-				<div class="req-content nobottomborder">
-					<div class="hip-header">
-						<p class="req nomargin">HippoPlayer v3.45 (10.1.2000)<br>Programmed by K-P Koljonen</p>
-					</div>
-					<div class="req-button-container">
-						<button class="hip-button hip-prev-song"></button>
-						<button class="hip-button hip-startof-song"></button>
-						<button class="hip-button hip-rewind-song"></button>
-						<button class="hip-button hip-play-song"></button>
-						<button class="hip-button hip-forward-song"></button>
-						<button class="hip-button hip-endof-song"></button>
-						<button class="hip-button hip-next-song"></button>
-						<button class="hip-button hip-pause-song"></button>
-						<button class="hip-button hip-eject-song"></button>
-						<button class="hip-button hip-info-song"></button>
-					</div>
-
-					<div class="req-button-container">
-						<div class="range-border"><input type="range" orient="horizontal" /></div>
-						<button class="hip-3-button" value="New">New</button>
-						<button class="hip-3-button" value="New">Add</button>
-						<button class="hip-3-button" value="New">Del</button>
-						<button class="hip-3-button" value="New">Prg</button>
-						<button class="hip-1-button" value="New">M</button>
-						<button class="hip-1-button" value="New">S</button>
-						<button class="hip-2-button" value="New">Pr</button>
-					</div>
-
-					<div class="hip-scrollbar-border mobileHide"></div>
-					<div class="hip-scrollbar-border-offset mobileHide"></div>
-					<div class="hip-scrollbar-divider mobileHide"></div>
-
-					<div class="hip-playlist nobg" dir="rtl">
-
-						<ul>
-							<li><a href="#">mod.ASS!_FUCK!_HOE!_TITS!</a></li>
-							<li><a href="#">mod.bring it down</a></li>
-							<li><a href="#">mod.disko divas</a></li>
-							<li><a href="#">mod.flower flavor</a></li>
-							<li><a href="#">mod.goes with da bong</a></li>
-							<li><a href="#">mod.rough cutz</a></li>
-							<li><a href="#">mod.The Dreamer</a></li>
-							<li><a href="#">mod.To Be In Love REMiX</a></li>
-							<li><a href="#">mod.UnderneathOurHome</a></li>
-							<li><a href="#">mod.upperz delight</a></li>
-							<li><a href="#">mod.welcome</a></li>
-							<li><a href="#">mod.Super_Subway_1986</a></li>
-							<li><a href="#">dbm.Live_Axxion</a></li>
-							<li><a href="#">THX.crystal_cracktro</a></li>
-							<li><a href="#">THX.Summerluvin'[+++]</a></li>
-							<li><a href="#">Steal_Da_Wheelz_Riddim.xm</a></li>
-							<li><a href="#">mod.Monotone Bitch</a></li>
-							<li><a href="#">mod.Optimistique</a></li>
-							<li><a href="#">mod.static_amiga_megamix</a></li>
-							<li><a href="#">mod.Introe81.mod</a></li>
-							<li><a href="#">mod.8909</a></li>
-							<li><a href="#">mod.Ass Up!</a></li>
-							<li><a href="#">mod.ASS!_FUCK!_HOE!_TITS!</a></li>
-							<li><a href="#">mod.bring it down</a></li>
-							<li><a href="#">mod.disko divas</a></li>
-							<li><a href="#">mod.flower flavor</a></li>
-							<li><a href="#">mod.goes with da bong</a></li>
-						</ul>
-					</div>
-
-				</div>
-			</div>
-		</div>
-
-	</div>
-</div>
-
-<!-- HIPPOINFO -->
-
-<div class="req-container hippo hippoinfo-dialogue-width"> <!-- original width: 384px -->
-	<div class="req-title-padding"><span>HippoInfo<span></div>
-		<div class="req-close-button"></div>
+	<div class="req-container about-dialogue-width"> <!-- original width: 640px -->
+		<div class="req-title">CygnusEdd</div>
 		<div class="req-cycle-gadget"></div>
 
 		<div class="req-border-3">
 			<div class="req-border-2">
 				<div class="req-border-1">
+
 					<div class="req-content nobottomborder">
-
-						<div class="hip-scrollbar-border infowindow-offset-1 mobileHide"></div>
-						<div class="hip-scrollbar-border-offset infowindow-offset-2 mobileHide"></div>
-						<div class="hip-scrollbar-divider infowindow-offset-3 mobileHide"></div>
-
-						<div class="hip-playlist nobg" dir="rtl" style="margin-top: 0px;">
-							<ul>
-								<li>Name: Youafrica-Dia</li>
-								<li>Type: Protracker</li>
-								<li>Size: 197674<span>($0012AB00-$0015AF2A)</span></li>
-								<li>Comment: Rene Bidstrup | Megademo 2 |</li>
-								<li>------------------------------------------</li>
-								<li>01 ST-26:goes with da bong<span>15730</span></li>
-								<li>02 ST-21:rough cutz<span>12245</span></li>
-								<li>03 ST-24:mod.The Dreamer<span>334</span></li>
-								<li>04 ST-21:mod.To Be In Love REMiX<span>3344</span></li>
-								<li>05 ST-26:mod.UnderneathOurHome<span>3434</span></li>
-								<li>06 ST-12:mod.upperz delight<span>89898</span></li>
-								<li>07 ST-26:mod.welcome<span>242</span></li>
-								<li>08 ST-21:mod.Super_Subway_1986<span>234422</span></li>
-								<li>09 ST-13:dbm.Live_Axxion<span>2344</span></li>
-								<li>10 ST-27:THX.crystal_cracktro<span>2342</span></li>
-								<li>11 ST-17:THX.Summerluvin'[+++]<span>11334</span></li>
-								<li>12 ST-23:Steal_Da_Wheelz_Riddim.xm<span>243</span></li>
-								<li>13 ST-23:mod.Monotone Bitch<span>74777</span></li>
-								<li>14 ST-21:mod.Optimistique<span>9984</span></li>
-								<li>15 ST-27:mod.static_amiga_megamix<span>244</span></li>
-								<li>16 ST-10:mod.Introe81.mod<span>2323</span></li>
-								<li>17 ST-27:mod.8909<span>26622</span></li>
-								<li>18 ST-21:mod.Ass Up!<span>8744</span></li>
-								<li>19 ST-17:mod.ASS!_FUCK!_HOE!_TITS!<span>2244</span></li>
-								<li>20 ST-03:mod.bring it down<span>88842</span></li>
-								<li>21 ST-27:21 mod.disko divas<span>22244</span></li>
-								<li>22 <span>0</span></li>
-								<li>23 <span>0</span></li>
-								<li>24 <span>0</span></li>
-								<li>25 <span>0</span></li>
-								<li>26 <span>0</span></li>
-								<li>27 <span>0</span></li>
-								<li>28 <span>0</span></li>
-								<li>29 <span>0</span></li>
-								<li>30 <span>0</span></li>
-								<li>31 <span>0</span></li>
-							</ul>
+						<p class="req center-text">CygnusEdd Professional V4.20<br>Copyright 2016-2020 Up Rough & Divine Stylers<br>
+							Written by Fred, Origo and Spot<br><br>Published by<br><br>aSCIIaRENA<br>(www.asciiarena.se)</br></p>
+							<div class="req-divider"></div>
+							<div class="req-button-container">
+								<div class="req-double-border center-align"><input class="req" value="Continue" type="button"></div>
+							</div>
 						</div>
 					</div>
 
@@ -1671,11 +1646,239 @@ and (max-device-width : 480px)
 			</div>
 		</div>
 
-	</div>
-</div>
+
+		<!-- HIPPOPLAYER EMPTY -->
+
+		<div class="req-container hippo hip-dialogue-width"> <!-- original width: 264px -->
+			<div class="req-title-padding">00:00</div>
+			<div class="req-close-button"></div>
+			<div class="req-size-gadget"></div>
+			<div class="req-cycle-gadget"></div>
+
+			<div class="req-border-3">
+				<div class="req-border-2">
+					<div class="req-border-1">
+
+						<div class="req-content nobottomborder">
+
+							<div class="hip-header">
+								<p class="req nomargin">HippoPlayer v3.45 (10.1.2000)<br>Programmed by K-P Koljonen</p>
+							</div>
+
+							<div class="req-button-container">
+								<button class="hip-button hip-prev-song"></button>
+								<button class="hip-button hip-startof-song"></button>
+								<button class="hip-button hip-rewind-song"></button>
+								<button class="hip-button hip-play-song"></button>
+								<button class="hip-button hip-forward-song"></button>
+								<button class="hip-button hip-endof-song"></button>
+								<button class="hip-button hip-next-song"></button>
+								<button class="hip-button hip-pause-song"></button>
+								<button class="hip-button hip-eject-song"></button>
+								<button class="hip-button hip-info-song"></button>
+							</div>
+
+							<div class="req-button-container">
+								<div class="range-border"><input type="range" orient="horizontal" /></div>
+								<button class="hip-3-button" value="New">New</button>
+								<button class="hip-3-button" value="New">Add</button>
+								<button class="hip-3-button" value="New">Del</button>
+								<button class="hip-3-button" value="New">Prg</button>
+								<button class="hip-1-button" value="New">M</button>
+								<button class="hip-1-button" value="New">S</button>
+								<button class="hip-2-button" value="New">Pr</button>
+							</div>
+
+							<div class="hip-playlist flipped nooverflow">
+								<ul>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+									<li></li>
+								</ul>
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<!-- HIPPOPLAYER -->
+
+		<div class="req-container hippo hip-dialogue-width"> <!-- original width: 264px -->
+			<div class="req-title-padding">00:00</div>
+			<div class="req-close-button"></div>
+			<div class="req-size-gadget"></div>
+			<div class="req-cycle-gadget"></div>
+
+			<div class="req-border-3">
+				<div class="req-border-2">
+					<div class="req-border-1">
+						<div class="req-content nobottomborder">
+							<div class="hip-header">
+								<p class="req nomargin">HippoPlayer v3.45 (10.1.2000)<br>Programmed by K-P Koljonen</p>
+							</div>
+							<div class="req-button-container">
+								<button class="hip-button hip-prev-song"></button>
+								<button class="hip-button hip-startof-song"></button>
+								<button class="hip-button hip-rewind-song"></button>
+								<button class="hip-button hip-play-song"></button>
+								<button class="hip-button hip-forward-song"></button>
+								<button class="hip-button hip-endof-song"></button>
+								<button class="hip-button hip-next-song"></button>
+								<button class="hip-button hip-pause-song"></button>
+								<button class="hip-button hip-eject-song"></button>
+								<button class="hip-button hip-info-song"></button>
+							</div>
+
+							<div class="req-button-container">
+								<div class="range-border"><input type="range" orient="horizontal" /></div>
+								<button class="hip-3-button" value="New">New</button>
+								<button class="hip-3-button" value="New">Add</button>
+								<button class="hip-3-button" value="New">Del</button>
+								<button class="hip-3-button" value="New">Prg</button>
+								<button class="hip-1-button" value="New">M</button>
+								<button class="hip-1-button" value="New">S</button>
+								<button class="hip-2-button" value="New">Pr</button>
+							</div>
+
+							<div class="hip-scrollbar-border mobileHide"></div>
+							<div class="hip-scrollbar-border-offset mobileHide"></div>
+							<div class="hip-scrollbar-divider mobileHide"></div>
+
+							<div class="hip-playlist nobg" dir="rtl">
+
+								<ul>
+									<li><a href="#">mod.ASS!_FUCK!_HOE!_TITS!</a></li>
+									<li><a href="#">mod.bring it down</a></li>
+									<li><a href="#">mod.disko divas</a></li>
+									<li><a href="#">mod.flower flavor</a></li>
+									<li><a href="#">mod.goes with da bong</a></li>
+									<li><a href="#">mod.rough cutz</a></li>
+									<li><a href="#">mod.The Dreamer</a></li>
+									<li><a href="#">mod.To Be In Love REMiX</a></li>
+									<li><a href="#">mod.UnderneathOurHome</a></li>
+									<li><a href="#">mod.upperz delight</a></li>
+									<li><a href="#">mod.welcome</a></li>
+									<li><a href="#">mod.Super_Subway_1986</a></li>
+									<li><a href="#">dbm.Live_Axxion</a></li>
+									<li><a href="#">THX.crystal_cracktro</a></li>
+									<li><a href="#">THX.Summerluvin'[+++]</a></li>
+									<li><a href="#">Steal_Da_Wheelz_Riddim.xm</a></li>
+									<li><a href="#">mod.Monotone Bitch</a></li>
+									<li><a href="#">mod.Optimistique</a></li>
+									<li><a href="#">mod.static_amiga_megamix</a></li>
+									<li><a href="#">mod.Introe81.mod</a></li>
+									<li><a href="#">mod.8909</a></li>
+									<li><a href="#">mod.Ass Up!</a></li>
+									<li><a href="#">mod.ASS!_FUCK!_HOE!_TITS!</a></li>
+									<li><a href="#">mod.bring it down</a></li>
+									<li><a href="#">mod.disko divas</a></li>
+									<li><a href="#">mod.flower flavor</a></li>
+									<li><a href="#">mod.goes with da bong</a></li>
+								</ul>
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<!-- HIPPOINFO -->
+
+		<div class="req-container hippo hippoinfo-dialogue-width"> <!-- original width: 384px -->
+			<div class="req-title-padding"><span>HippoInfo<span></div>
+				<div class="req-close-button"></div>
+				<div class="req-cycle-gadget"></div>
+
+				<div class="req-border-3">
+					<div class="req-border-2">
+						<div class="req-border-1">
+							<div class="req-content nobottomborder">
+
+								<div class="hip-scrollbar-border infowindow-offset-1 mobileHide"></div>
+								<div class="hip-scrollbar-border-offset infowindow-offset-2 mobileHide"></div>
+								<div class="hip-scrollbar-divider infowindow-offset-3 mobileHide"></div>
+
+								<div class="hip-playlist nobg" dir="rtl" style="margin-top: 0px;">
+									<ul>
+										<li>Name: Youafrica-Dia</li>
+										<li>Type: Protracker</li>
+										<li>Size: 197674<span>($0012AB00-$0015AF2A)</span></li>
+										<li>Comment: Rene Bidstrup | Megademo 2 |</li>
+										<li>------------------------------------------</li>
+										<li>01 ST-26:goes with da bong<span>15730</span></li>
+										<li>02 ST-21:rough cutz<span>12245</span></li>
+										<li>03 ST-24:mod.The Dreamer<span>334</span></li>
+										<li>04 ST-21:mod.To Be In Love REMiX<span>3344</span></li>
+										<li>05 ST-26:mod.UnderneathOurHome<span>3434</span></li>
+										<li>06 ST-12:mod.upperz delight<span>89898</span></li>
+										<li>07 ST-26:mod.welcome<span>242</span></li>
+										<li>08 ST-21:mod.Super_Subway_1986<span>234422</span></li>
+										<li>09 ST-13:dbm.Live_Axxion<span>2344</span></li>
+										<li>10 ST-27:THX.crystal_cracktro<span>2342</span></li>
+										<li>11 ST-17:THX.Summerluvin'[+++]<span>11334</span></li>
+										<li>12 ST-23:Steal_Da_Wheelz_Riddim.xm<span>243</span></li>
+										<li>13 ST-23:mod.Monotone Bitch<span>74777</span></li>
+										<li>14 ST-21:mod.Optimistique<span>9984</span></li>
+										<li>15 ST-27:mod.static_amiga_megamix<span>244</span></li>
+										<li>16 ST-10:mod.Introe81.mod<span>2323</span></li>
+										<li>17 ST-27:mod.8909<span>26622</span></li>
+										<li>18 ST-21:mod.Ass Up!<span>8744</span></li>
+										<li>19 ST-17:mod.ASS!_FUCK!_HOE!_TITS!<span>2244</span></li>
+										<li>20 ST-03:mod.bring it down<span>88842</span></li>
+										<li>21 ST-27:21 mod.disko divas<span>22244</span></li>
+										<li>22 <span>0</span></li>
+										<li>23 <span>0</span></li>
+										<li>24 <span>0</span></li>
+										<li>25 <span>0</span></li>
+										<li>26 <span>0</span></li>
+										<li>27 <span>0</span></li>
+										<li>28 <span>0</span></li>
+										<li>29 <span>0</span></li>
+										<li>30 <span>0</span></li>
+										<li>31 <span>0</span></li>
+									</ul>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
 
 
 
-<?php include "footer.php";
+		<?php include "footer.php";
 
 
