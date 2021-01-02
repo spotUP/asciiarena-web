@@ -23,6 +23,7 @@ Thumbs.db
 nbproject
 *.sublime-project
 *.sublime-workspace
+@eaDir
 
 # Komodo
 *.komodoproject
@@ -35,3 +36,5 @@ nbproject
 .idea
 node_modules
 collections
+collys_bad_filenames
+up-rough-amp
