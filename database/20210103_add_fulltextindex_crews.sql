@@ -1,0 +1,1 @@
+ALTER TABLE crews ADD FULLTEXT ftx_crews (`name`, `acronym`);
