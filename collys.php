@@ -94,7 +94,7 @@
 					?>
 
 					<a href="info_release.php?filename=<?=$encoded_filename?>"><img class="centered"
-					                                                                src="/collections/<?=$dirname?>/<?=$file_id?>"></a>
+					                                                                src="/collections/<?=$dirname?>/<?=$file_id?>" alt=""></a>
 
 					<span class="pink"><?=$upload_signature?></span>
 
@@ -185,7 +185,6 @@
 						</tbody>
 					</table>
 			</div>
-			</div>
 		<?php } else {
 			$todaysday = date("D");
 			$todaystime = date("d-m-y");
@@ -199,7 +198,7 @@
 				<br><br>
 			</div>
 			<?php
-			$ask = "SELECT collys.*, author_of.nick, crew_of.crew FROM collys LEFT JOIN author_of ON collys.filename = author_of.filename LEFT JOIN crew_of ON collys.filename = crew_of.filename GROUP BY collys.filename ORDER BY :criteria DESC $limit";
+			$ask = "SELECT collys.*, author_of.nick, crew_of.crew FROM collys LEFT JOIN author_of ON collys.id = author_of.colly_id LEFT JOIN crew_of ON collys.id = crew_of.colly_id GROUP BY collys.filename ORDER BY :criteria DESC {$limit}";
 			foreach (fetchAll($ask, [":criteria" => $sort_criteria]) as $row) {
 				$author = $row->author;
 				$filename = $row->filename;
