@@ -164,6 +164,7 @@ h1, h2, h3,
   padding: 0px;
   color: #ffffff;
   text-align: center;
+  animation: textglowwhite 2s infinite;
 }
 
 h3, .h3 {
@@ -202,6 +203,14 @@ h5, .h5 {
   text-indent: 0px;
   padding: 0px 0px;
 }
+
+
+a
+{   
+  color: #eeee44;
+  animation: textglowyellow 2s infinite;
+}
+
 
 .lead {
   font-size: 16px;
@@ -442,7 +451,6 @@ small,
 
 html {
 	font-family: 'TopazPlus_a1200';
-  /*  font-family: sans-serif; */
   line-height: 16px;
   line-height-step: 16px;
   color: #fff;
@@ -711,107 +719,204 @@ option {
 span.black
 {   
   color: #000000;
-  text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.10), 1px 1px 20px #000 !important;
+  animation: textglowblack 2s infinite;
+}
+
+
+@keyframes textglowblack {
+  0% {text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.40)}
+  50% {text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.60)} 
+  100% {text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.40)}
 }
 
 span.blue
 {   
   color: rgb(0, 0, 170);
-  text-shadow: 1px 1px 10px rgba(0, 0, 170, 0.80), 1px 1px 20px #000 !important;
+  animation: textglowblue 2s infinite;
+}
+
+@keyframes textglowblue {
+  0% {text-shadow: 1px 1px 10px rgba(0, 0, 170, 0.40)}
+  50% {text-shadow: 1px 1px 10px rgba(0, 0, 170, 0.60)} 
+  100% {text-shadow: 1px 1px 10px rgba(0, 0, 170, 0.40)}
 }
 
 span.green
 {    
   color: rgb(0, 170, 0);
-  text-shadow: 1px 1px 10px rgba(0, 170, 0, 0.80), 1px 1px 20px #000 !important;
+  animation: textglowgreen 2s infinite;
+}
+
+@keyframes textglowgreen {
+  0% {text-shadow: 1px 1px 10px rgba(0, 170, 0, 0.40)}
+  50% {text-shadow: 1px 1px 10px rgba(0, 170, 0, 0.60)} 
+  100% {text-shadow: 1px 1px 10px rgba(0, 170, 0, 0.40)}
 }
 
 span.cyan
 {   
   color: rgb(0, 187, 187) !important;
-  text-shadow: 1px 1px 10px rgba(0, 187, 187, 0.50), 1px 1px 20px #000 !important;
+  animation: textglowcyan 2s infinite;
+}
+
+@keyframes textglowcyan {
+  0% {text-shadow: 1px 1px 10px rgba(0, 187, 187, 0.40)}
+  50% {text-shadow: 1px 1px 10px rgba(0, 187, 187, 0.60)} 
+  100% {text-shadow: 1px 1px 10px rgba(0, 187, 187, 0.40)}
 }
 
 span.red
 {   
   color: #aa0000;
-  text-shadow: 1px 1px 10px rgba(170, 0, 0, 0.80), 1px 1px 20px #000 !important;
+  animation: textglowred 2s infinite;
+}
+
+@keyframes textglowred {
+  0% {text-shadow: 1px 1px 10px rgba(170, 0, 0, 0.40)}
+  50% {text-shadow: 1px 1px 10px rgba(170, 0, 0, 0.60)} 
+  100% {text-shadow: 1px 1px 10px rgba(170, 0, 0, 0.40)}
 }
 
 span.magenta
 {   
   color: #bb00bb;
-  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.80), 1px 1px 20px #000 !important;
+  animation: textglowmagenta 2s infinite;
+}
 
+@keyframes textglowmagenta {
+  0% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)}
+  50% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.60)} 
+  100% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)}
 }
 
 span.pink
 {   
   color: #bb00bb;
-  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.80), 1px 1px 20px #000 !important;
+  animation: textglowpink 2s infinite;
+}
+
+@keyframes textglowpink {
+  0% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)}
+  50% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.60)} 
+  100% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)}
 }
 
 span.brown
 {   
   color: #aa5500;
-  text-shadow: 1px 1px 10px rgba(170, 85, 0, 0.80), 1px 1px 20px #000 !important;
+  animation: textglowbrown 2s infinite;
+}
+
+@keyframes textglowbrown {
+  0% {text-shadow: 1px 1px 10px rgba(170, 85, 0, 0.40)}
+  50% {text-shadow: 1px 1px 10px rgba(170, 85, 0, 0.60)} 
+  100% {text-shadow: 1px 1px 10px rgba(170, 85, 0, 0.40)}
 }
 
 span.grey
 {   
   color: rgb(85, 85, 85);
-  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.80), 1px 1px 20px #000 !important;
+  animation: textglowgrey 2s infinite;
 }         
+
+@keyframes textglowgrey {
+  0% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)}
+  50% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.60)} 
+  100% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)}
+}
 
 span.lightgrey
 {   
   color: rgb(170, 170, 170);
-  text-shadow: 1px 1px 10px rgba(170, 170, 170, 0.30), 1px 1px 20px #000 !important;
+  animation: textglowlightgrey 2s infinite;
+}
 
+@keyframes textglowlightgrey {
+  0% {text-shadow: 1px 1px 10px rgba(170, 170, 170, 0.40)}
+  50% {text-shadow: 1px 1px 10px rgba(170, 170, 170, 0.60)} 
+  100% {text-shadow: 1px 1px 10px rgba(170, 170, 170, 0.40)}
 }
 
 span.white
 {   
   color: rgb(255, 255, 255);
-  text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.30), 1px 1px 20px #000 !important;
+  animation: textglowwhite 2s infinite;
+}
 
+@keyframes textglowwhite {
+  0% {text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.40)}
+  50% {text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.60)} 
+  100% {text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.40)}
 }
 
 span.lightcyan
 {   
   color: rgb(85, 255, 255); 
-  text-shadow: 1px 1px 10px rgba(85, 255, 255, 0.30), 1px 1px 20px #000 !important;
+  animation: textglowlightcyan 2s infinite;
+}
+
+@keyframes textglowlightcyan {
+  0% {text-shadow: 1px 1px 10px rgba(85, 255, 255, 0.40)}
+  50% {text-shadow: 1px 1px 10px rgba(85, 255, 255, 0.60)} 
+  100% {text-shadow: 1px 1px 10px rgba(85, 255, 255, 0.40)}
 }
 
 span.lightgreen
 {   
   color: rgb(85, 255, 85);
-  text-shadow: 1px 1px 10px rgba(85, 255, 85, 0.30), 1px 1px 20px #000 !important;
+  animation: textglowlightgreen 2s infinite;
 }
+
+@keyframes textglowlightgreen {
+  0% {text-shadow: 1px 1px 10px rgba(85, 255, 85, 0.40)}
+  50% {text-shadow: 1px 1px 10px rgba(85, 255, 85, 0.60)} 
+  100% {text-shadow: 1px 1px 10px rgba(85, 255, 85, 0.40)}
+}
+
 
 span.lightpink
 {   
   color: rgb(255, 85, 255); 
-  text-shadow: 1px 1px 10px rgba(255, 85, 255, 0.30), 1px 1px 20px #000 !important;
+  animation: textglowlightpink 2s infinite;
+}
+
+@keyframes textglowlightpink {
+  0% {text-shadow: 1px 1px 10px rgba(255, 85, 255, 0.40)}
+  50% {text-shadow: 1px 1px 10px rgba(255, 85, 255, 0.60)} 
+  100% {text-shadow: 1px 1px 10px rgba(255, 85, 255, 0.40)}
 }
 
 span.lightblue
 {   
   color: rgb(85, 85, 255); 
-  text-shadow: 1px 1px 10px rgba(85, 85, 255, 0.30), 1px 1px 20px #000 !important;
+  animation: textglowlightblue 2s infinite;
+}
 
+@keyframes textglowlightblue {
+  0% {text-shadow: 1px 1px 10px rgba(85, 85, 255, 0.40)}
+  50% {text-shadow: 1px 1px 10px rgba(85, 85, 255, 0.60)} 
+  100% {text-shadow: 1px 1px 10px rgba(85, 85, 255, 0.40)}
 }
 
 span.lightred
 {   
   color: rgb(255, 85, 85); 
-  text-shadow: 1px 1px 10px rgba(255, 85, 85, 0.30), 1px 1px 20px #000 !important;
-
+  animation: textglowlightred 2s infinite;
 }
 
-a{
-  /*  text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.30), 1px 1px 20px #000 !important; */
+@keyframes textglowlightred {
+  0% {text-shadow: 1px 1px 10px rgba(255, 85, 85, 0.40)}
+  50% {text-shadow: 1px 1px 10px rgba(255, 85, 85, 0.60)} 
+  100% {text-shadow: 1px 1px 10px rgba(255, 85, 85, 0.40)}
 }
+
+@keyframes textglowyellow {
+  0% {text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.40)}
+  50% {text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.60)} 
+  100% {text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.40)}
+}
+
+
 a.nav-link:hover{
   color: #aaa !important;
 }
@@ -854,7 +959,6 @@ a:hover, a.ascii:hover{
 span.yellow
 {   
   color: #eeee44;
-  text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.30), 1px 1px 20px #000 !important;
 }
 
 .bg-primary {
@@ -1032,6 +1136,15 @@ pointer-events: none;
 }
 
 .scanlines {
+  background: url(/assets/data/crtoverlay_test2.png);
+  width: 100%;
+  height: 100%;
+  background-repeat: repeat;
+  position: fixed;
+  z-index: 999999;
+  pointer-events: none;
+}
+.scanlines_old {
   top: -50%;
   left: -50%;
   right: -50%;
@@ -1429,12 +1542,12 @@ input[type=text]{
 }
 
 @media (orientation:landscape) {
-    .hide-on-landscape {
-        display: none;
-    }
+  .hide-on-landscape {
+    display: none;
+  }
 }
 @media (orientation:portrait) {
-    .hide-on-portrait {
-        display: none;
-    }
+  .hide-on-portrait {
+    display: none;
+  }
 }
