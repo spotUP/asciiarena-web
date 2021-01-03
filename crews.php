@@ -1,195 +1,86 @@
-<? require_once ('dbconnect_asciiarena.php'); ?>
+<?php
+	require_once "session.php";
+	$h1 = "CREWS";
+	require_once "header.php";
+	require_once "pagination.php";
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "https://www.w3.org/TR/html4/loose.dtd">
-<html>
-	<head>
-		<title>ASCIIARENA brought to you by UP ROUGH SOUNDSYSTEM</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
-		<link rel='stylesheet' href='style.css' type='text/css'>
-		<meta name="viewport" content="width=device-width">
-	</head>
-	<body>
-		<div class="maincontainer">
-			<div class="header"><?include ('header.php');?></div>
-			<div class="leftsidebar"><?include ('sidebar.php');?></div>
-			<div class="maincontent">
-			<div class='wrap'>
-			<div class='headline'>
-				Crews
-			</div>
-			<?php
+	$sort_by = $_GET[ 'sort_by' ] ?? "";
+	switch ($sort_by) {
+		case "members":
+		case "releases":
+			$sort_criteria = $sort_by;
+			break;
+		default:
+			$sort_criteria = "name";
+			$sort_by = "name";
+			break;
+	}
 
-//-----------------------------------------------------------------------------
-// PAGINATION DB QUERY
-//-----------------------------------------------------------------------------
+	$pageno = $_GET[ 'pageno' ] ?? 1;
+	$rows_per_page = 138;
+	$pagination = pagination("crews", $pageno, $rows_per_page, "&sort_by={$sort_by}");
+	if (!isset($_POST[ "search" ])) {
+		echo $pagination[ "pager" ];
+	}
+?>
+	<div class="collys_search">
+		<form action="?sort_by=<?=$sort_by?>" method="post">
+			<label>Search for: <input type="text" name="search"></label>
+		</form>
+	</div>
+<?php
 
-			if (isset($_GET['pageno']))
-			{
-			   $pageno = $_GET['pageno'];
-			} 
-			else 
-			{
-			   $pageno = 1;
-			}
+	//-----------------------------------------------------------------------------
+	// SHOW ARTISTS
+	//-----------------------------------------------------------------------------
 
-			$query= "SELECT COUNT(name) from crews ORDER BY name ASC";
-			$result = mysql_query($query, $dbh) or trigger_error("SQL", E_USER_ERROR);
-			$query_data = mysql_fetch_row($result);
-			$numrows = $query_data[0];
-
-			$rows_per_page = 150;
-			$lastpage      = ceil($numrows/$rows_per_page);
-
-			$pageno = (int)$pageno;
-			if ($pageno > $lastpage)
-			{
-			   $pageno = $lastpage;
-			}
-			if ($pageno < 1)
-			{
-			   $pageno = 1;
-			}
-
-			$limit = 'LIMIT ' .($pageno - 1) * $rows_per_page .',' .$rows_per_page;
-		    $ask="SELECT name from crews ORDER BY name ASC $limit";
-			$result = mysql_query($query, $dbh) or trigger_error("SQL", E_USER_ERROR);
-			// end pagination DB query
-
-//-----------------------------------------------------------------------------
-// PAGINATION NAV BAR
-//-----------------------------------------------------------------------------
-			?>
-		 	<div class='pagination'>
-			<?
-			if ($pageno == 1) 			
-			{                   		
-			}
-			else
-			{	
-				echo "<a href='{$_SERVER['PHP_SELF']}?pageno=1'>FIRST</a> ";
-				$prevpage = $pageno-1;
-				echo " <a href='{$_SERVER['PHP_SELF']}?pageno=$prevpage'>PREV</a> ";
-			}
-			echo " ( Page $pageno of $lastpage ) "; 	
-			if ($pageno == $lastpage) 					
-			{
-			}
-			else
-			{
-				$nextpage = $pageno+1;
-				echo " <a href='{$_SERVER['PHP_SELF']}?pageno=$nextpage'>NEXT</a> ";
-				echo " <a href='{$_SERVER['PHP_SELF']}?pageno=$lastpage'>LAST</a>";	
-			}
-			?>
-			</div>
-
-			<div class="collys_search">
-				<form enctype="multipart/form-data" action="crews.php" method="post">
-					Search for: <input type="text" name="search">
-				</form>	
-			</div>	
-			<?
-
-//-----------------------------------------------------------
-// SHOW CREWS
-//-----------------------------------------------------------
-		?>
-
-			<div class="content"></div>
-
-			<div style=" float: left ; width: 350px; padding-left: 4px; padding-bottom: 2px; padding-top: 2px;">
-				<yellow>CREW</yellow>
-			</div>
-
-			<div class="artist">
-				<yellow>MEMBERS</yellow>
-			</div>
-
-			<div style=" float: left ; width: 200px; padding-left: 4px; padding-bottom: 2px; padding-top: 2px;">
-				<yellow>RELEASES</yellow>
-			</div>
-			
-				<?php
-				if (!isset($_POST['search'])) 
-				{
-					$ask="SELECT name,acronym FROM crews ORDER BY name $limit";
-				}
-				if (isset($_POST['search'])) 
-				{		
-					$searchquery=$_POST['search'];
-					$searchquery=str_replace(" ",",",$searchquery);
-					$ask="SELECT name,acronym from crews where match(name) against ('$searchquery' in boolean mode) ORDER BY name $limit";
-				}
-				$result=mysql_query($ask,$dbh);
-				while ($row=mysql_fetch_array($result))
-				{
-					$crew=$row[0];
-					$encoded_crew=base64_encode($crew);
-					$acronym=$row[1];
-
-					$ask_members="SELECT COUNT(nick) FROM member_of where crew='$crew'";
-					$result_members=mysql_query($ask_members,$dbh);
-					while ($row_members=mysql_fetch_array($result_members))
-					$members=$row_members[0];					
-
-					$ask_rels="SELECT COUNT(filename) FROM crew_of where crew='$crew'";
-					$result_rels=mysql_query($ask_rels,$dbh);
-					while ($row_rels=mysql_fetch_array($result_rels))
-					$releases=$row_rels[0];				
-
-					?>
-					<div style=" float: left ; width: 350px; padding-left: 4px; padding-bottom: 2px; padding-top: 2px;">
-					<?
-					echo "<a href=\"info_crew.php?crew=$encoded_crew&sort_by=a.filename\">$crew</a>";
-					if (!empty($acronym))
-						echo " ($acronym)";
-					?></div>
-
-					<div class="artist"><?
-					echo "$members";
-					?></div>
-
-					<div style=" float: left ; width: 200px; padding-left: 4px; padding-bottom: 2px; padding-top: 2px;">
-					<?
-					echo "$releases"; ?>
-					</div> <?
-				}
-				
-//-----------------------------------------------------------------------------
-// PAGINATION NAV BAR
-//-----------------------------------------------------------------------------
-			?>
-		 	<div class='pagination'>
-			<?
-			if ($pageno == 1) 			
-			{                   		
-			}
-			else
-			{	
-				echo "<a href='{$_SERVER['PHP_SELF']}?pageno=1'>FIRST</a> ";
-				$prevpage = $pageno-1;
-				echo " <a href='{$_SERVER['PHP_SELF']}?pageno=$prevpage'>PREV</a> ";
-			}
-			echo " ( Page $pageno of $lastpage ) "; 	
-			if ($pageno == $lastpage) 					
-			{
-			}
-			else
-			{
-				$nextpage = $pageno+1;
-				echo " <a href='{$_SERVER['PHP_SELF']}?pageno=$nextpage'>NEXT</a> ";
-				echo " <a href='{$_SERVER['PHP_SELF']}?pageno=$lastpage'>LAST</a>";	
-			}
-			?>
-			</div>
-
-			<div class="collys_search">
-				<form enctype="multipart/form-data" action="crews.php" method="post">
-					Search for: <input type="text" name="search">
-				</form>	
-			</div>	
-			</div>
-			</div>
+?>
+	<div class="content_slim_divider"></div>
+	<div class="row">
+		<div class="artist_crew col-4">
+			<a href="crews.php?sort_by=name">CREW</a>
 		</div>
-	</body>
-</html>
+		<div class="artist_crew col-4">
+			<a href="crews.php?sort_by=members">MEMBERS</a>
+		</div>
+		<div class="artist_crew col-4">
+			<a href="crews.php?sort_by=releases">RELEASES</a>
+		</div>
+	</div>
+<?php
+	if (!isset($_POST[ 'search' ])) {
+		$q = "SELECT crews.*, COUNT(member_of.nick) AS members FROM crews LEFT JOIN member_of ON crews.name = member_of.crew GROUP BY crews.name ORDER BY {$sort_by} ASC {$pagination["limit"]}";
+		$p = [];
+	} else {
+		$searchquery = $_POST[ 'search' ];
+		$q = "SELECT crews.*, COUNT(member_of.nick) AS members FROM crews LEFT JOIN member_of ON crews.name = member_of.crew WHERE MATCH(crews.name, crews.acronym) AGAINST (:searchquery IN BOOLEAN MODE) GROUP BY crews.name ORDER BY {$sort_by} ASC {$pagination["limit"]}";
+		$p = [":searchquery" => $searchquery];
+	}
+	$crews = [];
+	foreach (fetchAll($q, $p) as $row) {
+		if (!array_key_exists($row->acronym, $crews)) {
+			$crews[$row->acronym] = $row;
+		}
+	}
+	foreach ($crews as $acronym => $crew) {
+		$encoded_crew = base64_encode($crew->name);
+		?>
+		<div class="row">
+			<div class="forum_nick col-4">
+				<a href="info_crew.php?crew=<?=$encoded_crew?>"><?=$crew->name;?><?=($acronym) ? " (" . $acronym .")" : '' ?></a>
+			</div>
+			<div class="artist_crew col-4"><?=(int)$crew->members?></div>
+			<div class="artist_crew col-4">N/A</div>
+		</div>
+		<?php
+	}
+	if (!isset($_POST[ "search" ])) {
+		echo $pagination[ "pager" ];
+	}
+?>
+	<div class="collys_search">
+		<form action="?sort_by=<?=$sort_by?>" method="post">
+			<label>Search for: <input type="text" name="search"></label>
+		</form>
+	</div>
+<?php include "footer.php";
