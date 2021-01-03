@@ -208,7 +208,7 @@ h5, .h5 {
 a
 {   
   color: #eeee44;
-  animation: textglowyellow 2s infinite;
+  text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.40)
 }
 
 
@@ -719,203 +719,106 @@ option {
 span.black
 {   
   color: #000000;
-  animation: textglowblack 2s infinite;
+  text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.40)
 }
 
-
-@keyframes textglowblack {
-  0% {text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.40)}
-}
 
 span.blue
 {   
   color: rgb(0, 0, 170);
-  animation: textglowblue 2s infinite;
-}
-
-@keyframes textglowblue {
-  0% {text-shadow: 1px 1px 10px rgba(0, 0, 170, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(0, 0, 170, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(0, 0, 170, 0.40)}
+  text-shadow: 1px 1px 10px rgba(0, 0, 170, 0.40)
 }
 
 span.green
 {    
   color: rgb(0, 170, 0);
-  animation: textglowgreen 2s infinite;
+  text-shadow: 1px 1px 10px rgba(0, 170, 0, 0.40)
 }
 
-@keyframes textglowgreen {
-  0% {text-shadow: 1px 1px 10px rgba(0, 170, 0, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(0, 170, 0, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(0, 170, 0, 0.40)}
-}
+
 
 span.cyan
 {   
   color: rgb(0, 187, 187) !important;
-  animation: textglowcyan 2s infinite;
-}
-
-@keyframes textglowcyan {
-  0% {text-shadow: 1px 1px 10px rgba(0, 187, 187, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(0, 187, 187, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(0, 187, 187, 0.40)}
+  text-shadow: 1px 1px 10px rgba(0, 187, 187, 0.40)
 }
 
 span.red
 {   
   color: #aa0000;
-  animation: textglowred 2s infinite;
-}
-
-@keyframes textglowred {
-  0% {text-shadow: 1px 1px 10px rgba(170, 0, 0, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(170, 0, 0, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(170, 0, 0, 0.40)}
+  text-shadow: 1px 1px 10px rgba(170, 0, 0, 0.40)
 }
 
 span.magenta
 {   
   color: #bb00bb;
-  animation: textglowmagenta 2s infinite;
-}
-
-@keyframes textglowmagenta {
-  0% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)}
+  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)
 }
 
 span.pink
 {   
   color: #bb00bb;
-  animation: textglowpink 2s infinite;
-}
-
-@keyframes textglowpink {
-  0% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)}
+  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)
 }
 
 span.brown
 {   
   color: #aa5500;
-  animation: textglowbrown 2s infinite;
+  text-shadow: 1px 1px 10px rgba(170, 85, 0, 0.40)
 }
 
-@keyframes textglowbrown {
-  0% {text-shadow: 1px 1px 10px rgba(170, 85, 0, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(170, 85, 0, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(170, 85, 0, 0.40)}
-}
 
 span.grey
 {   
   color: rgb(85, 85, 85);
-  animation: textglowgrey 2s infinite;
+  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)
 }         
 
-@keyframes textglowgrey {
-  0% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)}
-}
 
 span.lightgrey
 {   
   color: rgb(170, 170, 170);
-  animation: textglowlightgrey 2s infinite;
+  text-shadow: 1px 1px 10px rgba(170, 170, 170, 0.40)
 }
 
-@keyframes textglowlightgrey {
-  0% {text-shadow: 1px 1px 10px rgba(170, 170, 170, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(170, 170, 170, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(170, 170, 170, 0.40)}
-}
 
 span.white
 {   
   color: rgb(255, 255, 255);
-  animation: textglowwhite 2s infinite;
-}
-
-@keyframes textglowwhite {
-  0% {text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.40)}
+  text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.40)
 }
 
 span.lightcyan
 {   
   color: rgb(85, 255, 255); 
-  animation: textglowlightcyan 2s infinite;
-}
-
-@keyframes textglowlightcyan {
-  0% {text-shadow: 1px 1px 10px rgba(85, 255, 255, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(85, 255, 255, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(85, 255, 255, 0.40)}
+  text-shadow: 1px 1px 10px rgba(85, 255, 255, 0.40)
 }
 
 span.lightgreen
 {   
   color: rgb(85, 255, 85);
-  animation: textglowlightgreen 2s infinite;
-}
-
-@keyframes textglowlightgreen {
-  0% {text-shadow: 1px 1px 10px rgba(85, 255, 85, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(85, 255, 85, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(85, 255, 85, 0.40)}
+  text-shadow: 1px 1px 10px rgba(85, 255, 85, 0.40)
 }
 
 
 span.lightpink
 {   
   color: rgb(255, 85, 255); 
-  animation: textglowlightpink 2s infinite;
-}
-
-@keyframes textglowlightpink {
-  0% {text-shadow: 1px 1px 10px rgba(255, 85, 255, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(255, 85, 255, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(255, 85, 255, 0.40)}
+  text-shadow: 1px 1px 10px rgba(255, 85, 255, 0.40)
 }
 
 span.lightblue
 {   
   color: rgb(85, 85, 255); 
-  animation: textglowlightblue 2s infinite;
+  text-shadow: 1px 1px 10px rgba(85, 85, 255, 0.40)
 }
 
-@keyframes textglowlightblue {
-  0% {text-shadow: 1px 1px 10px rgba(85, 85, 255, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(85, 85, 255, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(85, 85, 255, 0.40)}
-}
 
 span.lightred
 {   
   color: rgb(255, 85, 85); 
-  animation: textglowlightred 2s infinite;
+  text-shadow: 1px 1px 10px rgba(255, 85, 85, 0.40)
 }
-
-@keyframes textglowlightred {
-  0% {text-shadow: 1px 1px 10px rgba(255, 85, 85, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(255, 85, 85, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(255, 85, 85, 0.40)}
-}
-
-@keyframes textglowyellow {
-  0% {text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.40)}
-}
-
 
 a.nav-link:hover{
   color: #aaa !important;
@@ -959,6 +862,7 @@ a:hover, a.ascii:hover{
 span.yellow
 {   
   color: #eeee44;
+  text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.40)
 }
 
 .bg-primary {
