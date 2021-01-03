@@ -25,7 +25,7 @@
 ?>
 	<div class="collys_search">
 		<form action="?sort_by=<?=$sort_by?>" method="post">
-			<label>Search for: <input type="text" name="search"></label>
+			<label>Search for: <input type="text" name="search" value="<?=(isset($_POST['search'])) ? $_POST['search'] : '' ?>"></label>
 		</form>
 	</div>
 <?php
@@ -80,7 +80,7 @@
 ?>
 	<div class="collys_search">
 		<form action="?sort_by=<?=$sort_by?>" method="post">
-			<label>Search for: <input type="text" name="search"></label>
+			<label>Search for: <input type="text" name="search" value="<?=(isset($_POST['search'])) ? $_POST['search'] : '' ?>"></label>
 		</form>
 	</div>
 <?php include "footer.php";
