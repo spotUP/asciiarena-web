@@ -8,10 +8,10 @@
 	switch ($sort_by) {
 		case "members":
 		case "releases":
-			$sort_criteria = $sort_by;
+		  $sort_order = "DESC";
 			break;
 		default:
-			$sort_criteria = "name";
+			$sort_order = "ASC";
 			$sort_by = "name";
 			break;
 	}
@@ -49,11 +49,11 @@
 	</div>
 <?php
 	if (!isset($_POST[ 'search' ])) {
-		$q = "SELECT crews.*, COUNT(member_of.nick) AS members FROM crews LEFT JOIN member_of ON crews.name = member_of.crew GROUP BY crews.name ORDER BY {$sort_by} ASC {$pagination["limit"]}";
+		$q = "SELECT crews.*, COUNT(member_of.nick) AS members FROM crews LEFT JOIN member_of ON crews.name = member_of.crew GROUP BY crews.name ORDER BY {$sort_by} {$sort_order} {$pagination["limit"]}";
 		$p = [];
 	} else {
 		$searchquery = $_POST[ 'search' ];
-		$q = "SELECT crews.*, COUNT(member_of.nick) AS members FROM crews LEFT JOIN member_of ON crews.name = member_of.crew WHERE MATCH(crews.name, crews.acronym) AGAINST (:searchquery IN BOOLEAN MODE) GROUP BY crews.name ORDER BY {$sort_by} ASC {$pagination["limit"]}";
+		$q = "SELECT crews.*, COUNT(member_of.nick) AS members FROM crews LEFT JOIN member_of ON crews.name = member_of.crew WHERE MATCH(crews.name, crews.acronym) AGAINST (:searchquery IN BOOLEAN MODE) GROUP BY crews.name ORDER BY {$sort_by} {$sort_order} {$pagination["limit"]}";
 		$p = [":searchquery" => $searchquery];
 	}
 	$crews = [];
