@@ -156,7 +156,7 @@ EOD;
 		</div>
 	</div>
 </div>
-<div class="container" style="padding-top: 40px;">
+<div class="container-fluid" style="padding-top: 40px;">
 	<div class="row" style="padding-top: 16px;">
 		<div class="col-12 d-flex justify-content-between">
 			<pre><span class="magenta overflow-hidden"><?=$stars1?></span></pre>
