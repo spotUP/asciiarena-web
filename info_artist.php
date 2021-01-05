@@ -1,45 +1,32 @@
-<? require_once ('dbconnect_asciiarena.php'); ?>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "https://www.w3.org/TR/html4/loose.dtd">
-<html>
-
-<head>
-	<title>ASCIIARENA brought to you by UP ROUGH SOUNDSYSTEM</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
-	<link rel='stylesheet' href='style.css' type='text/css'>
-	<meta name="viewport" content="width=device-width">
-</head>
-<body>
-	<div class="maincontainer">
-		<div class="header"><?php include ('header.php'); ?></div>
-		<div class="leftsidebar"><?php include ('sidebar.php'); ?></div>
-		<div class="maincontent">
-		<div class="wrap">
-		<?php
-
+<?php
+    require_once "session.php";
+    $h1 = "aRTIST iNFO";
+    include "header.php";
 //-----------------------------------------------------------------------------
 // ARTIST INFO
 //-----------------------------------------------------------------------------
 
-		$showartist=mysql_real_escape_string($_GET['artist']); // (secure)
-		$showartist=base64_decode($showartist);
+        $validSorts = array(
+            'a.name' => 'Name',
+            'a.filename' => 'Filename',
+            'a.year, a.month' => 'Release Date',
+            'a.timestamp' => 'Upload Date',
+            'a.uploader' => 'Uploader'
+        );
 
-		$ask="select * from artists where nick='$showartist'";
-		$result=mysql_query($ask);
-		while ($row=mysql_fetch_array($result))
-		{
+		$showartist=base64_decode($_GET['artist']);
+
+		$q = "select * from artists where nick=:nick";
+		$p = [":nick" => $showartist];
+        foreach (fetchAll($q, $p) as $row) {
+		    $row = get_object_vars($row);
 			$show_artist=$row['nick'];
 			$show_www=$row['www'];
 			$show_status=$row['active'];
-			$show_crew=$row['crew'];
 			$show_country=$row['country'];
 			$show_rating=$row['rating'];	
 
 			?>
-			<div class="headline">
-				Artist Info				
-			</div>
-			<div class="content_with_blenk">&nbsp;</div>
 
 			<div style="background: #ff000; padding-left: 4px; width: 70px; float: left;">
 				Nick:
@@ -48,6 +35,7 @@
 			<div style="padding-left: 4px; width: 620px; float: left;">
 				<?=$show_artist?>
 			</div>
+            <div style="clear: both;"></div>
 
 			<div style="background: #ff000; padding-left: 4px; width: 70px; float: left;">
 				Crew(s):
@@ -55,11 +43,12 @@
 
 			<div style="padding-left: 4px; width: 620px; float: left;">
 			<?php
-		    $ask_crew="select * from member_of where nick='$show_artist'";
-		    $result_crew=mysql_query($ask_crew,$dbh);
-		    $artists = array();
-		    while ($row_crew=mysql_fetch_array($result_crew)) 
-			{
+		    $q = "select * from member_of where nick=:nick";
+            $p = [":nick" => $show_artist];
+            $artists = array();
+
+            foreach (fetchAll($q, $p) as $row_crew) {
+                $row_crew = get_object_vars($row_crew);
 		        if(!array_key_exists($row_crew['nick'], $artists))
 				{
 		            $artists[$row_crew['nick']] = array();
@@ -69,11 +58,9 @@
 		            $artists[$row_crew['nick']][] = $row_crew['crew'];
 		        }
 		    }
-		    foreach($artists as $artist=>$crews) 
-			{
+		    foreach($artists as $artist=>$crews) {
 		        $c = 0;
-		        foreach($crews as $crew) 
-				{
+		        foreach($crews as $crew) {
 					$encoded_crew=base64_encode($crew);
 		            if($c > 0) 
 					{
@@ -89,10 +76,13 @@
 		                echo '<a href="info_crew.php?crew='.$encoded_crew.'&sort_by=a.filename">'.$crew.'</a>';
 		            $c++;
 		        }
-				?>
-		        </div>
-				<?
-			}
+		    }
+            ?>
+            </div>
+            <div style="clear: both;"></div>
+
+            <?php
+
 			if (!empty($show_www))
 			{
 				?>
@@ -103,7 +93,9 @@
 				<div style="padding-left: 4px; width: 620px; float: left;">				
 					<?=$show_www?>
 				</div>
-				<?
+                <div style="clear: both;"></div>
+
+            <?php
 			}
 			if (!empty($show_country))
 			{
@@ -115,7 +107,9 @@
 				<div style="padding-left: 4px; width: 620px; float: left;">
 					<?=$show_country?>
 				</div>
-				<? 
+                <div style="clear: both;"></div>
+
+            <?php
 			}
 			?>
 			<div style="padding-left: 4px; width: 70px; float: left;">
@@ -125,29 +119,26 @@
 			<div style="padding-left: 4px; width: 620px; float: left;">
 				<?=$show_status?>
 			</div>
-			
+            <div style="clear: both;"></div>
+
 			<div style="padding-left: 4px; width: 70px; float: left;">
 				Rating:
 			</div>
 
 			<div style="padding-left: 4px; width: 620px; float: left;">
-			<?
-				$ask_artist_rating="SELECT rating FROM artists where nick='$showartist'";
-				$result_artist_rating=mysql_query($ask_artist_rating,$dbh);
-				while ($row_artist_rating=mysql_fetch_array($result_artist_rating))
-				{
-					$artistrating=$row_artist_rating[0];
-				}
+			<?php
+				$q = "SELECT rating FROM artists where nick=:nick";
+				$p = [":nick" => $showartist];
+                $result_artist_rating = fetchOne($q, $p);
+                $artistrating = $result_artist_rating->rating;
+
+                $q = "SELECT COUNT(rating) AS cnt from comments where artist=:nick";
+                $p = [":nick" => $showartist];
+                $result_again = fetchOne($q, $p);
+                $votecount = $result_again->cnt;
 
 				if(empty($show_rating))
 				{
-					$askagain="SELECT COUNT(rating) from comments where artist='$showartist'";
-					$resultagain=mysql_query($askagain,$dbh);
-					while ($rowagain=mysql_fetch_array($resultagain))
-					{
-						$votecount=$rowagain[0];
-					}
-
 					$votesleft=(3-$votecount);
 					if ($votesleft==1)
 					{
@@ -160,102 +151,111 @@
 				}
 				else
 				{
-					$askagain="SELECT COUNT(rating) from comments where artist='$showartist'";
-					$resultagain=mysql_query($askagain,$dbh);
-					while ($rowagain=mysql_fetch_array($resultagain))
-					{
-						$votecount=$rowagain[0];
-					}
 					echo "$artistrating ($votecount votes)";
 				}
-				?>
-				</div>
-				<?
+            ?>
+            </div>
+            <div style="clear: both;"></div>
+
+            <?php
 		}
 
 //-----------------------------------------------------------------------------
 // LATEST FILE_ID
 //-----------------------------------------------------------------------------
+$q = "SELECT a.*, b.nick AS author, c.crew FROM collys AS a " .
+     "  INNER JOIN author_of AS b ON a.filename = b.filename " .
+     "  INNER JOIN crew_of AS c ON a.filename = c.filename " .
+     "WHERE b.nick = :nick GROUP BY a.filename ORDER BY a.year DESC, a.month DESC, a.day DESC LIMIT 1";
+$p = [":nick" => $show_artist];
+foreach (fetchAll($q, $p) as $row) {
+    $row = get_object_vars($row);
 
-$ask="SELECT a.*, b.nick AS author, c.crew FROM collys AS a INNER JOIN author_of AS b ON a.filename = b.filename INNER JOIN crew_of AS c ON a.filename = c.filename WHERE b.nick = '$show_artist' GROUP BY a.filename ORDER BY a.year DESC, a.month DESC, a.day DESC LIMIT 1";
-$result=mysql_query($ask,$dbh);
-while ($row=mysql_fetch_array($result))
-{
 	$crew = $row['crew'];
 	$viewtimes = $row['view_counter'];
 	$year = $row['year'];
 	$filename = $row['filename'];
 	$encoded_filename = base64_encode($row['filename']);
-	$acronym = $row['acronym'];
-	$file_id = $row[9];
 	$dirname = explode(".", $filename);
 	$dirname = $dirname[0];
 	?>
 
 					<div class="maincontent">
-						<div class="headline">Latest Release</div>
-						<div class="content_with_blenk"><br></div>
 
-						<div class="release_file_id">
-							<a href="info_release.php?filename=<?=$encoded_filename?>"><img class="centered" border="0" src="collys/<?=$dirname?>/<?=$row[9]?>"></a>
-							<br>
-						</div>
+                        <div class="row">
+                            <div class="header col-lg-12">
+                                <h1>Latest Release</h1>
+                            </div>
+                        </div>
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-8" style="margin-left:0px; padding-left: 0px; margin-top: 16px;">
+                                    <span>
+                                        <pre><?php
+                                        if ($row['file_id'] == "file_id.diz.png") {
+                                            echo file_get_contents("collections/file_id.diz.txt");
+                                        } else {
+                                            if (file_exists(__DIR__ . "/collections/{$dirname}/{$row['filename']}.diz")) {
+                                                $content = file_get_contents(__DIR__ . "/collections/{$dirname}/{$row['filename']}.diz");
+                                                echo utf8_encode($content);
+                                            }
+                                        }
+                                        ?>
+                                        </pre>
+                                    </span>
+                                </div>
+                                <div class="col-4">
+                                    <div class="row d-flex justify-content-between" style="margin-top: 16px;">
+                                        <span>
+                                            Artist(s):
+                                        </span>
+                                        <span>
+                            <?php
+                                $authors = array();
+                                $q = "select * from author_of where filename=:filename";
+                                $p = [":filename" => $filename];
+                                foreach (fetchAll($q, $p) as $row_author) {
+                                    $row_author = get_object_vars($row_author);
+                                    $authors[]=$row_author['nick'];
+                                }
 
-						<div style="float: right; width: 266px;">
-						<div style="float: right; height: 16px; width: 265px;"></div>
-
-						<div class="release_div_left">
-							Artist(s):
-						</div>
-
-						<div class="release_div_right">
-						<?php
-							$authors = array();
-							$ask_author="select * from author_of where filename='$filename'";
-							$result_author=mysql_query($ask_author,$dbh);
-							while ($row_author=mysql_fetch_array($result_author)) 
-							{
-								$authors[]=$row_author[0];
-							}
-
-							$c = 0;
-							foreach($authors as $author) 
-							{
-								$encoded_author=base64_encode($author);
-								if($c > 0) 
-								{
-									if($c == count($authors)-1) 
-									{
-										echo ' &amp; ';
-									} 
-									else 
-									{
-										echo ', ';
-									}
-								}
-								echo "<a href=\"info_artist.php?artist=$encoded_author&sort_by=filename\">$author</a>";
-								$c++;
-							}
-						?>
-						</div>
-
-						<div class="release_div_left">
-							Crew:
-						</div>
-
-						<div class="release_div_right">							
+                                $c = 0;
+                                foreach($authors as $author) {
+                                    $encoded_author=base64_encode($author);
+                                    if($c > 0)
+                                    {
+                                        if($c == count($authors)-1)
+                                        {
+                                            echo ' &amp; ';
+                                        }
+                                        else
+                                        {
+                                            echo ', ';
+                                        }
+                                    }
+                                    echo "<a href=\"info_artist.php?artist=$encoded_author&sort_by=a.filename\">$author</a>";
+                                    $c++;
+                                }
+                            ?>
+                                        </span>
+                                    </div>
+                                    <div class="row d-flex justify-content-between">
+                                    <span>
+                                        Crew:
+                                    </span>
+                                    <span>
 							<?php
 							$crews = array();
-							$ask_crew="select * from crew_of where filename='$filename'";
-							$result_crew=mysql_query($ask_crew,$dbh);
-							while ($row_crew=mysql_fetch_array($result_crew)) 
-							{
-								$crews[]=$row_crew[0];
+                            $q = "select * from crew_of where filename=:filename";
+                            $p = [":filename" => $filename];
+
+                            foreach (fetchAll($q, $p) as $row_crew) {
+                                $row_crew = get_object_vars($row_crew);
+								$crews[]=$row_crew['crew'];
 							}
 
 							$c = 0;
-							foreach($crews as $crew) 
-							{
+							foreach($crews as $crew) {
 								$encoded_crew=base64_encode($crew);
 								if($c > 0) 
 								{
@@ -272,122 +272,115 @@ while ($row=mysql_fetch_array($result))
 								$c++;
 							}
 							?>
-						</div>
+                                    </span>
+                                </div>
+                                <div class="row d-flex justify-content-between">
+                                    <span>
+                                        Filename:
+                                    </span>
+                                    <span>
+                                        <a href="info_release.php?filename=<?=$encoded_filename?>" ><?=$row['filename']?></a>
+                                    </span>
+						        </div>
 
-						<div class="release_div_left">
-							Filename:
-						</div>
+                                <div class="row d-flex justify-content-between">
+                                    <span>
+                                        Size:
+                                    </span>
+                                    <span>
+                                        <?=$row['filesize']?>
+                                    </span>
+                                </div>
 
-						<div class="release_div_right">
-							<a href="collys/<?=$row['filename']?>"><?=$row['filename']?></a>
-						</div>
+                                <div class="row d-flex justify-content-between">
+                                    <span>
+                                        Released:
+                                    </span>
+                                    <span>
+                                        <?php
+                                        if(!empty($prodday))
+                                        {
+                                            echo "$prodday ";
+                                        }
+                                        if(isset($prodmonth))
+                                        {
+                                            if ($month_list[$prodmonth]!=Unknown)
+                                                echo "$month_list[$prodmonth] ";
+                                        }
+                                        if(!empty($year))
+                                        {
+                                            echo "$year";
+                                        }
+                                        echo "&nbsp;";
+                                        ?>
+                                    </span>
+                                </div>
 
-						<div class="release_div_left">
-							Size:
-						</div>
-								
-						<div class="release_div_right">
-							<?=$row[filesize]?>
-						</div>
-								
-						<div class="release_div_left">
-							Released:
-						</div>
-								
-						<div class="release_div_right">
-							<?php
-							if(!empty($prodday))
-							{
-								echo "$prodday ";
-							}
-							if(isset($prodmonth))
-							{
-								if ($month_list[$prodmonth]!=Unknown)
-									echo "$month_list[$prodmonth] ";
-							}
-							if(!empty($year))
-							{
-								echo "$year";
-							}
-							echo "&nbsp;";
-							?>
-						</div>
-
-						<div class="release_div_left">
-							Rating:
-						</div>
-								
+                                <div class="row d-flex justify-content-between">
+                                    <span>
+                                        Rating:
+                                    </span>
+                                <span>
 						<?php
-						$ask_collyrating="SELECT rating from collys where filename='$filename'";
-						$result_collyrating=mysql_query($ask_collyrating,$dbh);
-						while ($row_collyrating=mysql_fetch_array($result_collyrating))
-						{
-							$collyrating=$row_collyrating[0];
-						}
+                        $q = "SELECT rating from collys where filename=:filename";
+                        $p = [":filename" => $filename];
+                        $result_colly_rating = fetchOne($q, $p);
+                        $collyrating = $result_colly_rating->rating;
 
-						$ask_votes="SELECT COUNT(rating) from comments where filename='$filename'";
-						$result_votes=mysql_query($ask_votes,$dbh);
-						while ($row_votes=mysql_fetch_array($result_votes))
-						{
-							$votecount=$row_votes[0];
-						}
-						?>
-						<div class="release_div_right">
-						<?
+                        $q = "SELECT COUNT(rating) AS cnt from comments where filename=:filename";
+                        $p = [":filename" => $filename];
+                        $result_votes = fetchOne($q, $p);
+                        $votecount = $result_votes->cnt;
+
 						if(empty($collyrating))
 						{
-							$askagain="SELECT COUNT(rating) from comments where filename='$filename'";
-							$resultagain=mysql_query($askagain,$dbh);
-							while ($rowagain=mysql_fetch_array($resultagain))
-							{
-								$votecount=$rowagain[0];
-								$votesleft=(3-$votecount);
-							}
+							$votesleft=(3-$votecount);
 							if ($votesleft==1)
 							{
 								echo "Awaiting $votesleft vote";
 							}
-								elseif ($votesleft > 1)
-								{
-									echo "Awaiting $votesleft votes";
-								}
-							}
-							else
-							{
-								echo "$collyrating ($votecount votes)";
-							}
-							?>
-						</div> 
-								
-						<div class="release_div_left">
-							Added by:
-						</div>
-								
-						<div class="release_div_right">									
-							<?=$row[uploader]?>
-						</div>
-								
-						<div class="release_div_left">
-							Viewed:
-						</div>
+                            elseif ($votesleft > 1)
+                            {
+                                echo "Awaiting $votesleft votes";
+                            }
+                        }
+                        else
+                        {
+                            echo "$collyrating ($votecount votes)";
+                        }
+                        ?>
+                                    </span>
+                                </div>
 
-						<div class="release_div_right">
-							<?=$viewtimes?> times
-						</div>
-								
-						<div class="release_div_left">
-							Downloaded:
-						</div>
-								
-						<div class="release_div_right">
-							<?
-							$ask="SELECT downloads from collys where filename='$filename'";
-							$result=mysql_query($ask,$dbh);
-							while ($row=mysql_fetch_array($result))
-							{
-								$downloads=$row[0];
-							}
-	
+                                <div class="row d-flex justify-content-between">
+                                    <span>
+                                        Added by:
+                                    </span>
+                                    <span>
+                                        <?=$row['uploader']?>
+                                    </span>
+                                </div>
+
+                                <div class="row d-flex justify-content-between">
+                                    <span>
+                                        Viewed:
+                                    </span>
+                                    <span>
+                                        <?=$viewtimes?> times
+                                    </span>
+                                </div>
+
+                                <div class="row d-flex justify-content-between">
+                                    <span>
+                                        Downloaded:
+                                    </span>
+                                    <span>
+							<?php
+                            $q = "SELECT downloads from collys where filename=:filename";
+                            $p = [":filename" => $filename];
+                            $result = fetchOne($q, $p);
+                            $downloads = $result->downloads;
+
 							if(empty($downloads))
 							{
 								echo "0 Times";
@@ -401,41 +394,49 @@ while ($row=mysql_fetch_array($result))
 								echo "$downloads Times";
 							}
 							?>
-						</div>
-						<?
-						}
-					?>
-					</div>
-					</div>
-					<?
+                                    </span>
+                                </div>
 
-	$ask="SELECT acronym FROM artists where nick='$artist'";
-	$result=mysql_query($ask,$dbh);
-	while ($row=mysql_fetch_array($result))
-	{
-		$acronym=$row[0];
-	}	
+        					</div>
+		    			</div>
+                    </div>
+                </div>
+    <?php
+ }
+        $q = "SELECT acronym FROM artists where nick=:nick";
+        $p = [":nick" => $artist];
+        $result = fetchOne($q, $p);
+        $acronym = $result->acronym;
+
 		$encoded_artist=base64_encode($artist);
 	?>
+        <div style="clear: both"></div>
 
 		<div class="headline">[ All <?=$acronym?> Releases ]
 		<yellow>Sort by:</yellow>
-		<a class="lightgreen" href="info_artist.php?artist=<?=$encoded_artist?>&sort_by=a.name">Name</a>
-		<a class="lightgreen" href="info_artist.php?artist=<?=$encoded_artist?>&sort_by=a.filename">Filename</a>
-		<a class="lightgreen" href="info_artist.php?artist=<?=$encoded_artist?>&sort_by=a.year, a.month">Release Date</a>
-		<a class="lightgreen" href="info_artist.php?artist=<?=$encoded_artist?>&sort_by=a.timestamp">Upload Date</a>
-		<a class="lightgreen" href="info_artist.php?artist=<?=$encoded_artist?>&sort_by=a.uploader">Uploader</a>
+        <?php
+          foreach ($validSorts as $key => $val) {
+              echo "<a class=\"lightgreen\" href=\"info_artist.php?artist={$encoded_artist}&sort_by={$key}\">{$val}</a> ";
+          }
+        ?>
 		</div>
 
-		<div class="content_with_blenk"><br></div>
 
-		<?
+<?php
 		$sort_criteria=$_GET['sort_by'];
-		$ask="SELECT a.*, b.nick AS author, c.crew FROM collys AS a INNER JOIN author_of AS b ON a.filename = b.filename INNER JOIN crew_of AS c ON a.filename = c.filename WHERE b.nick = '$showartist' GROUP BY a.filename ORDER BY $sort_criteria";
+        $q = "SELECT a.*, b.nick AS author, c.crew FROM collys AS a " .
+             "  INNER JOIN author_of AS b ON a.filename = b.filename " .
+             "  INNER JOIN crew_of AS c ON a.filename = c.filename " .
+             "WHERE b.nick = :nick GROUP BY a.filename";
 
-		$result=mysql_query($ask,$dbh);
-		while ($row=mysql_fetch_array($result))
-		{
+        if ((isset($_GET['sort_by'])) && (array_key_exists($sort_criteria, $validSorts))) {
+            $q.= " ORDER BY {$sort_criteria}";
+        }
+
+        $p = [":nick" => $showartist];
+        foreach (fetchAll($q, $p) as $row) {
+            $row = get_object_vars($row);
+
 			$author=$row['author'];
 			$filename=$row['filename'];
 			$encoded_filename=base64_encode($row['filename']);
@@ -451,24 +452,23 @@ while ($row=mysql_fetch_array($result))
 			$name=str_replace("'", "&#39;",$name);						// replace ' with &#39
 
 			?>
+            <div class="row d-flex justify-content-between">
 
-			<div class="artist">			
-				<a href="info_release.php?filename=<?=$encoded_filename?>" /><?=$filename?>
-			</div>
+                <span class="artist">
+                    <a href="info_release.php?filename=<?=$encoded_filename?>" ><?=$filename?></a>
+                </span>
 
 
-			<div class="collyname">
-				<a href="info_release.php?filename=<?=$encoded_filename?>" /><?=$name?></a>
-			</div>
-			
-			<div class="crew">
-				<a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.filename"/> <?=$crew?></a>
-			</div>
+                <span class="collyname">
+                    <a href="info_release.php?filename=<?=$encoded_filename?>" ><?=$name?></a>
+                </span>
+
+                <span class="crew">
+                    <a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.filename"> <?=$crew?></a>
+                </span>
+
+            </div>
 			<?
 		}
 		?>
-			</div>
-		</div>
-	</div>
-</body>
-</html>
+<?php include "footer.php";
