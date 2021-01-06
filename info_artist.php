@@ -50,12 +50,12 @@ include "header.php";
         </div>
 
         <div style="padding-left: 4px; width: 620px; float: left;">
-           <?php
-           $q = "select * from member_of where nick=:nick";
-           $p = [":nick" => $show_artist];
-           $artists = array();
+         <?php
+         $q = "select * from member_of where nick=:nick";
+         $p = [":nick" => $show_artist];
+         $artists = array();
 
-           foreach (fetchAll($q, $p) as $row_crew) {
+         foreach (fetchAll($q, $p) as $row_crew) {
             $row_crew = get_object_vars($row_crew);
             if(!array_key_exists($row_crew['nick'], $artists))
             {
@@ -69,9 +69,9 @@ include "header.php";
       foreach($artists as $artist=>$crews) {
           $c = 0;
           foreach($crews as $crew) {
-             $encoded_crew=base64_encode($crew);
-             if($c > 0) 
-             {
+           $encoded_crew=base64_encode($crew);
+           if($c > 0) 
+           {
               if($c == count($crews)-1) 
               {
                   echo ' &amp; ';
@@ -95,29 +95,29 @@ if (!empty($show_www))
 {
     ?>
     <div style="background: #ff000; padding-left: 4px; width: 70px; float: left;">
-     Webpage:
- </div>
+       Webpage:
+   </div>
 
- <div style="padding-left: 4px; width: 620px; float: left;">				
-     <?=$show_www?>
- </div>
- <div style="clear: both;"></div>
+   <div style="padding-left: 4px; width: 620px; float: left;">				
+       <?=$show_www?>
+   </div>
+   <div style="clear: both;"></div>
 
- <?php
+   <?php
 }
 if (!empty($show_country))
 {
     ?>
     <div style="background: #ff000; padding-left: 4px; width: 70px; float: left;">
-     Country:
- </div>
+       Country:
+   </div>
 
- <div style="padding-left: 4px; width: 620px; float: left;">
-     <?=$show_country?>
- </div>
- <div style="clear: both;"></div>
+   <div style="padding-left: 4px; width: 620px; float: left;">
+       <?=$show_country?>
+   </div>
+   <div style="clear: both;"></div>
 
- <?php
+   <?php
 }
 ?>
 <div style="padding-left: 4px; width: 70px; float: left;">
@@ -134,22 +134,22 @@ if (!empty($show_country))
 </div>
 
 <div style="padding-left: 4px; width: 620px; float: left;">
-   <?php
-   $q = "SELECT rating FROM artists where nick=:nick";
-   $p = [":nick" => $showartist];
-   $result_artist_rating = fetchOne($q, $p);
-   $artistrating = $result_artist_rating->rating;
+ <?php
+ $q = "SELECT rating FROM artists where nick=:nick";
+ $p = [":nick" => $showartist];
+ $result_artist_rating = fetchOne($q, $p);
+ $artistrating = $result_artist_rating->rating;
 
-   $q = "SELECT COUNT(rating) AS cnt from comments where artist=:nick";
-   $p = [":nick" => $showartist];
-   $result_again = fetchOne($q, $p);
-   $votecount = $result_again->cnt;
+ $q = "SELECT COUNT(rating) AS cnt from comments where artist=:nick";
+ $p = [":nick" => $showartist];
+ $result_again = fetchOne($q, $p);
+ $votecount = $result_again->cnt;
 
-   if(empty($show_rating))
+ if(empty($show_rating))
+ {
+   $votesleft=(3-$votecount);
+   if ($votesleft==1)
    {
-     $votesleft=(3-$votecount);
-     if ($votesleft==1)
-     {
       echo "Awaiting $votesleft vote";
   }
   elseif ($votesleft > 0)
@@ -159,7 +159,7 @@ if (!empty($show_country))
 }
 else
 {
- echo "$artistrating ($votecount votes)";
+   echo "$artistrating ($votecount votes)";
 }
 ?>
 </div>
@@ -190,7 +190,7 @@ foreach (fetchAll($q, $p) as $row) {
 
     <div class="maincontent">
 
-        <div class="row">
+        <div class="row apt-1">
             <div class="header col-lg-12">
                 <h1>Latest Release</h1>
             </div>
@@ -252,12 +252,12 @@ foreach (fetchAll($q, $p) as $row) {
                         Crew:
                     </span>
                     <span>
-                       <?php
-                       $crews = array();
-                       $q = "select * from crew_of where filename=:filename";
-                       $p = [":filename" => $filename];
+                     <?php
+                     $crews = array();
+                     $q = "select * from crew_of where filename=:filename";
+                     $p = [":filename" => $filename];
 
-                       foreach (fetchAll($q, $p) as $row_crew) {
+                     foreach (fetchAll($q, $p) as $row_crew) {
                         $row_crew = get_object_vars($row_crew);
                         $crews[]=$row_crew['crew'];
                     }
@@ -267,12 +267,12 @@ foreach (fetchAll($q, $p) as $row) {
                         $encoded_crew=base64_encode($crew);
                         if($c > 0) 
                         {
-                         if($c == count($crews)-1) 
+                           if($c == count($crews)-1) 
+                           {
+                             echo ' <magenta>&amp;</magenta> ';
+                         } 
+                         else 
                          {
-                           echo ' <magenta>&amp;</magenta> ';
-                       } 
-                       else 
-                       {
                           echo ', ';
                       }
                   }
@@ -342,22 +342,22 @@ foreach (fetchAll($q, $p) as $row) {
 
           if(empty($collyrating))
           {
-           $votesleft=(3-$votecount);
-           if ($votesleft==1)
-           {
-            echo "Awaiting $votesleft vote";
+             $votesleft=(3-$votecount);
+             if ($votesleft==1)
+             {
+                echo "Awaiting $votesleft vote";
+            }
+            elseif ($votesleft > 1)
+            {
+                echo "Awaiting $votesleft votes";
+            }
         }
-        elseif ($votesleft > 1)
+        else
         {
-            echo "Awaiting $votesleft votes";
+            echo "$collyrating ($votecount votes)";
         }
-    }
-    else
-    {
-        echo "$collyrating ($votecount votes)";
-    }
-    ?>
-</span>
+        ?>
+    </span>
 </div>
 
 <div class="row d-flex justify-content-between">
@@ -383,14 +383,14 @@ foreach (fetchAll($q, $p) as $row) {
         Downloaded:
     </span>
     <span>
-       <?php
-       $q = "SELECT downloads from collys where filename=:filename";
-       $p = [":filename" => $filename];
-       $result = fetchOne($q, $p);
-       $downloads = $result->downloads;
+     <?php
+     $q = "SELECT downloads from collys where filename=:filename";
+     $p = [":filename" => $filename];
+     $result = fetchOne($q, $p);
+     $downloads = $result->downloads;
 
-       if(empty($downloads))
-       {
+     if(empty($downloads))
+     {
         echo "0 Times";
     }
     elseif($downloads == 1)
@@ -420,15 +420,18 @@ $encoded_artist=base64_encode($artist);
 ?>
 <div style="clear: both"></div>
 
-<div class="headline">[ All <?=$acronym?> Releases ]
-  <yellow>Sort by:</yellow>
-  <?php
-  foreach ($validSorts as $key => $val) {
-      echo "<a class=\"lightgreen\" href=\"info_artist.php?artist={$encoded_artist}&sort_by={$key}\">{$val}</a> ";
-  }
-  ?>
-</div>
 
+<div class="row apt-1 apb-1">
+    <div class="header col-lg-12">
+        <h1>[ All <?=$acronym?> Releases ] <span class="yellow">Sort by:</span>
+            <?php
+            foreach ($validSorts as $key => $val) {
+              echo "<a class=\"lightgreen\" href=\"info_artist.php?artist={$encoded_artist}&sort_by={$key}\">{$val}</a>";
+          }
+          ?>
+      </h1>
+  </div>
+</div>
 
 <?php
 $sort_criteria=$_GET['sort_by'];
@@ -460,22 +463,20 @@ foreach (fetchAll($q, $p) as $row) {
 			$name=str_replace("'", "&#39;",$name);						// replace ' with &#39
 
 			?>
-            <div class="row d-flex justify-content-between">
+            <div class="col-lg-12 d-flex justify-content-between">
 
-                <span class="artist">
+                <div class="col-lg-3">
                     <a href="info_release.php?filename=<?=$encoded_filename?>" ><?=$filename?></a>
-                </span>
+                </div>
 
-
-                <span class="collyname">
-                    <a href="info_release.php?filename=<?=$encoded_filename?>" ><?=$name?></a>
-                </span>
-
-                <span class="crew">
+                <div class="col-lg-6">            
+                    <a href="info_release.php?filename=<?=$encoded_filename?>" ><?=$name?></a> 
+                </div>
+                <div class="col-lg-3">            
                     <a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.filename"> <?=$crew?></a>
-                </span>
-
+                </div>
             </div>
+
             <?
         }
         ?>
