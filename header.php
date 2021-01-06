@@ -24,6 +24,16 @@ __/\__  \    /
      /_  _\
        \/
 EOD;
+	$mobilelogo = <<<EOD
+             ________________    ________   ______________
+          ___\__     /  ____/___/    ___/__/______/______/
+         /     /    /____      /    /     /      /      /
+   _____/__________/__________/__________/______/______/__________
+.__\____   \     _     /__________ ________ |     |__\_____      /
+|     L/    \       __/_       __/_\_      \|     |      L/     /
+|___________/\____\     \___________/_____\       |____________/
+     a fugly place \_____\ holder logo     \______|
+EOD;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -161,8 +171,9 @@ EOD;
 		<div class="col-12 d-flex justify-content-between">
 			<pre class="overflow-hidden"><span class="magenta"><?=$stars1?></span></pre>
 			<div id="logoswitcher">
-				<div class="logo"><?=implode('</div><div class="logo" style="display: none;">', $logos)?></div>
+				<div class="logo d-none d-lg-block"><?=implode('</div><div class="logo" style="display: none;">', $logos)?></div>
 			</div>
+			<pre class="overflow-hidden d-lg-none"><span class="magenta"><?=$mobilelogo?></span></pre>
 			<pre class="overflow-hidden"><span class="magenta"><?=$stars2?></span></pre>
 		</div>
 	</div>
