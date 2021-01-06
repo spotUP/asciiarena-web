@@ -36,134 +36,102 @@ include "header.php";
 
           ?>
 
-          <div style="background: #ff000; padding-left: 4px; width: 70px; float: left;">
-            Nick:
+          <div class="col-lg-12">
+            Nick: <?=$show_artist?>
         </div>
-
-        <div style="padding-left: 4px; width: 620px; float: left;">
-            <?=$show_artist?>
-        </div>
-        <div style="clear: both;"></div>
-
-        <div style="background: #ff000; padding-left: 4px; width: 70px; float: left;">
+        <div class="col-lg-12">
             Crew(s):
-        </div>
+            <?php
+            $q = "select * from member_of where nick=:nick";
+            $p = [":nick" => $show_artist];
+            $artists = array();
 
-        <div style="padding-left: 4px; width: 620px; float: left;">
-         <?php
-         $q = "select * from member_of where nick=:nick";
-         $p = [":nick" => $show_artist];
-         $artists = array();
-
-         foreach (fetchAll($q, $p) as $row_crew) {
-            $row_crew = get_object_vars($row_crew);
-            if(!array_key_exists($row_crew['nick'], $artists))
-            {
-              $artists[$row_crew['nick']] = array();
-          }
-          if(!in_array($row_crew['crew'], $artists[$row_crew['nick']]))
-          {
-              $artists[$row_crew['nick']][] = $row_crew['crew'];
-          }
-      }
-      foreach($artists as $artist=>$crews) {
-          $c = 0;
-          foreach($crews as $crew) {
-           $encoded_crew=base64_encode($crew);
-           if($c > 0) 
-           {
-              if($c == count($crews)-1) 
+            foreach (fetchAll($q, $p) as $row_crew) {
+                $row_crew = get_object_vars($row_crew);
+                if(!array_key_exists($row_crew['nick'], $artists))
+                {
+                  $artists[$row_crew['nick']] = array();
+              }
+              if(!in_array($row_crew['crew'], $artists[$row_crew['nick']]))
               {
-                  echo ' &amp; ';
-              } 
-              else
-              {
-                  echo ', ';
+                  $artists[$row_crew['nick']][] = $row_crew['crew'];
               }
           }
-          echo '<a href="info_crew.php?crew='.$encoded_crew.'&sort_by=a.filename">'.$crew.'</a>';
-          $c++;
+          foreach($artists as $artist=>$crews) {
+              $c = 0;
+              foreach($crews as $crew) {
+               $encoded_crew=base64_encode($crew);
+               if($c > 0) 
+               {
+                  if($c == count($crews)-1) 
+                  {
+                      echo ' &amp; ';
+                  } 
+                  else
+                  {
+                      echo ', ';
+                  }
+              }
+              echo '<a href="info_crew.php?crew='.$encoded_crew.'&sort_by=a.filename">'.$crew.'</a>';
+              $c++;
+          }
       }
-  }
-  ?>
-</div>
-<div style="clear: both;"></div>
+      ?>
+  </div>
+  <?php
 
-<?php
-
-if (!empty($show_www))
-{
+  if (!empty($show_www))
+  {
     ?>
-    <div style="background: #ff000; padding-left: 4px; width: 70px; float: left;">
-       Webpage:
-   </div>
-
-   <div style="padding-left: 4px; width: 620px; float: left;">				
-       <?=$show_www?>
-   </div>
-   <div style="clear: both;"></div>
-
-   <?php
+    <div class="col-lg-12">
+        Webpage: <?=$show_www?>
+    </div>
+    <?php
 }
 if (!empty($show_country))
 {
     ?>
-    <div style="background: #ff000; padding-left: 4px; width: 70px; float: left;">
-       Country:
-   </div>
-
-   <div style="padding-left: 4px; width: 620px; float: left;">
-       <?=$show_country?>
-   </div>
-   <div style="clear: both;"></div>
-
-   <?php
+    <div class="col-lg-12">
+        Country: <?=$show_country?>
+    </div>
+    <?php
 }
 ?>
-<div style="padding-left: 4px; width: 70px; float: left;">
-    Status:
+<div class="col-lg-12">
+    Status: <?=$show_status?>
 </div>
-
-<div style="padding-left: 4px; width: 620px; float: left;">
-    <?=$show_status?>
-</div>
-<div style="clear: both;"></div>
-
-<div style="padding-left: 4px; width: 70px; float: left;">
+<div class="col-lg-12">
     Rating:
-</div>
 
-<div style="padding-left: 4px; width: 620px; float: left;">
- <?php
- $q = "SELECT rating FROM artists where nick=:nick";
- $p = [":nick" => $showartist];
- $result_artist_rating = fetchOne($q, $p);
- $artistrating = $result_artist_rating->rating;
+    <?php
+    $q = "SELECT rating FROM artists where nick=:nick";
+    $p = [":nick" => $showartist];
+    $result_artist_rating = fetchOne($q, $p);
+    $artistrating = $result_artist_rating->rating;
 
- $q = "SELECT COUNT(rating) AS cnt from comments where artist=:nick";
- $p = [":nick" => $showartist];
- $result_again = fetchOne($q, $p);
- $votecount = $result_again->cnt;
+    $q = "SELECT COUNT(rating) AS cnt from comments where artist=:nick";
+    $p = [":nick" => $showartist];
+    $result_again = fetchOne($q, $p);
+    $votecount = $result_again->cnt;
 
- if(empty($show_rating))
- {
-   $votesleft=(3-$votecount);
-   if ($votesleft==1)
-   {
-      echo "Awaiting $votesleft vote";
+    if(empty($show_rating))
+    {
+       $votesleft=(3-$votecount);
+       if ($votesleft==1)
+       {
+          echo "Awaiting $votesleft vote";
+      }
+      elseif ($votesleft > 0)
+      {
+          echo "Awaiting $votesleft votes";
+      }
   }
-  elseif ($votesleft > 0)
+  else
   {
-      echo "Awaiting $votesleft votes";
-  }
-}
-else
-{
    echo "$artistrating ($votecount votes)";
 }
 ?>
 </div>
-<div style="clear: both;"></div>
 
 <?php
 }
@@ -189,7 +157,6 @@ foreach (fetchAll($q, $p) as $row) {
     ?>
 
     <div class="maincontent">
-
         <div class="row apt-1">
             <div class="header col-lg-12">
                 <h1>Latest Release</h1>
@@ -197,7 +164,7 @@ foreach (fetchAll($q, $p) as $row) {
         </div>
         <div class="container-fluid">
             <div class="row">
-                <div class="col-8" style="margin-left:0px; padding-left: 0px; margin-top: 16px;">
+                <div class="col-8 apt-1 ml-0 pl-0 d-flex justify-content-center">
                     <span>
                         <pre><?php
                         if ($row['file_id'] == "file_id.diz.png") {
@@ -319,7 +286,6 @@ foreach (fetchAll($q, $p) as $row) {
             {
                 echo "$year";
             }
-            echo "&nbsp;";
             ?>
         </span>
     </div>
