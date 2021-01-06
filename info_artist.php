@@ -392,7 +392,7 @@ $encoded_artist=base64_encode($artist);
         <h1>[ All <?=$acronym?> Releases ] <span class="yellow">Sort by:</span>
             <?php
             foreach ($validSorts as $key => $val) {
-              echo "<a class=\"lightgreen\" href=\"info_artist.php?artist={$encoded_artist}&sort_by={$key}\">{$val}</a>";
+              echo "<a class=\"lightgreen\" href=\"info_artist.php?artist={$encoded_artist}&sort_by={$key}\">{$val} </a>";
           }
           ?>
       </h1>
