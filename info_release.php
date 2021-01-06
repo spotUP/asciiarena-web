@@ -771,8 +771,7 @@ if (!isset($_POST[ 'edit_colly' ])) {
 
 	?>
 	<div class="headline"></div>
-	<div class="content_with_blenk"><br></div>
-	<div class="content"><?php
+	<div class="content" style="padding-top: 16px;"><?php
 	if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) {
 		echo "<input type='submit' class='btn-primary amb-1' name='hide' value='Hide Colly!'> ";
 	}
@@ -808,54 +807,64 @@ if (!isset($_POST[ 'edit_colly' ])) {
 				echo "</div>";
 				if ($type != "ANSI") {
 					?>
-					<div>
-						<select name="font" class="btn-primary amb-1">
-							<option value='mosoul' selected='selected'>Font</option>
-							<option value='topaz'>Topaz</option>
-							<option value='microknight'>MicroKnight</option>
-							<option value='mosoul'>mO'sOul</option>
-							<option value='pot-noodle'>P0T-NOoDLE</option>
-						</select>
-						<select name="background_color" class="btn-primary amb-1">
-							<option selected="selected" value="#aaaaaa">BG Color</option>
-							<option class='black' value="#000000">Black</option>
-							<option class='darkblue' value="#0000aa">Dark Blue</option>
-							<option class='darkgreen' value="#00aa00">Dark Green</option>
-							<option class='darkcyan' value="#00aaaa">Dark Cyan</option>
-							<option class='darkred' value="#aa0000">Dark Red</option>
-							<option class='magenta' value="#aa00aa">Magenta</option>
-							<option class='brown' value="#aa5500">Brown</option>
-							<option class='darkgrey' value="#555555">Dark Grey</option>
-							<option class='grey' value="#aaaaaa">Grey</option>
-							<option class='blue' value="#5555ff">Blue</option>
-							<option class='green' value="#55ff55">Green</option>
-							<option class='cyan' value="#5555ff">Cyan</option>
-							<option class='red' value="#ff5555">Red</option>
-							<option class='magenta' value="#ff55ff">Magenta</option>
-							<option class='yellow' value="#ffff55">Yellow</option>
-							<option class='white' value="#ffffff">White</option>
-						</select>
-						<select name="foreground_color" class="btn-primary amb-1">
-							<option SELECTED value="0,0,0">FG Color</option>
-							<option class='black' value="0,0,0">Black</option>
-							<option class='darkblue' value="0,0,170">Dark Blue</option>
-							<option class='darkgreen' value="0,170,0">Dark Green</option>
-							<option class='darkcyan' value="0,170,170">Dark Cyan</option>
-							<option class='darkred' value="170,0,0">Dark Red</option>
-							<option class='magenta' value="170,0,170">Magenta</option>
-							<option class='brown' value="170,85,0">Brown</option>
-							<option class='darkgrey' value="85,85,85">Dark Grey</option>
-							<option class='grey' value="170,170,170">Grey</option>
-							<option class='blue' value="85,85,255">Blue</option>
-							<option class='green' value="85,255,85">Green</option>
-							<option class='cyan' value="85,85,255">Cyan</option>
-							<option class='red' value="255,85,85">Red</option>
-							<option class='magenta' value="255,85,255">Magenta</option>
-							<option class='yellow' value="255,255,85">Yellow</option>
-							<option class='white' value="255,255,255">White</option>
-						</select>
-						<input type="submit" class='btn-primary amb-1' name="change" value="Change!">
+					<div style="padding-bottom: 16px;">
+						<div class="btn-group" role="group">
+							<button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Font </button>
+							<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+								<a class="dropdown-item" href="#">Topaz</a>
+								<a class="dropdown-item" href="#">MicroKnight</a>
+								<a class="dropdown-item" href="#">mO'sOul</a>
+								<a class="dropdown-item" href="#">P0T-NOoDLE</a>
+							</div>
+						</div>
+
+						<div class="btn-group" role="group">
+							<button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">BG Color </button>
+							<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+								<a class="dropdown-item" href="#">Black</a>
+								<a class="dropdown-item" href="#">Dark Blue</a>
+								<a class="dropdown-item" href="#">Dark Green</a>
+								<a class="dropdown-item" href="#">Dark Cyan</a>
+								<a class="dropdown-item" href="#">Dark Red</a>
+								<a class="dropdown-item" href="#">Magenta</a>
+								<a class="dropdown-item" href="#">Brown</a>
+								<a class="dropdown-item" href="#">Dark Grey</a>
+								<a class="dropdown-item" href="#">Grey</a>
+								<a class="dropdown-item" href="#">Blue</a>
+								<a class="dropdown-item" href="#">Green</a>
+								<a class="dropdown-item" href="#">Cyan</a>
+								<a class="dropdown-item" href="#">Red</a>
+								<a class="dropdown-item" href="#">Magenta</a>
+								<a class="dropdown-item" href="#">Yellow</a>
+								<a class="dropdown-item" href="#">Magenta</a>
+								<a class="dropdown-item" href="#">White</a>
+							</div>
+						</div>
+
+						<div class="btn-group" role="group">
+							<button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">FG Color </button>
+							<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+								<a class="dropdown-item" href="#">Black</a>
+								<a class="dropdown-item" href="#">Dark Blue</a>
+								<a class="dropdown-item" href="#">Dark Green</a>
+								<a class="dropdown-item" href="#">Dark Cyan</a>
+								<a class="dropdown-item" href="#">Dark Red</a>
+								<a class="dropdown-item" href="#">Magenta</a>
+								<a class="dropdown-item" href="#">Brown</a>
+								<a class="dropdown-item" href="#">Dark Grey</a>
+								<a class="dropdown-item" href="#">Grey</a>
+								<a class="dropdown-item" href="#">Blue</a>
+								<a class="dropdown-item" href="#">Green</a>
+								<a class="dropdown-item" href="#">Cyan</a>
+								<a class="dropdown-item" href="#">Red</a>
+								<a class="dropdown-item" href="#">Magenta</a>
+								<a class="dropdown-item" href="#">Yellow</a>
+								<a class="dropdown-item" href="#">Magenta</a>
+								<a class="dropdown-item" href="#">White</a>
+							</div>
+						</div>
 					</div>
+
 				</form>
 				<?php
 			}
@@ -930,7 +939,7 @@ if (!isset($_POST[ 'edit_colly' ])) {
 							<div class="bg-secondary col-12 ap-1 amb-1">
 								<span class="cyan"><?=$comment?></span>
 								<div class="col-12 p-0 m-0 apt-1">
-								<input type="hidden" name="commentid" value="<?=$commentid?>"/><input type="submit" class="btn btn-primary" name="edit" value="Edit">
+									<input type="hidden" name="commentid" value="<?=$commentid?>"/><input type="submit" class="btn btn-primary" name="edit" value="Edit">
 								</div>
 							</div>
 							<?php
@@ -963,9 +972,9 @@ if (!isset($_POST[ 'edit_colly' ])) {
 						<div class="bg-secondary col-12 ap-1 amb-1">
 							<span class="cyan"><?=$comment?></span>
 							<div class="col-12 p-0 m-0 apt-1">
-							<input type="hidden" class="btn btn-primary" name="commentid" value="<?=$commentid?>">
-							<input type="submit" class="btn btn-primary" name="edit" value="Edit">
-							<input type="submit" class="btn btn-primary" name="Delete" value="Delete">
+								<input type="hidden" class="btn btn-primary" name="commentid" value="<?=$commentid?>">
+								<input type="submit" class="btn btn-primary" name="edit" value="Edit">
+								<input type="submit" class="btn btn-primary" name="Delete" value="Delete">
 							</div>
 						</div>
 
@@ -984,8 +993,8 @@ if (!isset($_POST[ 'edit_colly' ])) {
 							<div class="col-12 ap-1 amb-1">
 								<span class="cyan"><?=$comment?></span>
 								<div class="col-12 p-0 m-0 apt-1">
-								<input type="hidden" class="btn btn-primary" name="commentid" value="<?=$commentid?>">
-								<input type="submit" class="btn btn-primary" name="edit" value="Edit">
+									<input type="hidden" class="btn btn-primary" name="commentid" value="<?=$commentid?>">
+									<input type="submit" class="btn btn-primary" name="edit" value="Edit">
 								</div>
 							</div>
 							<?php
@@ -1015,8 +1024,8 @@ if (!isset($_POST[ 'edit_colly' ])) {
 							<span class="cyan"><?=$comment?></span>
 							<input type="hidden" name="commentid" value="<?=$commentid?>">
 							<div class="col-12 p-0 m-0 apt-1">
-							<input type="submit" class="btn btn-primary" name="edit" value="Edit">
-							<input type="submit" class="btn btn-primary" name="Delete" value="Delete">
+								<input type="submit" class="btn btn-primary" name="edit" value="Edit">
+								<input type="submit" class="btn btn-primary" name="Delete" value="Delete">
 							</div>
 						</div>
 						<?php

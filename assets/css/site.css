@@ -1264,13 +1264,13 @@ input.form-control::placeholder {
 }
 
 button.btn.btn-secondary{
-  margin-right: 16px !important;
-  /*  margin-bottom: 16px !important; */
+  margin-right: 8px !important;
+  height: 16px;
 }
 
 button.btn.btn-primary{
-  margin-right: 16px !important;
-  /*  margin-bottom: 16px !important; */
+  margin-right: 8px !important;
+  height: 16px;
 }
 
 .dropdown-menu {
