@@ -159,11 +159,11 @@ EOD;
 <div class="container-fluid" style="padding-top: 40px;">
 	<div class="row" style="padding-top: 16px;">
 		<div class="col-12 d-flex justify-content-between">
-			<pre><span class="magenta overflow-hidden"><?=$stars1?></span></pre>
+			<pre class="overflow-hidden"><span class="magenta"><?=$stars1?></span></pre>
 			<div id="logoswitcher">
 				<div class="logo"><?=implode('</div><div class="logo" style="display: none;">', $logos)?></div>
 			</div>
-			<pre><span class="magenta overflow-hidden"><?=$stars2?></span></pre>
+			<pre class="overflow-hidden"><span class="magenta"><?=$stars2?></span></pre>
 		</div>
 	</div>
 	<script>
