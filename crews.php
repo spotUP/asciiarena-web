@@ -5,10 +5,7 @@ require_once "header.php";
 
 ?>
 <div class="row">
-	<div class="col-lg-2">
-		<?php include "sidebar.php"; ?>
-	</div>
-	<div class="col-lg-8">
+	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2">
 <?php
 
 require_once "pagination.php";
@@ -101,7 +98,10 @@ if (!isset($_POST[ "search" ])) {
 			</form>
 		</div>
 	</div>
-	<div class="col-lg-2">
+	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+		<?php include "sidebar.php"; ?>
+	</div>
+	<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
 		<?php include "sidebar_right.php"; ?>
 	</div>
 	<?php include "footer.php";
