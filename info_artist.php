@@ -36,10 +36,10 @@ include "header.php";
 
           ?>
 
-          <div class="col-lg-12">
+          <div class="col-lg-12 pl-0">
             Nick: <?=$show_artist?>
         </div>
-        <div class="col-lg-12">
+        <div class="col-lg-12 pl-0">
             Crew(s):
             <?php
             $q = "select * from member_of where nick=:nick";
@@ -83,7 +83,7 @@ include "header.php";
   if (!empty($show_www))
   {
     ?>
-    <div class="col-lg-12">
+    <div class="col-lg-12 pl-0">
         Webpage: <?=$show_www?>
     </div>
     <?php
@@ -91,16 +91,16 @@ include "header.php";
 if (!empty($show_country))
 {
     ?>
-    <div class="col-lg-12">
+    <div class="col-lg-12 pl-0">
         Country: <?=$show_country?>
     </div>
     <?php
 }
 ?>
-<div class="col-lg-12">
+<div class="col-lg-12 pl-0">
     Status: <?=$show_status?>
 </div>
-<div class="col-lg-12">
+<div class="col-lg-12 pl-0">
     Rating:
 
     <?php
@@ -429,16 +429,16 @@ foreach (fetchAll($q, $p) as $row) {
 			$name=str_replace("'", "&#39;",$name);						// replace ' with &#39
 
 			?>
-            <div class="col-lg-12 d-flex justify-content-between">
+            <div class="col-lg-12 d-flex justify-content-between pl-0">
 
-                <div class="col-lg-3">
+                <div class="col-lg-3 pl-0">
                     <a href="info_release.php?filename=<?=$encoded_filename?>" ><?=$filename?></a>
                 </div>
 
-                <div class="col-lg-6">            
+                <div class="col-lg-6 pl-0">            
                     <a href="info_release.php?filename=<?=$encoded_filename?>" ><?=$name?></a> 
                 </div>
-                <div class="col-lg-3">            
+                <div class="col-lg-3 pl-0">            
                     <a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.filename"> <?=$crew?></a>
                 </div>
             </div>
