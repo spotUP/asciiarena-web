@@ -25,14 +25,14 @@ __/\__  \    /
        \/
 EOD;
 	$mobilelogo = <<<EOD
-             ________________    ________   ______________
-          ___\__     /  ____/___/    ___/__/______/______/
-         /     /    /____      /    /     /      /      /
-   _____/__________/__________/__________/______/______/__________
-.__\____   \     _     /__________ ________ |     |__\_____      /
-|     L/    \       __/_       __/_\_      \|     |      L/     /
-|___________/\____\     \___________/_____\       |____________/
-     a fugly place \_____\ holder logo     \______|
+         _________________    ________   ______________
+      .__\___     /  ____/___/    ___/__/______/______/
+      |    L/    /_____     /    /     /      /      /
+  ___ |_________/__________/__________/______/______/_____
+._\_____    /\____   /__/___   _   /___ |    |__\___     /
+|    L/    /    |   /     _/  ____/_   \|    |    L/    /
+|_________/ ____|________/_________/__\      |_________/
+                                       \_____|
 EOD;
 ?>
 <!DOCTYPE html>
@@ -169,18 +169,18 @@ EOD;
 <div class="container-fluid" style="padding-top: 40px;">
 	<div class="row" style="padding-top: 16px;">
 		<div class="col-12 d-flex justify-content-between">
-			<pre class="overflow-hidden"><span class="magenta"><?=$stars1?></span></pre>
+			<pre class="overflow-hidden d-none d-lg-block"><span class="magenta"><?=$stars1?></span></pre>
 			<div class="d-none d-lg-block">
 				<div id="logoswitcher">
 					<div class="logo"><?=implode('</div><div class="logo" style="display: none;">', $logos)?></div>
 				</div>
 			</div>
 			<pre class="overflow-hidden d-lg-none"><span class="magenta"><?=$mobilelogo?></span></pre>
-			<pre class="overflow-hidden"><span class="magenta"><?=$stars2?></span></pre>
+			<pre class="overflow-hidden d-none d-lg-block"><span class="magenta"><?=$stars2?></span></pre>
 		</div>
 	</div>
 	<script>
-		switcharoo("#logoswitcher > div", 2500);
+		switcharoo("#logoswitcher > div", 60000);
 	</script>
 	<?php if(!empty($h1)) {
 		$switcher = (is_array($h1)) ? "switcher" : ""; ?>
