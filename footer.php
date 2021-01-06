@@ -92,9 +92,9 @@
 </div>
 
 <div class="navbar navbar-expand-lg fixed-bottom navbar-dark bg-primary d-flex justify-content-between"
-     style="height: 22px;">
-	<span style="margin-left: 200px;" class="red">NComm 2.0</span> <span class="green">aSCIIaRENA</span> <span
-			style="margin-right: 200px" class="green"><?php echo Date("H:i", time()), " 00:00"; ?></span>
+     style="padding-left: 100px; padding-right: 100px; height: 22px;">
+	<span class="red">NComm 2.0</span> <span class="green">aSCIIaRENA</span> <span
+		 class="green"><?php echo Date("H:i", time()), " 00:00"; ?></span>
 </div>
 
 <script>
