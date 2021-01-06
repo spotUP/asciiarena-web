@@ -170,15 +170,15 @@ EOD;
 </div>
 <div class="container-fluid" style="padding-top: 40px;">
 	<div class="row" style="padding-top: 16px;">
-		<div class="col-12 d-flex justify-content-between">
+		<div class="col-12 d-flex justify-content-center">
 			<pre class="overflow-hidden d-none d-lg-block"><span class="magenta"><?=$stars1?></span></pre>
 			<div class="d-none d-lg-block">
 				<div id="logoswitcher">
-					<div class="logo"><?=implode('</div><div class="logo" style="display: none;">', $logos)?></div>
+					<div class="logo" style="margin-left: 32px; margin-right: 32px;"><?=implode('</div><div class="logo" style="display: none;">', $logos)?></div>
 				</div>
 			</div>
 			<pre class="overflow-hidden d-lg-none"><span class="magenta"><?=$mobilelogo?></span></pre>
-			<pre class="overflow-hidden d-none d-lg-block"><span class="magenta"><?=$stars2?></span></pre>
+			<pre class="overflow-hidden d-none d-lg-block aml-1"><span class="magenta"><?=$stars2?></span></pre>
 		</div>
 	</div>
 	<script>
