@@ -821,9 +821,9 @@ if (!isset($_POST[ 'edit_colly' ])) {
 				echo "</div>";
 				if ($type != "ANSI") {
 					?>
-					<div class="apb-1">
+					<div class="apb-0">
 
-					<input type='submit' class='btn-primary amb-1' name=fullscreen value='Fullscreen'>
+						<input type='submit' class='btn-primary amb-1' name=fullscreen value='Fullscreen'>
 
 						<div class="btn-group" role="group">
 							<button id="btnGroupDrop1" type="button" class="btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Font </button>
@@ -915,14 +915,14 @@ if (!isset($_POST[ 'edit_colly' ])) {
 						$bgcolor = (empty($def_color)) ? "#000000" : $def_color;
 					}
 					?>
-					<div class="content">
-						<div class="row m-0 p-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>; color: <?=$fgcolor?>;"><pre><?php
-						if (file_exists(__DIR__ . "/collections/{$dirname}/{$filename}")) {
-							$content = file_get_contents(__DIR__ . "/collections/{$dirname}/{$filename}");
-							echo utf8_encode($content);
-						}
-						?></pre>
-					</div>
+					<div class="row ml-0 mr-0 amb-1 p-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>; color: <?=$fgcolor?>;"><pre><?php
+					if (file_exists(__DIR__ . "/collections/{$dirname}/{$filename}")) {
+						$content = file_get_contents(__DIR__ . "/collections/{$dirname}/{$filename}");
+						echo "<br><br><br><br>";
+						echo utf8_encode($content);
+						echo "<br><br><br><br>";
+					}
+					?></pre>
 				</div>
 			<?php }
 		}
