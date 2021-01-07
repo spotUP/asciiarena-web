@@ -30,7 +30,7 @@ require_once "header.php"; ?>
 				</div>
 				<div class="content_with_blenk">
 					<textarea rows="5" cols="82" id="broken_comment" name="broken_comment"></textarea>
-					<input type="submit" class="btn btn-primary" name="do_report_broken" value="Report">
+					<input type="submit" class="btn-primary" name="do_report_broken" value="Report">
 				</div>
 			</form>
 			<?php
@@ -798,11 +798,11 @@ if (!isset($_POST[ 'edit_colly' ])) {
 		echo "<input type='submit' class='btn-primary amb-1' name=broken value='Report Broken'> ";
 		if ($_user[ "nick" ] === $uploader || is_admin()) {
 			echo "<input type='hidden' name='filename' value=$filename>";
-			echo "<input type='submit' class='btn btn-primary amb-1' name=edit_colly value='Edit Colly'> ";
+			echo "<input type='submit' class='btn-primary amb-1' name=edit_colly value='Edit Colly'> ";
 		}
 	}
 	if (!isset($_POST[ 'download' ])) {
-		echo "<input type='submit' class='btn btn-primary amb-1' name=download value='Download'> ";
+		echo "<input type='submit' class='btn-primary amb-1' name=download value='Download'> ";
 	} elseif (isset($_POST[ 'download' ])) {
 					$ask = "select downloads from collys where filename='$filename'"; // download counter
 					$result = mysql_query($ask, $dbh);
@@ -821,9 +821,12 @@ if (!isset($_POST[ 'edit_colly' ])) {
 				echo "</div>";
 				if ($type != "ANSI") {
 					?>
-					<div style="padding-bottom: 16px;">
+					<div class="apb-1">
+
+					<input type='submit' class='btn-primary amb-1' name=fullscreen value='Fullscreen'>
+
 						<div class="btn-group" role="group">
-							<button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Font </button>
+							<button id="btnGroupDrop1" type="button" class="btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Font </button>
 							<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
 								<a class="dropdown-item" href="#">Topaz</a>
 								<a class="dropdown-item" href="#">MicroKnight</a>
@@ -833,7 +836,7 @@ if (!isset($_POST[ 'edit_colly' ])) {
 						</div>
 
 						<div class="btn-group" role="group">
-							<button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">BG Color </button>
+							<button id="btnGroupDrop1" type="button" class="btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">BG Color </button>
 							<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
 								<a class="dropdown-item" href="#">Black</a>
 								<a class="dropdown-item" href="#">Dark Blue</a>
@@ -856,7 +859,7 @@ if (!isset($_POST[ 'edit_colly' ])) {
 						</div>
 
 						<div class="btn-group" role="group">
-							<button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">FG Color </button>
+							<button id="btnGroupDrop1" type="button" class="btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">FG Color </button>
 							<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
 								<a class="dropdown-item" href="#">Black</a>
 								<a class="dropdown-item" href="#">Dark Blue</a>
@@ -952,7 +955,7 @@ if (!isset($_POST[ 'edit_colly' ])) {
 							<div class="bg-secondary col-12 ap-1 amb-1">
 								<span class="cyan"><?=$comment?></span>
 								<div class="col-12 p-0 m-0 apt-1">
-									<input type="hidden" name="commentid" value="<?=$commentid?>"/><input type="submit" class="btn btn-primary" name="edit" value="Edit">
+									<input type="hidden" name="commentid" value="<?=$commentid?>"/><input type="submit" class="btn-primary" name="edit" value="Edit">
 								</div>
 							</div>
 							<?php
@@ -985,9 +988,9 @@ if (!isset($_POST[ 'edit_colly' ])) {
 						<div class="bg-secondary col-12 ap-1 amb-1">
 							<span class="cyan"><?=$comment?></span>
 							<div class="col-12 p-0 m-0 apt-1">
-								<input type="hidden" class="btn btn-primary" name="commentid" value="<?=$commentid?>">
-								<input type="submit" class="btn btn-primary" name="edit" value="Edit">
-								<input type="submit" class="btn btn-primary" name="Delete" value="Delete">
+								<input type="hidden" class="btn-primary" name="commentid" value="<?=$commentid?>">
+								<input type="submit" class="btn-primary" name="edit" value="Edit">
+								<input type="submit" class="btn-primary" name="Delete" value="Delete">
 							</div>
 						</div>
 
@@ -1006,8 +1009,8 @@ if (!isset($_POST[ 'edit_colly' ])) {
 							<div class="col-12 ap-1 amb-1">
 								<span class="cyan"><?=$comment?></span>
 								<div class="col-12 p-0 m-0 apt-1">
-									<input type="hidden" class="btn btn-primary" name="commentid" value="<?=$commentid?>">
-									<input type="submit" class="btn btn-primary" name="edit" value="Edit">
+									<input type="hidden" class="btn-primary" name="commentid" value="<?=$commentid?>">
+									<input type="submit" class="btn-primary" name="edit" value="Edit">
 								</div>
 							</div>
 							<?php
@@ -1037,8 +1040,8 @@ if (!isset($_POST[ 'edit_colly' ])) {
 							<span class="cyan"><?=$comment?></span>
 							<input type="hidden" name="commentid" value="<?=$commentid?>">
 							<div class="col-12 p-0 m-0 apt-1">
-								<input type="submit" class="btn btn-primary" name="edit" value="Edit">
-								<input type="submit" class="btn btn-primary" name="Delete" value="Delete">
+								<input type="submit" class="btn-primary" name="edit" value="Edit">
+								<input type="submit" class="btn-primary" name="Delete" value="Delete">
 							</div>
 						</div>
 						<?php
@@ -1083,7 +1086,7 @@ if (!isset($_POST[ 'edit_colly' ])) {
 				<div class="content">
 					<textarea rows="5" cols="82" id="commentvote" name="comment"></textarea>
 					<input type="hidden" name="crew" align="right" value="<?=$crew?>"><input type="hidden" name="artist" align="right" value="<?=$artist?>">
-					<input type="submit" class="btn btn-primary" name="add_comment" align="right" value="Comment">
+					<input type="submit" class="btn-primary" name="add_comment" align="right" value="Comment">
 				</div>
 			</form>
 			<script type="text/javascript">
@@ -1112,7 +1115,7 @@ if (!isset($_POST[ 'edit_colly' ])) {
 			</select>
 			<input type="hidden" name="crew" align="right" value="<?=$crew?>"><input type="hidden" name="artist"
 			align="right" value="<?=$artist?>">
-			<input type="submit" class="btn btn-primary" name="add_comment" align="right" value="Comment">
+			<input type="submit" class="btn-primary" name="add_comment" align="right" value="Comment">
 		</form>
 		<script type="text/javascript">
 			document.getElementById('comment').focus();
@@ -1144,7 +1147,7 @@ if (isset($_POST[ 'edit' ])) {
 	<div class="content">
 		<textarea rows="5" cols="82" name="edit_message"><?=$comment?></textarea>
 		<input type="hidden" name="commentid" value="<?=$commentid?>"/>
-		<input type="submit" class="btn btn-primary" name="writeedit" align="right" value="Submit">
+		<input type="submit" class="btn-primary" name="writeedit" align="right" value="Submit">
 	</form>
 </div>
 <?php
