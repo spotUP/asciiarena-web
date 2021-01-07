@@ -30,7 +30,7 @@ $dirname = $dirname[ 0 ];
 
 			<div class="container-fluid">
 				<div class="row">
-					<div class="col-8" style="margin-left:0px; padding-left: 0px; margin-top: 16px;">
+					<div class="col-8 ml-0 pl-0 amt-1">
 						<span>
 							<?php if ($colly->file_id == "file_id.diz.png") {
 								$file_id_diz = file_get_contents("collections/file_id.diz.txt");
@@ -105,12 +105,6 @@ $dirname = $dirname[ 0 ];
 								?>
 							</span>
 						</div>
-
-
-
-
-
-
 
 						<div class="row d-flex justify-content-between">
 							<span>Rating:</span>

@@ -599,6 +599,15 @@ body > div.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-white > span
   /*    width: 82px; */
 }
 
+.dropdown-toggle{
+  padding-top: 1px;
+}
+
+.dropdown-toggle::after {
+    position: relative;
+    top: -3px;
+}
+
 .valid-feedback {
   font-size: 16px;
 }
@@ -696,25 +705,6 @@ option {
 {   
   background: rgb(255, 85, 85); 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 span.black
 {   
@@ -831,9 +821,6 @@ a.nav-link:active{
 a.nav-link:focus{
   color: #aaa !important;
 }
-
-
-
 
 a.dropdown-item:hover{
   color: #aaa !important;
@@ -1271,6 +1258,7 @@ button.btn.btn-secondary{
 button.btn.btn-primary{
   margin-right: 8px !important;
   height: 16px;
+  padding-top: 1px;
 }
 
 .dropdown-menu {
