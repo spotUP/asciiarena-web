@@ -44,22 +44,24 @@ require_once "header.php"; ?>
 				":filename" => $decoded_filename
 			]);
 			?>
-			<div class="headline">
-				Status
+			<div class="row">
+				<div class="col-lg-4">
+					<div class="bs-component">
+						<div class="alert alert-dismissible alert-success">
+							<button type="button" class="close" data-dismiss="alert">x</button>
+							You reported <?=$decoded_filename?> as broken!
+						</div>
+					</div>
+				</div>
 			</div>
-
-			<div class="content_with_blenk">
-				You reported <?=$decoded_filename?> as broken!
-			</div>
-
 			<?php
 			echo "<meta http-equiv='Refresh' content='2; url=$_SERVER[PHP_SELF]?filename=$filename'>";
 			exit;
 		}
 
-			//-----------------------------------------------------------------------------
-			// WRITE EDITED MESSAGE TO DB
-			//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
+// WRITE EDITED MESSAGE TO DB
+//----------------------------------------------------------------------------------------------
 
 		if (isset($_POST[ 'edit_message' ]) && (isset($_GET[ 'comment' ]))) {
 			$commentid = $_POST[ 'commentid' ] ?? "";
@@ -92,9 +94,9 @@ require_once "header.php"; ?>
 				$crew = $row[ 0 ];
 			}
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 // WRITE COMMENT TO DATABASE
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 
 			if (isset($_POST[ 'comment' ]) && (isset($_GET[ 'comment' ]))) {
 				$comment = cleanInsertPost($comment);
@@ -127,9 +129,9 @@ require_once "header.php"; ?>
 				}
 			}
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 // CALCULATE RATING FOR COLLY
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 
 			$ask_rate_amount = "SELECT COUNT(rating) from comments where filename='$filename' and rating>0";
 			$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
@@ -148,9 +150,9 @@ require_once "header.php"; ?>
 				mysql_query($ask, $dbh);
 			}
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 // CALCULATE RATING FOR CREW
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 
 			$ask_rate_amount = "SELECT COUNT(rating) from comments where crew='$crew' and rating>0";
 			$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
@@ -168,9 +170,9 @@ require_once "header.php"; ?>
 				mysql_query($ask, $dbh);
 			}
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 // CALCULATE RATING FOR ARTISTS
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 
 			$ask = "select nick from author_of where filename='$filename'";
 			$result = mysql_query($ask, $dbh);
@@ -194,9 +196,9 @@ require_once "header.php"; ?>
 			echo "<meta http-equiv='Refresh' content='0; url=$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
 		}
 
-			//-----------------------------------------------------------------------------
-			// DELETE COMMENTS
-			//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
+// DELETE COMMENTS
+//----------------------------------------------------------------------------------------------
 
 		if (isset($_POST[ 'Delete' ])) {
 			if ($rank = "Admin") {
@@ -266,9 +268,9 @@ require_once "header.php"; ?>
 			}
 		}
 
-			//---------------------------------------------------------------------------------------------------------------
-			// WRITE COLLY INFO TO DB
-			//---------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------
+// WRITE COLLY INFO TO DB
+//---------------------------------------------------------------------------------------------------------------
 
 		if (isset($_POST[ 'do_edit_colly' ])) {
 			$filename = $_POST[ 'filename' ];
@@ -402,12 +404,15 @@ require_once "header.php"; ?>
 					}
 				} else {
 					?>
-					<div class="headline">
-						Error
-					</div>
-
-					<div class="content_with_blenk">
-						There was an error during the conversion, please inform an admin!
+					<div class="row">
+						<div class="col-lg-4">
+							<div class="bs-component">
+								<div class="alert alert-dismissible alert-danger">
+									<button type="button" class="close" data-dismiss="alert">x</button>
+									There was an error during the conversion, please inform an admin!
+								</div>
+							</div>
+						</div>
 					</div>
 					<?php
 
@@ -428,12 +433,15 @@ require_once "header.php"; ?>
 					}
 				} else {
 					?>
-					<div class="headline">
-						Error
-					</div>
-
-					<div class="content_with_blenk">
-						There was an error during the conversion, please inform an admin!
+					<div class="row">
+						<div class="col-lg-4">
+							<div class="bs-component">
+								<div class="alert alert-dismissible alert-danger">
+									<button type="button" class="close" data-dismiss="alert">x</button>
+									There was an error during the conversion, please inform an admin!
+								</div>
+							</div>
+						</div>
 					</div>
 					<?php
 					$ask = "DELETE from image_of WHERE filename LIKE '$filename%'";
@@ -453,12 +461,15 @@ require_once "header.php"; ?>
 					}
 				} else {
 					?>
-					<div class="headline">
-						Error
-					</div>
-
-					<div class="content_with_blenk">
-						There was an error during the conversion, please inform an admin!
+					<div class="row">
+						<div class="col-lg-4">
+							<div class="bs-component">
+								<div class="alert alert-dismissible alert-danger">
+									<button type="button" class="close" data-dismiss="alert">x</button>
+									There was an error during the conversion, please inform an admin!
+								</div>
+							</div>
+						</div>
 					</div>
 					<?php
 
@@ -479,12 +490,15 @@ require_once "header.php"; ?>
 					}
 				} else {
 					?>
-					<div class="headline">
-						Error
-					</div>
-
-					<div class="content_with_blenk">
-						There was an error during the conversion, please inform an admin!
+					<div class="row">
+						<div class="col-lg-4">
+							<div class="bs-component">
+								<div class="alert alert-dismissible alert-danger">
+									<button type="button" class="close" data-dismiss="alert">x</button>
+									There was an error during the conversion, please inform an admin!
+								</div>
+							</div>
+						</div>
 					</div>
 					<?php
 					$ask = "DELETE from image_of WHERE filename LIKE '$filename%'";
@@ -506,12 +520,15 @@ require_once "header.php"; ?>
 					}
 				} else {
 					?>
-					<div class="headline">
-						Error
-					</div>
-
-					<div class="content_with_blenk">
-						There was an error during the conversion, please inform an admin!
+					<div class="row">
+						<div class="col-lg-4">
+							<div class="bs-component">
+								<div class="alert alert-dismissible alert-danger">
+									<button type="button" class="close" data-dismiss="alert">x</button>
+									There was an error during the conversion, please inform an admin!
+								</div>
+							</div>
+						</div>
 					</div>
 					<?php
 					$ask = "DELETE from image_of WHERE filename LIKE '$filename%'";
@@ -580,9 +597,9 @@ require_once "header.php"; ?>
 			}
 		}
 
-			//-----------------------------------------------------------------------------
-			// EDIT COLLY FIELD
-			//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
+// EDIT COLLY FIELD
+//----------------------------------------------------------------------------------------------
 
 		if (isset($_POST[ 'edit_colly' ])) {
 			$getcollyname = $_POST[ 'filename' ];
@@ -758,9 +775,9 @@ require_once "header.php"; ?>
 }
 include('info_release_summary.php');
 
-			//-----------------------------------------------------------------------------
-			// TOP CONTROL TABLE
-			//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
+// TOP CONTROL TABLE
+//----------------------------------------------------------------------------------------------
 if (!isset($_POST[ 'edit_colly' ])) {
 	$type = fetchOne("SELECT type FROM collys WHERE filename = :filename", [":filename" => $filename])->type ?? "";
 
@@ -861,14 +878,13 @@ if (!isset($_POST[ 'edit_colly' ])) {
 							</div>
 						</div>
 					</div>
-
 				</form>
 				<?php
 			}
 
-				//-----------------------------------------------------------------------------
-				// SHOW COLLY?
-				//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
+// SHOW COLLY?
+//----------------------------------------------------------------------------------------------
 
 			if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) {
 				$fgcolor = $_POST[ 'foreground_color' ];
@@ -908,9 +924,9 @@ if (!isset($_POST[ 'edit_colly' ])) {
 			<?php }
 		}
 
-				//-----------------------------------------------------------------------------
-				//SHOW COMMENTS
-				//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
+//SHOW COMMENTS
+//----------------------------------------------------------------------------------------------
 		if (!isset($_POST[ 'edit' ])) {
 			foreach (fetchAll("SELECT comment, rating, nick, timestamp, commentid, base64 FROM comments WHERE filename = :filename ORDER BY timestamp ASC", [":filename" => $filename]) as $row) {
 				$comment = $row->comment;
@@ -1033,9 +1049,9 @@ if (!isset($_POST[ 'edit_colly' ])) {
 		}
 	}
 
-				//-----------------------------------------------------------------------------
-				// ADD COMMENT FIELD
-				//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
+// ADD COMMENT FIELD
+//----------------------------------------------------------------------------------------------
 
 	if (isset($_POST[ 'addcomment' ])) {
 		$ask = "SELECT crew FROM crew_of WHERE filename='$filename'";
@@ -1105,9 +1121,9 @@ if (!isset($_POST[ 'edit_colly' ])) {
 	}
 }
 
-				//-----------------------------------------------------------------------------
-				// EDIT COMMENT FIELD
-				//-----------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+// EDIT COMMENT FIELD
+//--------------------------------------------------------------------------------------------------
 
 if (isset($_POST[ 'edit' ])) {
 	echo "<form action=\"$_SERVER[PHP_SELF]?filename=$decoded_filename&comment\" method=\"post\">";
