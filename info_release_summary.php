@@ -47,7 +47,7 @@ $dirname = $dirname[ 0 ];
 							?>
 						</span>
 					</div>
-					<div class="col-4">
+					<div class="col-lg-4">
 						<div class="row d-flex justify-content-between">
 
 							<span>Artist(s):</span>
