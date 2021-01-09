@@ -23,14 +23,14 @@ $dirname = $dirname[ 0 ];
 			?>
 			<div class="row">
 				<div class="header col-lg-12">
-					<h1><?=$colly->name?></h1>
+					<h1 class="ap-1"><?=$colly->name?></h1>
 				</div>
 			</div>
 
 
 			<div class="container-fluid">
-				<div class="row">
-					<div class="col-8 ml-0 pl-0 amt-1">
+				<div class="row ap-1 bg-secondary">
+					<div class="col-8 m-0 p-0" style="position: relative; top: -16px;">
 						<span>
 							<?php if ($colly->file_id == "file_id.diz.png") {
 								$file_id_diz = file_get_contents("collections/file_id.diz.txt");
@@ -48,7 +48,7 @@ $dirname = $dirname[ 0 ];
 						</span>
 					</div>
 					<div class="col-4">
-						<div class="row d-flex justify-content-between" style="margin-top: 16px;">
+						<div class="row d-flex justify-content-between">
 
 							<span>Artist(s):</span>
 

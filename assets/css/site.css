@@ -1298,19 +1298,33 @@ input[type=text]{
 
 
 .ap-1 { 
-  padding: 16px !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+  padding-top: 16px !important;
+  padding-bottom: 16px !important;
+}
+
+.am-1 { 
+  margin-left-left: 8px !important;
+  margin-right: 8px !important;
+  margin-top: 16px !important;
+  margin-bottom: 16px !important;
 }
 
 .apt-1 { 
   padding-top: 16px !important;
 }
 
+.amt-1 { 
+  margin-top: 16px !important;
+}
+
 .apl-1 { 
-  padding-left: 16px !important;
+  padding-left: 8px !important;
 }
 
 .apr-1 { 
-  padding-right: 16px !important;
+  padding-right: 8px !important;
 }
 
 .apb-1 { 
