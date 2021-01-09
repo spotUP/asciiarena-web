@@ -95,7 +95,7 @@ EOD;
 	</div>
 </div>
 <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-menu" style="top: 22px; border-top: 3px solid black;">
-	<div class="container-fluid">
+	<div class="container-fluid m-0 p-0">
 		<a href="/" class="navbar-brand">aSCIIaRENA</a>
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
 		        aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
@@ -168,7 +168,7 @@ EOD;
 		</div>
 	</div>
 </div>
-<div class="container-fluid" style="padding-top: 40px;">
+<div class="container-fluid m-0 p-0" style="padding-top: 40px;">
 	<div class="row" style="padding-top: 16px;">
 		<div class="col-12 d-flex justify-content-center">
 			<pre class="overflow-hidden d-none d-lg-block"><span class="magenta"><?=$stars1?></span></pre>
@@ -206,7 +206,7 @@ EOD;
 	<?php }
 	}
 	?>
-	<div class="col-12 m0 p-0 m-0 apb-1">
+	<div class="col-12 p-0 m-0 apb-1">
 		<div class="bs-component">
 			<div class="alert alert-dismissible alert-danger hide-on-landscape">
 				<button type="button" class="close" data-dismiss="alert">x</button>

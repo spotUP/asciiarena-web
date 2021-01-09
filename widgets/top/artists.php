@@ -1,6 +1,6 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
 	<div class="header col-lg-12">
-		<h2>TOP 5 ARTISTS</h2>
+		<h2 class="ap-1">TOP 5 ARTISTS</h2>
 	</div>
 <?php
 	foreach (fetchAll("SELECT nick, rating FROM artists ORDER BY rating DESC LIMIT 5") as $row) {

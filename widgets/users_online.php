@@ -1,7 +1,7 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
 
 <div class="header col-lg-12">
-	<h2>USERS ONLINE</h2>
+	<h2 class="ap-1">USERS ONLINE</h2>
 </div>
 
 <?php

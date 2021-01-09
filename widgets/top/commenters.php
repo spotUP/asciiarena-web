@@ -1,6 +1,6 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
 	<div class="header col-lg-12">
-		<h2>TOP COMMENTERS</h2>
+		<h2 class="ap-1">TOP COMMENTERS</h2>
 	</div>
 <?php
 	foreach (fetchAll("SELECT COUNT(nick) AS topcommentators, nick, user_id FROM comments GROUP BY nick ORDER BY topcommentators DESC LIMIT 5") as $row) {
