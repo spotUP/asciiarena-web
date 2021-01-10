@@ -15,7 +15,7 @@
 		}
 		$limit = 'LIMIT ' . ($pageno - 1) * $perpage . ',' . $perpage;
 		ob_start();
-		echo "<div class='row ml-0' style='margin-bottom: 16px;'>";
+		echo "<div class='row' style='margin-bottom: 16px;'>";
 		echo "<ul class='pagination'>";
 		if ($pageno !== 1) {
 			echo "<li class='page-item'><a class='page-link' href='?pageno=1&{$additional}'>FIRST</a></li>";
