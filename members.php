@@ -46,7 +46,9 @@ include "header.php";
 			<?php }
 			if ($member->rank === "Admin") {
 				?>
-				<img class="position-absolute" style="right: 0; top: -40px; z-index: 11;" src="/assets/data/sticker_king.png" alt="Admin">
+				<div class="jump" style="position: absolute; right: 15px; top: -12px; z-index: 11;">
+					<img class="position-absolute" style="right: 0; top: -40px; z-index: 11;" src="/assets/data/sticker_king.png" alt="Admin">
+				</div>
 				<?php
 			}
 			if (!empty($member->messenger) && ($member->display_messenger === "Yes")) {
@@ -72,15 +74,15 @@ include "header.php";
 			$kb = round($member->uploaded / 1000);
 			if ($kb >= 20000) {
 				?>
-				<img class="position-absolute" style="right: 15px; top: -12px; z-index: 11;"
-				src="/assets/data/sticker_pumper.png" alt="Pumper">
+				<div class="waggle" style="position: absolute; right: 15px; top: -12px; z-index: 11;">
+					<img src="/assets/data/sticker_pumper.png" alt="Pumper">
+				</div>
 				<?php
 			}
 			$comment_amount = fetchOne("SELECT COUNT(*) total FROM comments WHERE user_id = {$member->id}")->total;
 			if ($comment_amount >= 300) {
 				?>
-				<img class="position-absolute" style="right: 100px; top: -30px; z-index: 11;"
-				src="/assets/data/sticker_supporter.png" alt="Commenter">
+				<img class="position-absolute" style="right: 100px; top: -30px; z-index: 11;" src="/assets/data/sticker_supporter.png" alt="Commenter">
 				<?php
 			}
 			$colly_amount = fetchOne("SELECT COUNT(*) total from collys where uploader_id = {$member->id}")->total;
