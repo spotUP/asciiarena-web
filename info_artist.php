@@ -14,9 +14,7 @@ include "header.php";
     $validSorts = array(
       'a.name' => 'Name',
       'a.filename' => 'Filename',
-      'a.year, a.month' => 'Release Date',
-      'a.timestamp' => 'Upload Date',
-      'a.uploader' => 'Uploader'
+      'a.year, a.month' => 'Release Date'
     );
 
     $showartist=base64_decode($_GET['artist']);
