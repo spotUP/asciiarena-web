@@ -189,7 +189,7 @@ EOD;
 		<div class="page-header">
 			<div class="row">
 				<div class="col-12">
-					<h1 class="<?=$switcher?>" style="background: transparent; min-height: 16px;">
+					<h1 class="<?=$switcher?>" style="min-height: 16px;">
 							<span><?php if(!empty($switcher)) {
 									echo implode("</span><span style='display: none;'>", $h1);
 								} else {
