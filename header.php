@@ -186,7 +186,7 @@ EOD;
 	</script>
 	<?php if(!empty($h1)) {
 		$switcher = (is_array($h1)) ? "switcher" : ""; ?>
-		<div class="page-header" style="margin: 16px 0;">
+		<div class="page-header">
 			<div class="row">
 				<div class="col-12">
 					<h1 class="<?=$switcher?>" style="min-height: 16px;">
