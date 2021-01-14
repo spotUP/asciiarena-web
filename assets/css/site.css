@@ -1457,3 +1457,49 @@ input[type=text]{
     display: none;
   }
 }
+
+.jump {
+  animation: jump 1s 6s forwards cubic-bezier(.84,-0.54,.31,1.19);
+}
+
+.waggle {
+  animation: waggle 1s 1s forwards ease-out;
+}
+
+@keyframes jump {
+  0% {
+    transform: none;
+  }
+  50% {
+    transform: translateY(-2em);
+  }
+}
+
+@keyframes waggle {
+  0% {
+    transform: none;
+  }
+  50% {
+    transform: rotateZ(-20deg) scale(1.2);
+  }
+  60% {
+    transform: rotateZ(25deg) scale(1.2);
+  }
+  67.5% {
+    transform: rotateZ(-15deg) scale(1.2);
+  }
+  75% {
+    transform: rotateZ(15deg) scale(1.2);
+  }
+  82.5% {
+    transform: rotateZ(-12deg) scale(1.2);
+  }
+  85% {
+    transform: rotateZ(0) scale(1.2);
+  }
+  100% {
+    transform: rotateZ(0) scale(1);
+  }
+}
+
+
