@@ -169,7 +169,7 @@ EOD;
 	</div>
 </div>
 <div class="container-fluid m-0 p-0">
-	<div class="row" style="padding-top: 58px;">
+	<div class="row" style="padding-top: 58px; padding-bottom: 16px;">
 		<div class="col-12 d-flex justify-content-center">
 			<pre class="overflow-hidden d-none d-lg-block"><span class="magenta"><?=$stars1?></span></pre>
 			<div class="d-none d-lg-block">
