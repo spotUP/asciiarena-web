@@ -2,7 +2,7 @@
 	header('Content-Type: text/html; charset=UTF-8');
 	$logos = [];
 	foreach(fetchAll("SELECT ascii FROM logos ORDER BY RAND() limit 10") as $logo) {
-		$logos[] = '<a href="/" class="logo"><pre><span class="magenta">' . utf8_encode(base64_decode($logo->ascii)) . '</span></pre></a>';
+		$logos[] = '<a href="/" class="logo"><pre style="overflow: hidden;"><span class="magenta">' . utf8_encode(base64_decode($logo->ascii)) . '</span></pre></a>';
 	}
 	$stars1 = <<<EOD
 __/\__
@@ -82,7 +82,7 @@ EOD;
 	</script>
 </head>
 
-<body>
+<body style="overflow-x: hidden;">
 <div class="scanlines"></div>
 <!-- <div class="overlay"></div> -->
 <div class="vignette"></div>
@@ -171,14 +171,14 @@ EOD;
 <div class="container-fluid m-0 p-0">
 	<div class="row" style="padding-top: 58px; padding-bottom: 16px;">
 		<div class="col-12 d-flex justify-content-center">
-			<pre class="overflow-hidden d-none d-lg-block"><span class="magenta"><?=$stars1?></span></pre>
-			<div class="d-none d-lg-block">
+			<pre class="overflow-hidden d-none d-lg-block" style="position: relative; left: 32px;"><span class="magenta"><?=$stars1?></span></pre>
+			<div class="overflow-hidden d-none d-lg-block mx-auto">
 				<div id="logoswitcher">
-					<div class="logo" style="margin-left: 32px; margin-right: 32px;"><?=implode('</div><div class="logo" style="display: none;">', $logos)?></div>
+					<div class="logo overflow-hidden"><?=implode('</div><div class="logo" style="display: none;">', $logos)?></div>
 				</div>
 			</div>
 			<pre class="overflow-hidden d-lg-none"><span class="magenta"><?=$mobilelogo?></span></pre>
-			<pre class="overflow-hidden d-none d-lg-block aml-1"><span class="magenta"><?=$stars2?></span></pre>
+			<pre class="overflow-hidden d-none d-lg-block aml-1" style="position: relative; left: -32px;"><span class="magenta"><?=$stars2?></span></pre>
 		</div>
 	</div>
 	<script>
