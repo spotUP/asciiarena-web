@@ -6,36 +6,38 @@ require_once "header.php";
 ?>
 <div class="row">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2">
-<?php
+		<?php
 
-require_once "pagination.php";
+		require_once "pagination.php";
 
-$sort_by = $_GET[ 'sort_by' ] ?? "";
-switch ($sort_by) {
-	case "members":
-	case "releases":
-	$sort_order = "DESC";
-	break;
-	default:
-	$sort_order = "ASC";
-	$sort_by = "name";
-	break;
-}
+		$sort_by = $_GET[ 'sort_by' ] ?? "";
+		switch ($sort_by) {
+			case "members":
+			case "releases":
+			$sort_order = "DESC";
+			break;
+			default:
+			$sort_order = "ASC";
+			$sort_by = "name";
+			break;
+		}
 
-$pageno = $_GET[ 'pageno' ] ?? 1;
-$rows_per_page = 138;
-$pagination = pagination("crews", $pageno, $rows_per_page, "&sort_by={$sort_by}");
-if (!isset($_POST[ "search" ])) {
-	echo $pagination[ "pager" ];
-}
-?>
+		$pageno = $_GET[ 'pageno' ] ?? 1;
+		$rows_per_page = 138;
+		$pagination = pagination("crews", $pageno, $rows_per_page, "&sort_by={$sort_by}");
+		if (!isset($_POST[ "search" ])) {
+			echo $pagination[ "pager" ];
+		}
+		?>
 
 
 
-		<div class="collys_search">
-			<form action="?sort_by=<?=$sort_by?>" method="post">
-				<label>Search for: <input type="text" name="search"></label>
-			</form>
+		<div class="row amb-1">
+			<div class="col-4">
+				<form action="?sort_by=<?=$sort_by?>" method="post">
+					<label>Search for: <input type="text" name="search"></label>
+				</form>
+			</div>
 		</div>
 		<?php
 
@@ -44,21 +46,19 @@ if (!isset($_POST[ "search" ])) {
 	//-----------------------------------------------------------------------------
 
 
-
-
 		?>
-
-
-		<div class="content_slim_divider"></div>
-		<div class="row">
-			<div class="artist_crew col-4">
-				<a href="crews.php?sort_by=name">CREW</a>
+		<div class="row amb-1">
+			<div class="col-4">
+				<a class="white" href="crews.php?sort_by=name">CREW</a>
 			</div>
-			<div class="artist_crew col-4">
-				<a href="crews.php?sort_by=members">MEMBERS</a>
+			<div class="col-3">
+				<a class="white" href="crews.php?sort_by=members">MEMBERS</a>
 			</div>
-			<div class="artist_crew col-4">
-				<a href="crews.php?sort_by=releases">RELEASES</a>
+			<div class="col-3">
+				<a class="white" href="crews.php?sort_by=releases">RELEASES</a>
+			</div>
+			<div class="col-2">
+				<a class="white" href="crews.php?sort_by=releases">SCORE</a>
 			</div>
 		</div>
 		<?php
@@ -80,11 +80,18 @@ if (!isset($_POST[ "search" ])) {
 			$encoded_crew = base64_encode($crew->name);
 			?>
 			<div class="row">
-				<div class="forum_nick col-4">
+				<div class="col-4">
 					<a href="info_crew.php?crew=<?=$encoded_crew?>"><?=$crew->name;?><?=($acronym) ? " (" . $acronym .")" : '' ?></a>
 				</div>
-				<div class="artist_crew col-4"><?=(int)$crew->members?></div>
-				<div class="artist_crew col-4">N/A</div>
+				<div class="col-3 green">
+					<?=(int)$crew->members?>
+				</div>
+				<div class="magenta col-3">
+					N/A
+				</div>
+				<div class="col-2">
+					N/A
+				</div>
 			</div>
 			<?php
 		}
