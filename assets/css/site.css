@@ -1541,11 +1541,12 @@ input[type=text]{
 }
 
 .navbar-toggler-icon {
-  display: inline-block;
   width: 8px;
   height: 16px;
-  vertical-align: middle;
-  content: "";
-  background: no-repeat center center;
-  background-size: 100% 100%;
 }
+
+.dropup, .dropright, .dropdown, .dropleft {
+    line-height: 14px;
+    height: 16px;
+}
+
