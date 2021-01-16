@@ -17,7 +17,7 @@
 
 		?>
 		<div class="col-lg-12 d-flex justify-content-between">
-			<a href="mags.php?sort_by=timestamp"><?=$filename?></a>
+			<a class="magenta" href="mags.php?sort_by=timestamp"><?=$filename?></a>
 			<?=$upload_date?>
 		</div>
 		<?php

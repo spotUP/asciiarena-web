@@ -95,9 +95,9 @@ EOD;
 		<a href="/accounting.php"><img src="/assets/data/multitask.png" alt=""></a>
 	</div>
 </div>
-<div class="navbar navbar-expand-lg fixed-top navbar-dark bg-menu" style="top: 22px; border-top: 3px solid black;">
+<div class="navbar navbar-expand-lg fixed-top bg-blue" style="top: 22px; height: 21px">
 	<div class="container-fluid m-0 p-0">
-		<a href="/" class="navbar-brand">aSCIIaRENA</a>
+		<a href="/" style="color: #fff" class="navbar-brand">aSCIIaRENA</a>
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
 		        aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon">M</span>
@@ -159,7 +159,7 @@ EOD;
 					}
 				?>
 				<li class="nav-item">
-					<a class="nav-link" style="padding-right: 8px;" target="popup"
+					<a class="nav-link" style="padding-right: 8px; color: #eeee44" target="popup"
 					   onclick="window.open('/up-rough-amp/index.html','name','width=275,height=450')">MUSIC PLAYER</a>
 				</li>
 			</ul>

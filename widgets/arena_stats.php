@@ -4,17 +4,17 @@
 </div>
 <div class="col-12 d-flex justify-content-between">
 	<span>Collys Online:</span>
-	<span><?=fetchOne("SELECT COUNT(*) total FROM collys")->total?></span>
+	<span class="magenta"><?=fetchOne("SELECT COUNT(*) total FROM collys")->total?></span>
 </div>
 <div class="col-12 d-flex justify-content-between">
 	<span>Pumped Bytes:</span>
-	<span><?=fetchOne("SELECT sum(filesize) bytes FROM collys")->bytes?></span>
+	<span class="magenta"><?=fetchOne("SELECT sum(filesize) bytes FROM collys")->bytes?></span>
 </div>
 <div class="col-12 d-flex justify-content-between">
 	<span>Users:</span>
-	<span><?=fetchOne("SELECT COUNT(*) users FROM users")->users?></span>
+	<span class="magenta"><?=fetchOne("SELECT COUNT(*) users FROM users")->users?></span>
 </div>
 <div class="col-12 d-flex justify-content-between">
 	<span>Comments:</span>
-	<span><?=fetchOne("SELECT COUNT(*) comments FROM comments")->comments?></span>
+	<span class="magenta"><?=fetchOne("SELECT COUNT(*) comments FROM comments")->comments?></span>
 </div>

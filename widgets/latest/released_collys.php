@@ -34,7 +34,7 @@
 
 		?>
 		<div class="col-lg-12 d-flex justify-content-between">
-			<a href="info_release.php?filename=<?=$filename?>"><?=$latestreleased?></a>
+			<a class="magenta" href="info_release.php?filename=<?=$filename?>"><?=$latestreleased?></a>
 			<?=$release_year?>-<?=$release_month?>-<?=$release_day?>
 		</div>
 		<?php

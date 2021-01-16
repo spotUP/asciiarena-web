@@ -494,6 +494,7 @@ textarea {
   margin-right: 8px !important;
   width: 132px;
   text-align: center;
+  outline: 0;
 }
 
 .btn-secondary {

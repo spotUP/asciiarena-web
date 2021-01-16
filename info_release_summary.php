@@ -34,12 +34,12 @@ $dirname = $dirname[ 0 ];
 						<span>
 							<?php if ($colly->file_id == "file_id.diz.png") {
 								$file_id_diz = file_get_contents("collections/file_id.diz.txt");
-								echo "<pre>";
+								echo "<pre style=\"color: red\">";
 								echo $file_id_diz;
 								echo "</pre>";
 							} else {
 								if (file_exists("$file_id")) {
-									echo "<pre>";
+									echo "<pre class=\"magenta\">";
 									echo utf8_encode($file_id_diz);
 									echo "</pre>";
 								}
@@ -56,7 +56,7 @@ $dirname = $dirname[ 0 ];
 							$authors = [];
 							foreach (fetchAll("SELECT * FROM author_of WHERE filename = :filename", [":filename" => $filename]) as $row) {
 								$encoded_author = base64_encode($row->nick);
-								$authors[] = "<a href=\"info_artist.php?artist={$encoded_author}&sort_by=filename\">{$row->nick}</a>";
+								$authors[] = "<a class=\"green\" href=\"info_artist.php?artist={$encoded_author}&sort_by=filename\">{$row->nick}</a>";
 							}
 							?>
 							<span>
