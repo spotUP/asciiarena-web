@@ -207,8 +207,7 @@ h5, .h5 {
 
 a
 {   
-  color: #eeee44;
-  text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.40)
+
 }
 
 
@@ -709,106 +708,128 @@ option {
 
 span.black
 {   
-  color: #000000;
-  text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.40)
+  color: #000000 !important;
+  text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.40) !important;
 }
 
 
 span.blue
 {   
-  color: rgb(0, 0, 170);
-  text-shadow: 1px 1px 10px rgba(0, 0, 170, 0.40)
+  color: rgb(0, 0, 170) !important;
+  text-shadow: 1px 1px 10px rgba(0, 0, 170, 0.40) !important;
 }
 
-span.green
+.green
 {    
-  color: rgb(0, 170, 0);
-  text-shadow: 1px 1px 10px rgba(0, 170, 0, 0.40)
+  color: rgb(85, 255, 85) !important;
+  text-shadow: 1px 1px 10px rgba(0, 170, 0, 0.40) !important;
 }
 
+.green:hover
+{   
+  color: rgb(255, 255, 255) !important;
+  text-shadow: 1px 1px 10px rgba(85, 255, 85, 0.40) !important;
+}
 
 
 span.cyan
 {   
   color: rgb(0, 187, 187) !important;
-  text-shadow: 1px 1px 10px rgba(0, 187, 187, 0.40)
+  text-shadow: 1px 1px 10px rgba(0, 187, 187, 0.40) !important;
 }
 
 span.red
 {   
-  color: #aa0000;
-  text-shadow: 1px 1px 10px rgba(170, 0, 0, 0.40)
+  color: #aa0000 !important;
+  text-shadow: 1px 1px 10px rgba(170, 0, 0, 0.40) !important;
 }
 
-span.magenta
+.magenta
 {   
-  color: #bb00bb;
-  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)
+  color: rgb(255, 85, 255) !important; 
+  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
+}
+
+.magenta:hover
+{   
+  color: rgb(255, 255, 255) !important;
+  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
 }
 
 span.pink
 {   
-  color: #bb00bb;
-  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)
+  color: #bb00bb !important;
+  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
+}
+
+.pink
+{   
+  color: #bb00bb !important;
+  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
+}
+
+.pink:hover{
+  color: rgb(255, 255, 255) !important;
+  text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.40) !important;
 }
 
 span.brown
 {   
-  color: #aa5500;
-  text-shadow: 1px 1px 10px rgba(170, 85, 0, 0.40)
+  color: #aa5500 !important;
+  text-shadow: 1px 1px 10px rgba(170, 85, 0, 0.40) !important;
 }
 
 
 span.grey
 {   
-  color: rgb(85, 85, 85);
-  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)
+  color: rgb(85, 85, 85) !important;
+  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
 }         
 
 
 span.lightgrey
 {   
-  color: rgb(170, 170, 170);
-  text-shadow: 1px 1px 10px rgba(170, 170, 170, 0.40)
+  color: rgb(170, 170, 170) !important;
+  text-shadow: 1px 1px 10px rgba(170, 170, 170, 0.40) !important;
 }
 
 
 span.white
 {   
-  color: rgb(255, 255, 255);
-  text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.40)
+  color: rgb(255, 255, 255) !important;
+  text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.40) !important;
 }
 
 span.lightcyan
 {   
-  color: rgb(85, 255, 255); 
-  text-shadow: 1px 1px 10px rgba(85, 255, 255, 0.40)
+  color: rgb(85, 255, 255) !important;
+  text-shadow: 1px 1px 10px rgba(85, 255, 255, 0.40) !important;
 }
 
 span.lightgreen
 {   
-  color: rgb(85, 255, 85);
-  text-shadow: 1px 1px 10px rgba(85, 255, 85, 0.40)
+  color: rgb(85, 255, 85) !important;
+  text-shadow: 1px 1px 10px rgba(85, 255, 85, 0.40) !important;
 }
 
 
-span.lightpink
+.lightpink
 {   
-  color: rgb(255, 85, 255); 
-  text-shadow: 1px 1px 10px rgba(255, 85, 255, 0.40)
+  color: rgb(255, 85, 255) !important;
+  text-shadow: 1px 1px 10px rgba(255, 85, 255, 0.40) !important;
 }
 
 span.lightblue
 {   
-  color: rgb(85, 85, 255); 
-  text-shadow: 1px 1px 10px rgba(85, 85, 255, 0.40)
+  color: rgb(85, 85, 255) !important;
+  text-shadow: 1px 1px 10px rgba(85, 85, 255, 0.40) !important;
 }
 
 
 span.lightred
 {   
-  color: rgb(255, 85, 85); 
-  text-shadow: 1px 1px 10px rgba(255, 85, 85, 0.40)
+  color: rgb(255, 85, 85) !important;
+  text-shadow: 1px 1px 10px rgba(255, 85, 85, 0.40) !important;
 }
 
 a.nav-link:hover{
@@ -837,19 +858,19 @@ a.dropdown-item:focus{
 
 a:hover, a.ascii:hover{
   background: transparent;
-  /*color: #ffffff; */
-  /*  text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.30), 1px 1px 20px #000 !important; */
-  background: linear-gradient(to right, #6666ff, #0099ff , #00ff00, #ff3399, #6666ff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: rainbow_animation 20s ease-in-out infinite;
-  background-size: 400% 100%;
-  animation: colorRotate 6s linear 0s infinite;
+  color: #ffffff;
+  margin-left: 8px;
 }
-span.yellow
+
+.yellow
 {   
-  color: #eeee44;
+  color: rgb(255,255,85);
+  text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.40)
+}
+
+.yellow:hover
+{   
+  color: #ffffff;
   text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.40)
 }
 

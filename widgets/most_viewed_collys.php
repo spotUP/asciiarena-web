@@ -13,7 +13,7 @@
 		$views = $row->view_counter;
 		?>
 		<div class="col-lg-12 d-flex justify-content-between">
-			<a class="pink" href="info_release.php?filename=<?=$decodedfilename?>"><?=$filename?></a>
+			<a class="magenta" href="info_release.php?filename=<?=$decodedfilename?>"><?=$filename?></a>
 			<?=$views?>
 		</div>
 		<?php
