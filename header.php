@@ -140,13 +140,10 @@ EOD;
 							<a class="nav-link" href="/submit.php">SUBMiT</a>
 						</li>
 						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" style="padding-right: 8px; data-toggle="dropdown" href="#">ACCOUNT<span class="caret" style="padding-right: 8px;"></span></a>
+							<a class="nav-link dropdown-toggle" style="padding-right: 8px;" data-toggle="dropdown" href="#">ACCOUNT<span class="caret" style="padding-right: 8px;"></span></a>
 							<div class="dropdown-menu" aria-labelledby="account">
-
-								<a class="dropdown-item" href="/messages.php">MAiL<span
-										style="padding-left: 4px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;</span></a>
-								<a class="dropdown-item" href="/crib.php">CRiB<span
-										style="padding-left: 4px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;</span></a>
+								<a class="dropdown-item" href="/messages.php">MAiL<span style="padding-left: 4px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;</span></a>
+								<a class="dropdown-item" href="/crib.php">CRiB<span style="padding-left: 4px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;</span></a>
 								<div class="dropdown-divider">~~~~~~~~</div>
 								<?php
 									if(is_admin()) {
