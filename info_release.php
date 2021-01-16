@@ -948,9 +948,9 @@ if (!isset($_POST[ 'edit_colly' ])) {
 					if ($commentnick === $_user[ "nick" ]) {
 						?>
 						<div class="header bg-header col-12 ap-1">
-							<span class="yellow"> BY:</span>
-							<span class="white"><?=$commentnick?></span>
-							<span class="yellow">DATE:</span>
+							<span> BY:</span>
+							<span class="yellow"><?=$commentnick?></span>
+							<span>DATE:</span>
 							<span class="white"><?=$commenttime?></span>
 							<span class="yellow">RATING:</span>
 							<span class="white"><?=$userrating?></span>
@@ -965,9 +965,9 @@ if (!isset($_POST[ 'edit_colly' ])) {
 					} else {
 						?>
 						<div class="header bg-header col-12 ap-1">
-							<span class="yellow"> BY:</span>
-							<span class="white"><?=$commentnick?></span>
-							<span class="yellow">DATE:</span>
+							<span> BY:</span>
+							<span class="yellow"><?=$commentnick?></span>
+							<span>DATE:</span>
 							<span class="white"><?=$commenttime?></span>
 							<span class="yellow">RATING:</span>
 							<span class="white"><?=$userrating?></span>
@@ -981,12 +981,12 @@ if (!isset($_POST[ 'edit_colly' ])) {
 				if (is_admin()) {
 					?>
 					<div class="header bg-header col-12 ap-1">
-						<span class="yellow"> BY:</span>
-						<span class="white"><?=$commentnick?></span>
-						<span class="yellow">DATE:</span>
-						<span class="white"><?=$commenttime?></span>
-						<span class="yellow">RATING:</span>
-						<span class="white"><?=$userrating?></span>
+						<span> BY:</span>
+						<span class="yellow"><?=$commentnick ?></span>
+						<span> DATE:</span>
+						<span class="white"><?=$commenttime ?></span>
+						<span class="yellow"> RATING:</span>
+						<span class="white"><?=$userrating ?></span>
 					</div>
 					<div class="bg-secondary col-12 ap-1 amb-1">
 						<span class="cyan"><?=$comment?></span>
@@ -1004,10 +1004,10 @@ if (!isset($_POST[ 'edit_colly' ])) {
 					if ($commentnick === $_user[ "nick" ]) {
 						?>
 						<div class="header bg-header col-12 ap-1">
-							<span class="yellow"> BY:</span>
-							<span class="white"><?=$commentnick?></span>
-							<span class="yellow">DATE:</span>
-							<span class="white"><?=$commenttime?></span>
+							<span> BY:</span>
+							<span class="yellow"><?=$commentnick ?></span>
+							<span> DATE:</span>
+							<span class="white"><?=$commenttime ?></span>
 						</div>
 						<div class="col-12 ap-1 amb-1">
 							<span class="cyan"><?=$comment?></span>
@@ -1020,10 +1020,10 @@ if (!isset($_POST[ 'edit_colly' ])) {
 					} else {
 						?>
 						<div class="header bg-header col-12 ap-1">
-							<span class="yellow"> BY:</span>
-							<span class="white"><?=$commentnick?></span>
-							<span class="yellow">DATE:</span>
-							<span class="white"><?=$commenttime?></span>
+							<span> BY:</span>
+							<span class="yellow"><?=$commentnick ?></span>
+							<span> DATE:</span>
+							<span class="white"><?=$commenttime ?></span>
 						</div>
 						<div class="bg-secondary col-12 ap-1 amb-1">
 							<span class="cyan"><?=$comment?></span>
@@ -1034,10 +1034,10 @@ if (!isset($_POST[ 'edit_colly' ])) {
 				if (is_admin()) {
 					?>
 					<div class="bg-header header col-12 ap-1">
-						<span class="yellow"> BY:</span>
-						<span class="white"><?=$commentnick?></span>
-						<span class="yellow">DATE:</span>
-						<span class="white"><?=$commenttime?></span>
+						<span> BY:</span>
+						<span class="yellow"><?=$commentnick ?></span>
+						<span> DATE:</span>
+						<span class="white"><?=$commenttime ?></span>
 					</div>
 					<div class="bg-secondary col-12 ap-1 amb-1">
 						<span class="cyan"><?=$comment?></span>

@@ -19,7 +19,7 @@
 		$upload_date = date("o-m-d", $upload_date);
 		?>
 		<div class="col-lg-12 d-flex justify-content-between">
-			<a href="apps.php?sort_by=timestamp DESC"><?=$filename?></a>
+			<a class="magenta" href="apps.php?sort_by=timestamp DESC"><?=$filename?></a>
 			<?=$upload_date?>
 		</div>
 		<?php
