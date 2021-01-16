@@ -17,7 +17,7 @@
 
 		?>
 		<div class="col-lg-12 d-flex justify-content-between">
-			<a href="info_release.php?filename=<?=$encodedfilename?>"><?=$filename?></a>
+			<a class="magenta" href="info_release.php?filename=<?=$encodedfilename?>"><?=$filename?></a>
 			<?=$upload_date?>
 		</div>
 		<?php
