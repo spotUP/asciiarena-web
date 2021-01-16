@@ -794,7 +794,7 @@ span.lightgrey
 }
 
 
-span.white
+.white
 {   
   color: rgb(255, 255, 255) !important;
   text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.40) !important;
@@ -856,12 +856,23 @@ a.dropdown-item:focus{
   color: #aaa !important;
 }
 
-a:hover, a.ascii:hover{
+a:hover{
   background: transparent;
   color: #ffffff;
-  margin-left: 8px;
+/*  margin-left: 8px; */
 }
 
+a:hover::before{
+  content: ">";
+}
+
+a.ascii:hover{
+  content: initial !important;
+}
+
+a.ascii:hover::before{
+  content: initial !important;
+}
 .yellow
 {   
   color: rgb(255,255,85);
