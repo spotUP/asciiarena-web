@@ -87,6 +87,7 @@ EOD;
 <!-- <div class="overlay"></div> -->
 <div class="vignette"></div>
 <!--<div class="noise"></div> -->
+
 <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-white d-flex justify-content-between"
      style="height: 22px; margin-bottom: 2px; padding-right: 2px;">
 	<span style="margin-left: 16px;" class="ncommm">NComm 2.0 Copyright 1988-1992 Daniel Bloch & co.</span>
@@ -99,7 +100,7 @@ EOD;
 		<a href="/" class="navbar-brand">aSCIIaRENA</a>
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
 		        aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-			<span class="navbar-toggler-icon"></span>
+			<span class="navbar-toggler-icon">M</span>
 		</button>
 		<div class="collapse navbar-collapse" id="navbarResponsive">
 			<ul class="navbar-nav">
@@ -168,6 +169,7 @@ EOD;
 		</div>
 	</div>
 </div>
+
 <div class="container-fluid m-0 p-0">
 	<div class="row" style="padding-top: 58px; padding-bottom: 16px;">
 		<div class="col-12 d-flex justify-content-center">

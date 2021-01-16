@@ -604,8 +604,8 @@ body > div.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-white > span
 }
 
 .dropdown-toggle::after {
-    position: relative;
-    top: -3px;
+  position: relative;
+  top: -3px;
 }
 
 .valid-feedback {
@@ -1502,4 +1502,50 @@ input[type=text]{
   }
 }
 
+.show{
+  display: inline-block !important;
+}
 
+@media only screen and (max-width: 768px) {
+  .show{
+    border: 0;
+  }
+  .dropdown-item {
+    margin-left: 12px;
+  }
+  .navbar-nav .dropdown-menu {
+    background: none;
+  }
+}
+
+.collapse{
+  display: none;
+}
+
+.navbar-toggler{
+  outline:0;
+  background: grey;
+  color: black;
+  height: 16px !important;
+  width: 8px;
+  margin: 0px !important;
+  padding: 0px !important;
+  line-height: 15px !important;
+}
+
+.navbar-toggler:focus{
+  outline:0;
+  background: black;
+  color: white;
+  height: 16px !important;
+}
+
+.navbar-toggler-icon {
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  vertical-align: middle;
+  content: "";
+  background: no-repeat center center;
+  background-size: 100% 100%;
+}
