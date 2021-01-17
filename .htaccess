@@ -17,10 +17,7 @@ RewriteCond %{REQUEST_FILENAME} !-d
 # Rewrite all other URLs to index.php/URL
 RewriteRule .* index.php/$0 [PT,L]
 
-RewriteCond %{HTTP_HOST} ^asciiarena\.com [NC]
-RewriteCond %{SERVER_PORT} 80
-RewriteRule ^(.*)$ https://www.asciiarena.com/$1 [R,L]
-
-RewriteCond %{HTTP_HOST} ^asciiarena\.se [NC]
-RewriteCond %{SERVER_PORT} 80
-RewriteRule ^(.*)$ https://www.asciiarena.se/$1 [R,L]
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
+Header always set Content-Security-Policy "upgrade-insecure-requests;"
