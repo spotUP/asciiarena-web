@@ -90,24 +90,32 @@ switch ($sort_by) {
 					$dirname = $dirname[ 0 ];
 					{
 						?>
-						<div class="row">
-							<div class="col-6">
-								<a href="info_release.php?filename=<?=$encoded_filename?>"> <span class="cyan"><?=$filename?>&nbsp;</span></a> <span class="green">PF--&nbsp;&nbsp;</span> <span class="yellow"><?=$row->filesize?>&nbsp;</span><span class="yellow"><?=$upload_date?></span>
-							</div>
-							<div class="col-6">
-								<a href="info_release.php?filename=<?=$encoded_filename?>"><img src="/collections/<?=$dirname?>/<?=$file_id?>" alt=""></a>
-							</div>
+					<div class="row">
+						<div class="col-6">
+							<a href=""><span class="cyan" style="margin-right: 8px;"><?=$filename?></span></a> <span class="green" style="margin-right: 16px;">PF--</span> <span class="yellow" style="margin-right: 8px;"><?=$row->filesize?></span> <span class="yellow"><?=$upload_date?></span>
+							<?php
+							$ask_sig = "SELECT upload_signature from users where nick = :uploader";
+							$upload_signature = fetchOne($ask_sig, [":uploader" => $uploader])->upload_signature;
+							?>
 						</div>
-						<div class="row">
-							<div class="col-6">
-								<?php
-								$ask_sig = "SELECT upload_signature from users where nick = :uploader";
-								$upload_signature = fetchOne($ask_sig, [":uploader" => $uploader])->upload_signature;
-								?>							
-								<span class="pink"><?=$upload_signature?></span>
-								<span class="green">[ aSCIIaRENa ] [ FREE LEECH ] [ aSCIIaRENa ]</span>
-							</div>
+						<div class="col-6 apb-1" style="margin-top: -16px;">				
+							<pre style="overflow: hidden;"><a class="magenta ascii" href="info_release.php?filename=<?=$encoded_filename?>"><?=$orig?></a></pre>
 						</div>
+					</div>
+					<div class="row apb-1">
+						<div class="col-6">
+						</div>
+						<div class="col-6">
+							<span class="pink text-right"><?=$upload_signature?></span>
+						</div>
+					</div>
+					<div class="row apb-2">
+						<div class="col-6">
+						</div>
+						<div class="col-6">
+							<span class="green text-right">[ aSCIIaRENa ] [ FREE LEECH ] [ aSCIIaRENa ]</span>
+						</div>
+					</div>
 						<?php
 					}
 				}
