@@ -1363,6 +1363,11 @@ input[type=text]{
 .apb-1 { 
   padding-bottom: 16px !important;
 }
+
+.apb-2 { 
+  padding-bottom: 32px !important;
+}
+
 .amb-1 { 
   margin-bottom: 16px !important;
 }
