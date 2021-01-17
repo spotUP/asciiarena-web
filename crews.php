@@ -86,7 +86,7 @@ require_once "header.php";
 				<div class="col-3 green">
 					<?=(int)$crew->members?>
 				</div>
-				<div class="magenta col-3">
+				<div class="magenta col-3 nolink">
 					N/A
 				</div>
 				<div class="col-2">
