@@ -23,8 +23,7 @@
 					<input class="form-control col-11 tagtext" type="text" maxlength="68" name="tagtext"
 					       placeholder="Tag the wall"
 					       id="<?=$tag?>" required autocomplete="off">
-					<button class="btn-primary col-1" style="margin: 0 !important; padding: 0 !important" type="submit">Tag
-					</button>
+					<button class="btn-primary col-1" style="margin: 0 !important; padding: 0 !important" type="submit">Tag</button>
 				</form>
 			</div>
 			<script>
