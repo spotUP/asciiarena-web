@@ -1,5 +1,5 @@
 <?php
-	require_once "session.php";
+	include "session.php";
 	$h1 = "wELCOME tO aSCIIaRENA";
 	include "header.php";
 ?>
@@ -13,6 +13,7 @@
 //-----------------------------------------------------------------------------
 
 		if (isset($_POST[ 'postnewmessage' ]) && (isset($_GET[ 'post' ]))) {
+			$postername = $_user['nick'];
 			$posttomember = $_POST[ 'posttomember' ];
 			$postsubject = $_POST[ 'postsubject' ];
 			$postmessage = $_POST[ 'postmessage' ];
@@ -66,23 +67,28 @@
 				exit;
 			}
 
-			$ask = "SELECT thread FROM messages ORDER BY thread DESC LIMIT 1";
-			$result = mysql_query($ask, $dbh);
-			if (mysql_num_rows($result) > 0) {
-				while ($row = mysql_fetch_array($result)) {
-					$thread = $row[ 0 ];
-				}
-			}
+			$ask = $_db->prepare("SELECT thread FROM messages ORDER BY thread DESC LIMIT 1");
+			$ask->execute();
+			$row = $ask->fetch(PDO::FETCH_OBJ);
+			$thread = $row->thread;
 			if (empty($thread)) {
 				$thread = 0;
 			}
 			$thread++;
 
-			$postsubject = cleanInsertPost($postsubject);
-			$postmessage = cleanInsertPost($postmessage);
 			$now = time();
-			$ask = "insert into messages values (0,$thread,'$posttomember','$nick',$now,'$postsubject','$postmessage',1,1)";
-			mysql_query($ask, $dbh);
+			$ask = $_db->prepare("INSERT INTO messages 
+       (thread, postedto, postername, timestamp, subject, message, new, unread)
+VALUES (:thread,:posttomember,:postername,:now,:postsubject,:postmessage,1,1)
+");
+			$ask->execute([
+				'thread' => $thread,
+				'posttomember' => $posttomember,
+				'postername' => $postername,
+				'now' => $now,
+				'postsubject' => $postsubject,
+				'postmessage' => $postmessage
+			]);
 			?>
 			<meta http-equiv="Refresh" content="0; url=messages.php">
 			<?php
@@ -169,8 +175,8 @@
 		if (isset($_POST[ 'deletemessage' ])) {
 			$deleteid = ($_POST[ 'thread' ]);
 
-			$ask = "delete from messages where thread=$deleteid and postedto='$nick'";
-			mysql_query($ask, $dbh);
+			$ask = $_db->prepare("delete from messages where thread=:deleteid and postedto=:nick");
+			$ask->execute(['deleteid' => $deleteid, 'nick' => $nick]);
 		}
 
 //-----------------------------------------------------------------------------
@@ -258,13 +264,13 @@
 						</div>
 
 						<?php
-						$update = "update messages set new=0 where thread=$thread";
-//						mysql_query($update, $dbh);
+						$update = $_db->prepare("update messages set new=0 where thread=:thread");
+						$update->execute(['thread']);
 					}
 
-					$ask = "select * from messages where thread=$thread";
-					$result = mysql_query($ask, $dbh);
-					while ($row = mysql_fetch_array($result)) {
+					$ask = $_db->prepare("select * from messages where thread = :thread");
+					$ask->execute(['thread' => $thread]);
+					foreach($rows as $row) {
 						$messpostername = $row[ 'postername' ];
 						$messtimestamp = $row[ 'timestamp' ];
 						$messtime = date("Y-m-d H:i", $messtimestamp);
@@ -331,11 +337,12 @@
 						Receiver:
 						<select name="posttomember">
 							<?php
-								$ask = "SELECT nick FROM users ORDER BY nick ASC";
-								$result = mysql_query($ask, $dbh);
-								while ($row = mysql_fetch_row($result)) {
-									$allnicks = $row[ 0 ];
-									echo "<option>$allnicks</option>";
+								$ask = $_db->prepare("SELECT nick FROM users ORDER BY nick ASC");
+								$ask->execute();
+								$rows = $ask->fetchAll(PDO::FETCH_OBJ);
+								foreach($rows as $row) {
+									$nick = htmlspecialchars($row->nick);
+									echo "<option>$nick</option>";
 								}
 							?>
 						</select>
