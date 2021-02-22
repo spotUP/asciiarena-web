@@ -1,7 +1,7 @@
 <?php
 	define("VALID", true);
 	define("BASEDIR", __DIR__);
-	define("DEBUG", (in_array($_SERVER[ "REMOTE_ADDR" ], ["127.0.0.1", "77.53.224.247"])));
+	define("DEBUG", (in_array($_SERVER[ "REMOTE_ADDR" ], ["127.0.0.1", "77.53.224.247", "::1"])));
 	if (DEBUG) {
 		ini_set("display_errors", 1);
 		ini_set("display_startup_errors", 1);
