@@ -1,5 +1,5 @@
 <?php defined('VALID') or die('Nuh-uh!');
-	$_db = new PDO("mysql:dbname=uprough_ascii;host=localhost:3306", "uprough_ascii", "D0pestD0pest",
+	$_db = new PDO("mysql:dbname=uprough_ascii;host=srv-captain--mariadb-db", "root", getenv('DBPW'),
 		[PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 	$_queries = [];
 	if (DEBUG) {
