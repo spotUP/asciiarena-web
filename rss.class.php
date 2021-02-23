@@ -31,7 +31,6 @@
 
 	private function getItems($id)
 	{
-		require_once ('dbconnect_asciiarena.php'); 
 		
 		switch ($id)
 		{

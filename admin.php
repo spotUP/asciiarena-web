@@ -1,5 +1,4 @@
 <?php
-require_once('dbconnect_asciiarena.php'); 
 require_once('ansilove.php');
 ?>
 
