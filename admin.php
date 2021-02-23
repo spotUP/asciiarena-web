@@ -150,7 +150,7 @@ require_once('ansilove.php');
 		}
 		?>
 		<meta http-equiv="Refresh" content="0; url=admin.php">
-		<?
+		<?php
 	}	
 
 
@@ -169,7 +169,7 @@ require_once('ansilove.php');
 			$ask="delete from users where nick='$delete_user'";
 			mysql_query($ask,$dbh);
 		}
-		?><meta http-equiv="Refresh" content="0; url=admin.php"><?
+		?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
 	}	
 
 
@@ -190,7 +190,7 @@ require_once('ansilove.php');
 			$ask="delete from bbs_of where crew='$delete_crew'";
 			mysql_query($ask,$dbh);
 		}
-		?><meta http-equiv="Refresh" content="0; url=admin.php"><?
+		?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
 	}	
 
 //---------------------------------------------------------------------------------------------------------------
@@ -213,7 +213,7 @@ require_once('ansilove.php');
 			$ask="delete from logos where filename='$delete_sitelogo'";
 			mysql_query($ask,$dbh);
 		}
-		?><meta http-equiv="Refresh" content="0; url=admin.php"><?
+		?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
 	}	
 
 //---------------------------------------------------------------------------------------------------------------
@@ -382,7 +382,7 @@ require_once('ansilove.php');
 			$ask="delete from bbses where name='$delete_bbs'";
 			mysql_query($ask,$dbh);
 		}
-		?><meta http-equiv="Refresh" content="0; url=admin.php"><?
+		?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
 	}	
 
 //---------------------------------------------------------------------------------------------------------------
@@ -401,7 +401,7 @@ require_once('ansilove.php');
 			$ask="delete from member_of where nick='$delete_artist'";
 			mysql_query($ask,$dbh);
 		}
-		?><meta http-equiv="Refresh" content="0; url=admin.php"><?
+		?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
 	}	
 
 //---------------------------------------------------------------------------------------------------------------
@@ -991,7 +991,7 @@ require_once('ansilove.php');
 				You must enter a valid E-Mail adress!
 			</div>
 			<meta http-equiv="Refresh" content="2; url=admin.php">
-			<?
+			<?php
 			exit();
 		}
 		$user_nick=$_POST['usernick'];
@@ -1034,7 +1034,7 @@ require_once('ansilove.php');
 				You have to make a signature before submitting!
 			</div>
 			<meta http-equiv="Refresh" content="2; url=admin.php">
-			<?
+			<?php
 			exit();
 		}
 
@@ -1093,7 +1093,7 @@ require_once('ansilove.php');
 				You submit an empty logo!
 			</div>
 			<meta http-equiv="Refresh" content="2; url=admin.php">
-			<?
+			<?php
 			exit();
 		}
 
@@ -1176,7 +1176,7 @@ require_once('ansilove.php');
 		<input type="submit" name="open_edit_colly_field" value="Select">
 		<input type="hidden" name="filename" value="<?=$getcollyname?>">
 	</div>
-	<?
+	<?php
 			if(isset($_POST['getcollyname']) && (isset($_POST['open_edit_colly_field'])))
 			{
 				$getcollyname=$_POST['getcollyname'];
@@ -1209,7 +1209,7 @@ require_once('ansilove.php');
 					</div>
 					
 					<div class="info_release_right">
-						<?
+						<?php
 						echo "<SELECT NAME=edit_colly_year>";
 						$countyear=1986;
 						$maxyear=date("Y");
@@ -1258,7 +1258,7 @@ require_once('ansilove.php');
 					</div>
 					
 					<div class="info_release_right">											
-						<?
+						<?php
 						$ask="select nick from author_of where filename='$getcollyname'";
 						$result=mysql_query($ask,$dbh);
 						while ($row=mysql_fetch_array($result))
@@ -1288,7 +1288,7 @@ require_once('ansilove.php');
 					
 					<div class="info_release_right">							
 
-						<?
+						<?php
 						$ask="select crew from crew_of where filename='$getcollyname'";
 						$result=mysql_query($ask,$dbh);
 						while ($row=mysql_fetch_array($result))
@@ -1319,7 +1319,7 @@ require_once('ansilove.php');
 					</div>
 				</div>						
 			</form>
-			<?
+			<?php
 		 }
 
 //--------------------------------------------------------------------------------
@@ -1467,11 +1467,11 @@ require_once('ansilove.php');
 				<input type="hidden" name="getcrew" value="<?=$getcrew?>">
 				<input type="submit" name="do_change_crew" value="Change">
 			</div>
-			<?
+			<?php
 			} 
 			?>
 	</form>
-	<?
+	<?php
 
 //--------------------------------------------------------------------------------
 // EDIT ARTIST FIELD
@@ -1504,7 +1504,7 @@ require_once('ansilove.php');
 		<div class="content_with_blenk">&nbsp;</div>
 		
 	<select name="getartist">
-	<?
+	<?php
 	if (isset($show_artist_nick))
 	{
   		echo "<option selected=\"selected\" value=\"$show_all_user_names\">$show_artist_nick</option>";
@@ -1521,7 +1521,7 @@ require_once('ansilove.php');
 	<input type="submit" value="Select">
 	</form>
 	<form enctype="multipart/form-data" action="#" method="post">
-	<?	
+	<?php
 	if (isset($_POST['getartist']))
 	{ 
 		$getartist=$_POST['getartist'];
@@ -1566,7 +1566,7 @@ require_once('ansilove.php');
 				<select name="old_artist_crews[]"> 
 					<option selected="selected"><?=$artist_crew?></option>
 					<option value="Delete">Remove Crew</option>
-					<?
+					<?php
 					$ask_crews="select name from crews";
 					$result_crews=mysql_query($ask_crews,$dbh);
 					while ($row_crews=mysql_fetch_array($result_crews))
@@ -1590,7 +1590,7 @@ require_once('ansilove.php');
 		
 		<div class="content">
 			<select name="change_artist_country">
-				<? 
+				<?php
 				if (!empty($show_artist_country))
 				{
 					echo "<option selected value=\"$symbol\">$show_artist_country</option>\n";
@@ -1624,7 +1624,7 @@ require_once('ansilove.php');
 			<input type="hidden" name="getartist" value="<?=$getartist?>" />	
 			<input type="submit" name="do_edit_artist" value="Change">
 		</div>
-		<?	
+		<?php
 		} 
 		?>
 	</form>
@@ -1684,7 +1684,7 @@ require_once('ansilove.php');
 		$getuser=$_POST['getuser'];
 		?>
 		<form enctype="multipart/form-data" action="admin.php" method="post">
-		<?
+		<?php
 		$ask="select * from users where nick='$getuser'";
 		$result=mysql_query($ask);
 	
@@ -1736,7 +1736,7 @@ require_once('ansilove.php');
 			Birth:
 			<select name="changeuserbyear"> 
 				<option><?=$show_user_byear?></option>";
-				<?
+				<?php
 				$countyear=1900;
 				$maxyear=date("Y")-5;
 				while($countyear<$maxyear)
@@ -1750,7 +1750,7 @@ require_once('ansilove.php');
 
 		<div class="content">
 			<select name="changeuserbmonth">
-				<?
+				<?php
 				echo "<option>$show_user_bmonth</option>";
 				$countmonth=1;
 				$maxmonth=12;
@@ -1763,7 +1763,7 @@ require_once('ansilove.php');
 			</select>
 
 			<select name=\"changeuserbday\">
-				<?
+				<?php
 				echo "<option>$show_user_bday</option>";
 				$countday=1;
 				$maxday=31;
@@ -1781,7 +1781,7 @@ require_once('ansilove.php');
 		
 		<div class="content">
 			<select name="changeusercountry">
-					<? 
+					<?php
 					if (!empty($show_user_country))
 					{
 						echo "<option selected value=\"$symbol\">$show_user_country</option>\n";
@@ -1820,7 +1820,7 @@ require_once('ansilove.php');
 			<input type="submit" size="5" value="Save">
 		</div>
 	</form>
-			<? 
+			<?php
 			} 
 			?>
 	<form name="signatureeditor" action="admin.php" method="post">
@@ -1864,7 +1864,7 @@ require_once('ansilove.php');
 		</select>
 		<input type="hidden" name="user_signature" value="<?=$user_signature?>"><input type="submit" value="Submit">
 	</div>
-		<? 
+		<?php
 		} 
 		?>
 		</form>
@@ -1968,7 +1968,7 @@ require_once('ansilove.php');
 				<input type="submit" value="Submit">
 			</div>
 		</form>
-		<? 
+		<?php
 	} 
 
 	if (isset($_POST['getsitelogo']) && (!isset($_POST['edit_sitelogo'])))
@@ -1987,7 +1987,7 @@ require_once('ansilove.php');
 				<input type="submit" name="delete_sitelogo" value="Delete">
 			</div>
 		</form>
-		<?
+		<?php
 	} 
 	?>
 	
@@ -2084,7 +2084,7 @@ require_once('ansilove.php');
 			<input type="submit" name="delete_bbs" value="Delete">
 		</div>
 		</form>
-		<? 
+		<?php
 		} 
 		?>
 
@@ -2096,22 +2096,22 @@ require_once('ansilove.php');
 	
 	<div class="content_with_blenk">&nbsp;</div>
 
-		<?
+		<?php
 		if (!isset($_POST['edit_forum']))
 		{
 			?>
 			<input type="submit" name='edit_forum' value="Forum Options">
-			<?
+			<?php
 		}
 		?>
 		</form>
-		<?
+		<?php
 
 		if (isset($_POST['edit_forum']))
 		{
 			?>
 			<form enctype="multipart/form-data" action="admin.php" method="post">
-			<?
+			<?php
 			$ask="SELECT * FROM forum_forum ORDER BY forum_name ASC, public ASC";
 			$result=mysql_query($ask,$dbh);
 			while ($row=mysql_fetch_array($result))
@@ -2125,23 +2125,23 @@ require_once('ansilove.php');
 					<input type="text" size="32" name="edit_forum_name" value="<?=$forum_name?>">
 					<select name="forum_public">
 					<option selected="selected"><?=$public?></option>
-					<? 
+					<?php
 					if ($public != "Public")
 					{
 						?>
 						<option>Public</option>
-						<?
+						<?php
 					}
 					if ($public != "Closed") 
 					{
 						?>
 						<option>Closed</option>
-						<?
+						<?php
 					}
 					?>
 				</select>
 				</div>
-				<?	
+				<?php
 
 				$ask_members="SELECT nick FROM forum_access where forum_id=$forum_id ORDER BY nick ASC";
 				$result_members=mysql_query($ask_members,$dbh);
@@ -2152,7 +2152,7 @@ require_once('ansilove.php');
 					<div class="content">
 						<?=$forum_member?>
 					</div>
-					<?
+					<?php
 					}
 				if ($public != "Public") 
 				{
@@ -2160,7 +2160,7 @@ require_once('ansilove.php');
 					<div class="content">
 						<form enctype="multipart/form-data" action="admin.php" method="post">
 						<select name="new_forum_member">
-						<?
+						<?php
 						echo "<option selected='selected'>None</option>";
 						$ask_add_member="SELECT nick FROM users";
 						$result_add_member=mysql_query($ask_add_member,$dbh);
@@ -2175,7 +2175,7 @@ require_once('ansilove.php');
 						<br><br>
 					</div>
 					</form>
-					<?
+					<?php
 				}
 
 			}
@@ -2193,7 +2193,7 @@ require_once('ansilove.php');
 			<br><br>
 			</div>
 			</form>
-			<? 
+			<?php
 			}
 			?>
 
@@ -2204,7 +2204,7 @@ require_once('ansilove.php');
 			<div class="content_with_blenk">&nbsp;</div>
 
 			<form enctype="multipart/form-data" action="admin.php" method="post">
-			<?
+			<?php
 			$ask="SELECT * FROM collys WHERE broken='1' ORDER BY filename ASC";
 			$result=mysql_query($ask,$dbh);
 			while ($row=mysql_fetch_array($result))
@@ -2229,7 +2229,7 @@ require_once('ansilove.php');
 						<br><br>
 					</div>
 				</form>
-				<?
+				<?php
 			}
 		}
 		else
@@ -2243,7 +2243,7 @@ require_once('ansilove.php');
 				Your IP has been logged and has been forwarded to the Swedish police.<br>
 				Tough luck sucka!<br><br>
 			</div>
-			<?
+			<?php
 		}
 		?>
 	</div>

@@ -169,7 +169,7 @@
 			<div class="headline">
 				Error
 			</div>
-			<? if(!empty($filesize)) ?>
+			<?php if(!empty($filesize)) ?>
 			<div class="content_with_blenk">			
 				The colly is <?=$filesize?> bytes! The maximum allowed size is <?=$max_file_size?>	
 				If this really is a (huge!) colly, please inform an Admin!
@@ -695,7 +695,7 @@
 						The mag is <?=$filesize?> bytes! The maximum allowed size is <?=$max_file_size?><br>
 						Please inform an Admin!
 					</div>
-					<?
+					<?php
 					}
 					exit;
 				}
@@ -1169,7 +1169,7 @@
 				<?=$dupe?> exists!<br><br>
 				</div>
 				<meta http-equiv="Refresh" content="2; url=submit.php">
-				<?
+				<?php
 				exit();
 			}
 			else
@@ -1179,7 +1179,7 @@
 				<?=$searchquery?> does NOT exist! Go on boy! Upload it!<br><br>
 				</div>
 				<meta http-equiv="Refresh" content="2; url=submit.php">
-				<?
+				<?php
 				exit();
 			}			
 		}
@@ -1268,7 +1268,7 @@
 				The colly is <?=$filesize?> bytes! The maximum allowed size is <?=$max_file_size?><br>
 				If this really is a (huge!) colly, please inform an Admin!
 			</div>
-			<?
+			<?php
 			exit();
 		}
 	
@@ -1546,7 +1546,7 @@
 				<div class="content_with_blenk">
 					There was an error during the conversion, please inform an admin!
 				</div>
-				<?
+				<?php
 
 				$ask ="DELETE from image_of WHERE filename LIKE '$filename%'";
 				mysql_query($ask,$dbh);
@@ -1577,7 +1577,7 @@
 				<div class="content_with_blenk">
 					There was an error during the conversion, please inform an admin!
 				</div>
-				<?
+				<?php
 				$ask ="DELETE from image_of WHERE filename LIKE '$filename%'";
 				mysql_query($ask,$dbh);
 
@@ -1607,7 +1607,7 @@
 				<div class="content_with_blenk">
 					There was an error during the conversion, please inform an admin!
 				</div>
-				<?
+				<?php
 				
 				$ask ="DELETE from image_of WHERE filename LIKE '$filename%'";
 				mysql_query($ask,$dbh);
@@ -1638,7 +1638,7 @@
 				<div class="content_with_blenk">
 					There was an error during the conversion, please inform an admin!
 				</div>
-				<?
+				<?php
 				$ask ="DELETE from image_of WHERE filename LIKE '$filename%'";
 				mysql_query($ask,$dbh);
 
@@ -1670,7 +1670,7 @@
 				<div class="content_with_blenk">
 					There was an error during the conversion, please inform an admin!
 				</div>
-				<?
+				<?php
 				$ask ="DELETE from image_of WHERE filename LIKE '$filename%'";
 				mysql_query($ask,$dbh);
 
@@ -1726,7 +1726,7 @@
 			The colly has been posted!
 		</div>
 
-		<?
+		<?php
 		$dirname = explode(".", $filename);
 		$dirname = $dirname[0];
 
@@ -1952,7 +1952,7 @@
 			<div class="content_with_blenk">
 				You must fill the subject field!
 			</div>
-			<?
+			<?php
 		?>
 		<meta http-equiv='Refresh' content='2; url=submit.php'>
 		<?php	
@@ -2325,7 +2325,7 @@
 					<option>Illegal</option>
 				</select>
 			</div>
-			<?
+			<?php
 		}
 		?>
 
@@ -2414,7 +2414,7 @@
 	</div>
 
 	</form>	
-	<?
+	<?php
 	}
 	else
 	{
@@ -2427,7 +2427,7 @@
 			<br>You need to be logged in to use this feature.<br>
 			<a href=login.php>LOGiN.</a><br><br>
 		</div>
-		<?
+		<?php
 	}
 	?>
 	</div>
