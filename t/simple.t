@@ -12,6 +12,7 @@ use Test::Mojo;
 subtest 'Syntax check recursively' => sub {
   my $iter = Path::Tiny->new('.')->iterator;
   while ( my $path = $iter->() ) {
+    next unless $path =~ m{\.php$};
     like `php -l $path`, qr{No syntax error}, "Syntax ok for '$path'";
   }
 };
