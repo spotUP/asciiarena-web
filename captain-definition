@@ -1,5 +1,6 @@
 {
  "schemaVersion" :2 ,
  "templateId" :"php/7.1.10"
+ "dockerfilePath": "./DockerFile"
 }
 
