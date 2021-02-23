@@ -92,7 +92,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 					else
 					{
 						$recipient = $_POST['email'];
-						?><meta http-equiv="Refresh" content="0; url=reminder.php?sent=sent&recipient=<?=$recipient?>"><?
+						?><meta http-equiv="Refresh" content="0; url=reminder.php?sent=sent&recipient=<?=$recipient?>"><?php
 					}
 				}
 			}
@@ -108,7 +108,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 
 				$ask_update="update users set temp_pw_hash=(null) where nick='$nick'";
 				mysql_query($ask_update,$dbh);	
-				?><meta http-equiv="Refresh" content="0; url=login.php"><?
+				?><meta http-equiv="Refresh" content="0; url=login.php"><?php
 			}
 			
 			echo "<form action='$_SERVER[PHP_SELF]' method='post'>";
@@ -118,7 +118,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 				if (isset($_POST['email']) && (!isset($mail))) 
 				{
 					echo "<tr><td align='center' width='165'>tHiS eMAiL aDDY dOESN'T eXiST iN tHE dATABASE!</td></td></tr>";
-					?><meta http-equiv="Refresh" content="3; url=reminder.php"><?
+					?><meta http-equiv="Refresh" content="3; url=reminder.php"><?php
 				}
 				if (!isset($_POST['email']) && (!isset($_GET['newpassword']) && (!isset($_GET['sent']))))
 				{

@@ -48,7 +48,7 @@ if ($logged_in == 1)
 				</td>
 			</table>
 			<meta http-equiv='Refresh' content='2; url=crib.php>
-			<?
+			<?php
 			exit;
 		}
 
@@ -106,7 +106,7 @@ if ($logged_in == 1)
 		$_SESSION['nick'] = $changenick;
 		?>
 		<meta http-equiv="Refresh" content="0; url=crib.php">
-		<?
+		<?php
 	}
 	if(isset($_POST['changecrew']))
 	{
@@ -151,8 +151,8 @@ if ($logged_in == 1)
 		$mail = trim($_POST['changemail']);  
 		if(!checkEmail($mail)) 
 		{
-			?><table width="913px"><caption>FAILURE!</caption><tr><td>Error! You must enter a valid E-Mail adress!</td></tr></table><?	
-			?><meta http-equiv="Refresh" content="3; url=crib.php"><?
+			?><table width="913px"><caption>FAILURE!</caption><tr><td>Error! You must enter a valid E-Mail adress!</td></tr></table><?php
+			?><meta http-equiv="Refresh" content="3; url=crib.php"><?php
 			exit;
 		}
 		
@@ -198,7 +198,7 @@ if ($logged_in == 1)
 			</div>
 			
 			<meta http-equiv="Refresh" content="3; url=crib.php">
-			<?		
+			<?php	
 			exit;		
 		}
 
@@ -221,7 +221,7 @@ if ($logged_in == 1)
 			</div>
 			
 			<meta http-equiv="Refresh" content="3; url=crib.php">
-			<?		
+			<?php	
 			exit;		
 		}
 
@@ -237,9 +237,9 @@ if ($logged_in == 1)
 			<div class="content">
 				The password must contain 6 characters!	
 			</div>
-			<?
+			<?php
 			
-			?><meta http-equiv="Refresh" content="2; url=crib.php"><?
+			?><meta http-equiv="Refresh" content="2; url=crib.php"><?php
 			exit;
 		}
 
@@ -325,7 +325,7 @@ if ($logged_in == 1)
 //-----------------------------------------------------------------------------
 	?>
 	<form enctype="multipart/form-data" action="crib.php" method="post">
-		<?	
+		<?php
 		$ask="select * from users where nick='$nick'";
 		$result=mysql_query($ask);
 		while ($row=mysql_fetch_array($result))
@@ -433,10 +433,10 @@ if ($logged_in == 1)
 
 			<div style="width: 476px; float: left;">
 				<select name="changecountry"> 
-					<?
+					<?php
 					if (!empty($show_country))
 					{
-						?><option selected="selected" value="<?=$show_country?>"/><?=$country_list["$show_country"]?></option><?
+						?><option selected="selected" value="<?=$show_country?>"/><?=$country_list["$show_country"]?></option><?php
 					}
 					else
 					{
@@ -473,7 +473,7 @@ if ($logged_in == 1)
 				<div style="width: 476px; float: left;">
 					<select name="display_messenger">
 						<option selected="selected"><?=$show_display_messenger?></option>
-						<? 
+						<?php
 						if($show_display_messenger!=Yes)
 							echo "<option>Yes</option>";
 						if($show_display_messenger!=No)
@@ -488,7 +488,7 @@ if ($logged_in == 1)
 				<div style="width: 476px; float: left;">
 					<select name="display_mail">
 						<option selected="selected"><?=$show_display_mail?></option>
-						<? 
+						<?php
 						if($show_display_mail!=Yes)
 							echo "<option>Yes</option>";
 						if($show_display_mail!=No)
@@ -512,7 +512,7 @@ if ($logged_in == 1)
 				<div style="width: 476px; float: left;">
 					<select name="changelistviewmode">
 						<option selected="selected"><?=$show_viewmode?></option>
-						<? 
+						<?php
 						if($show_viewmode!=BBS)
 							echo "<option>BBS</option>";
 						if($show_viewmode!=Standard)
@@ -725,7 +725,7 @@ if ($logged_in == 1)
 			<script type="text/javascript">
 				document.getElementById('signature').focus();
 			</script>
-			<?
+			<?php
 		}
 	}
 	else
@@ -738,7 +738,7 @@ if ($logged_in == 1)
 			<br>You need to be logged in to use this feature.<br>
 			<a href=login.php>LOGiN.</a><br><br>
 		</div>
-		<?
+		<?php
 	}
 	?>
 
