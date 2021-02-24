@@ -22,7 +22,14 @@ subtest 'Basic URLs' => sub {
   my $server = 'http://' . $host_port;
 
   my ($in, $out, $err);
-  my $h = start ['php', '-d', 'include_path=.', '-S', $host_port ], \$in, \$out, \$err;
+  my $h = start ['php', 
+    '-d', 'include_path=.',
+    '-d', 'log_errors=1',
+    '-d', 'error_reporting=-1',
+    '-d', 'display_errors=stdout',
+    '-S', $host_port ,
+  ], 
+  \$in, \$out, \$err;
   while ($h->pump) {
     die $err if $err =~ /failed|error/i;
     last if $err =~ /$host_port/;
