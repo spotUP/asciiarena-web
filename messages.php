@@ -1,7 +1,7 @@
 <?php
-	include "session.php";
+	include_once "session.php";
 	$h1 = "wELCOME tO aSCIIaRENA";
-	include "header.php";
+	include_once "header.php";
 ?>
 
 <?php
@@ -265,17 +265,16 @@ VALUES (:thread,:posttomember,:postername,:now,:postsubject,:postmessage,1,1)
 
 						<?php
 						$update = $_db->prepare("update messages set new=0 where thread=:thread");
-						$update->execute(['thread']);
+						$update->execute(['thread' => $thread]);
 					}
 
-					$ask = $_db->prepare("select * from messages where thread = :thread");
-					$ask->execute(['thread' => $thread]);
+					$rows = fetchAll("select * from messages where thread = :thread", [ 'thread' => $thread ]);
 					foreach($rows as $row) {
-						$messpostername = $row[ 'postername' ];
-						$messtimestamp = $row[ 'timestamp' ];
+						$messpostername = $row->postername;
+						$messtimestamp = $row->timestamp;
 						$messtime = date("Y-m-d H:i", $messtimestamp);
-						$postsubject = $row[ 'subject' ];
-						$postmessage = $row[ 'message' ];
+						$postsubject = $row->subject;
+						$postmessage = $row->message;
 
 						$postsubject = fixOutputPost($postsubject);
 						$postmessage = fixOutputPost($postmessage);

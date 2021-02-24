@@ -1,7 +1,7 @@
 <?php
 
-include 'session.php';
-include 'header.php';
+include_once 'session.php';
+include_once 'header.php';
 
 $now = time();
 
@@ -129,7 +129,7 @@ $now = time();
 						exit;
 					}
 					$ask = $_db->prepare("INSERT INTO users
-       (nick,       crew,         password, pwhash, lastactive, current, avatar,               mail,  uploaded, rank,        upload_signature,                              list_view_mode, display_mail,display_messenger)
+       (nick,       crew,         password, pwhash, lastactive, current, avatar,               mail,  uploaded, `rank`,        upload_signature,                              list_view_mode, display_mail,display_messenger)
 VALUES (:check_nick,'Independent','SECRET',:pwhash, :now,       '',      'AvatarDefault.jpg', :mail,   0,        'Inactive', '- -- - aSCIIaRENa - ---- - aSCIIaRENa - -- -','Standard',     'No',        'No'            )
 ");
 					$ask->execute([

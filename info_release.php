@@ -8,6 +8,7 @@ require_once "header.php"; ?>
 		$filename = base64_decode($decoded_filename);
 		$_SESSION[ 'filename' ] = $filename;
 
+        $nick = $_user['nick'];
 		$time = time();
 		$comment = $_POST[ 'comment' ] ?? "";
 

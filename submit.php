@@ -1,11 +1,6 @@
 <?php
-	require_once ('dbconnect_asciiarena.php');
-	require_once('ansilove.php');
-
-//	echo "<pre>"; print_r($_POST);echo "</pre>";
-//	echo "<pre>"; print_r($_FILES);echo "</pre>";
+include_once "session.php";
 ?>
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "https://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -20,10 +15,10 @@
 		var newselect = " <select name=\"artist[]\"" + document.getElementById('total_artists').value + "><option value=\"Unknown\">Unknown</option><?php
 
 			$ask="select nick from artists";
-			$result=mysql_query($ask,$dbh);
-			while ($row=mysql_fetch_array($result))
+			$result=fetchAll($ask);
+			foreach ($result as $row)
 			{
-		        $artists=$row[0];
+		        $artists=$row->nick;
 		        echo "<option value='$artists'>$artists</option>";
 			}
 			echo "</select>\"\n";
@@ -40,10 +35,10 @@
 		var newselect = " <select name=\"crew[]\"" + document.getElementById('total_crews').value + "><option>Independent</option><?php
 
 			$ask="select name from crews";
-			$result=mysql_query($ask,$dbh);
-			while ($row=mysql_fetch_array($result))
+			$result=fetchAll($ask);
+			foreach ($result as $row)
 			{
-		        $crews=$row[0];
+		        $crews=$row->name;
 		        echo "<option value='$crews'>$crews</option>";
 			}
 			echo "</select>\"\n";
@@ -60,10 +55,10 @@
 		var newselect = " <select name=\"artist_crew[]\"" + document.getElementById('total_artist_crews').value + "><option value=\"Unknown\">Unknown</option><?php
 
 			$ask="select name from crews";
-			$result=mysql_query($ask,$dbh);
-			while ($row=mysql_fetch_array($result))
+			$result=fetchAll($ask);
+			foreach ($result as $row)
 			{
-		        $crews=$row[0];
+		        $crews=$row->name;
 		        echo "<option value='$crews'>$crews</option>";
 			}
 			echo "</select>\"\n";
@@ -80,11 +75,10 @@
 		var newselect = " <select name=\"add_crew_bbs[]\"" + document.getElementById('total_crew_bbses').value + "><option value=\"Unknown\">Unknown</option><?php
 
 			$ask="select name from bbses";
-			$result=mysql_query($ask,$dbh);
-
-			while ($row=mysql_fetch_array($result))
+			$result=fetchAll($ask);
+			foreach ($result as $row)
 			{
-		        $crew_bbs=$row[0];
+		        $crew_bbs=$row->name;
 		        echo "<option value='$crew_bbs'>$crew_bbs</option>";
 			}
 			echo "</select>\"\n";
@@ -107,7 +101,7 @@
 		<div class="wrap">
 
 	<?php
-	if ($logged_in == 1)
+	if (is_logged_in())
 	{
 
 //---------------------------------------------------------------------------------------------------------------
@@ -169,7 +163,7 @@
 			<div class="headline">
 				Error
 			</div>
-			<? if(!empty($filesize)) ?>
+			<?php if(!empty($filesize)) ?>
 			<div class="content_with_blenk">			
 				The colly is <?=$filesize?> bytes! The maximum allowed size is <?=$max_file_size?>	
 				If this really is a (huge!) colly, please inform an Admin!
@@ -191,8 +185,8 @@
 			exit;
 		}	
 		$ask_existing="select filename from apps where filename='$filename'";
-		$result_existing=mysql_query($ask_existing,$dbh);
-		while($row_existing=mysql_fetch_row($result_existing))
+		$result_existing=fetchAll($ask_existing);
+		foreach ($result_existing as $row_existing)
 		{
 	        $existing_file=$row_existing[0];
 
@@ -695,7 +689,7 @@
 						The mag is <?=$filesize?> bytes! The maximum allowed size is <?=$max_file_size?><br>
 						Please inform an Admin!
 					</div>
-					<?
+					<?php
 					}
 					exit;
 				}
@@ -1169,7 +1163,7 @@
 				<?=$dupe?> exists!<br><br>
 				</div>
 				<meta http-equiv="Refresh" content="2; url=submit.php">
-				<?
+				<?php
 				exit();
 			}
 			else
@@ -1179,7 +1173,7 @@
 				<?=$searchquery?> does NOT exist! Go on boy! Upload it!<br><br>
 				</div>
 				<meta http-equiv="Refresh" content="2; url=submit.php">
-				<?
+				<?php
 				exit();
 			}			
 		}
@@ -1268,7 +1262,7 @@
 				The colly is <?=$filesize?> bytes! The maximum allowed size is <?=$max_file_size?><br>
 				If this really is a (huge!) colly, please inform an Admin!
 			</div>
-			<?
+			<?php
 			exit();
 		}
 	
@@ -1546,7 +1540,7 @@
 				<div class="content_with_blenk">
 					There was an error during the conversion, please inform an admin!
 				</div>
-				<?
+				<?php
 
 				$ask ="DELETE from image_of WHERE filename LIKE '$filename%'";
 				mysql_query($ask,$dbh);
@@ -1577,7 +1571,7 @@
 				<div class="content_with_blenk">
 					There was an error during the conversion, please inform an admin!
 				</div>
-				<?
+				<?php
 				$ask ="DELETE from image_of WHERE filename LIKE '$filename%'";
 				mysql_query($ask,$dbh);
 
@@ -1607,7 +1601,7 @@
 				<div class="content_with_blenk">
 					There was an error during the conversion, please inform an admin!
 				</div>
-				<?
+				<?php
 				
 				$ask ="DELETE from image_of WHERE filename LIKE '$filename%'";
 				mysql_query($ask,$dbh);
@@ -1638,7 +1632,7 @@
 				<div class="content_with_blenk">
 					There was an error during the conversion, please inform an admin!
 				</div>
-				<?
+				<?php
 				$ask ="DELETE from image_of WHERE filename LIKE '$filename%'";
 				mysql_query($ask,$dbh);
 
@@ -1670,7 +1664,7 @@
 				<div class="content_with_blenk">
 					There was an error during the conversion, please inform an admin!
 				</div>
-				<?
+				<?php
 				$ask ="DELETE from image_of WHERE filename LIKE '$filename%'";
 				mysql_query($ask,$dbh);
 
@@ -1726,7 +1720,7 @@
 			The colly has been posted!
 		</div>
 
-		<?
+		<?php
 		$dirname = explode(".", $filename);
 		$dirname = $dirname[0];
 
@@ -1952,7 +1946,7 @@
 			<div class="content_with_blenk">
 				You must fill the subject field!
 			</div>
-			<?
+			<?php
 		?>
 		<meta http-equiv='Refresh' content='2; url=submit.php'>
 		<?php	
@@ -2312,7 +2306,7 @@
 		</div>
 	
 	<?php
-		if (($rank == Elite) || ($rank == Admin))
+		if (($rank == Elite) || is_admin())
 		{
 			?>
 			<div class="content">
@@ -2325,7 +2319,7 @@
 					<option>Illegal</option>
 				</select>
 			</div>
-			<?
+			<?php
 		}
 		?>
 
@@ -2414,7 +2408,7 @@
 	</div>
 
 	</form>	
-	<?
+	<?php
 	}
 	else
 	{
@@ -2427,7 +2421,7 @@
 			<br>You need to be logged in to use this feature.<br>
 			<a href=login.php>LOGiN.</a><br><br>
 		</div>
-		<?
+		<?php
 	}
 	?>
 	</div>

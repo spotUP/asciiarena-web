@@ -1,6 +1,13 @@
 <?php defined('VALID') or die('Nuh-uh!');
-	$_db = new PDO("mysql:dbname=uprough_ascii;host=srv-captain--mariadb-db", "root", getenv('DBPW'),
+    $dbuser = getenv('DBUSER') ? getenv('DBUSER') : 'root';
+    $dbpw   = getenv('DBPW')   ? getenv('DBPW')   : '';
+    $dbhost = getenv('DBHOST') ? getenv('DBHOST') : 'localhost';
+    $dbname = getenv('DBNAME') ? getenv('DBNAME') : 'uprough_ascii';
+
+	$_db = new PDO("mysql:dbname={$dbname};host={$dbhost}", $dbuser, $dbpw,
 		[PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+    # Avoid errors like: GET /info_artist.php - Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #23 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'uprough_ascii.c.crew' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in /projects/asciiarena/tools/db.php:55
+    $_db->query("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
 	$_queries = [];
 	if (DEBUG) {
 		doQuery("SET profiling = 1");
