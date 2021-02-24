@@ -45,7 +45,7 @@ subtest 'Basic URLs' => sub {
     { path => 'info_release_summary.php', },
     { path => 'logoeditor.php',           },
     { path => 'logout.php',               },
-    { path => 'members.php',              expected => 302 },
+    { path => 'members.php',              code => 302 },
     { path => 'messages.php',             },
     { path => 'missing.php',              },
     { path => 'pagination.php',           },
