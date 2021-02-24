@@ -2311,7 +2311,7 @@
 		</div>
 	
 	<?php
-		if (($rank == Elite) || ($rank == Admin))
+		if (($rank == Elite) || is_admin())
 		{
 			?>
 			<div class="content">

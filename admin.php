@@ -129,7 +129,7 @@ require_once('ansilove.php');
 	</div>	
 	<div class="maincontent">
 	<?php
-	if (is_logged_in() && ($rank =="Admin"))
+	if (is_logged_in() && is_admin())
 	{
 
 		//echo "<pre>";print_r($_POST);echo "</pre>";
@@ -138,7 +138,7 @@ require_once('ansilove.php');
 // SET COLLY TO FIXED
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['colly_fixed']) && $rank=="Admin")
+	if(isset($_POST['colly_fixed']) && is_admin())
 	{
 		$fixed_colly=cleanInsert($_POST['filename']);
 		$fixed_colly=stripslashes($fixed_colly);
@@ -158,7 +158,7 @@ require_once('ansilove.php');
 // DELETE USER FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['delete_user']) && $rank=="Admin")
+	if(isset($_POST['delete_user']) && is_admin())
 	{
 		$delete_user=$_POST['getuser'];
 		$delete_user=cleanInsert($delete_user);
@@ -176,7 +176,7 @@ require_once('ansilove.php');
 // DELETE CREW FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['do_delete_crew']) && $rank=="Admin")
+	if(isset($_POST['do_delete_crew']) && is_admin())
 	{
 		$delete_crew=$_POST['getcrew'];
 		$delete_crew=cleanInsert($delete_crew);
@@ -196,7 +196,7 @@ require_once('ansilove.php');
 // DELETE SITELOGO FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['delete_sitelogo']) && $rank=="Admin")
+	if(isset($_POST['delete_sitelogo']) && is_admin())
 	{
 		$delete_sitelogo=$_POST['getsitelogo'];
 		$delete_sitelogo=cleanInsert($delete_sitelogo);
@@ -219,7 +219,7 @@ require_once('ansilove.php');
 // DELETE COLLY FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['do_delete_colly']) && $rank=="Admin")
+	if(isset($_POST['do_delete_colly']) && is_admin())
 	{
 		$delete_colly=$_POST['filename'];
 		$delete_colly=cleanInsert($delete_colly);
@@ -371,7 +371,7 @@ require_once('ansilove.php');
 // DELETE BBS FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['delete_bbs']) && $rank=="Admin")
+	if(isset($_POST['delete_bbs']) && is_admin())
 	{
 		$delete_bbs=$_POST['getbbs'];
 		$delete_bbs=cleanInsert($delete_bbs);
@@ -388,7 +388,7 @@ require_once('ansilove.php');
 // DELETE ARTIST FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['delete_artist']) && $rank=="Admin")
+	if(isset($_POST['delete_artist']) && is_admin())
 	{
 		$delete_artist=$_POST['getartist'];
 		$delete_artist=cleanInsert($delete_artist);
@@ -407,9 +407,9 @@ require_once('ansilove.php');
 // WRITE COLLY INFO TO DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['do_edit_colly']) && $rank=="Admin")
+	if(isset($_POST['do_edit_colly']) && is_admin())
 	{
-		if(isset($_POST['edit_colly_name']) && $rank=="Admin")
+		if(isset($_POST['edit_colly_name']) && is_admin())
 		{
 			$filename=$_POST['filename'];
 			$filename=cleanInsert($filename);
@@ -420,7 +420,7 @@ require_once('ansilove.php');
 			mysql_query($ask,$dbh);
 		}
 
-		if(isset($_POST['old_colly_authors']) || (isset($_POST['colly_author']) && $rank=="Admin"))
+		if(isset($_POST['old_colly_authors']) || (isset($_POST['colly_author']) && is_admin()))
 		{
 			$filename=$_POST['filename'];
 			$filename=cleanInsert($filename);
@@ -450,7 +450,7 @@ require_once('ansilove.php');
 			$ask="delete from author_of where filename='$filename' and nick='Delete'";
 			mysql_query($ask,$dbh);
 		}
-		if(isset($_POST['old_colly_crews']) || (isset($_POST['colly_crew']) && $rank=="Admin"))
+		if(isset($_POST['old_colly_crews']) || (isset($_POST['colly_crew']) && is_admin()))
 		{
 			$filename=$_POST['filename'];
 			$filename=cleanInsert($filename);
@@ -479,7 +479,7 @@ require_once('ansilove.php');
 			$ask="delete from crew_of where filename='$filename' and crew='Delete'";
 			mysql_query($ask,$dbh);
 		}
-		if(isset($_POST['edit_colly_year']) && $rank=="Admin")
+		if(isset($_POST['edit_colly_year']) && is_admin())
 		{
 			$filename=$_POST['filename'];
 			$filename=cleanInsert($filename);
@@ -488,7 +488,7 @@ require_once('ansilove.php');
 			$ask="update collys set year='$edit_colly_year' where filename='$filename'";	
 			mysql_query($ask,$dbh);	
 		}
-		if(isset($_POST['edit_colly_type']) && $rank=="Admin")
+		if(isset($_POST['edit_colly_type']) && is_admin())
 		{
 			$filename=$_POST['filename'];
 			$filename=cleanInsert($filename);
@@ -499,7 +499,7 @@ require_once('ansilove.php');
 			$ask="update collys set type='$edit_colly_type' where filename='$filename'";	
 			mysql_query($ask,$dbh);	
 		}
-		if(isset($_POST['edit_colly_month']) && $rank=="Admin")
+		if(isset($_POST['edit_colly_month']) && is_admin())
 		{
 			$filename=$_POST['filename'];
 			$filename=cleanInsert($filename);
@@ -510,7 +510,7 @@ require_once('ansilove.php');
 			$ask="update collys set month='$edit_colly_month' where filename='$filename'";	
 			mysql_query($ask,$dbh);	
 		}
-		if(isset($_POST['edit_colly_day']) && $rank=="Admin")
+		if(isset($_POST['edit_colly_day']) && is_admin())
 		{
 			$filename=$_POST['filename'];
 			$filename=cleanInsert($filename);
@@ -577,9 +577,9 @@ require_once('ansilove.php');
 // WRITE CREW INFO TO DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['do_change_crew']) && $rank=="Admin")
+	if(isset($_POST['do_change_crew']) && is_admin())
 	{
-		if(isset($_POST['edit_crew_name']) && $rank=="Admin")
+		if(isset($_POST['edit_crew_name']) && is_admin())
 		{
 			$crew=$_POST['getcrew'];
 			$crew=cleanInsert($crew);
@@ -599,7 +599,7 @@ require_once('ansilove.php');
 			$ask="update member_of set crew='$edit_crew_name' where crew='$crew'";	
 			mysql_query($ask,$dbh);
 			}
-			if(isset($_POST['edit_crew_www']) && $rank=="Admin")
+			if(isset($_POST['edit_crew_www']) && is_admin())
 			{
 				$crew=$_POST['getcrew'];
 				$crew=cleanInsert($crew);
@@ -611,7 +611,7 @@ require_once('ansilove.php');
 				mysql_query($ask,$dbh);	
 			}
 
-			if(isset($_POST['add_bbs']) && $rank=="Admin")
+			if(isset($_POST['add_bbs']) && is_admin())
 			{
 				foreach($_POST[add_bbs] as $add_bbs) // add new bbses
 				{
@@ -620,7 +620,7 @@ require_once('ansilove.php');
 				}
 			}
 
-			if(isset($_POST['edit_crew_contact']) && $rank=="Admin")
+			if(isset($_POST['edit_crew_contact']) && is_admin())
 			{
 				$crew=$_POST['getcrew'];
 				$crew=cleanInsert($crew);
@@ -631,7 +631,7 @@ require_once('ansilove.php');
 				$ask="update crews set contact='$edit_crew_contact' where name='$edit_crew_name'";	
 				mysql_query($ask,$dbh);	
 			}
-			if(isset($_POST['edit_crew_status']) && $rank=="Admin")
+			if(isset($_POST['edit_crew_status']) && is_admin())
 			{
 				$crew=$_POST['getcrew'];
 				$crew=cleanInsert($crew);
@@ -642,7 +642,7 @@ require_once('ansilove.php');
 				$ask="update crews set active='$edit_crew_status' where name='$edit_crew_name'";	
 				mysql_query($ask,$dbh);	
 			}
-			if(isset($_POST['edit_crew_acronym']) && $rank=="Admin")
+			if(isset($_POST['edit_crew_acronym']) && is_admin())
 			{
 				$crew=$_POST['getcrew'];
 				$crew=cleanInsert($crew);
@@ -658,9 +658,9 @@ require_once('ansilove.php');
 // WRITE ARTIST INFO TO DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['do_edit_artist']) && $rank=="Admin")
+	if(isset($_POST['do_edit_artist']) && is_admin())
 	{
-		if(isset($_POST['edit_artist_nick']) && $rank=="Admin")
+		if(isset($_POST['edit_artist_nick']) && is_admin())
 		{
 			$artist=$_POST['getartist'];
 			$artist=cleanInsert($artist);
@@ -678,7 +678,7 @@ require_once('ansilove.php');
 			mysql_query($ask,$dbh);	
 
 		}
-		if(isset($_POST['edit_artist_www']) && $rank=="Admin")
+		if(isset($_POST['edit_artist_www']) && is_admin())
 		{
 			$artist=$_POST['getartist'];
 			$artist=cleanInsert($artist);
@@ -689,7 +689,7 @@ require_once('ansilove.php');
 			$ask="update artists set www='$edit_artist_www' where nick='$edit_artist_nick'";	
 			mysql_query($ask,$dbh);	
 		}
-		if(isset($_POST['edit_artist_status']) && $rank=="Admin")
+		if(isset($_POST['edit_artist_status']) && is_admin())
 		{
 			$artist=$_POST['getartist'];
 			$artist=cleanInsert($artist);
@@ -700,7 +700,7 @@ require_once('ansilove.php');
 			$ask="update artists set active='$edit_artist_status' where nick='$edit_artist_nick'";	
 			mysql_query($ask,$dbh);	
 		}
-		if(isset($_POST['old_artist_crews']) || (isset($_POST['artist_crew']) && $rank=="Admin"))
+		if(isset($_POST['old_artist_crews']) || (isset($_POST['artist_crew']) && is_admin()))
 		{
 			$artist=$_POST['getartist'];
 			$artist=cleanInsert($artist);
@@ -729,7 +729,7 @@ require_once('ansilove.php');
 			mysql_query($ask,$dbh);
 		}
 
-		if(isset($_POST['change_artist_country']) && $rank=="Admin")
+		if(isset($_POST['change_artist_country']) && is_admin())
 		{
 			$artist=cleanInsert($_POST['getartist']);
 			$change_artist_country = cleanInsert($_POST['change_artist_country']); 
@@ -741,7 +741,7 @@ require_once('ansilove.php');
 			}
 		}
 
-		if(isset($_POST['edit_artist_acronym']) && $rank=="Admin")
+		if(isset($_POST['edit_artist_acronym']) && is_admin())
 		{
 			$artist=$_POST['getartist'];
 			$artist=cleanInsert($artist);
@@ -758,9 +758,9 @@ require_once('ansilove.php');
 // WRITE BBS INFO TO DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['do_edit_bbs']) && $rank=="Admin")
+	if(isset($_POST['do_edit_bbs']) && is_admin())
 	{
-		if(isset($_POST['edit_bbs_name']) && $rank=="Admin")
+		if(isset($_POST['edit_bbs_name']) && is_admin())
 		{
 			$bbs_name=$_POST['getbbs'];
 			$bbs_name=cleanInsert($bbs_name);
@@ -774,7 +774,7 @@ require_once('ansilove.php');
 			$ask="update bbs_of set name='$edit_bbs_name' where name='$bbs_name'";	
 			mysql_query($ask,$dbh);	
 		}
-		if(isset($_POST['edit_bbs_sysop']) && $rank=="Admin")
+		if(isset($_POST['edit_bbs_sysop']) && is_admin())
 		{
 			$bbs_name=$_POST['getbbs'];
 			$bbs_name=cleanInsert($bbs_name);
@@ -785,7 +785,7 @@ require_once('ansilove.php');
 			$ask="update bbses set sysop='$edit_bbs_sysop' where name='$edit_bbs_name'";	
 			mysql_query($ask,$dbh);	
 		}
-		if(isset($_POST['edit_bbs_address']) && $rank=="Admin")
+		if(isset($_POST['edit_bbs_address']) && is_admin())
 		{
 			$bbs_name=$_POST['getbbs'];
 			$bbs_name=cleanInsert($bbs_name);
@@ -796,7 +796,7 @@ require_once('ansilove.php');
 			$ask="update bbses set address='$edit_bbs_address' where name='$edit_bbs_name'";	
 			mysql_query($ask,$dbh);	
 		}
-		if(isset($_POST['edit_bbs_number']) && $rank=="Admin")
+		if(isset($_POST['edit_bbs_number']) && is_admin())
 		{
 			$bbs_name=$_POST['getbbs'];
 			$bbs_name=cleanInsert($bbs_name);
@@ -813,9 +813,9 @@ require_once('ansilove.php');
 // WRITE FORUM DATA TO DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['do_edit_forum']) && $rank=="Admin")
+	if(isset($_POST['do_edit_forum']) && is_admin())
 	{
-		if(isset($_POST['do_add_new_forum_member']) && $rank=="Admin")
+		if(isset($_POST['do_add_new_forum_member']) && is_admin())
 		{
 			$new_forum_member=$_POST['new_forum_member'];
 			$new_forum_member=cleanInsert($new_forum_member);
@@ -830,7 +830,7 @@ require_once('ansilove.php');
 			mysql_query($ask,$dbh);	
 		}
 			
-		if(isset($_POST['do_add_new_forum']) && $rank=="Admin")
+		if(isset($_POST['do_add_new_forum']) && is_admin())
 		{
 			$new_forum_name=$_POST['new_forum_name'];
 			$new_forum_name=cleanInsert($new_forum_name); 
@@ -1325,7 +1325,7 @@ require_once('ansilove.php');
 // EDIT CREW FIELD
 //--------------------------------------------------------------------------------
 
-	if(isset($_POST['getcrew']) && $rank=="Admin")
+	if(isset($_POST['getcrew']) && is_admin())
 	{
 		$getcrew=$_POST['getcrew'];
 		$getcrew=cleanInsert($getcrew);
@@ -1476,7 +1476,7 @@ require_once('ansilove.php');
 // EDIT ARTIST FIELD
 //--------------------------------------------------------------------------------
 
-	if(isset($_POST['getartist']) && $rank=="Admin")
+	if(isset($_POST['getartist']) && is_admin())
 	{
 		$getartist=$_POST['getartist'];
 		$getartist=cleanInsert($getartist);
@@ -1632,7 +1632,7 @@ require_once('ansilove.php');
 // EDIT USER FIELD
 //--------------------------------------------------------------------------------
 
-	if(isset($_POST['getuser']) && $rank=="Admin")
+	if(isset($_POST['getuser']) && is_admin())
 	{
 		$getuser=$_POST['getuser'];
 		$getuser=cleanInsert($getuser);
@@ -1873,7 +1873,7 @@ require_once('ansilove.php');
 // EDIT SITELOGO FIELD
 //--------------------------------------------------------------------------------
 
-	if(isset($_POST['getsitelogo']) && $rank=="Admin")
+	if(isset($_POST['getsitelogo']) && is_admin())
 	{
 		$getsitelogo=$_POST['getsitelogo'];
 		$getsitelogo=cleanInsert($getsitelogo);
@@ -1995,7 +1995,7 @@ require_once('ansilove.php');
 <!-- -------------------------------------------------------------------------------- -->
 
 	<?php
-	if(isset($_POST['getbbs']) && $rank=="Admin")
+	if(isset($_POST['getbbs']) && is_admin())
 	{
 		$getbbs=$_POST['getbbs'];
 		$ask="select * from bbses where name='$getbbs'";
