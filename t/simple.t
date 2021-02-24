@@ -13,6 +13,7 @@ subtest 'Basic URLs' => sub {
   my $server = 'http://' . $host_port;
 
   my ($in, $out, $err);
+
   my $h = start ['php',
     '-d', 'include_path=.',
     '-d', 'log_errors=1',
@@ -31,7 +32,7 @@ subtest 'Basic URLs' => sub {
     { path => 'accounting.php',           },
     { path => 'admin.php',                },
     { path => 'artists.php',              },
-    { path => 'cmds.php',                 },
+    { path => 'cmds.php',                 code => 302 },
     { path => 'collys.php',               },
     { path => 'crews.php',                },
     { path => 'crib.php',                 },
