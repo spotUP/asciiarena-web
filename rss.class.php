@@ -1,5 +1,7 @@
 <?php
-  class RSS
+include_once('session.php');
+
+class RSS
   {
 
 	public function GetFeed($id)

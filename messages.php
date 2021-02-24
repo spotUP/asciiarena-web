@@ -1,7 +1,7 @@
 <?php
-	include "session.php";
+	include_once "session.php";
 	$h1 = "wELCOME tO aSCIIaRENA";
-	include "header.php";
+	include_once "header.php";
 ?>
 
 <?php
