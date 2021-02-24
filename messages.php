@@ -265,7 +265,7 @@ VALUES (:thread,:posttomember,:postername,:now,:postsubject,:postmessage,1,1)
 
 						<?php
 						$update = $_db->prepare("update messages set new=0 where thread=:thread");
-						$update->execute(['thread']);
+						$update->execute(['thread' => $thread]);
 					}
 
 					$ask = $_db->prepare("select * from messages where thread = :thread");
