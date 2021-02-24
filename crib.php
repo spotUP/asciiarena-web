@@ -4,7 +4,7 @@
 	include "header.php";
 ?>
 <?php
-if ($logged_in == 1)
+if (is_logged_in())
 {
 
 	$showmember=$nick;

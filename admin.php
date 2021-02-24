@@ -128,8 +128,8 @@ require_once('ansilove.php');
 		<?php include ('sidebar.php'); ?>
 	</div>	
 	<div class="maincontent">
-	<?php	
-	if (($logged_in == 1) && ($rank =="Admin"))
+	<?php
+	if (is_logged_in() && ($rank =="Admin"))
 	{
 
 		//echo "<pre>";print_r($_POST);echo "</pre>";
