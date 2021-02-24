@@ -1,5 +1,5 @@
 <?php defined('VALID') or die('Nuh-uh!');
-	$_db = new PDO("mysql:dbname=uprough_ascii;host=localhost:3306", "uprough_ascii", "D0pestD0pest",
+	$_db = new PDO("mysql:dbname=uprough_ascii;host=srv-captain--mariadb-db", "root", getenv('DBPW'),
 		[PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
     # Avoid errors like: GET /info_artist.php - Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #23 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'uprough_ascii.c.crew' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in /projects/asciiarena/tools/db.php:55
     $_db->query("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");

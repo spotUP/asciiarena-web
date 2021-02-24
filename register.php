@@ -220,7 +220,7 @@ VALUES (:thread, :check_nick,'Spot',:now,'Welcome!',:welcome_msg,1)
 					?>
 					<table width="913px">
 						<tr><td>&nbsp;</td></tr>
-						<tr><td><img class='centered' border='0' src='data/register.png'></td></tr>
+						<tr><td><img class='centered' border='0' src='assets/data/register.png'></td></tr>
 						<tr><td>&nbsp;</td></tr>
 						<tr><td align="center">Your account has been created, a mail with instructions</td></tr>
 						<tr><td align="center">has been sent to your e-mail adress.</td></tr>
@@ -233,7 +233,7 @@ VALUES (:thread, :check_nick,'Spot',:now,'Welcome!',:welcome_msg,1)
 				<form action="register.php" method="post">
 						<table width="913px">
 						<tr><td colspan="5">&nbsp;</td></tr>
-						<tr><td colspan="5"><img class='centered' border='0' src='data/register.png'></td></tr>
+						<tr><td colspan="5"><img class='centered' border='0' src='assets/data/register.png'></td></tr>
 						<tr><td colspan="5">&nbsp;</td></tr>
 					<?php if (!isset($_GET['confirm']))
 					{
