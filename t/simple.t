@@ -4,31 +4,22 @@ use strict;
 use warnings;
 
 use IPC::Run 'start';
-use Path::Tiny;
 
 use Test::More;
 use Test::Mojo;
-
-subtest 'Syntax check recursively' => sub {
-  my $iter = Path::Tiny->new('.')->iterator;
-  while ( my $path = $iter->() ) {
-    next unless $path =~ m{\.php$};
-    like `php -l $path`, qr{No syntax error}, "Syntax ok for '$path'";
-  }
-};
 
 subtest 'Basic URLs' => sub {
   my $host_port = 'localhost:8122';
   my $server = 'http://' . $host_port;
 
   my ($in, $out, $err);
-  my $h = start ['php', 
+  my $h = start ['php',
     '-d', 'include_path=.',
     '-d', 'log_errors=1',
     '-d', 'error_reporting=-1',
     '-d', 'display_errors=stdout',
     '-S', $host_port ,
-  ], 
+  ],
   \$in, \$out, \$err;
   while ($h->pump) {
     die $err if $err =~ /failed|error/i;
@@ -72,6 +63,7 @@ subtest 'Basic URLs' => sub {
 
   for my $test (@{ $url_tests }) {
     my $ok = $t->get_ok("$server/$test->{path}")->status_is($test->{code} // 200);
+    warn $t->tx->res->body if ($ENV{AA_PATH} // '') eq $test->{path};
     $h->pump;
     note $out; undef $out;
     diag $err; undef $err;
