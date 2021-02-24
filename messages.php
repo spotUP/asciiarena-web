@@ -159,7 +159,7 @@ VALUES (:thread,:posttomember,:postername,:now,:postsubject,:postmessage,1,1)
 			$postsubject = cleanInsert($postsubject);
 			$postmessage = cleanInsertPost($postmessage);
 			$now = time();
-			$ask = "INSERT INTO messages (thread, postedto, postername, timestamp, subject, message, new, unread) VALUES (0,:thread,:posttomember,:nick,:now,:postsubject,:postmessage,1,1)";
+			$ask = "INSERT INTO messages (thread, postedto, postername, timestamp, subject, message, new, unread) VALUES (:thread,:posttomember,:nick,:now,:postsubject,:postmessage,1,1)";
 			doQuery($ask, [
 			  'thread'       => $thread,
 			  'posttomember' => $posttomember,
