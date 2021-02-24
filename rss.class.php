@@ -45,13 +45,13 @@ class RSS
 				$ask="";
 		}
 		
-		$result=mysql_query($ask,$dbh);
+		$result=fetchAll($ask);
 		$items = '';
-		while($row = mysql_fetch_array($result))
+		foreach($result as $row)
 		{
-			$encodedfilename = base64_encode($row['filename']);
+			$encodedfilename = base64_encode($row->filename);
 			$items .= '<item>
-				<title>'. $row[0] .' ('. $row["filename"] .')</title>
+				<title>'. $row->id .' ('. $row->filename .')</title>
 				<link>https://www.asciiarena.se/info_release.php?filename='.$encodedfilename.' </link>
 				<description></description>
 			</item>';

@@ -15,10 +15,10 @@ include_once "session.php";
 		var newselect = " <select name=\"artist[]\"" + document.getElementById('total_artists').value + "><option value=\"Unknown\">Unknown</option><?php
 
 			$ask="select nick from artists";
-			$result=mysql_query($ask,$dbh);
-			while ($row=mysql_fetch_array($result))
+			$result=fetchAll($ask);
+			foreach ($result as $row)
 			{
-		        $artists=$row[0];
+		        $artists=$row->nick;
 		        echo "<option value='$artists'>$artists</option>";
 			}
 			echo "</select>\"\n";
@@ -35,10 +35,10 @@ include_once "session.php";
 		var newselect = " <select name=\"crew[]\"" + document.getElementById('total_crews').value + "><option>Independent</option><?php
 
 			$ask="select name from crews";
-			$result=mysql_query($ask,$dbh);
-			while ($row=mysql_fetch_array($result))
+			$result=fetchAll($ask);
+			foreach ($result as $row)
 			{
-		        $crews=$row[0];
+		        $crews=$row->name;
 		        echo "<option value='$crews'>$crews</option>";
 			}
 			echo "</select>\"\n";
@@ -55,10 +55,10 @@ include_once "session.php";
 		var newselect = " <select name=\"artist_crew[]\"" + document.getElementById('total_artist_crews').value + "><option value=\"Unknown\">Unknown</option><?php
 
 			$ask="select name from crews";
-			$result=mysql_query($ask,$dbh);
-			while ($row=mysql_fetch_array($result))
+			$result=fetchAll($ask);
+			foreach ($result as $row)
 			{
-		        $crews=$row[0];
+		        $crews=$row->name;
 		        echo "<option value='$crews'>$crews</option>";
 			}
 			echo "</select>\"\n";
@@ -75,11 +75,10 @@ include_once "session.php";
 		var newselect = " <select name=\"add_crew_bbs[]\"" + document.getElementById('total_crew_bbses').value + "><option value=\"Unknown\">Unknown</option><?php
 
 			$ask="select name from bbses";
-			$result=mysql_query($ask,$dbh);
-
-			while ($row=mysql_fetch_array($result))
+			$result=fetchAll($ask);
+			foreach ($result as $row)
 			{
-		        $crew_bbs=$row[0];
+		        $crew_bbs=$row->name;
 		        echo "<option value='$crew_bbs'>$crew_bbs</option>";
 			}
 			echo "</select>\"\n";
@@ -186,8 +185,8 @@ include_once "session.php";
 			exit;
 		}	
 		$ask_existing="select filename from apps where filename='$filename'";
-		$result_existing=mysql_query($ask_existing,$dbh);
-		while($row_existing=mysql_fetch_row($result_existing))
+		$result_existing=fetchAll($ask_existing);
+		foreach ($result_existing as $row_existing)
 		{
 	        $existing_file=$row_existing[0];
 
