@@ -268,14 +268,13 @@ VALUES (:thread,:posttomember,:postername,:now,:postsubject,:postmessage,1,1)
 						$update->execute(['thread' => $thread]);
 					}
 
-					$ask = $_db->prepare("select * from messages where thread = :thread");
-					$ask->execute(['thread' => $thread]);
+					$rows = fetchAll("select * from messages where thread = :thread", [ 'thread' => $thread ]);
 					foreach($rows as $row) {
-						$messpostername = $row[ 'postername' ];
-						$messtimestamp = $row[ 'timestamp' ];
+						$messpostername = $row->postername;
+						$messtimestamp = $row->timestamp;
 						$messtime = date("Y-m-d H:i", $messtimestamp);
-						$postsubject = $row[ 'subject' ];
-						$postmessage = $row[ 'message' ];
+						$postsubject = $row->subject;
+						$postmessage = $row->message;
 
 						$postsubject = fixOutputPost($postsubject);
 						$postmessage = fixOutputPost($postmessage);
