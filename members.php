@@ -6,7 +6,7 @@ $member = fetchOne("SELECT * FROM users WHERE id = :id", [":id" => $user_id], ["
 
 if (empty($member->id)) {
 	header("Location: /");
-	die();
+	exit();
 }
 
 $h1 = "MEMBER INFO";
