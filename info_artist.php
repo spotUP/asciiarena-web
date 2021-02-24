@@ -438,7 +438,7 @@ foreach (fetchAll($q, $p) as $row) {
         </div>
       </div>
 
-      <?
+      <?php
     }
     ?>
   </div>
@@ -448,4 +448,4 @@ foreach (fetchAll($q, $p) as $row) {
   <div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
     <?php include "sidebar_right.php"; ?>
   </div>
-  <?php include "footer.php";
+  <?php include "footer.php"; ?>

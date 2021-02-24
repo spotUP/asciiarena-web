@@ -1,5 +1,4 @@
 <?php
-require_once ('dbconnect_asciiarena.php');
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "https://www.w3.org/TR/html4/loose.dtd">
@@ -25,7 +24,7 @@ require_once ('dbconnect_asciiarena.php');
 						<div class="content">
 							<a href="index.php"> <img border='0' src='data/goodbye.png'></a>
 						</div>
-						<?
+						<?php
 
 						mysqli_query($dbh, "update users set lastactive='0' where nick='$nick'");
 
@@ -34,7 +33,7 @@ require_once ('dbconnect_asciiarena.php');
 						session_destroy();
 						?>
 						<meta http-equiv="Refresh" content="10; url=index.php">
-						<?
+						<?php
 					}
 					?>			
 				</div>

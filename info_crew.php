@@ -1,4 +1,4 @@
-<? require_once ('dbconnect_asciiarena.php'); ?>
+<?php'); ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "https://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -13,11 +13,11 @@
 
 <div class="maincontainer">
 	<div class="header">
-		<? include ('header.php'); ?>
+		<?php include ('header.php'); ?>
 	</div>
 
 	<div class="leftsidebar">
-		<?include ('sidebar.php'); ?>
+		<?php include ('sidebar.php'); ?>
 	</div>
 
 	<div class="maincontent">
@@ -50,7 +50,7 @@
 		?>	
 		<div class="headline">
 			<?=$show_name?> 
-			<?
+			<?php
 			if (isset($show_acronym))
 			{
 				echo "[$show_acronym]";
@@ -59,14 +59,14 @@
 		</div>
 		<div class="content_with_blenk"><br></div>
 
-		<?
+		<?php
 		if (!empty($show_www))
 		{
 			?>
 			<div class="content_centered">
 				Webpage: <?=$show_www?>
 			</div>
-			<?
+			<?php
 		}
 		if(!empty($how_contact))
 		{
@@ -74,7 +74,7 @@
 			<div class="content_centered">
 				Contact: <?=$show_contact?>
 			</div>
-			<?
+			<?php
 		}
 		if(!empty($how_active))
 		{
@@ -82,12 +82,12 @@
 			<div class="content_centered">
 				Status: <?=$show_active?>
 			</div>
-			<?
+			<?php
 		}
 		?>
 		<div class="content_centered">
 			Rating:
-			<?		
+			<?php
 			$ask_crew_rating="SELECT rating from crews where name='$showcrew'";
 			$result_crew_rating=mysql_query($ask_crew_rating,$dbh);
 			while ($row_crew_rating=mysql_fetch_array($result_crew_rating))
@@ -126,7 +126,7 @@
 			}
 		?>
 		</div>
-		<?
+		<?php
 		$ask_members="SELECT COUNT(nick) FROM member_of where crew='$showcrew'";
 		$result_members=mysql_query($ask_members,$dbh);
 		while ($row_members=mysql_fetch_array($result_members))
@@ -149,7 +149,7 @@
 		<div class="content">
 			&nbsp;
 		</div>
-		<?
+		<?php
 	}
 	?>
 
@@ -171,7 +171,7 @@
 		<yellow>RELEASES</yellow>
 	</div>
 	
-	<?
+	<?php
 	$ask="select nick from member_of where crew='$showcrew'";
 	$result=mysql_query($ask,$dbh);
 	while ($row=mysql_fetch_array($result))
@@ -188,7 +188,7 @@
 			?>
 			<div style="clear: left; float: left; width: 170px; padding-left: 4px; padding-bottom: 2px; padding-top: 2px;"> 
 				<a href="info_artist.php?artist=<?=$encoded_crewmember?>&sort_by=filename" /> <?=$crewmember?> 
-				<?
+				<?php
 				if(!empty($membacronym))
 				{
 				echo "[$membacronym]";
@@ -198,7 +198,7 @@
 			</div>
 		
 			<div style="float: left; width: 140px;">	
-				<?
+				<?php
 				$ask_artist_rating="SELECT rating FROM artists where nick='$crewmember'";
 				$result_artist_rating=mysql_query($ask_artist_rating,$dbh);
 				while ($row_artist_rating=mysql_fetch_array($result_artist_rating))
@@ -238,7 +238,7 @@
 				}
 			?>
 			</div>	
-			<?
+			<?php
 			$ask_memb_rels="SELECT COUNT(filename) FROM author_of WHERE nick='$crewmember'";
 			$result_memb_rels=mysql_query($ask_memb_rels,$dbh);
 			while ($row_memb_rels=mysql_fetch_array($result_memb_rels))
@@ -319,7 +319,7 @@
 					&nbsp;
 				</div>
 				
-				<?
+				<?php
 			}
 	
 		}
@@ -346,14 +346,14 @@
 					<div class="maincontent">
 						<div class="headline">Latest Release</div>
 						<div class="content_with_blenk"><br></div>
-						<?
+						<?php
 						if ($row[9] == "file_id.diz.png")
 						{
 							?>
 							<div class="release_file_id">
 							<a href="info_release.php?filename=<?=$encoded_filename?>"><img class="centered" border="0" src="collys/file_id.diz.png"></a>
 							</div>
-							<?
+							<?php
 						}
 						else
 						{
@@ -362,7 +362,7 @@
 								<a href="info_release.php?filename=<?=$encoded_filename?>"><img class="centered" border="0" src="collys/<?=$dirname?>/<?=$row[9]?>"></a>
 								<br>
 							</div>
-							<?
+							<?php
 						}
 						?>
 						<div style="float: right; width: 266px;">
@@ -507,7 +507,7 @@
 						}
 						?>
 						<div class="release_div_right">
-						<?
+						<?php
 						if(empty($collyrating))
 						{
 							$askagain="SELECT COUNT(rating) from comments where filename='$filename'";
@@ -560,7 +560,7 @@
 						</div>
 								
 						<div class="release_div_right">
-							<?
+							<?php
 							$ask="SELECT downloads from collys where filename='$filename'";
 							$result=mysql_query($ask,$dbh);
 							while ($row=mysql_fetch_array($result))
@@ -586,12 +586,12 @@
 						<div class="content">
 							&nbsp;
 						</div>
-						<?
+						<?php
 						}
 					?>
 					</div>
 					</div>
-					<?
+					<?php
 
 	$ask_check="SELECT a.*, b.nick AS author, c.crew FROM collys AS a INNER JOIN author_of AS b ON a.filename = b.filename INNER JOIN crew_of AS c ON a.filename = c.filename WHERE c.crew = '$crew' GROUP BY a.filename ORDER BY $sort_criteria ASC LIMIT 1";
 	$result_check=mysql_query($ask_check,$dbh);
@@ -625,7 +625,7 @@
 			ARTiST
 		</div>
 				
-		<?
+		<?php
 		$ask="SELECT a.*, b.nick AS author, c.crew FROM collys AS a INNER JOIN author_of AS b ON a.filename = b.filename INNER JOIN crew_of AS c ON a.filename = c.filename WHERE c.crew = '$showcrew' GROUP BY a.filename ORDER BY $sort_criteria ASC";
 		$result=mysql_query($ask,$dbh);
 		while ($row=mysql_fetch_array($result))
@@ -649,7 +649,7 @@
 			<div class="artist">			
 				<a href="info_artist.php?artist=<?=$encoded_author?>&sort_by=filename"><?=$author?></a>
 			</div>
-			<?
+			<?php
 			}
 		}
 	}

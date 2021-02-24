@@ -1,6 +1,5 @@
 <?php
-require_once('dbconnect_asciiarena.php'); 
-require_once('ansilove.php');
+  include_once('session.php');
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "https://www.w3.org/TR/html4/loose.dtd">
@@ -45,10 +44,10 @@ require_once('ansilove.php');
 		var newselect = " <select name=\"add_bbs[]\"" + document.getElementById('total_bbses').value + "><option value=\"Unknown\">Unknown</option><?php
 
 			$ask="select name from bbses";
-			$result=mysql_query($ask,$dbh);
-			while ($row=mysql_fetch_array($result))
+			$result=fetchAll($ask);
+			foreach ($result as $row)
 			{
-		        $add_bbses=$row[0];
+		        $add_bbses=$row->name;
 		        echo "<option>$add_bbses</option>";
 			}
 			echo "</select>\"\n";
@@ -65,10 +64,10 @@ require_once('ansilove.php');
 		var newselect = " <select name=\"artist_crew[]\"" + document.getElementById('total_artist_crews').value + "><option value=\"Unknown\">Unknown</option><?php
 
 			$ask="select name from crews";
-			$result=mysql_query($ask,$dbh);
-			while ($row=mysql_fetch_array($result))
+			$result=fetchAll($ask);
+			foreach($result as $row)
 			{
-		        $crews=$row[0];
+		        $crews=$row->name;
 		        echo "<option value='$crews'>$crews</option>";
 			}
 			echo "</select>\"\n";
@@ -85,10 +84,10 @@ require_once('ansilove.php');
 		var newselect = " <select name=\"colly_author[]\"" + document.getElementById('total_colly_authors').value + "><option value=\"Unknown\">Unknown</option><?php
 
 			$ask="select nick from artists";
-			$result=mysql_query($ask,$dbh);
-			while ($row=mysql_fetch_array($result))
-			{
-		        $artists=$row[0];
+            $result=fetchAll($ask);
+            foreach($result as $row)
+        	{
+		        $artists=$row->nick;
 		        echo "<option>$artists</option>";
 			}
 			echo "</select>\"\n";
@@ -105,10 +104,10 @@ require_once('ansilove.php');
 		var newselect = " <select name=\"colly_crew[]\"" + document.getElementById('total_colly_crews').value + "><option>Independent</option><?php
 
 			$ask="select name from crews";
-			$result=mysql_query($ask,$dbh);
-			while ($row=mysql_fetch_array($result))
+			$result=fetchAll($ask);
+foreach ($result as $row)
 			{
-		        $crews=$row[0];
+		        $crews=$row->name;
 		        echo "<option value='$crews'>$crews</option>";
 			}
 			echo "</select>\"\n";
@@ -129,8 +128,8 @@ require_once('ansilove.php');
 		<?php include ('sidebar.php'); ?>
 	</div>	
 	<div class="maincontent">
-	<?php	
-	if (($logged_in == 1) && ($rank =="Admin"))
+	<?php
+	if (is_logged_in() && is_admin())
 	{
 
 		//echo "<pre>";print_r($_POST);echo "</pre>";
@@ -139,18 +138,18 @@ require_once('ansilove.php');
 // SET COLLY TO FIXED
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['colly_fixed']) && $rank=="Admin")
+	if(isset($_POST['colly_fixed']) && is_admin())
 	{
 		$fixed_colly=cleanInsert($_POST['filename']);
 		$fixed_colly=stripslashes($fixed_colly);
 		if(!empty($fixed_colly))
 		{
-			$ask="update collys set broken=0 where filename='$fixed_colly'";
-			mysql_query($ask,$dbh);
+			$ask="update collys set broken=0 where filename=:fixed_colly";
+			doQuery($ask,[':fixed_colly' => $fixed_colly]);
 		}
 		?>
 		<meta http-equiv="Refresh" content="0; url=admin.php">
-		<?
+		<?php
 	}	
 
 
@@ -159,17 +158,17 @@ require_once('ansilove.php');
 // DELETE USER FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['delete_user']) && $rank=="Admin")
+	if(isset($_POST['delete_user']) && is_admin())
 	{
 		$delete_user=$_POST['getuser'];
 		$delete_user=cleanInsert($delete_user);
 
 		if(!empty($delete_user))
 		{
-			$ask="delete from users where nick='$delete_user'";
-			mysql_query($ask,$dbh);
+			$ask="delete from users where nick=:delete_user";
+			doQuery($ask, [ ':delete_user' => $delete_user ]);
 		}
-		?><meta http-equiv="Refresh" content="0; url=admin.php"><?
+		?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
 	}	
 
 
@@ -177,27 +176,27 @@ require_once('ansilove.php');
 // DELETE CREW FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['do_delete_crew']) && $rank=="Admin")
+	if(isset($_POST['do_delete_crew']) && is_admin())
 	{
 		$delete_crew=$_POST['getcrew'];
 		$delete_crew=cleanInsert($delete_crew);
 
 		if(!empty($delete_crew))
 		{
-			$ask="delete from crews where name='$delete_crew'";
-			mysql_query($ask,$dbh);
+			$ask="delete from crews where name=:delete_crew";
+			doQuery($ask,[ ':delete_crew' => $delete_crew]);
 
-			$ask="delete from bbs_of where crew='$delete_crew'";
-			mysql_query($ask,$dbh);
+			$ask="delete from bbs_of where crew=:delete_crew";
+			doQuery($ask,[ ':delete_crew' => $delete_crew]);
 		}
-		?><meta http-equiv="Refresh" content="0; url=admin.php"><?
+		?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
 	}	
 
 //---------------------------------------------------------------------------------------------------------------
 // DELETE SITELOGO FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['delete_sitelogo']) && $rank=="Admin")
+	if(isset($_POST['delete_sitelogo']) && is_admin())
 	{
 		$delete_sitelogo=$_POST['getsitelogo'];
 		$delete_sitelogo=cleanInsert($delete_sitelogo);
@@ -210,33 +209,33 @@ require_once('ansilove.php');
 
 		if(!empty($delete_sitelogo))
 		{
-			$ask="delete from logos where filename='$delete_sitelogo'";
-			mysql_query($ask,$dbh);
+			$ask="delete from logos where filename=:delete_sitelogo";
+			doQuery($ask, [':delete_sitelogo' => $delete_sitelogo]);
 		}
-		?><meta http-equiv="Refresh" content="0; url=admin.php"><?
+		?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
 	}	
 
 //---------------------------------------------------------------------------------------------------------------
 // DELETE COLLY FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['do_delete_colly']) && $rank=="Admin")
+	if(isset($_POST['do_delete_colly']) && is_admin())
 	{
 		$delete_colly=$_POST['filename'];
 		$delete_colly=cleanInsert($delete_colly);
 
 		$ask="select uploader from collys where filename='$delete_colly'"; // fetch uploader of deleted colly
-		$result=mysql_query($ask,$dbh);
-		while ($row=mysql_fetch_array($result))
+		$result=fetchAll($ask);
+foreach ($result as $row)
 		{
-			$uploader=$row['uploader'];
+			$uploader=$row->uploader;
 		}
 
 		$ask="SELECT * FROM image_of WHERE filename LIKE '$delete_colly%'"; // fetch uploader of deleted colly
-		$result=mysql_query($ask,$dbh);
-		while ($row=mysql_fetch_array($result))
+		$result=fetchAll($ask);
+foreach ($result as $row)
 		{
-			$collyimage=$row['images'];
+			$collyimage=$row->images;
 			$collyimage=addslashes($collyimage);
 			unlink("$collyimage");
 		}
@@ -271,70 +270,61 @@ require_once('ansilove.php');
 		
 		if(!empty($delete_colly))
 		{
-			$ask="delete from collys where filename='$delete_colly'"; 
-			mysql_query($ask,$dbh);
-
-			$ask="delete from comments where filename='$delete_colly'"; 
-			mysql_query($ask,$dbh);
-
-			$ask="DELETE FROM image_of WHERE filename LIKE '$delete_colly%'"; 
-			mysql_query($ask,$dbh);
-
-			$ask="DELETE FROM crew_of WHERE filename LIKE '$delete_colly%'"; 
-			mysql_query($ask,$dbh);
-
-			$ask="DELETE FROM author_of WHERE filename LIKE '$delete_colly%'"; 
-			mysql_query($ask,$dbh);
+			doQuery("delete from collys    WHERE filename    = :delete_colly", [ ":delete_colly" =>  $delete_colly   ]); 
+			doQuery("delete from comments  WHERE filename    = :delete_colly", [ ":delete_colly" =>  $delete_colly   ]); 
+			doQuery("DELETE FROM image_of  WHERE filename LIKE :delete_colly", [ ":delete_colly" => "$delete_colly%" ]); 
+			doQuery("DELETE FROM crew_of   WHERE filename LIKE :delete_colly", [ ":delete_colly" => "$delete_colly%" ]); 
+			doQuery("DELETE FROM author_of WHERE filename LIKE :delete_colly", [ ":delete_colly" => "$delete_colly%" ]); 
 		}
 
-		$result = mysql_query("select sum(filesize) from collys where uploader='$nick'",$dbh);
-		if ($row = mysql_fetch_row($result))
+		$row = fetchOne("select sum(filesize) AS sum_filesize from collys where uploader=':nick'", [":nick" => $nick]);
+		if ($row)
 		{
-			$collysize=$row[0];
+			$collysize=$row->sum_filesize;
 		}
 
-		$result = mysql_query("select sum(filesize) from mags where uploader='$nick'",$dbh);
-		if ($row = mysql_fetch_row($result))
+		$row = fetchOne("select sum(filesize) AS sum_filesize from mags where uploader=':nick'", [":nick" => $nick]);
+		if ($row)
 		{
-			$magsize=$row[0];
+			$magsize=$row->sum_filesize;
 		}
 
-		$result = mysql_query("select sum(filesize) from apps where uploader='$nick'",$dbh);
-		if ($row = mysql_fetch_row($result))
+		$row = fetchOne("select sum(filesize) AS sum_filesize from apps where uploader=':nick'", [":nick" => $nick]);
+		if ($row)
 		{
-			$appsize=$row[0];
+			$appsize=$row->sum_filesize;
 		}
 		$pumped = $collysize + $appsize + $magsize;
-		mysql_query("update users set uploaded='$pumped' where nick='$nick'", $dbh);
+		doQuery("update users set uploaded = :pumped where nick = :nick", [":nick" => $nick, ":pumped" => $pumped]);
 
 //---------------------------------------------------------------------------------------------------------------
 // RECALCULATE RATINGS FOR ARTISTS
 //---------------------------------------------------------------------------------------------------------------
 
 		$ask="select nick from author_of";
-		$result=mysql_query($ask,$dbh);
-		while ($row=mysql_fetch_array($result))
+		$result=fetchAll($ask);
+foreach ($result as $row)
 		{
-			$artist=$row[0];
+			$artist=$row->nick;
 	
-			$ask_avg="select avg(rating) from comments where artist='$artist' and rating>0";
-			$result_avg=mysql_query($ask_avg,$dbh);
-			while ($row_avg=mysql_fetch_array($result_avg))
+			$ask_avg="select avg(rating) AS avg_rating from comments where artist= :artist and rating > 0";
+			$result_avg=fetchAll($ask_avg, [':artist' => $artist]);
+			foreach ($result_avg as $row_avg)
 			{
-				$avg_artist_rating=$row_avg[0];
+				$avg_artist_rating=$row_avg->avg_rating;
 			}
 			
-			$ask_rate_amount="SELECT COUNT(rating) from comments where artist='$artist' and rating>0";
-			$result_rate_amount=mysql_query($ask_rate_amount,$dbh);
-			while ($row_rate_amount=mysql_fetch_array($result_rate_amount))
+			$ask_rate_amount="SELECT COUNT(rating) AS count_rating from comments where artist=:artist and rating>0";
+			$result_rate_amount=fetchAll($ask_rate_amount,[ ':artist' => $artist ]);
+			foreach ($result_rate_amount as $row_rate_amount)
 			{
-				$rate_amount=$row_rate_amount[0];
+				$rate_amount=$row_rate_amount->count_rating;
 			}
 
 			if ($rate_amount >2)
 			{
-				$ask_update="update artists set rating=$avg_artist_rating where nick='$artist'";
-				mysql_query($ask_update,$dbh);	
+				$ask_update="update artists set rating=:avg_artist_rating where nick=:artist";
+				doQuery($ask_update, [ ':artist' => $artist, ':avg_artist_rating' => $avg_artist_rating]);	
 			}
 		}
 
@@ -344,23 +334,24 @@ require_once('ansilove.php');
 
 
 		$ask="select name from crews";
-		$result=mysql_query($ask,$dbh);
-		while ($row=mysql_fetch_array($result))
+		$result=fetchAll($ask);
+foreach ($result as $row)
 		{
-			$crew=$row[0];
+			$crew=$row->name;
 
-			$ask_rating="select avg(rating) from comments where crew='$crew' and rating>0";
-			$result_rating=mysql_query($ask_rating,$dbh);
-			while ($row_rating=mysql_fetch_array($result_rating))
+			# FIXME: Probably fetchOne ?
+			$ask_rating="select avg(rating) AS avg_rating from comments where crew=:crew and rating>0";
+			$result_rating=fetchAll($ask_rating, [':crew' => $crew ]);
+			foreach ($result_rating as $avg_crew_rating)
 			{
-				$avg_crew_rating=$row_rating[0];
+				$avg_crew_rating=$row_rating->avg_rating;
 			}
 			if(!isset($avg_crew_rating))
 			{
 				$avg_crew_rating=0;
 			}	
-			$ask_update="update crews set rating=$avg_crew_rating where name='$crew'";
-			mysql_query($ask_update,$dbh);	
+			$ask_update="update crews set rating=:avg_crew_rating where name=:crew ";
+			doQuery($ask_update,[':avg_crew_rating' => $avg_crew_rating, ':crew' => $crew]);	
 		}
 		?>
 		<meta http-equiv="Refresh" content="0; url=admin.php">
@@ -372,70 +363,70 @@ require_once('ansilove.php');
 // DELETE BBS FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['delete_bbs']) && $rank=="Admin")
+	if(isset($_POST['delete_bbs']) && is_admin())
 	{
 		$delete_bbs=$_POST['getbbs'];
 		$delete_bbs=cleanInsert($delete_bbs);
 
 		if(!empty($delete_bbs))
 		{
-			$ask="delete from bbses where name='$delete_bbs'";
-			mysql_query($ask,$dbh);
+			$ask="delete from bbses where name=:delete_bbs";
+			doQuery($ask,[ ':delete_bbs' => $delete_bbs ]);
 		}
-		?><meta http-equiv="Refresh" content="0; url=admin.php"><?
+		?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
 	}	
 
 //---------------------------------------------------------------------------------------------------------------
 // DELETE ARTIST FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['delete_artist']) && $rank=="Admin")
+	if(isset($_POST['delete_artist']) && is_admin())
 	{
 		$delete_artist=$_POST['getartist'];
 		$delete_artist=cleanInsert($delete_artist);
 		if(!empty($delete_artist))
 		{
-			$ask="delete from artists where nick='$delete_artist'";
-			mysql_query($ask,$dbh);
+			$ask="delete from artists where nick=:delete_artist";
+			doQuery($ask, [':delete_artist' => $delete_artist]);
 
-			$ask="delete from member_of where nick='$delete_artist'";
-			mysql_query($ask,$dbh);
+			$ask="delete from member_of where nick=:delete_artist";
+			doQuery($ask, [':delete_artist' => $delete_artist]);
 		}
-		?><meta http-equiv="Refresh" content="0; url=admin.php"><?
+		?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
 	}	
 
 //---------------------------------------------------------------------------------------------------------------
 // WRITE COLLY INFO TO DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['do_edit_colly']) && $rank=="Admin")
+	if(isset($_POST['do_edit_colly']) && is_admin())
 	{
-		if(isset($_POST['edit_colly_name']) && $rank=="Admin")
+		if(isset($_POST['edit_colly_name']) && is_admin())
 		{
 			$filename=$_POST['filename'];
 			$filename=cleanInsert($filename);
 
 			$edit_colly_name=$_POST['edit_colly_name'];
 			$edit_colly_name = cleanInsert($edit_colly_name); 
-			$ask="update collys set name='$edit_colly_name' where filename='$filename'";	
-			mysql_query($ask,$dbh);
+			$ask="update collys set name=:edit_colly_name where filename=:filename";	
+			doQuery($ask, [':edit_colly_name' => $edit_colly_name, ':filename' => $filename]);
 		}
 
-		if(isset($_POST['old_colly_authors']) || (isset($_POST['colly_author']) && $rank=="Admin"))
+		if(isset($_POST['old_colly_authors']) || (isset($_POST['colly_author']) && is_admin()))
 		{
 			$filename=$_POST['filename'];
 			$filename=cleanInsert($filename);
 
-			$ask="delete from author_of where filename='$filename'";
-			mysql_query($ask,$dbh);
+			$ask="delete from author_of where filename=:filename";
+			doQuery($ask, [':filename' => $filename]);
 
 			if (isset($_POST['old_colly_authors']))
 			{			
 				foreach($_POST['old_colly_authors'] as $colly_author)
 				{
 					$colly_author=cleanInsert($colly_author);
-					$ask="insert into author_of values ('$colly_author','$filename')";
-					mysql_query($ask,$dbh);
+					$ask="insert into author_of values (:colly_author,:filename)";
+					doQuery($ask, [':colly_author' => $colly_author, ':filename' => $filename]);
 				}
 			}
 	
@@ -444,27 +435,27 @@ require_once('ansilove.php');
 				foreach($_POST['colly_author'] as $new_colly_author)
 				{
 					$new_colly_author=cleanInsert($new_colly_author);
-					$ask="insert into author_of values ('$new_colly_author','$filename')";
-					mysql_query($ask,$dbh);
+					$ask="insert into author_of values (:new_colly_author,:filename)";
+					doQuery($ask,[':new_colly_author' => $new_colly_author, ':filename' => $filename]);
 				}
 			}
-			$ask="delete from author_of where filename='$filename' and nick='Delete'";
-			mysql_query($ask,$dbh);
+			$ask="delete from author_of where filename=:filename and nick='Delete'";
+			doQuery($ask,[':filename' => $filename ]);
 		}
-		if(isset($_POST['old_colly_crews']) || (isset($_POST['colly_crew']) && $rank=="Admin"))
+		if(isset($_POST['old_colly_crews']) || (isset($_POST['colly_crew']) && is_admin()))
 		{
 			$filename=$_POST['filename'];
 			$filename=cleanInsert($filename);
 
-			$ask="delete from crew_of where filename='$filename'";
-			mysql_query($ask,$dbh);
+			$ask="delete from crew_of where filename=:filename";
+			doQuery($ask,[':filename' => $filename]);
 
 			if (isset($_POST[old_colly_crews]))
 			{			
 				foreach($_POST[old_colly_crews] as $colly_crew)
 				{
-					$ask="insert into crew_of values ('$colly_crew','$filename')";
-					mysql_query($ask,$dbh);
+					$ask="insert into crew_of values (:colly_crew,:filename)";
+					doQuery($ask,[':colly_crew' => $colly_crew, ':filename' => $filename]);
 				}
 			}
 	
@@ -472,24 +463,24 @@ require_once('ansilove.php');
 			{
 				foreach($_POST[colly_crew] as $new_colly_crew)
 				{
-					$ask="insert into crew_of values ('$new_colly_crew','$filename')";
-					mysql_query($ask,$dbh);
+					$ask="insert into crew_of values (:new_colly_crew, :filename)";
+					doQuery($ask, [':new_colly_crew' => $new_colly_crew, ':filename' => $filename]);
 				}
 			}
 			
-			$ask="delete from crew_of where filename='$filename' and crew='Delete'";
-			mysql_query($ask,$dbh);
+			$ask="delete from crew_of where filename=:filename and crew='Delete'";
+			doQuery($ask,[':filename' => $filename]);
 		}
-		if(isset($_POST['edit_colly_year']) && $rank=="Admin")
+		if(isset($_POST['edit_colly_year']) && is_admin())
 		{
 			$filename=$_POST['filename'];
 			$filename=cleanInsert($filename);
 			$edit_colly_year=$_POST['edit_colly_year'];
 			$edit_colly_year= cleanInsert($edit_colly_year); 
-			$ask="update collys set year='$edit_colly_year' where filename='$filename'";	
-			mysql_query($ask,$dbh);	
+			$ask="update collys set year=:edit_colly_year where filename=:filename";	
+			doQuery($ask,[':edit_colly_year' => $edit_colly_year, ':filename' => $filename]);	
 		}
-		if(isset($_POST['edit_colly_type']) && $rank=="Admin")
+		if(isset($_POST['edit_colly_type']) && is_admin())
 		{
 			$filename=$_POST['filename'];
 			$filename=cleanInsert($filename);
@@ -497,10 +488,10 @@ require_once('ansilove.php');
 			$edit_colly_type=$_POST['edit_colly_type'];
 			$edit_colly_type=cleanInsert($edit_colly_type); 
 
-			$ask="update collys set type='$edit_colly_type' where filename='$filename'";	
-			mysql_query($ask,$dbh);	
+			$ask="update collys set type=:edit_colly_type where filename=:filename";	
+			doQuery($ask,[':edit_colly_type' => $edit_colly_type, ':filename' => $filename]);	
 		}
-		if(isset($_POST['edit_colly_month']) && $rank=="Admin")
+		if(isset($_POST['edit_colly_month']) && is_admin())
 		{
 			$filename=$_POST['filename'];
 			$filename=cleanInsert($filename);
@@ -509,9 +500,9 @@ require_once('ansilove.php');
 			$edit_colly_month=cleanInsert($edit_colly_month);
 			
 			$ask="update collys set month='$edit_colly_month' where filename='$filename'";	
-			mysql_query($ask,$dbh);	
+			doQuery($ask,[':edit_colly_month' => $edit_colly_month, ':filename' => $filename]);	
 		}
-		if(isset($_POST['edit_colly_day']) && $rank=="Admin")
+		if(isset($_POST['edit_colly_day']) && is_admin())
 		{
 			$filename=$_POST['filename'];
 			$filename=cleanInsert($filename);
@@ -519,8 +510,8 @@ require_once('ansilove.php');
 			$edit_colly_day=$_POST['edit_colly_day'];
 			$edit_colly_day=cleanInsert($edit_colly_day); 
 			
-			$ask="update collys set day='$edit_colly_day' where filename='$filename'";	
-			mysql_query($ask,$dbh);	
+			$ask="update collys set day=:edit_colly_day where filename=:filename";	
+			doQuery($ask,[':edit_colly_day' => $edit_colly_day, ':filename' => $filename]);	
 		}
 
 //---------------------------------------------------------------------------------------------------------------
@@ -528,14 +519,14 @@ require_once('ansilove.php');
 //---------------------------------------------------------------------------------------------------------------
 
 		$ask="select nick from author_of";
-		$result=mysql_query($ask,$dbh);
-		while ($row=mysql_fetch_array($result))
+		$result=fetchAll($ask);
+foreach ($result as $row)
 		{
-			$artist=$row[0];
+			$artist=$row->nick;
 
-			$ask_rating="select avg(rating) from comments where artist='$artist' and rating>0";
-			$result_rating=mysql_query($ask_rating,$dbh);
-			while ($row_rating=mysql_fetch_array($result_rating))
+			$ask_rating="select avg(rating) from comments where artist=:artist and rating>0";
+			$result_rating=fetchAll($ask_rating,[':artist' => $artist]);
+			foreach ($result_rating as $row_rating)
 			{
 				$avg_artist_rating=$row_rating[0];
 			}
@@ -545,18 +536,18 @@ require_once('ansilove.php');
 				$avg_artist_rating=0;
 			}	
 
-			$ask_update="update artists set rating=$avg_artist_rating where nick='$artist'";
-			mysql_query($ask,$dbh);	
+			$ask_update="update artists set rating=:avg_artist_rating where nick=:artist";
+			doQuery($ask,[':avg_artist_rating' => $avg_artist_rating, ':artist' => $artist]);	
 		}
 		$ask="select crew from crew_of";
-		$result=mysql_query($ask,$dbh);
-		while ($row=mysql_fetch_array($result))
+		$result=fetchAll($ask);
+foreach ($result as $row)
 		{
-			$crew=$row[0];
+			$crew=$row->crew;
 
-			$ask_rating="select avg(rating) from comments where crew='$crew' and rating>0";
-			$result_rating=mysql_query($ask_rating,$dbh);
-			while ($row=mysql_fetch_array($result_rating))
+			$ask_rating="select avg(rating) from comments where crew=:crew and rating>0";
+			$result_rating=fetchAll($ask_rating,[ ':crew' => $crew ]);
+			foreach ($result_rating as $row)
 			{
 				$avg_crew_rating=$row_rating[0];
 			}
@@ -564,8 +555,8 @@ require_once('ansilove.php');
 			{
 				$avg_crew_rating=0;
 			}	
-			$ask_update="update crews set rating=$avg_crew_rating where name='$crew'";
-			mysql_query($ask_update,$dbh);	
+			$ask_update="update crews set rating=:avg_crew_rating where name=:crew";
+			doQuery($ask_update,[':avg_crew_rating' => $avg_crew_rating, ':crew' => $crew]);	
 		}
 		?>
 		<meta http-equiv="Refresh" content="0; url=admin.php">
@@ -578,9 +569,9 @@ require_once('ansilove.php');
 // WRITE CREW INFO TO DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['do_change_crew']) && $rank=="Admin")
+	if(isset($_POST['do_change_crew']) && is_admin())
 	{
-		if(isset($_POST['edit_crew_name']) && $rank=="Admin")
+		if(isset($_POST['edit_crew_name']) && is_admin())
 		{
 			$crew=$_POST['getcrew'];
 			$crew=cleanInsert($crew);
@@ -588,19 +579,12 @@ require_once('ansilove.php');
 			$edit_crew_name=$_POST['edit_crew_name'];
 			$edit_crew_name=cleanInsert($edit_crew_name); 
 
-			$ask="update crews set name='$edit_crew_name' where name='$crew'";	
-			mysql_query($ask,$dbh);	
-
-			$ask="update crew_of set crew='$edit_crew_name' where crew='$crew'";	
-			mysql_query($ask,$dbh);	
-
-			$ask="update bbs_of set crew='$edit_crew_name' where crew='$crew'";	
-			mysql_query($ask,$dbh);
-
-			$ask="update member_of set crew='$edit_crew_name' where crew='$crew'";	
-			mysql_query($ask,$dbh);
-			}
-			if(isset($_POST['edit_crew_www']) && $rank=="Admin")
+			doQuery("update crews     set name=:edit_crew_name where name=:crew", [':edit_crew_name' => $edit_crew_name, ':crew' => $crew]);
+			doQuery("update crew_of   set crew=:edit_crew_name where crew=:crew", [':edit_crew_name' => $edit_crew_name, ':crew' => $crew]);	
+			doQuery("update bbs_of    set crew=:edit_crew_name where crew=:crew", [':edit_crew_name' => $edit_crew_name, ':crew' => $crew]);	
+			doQuery("update member_of set crew=:edit_crew_name where crew=:crew", [':edit_crew_name' => $edit_crew_name, ':crew' => $crew]);	
+		}
+			if(isset($_POST['edit_crew_www']) && is_admin())
 			{
 				$crew=$_POST['getcrew'];
 				$crew=cleanInsert($crew);
@@ -608,20 +592,18 @@ require_once('ansilove.php');
 				$edit_crew_www=$_POST['edit_crew_www'];
 				$edit_crew_www=cleanInsert($edit_crew_www); 
 
-				$ask="update crews set www='$edit_crew_www' where name='$edit_crew_name'";	
-				mysql_query($ask,$dbh);	
+				doQuery("update crews set www=:edit_crew_www where name=:edit_crew_name", [':edit_creq_www' => $edit_crew_www, ':edit_crew_name' => $edit_crew_name]);	
 			}
 
-			if(isset($_POST['add_bbs']) && $rank=="Admin")
+			if(isset($_POST['add_bbs']) && is_admin())
 			{
 				foreach($_POST[add_bbs] as $add_bbs) // add new bbses
 				{
-				$ask="insert into bbs_of values ('$add_bbs','$crew')";
-				mysql_query($ask,$dbh);
+				doQuery("insert into bbs_of values (:add_bbs,:crew)", [':add_bbs' => $add_bbs, ':crew' => $crew]);
 				}
 			}
 
-			if(isset($_POST['edit_crew_contact']) && $rank=="Admin")
+			if(isset($_POST['edit_crew_contact']) && is_admin())
 			{
 				$crew=$_POST['getcrew'];
 				$crew=cleanInsert($crew);
@@ -630,9 +612,9 @@ require_once('ansilove.php');
 				$edit_crew_contact=cleanInsert($edit_crew_contact); 
 
 				$ask="update crews set contact='$edit_crew_contact' where name='$edit_crew_name'";	
-				mysql_query($ask,$dbh);	
+				doQuery($ask, [':edit_crew_contact' => $edit_crew_contact, ':edit_crew_name' => $edit_crew_name]);	
 			}
-			if(isset($_POST['edit_crew_status']) && $rank=="Admin")
+			if(isset($_POST['edit_crew_status']) && is_admin())
 			{
 				$crew=$_POST['getcrew'];
 				$crew=cleanInsert($crew);
@@ -640,10 +622,10 @@ require_once('ansilove.php');
 				$edit_crew_status=$_POST['edit_crew_status'];
 				$edit_crew_status=cleanInsert($edit_crew_status); 
 
-				$ask="update crews set active='$edit_crew_status' where name='$edit_crew_name'";	
-				mysql_query($ask,$dbh);	
+				$ask="update crews set active=:edit_crew_status where name=:edit_crew_name";	
+				doQuery($ask, [':edit_crew_status' => $edit_crew_status, ':edit_crew_name' => $edit_crew_name]);	
 			}
-			if(isset($_POST['edit_crew_acronym']) && $rank=="Admin")
+			if(isset($_POST['edit_crew_acronym']) && is_admin())
 			{
 				$crew=$_POST['getcrew'];
 				$crew=cleanInsert($crew);
@@ -651,17 +633,17 @@ require_once('ansilove.php');
 				$edit_crew_acronym=$_POST['edit_crew_acronym'];
 				$edit_crew_acronym=cleanInsert($edit_crew_acronym); 
 
-				$ask="update crews set acronym='$edit_crew_acronym' where name='$edit_crew_name'";	
-				mysql_query($ask,$dbh);	
+				$ask="update crews set acronym=:edit_crew_acronym where name=:edit_crew_name";
+				doQuery($ask, [':edit_crew_acronym' => $edit_crew_acronym, ':edit_crew_name' => $edit_crew_name ]);
 			}
 		}
 //---------------------------------------------------------------------------------------------------------------
 // WRITE ARTIST INFO TO DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['do_edit_artist']) && $rank=="Admin")
+	if(isset($_POST['do_edit_artist']) && is_admin())
 	{
-		if(isset($_POST['edit_artist_nick']) && $rank=="Admin")
+		if(isset($_POST['edit_artist_nick']) && is_admin())
 		{
 			$artist=$_POST['getartist'];
 			$artist=cleanInsert($artist);
@@ -669,17 +651,17 @@ require_once('ansilove.php');
 			$edit_artist_nick=$_POST['edit_artist_nick'];
 			$edit_artist_nick = cleanInsert($edit_artist_nick); 
 
-			$ask="update artists set nick='$edit_artist_nick' where nick='$artist'";	
-			mysql_query($ask,$dbh);	
+			$ask="update artists   set nick=:edit_artist_nick where nick=:artist";	
+			doQuery($ask,[':edit_artist_nick' => $edit_artist_nick, ':artist' => $artist]);	
 
-			$ask="update member_of set nick='$edit_artist_nick' where nick='$artist'";	
-			mysql_query($ask,$dbh);	
+			$ask="update member_of set nick=:edit_artist_nick' where nick=:artist";	
+			doQuery($ask,[':edit_artist_nick' => $edit_artist_nick, ':artist' => $artist]);	
 
-			$ask="update author_of set nick='$edit_artist_nick' where nick='$artist'";	
-			mysql_query($ask,$dbh);	
+			$ask="update author_of set nick=:edit_artist_nick' where nick=:artist";	
+			doQuery($ask,[':edit_artist_nick' => $edit_artist_nick, ':artist' => $artist]);	
 
 		}
-		if(isset($_POST['edit_artist_www']) && $rank=="Admin")
+		if(isset($_POST['edit_artist_www']) && is_admin())
 		{
 			$artist=$_POST['getartist'];
 			$artist=cleanInsert($artist);
@@ -687,10 +669,10 @@ require_once('ansilove.php');
 			$edit_artist_www=$_POST['edit_artist_www'];
 			$edit_artist_www = cleanInsert($edit_artist_www); 
 
-			$ask="update artists set www='$edit_artist_www' where nick='$edit_artist_nick'";	
-			mysql_query($ask,$dbh);	
+			$ask="update artists set www=:edit_artist_www where nick=:edit_artist_nick";	
+			doQuery($ask,[':edit_artist_www' => $edit_artist_www, ':edit_artist_nick' => $edit_artist_nick]);	
 		}
-		if(isset($_POST['edit_artist_status']) && $rank=="Admin")
+		if(isset($_POST['edit_artist_status']) && is_admin())
 		{
 			$artist=$_POST['getartist'];
 			$artist=cleanInsert($artist);
@@ -698,51 +680,51 @@ require_once('ansilove.php');
 			$edit_artist_status=$_POST['edit_artist_status'];
 			$edit_artist_status = cleanInsert($edit_artist_status); 
 
-			$ask="update artists set active='$edit_artist_status' where nick='$edit_artist_nick'";	
-			mysql_query($ask,$dbh);	
+			$ask="update artists set active=:edit_artist_status where nick=:edit_artist_nick";	
+			doQuery($ask, [':edit_artist_status' => $edit_artist_status, ':edit_artist_nick' => $edit_artist_nick]);	
 		}
-		if(isset($_POST['old_artist_crews']) || (isset($_POST['artist_crew']) && $rank=="Admin"))
+		if(isset($_POST['old_artist_crews']) || (isset($_POST['artist_crew']) && is_admin()))
 		{
 			$artist=$_POST['getartist'];
 			$artist=cleanInsert($artist);
 
-			$ask="delete from member_of where nick='$edit_artist_nick'";
-			mysql_query($ask,$dbh);
+			$ask="delete from member_of where nick=:edit_artist_nick";
+			doQuery($ask, [':edit_artist_nick' => $edit_artist_nick]);
 
 			if (isset($_POST[old_artist_crews]))			
 			{
 				foreach($_POST[old_artist_crews] as $artist_crew)
 				{
-					$ask="insert into member_of values ('$artist_crew','$edit_artist_nick')";
-					mysql_query($ask,$dbh);
+					$ask="insert into member_of values (:artist_crew,:edit_artist_nick)";
+					doQuery($ask,[':artist_crew' => $artist_crew, ':edit_artist_nick' => $edit_artist_nick]);
 				}
 			}
 			if (isset($_POST[artist_crew]))
 			{
 				foreach($_POST[artist_crew] as $new_artist_crew)
 				{
-					$ask="insert into member_of values ('$new_artist_crew','$edit_artist_nick')";
-					mysql_query($ask,$dbh);
+					$ask="insert into member_of values (:new_artist_crew,:edit_artist_nick)";
+					doQuery($ask,[':new_artist_crew' => $new_artist_crew, ':edit_artist_nick' => $edit_artist_nick]);
 				}
 			}
 			
-			$ask="delete from member_of where nick='$edit_artist_nick' and crew='Delete'";
-			mysql_query($ask,$dbh);
+			$ask="delete from member_of where nick=:edit_artist_nick and crew='Delete'";
+			doQuery($ask, [':edit_artist_nick' => $edit_artist_nick]);
 		}
 
-		if(isset($_POST['change_artist_country']) && $rank=="Admin")
+		if(isset($_POST['change_artist_country']) && is_admin())
 		{
 			$artist=cleanInsert($_POST['getartist']);
 			$change_artist_country = cleanInsert($_POST['change_artist_country']); 
 
 			if (!empty($change_artist_country))
 			{
-				$ask="update artists set country='$country_list[$change_artist_country]' where nick='$edit_artist_nick'";	
-				mysql_query($ask,$dbh);	
+				$ask="update artists set country=:change_artist_country where nick=:edit_artist_nick";	
+				doQuery($ask, [':change_artist_country' => $country_list[$change_artist_country], ':edit_artist_nick' => $edit_artist_nick]);	
 			}
 		}
 
-		if(isset($_POST['edit_artist_acronym']) && $rank=="Admin")
+		if(isset($_POST['edit_artist_acronym']) && is_admin())
 		{
 			$artist=$_POST['getartist'];
 			$artist=cleanInsert($artist);
@@ -750,8 +732,8 @@ require_once('ansilove.php');
 			$edit_artist_acronym=$_POST['edit_artist_acronym'];
 			$edit_artist_acronym=cleanInsert($edit_artist_acronym); 
 
-			$ask="update artists set acronym='$edit_artist_acronym' where nick='$edit_artist_nick'";	
-			mysql_query($ask,$dbh);	
+			$ask="update artists set acronym=:edit_artist_acronym where nick=:edit_artist_nick";	
+			doQuery($ask,['edit_artist_acronym' => $edit_artist_acronym, ':edit_artist_nick' => $edit_artist_nick]);	
 		}
 	}
 
@@ -759,9 +741,9 @@ require_once('ansilove.php');
 // WRITE BBS INFO TO DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['do_edit_bbs']) && $rank=="Admin")
+	if(isset($_POST['do_edit_bbs']) && is_admin())
 	{
-		if(isset($_POST['edit_bbs_name']) && $rank=="Admin")
+		if(isset($_POST['edit_bbs_name']) && is_admin())
 		{
 			$bbs_name=$_POST['getbbs'];
 			$bbs_name=cleanInsert($bbs_name);
@@ -769,13 +751,13 @@ require_once('ansilove.php');
 			$edit_bbs_name=$_POST['edit_bbs_name'];
 			$edit_bbs_name=cleanInsert($edit_bbs_name); 
 
-			$ask="update bbses set name='$edit_bbs_name' where name='$bbs_name'";	
-			mysql_query($ask,$dbh);	
+			$ask="update bbses set name=:edit_bbs_name where name=:bbs_name";	
+			doQuery($ask, [':edit_bbs_name' => $edit_bbs_name, ':bbs_name' => $bbs_name]);	
 
-			$ask="update bbs_of set name='$edit_bbs_name' where name='$bbs_name'";	
-			mysql_query($ask,$dbh);	
+			$ask="update bbs_of set name=:edit_bbs_name where name=:bbs_name";	
+			doQuery($ask, [':edit_bbs_name' => $edit_bbs_name, ':bbs_name' => $bbs_name]);	
 		}
-		if(isset($_POST['edit_bbs_sysop']) && $rank=="Admin")
+		if(isset($_POST['edit_bbs_sysop']) && is_admin())
 		{
 			$bbs_name=$_POST['getbbs'];
 			$bbs_name=cleanInsert($bbs_name);
@@ -783,10 +765,10 @@ require_once('ansilove.php');
 			$edit_bbs_sysop=$_POST['edit_bbs_sysop'];
 			$edit_bbs_sysop= cleanInsert($edit_bbs_sysop); 
 
-			$ask="update bbses set sysop='$edit_bbs_sysop' where name='$edit_bbs_name'";	
-			mysql_query($ask,$dbh);	
+			$ask="update bbses set sysop=:edit_bbs_sysop where name=:edit_bbs_name";	
+			doQuery($ask,[':edit_bbs_sysop' => $edit_bbs_sysop, ':edit_bbs_name' => $edit_bbs_name]);	
 		}
-		if(isset($_POST['edit_bbs_address']) && $rank=="Admin")
+		if(isset($_POST['edit_bbs_address']) && is_admin())
 		{
 			$bbs_name=$_POST['getbbs'];
 			$bbs_name=cleanInsert($bbs_name);
@@ -794,10 +776,10 @@ require_once('ansilove.php');
 			$edit_bbs_address = $_POST['edit_bbs_address'];
 			$edit_bbs_address = cleanInsert($edit_bbs_address); 
 
-			$ask="update bbses set address='$edit_bbs_address' where name='$edit_bbs_name'";	
-			mysql_query($ask,$dbh);	
+			$ask="update bbses set address=:edit_bbs_address where name=:edit_bbs_name";	
+			doQuery($ask, [':edit_bbs_address' => $edit_bbs_address, ':edit_bbs_name' => $edit_bbs_name]);	
 		}
-		if(isset($_POST['edit_bbs_number']) && $rank=="Admin")
+		if(isset($_POST['edit_bbs_number']) && is_admin())
 		{
 			$bbs_name=$_POST['getbbs'];
 			$bbs_name=cleanInsert($bbs_name);
@@ -805,8 +787,8 @@ require_once('ansilove.php');
 			$edit_bbs_number=$_POST['edit_bbs_number'];
 			$edit_bbs_number=cleanInsert($edit_bbs_number); 
 
-			$ask="update bbses set number='$edit_bbs_number' where name='$edit_bbs_name'";	
-			mysql_query($ask,$dbh);	
+			$ask="update bbses set number=:edit_bbs_number where name=:edit_bbs_name";	
+			doQuery($ask,[':edit_bbs_number' => $edit_bbs_number, ':edit_bbs_name' => $edit_bbs_name]);	
 		}
 	}
 
@@ -814,9 +796,9 @@ require_once('ansilove.php');
 // WRITE FORUM DATA TO DB
 //---------------------------------------------------------------------------------------------------------------
 
-	if(isset($_POST['do_edit_forum']) && $rank=="Admin")
+	if(isset($_POST['do_edit_forum']) && is_admin())
 	{
-		if(isset($_POST['do_add_new_forum_member']) && $rank=="Admin")
+		if(isset($_POST['do_add_new_forum_member']) && is_admin())
 		{
 			$new_forum_member=$_POST['new_forum_member'];
 			$new_forum_member=cleanInsert($new_forum_member);
@@ -827,11 +809,11 @@ require_once('ansilove.php');
 			$new_forum_id=$_POST['new_forum_id'];
 			$new_forum_id=cleanInsert($new_forum_id);
 
-			$ask="insert into forum_access values ('$new_forum_member','$new_forum_name',$new_forum_id)";	
-			mysql_query($ask,$dbh);	
+			$ask="insert into forum_access values (:new_forum_member, :new_forum_name, :new_forum_id";	
+			doQuery($ask, [':new_forum_member' => $new_forum_member, ':new_forum_name' => $new_forum_name, ':new_forum_id' => $new_forum_id]);	
 		}
 			
-		if(isset($_POST['do_add_new_forum']) && $rank=="Admin")
+		if(isset($_POST['do_add_new_forum']) && is_admin())
 		{
 			$new_forum_name=$_POST['new_forum_name'];
 			$new_forum_name=cleanInsert($new_forum_name); 
@@ -840,10 +822,10 @@ require_once('ansilove.php');
 			$new_forum_public=cleanInsert($new_forum_public); 
 
 			$ask="select forum_id from forum_forum ORDER BY forum_id DESC LIMIT 1"; // grab latest id
-			$result=mysql_query($ask,$dbh);
-			while ($row=mysql_fetch_array($result))
+			$result=fetchAll($ask);
+foreach ($result as $row)
 			{
-				$new_forum_id=$row[0];
+				$new_forum_id=$row->forum_id;
 			}
 			if(!isset($new_forum_id))
 			{
@@ -854,8 +836,8 @@ require_once('ansilove.php');
 				$new_forum_id=$new_forum_id+1;
 			}
 
-			$ask="insert into forum_forum values ($new_forum_id,'$new_forum_name','$new_forum_public')";	
-			mysql_query($ask,$dbh);	
+			$ask="insert into forum_forum values (:new_forum_id,:new_forum_name,:new_forum_public)";	
+			doQuery($ask,[':new_forum_id' => $new_forum_id, ':new_forum_name' => $new_forum_name, ':new_forum_public' => $new_forum_public]);	
 		}
 	}
 
@@ -871,8 +853,8 @@ require_once('ansilove.php');
 		$user_nick=$_POST['getuser'];
 		$user_nick=cleanInsert($user_nick);
 
-		$ask="update users set nick='$change_user_nick' where nick='$user_nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set nick=:change_user_nick where nick=:user_nick";
+		doQuery($ask, [':change_user_nick' => $change_user_nick, ':user_nick' => $user_nick]);	
 	}
 	if(isset($_POST['changeusercrew']))
 	{
@@ -885,8 +867,8 @@ require_once('ansilove.php');
 		$user_nick=$_POST['usernick'];
 		$user_nick=cleanInsert($user_nick);
 		
-		$ask="update users set crew='$changecrew' where nick='$change_user_nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set crew=:changecrew where nick=:change_user_nick";
+		doQuery($ask,[':changecrew' => $changecrew, ':change_user_nick' => $change_user_nick ]);	
 	}
 	if(isset($_POST['edit_user_rank']))
 	{
@@ -899,8 +881,8 @@ require_once('ansilove.php');
 		$user_nick=$_POST['usernick'];
 		$user_nick=cleanInsert($user_nick);
 
-		$ask="update users set rank='$edit_user_rank' where nick='$change_user_nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set rank=:edit_user_rank where nick=:change_user_nick";
+		doQuery($ask, [':edit_user_rank' => $edit_user_rank, ':change_user_nick' => $change_user_nick]);	
 	}
 	if(isset($_POST['changeuserbyear']))
 	{
@@ -913,8 +895,8 @@ require_once('ansilove.php');
 		$user_nick=$_POST['usernick'];
 		$user_nick=cleanInsert($user_nick);
 
-		$ask="update users set byear=$changebyear where nick='$change_user_nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set byear=:changebyear where nick=:change_user_nick";
+		doQuery($ask, [':changebyear' => $changebyear, ':change_user_nick' => $change_user_nick]);	
 	}
 	if(isset($_POST['changeuserbmonth']))
 	{
@@ -927,8 +909,8 @@ require_once('ansilove.php');
 		$user_nick=$_POST['usernick'];
 		$user_nick=cleanInsert($user_nick);
 
-		$ask="update users set bmonth=$changebmonth where nick='$change_user_nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set bmonth=:changebmonth where nick=:change_user_nick";
+		doQuery($ask, [':changebmonth' => $changebmonth, ':change_user_nick' => $change_user_nick]);	
 	}
 	if(isset($_POST['changeuserbday']))
 	{
@@ -941,8 +923,8 @@ require_once('ansilove.php');
 		$user_nick=$_POST['usernick'];
 		$user_nick=cleanInsert($user_nick);
 
-		$ask="update users set bday=$changebday where nick='$change_user_nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set bday=:changebday where nick=:change_user_nick";
+		doQuery($ask, [':changebday' => $changebday, ':change_user_nick' => $change_user_nick]);	
 	}
 	if(isset($_POST['changeusercountry']))
 	{
@@ -955,8 +937,8 @@ require_once('ansilove.php');
 		$user_nick=$_POST['usernick'];
 		$user_nick=cleanInsert($user_nick);
 
-		$ask="update users set country='$country_list[$change_country]' where nick='$change_user_nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set country=':change_country' where nick=:change_user_nick";
+		doQuery($ask,[':change_country' => $country_list[$change_country], ':change_user_nick' => $change_user_nick ]);	
 	}
 	if(isset($_POST['changeusermessenger']))
 	{
@@ -969,8 +951,8 @@ require_once('ansilove.php');
 		$user_nick=$_POST['usernick'];
 		$user_nick=cleanInsert($user_nick);
 		
-		$ask="update users set messenger='$changemessenger' where nick='$change_user_nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set messenger=:changemessenger where nick=:change_user_nick";
+		doQuery($ask,[':changemessenger' => $changemessenger, ':change_user_nick' => $change_user_nick]);	
 	}
 	if(isset($_POST['changeusermail']))
 	{
@@ -991,14 +973,14 @@ require_once('ansilove.php');
 				You must enter a valid E-Mail adress!
 			</div>
 			<meta http-equiv="Refresh" content="2; url=admin.php">
-			<?
+			<?php
 			exit();
 		}
 		$user_nick=$_POST['usernick'];
 		$user_nick=cleanInsert($user_nick);
 
-		$ask="update users set mail='$mail' where nick='$change_user_nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set mail=:mail where nick=:change_user_nick";
+		doQuery($ask, [':mail' => $mail, ':change_user_nick' => $change_user_nick ]);	
 	}
 	
 //---------------------------------------------------------------------------------------------------------------
@@ -1034,7 +1016,7 @@ require_once('ansilove.php');
 				You have to make a signature before submitting!
 			</div>
 			<meta http-equiv="Refresh" content="2; url=admin.php">
-			<?
+			<?php
 			exit();
 		}
 
@@ -1056,12 +1038,12 @@ require_once('ansilove.php');
 
 		imagepng($image,"signatures/$user_signature.png");	 											// save image		
 
-		$ask="update users set signature='$user_signature' where nick='$edit_user_nick'";
-		mysql_query($ask,$dbh);
+		$ask="update users set signature=:user_signature where nick=:edit_user_nick";
+		doQuery($ask, [':user_signature' => $user_signature, ':edit_user_nick' => $edit_user_nick]);
 
 		$sigdata=cleanInsertPost($sigdata);
-		$ask="update users set sigdata='$sigdata' where nick='$edit_user_nick'";
-		mysql_query($ask,$dbh);
+		$ask="update users set sigdata=:sigdata where nick=:edit_user_nick";
+		doQuery($ask, [':sigdata' => $sigdata, ':edit_user_nick' => $edit_user_nick]);
 
 		unlink ("signatures/tempsignature.diz");
 		unlink ("signatures/tempsignature.diz.png");
@@ -1093,7 +1075,7 @@ require_once('ansilove.php');
 				You submit an empty logo!
 			</div>
 			<meta http-equiv="Refresh" content="2; url=admin.php">
-			<?
+			<?php
 			exit();
 		}
 
@@ -1120,11 +1102,11 @@ require_once('ansilove.php');
 		unlink ("templogo.diz.png");
 
 		$editedsitelogodata=cleanInsertPost($editedsitelogodata);
-		$ask_update="update logos set ascii='$editedsitelogodata' where filename='$logo'";
-		mysql_query($ask_update,$dbh);	
+		$ask_update="update logos set ascii=:editedsitelogodata where filename=:logo";
+		doQuery($ask_update,[':editedsitelogodata' => $editedsitelogodata, ':logo' => $logo]);	
 
-		$ask_update="update logos set base64='1' where filename='$logo'";
-		mysql_query($ask_update,$dbh);	
+		$ask_update="update logos set base64='1' where filename=:logo";
+		doQuery($ask_update,[':logo' => $logo]);	
 	}
 
 //--------------------------------------------------------------------------------
@@ -1136,17 +1118,17 @@ require_once('ansilove.php');
 		$getcollyname=$_POST['getcollyname'];
 		$getcollyname=cleanInsert($getcollyname);
 		
-		$ask="select * from collys where filename='$getcollyname'";
-		$result=mysql_query($ask);
-		while ($row=mysql_fetch_array($result))
+		$ask="select * from collys where filename=:getcollyname";
+		$result=doQuery($ask, [ ':getcollyname' => $getcollyname]);
+		foreach ($result as $row)
 		{
-			$show_colly_name=$row['name'];
-			$show_colly_crew=$row['crew'];
-			$show_colly_year=$row['year'];
-			$show_colly_month=$row['month'];
-			$show_colly_day=$row['day'];
-			$show_colly_type=$row['type'];
-			$show_colly_diz=$row['file_id'];
+			$show_colly_name  = $row->name;
+			$show_colly_crew  = $row->crew;
+			$show_colly_year  = $row->year;
+			$show_colly_month = $row->month;
+			$show_colly_day   = $row->day;
+			$show_colly_type  = $row->type;
+			$show_colly_diz   = $row->file_id;
 		}
 	}
 	?>
@@ -1164,11 +1146,11 @@ require_once('ansilove.php');
 				echo "<option>$show_colly_name</option>";
 			}
 			$ask="SELECT name, filename FROM collys ORDER BY filename";
-			$result=mysql_query($ask,$dbh);	
-			while ($row=mysql_fetch_array($result))
+			$result=fetchAll($ask);
+foreach ($result as $row)
 			{
-				$show_all_colly_names=$row['name'];
-				$show_all_colly_filenames=$row['filename'];
+				$show_all_colly_names=$row->name;
+				$show_all_colly_filenames=$row->filename;
 				echo "<option>$show_all_colly_filenames</option>";
 			}
 			?>
@@ -1176,7 +1158,7 @@ require_once('ansilove.php');
 		<input type="submit" name="open_edit_colly_field" value="Select">
 		<input type="hidden" name="filename" value="<?=$getcollyname?>">
 	</div>
-	<?
+	<?php
 			if(isset($_POST['getcollyname']) && (isset($_POST['open_edit_colly_field'])))
 			{
 				$getcollyname=$_POST['getcollyname'];
@@ -1209,7 +1191,7 @@ require_once('ansilove.php');
 					</div>
 					
 					<div class="info_release_right">
-						<?
+						<?php
 						echo "<SELECT NAME=edit_colly_year>";
 						$countyear=1986;
 						$maxyear=date("Y");
@@ -1258,10 +1240,10 @@ require_once('ansilove.php');
 					</div>
 					
 					<div class="info_release_right">											
-						<?
+						<?php
 						$ask="select nick from author_of where filename='$getcollyname'";
-						$result=mysql_query($ask,$dbh);
-						while ($row=mysql_fetch_array($result))
+						$result=fetchAll($ask);
+foreach ($result as $row)
 						{
 							$colly_author=$row[0];
 							echo "<select name=\"old_colly_authors[]\">"; 
@@ -1269,10 +1251,10 @@ require_once('ansilove.php');
 							echo "<option value='Delete'>Remove Author</option>";
 
 							$ask_authors="select nick from artists";
-							$result_authors=mysql_query($ask_authors,$dbh);
-							while ($row_authors=mysql_fetch_array($result_authors))
+							$result_authors=fetchAll($ask_authors);
+							foreach ($result_authors as $row_authors)
 							{
-								$authors=$row_authors[0];
+								$authors=$row_authors->nick;
 								echo "<option>$authors</option>";
 							}
 							echo "</select>";
@@ -1288,18 +1270,18 @@ require_once('ansilove.php');
 					
 					<div class="info_release_right">							
 
-						<?
-						$ask="select crew from crew_of where filename='$getcollyname'";
-						$result=mysql_query($ask,$dbh);
-						while ($row=mysql_fetch_array($result))
+						<?php
+						$ask="select crew from crew_of where filename=:getcollyname";
+						$result=fetchAll($ask, [':getcollyname' => $getcollyname]);
+foreach ($result as $row)
 						{
-							$colly_crew=$row[0];
+							$colly_crew=$row->crew;
 							echo "<select name=\"old_colly_crews[]\">"; 
 							echo "<option selected=\"selected\">$colly_crew</option>";
 							echo "<option value='Delete'>Remove Crew</option>";
 								$ask_crews="select name from crews";
-							$result_crews=mysql_query($ask_crews,$dbh);
-							while ($row_crews=mysql_fetch_array($result_crews))
+							$result_crews=fetchAll($ask_crews);
+							foreach ($result_crews as $row_crews)
 							{
 								$crews=$row_crews[0];
 								echo "<option>$crews</option>";
@@ -1319,27 +1301,27 @@ require_once('ansilove.php');
 					</div>
 				</div>						
 			</form>
-			<?
+			<?php
 		 }
 
 //--------------------------------------------------------------------------------
 // EDIT CREW FIELD
 //--------------------------------------------------------------------------------
 
-	if(isset($_POST['getcrew']) && $rank=="Admin")
+	if(isset($_POST['getcrew']) && is_admin())
 	{
 		$getcrew=$_POST['getcrew'];
 		$getcrew=cleanInsert($getcrew);
-		$ask="select * from crews where name='$getcrew'";
-		$result=mysql_query($ask);
-		while ($row=mysql_fetch_array($result))
+		$ask="select * from crews where name=:getcrew";
+		$result=fetchAll($ask, [ ':getcrew' => $getcrew ]);
+		foreach ($result as $row)
 		{
-			$show_crew_name=$row['name'];
-			$show_crew_www=$row['www'];
-			$show_crew_bbs=$row['bbs'];
-			$show_crew_contact=$row['contact'];
-			$show_crew_status=$row['active'];
-			$show_crew_acronym=$row['acronym'];
+			$show_crew_name    = $row->name;
+			$show_crew_www     = $row->www;
+			$show_crew_bbs     = $row->bbs;
+			$show_crew_contact = $row->contact;
+			$show_crew_status  = $row->active;
+			$show_crew_acronym = $row->acronym;
 		}
 	}
 	?>
@@ -1356,10 +1338,10 @@ require_once('ansilove.php');
 					echo "<option selected=\"selected\">$show_crew_name</option>";
 				}
 				$ask="select name from crews";
-				$result=mysql_query($ask,$dbh);
-				while ($row=mysql_fetch_array($result))
+				$result=fetchAll($ask);
+foreach ($result as $row)
 				{
-					$show_all_crew_names=$row['name'];
+					$show_all_crew_names=$row->name;
 					echo "<option>$show_all_crew_names</option>";
 				}
 				?>
@@ -1374,16 +1356,16 @@ require_once('ansilove.php');
 			$getcrew=$_POST['getcrew'];
 			$getcrew=cleanInsert($getcrew);
 
-			$ask="select * from crews where name='$getcrew'";
-			$result=mysql_query($ask);
-			while ($row=mysql_fetch_array($result))
+			$ask="select * from crews where name=:getcrew";
+			$result=fetchAll($ask, [':getcrew' => $getcrew ]);
+			foreach ($result as $row)
 			{
-				$show_crew_name=$row['name'];
-				$show_crew_www=$row['www'];
-				$show_crew_bbs=$row['bbs'];
-				$show_crew_contact=$row['contact'];
-				$show_crew_status=$row['active'];
-				$show_crew_acronym=$row['acronym'];
+				$show_crew_name=$row->name;
+				$show_crew_www=$row->www;
+				$show_crew_bbs=$row->bbs;
+				$show_crew_contact=$row->contact;
+				$show_crew_status=$row->active;
+				$show_crew_acronym=$row->acronym;
 			}
 			
 			?>
@@ -1419,20 +1401,20 @@ require_once('ansilove.php');
 
 			<div class="content">		
 				<?php
-				$ask="select name from bbs_of where crew='$getcrew'";
-				$result=mysql_query($ask,$dbh);
-				while ($row=mysql_fetch_array($result))
+				$ask="select name from bbs_of where crew = :getcrew ";
+				$result=fetchAll($ask, [ ':getcrew' => $getcrew ]);
+foreach ($result as $row)
 				{
-					$bbs = $row['name'];
+					$bbs = $row->name;
 					echo "<select name=\"edit_bbs[]\">";
 						echo "<option selected=\"selected\">$bbs</option>";
 
 					$ask_bbs="select name from bbses";
-					$result_bbs=mysql_query($ask_bbs,$dbh);
-					while ($row_bbs=mysql_fetch_array($result_bbs))
+					$result_bbs=fetchAll($ask_bbs);
+					foreach ($result_bbs as $row_bbs)
 					{
-						$all_bbses=$row_bbs['name'];
-						echo "<option>$all_authors</option>";
+						$all_bbses=$row_bbs->name;
+						echo "<option>$all_bbses</option>";
 					}
 				echo "</select>";	
 				}
@@ -1467,32 +1449,32 @@ require_once('ansilove.php');
 				<input type="hidden" name="getcrew" value="<?=$getcrew?>">
 				<input type="submit" name="do_change_crew" value="Change">
 			</div>
-			<?
+			<?php
 			} 
 			?>
 	</form>
-	<?
+	<?php
 
 //--------------------------------------------------------------------------------
 // EDIT ARTIST FIELD
 //--------------------------------------------------------------------------------
 
-	if(isset($_POST['getartist']) && $rank=="Admin")
+	if(isset($_POST['getartist']) && is_admin())
 	{
 		$getartist=$_POST['getartist'];
 		$getartist=cleanInsert($getartist);
 		
-		$ask="select * from artists where nick='$getartist'";
-		$result=mysql_query($ask);
-		while ($row=mysql_fetch_array($result))
+		$ask="select * from artists where nick=:getartist";
+		$result=fetchAll($ask, [':getartist' => $getartist]);
+		foreach ($result as $row)
 		{
-			$show_artist_nick=$row['nick'];
-			$show_artist_www=$row['www'];
-			$show_artist_status=$row['active'];
-			$show_artist_crew=$row['crew'];
-			$show_artist_bbs=$row['bbs'];
-			$show_artist_country=$row['country'];
-			$show_artist_acronym=$row['acronym'];
+			$show_artist_nick=$row->nick;
+			$show_artist_www=$row->www;
+			$show_artist_status=$row->active;
+			$show_artist_crew=$row->crew;
+			$show_artist_bbs=$row->bbs;
+			$show_artist_country=$row->country;
+			$show_artist_acronym=$row->acronym;
 		}
 	}
 	?>
@@ -1504,16 +1486,16 @@ require_once('ansilove.php');
 		<div class="content_with_blenk">&nbsp;</div>
 		
 	<select name="getartist">
-	<?
+	<?php
 	if (isset($show_artist_nick))
 	{
   		echo "<option selected=\"selected\" value=\"$show_all_user_names\">$show_artist_nick</option>";
 	}
 	$ask="select nick from artists";
-	$result=mysql_query($ask,$dbh);
-	while ($row=mysql_fetch_array($result))
+	$result=fetchAll($ask);
+foreach ($result as $row)
 	{
-		$show_all_artist_names=$row['nick'];
+		$show_all_artist_names=$row->nick;
 	  	echo "<option>$show_all_artist_names</option>";
 	}
 	?>
@@ -1521,7 +1503,7 @@ require_once('ansilove.php');
 	<input type="submit" value="Select">
 	</form>
 	<form enctype="multipart/form-data" action="#" method="post">
-	<?	
+	<?php
 	if (isset($_POST['getartist']))
 	{ 
 		$getartist=$_POST['getartist'];
@@ -1558,18 +1540,18 @@ require_once('ansilove.php');
 		<div class="content">
 			<?php
 			$ask="select crew from member_of where nick='$getartist'";
-			$result=mysql_query($ask,$dbh);
-			while ($row=mysql_fetch_array($result))
+			$result=fetchAll($ask);
+foreach ($result as $row)
 			{
 				$artist_crew=$row[0];
 				?>
 				<select name="old_artist_crews[]"> 
 					<option selected="selected"><?=$artist_crew?></option>
 					<option value="Delete">Remove Crew</option>
-					<?
+					<?php
 					$ask_crews="select name from crews";
-					$result_crews=mysql_query($ask_crews,$dbh);
-					while ($row_crews=mysql_fetch_array($result_crews))
+					$result_crews=fetchAll($ask_crews);
+					foreach ($result_crews as $row_crews)
 					{
 						$crews=$row_crews[0];
 						echo "<option>$crews</option>";
@@ -1590,7 +1572,7 @@ require_once('ansilove.php');
 		
 		<div class="content">
 			<select name="change_artist_country">
-				<? 
+				<?php
 				if (!empty($show_artist_country))
 				{
 					echo "<option selected value=\"$symbol\">$show_artist_country</option>\n";
@@ -1624,7 +1606,7 @@ require_once('ansilove.php');
 			<input type="hidden" name="getartist" value="<?=$getartist?>" />	
 			<input type="submit" name="do_edit_artist" value="Change">
 		</div>
-		<?	
+		<?php
 		} 
 		?>
 	</form>
@@ -1633,23 +1615,23 @@ require_once('ansilove.php');
 // EDIT USER FIELD
 //--------------------------------------------------------------------------------
 
-	if(isset($_POST['getuser']) && $rank=="Admin")
+	if(isset($_POST['getuser']) && is_admin())
 	{
 		$getuser=$_POST['getuser'];
 		$getuser=cleanInsert($getuser);
 		
-		$ask="select * from users where nick='$getuser'";
-		$result=mysql_query($ask);
-		while ($row=mysql_fetch_array($result))
+		$ask="select * from users where nick=:getuser";
+		$result=fetchAll($ask, [ ':getuser' => $getuser]);
+		foreach ($result as $row)
 		{
-			$show_user_nick=$row['nick'];
-			$show_user_www=$row['www'];
-			$show_user_status=$row['active'];
-			$show_user_crew=$row['crew'];
-			$show_user_bbs=$row['bbs'];
-			$show_user_country=$row['country'];
-			$show_user_acronym=$row['acronym'];
-			$show_user_rank=$row['rank'];
+			$show_user_nick=$row->nick;
+			$show_user_www=$row->www;
+			$show_user_status=$row->active;
+			$show_user_crew=$row->crew;
+			$show_user_bbs=$row->bbs;
+			$show_user_country=$row->country;
+			$show_user_acronym=$row->acronym;
+			$show_user_rank=$row->rank;
 		}
 	}
 	?>
@@ -1667,10 +1649,10 @@ require_once('ansilove.php');
 				  	echo "<option selected value=\"$show_all_user_names\">$show_user_nick</option>";
 				}
 				$ask="SELECT nick FROM users";
-				$result=mysql_query($ask,$dbh);
-				while ($row=mysql_fetch_array($result))
+				$result=fetchAll($ask);
+foreach ($result as $row)
 				{
-					$show_all_user_names=$row['nick'];
+					$show_all_user_names=$row->nick;
 				  	echo "<option>$show_all_user_names</option>";
 				}
 				?>
@@ -1684,24 +1666,24 @@ require_once('ansilove.php');
 		$getuser=$_POST['getuser'];
 		?>
 		<form enctype="multipart/form-data" action="admin.php" method="post">
-		<?
-		$ask="select * from users where nick='$getuser'";
-		$result=mysql_query($ask);
+		<?php
+		$ask="select * from users where nick=:getuser";
+		$result=fetchAll($ask, [ ':getuser' => $getuser ]);
 	
-		while ($row=mysql_fetch_array($result))
+		foreach ($result as $row)
 		{
-			$show_user_nick=$row['nick'];
-			$show_user_crew=$row['crew'];
-			$show_user_byear=$row['byear'];
-			$show_user_bmonth=$row['bmonth'];
-			$show_user_bday=$row['bday'];
-			$show_user_country=$row['country'];
-			$show_user_avatar=$row['avatar'];
-			$show_user_mail=$row['mail'];
-			$show_user_webpage=$row['webpage'];		
-			$show_user_sigdata=$row['sigdata'];
-			$show_user_rank=$row['rank'];
-			$user_signature=$row['signature'];
+			$show_user_nick    = $row->nick;
+			$show_user_crew    = $row->crew;
+			$show_user_byear   = $row->byear;
+			$show_user_bmonth  = $row->bmonth;
+			$show_user_bday    = $row->bday;
+			$show_user_country = $row->country;
+			$show_user_avatar  = $row->avatar;
+			$show_user_mail    = $row->mail;
+			$show_user_webpage = $row->webpage;		
+			$show_user_sigdata = $row->sigdata;
+			$show_user_rank    = $row->rank;
+			$user_signature    = $row->signature;
 			?>
 		<div class="content">
 			Nick:
@@ -1736,7 +1718,7 @@ require_once('ansilove.php');
 			Birth:
 			<select name="changeuserbyear"> 
 				<option><?=$show_user_byear?></option>";
-				<?
+				<?php
 				$countyear=1900;
 				$maxyear=date("Y")-5;
 				while($countyear<$maxyear)
@@ -1750,7 +1732,7 @@ require_once('ansilove.php');
 
 		<div class="content">
 			<select name="changeuserbmonth">
-				<?
+				<?php
 				echo "<option>$show_user_bmonth</option>";
 				$countmonth=1;
 				$maxmonth=12;
@@ -1763,7 +1745,7 @@ require_once('ansilove.php');
 			</select>
 
 			<select name=\"changeuserbday\">
-				<?
+				<?php
 				echo "<option>$show_user_bday</option>";
 				$countday=1;
 				$maxday=31;
@@ -1781,7 +1763,7 @@ require_once('ansilove.php');
 		
 		<div class="content">
 			<select name="changeusercountry">
-					<? 
+					<?php
 					if (!empty($show_user_country))
 					{
 						echo "<option selected value=\"$symbol\">$show_user_country</option>\n";
@@ -1820,7 +1802,7 @@ require_once('ansilove.php');
 			<input type="submit" size="5" value="Save">
 		</div>
 	</form>
-			<? 
+			<?php
 			} 
 			?>
 	<form name="signatureeditor" action="admin.php" method="post">
@@ -1864,7 +1846,7 @@ require_once('ansilove.php');
 		</select>
 		<input type="hidden" name="user_signature" value="<?=$user_signature?>"><input type="submit" value="Submit">
 	</div>
-		<? 
+		<?php
 		} 
 		?>
 		</form>
@@ -1874,16 +1856,16 @@ require_once('ansilove.php');
 // EDIT SITELOGO FIELD
 //--------------------------------------------------------------------------------
 
-	if(isset($_POST['getsitelogo']) && $rank=="Admin")
+	if(isset($_POST['getsitelogo']) && is_admin())
 	{
 		$getsitelogo=$_POST['getsitelogo'];
 		$getsitelogo=cleanInsert($getsitelogo);
 
-		$ask="select * from logos where filename=\"$getsitelogo\"";
-		$result=mysql_query($ask);
-		while ($row=mysql_fetch_array($result))
+		$ask="select * from logos where filename=:getsitelogo";
+		$result=fetchAll($ask, [':getsitelogo' => $getsitelogo]);
+		foreach ($result as $row)
 		{
-			$filename=$row['filename'];
+			$filename=$row->logo_id;
 			$logo_image="<img class=\"centered\" border=\"0\" src=logos/$filename>";
 		}
 	}
@@ -1905,10 +1887,10 @@ require_once('ansilove.php');
 				}
 			
 				$ask="select filename from logos";
-				$result=mysql_query($ask,$dbh);
-				while ($row=mysql_fetch_array($result))
+				$result=fetchAll($ask);
+foreach ($result as $row)
 				{
-					$show_all_site_logos=$row['filename'];
+					$show_all_site_logos=$row->filename;
 					echo "<option>$show_all_site_logos</option>";
 				}
 				?>
@@ -1921,14 +1903,14 @@ require_once('ansilove.php');
 	if (isset($_POST['edit_sitelogo']))
 	{
 		$editsitelogo=$_POST['getsitelogo'];
-		$ask="select * from logos where filename=\"$editsitelogo\"";
-		$result=mysql_query($ask);
-		while ($row=mysql_fetch_array($result))
+		$ask="select * from logos where filename=:editsitelogo";
+		$result=fetchAll($ask, [ ':editsitelogo' => $editsitelogo]);
+		foreach ($result as $row)
 		{
-			$filename=$row['filename'];
-			$author=$row['author'];
-			$ascii=$row['ascii'];
-			$base64=$row['base64'];
+			$filename = $row->filename;
+			$author   = $row->author;
+			$ascii    = $row->ascii;
+			$base64   = $row->base64;
 			$ascii=fixOutputEdit($ascii);
 		}
 		?>
@@ -1968,7 +1950,7 @@ require_once('ansilove.php');
 				<input type="submit" value="Submit">
 			</div>
 		</form>
-		<? 
+		<?php
 	} 
 
 	if (isset($_POST['getsitelogo']) && (!isset($_POST['edit_sitelogo'])))
@@ -1987,7 +1969,7 @@ require_once('ansilove.php');
 				<input type="submit" name="delete_sitelogo" value="Delete">
 			</div>
 		</form>
-		<?
+		<?php
 	} 
 	?>
 	
@@ -1996,17 +1978,17 @@ require_once('ansilove.php');
 <!-- -------------------------------------------------------------------------------- -->
 
 	<?php
-	if(isset($_POST['getbbs']) && $rank=="Admin")
+	if(isset($_POST['getbbs']) && is_admin())
 	{
 		$getbbs=$_POST['getbbs'];
-		$ask="select * from bbses where name='$getbbs'";
-		$result=mysql_query($ask);
-		while ($row=mysql_fetch_array($result))
+		$ask="select * from bbses where name=:getbbs";
+		$result=fetchAll($ask, [ ':getbbs' => $getbbs ]);
+		foreach ($result as $row)
 		{
-			$show_bbs_name=$row['name'];
-			$show_bbs_sysop=$row['sysop'];
-			$show_bbs_address=$row['address'];
-			$show_bbs_number=$row['number'];
+			$show_bbs_name    = $row->name;
+			$show_bbs_sysop   = $row->sysop;
+			$show_bbs_address = $row->address;
+			$show_bbs_number  = $row->number;
 		}
 	}
 
@@ -2027,10 +2009,10 @@ require_once('ansilove.php');
 				  	echo "<option selected=\"selected\">$show_bbs_name</option>";
 				}
 				$ask="SELECT name FROM bbses ORDER BY name";
-				$result=mysql_query($ask,$dbh);
-				while ($row=mysql_fetch_array($result))
+				$result=fetchAll($ask);
+				foreach ($result as $row)
 				{
-					$show_all_bbses=$row['name'];
+					$show_all_bbses=$row->name;
 				  	echo "<option>$show_all_bbses</option>";
 				}
 			?>
@@ -2084,7 +2066,7 @@ require_once('ansilove.php');
 			<input type="submit" name="delete_bbs" value="Delete">
 		</div>
 		</form>
-		<? 
+		<?php
 		} 
 		?>
 
@@ -2096,63 +2078,63 @@ require_once('ansilove.php');
 	
 	<div class="content_with_blenk">&nbsp;</div>
 
-		<?
+		<?php
 		if (!isset($_POST['edit_forum']))
 		{
 			?>
 			<input type="submit" name='edit_forum' value="Forum Options">
-			<?
+			<?php
 		}
 		?>
 		</form>
-		<?
+		<?php
 
 		if (isset($_POST['edit_forum']))
 		{
 			?>
 			<form enctype="multipart/form-data" action="admin.php" method="post">
-			<?
+			<?php
 			$ask="SELECT * FROM forum_forum ORDER BY forum_name ASC, public ASC";
-			$result=mysql_query($ask,$dbh);
-			while ($row=mysql_fetch_array($result))
+			$result=fetchAll($ask);
+			foreach ($result as $row)
 			{
-				$forum_name=$row['forum_name'];
-				$forum_id=$row['forum_id'];
-				$public=$row['public'];
+				$forum_name = $row->forum_name;
+				$forum_id   = $row->forum_id;
+				$public     = $row->public;
 
 				?>
 				<div class="content">
 					<input type="text" size="32" name="edit_forum_name" value="<?=$forum_name?>">
 					<select name="forum_public">
 					<option selected="selected"><?=$public?></option>
-					<? 
+					<?php
 					if ($public != "Public")
 					{
 						?>
 						<option>Public</option>
-						<?
+						<?php
 					}
 					if ($public != "Closed") 
 					{
 						?>
 						<option>Closed</option>
-						<?
+						<?php
 					}
 					?>
 				</select>
 				</div>
-				<?	
+				<?php
 
-				$ask_members="SELECT nick FROM forum_access where forum_id=$forum_id ORDER BY nick ASC";
-				$result_members=mysql_query($ask_members,$dbh);
-				while ($row_members=mysql_fetch_array($result_members))
+				$ask_members="SELECT nick FROM forum_access where forum_id=:forum_id ORDER BY nick ASC";
+				$result_members=fetchAll($ask_members,[':forum_id' => $forum_id]);
+				foreach ($result_members as $row_members)
 				{
-					$forum_member=$row_members['nick'];				
+					$forum_member=$row_members->nick;				
 					?>
 					<div class="content">
 						<?=$forum_member?>
 					</div>
-					<?
+					<?php
 					}
 				if ($public != "Public") 
 				{
@@ -2160,13 +2142,13 @@ require_once('ansilove.php');
 					<div class="content">
 						<form enctype="multipart/form-data" action="admin.php" method="post">
 						<select name="new_forum_member">
-						<?
+						<?php
 						echo "<option selected='selected'>None</option>";
 						$ask_add_member="SELECT nick FROM users";
-						$result_add_member=mysql_query($ask_add_member,$dbh);
-						while ($row_add_member=mysql_fetch_array($result_add_member))
+						$result_add_member=fetchAll($ask_add_member);
+						foreach ($result_add_member as $row_add_member)
 						{
-							$forum_member=$row_add_member['nick'];
+							$forum_member=$row_add_member->nick;
 							echo "<option>$forum_member</option>";
 						}
 						?>
@@ -2175,7 +2157,7 @@ require_once('ansilove.php');
 						<br><br>
 					</div>
 					</form>
-					<?
+					<?php
 				}
 
 			}
@@ -2193,7 +2175,7 @@ require_once('ansilove.php');
 			<br><br>
 			</div>
 			</form>
-			<? 
+			<?php
 			}
 			?>
 
@@ -2204,14 +2186,14 @@ require_once('ansilove.php');
 			<div class="content_with_blenk">&nbsp;</div>
 
 			<form enctype="multipart/form-data" action="admin.php" method="post">
-			<?
+			<?php
 			$ask="SELECT * FROM collys WHERE broken='1' ORDER BY filename ASC";
-			$result=mysql_query($ask,$dbh);
-			while ($row=mysql_fetch_array($result))
+			$result=fetchAll($ask);
+foreach ($result as $row)
 			{
-				$filename=$row['filename'];
+				$filename=$row->filename;
 				$encoded_filename=base64_encode($filename);
-				$broken_comment=$row['broken_comment'];
+				$broken_comment=$row->broken_comment;
 
 				?>
 				<form enctype="multipart/form-data" action="admin.php" method="post">		
@@ -2229,7 +2211,7 @@ require_once('ansilove.php');
 						<br><br>
 					</div>
 				</form>
-				<?
+				<?php
 			}
 		}
 		else
@@ -2243,7 +2225,7 @@ require_once('ansilove.php');
 				Your IP has been logged and has been forwarded to the Swedish police.<br>
 				Tough luck sucka!<br><br>
 			</div>
-			<?
+			<?php
 		}
 		?>
 	</div>
