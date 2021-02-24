@@ -1,10 +1,6 @@
 <?php
-	require_once('ansilove.php');
-
-//	echo "<pre>"; print_r($_POST);echo "</pre>";
-//	echo "<pre>"; print_r($_FILES);echo "</pre>";
+include_once "session.php";
 ?>
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "https://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>

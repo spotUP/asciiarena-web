@@ -1,7 +1,7 @@
 <?php
 
-include 'session.php';
-include 'header.php';
+include_once 'session.php';
+include_once 'header.php';
 
 $now = time();
 
