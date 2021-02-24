@@ -24,10 +24,6 @@
 					Error
 				</div>
 
-				<div class="content_with_blenk">
-					&nbsp;
-				</div>
-
 				<div class="content">
 					You must select a receiver!
 				</div>
@@ -40,10 +36,6 @@
 					Error
 				</div>
 
-				<div class="content_with_blenk">
-					&nbsp;
-				</div>
-
 				<div class="content">
 					You must fill the subject field!
 				</div>
@@ -54,10 +46,6 @@
 				?>
 				<div class="headline">
 					Error
-				</div>
-
-				<div class="content_with_blenk">
-					&nbsp;
 				</div>
 
 				<div class="content">
@@ -112,10 +100,6 @@ VALUES (:thread,:posttomember,:postername,:now,:postsubject,:postmessage,1,1)
 					Error
 				</div>
 
-				<div class="content_with_blenk">
-					&nbsp;
-				</div>
-
 				<div class="content">
 					You must select a receiver!
 				</div>
@@ -129,7 +113,7 @@ VALUES (:thread,:posttomember,:postername,:now,:postsubject,:postmessage,1,1)
 					Error
 				</div>
 
-				<div class="content_with_blenk">&nbsp;</div>
+				<div class="content_with_blenk"> </div>
 
 				<div class="content">
 					You must fill the subject field!
@@ -143,10 +127,6 @@ VALUES (:thread,:posttomember,:postername,:now,:postsubject,:postmessage,1,1)
 				?>
 				<div class="headline">
 					Error
-				</div>
-
-				<div class="content_with_blenk">
-					&nbsp;
 				</div>
 
 				<div class="content">
@@ -232,10 +212,6 @@ VALUES (:thread,:posttomember,:postername,:now,:postsubject,:postmessage,1,1)
 							<?=$postsubject?>
 						</div>
 
-						<div class="content_with_blenk">
-							&nbsp;
-						</div>
-
 						<div class="collys_filename">
 							<cyan>Date</cyan>
 							<blue>:</blue>
@@ -244,8 +220,7 @@ VALUES (:thread,:posttomember,:postername,:now,:postsubject,:postmessage,1,1)
 
 						<div class="collys_file_id">
 							<cyan>Subject</cyan>
-							<blue>:</blue>&nbsp;<white><?=$postsubject?>
-								<white>
+							<blue>:</blue> <white><?=$postsubject?></white>
 						</div>
 
 						<div class="collys_filename">
@@ -255,12 +230,12 @@ VALUES (:thread,:posttomember,:postername,:now,:postsubject,:postmessage,1,1)
 						</div>
 
 						<div class="collys_file_id">
-							<cyan>Status</cyan>&nbsp;&nbsp;<blue>:</blue>
+							<cyan>Status</cyan>  <blue>:</blue>
 							<white>Private</white>
 						</div>
 
 						<div class="collys_filename">
-							<cyan>To&nbsp;&nbsp;</cyan>
+							<cyan>To  </cyan>
 							<blue>:</blue>
 							<white><?=$messpostedto?></white>
 						</div>
@@ -334,10 +309,6 @@ VALUES (:thread,:posttomember,:postername,:now,:postsubject,:postmessage,1,1)
 						New Message
 					</div>
 
-					<div class="content_with_blenk">
-						&nbsp;
-					</div>
-
 					<div class="collys_filename">
 						Receiver:
 						<select name="posttomember">
@@ -402,7 +373,7 @@ VALUES (:thread,:posttomember,:postername,:now,:postsubject,:postmessage,1,1)
 				<div style="width: 100vw; float: left; display: inline-block;">
 
 				<div style="display: inline-block;">
-					<span class="cyan">Subject</span><span class="blue">:&nbsp;</span>
+					<span class="cyan">Subject</span><span class="blue">: </span>
 				</div>
 
 				<div style="min-width: 15vw; display: inline-block;">
