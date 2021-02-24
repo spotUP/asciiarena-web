@@ -28,12 +28,9 @@ $now = time();
 					$confirm_password=$_POST['confirm_password'];
 					$confirm_password_md5=md5($confirm_password);
 
-					$ask="SELECT * FROM users WHERE nick='$confirm_nick'";
-					$result=mysql_query($ask,$dbh);
-					while ($row=mysql_fetch_array($result))
-					{
-						$pw_hash=$row['pwhash'];							
-					}					
+					$ask="SELECT * FROM users WHERE nick=:confirm_nick";
+					$row=fetchOne($ask, ['confirm_nick' => $confirm_nick ]);
+					$pw_hash=$row->pwhash;
 
 					if ($confirm_password_md5 != $pw_hash)
 					{
@@ -46,11 +43,8 @@ $now = time();
 					
 					if ($confirm_password_md5 == $pw_hash)
 					{
-						$ask_update="update users set rank='User' where nick='$confirm_nick'";
-						mysql_query($ask_update,$dbh);
-
-						$ask_update="update users set joined=$now where nick='$confirm_nick'";
-						mysql_query($ask_update,$dbh);
+						$ask_update="update users set rank='User', joined=:now where nick=:confirm_nick";
+						doQuery($ask_update,['confirm_nick' => $confirm_nick, 'now' => $now ]);
 
 						$_SESSION['password'] = $confirm_password;
 						$_SESSION['password'] = $confirm_nick;
@@ -161,7 +155,8 @@ VALUES (:check_nick,'Independent','SECRET',:pwhash, :now,       '',      'Avatar
 					$ask->execute();
 					$rows = $ask->fetch(PDO::FETCH_OBJ);
 					if($rows === false) 
-					{ 
+					{
+					    # FIXME: $row is probably wrong? 
 						$thread=$row[0];
 					}
 					if (empty($thread))
@@ -251,12 +246,9 @@ VALUES (:thread, :check_nick,'Spot',:now,'Welcome!',:welcome_msg,1)
 						$confirm_pw_hash=$_GET['confirm'];
 
 						$ask="SELECT * FROM users WHERE pwhash='$confirm_pw_hash'";
-						$result=mysql_query($ask,$dbh);
-						while ($row=mysql_fetch_array($result))
-						{
-							$nick=$row['nick'];
-							$pw_hash=$row['pwhash'];							
-						}					
+						$row=fetchOne($ask, ['confirm_pw_hash' => $confirm_pw_hash ]);
+						$nick=$row->nick;
+						$pw_hash=$row->pwhash;
 						?>
 						<tr><td colspan="3" align="center">wELCOME <?=$nick?>, pLEASE cONFiRM yOUR pASSWORD!</td></tr>
 						<tr><td align="center">Password: <input type="hidden" name="confirm_nick" value="<?=$nick?>"><input type="password" name="confirm_password" size="14"> <input type="submit" value="Confirm!"></td></tr>
