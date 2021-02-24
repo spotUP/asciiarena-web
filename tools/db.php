@@ -67,3 +67,13 @@
 		}
 		return false;
 	}
+
+    # The following two methods were previously used to escape values when inserting into DB. With placeholders they can be a noop.
+    # When most files are migrated/fixed the actual method calls may be skipped, just returning value for now
+    function cleanInsert($q = "") {
+        return $q;
+    }
+
+    function cleanInsertPost($q = "") {
+        return $q;
+    }
