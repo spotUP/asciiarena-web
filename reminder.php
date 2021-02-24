@@ -47,17 +47,17 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 
 				$recipient = $_POST['email'];
 
-				$ask="SELECT mail FROM users WHERE mail='$recipient'";
-				$result=mysql_query($ask,$dbh);
-				while ($row=mysql_fetch_array($result))
+				$ask="SELECT mail, nick FROM users WHERE mail=:recipient";
+				$result=fetchOne($ask, [ 'recipient' => $recipient ]);
+				foreach ($result as $row)
 				{
-					$mail=$row['mail'];
-					$nick=$row['nick'];					
+					$mail=$row->mail;
+					$nick=$row->nick;					
 				}
 				if (isset($_POST['email']) && (isset($mail)))
 				{
-					$ask_update="update users set temp_pw_hash='$pwhash' where mail='$recipient'";
-					mysql_query($ask_update,$dbh);	
+					$ask_update="update users set temp_pw_hash=:pwhash where mail=:recipient";
+					doQuery($ask_update, ['pwhash' => $ppwhash, 'recipient' => $recipient ]);
 
 					$from = "aSCIIaRENA <spotUP@gmail.com>";
 					$to = "$nick <$recipient>";
@@ -102,11 +102,11 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 				$new_password=cleanInsert($new_password); 
 				$pwhash=md5($new_password);
 
-				$ask_update="update users set pwhash='$pwhash' where nick='$nick'";
-				mysql_query($ask_update,$dbh);	
+				$ask_update="update users set pwhash=:pwhash where nick=:nick";
+				doQuery($ask_update, ['pwhash' => $pwhash, 'nick' => $nick ]);
 
-				$ask_update="update users set temp_pw_hash=(null) where nick='$nick'";
-				mysql_query($ask_update,$dbh);	
+				$ask_update="update users set temp_pw_hash=(null) where nick=:nick";
+				doQuery($ask_update, ['nick' => $nick ]);
 				?><meta http-equiv="Refresh" content="0; url=login.php"><?php
 			}
 			
@@ -137,13 +137,13 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 				if (isset($_GET['newpassword']))
 				{				
 					$new_password=$_GET['newpassword'];
-					$ask="SELECT * FROM users WHERE temp_pw_hash='$new_password'";
-					$result=mysql_query($ask,$dbh);
-					while ($row=mysql_fetch_array($result))
+					$ask="SELECT * FROM users WHERE temp_pw_hash=:new_password";
+					$result=fetchAll($ask, ['new_password' => $new_password ]);
+					foreach ($result as $row)
 					{
-						$nick=$row['nick'];
-						$mail=$row['mail'];
-						$temp_pw_hash=$row['temp_pw_hash'];
+						$nick=$row->nick;
+						$mail=$row->mail;
+						$temp_pw_hash=$row->temp_pw_hash;
 					}
 
 					if ($new_password == $temp_pw_hash)
