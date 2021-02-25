@@ -256,7 +256,7 @@ VALUES (:thread,:posttomember,:postername,:now,:postsubject,:postmessage,1,1)
 						$messtimestamp = $row->timestamp;
 						$messtime = date("Y-m-d H:i", $messtimestamp);
 						$postsubject = $row->subject;
-						$postmessage = $row->message;
+						$postmessage = htmlspecialchars($row->message);
 
 						$postsubject = fixOutputPost($postsubject);
 						$postmessage = fixOutputPost($postmessage);
