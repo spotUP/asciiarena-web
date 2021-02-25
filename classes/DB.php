@@ -42,10 +42,12 @@ class DB {
   public static function getDbh() {
     // FIXME! Replace with secure and reasonable dotenv or similar, outside of webroot
     // Until that's fixed this'll have to be manually edited both locally and in production
-    $user = "asciidev";
-    $password = "D0pestD0pest";
-    $db = "uprough_ascii";
-    $host = "localhost";
+
+    $user     = getenv('DBUSER') ?: 'root';
+    $password = getenv('DBPW')   ?: '';
+    $host     = getenv('DBHOST') ?: 'localhost';
+    $db       = getenv('DBNAME') ?: 'uprough_ascii';
+
     $driver = "mysql";
 
     $dbh = new DB($user, $password, $db, $host, $driver);
