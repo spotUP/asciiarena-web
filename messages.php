@@ -265,7 +265,7 @@ VALUES (:thread,:posttomember,:postername,:now,:postsubject,:postmessage,1,1)
 
 						?>
 						<div class="content">
-							<white><?=$postmessage?></white>
+							<pre><white><?=$postmessage?></white></pre>
 						</div>
 						<div class="content">
 							<blue><?=$signature?></blue>
