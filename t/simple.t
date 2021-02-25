@@ -3,31 +3,13 @@
 use strict;
 use warnings;
 
-use IPC::Run 'start';
-
 use Test::More;
 use Test::Mojo;
 
+use lib 't/lib';
+use AsciiArena;
+
 subtest 'Basic URLs' => sub {
-  my $host_port = 'localhost:8122';
-  my $server = 'http://' . $host_port;
-
-  my ($in, $out, $err);
-
-  my $h = start ['php',
-    '-d', 'include_path=.',
-    '-d', 'log_errors=1',
-    '-d', 'error_reporting=-1',
-    '-d', 'display_errors=stdout',
-    '-S', $host_port ,
-  ],
-  \$in, \$out, \$err;
-  while ($h->pump) {
-    die $err if $err =~ /failed|error/i;
-    last if $err =~ /$host_port/;
-  }
-  my $t = Test::Mojo->new;
-
   my $url_tests = [
     { path => 'accounting.php',           },
     { path => 'admin.php',                },
@@ -62,15 +44,12 @@ subtest 'Basic URLs' => sub {
     { path => 'worker.php',               },
   ];
 
+  my $t = AsciiArena->new;
+
   for my $test (@{ $url_tests }) {
-    my $ok = $t->get_ok("$server/$test->{path}")->status_is($test->{code} // 200);
-    warn $t->tx->res->body if ($ENV{AA_PATH} // '') eq $test->{path};
-    $h->pump;
-    note $out; undef $out;
-    diag $err; undef $err;
+    my $ok = $t->get_ok("/$test->{path}")->status_is($test->{code} // 200);
   }
 
-  $h->kill_kill;
 };
 
 done_testing;
