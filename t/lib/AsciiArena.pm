@@ -46,8 +46,8 @@ sub _build_ok {
 
 sub dump_output {
   $h->pump;
-  note $out; undef $out;
-  diag $err; undef $err;
+  do { note $out; undef $out; } if $out;
+  do { diag $err; undef $err; } if $err;
 }
 
 DESTROY {
