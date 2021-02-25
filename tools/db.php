@@ -1,8 +1,9 @@
 <?php defined('VALID') or die('Nuh-uh!');
-    $dbuser = getenv('DBUSER') ? getenv('DBUSER') : 'root';
-    $dbpw   = getenv('DBPW')   ? getenv('DBPW')   : '';
-    $dbhost = getenv('DBHOST') ? getenv('DBHOST') : 'localhost';
-    $dbname = getenv('DBNAME') ? getenv('DBNAME') : 'uprough_ascii';
+
+    $dbuser = getenv('DBUSER') ?: 'root';
+    $dbpw   = getenv('DBPW')   ?: '';
+    $dbhost = getenv('DBHOST') ?: 'localhost';
+    $dbname = getenv('DBNAME') ?: 'uprough_ascii';
 
 	$_db = new PDO("mysql:dbname={$dbname};host={$dbhost}", $dbuser, $dbpw,
 		[PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
