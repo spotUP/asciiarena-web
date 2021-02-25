@@ -1,18 +1,23 @@
 # Turn on URL rewriting
-RewriteEngine On
+#RewriteEngine On
 
 # Installation directory
-RewriteBase /
+#RewriteBase /
 
 # Protect hidden files from being viewed
-<Files .*>
-	Order Deny,Allow
-	Deny From All
-</Files>
-
+#<Files .*>
+#	Order Deny,Allow
+#	Deny From All
+#</Files>
+#
 # Allow any files or directories that exist to be displayed directly
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
 
 # Rewrite all other URLs to index.php/URL
-RewriteRule .* index.php/$0 [PT,L]
+#RewriteRule .* index.php/$0 [PT,L]
+
+#RewriteEngine On
+#RewriteCond %{HTTPS} !=on
+#RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
+#Header always set Content-Security-Policy "upgrade-insecure-requests;"

@@ -1,6 +1,6 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
 	<div class="header col-lg-12">
-		<h2><a class="lightgreen" href="apps.php?sort_by=timestamp">LATEST ADDED APPS</a> <a class="lightgreen"
+		<h2 class="ap-1"><a class="lightgreen" href="apps.php?sort_by=timestamp">LATEST ADDED APPS</a> <a class="lightgreen"
 		                                                                                     href="rss.php?class=0">[RSS]</a>
 		</h2>
 	</div>
@@ -19,7 +19,7 @@
 		$upload_date = date("o-m-d", $upload_date);
 		?>
 		<div class="col-lg-12 d-flex justify-content-between">
-			<a href="apps.php?sort_by=timestamp DESC"><?=$filename?></a>
+			<a class="magenta" href="apps.php?sort_by=timestamp DESC"><?=$filename?></a>
 			<?=$upload_date?>
 		</div>
 		<?php
