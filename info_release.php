@@ -1,16 +1,14 @@
 <?php
 require_once "session.php";
 require_once "header.php"; ?>
-<div class="modal-body row">
-	<div class="col-lg-2">
-		<?php include('sidebar.php'); ?>
-	</div>
-	<div class="col-lg-8">
+<div class="modal-body row m-0 p-0">
+	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
 		<?php
 		$decoded_filename = $_GET[ 'filename' ] ?? "";
 		$filename = base64_decode($decoded_filename);
 		$_SESSION[ 'filename' ] = $filename;
 
+        $nick = $_user['nick'];
 		$time = time();
 		$comment = $_POST[ 'comment' ] ?? "";
 
@@ -33,7 +31,7 @@ require_once "header.php"; ?>
 				</div>
 				<div class="content_with_blenk">
 					<textarea rows="5" cols="82" id="broken_comment" name="broken_comment"></textarea>
-					<input type="submit" class="btn btn-primary" name="do_report_broken" value="Report">
+					<input type="submit" class="btn-primary" name="do_report_broken" value="Report">
 				</div>
 			</form>
 			<?php
@@ -47,22 +45,24 @@ require_once "header.php"; ?>
 				":filename" => $decoded_filename
 			]);
 			?>
-			<div class="headline">
-				Status
+			<div class="row">
+				<div class="col-lg-4">
+					<div class="bs-component">
+						<div class="alert alert-dismissible alert-success">
+							<button type="button" class="close" data-dismiss="alert">x</button>
+							You reported <?=$decoded_filename?> as broken!
+						</div>
+					</div>
+				</div>
 			</div>
-
-			<div class="content_with_blenk">
-				You reported <?=$decoded_filename?> as broken!
-			</div>
-
 			<?php
 			echo "<meta http-equiv='Refresh' content='2; url=$_SERVER[PHP_SELF]?filename=$filename'>";
 			exit;
 		}
 
-			//-----------------------------------------------------------------------------
-			// WRITE EDITED MESSAGE TO DB
-			//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
+// WRITE EDITED MESSAGE TO DB
+//----------------------------------------------------------------------------------------------
 
 		if (isset($_POST[ 'edit_message' ]) && (isset($_GET[ 'comment' ]))) {
 			$commentid = $_POST[ 'commentid' ] ?? "";
@@ -95,9 +95,9 @@ require_once "header.php"; ?>
 				$crew = $row[ 0 ];
 			}
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 // WRITE COMMENT TO DATABASE
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 
 			if (isset($_POST[ 'comment' ]) && (isset($_GET[ 'comment' ]))) {
 				$comment = cleanInsertPost($comment);
@@ -130,9 +130,9 @@ require_once "header.php"; ?>
 				}
 			}
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 // CALCULATE RATING FOR COLLY
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 
 			$ask_rate_amount = "SELECT COUNT(rating) from comments where filename='$filename' and rating>0";
 			$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
@@ -151,9 +151,9 @@ require_once "header.php"; ?>
 				mysql_query($ask, $dbh);
 			}
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 // CALCULATE RATING FOR CREW
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 
 			$ask_rate_amount = "SELECT COUNT(rating) from comments where crew='$crew' and rating>0";
 			$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
@@ -171,9 +171,9 @@ require_once "header.php"; ?>
 				mysql_query($ask, $dbh);
 			}
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 // CALCULATE RATING FOR ARTISTS
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 
 			$ask = "select nick from author_of where filename='$filename'";
 			$result = mysql_query($ask, $dbh);
@@ -197,9 +197,9 @@ require_once "header.php"; ?>
 			echo "<meta http-equiv='Refresh' content='0; url=$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
 		}
 
-			//-----------------------------------------------------------------------------
-			// DELETE COMMENTS
-			//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
+// DELETE COMMENTS
+//----------------------------------------------------------------------------------------------
 
 		if (isset($_POST[ 'Delete' ])) {
 			if ($rank = "Admin") {
@@ -269,9 +269,9 @@ require_once "header.php"; ?>
 			}
 		}
 
-			//---------------------------------------------------------------------------------------------------------------
-			// WRITE COLLY INFO TO DB
-			//---------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------
+// WRITE COLLY INFO TO DB
+//---------------------------------------------------------------------------------------------------------------
 
 		if (isset($_POST[ 'do_edit_colly' ])) {
 			$filename = $_POST[ 'filename' ];
@@ -405,12 +405,15 @@ require_once "header.php"; ?>
 					}
 				} else {
 					?>
-					<div class="headline">
-						Error
-					</div>
-
-					<div class="content_with_blenk">
-						There was an error during the conversion, please inform an admin!
+					<div class="row">
+						<div class="col-lg-4">
+							<div class="bs-component">
+								<div class="alert alert-dismissible alert-danger">
+									<button type="button" class="close" data-dismiss="alert">x</button>
+									There was an error during the conversion, please inform an admin!
+								</div>
+							</div>
+						</div>
 					</div>
 					<?php
 
@@ -431,12 +434,15 @@ require_once "header.php"; ?>
 					}
 				} else {
 					?>
-					<div class="headline">
-						Error
-					</div>
-
-					<div class="content_with_blenk">
-						There was an error during the conversion, please inform an admin!
+					<div class="row">
+						<div class="col-lg-4">
+							<div class="bs-component">
+								<div class="alert alert-dismissible alert-danger">
+									<button type="button" class="close" data-dismiss="alert">x</button>
+									There was an error during the conversion, please inform an admin!
+								</div>
+							</div>
+						</div>
 					</div>
 					<?php
 					$ask = "DELETE from image_of WHERE filename LIKE '$filename%'";
@@ -456,12 +462,15 @@ require_once "header.php"; ?>
 					}
 				} else {
 					?>
-					<div class="headline">
-						Error
-					</div>
-
-					<div class="content_with_blenk">
-						There was an error during the conversion, please inform an admin!
+					<div class="row">
+						<div class="col-lg-4">
+							<div class="bs-component">
+								<div class="alert alert-dismissible alert-danger">
+									<button type="button" class="close" data-dismiss="alert">x</button>
+									There was an error during the conversion, please inform an admin!
+								</div>
+							</div>
+						</div>
 					</div>
 					<?php
 
@@ -482,12 +491,15 @@ require_once "header.php"; ?>
 					}
 				} else {
 					?>
-					<div class="headline">
-						Error
-					</div>
-
-					<div class="content_with_blenk">
-						There was an error during the conversion, please inform an admin!
+					<div class="row">
+						<div class="col-lg-4">
+							<div class="bs-component">
+								<div class="alert alert-dismissible alert-danger">
+									<button type="button" class="close" data-dismiss="alert">x</button>
+									There was an error during the conversion, please inform an admin!
+								</div>
+							</div>
+						</div>
 					</div>
 					<?php
 					$ask = "DELETE from image_of WHERE filename LIKE '$filename%'";
@@ -509,12 +521,15 @@ require_once "header.php"; ?>
 					}
 				} else {
 					?>
-					<div class="headline">
-						Error
-					</div>
-
-					<div class="content_with_blenk">
-						There was an error during the conversion, please inform an admin!
+					<div class="row">
+						<div class="col-lg-4">
+							<div class="bs-component">
+								<div class="alert alert-dismissible alert-danger">
+									<button type="button" class="close" data-dismiss="alert">x</button>
+									There was an error during the conversion, please inform an admin!
+								</div>
+							</div>
+						</div>
 					</div>
 					<?php
 					$ask = "DELETE from image_of WHERE filename LIKE '$filename%'";
@@ -583,9 +598,9 @@ require_once "header.php"; ?>
 			}
 		}
 
-			//-----------------------------------------------------------------------------
-			// EDIT COLLY FIELD
-			//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
+// EDIT COLLY FIELD
+//----------------------------------------------------------------------------------------------
 
 		if (isset($_POST[ 'edit_colly' ])) {
 			$getcollyname = $_POST[ 'filename' ];
@@ -761,36 +776,36 @@ require_once "header.php"; ?>
 }
 include('info_release_summary.php');
 
-			//-----------------------------------------------------------------------------
-			// TOP CONTROL TABLE
-			//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
+// TOP CONTROL TABLE
+//----------------------------------------------------------------------------------------------
+
 if (!isset($_POST[ 'edit_colly' ])) {
 	$type = fetchOne("SELECT type FROM collys WHERE filename = :filename", [":filename" => $filename])->type ?? "";
 
-	echo "<form action='$_SERVER[PHP_SELF]?filename=$decoded_filename' method='post' enctype='multipart/form-data'>";
 
 	?>
-	<div class="headline"></div>
-	<div class="content_with_blenk"><br></div>
-	<div class="content"><?php
-	if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) {
-		echo "<input type='submit' class='btn-primary amb-1' name='hide' value='Hide Colly!'> ";
-	}
-	if (!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) {
-		echo "<input type='submit' class='btn-primary amb-1' name='view' value='View Colly'> ";
-	}
-	if (is_logged_in()) {
-		echo "<input type='submit' class='btn-primary amb-1' name=addcomment value='Comment'> ";
-		echo "<input type='submit' class='btn-primary amb-1' name=favourite value='Favourite'> ";
-		echo "<input type='submit' class='btn-primary amb-1' name=broken value='Report Broken'> ";
-		if ($_user[ "nick" ] === $uploader || is_admin()) {
-			echo "<input type='hidden' name='filename' value=$filename>";
-			echo "<input type='submit' class='btn btn-primary amb-1' name=edit_colly value='Edit Colly'> ";
-		}
-	}
-	if (!isset($_POST[ 'download' ])) {
-		echo "<input type='submit' class='btn btn-primary amb-1' name=download value='Download'> ";
-	} elseif (isset($_POST[ 'download' ])) {
+	<div class="container-fluid bg-secondary amb-1"><?php
+		echo "<form action='$_SERVER[PHP_SELF]?filename=$decoded_filename' method='post' enctype='multipart/form-data'>";
+
+			if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) {
+				echo "<input type='submit' class='btn-primary amb-1' name='hide' value='Hide Colly!'> ";
+			}
+			if (!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) {
+				echo "<input type='submit' class='btn-primary amb-1' name='view' value='View Colly'> ";
+			}
+			if (is_logged_in()) {
+				echo "<input type='submit' class='btn-primary amb-1' name=addcomment value='Comment'> ";
+				echo "<input type='submit' class='btn-primary amb-1' name=favourite value='Favourite'> ";
+				echo "<input type='submit' class='btn-primary amb-1' name=broken value='Report Broken'> ";
+				if ($_user[ "nick" ] === $uploader || is_admin()) {
+					echo "<input type='hidden' name='filename' value=$filename>";
+					echo "<input type='submit' class='btn-primary amb-1' name=edit_colly value='Edit Colly'> ";
+				}
+			}
+			if (!isset($_POST[ 'download' ])) {
+				echo "<input type='submit' class='btn-primary amb-1' name=download value='Download'> ";
+			} elseif (isset($_POST[ 'download' ])) {
 					$ask = "select downloads from collys where filename='$filename'"; // download counter
 					$result = mysql_query($ask, $dbh);
 					while ($row = mysql_fetch_array($result)) {
@@ -805,157 +820,138 @@ if (!isset($_POST[ 'edit_colly' ])) {
 					<meta content="1; URL=<?=$filenameandpath?>" http-equiv="Refresh">
 					<?php
 				}
-				echo "</div>";
+				
 				if ($type != "ANSI") {
 					?>
-					<div>
-						<select name="font" class="btn-primary amb-1">
-							<option value='mosoul' selected='selected'>Font</option>
-							<option value='topaz'>Topaz</option>
-							<option value='microknight'>MicroKnight</option>
-							<option value='mosoul'>mO'sOul</option>
-							<option value='pot-noodle'>P0T-NOoDLE</option>
-						</select>
-						<select name="background_color" class="btn-primary amb-1">
-							<option selected="selected" value="#aaaaaa">BG Color</option>
-							<option class='black' value="#000000">Black</option>
-							<option class='darkblue' value="#0000aa">Dark Blue</option>
-							<option class='darkgreen' value="#00aa00">Dark Green</option>
-							<option class='darkcyan' value="#00aaaa">Dark Cyan</option>
-							<option class='darkred' value="#aa0000">Dark Red</option>
-							<option class='magenta' value="#aa00aa">Magenta</option>
-							<option class='brown' value="#aa5500">Brown</option>
-							<option class='darkgrey' value="#555555">Dark Grey</option>
-							<option class='grey' value="#aaaaaa">Grey</option>
-							<option class='blue' value="#5555ff">Blue</option>
-							<option class='green' value="#55ff55">Green</option>
-							<option class='cyan' value="#5555ff">Cyan</option>
-							<option class='red' value="#ff5555">Red</option>
-							<option class='magenta' value="#ff55ff">Magenta</option>
-							<option class='yellow' value="#ffff55">Yellow</option>
-							<option class='white' value="#ffffff">White</option>
-						</select>
-						<select name="foreground_color" class="btn-primary amb-1">
-							<option SELECTED value="0,0,0">FG Color</option>
-							<option class='black' value="0,0,0">Black</option>
-							<option class='darkblue' value="0,0,170">Dark Blue</option>
-							<option class='darkgreen' value="0,170,0">Dark Green</option>
-							<option class='darkcyan' value="0,170,170">Dark Cyan</option>
-							<option class='darkred' value="170,0,0">Dark Red</option>
-							<option class='magenta' value="170,0,170">Magenta</option>
-							<option class='brown' value="170,85,0">Brown</option>
-							<option class='darkgrey' value="85,85,85">Dark Grey</option>
-							<option class='grey' value="170,170,170">Grey</option>
-							<option class='blue' value="85,85,255">Blue</option>
-							<option class='green' value="85,255,85">Green</option>
-							<option class='cyan' value="85,85,255">Cyan</option>
-							<option class='red' value="255,85,85">Red</option>
-							<option class='magenta' value="255,85,255">Magenta</option>
-							<option class='yellow' value="255,255,85">Yellow</option>
-							<option class='white' value="255,255,255">White</option>
-						</select>
-						<input type="submit" class='btn-primary amb-1' name="change" value="Change!">
-					</div>
-				</form>
-				<?php
-			}
+					<div class="apb-0">
 
-				//-----------------------------------------------------------------------------
-				// SHOW COLLY?
-				//-----------------------------------------------------------------------------
+						<input type='submit' class='btn-primary amb-1' name=fullscreen value='Fullscreen'>
 
-			if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) {
-				$fgcolor = $_POST[ 'foreground_color' ];
+						<div class="btn-group" role="group">
+							<button id="btnGroupDrop1" type="button" class="btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Font </button>
+							<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+								<a class="dropdown-item" href="#">Topaz</a>
+								<a class="dropdown-item" href="#">MicroKnight</a>
+								<a class="dropdown-item" href="#">mO'sOul</a>
+								<a class="dropdown-item" href="#">P0T-NOoDLE</a>
+							</div>
+						</div>
 
-				$font = fetchOne("SELECT def_font FROM users WHERE nick = :nick", [":nick" => $nick])->def_font ?? "mosoul";
+						<div class="btn-group" role="group">
+							<button id="btnGroupDrop1" type="button" class="btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">BG Color </button>
+							<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+								<a class="dropdown-item" href="#">Black</a>
+								<a class="dropdown-item" href="#">Dark Blue</a>
+								<a class="dropdown-item" href="#">Dark Green</a>
+								<a class="dropdown-item" href="#">Dark Cyan</a>
+								<a class="dropdown-item" href="#">Dark Red</a>
+								<a class="dropdown-item" href="#">Magenta</a>
+								<a class="dropdown-item" href="#">Brown</a>
+								<a class="dropdown-item" href="#">Dark Grey</a>
+								<a class="dropdown-item" href="#">Grey</a>
+								<a class="dropdown-item" href="#">Blue</a>
+								<a class="dropdown-item" href="#">Green</a>
+								<a class="dropdown-item" href="#">Cyan</a>
+								<a class="dropdown-item" href="#">Red</a>
+								<a class="dropdown-item" href="#">Magenta</a>
+								<a class="dropdown-item" href="#">Yellow</a>
+								<a class="dropdown-item" href="#">Magenta</a>
+								<a class="dropdown-item" href="#">White</a>
+							</div>
+						</div>
 
-				if (isset($_POST[ 'change' ])) {
-					$bgcolor = $_POST[ 'background_color' ];
-
-					$font = $_POST[ 'font' ];
-				}
-				$row = fetchOne("SELECT view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
-				$type = $row->type;
-				$counter = $row->view_counter;
-				$counter++;
-
-				doQuery("UPDATE collys SET view_counter = :counter WHERE filename = :filename", [
-					":counter" => $counter,
-					":filename" => $filename
-				]);
-
-				if ($type == "ASCII") {
-					if (empty($bgcolor)) {
-						$def_color = fetchOne("SELECT def_bg_col FROM users WHERE nick = :nick", [":nick" => $nick])->def_bg_col;
-						$bgcolor = (empty($def_color)) ? "#000000" : $def_color;
-					}
-					?>
-					<div class="content">
-						<div class="row m-0 p-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>; color: <?=$fgcolor?>;"><pre><?php
-						if (file_exists(__DIR__ . "/collections/{$dirname}/{$filename}")) {
-							$content = file_get_contents(__DIR__ . "/collections/{$dirname}/{$filename}");
-							echo utf8_encode($content);
-						}
-						?></pre>
-					</div>
+						<div class="btn-group" role="group">
+							<button id="btnGroupDrop1" type="button" class="btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">FG Color </button>
+							<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+								<a class="dropdown-item" href="#">Black</a>
+								<a class="dropdown-item" href="#">Dark Blue</a>
+								<a class="dropdown-item" href="#">Dark Green</a>
+								<a class="dropdown-item" href="#">Dark Cyan</a>
+								<a class="dropdown-item" href="#">Dark Red</a>
+								<a class="dropdown-item" href="#">Magenta</a>
+								<a class="dropdown-item" href="#">Brown</a>
+								<a class="dropdown-item" href="#">Dark Grey</a>
+								<a class="dropdown-item" href="#">Grey</a>
+								<a class="dropdown-item" href="#">Blue</a>
+								<a class="dropdown-item" href="#">Green</a>
+								<a class="dropdown-item" href="#">Cyan</a>
+								<a class="dropdown-item" href="#">Red</a>
+								<a class="dropdown-item" href="#">Magenta</a>
+								<a class="dropdown-item" href="#">Yellow</a>
+								<a class="dropdown-item" href="#">Magenta</a>
+								<a class="dropdown-item" href="#">White</a>
+							</div>
+						</div>
+					</form>
 				</div>
-			<?php }
+			</div>
+
+			<?php
 		}
 
-				//-----------------------------------------------------------------------------
-				//SHOW COMMENTS
-				//-----------------------------------------------------------------------------
-		if (!isset($_POST[ 'edit' ])) {
-			foreach (fetchAll("SELECT comment, rating, nick, timestamp, commentid, base64 FROM comments WHERE filename = :filename ORDER BY timestamp ASC", [":filename" => $filename]) as $row) {
-				$comment = $row->comment;
-				$userrating = $row->rating;
-				$commentnick = $row->nick;
-				$commentid = $row->commentid;
-				$commenttime = date("Y-m-d H:i", $row->timestamp);
-				$comment = fixOutputPost($comment, (boolean)$row->base64);
+//----------------------------------------------------------------------------------------------
+// SHOW COLLY?
+//----------------------------------------------------------------------------------------------
 
-				echo "<form action='$_SERVER[PHP_SELF]?filename=$decoded_filename&post' method='post'>";
-				if ($userrating > 0) {
-					if (!is_admin()) {
-						if ($commentnick === $_user[ "nick" ]) {
-							?>
-							<div class="header bg-header col-12 ap-1">
-								<span class="yellow"> BY:</span>
-								<span class="white"><?=$commentnick?></span>
-								<span class="yellow">DATE:</span>
-								<span class="white"><?=$commenttime?></span>
-								<span class="yellow">RATING:</span>
-								<span class="white"><?=$userrating?></span>
-							</div>
-							<div class="bg-secondary col-12 ap-1 amb-1">
-								<span class="cyan"><?=$comment?></span>
-								<div class="col-12 p-0 m-0 apt-1">
-								<input type="hidden" name="commentid" value="<?=$commentid?>"/><input type="submit" class="btn btn-primary" name="edit" value="Edit">
-								</div>
-							</div>
-							<?php
-						} else {
-							?>
-							<div class="header bg-header col-12 ap-1">
-								<span class="yellow"> BY:</span>
-								<span class="white"><?=$commentnick?></span>
-								<span class="yellow">DATE:</span>
-								<span class="white"><?=$commenttime?></span>
-								<span class="yellow">RATING:</span>
-								<span class="white"><?=$userrating?></span>
-							</div>
-							<div class="bg-secondary col-12 ap-1 amb-1">
-								<span class="cyan"><?=$comment?></span>
-							</div>
-							<?php
-						}
-					}
-					if (is_admin()) {
+		if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) {
+			$fgcolor = $_POST[ 'foreground_color' ];
+
+			$font = fetchOne("SELECT def_font FROM users WHERE nick = :nick", [":nick" => $nick])->def_font ?? "mosoul";
+
+			if (isset($_POST[ 'change' ])) {
+				$bgcolor = $_POST[ 'background_color' ];
+
+				$font = $_POST[ 'font' ];
+			}
+			$row = fetchOne("SELECT view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
+			$type = $row->type;
+			$counter = $row->view_counter;
+			$counter++;
+
+			doQuery("UPDATE collys SET view_counter = :counter WHERE filename = :filename", [
+				":counter" => $counter,
+				":filename" => $filename
+			]);
+
+			if ($type == "ASCII") {
+				if (empty($bgcolor)) {
+					$def_color = fetchOne("SELECT def_bg_col FROM users WHERE nick = :nick", [":nick" => $nick])->def_bg_col;
+					$bgcolor = (empty($def_color)) ? "#000000" : $def_color;
+				}
+				?>
+				<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>; color: <?=$fgcolor?>;"><pre><?php
+				if (file_exists(__DIR__ . "/collections/{$dirname}/{$filename}")) {
+					$content = file_get_contents(__DIR__ . "/collections/{$dirname}/{$filename}");
+					echo "<br><br><br><br>";
+					echo utf8_encode($content);
+					echo "<br><br><br><br>";
+				}
+				?></pre>
+			</div>
+		<?php }
+	}
+
+//----------------------------------------------------------------------------------------------
+//SHOW COMMENTS
+//----------------------------------------------------------------------------------------------
+	if (!isset($_POST[ 'edit' ])) {
+		foreach (fetchAll("SELECT comment, rating, nick, timestamp, commentid, base64 FROM comments WHERE filename = :filename ORDER BY timestamp ASC", [":filename" => $filename]) as $row) {
+			$comment = $row->comment;
+			$userrating = $row->rating;
+			$commentnick = $row->nick;
+			$commentid = $row->commentid;
+			$commenttime = date("Y-m-d H:i", $row->timestamp);
+			$comment = fixOutputPost($comment, (boolean)$row->base64);
+
+			echo "<form action='$_SERVER[PHP_SELF]?filename=$decoded_filename&post' method='post'>";
+			if ($userrating > 0) {
+				if (!is_admin()) {
+					if ($commentnick === $_user[ "nick" ]) {
 						?>
 						<div class="header bg-header col-12 ap-1">
-							<span class="yellow"> BY:</span>
-							<span class="white"><?=$commentnick?></span>
-							<span class="yellow">DATE:</span>
+							<span> BY:</span>
+							<span class="yellow"><?=$commentnick?></span>
+							<span>DATE:</span>
 							<span class="white"><?=$commenttime?></span>
 							<span class="yellow">RATING:</span>
 							<span class="white"><?=$userrating?></span>
@@ -963,145 +959,178 @@ if (!isset($_POST[ 'edit_colly' ])) {
 						<div class="bg-secondary col-12 ap-1 amb-1">
 							<span class="cyan"><?=$comment?></span>
 							<div class="col-12 p-0 m-0 apt-1">
-							<input type="hidden" class="btn btn-primary" name="commentid" value="<?=$commentid?>">
-							<input type="submit" class="btn btn-primary" name="edit" value="Edit">
-							<input type="submit" class="btn btn-primary" name="Delete" value="Delete">
+								<input type="hidden" name="commentid" value="<?=$commentid?>"/><input type="submit" class="btn-primary" name="edit" value="Edit">
 							</div>
 						</div>
-
 						<?php
-					}
-				} else {
-					if (!is_admin()) {
-						if ($commentnick === $_user[ "nick" ]) {
-							?>
-							<div class="header bg-header col-12 ap-1">
-								<span class="yellow"> BY:</span>
-								<span class="white"><?=$commentnick?></span>
-								<span class="yellow">DATE:</span>
-								<span class="white"><?=$commenttime?></span>
-							</div>
-							<div class="col-12 ap-1 amb-1">
-								<span class="cyan"><?=$comment?></span>
-								<div class="col-12 p-0 m-0 apt-1">
-								<input type="hidden" class="btn btn-primary" name="commentid" value="<?=$commentid?>">
-								<input type="submit" class="btn btn-primary" name="edit" value="Edit">
-								</div>
-							</div>
-							<?php
-						} else {
-							?>
-							<div class="header bg-header col-12 ap-1">
-								<span class="yellow"> BY:</span>
-								<span class="white"><?=$commentnick?></span>
-								<span class="yellow">DATE:</span>
-								<span class="white"><?=$commenttime?></span>
-							</div>
-							<div class="bg-secondary col-12 ap-1 amb-1">
-								<span class="cyan"><?=$comment?></span>
-							</div>
-							<?php
-						}
-					}
-					if (is_admin()) {
+					} else {
 						?>
-						<div class="bg-header header col-12 ap-1">
-							<span class="yellow"> BY:</span>
-							<span class="white"><?=$commentnick?></span>
-							<span class="yellow">DATE:</span>
+						<div class="header bg-header col-12 ap-1">
+							<span> BY:</span>
+							<span class="yellow"><?=$commentnick?></span>
+							<span>DATE:</span>
 							<span class="white"><?=$commenttime?></span>
+							<span class="yellow">RATING:</span>
+							<span class="white"><?=$userrating?></span>
 						</div>
 						<div class="bg-secondary col-12 ap-1 amb-1">
 							<span class="cyan"><?=$comment?></span>
-							<input type="hidden" name="commentid" value="<?=$commentid?>">
-							<div class="col-12 p-0 m-0 apt-1">
-							<input type="submit" class="btn btn-primary" name="edit" value="Edit">
-							<input type="submit" class="btn btn-primary" name="Delete" value="Delete">
-							</div>
 						</div>
 						<?php
 					}
 				}
-				echo "</form>";
+				if (is_admin()) {
+					?>
+					<div class="header bg-header col-12 ap-1">
+						<span> BY:</span>
+						<span class="yellow"><?=$commentnick ?></span>
+						<span> DATE:</span>
+						<span class="white"><?=$commenttime ?></span>
+						<span class="yellow"> RATING:</span>
+						<span class="white"><?=$userrating ?></span>
+					</div>
+					<div class="bg-secondary col-12 ap-1 amb-1">
+						<span class="cyan"><?=$comment?></span>
+						<div class="col-12 p-0 m-0 apt-1">
+							<input type="hidden" class="btn-primary" name="commentid" value="<?=$commentid?>">
+							<input type="submit" class="btn-primary" name="edit" value="Edit">
+							<input type="submit" class="btn-primary" name="Delete" value="Delete">
+						</div>
+					</div>
+
+					<?php
+				}
+			} else {
+				if (!is_admin()) {
+					if ($commentnick === $_user[ "nick" ]) {
+						?>
+						<div class="header bg-header col-12 ap-1">
+							<span> BY:</span>
+							<span class="yellow"><?=$commentnick ?></span>
+							<span> DATE:</span>
+							<span class="white"><?=$commenttime ?></span>
+						</div>
+						<div class="col-12 ap-1 amb-1">
+							<span class="cyan"><?=$comment?></span>
+							<div class="col-12 p-0 m-0 apt-1">
+								<input type="hidden" class="btn-primary" name="commentid" value="<?=$commentid?>">
+								<input type="submit" class="btn-primary" name="edit" value="Edit">
+							</div>
+						</div>
+						<?php
+					} else {
+						?>
+						<div class="header bg-header col-12 ap-1">
+							<span> BY:</span>
+							<span class="yellow"><?=$commentnick ?></span>
+							<span> DATE:</span>
+							<span class="white"><?=$commenttime ?></span>
+						</div>
+						<div class="bg-secondary col-12 ap-1 amb-1">
+							<span class="cyan"><?=$comment?></span>
+						</div>
+						<?php
+					}
+				}
+				if (is_admin()) {
+					?>
+					<div class="bg-header header col-12 ap-1">
+						<span> BY:</span>
+						<span class="yellow"><?=$commentnick ?></span>
+						<span> DATE:</span>
+						<span class="white"><?=$commenttime ?></span>
+					</div>
+					<div class="bg-secondary col-12 ap-1 amb-1">
+						<span class="cyan"><?=$comment?></span>
+						<input type="hidden" name="commentid" value="<?=$commentid?>">
+						<div class="col-12 p-0 m-0 apt-1">
+							<input type="submit" class="btn-primary" name="edit" value="Edit">
+							<input type="submit" class="btn-primary" name="Delete" value="Delete">
+						</div>
+					</div>
+					<?php
+				}
 			}
-		}
-	}
-
-				//-----------------------------------------------------------------------------
-				// ADD COMMENT FIELD
-				//-----------------------------------------------------------------------------
-
-	if (isset($_POST[ 'addcomment' ])) {
-		$ask = "SELECT crew FROM crew_of WHERE filename='$filename'";
-		$result = mysql_query($ask, $dbh);
-		if ($row = mysql_fetch_array($result)) {
-			$crew = $row[ 0 ];
-		}
-
-		$ask = "SELECT nick FROM author_of WHERE filename='$filename'";
-		$result = mysql_query($ask, $dbh);
-		if ($row = mysql_fetch_array($result)) {
-			$artist = $row[ 0 ];
-		}
-
-		if (!isset($_POST[ 'edit' ])) {
-			$ask = "select sum(rating) from comments where filename='$filename' and nick='$nick' and rating>0";
-			$result = mysql_query($ask, $dbh);
-			if ($row = mysql_fetch_array($result)) {
-				$hasrated = $row[ 0 ];
-			}
-			if ($hasrated > 0) {
-				echo "<form action=\"info_release.php?filename=$decoded_filename&comment\" method=\"post\">";
-				?>
-				<div class="headline">
-					Enter your comment...
-				</div>
-				<div class="content_with_blenk"><br></div>
-
-				<div class="content">
-					<textarea rows="5" cols="82" id="commentvote" name="comment"></textarea>
-					<input type="hidden" name="crew" align="right" value="<?=$crew?>"><input type="hidden" name="artist" align="right" value="<?=$artist?>">
-					<input type="submit" class="btn btn-primary" name="add_comment" align="right" value="Comment">
-				</div>
-			</form>
-			<script type="text/javascript">
-				document.getElementById('commentvote').focus();
-			</script>
-			<?php
-		}
-		else
-		{
-			echo "<form action=$_SERVER[PHP_SELF]?filename=$decoded_filename&comment method=\"post\">";
-			?>
-			<div class="headline">
-				Enter your comment...
-			</div>
-
-			<div class="content">
-				<textarea rows="5" cols="82" id="comment" name="comment"></textarea>
-			</div>
-
-			RATING
-			<select name="user_added_rating">
-				<option value="0" selected="selected">Blank</option><?php
-				for ($i = 1; $i < 11; $i++) {
-					echo "<option value=$i>$i</option>";
-				} ?>
-			</select>
-			<input type="hidden" name="crew" align="right" value="<?=$crew?>"><input type="hidden" name="artist"
-			align="right" value="<?=$artist?>">
-			<input type="submit" class="btn btn-primary" name="add_comment" align="right" value="Comment">
-		</form>
-		<script type="text/javascript">
-			document.getElementById('comment').focus();
-			</script><?php
+			echo "</form>";
 		}
 	}
 }
 
-				//-----------------------------------------------------------------------------
-				// EDIT COMMENT FIELD
-				//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
+// ADD COMMENT FIELD
+//----------------------------------------------------------------------------------------------
+
+if (isset($_POST[ 'addcomment' ])) {
+	$ask = "SELECT crew FROM crew_of WHERE filename='$filename'";
+	$result = mysql_query($ask, $dbh);
+	if ($row = mysql_fetch_array($result)) {
+		$crew = $row[ 0 ];
+	}
+
+	$ask = "SELECT nick FROM author_of WHERE filename='$filename'";
+	$result = mysql_query($ask, $dbh);
+	if ($row = mysql_fetch_array($result)) {
+		$artist = $row[ 0 ];
+	}
+
+	if (!isset($_POST[ 'edit' ])) {
+		$ask = "select sum(rating) from comments where filename='$filename' and nick='$nick' and rating>0";
+		$result = mysql_query($ask, $dbh);
+		if ($row = mysql_fetch_array($result)) {
+			$hasrated = $row[ 0 ];
+		}
+		if ($hasrated > 0) {
+			echo "<form action=\"info_release.php?filename=$decoded_filename&comment\" method=\"post\">";
+			?>
+			<div class="headline">
+				Enter your comment...
+			</div>
+			<div class="content_with_blenk"><br></div>
+
+			<div class="content">
+				<textarea rows="5" cols="82" id="commentvote" name="comment"></textarea>
+				<input type="hidden" name="crew" align="right" value="<?=$crew?>"><input type="hidden" name="artist" align="right" value="<?=$artist?>">
+				<input type="submit" class="btn-primary" name="add_comment" align="right" value="Comment">
+			</div>
+		</form>
+		<script type="text/javascript">
+			document.getElementById('commentvote').focus();
+		</script>
+		<?php
+	}
+	else
+	{
+		echo "<form action=$_SERVER[PHP_SELF]?filename=$decoded_filename&comment method=\"post\">";
+		?>
+		<div class="headline">
+			Enter your comment...
+		</div>
+
+		<div class="content">
+			<textarea rows="5" cols="82" id="comment" name="comment"></textarea>
+		</div>
+
+		RATING
+		<select name="user_added_rating">
+			<option value="0" selected="selected">Blank</option><?php
+			for ($i = 1; $i < 11; $i++) {
+				echo "<option value=$i>$i</option>";
+			} ?>
+		</select>
+		<input type="hidden" name="crew" align="right" value="<?=$crew?>"><input type="hidden" name="artist"
+		align="right" value="<?=$artist?>">
+		<input type="submit" class="btn-primary" name="add_comment" align="right" value="Comment">
+	</form>
+	<script type="text/javascript">
+		document.getElementById('comment').focus();
+		</script><?php
+	}
+}
+}
+
+//--------------------------------------------------------------------------------------------------
+// EDIT COMMENT FIELD
+//--------------------------------------------------------------------------------------------------
 
 if (isset($_POST[ 'edit' ])) {
 	echo "<form action=\"$_SERVER[PHP_SELF]?filename=$decoded_filename&comment\" method=\"post\">";
@@ -1122,7 +1151,7 @@ if (isset($_POST[ 'edit' ])) {
 	<div class="content">
 		<textarea rows="5" cols="82" name="edit_message"><?=$comment?></textarea>
 		<input type="hidden" name="commentid" value="<?=$commentid?>"/>
-		<input type="submit" class="btn btn-primary" name="writeedit" align="right" value="Submit">
+		<input type="submit" class="btn-primary" name="writeedit" align="right" value="Submit">
 	</form>
 </div>
 <?php
@@ -1130,7 +1159,11 @@ if (isset($_POST[ 'edit' ])) {
 ?>
 </div>
 
-<div class="col-lg-2">
+<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+	<?php include('sidebar.php'); ?>
+</div>
+
+<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
 	<?php include('sidebar_right.php'); ?>
 </div>
 <?php include('footer.php'); ?>

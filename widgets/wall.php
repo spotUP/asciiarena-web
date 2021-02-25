@@ -4,8 +4,8 @@
 	$form = "form_{$wall_id}";
 	$tag = "tag_{$wall_id}";
 ?>
-<div class="container" style="padding-bottom: 16px;">
-	<div class="row" id="<?=$wall?>"></div>
+<div class="container-fluid" style="padding-bottom: 16px;">
+	<div class="row m-0 p-0" id="<?=$wall?>"></div>
 	<?php if (is_logged_in()): ?>
 		<div class="row">
 			<style>
@@ -23,8 +23,7 @@
 					<input class="form-control col-11 tagtext" type="text" maxlength="68" name="tagtext"
 					       placeholder="Tag the wall"
 					       id="<?=$tag?>" required autocomplete="off">
-					<button class="btn-primary col-1" style="margin: 0 !important; padding: 0 !important" type="submit">Tag
-					</button>
+					<button class="btn-primary col-1" style="margin: 0 !important; padding: 0 !important" type="submit">Tag</button>
 				</form>
 			</div>
 			<script>

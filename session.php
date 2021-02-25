@@ -1,12 +1,7 @@
 <?php
+	require_once "tools/debug.php";
 	define("VALID", true);
 	define("BASEDIR", __DIR__);
-	define("DEBUG", ($_SERVER[ "REMOTE_ADDR" ] === "77.53.224.247"));
-	if (DEBUG) {
-		ini_set("display_errors", 1);
-		ini_set("display_startup_errors", 1);
-		error_reporting(E_ALL);
-	}
 	if (session_status() === PHP_SESSION_NONE) {
 		session_start();
 	}

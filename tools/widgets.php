@@ -29,7 +29,7 @@
 					$output[] = "<div class=\"row {$class}\" style=\"{$style}\">";
 				}
 				if (!empty($header)) {
-					$output[] = "<div class=\"header col-12\"><h2>{$header}</h2></div>";
+					$output[] = "<div class=\"header col-12\"><h2 class='ap-1'>{$header}</h2></div>";
 				}
 				ob_start();
 				include BASEDIR . "/widgets/{$file}.php";

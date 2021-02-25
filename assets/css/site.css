@@ -207,8 +207,7 @@ h5, .h5 {
 
 a
 {   
-  color: #eeee44;
-  animation: textglowyellow 2s infinite;
+
 }
 
 
@@ -494,6 +493,7 @@ textarea {
   margin-right: 8px !important;
   width: 132px;
   text-align: center;
+  outline: 0;
 }
 
 .btn-secondary {
@@ -599,6 +599,15 @@ body > div.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-white > span
   /*    width: 82px; */
 }
 
+.dropdown-toggle{
+  padding-top: 1px;
+}
+
+.dropdown-toggle::after {
+  position: relative;
+  top: -3px;
+}
+
 .valid-feedback {
   font-size: 16px;
 }
@@ -697,225 +706,131 @@ option {
   background: rgb(255, 85, 85); 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 span.black
 {   
-  color: #000000;
-  animation: textglowblack 2s infinite;
+  color: #000000 !important;
+  text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.40) !important;
 }
 
-
-@keyframes textglowblack {
-  0% {text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.40)}
-}
 
 span.blue
 {   
-  color: rgb(0, 0, 170);
-  animation: textglowblue 2s infinite;
+  color: rgb(0, 0, 170) !important;
+  text-shadow: 1px 1px 10px rgba(0, 0, 170, 0.40) !important;
 }
 
-@keyframes textglowblue {
-  0% {text-shadow: 1px 1px 10px rgba(0, 0, 170, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(0, 0, 170, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(0, 0, 170, 0.40)}
-}
-
-span.green
+.green
 {    
-  color: rgb(0, 170, 0);
-  animation: textglowgreen 2s infinite;
+  color: rgb(85, 255, 85) !important;
+  text-shadow: 1px 1px 10px rgba(0, 170, 0, 0.40) !important;
 }
 
-@keyframes textglowgreen {
-  0% {text-shadow: 1px 1px 10px rgba(0, 170, 0, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(0, 170, 0, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(0, 170, 0, 0.40)}
+.green:hover
+{   
+  color: rgb(255, 255, 255) !important;
+  text-shadow: 1px 1px 10px rgba(85, 255, 85, 0.40) !important;
 }
+
 
 span.cyan
 {   
   color: rgb(0, 187, 187) !important;
-  animation: textglowcyan 2s infinite;
-}
-
-@keyframes textglowcyan {
-  0% {text-shadow: 1px 1px 10px rgba(0, 187, 187, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(0, 187, 187, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(0, 187, 187, 0.40)}
+  text-shadow: 1px 1px 10px rgba(0, 187, 187, 0.40) !important;
 }
 
 span.red
 {   
-  color: #aa0000;
-  animation: textglowred 2s infinite;
+  color: #aa0000 !important;
+  text-shadow: 1px 1px 10px rgba(170, 0, 0, 0.40) !important;
 }
 
-@keyframes textglowred {
-  0% {text-shadow: 1px 1px 10px rgba(170, 0, 0, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(170, 0, 0, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(170, 0, 0, 0.40)}
-}
-
-span.magenta
+.magenta
 {   
-  color: #bb00bb;
-  animation: textglowmagenta 2s infinite;
+  color: rgb(255, 85, 255) !important; 
+  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
 }
 
-@keyframes textglowmagenta {
-  0% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)}
+.magenta:hover
+{   
+  color: rgb(255, 255, 255) !important;
+  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
 }
 
 span.pink
 {   
-  color: #bb00bb;
-  animation: textglowpink 2s infinite;
+  color: #bb00bb !important;
+  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
 }
 
-@keyframes textglowpink {
-  0% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)}
+.pink
+{   
+  color: #bb00bb !important;
+  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
+}
+
+.pink:hover{
+  color: rgb(255, 255, 255) !important;
+  text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.40) !important;
 }
 
 span.brown
 {   
-  color: #aa5500;
-  animation: textglowbrown 2s infinite;
+  color: #aa5500 !important;
+  text-shadow: 1px 1px 10px rgba(170, 85, 0, 0.40) !important;
 }
 
-@keyframes textglowbrown {
-  0% {text-shadow: 1px 1px 10px rgba(170, 85, 0, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(170, 85, 0, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(170, 85, 0, 0.40)}
-}
 
 span.grey
 {   
-  color: rgb(85, 85, 85);
-  animation: textglowgrey 2s infinite;
+  color: rgb(85, 85, 85) !important;
+  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
 }         
 
-@keyframes textglowgrey {
-  0% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40)}
-}
 
 span.lightgrey
 {   
-  color: rgb(170, 170, 170);
-  animation: textglowlightgrey 2s infinite;
+  color: rgb(170, 170, 170) !important;
+  text-shadow: 1px 1px 10px rgba(170, 170, 170, 0.40) !important;
 }
 
-@keyframes textglowlightgrey {
-  0% {text-shadow: 1px 1px 10px rgba(170, 170, 170, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(170, 170, 170, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(170, 170, 170, 0.40)}
-}
 
-span.white
+.white
 {   
-  color: rgb(255, 255, 255);
-  animation: textglowwhite 2s infinite;
-}
-
-@keyframes textglowwhite {
-  0% {text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.40)}
+  color: rgb(255, 255, 255) !important;
+  text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.40) !important;
 }
 
 span.lightcyan
 {   
-  color: rgb(85, 255, 255); 
-  animation: textglowlightcyan 2s infinite;
-}
-
-@keyframes textglowlightcyan {
-  0% {text-shadow: 1px 1px 10px rgba(85, 255, 255, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(85, 255, 255, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(85, 255, 255, 0.40)}
+  color: rgb(85, 255, 255) !important;
+  text-shadow: 1px 1px 10px rgba(85, 255, 255, 0.40) !important;
 }
 
 span.lightgreen
 {   
-  color: rgb(85, 255, 85);
-  animation: textglowlightgreen 2s infinite;
-}
-
-@keyframes textglowlightgreen {
-  0% {text-shadow: 1px 1px 10px rgba(85, 255, 85, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(85, 255, 85, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(85, 255, 85, 0.40)}
+  color: rgb(85, 255, 85) !important;
+  text-shadow: 1px 1px 10px rgba(85, 255, 85, 0.40) !important;
 }
 
 
-span.lightpink
+.lightpink
 {   
-  color: rgb(255, 85, 255); 
-  animation: textglowlightpink 2s infinite;
-}
-
-@keyframes textglowlightpink {
-  0% {text-shadow: 1px 1px 10px rgba(255, 85, 255, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(255, 85, 255, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(255, 85, 255, 0.40)}
+  color: rgb(255, 85, 255) !important;
+  text-shadow: 1px 1px 10px rgba(255, 85, 255, 0.40) !important;
 }
 
 span.lightblue
 {   
-  color: rgb(85, 85, 255); 
-  animation: textglowlightblue 2s infinite;
+  color: rgb(85, 85, 255) !important;
+  text-shadow: 1px 1px 10px rgba(85, 85, 255, 0.40) !important;
 }
 
-@keyframes textglowlightblue {
-  0% {text-shadow: 1px 1px 10px rgba(85, 85, 255, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(85, 85, 255, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(85, 85, 255, 0.40)}
-}
 
 span.lightred
 {   
-  color: rgb(255, 85, 85); 
-  animation: textglowlightred 2s infinite;
+  color: rgb(255, 85, 85) !important;
+  text-shadow: 1px 1px 10px rgba(255, 85, 85, 0.40) !important;
 }
-
-@keyframes textglowlightred {
-  0% {text-shadow: 1px 1px 10px rgba(255, 85, 85, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(255, 85, 85, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(255, 85, 85, 0.40)}
-}
-
-@keyframes textglowyellow {
-  0% {text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.40)}
-  50% {text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.60)} 
-  100% {text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.40)}
-}
-
 
 a.nav-link:hover{
   color: #aaa !important;
@@ -929,9 +844,6 @@ a.nav-link:focus{
   color: #aaa !important;
 }
 
-
-
-
 a.dropdown-item:hover{
   color: #aaa !important;
 }
@@ -944,21 +856,33 @@ a.dropdown-item:focus{
   color: #aaa !important;
 }
 
-a:hover, a.ascii:hover{
+a:hover{
   background: transparent;
-  /*color: #ffffff; */
-  /*  text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.30), 1px 1px 20px #000 !important; */
-  background: linear-gradient(to right, #6666ff, #0099ff , #00ff00, #ff3399, #6666ff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: rainbow_animation 20s ease-in-out infinite;
-  background-size: 400% 100%;
-  animation: colorRotate 6s linear 0s infinite;
+  color: #ffffff;
+/*  margin-left: 8px; */
 }
-span.yellow
+
+a:hover::before{
+  content: ">";
+}
+
+a.ascii:hover{
+  content: initial !important;
+}
+
+a.ascii:hover::before{
+  content: initial !important;
+}
+.yellow
 {   
-  color: #eeee44;
+  color: rgb(255,255,85);
+  text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.40)
+}
+
+.yellow:hover
+{   
+  color: #ffffff;
+  text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.40)
 }
 
 .bg-primary {
@@ -1360,13 +1284,14 @@ input.form-control::placeholder {
 }
 
 button.btn.btn-secondary{
-  margin-right: 16px !important;
-  /*  margin-bottom: 16px !important; */
+  margin-right: 8px !important;
+  height: 16px;
 }
 
 button.btn.btn-primary{
-  margin-right: 16px !important;
-  /*  margin-bottom: 16px !important; */
+  margin-right: 8px !important;
+  height: 16px;
+  padding-top: 1px;
 }
 
 .dropdown-menu {
@@ -1400,30 +1325,48 @@ button.btn.btn-primary{
 }
 
 input[type=text]{
-  background: #111111 !important;
   color: #999999;
 }
 
 
 .ap-1 { 
-  padding: 16px !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+  padding-top: 16px !important;
+  padding-bottom: 16px !important;
+}
+
+.am-1 { 
+  margin-left-left: 8px !important;
+  margin-right: 8px !important;
+  margin-top: 16px !important;
+  margin-bottom: 16px !important;
 }
 
 .apt-1 { 
   padding-top: 16px !important;
 }
 
+.amt-1 { 
+  margin-top: 16px !important;
+}
+
 .apl-1 { 
-  padding-left: 16px !important;
+  padding-left: 8px !important;
 }
 
 .apr-1 { 
-  padding-right: 16px !important;
+  padding-right: 8px !important;
 }
 
 .apb-1 { 
   padding-bottom: 16px !important;
 }
+
+.apb-2 { 
+  padding-bottom: 32px !important;
+}
+
 .amb-1 { 
   margin-bottom: 16px !important;
 }
@@ -1551,3 +1494,96 @@ input[type=text]{
     display: none;
   }
 }
+
+.jump {
+  animation: jump 1s 6s forwards cubic-bezier(.84,-0.54,.31,1.19);
+}
+
+.waggle {
+  animation: waggle 1s 1s forwards ease-out;
+}
+
+@keyframes jump {
+  0% {
+    transform: none;
+  }
+  50% {
+    transform: translateY(-2em);
+  }
+}
+
+@keyframes waggle {
+  0% {
+    transform: none;
+  }
+  50% {
+    transform: rotateZ(-20deg) scale(1.2);
+  }
+  60% {
+    transform: rotateZ(25deg) scale(1.2);
+  }
+  67.5% {
+    transform: rotateZ(-15deg) scale(1.2);
+  }
+  75% {
+    transform: rotateZ(15deg) scale(1.2);
+  }
+  82.5% {
+    transform: rotateZ(-12deg) scale(1.2);
+  }
+  85% {
+    transform: rotateZ(0) scale(1.2);
+  }
+  100% {
+    transform: rotateZ(0) scale(1);
+  }
+}
+
+.show{
+  display: inline-block !important;
+}
+
+@media only screen and (max-width: 768px) {
+  .show{
+    border: 0;
+  }
+  .dropdown-item {
+    margin-left: 12px;
+  }
+  .navbar-nav .dropdown-menu {
+    background: none;
+  }
+}
+
+.collapse{
+  display: none;
+}
+
+.navbar-toggler{
+  outline:0;
+  background: grey;
+  color: black;
+  height: 16px !important;
+  width: 8px;
+  margin: 0px !important;
+  padding: 0px !important;
+  line-height: 15px !important;
+}
+
+.navbar-toggler:focus{
+  outline:0;
+  background: black;
+  color: white;
+  height: 16px !important;
+}
+
+.navbar-toggler-icon {
+  width: 8px;
+  height: 16px;
+}
+
+.dropup, .dropright, .dropdown, .dropleft {
+    line-height: 14px;
+    height: 16px;
+}
+

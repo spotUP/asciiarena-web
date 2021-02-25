@@ -23,23 +23,23 @@ $dirname = $dirname[ 0 ];
 			?>
 			<div class="row">
 				<div class="header col-lg-12">
-					<h1><?=$colly->name?></h1>
+					<h1 class="ap-1"><?=$colly->name?></h1>
 				</div>
 			</div>
 
 
 			<div class="container-fluid">
-				<div class="row">
-					<div class="col-8" style="margin-left:0px; padding-left: 0px; margin-top: 16px;">
+				<div class="row ap-1 bg-secondary">
+					<div class="col-lg-8 d-flex justify-content-center justify-content-lg-start" style="position: relative; top: -16px;">
 						<span>
 							<?php if ($colly->file_id == "file_id.diz.png") {
 								$file_id_diz = file_get_contents("collections/file_id.diz.txt");
-								echo "<pre>";
+								echo "<pre style=\"color: red\">";
 								echo $file_id_diz;
 								echo "</pre>";
 							} else {
 								if (file_exists("$file_id")) {
-									echo "<pre>";
+									echo "<pre class=\"magenta\">";
 									echo utf8_encode($file_id_diz);
 									echo "</pre>";
 								}
@@ -47,8 +47,8 @@ $dirname = $dirname[ 0 ];
 							?>
 						</span>
 					</div>
-					<div class="col-4">
-						<div class="row d-flex justify-content-between" style="margin-top: 16px;">
+					<div class="col-lg-4">
+						<div class="row d-flex justify-content-between">
 
 							<span>Artist(s):</span>
 
@@ -56,7 +56,7 @@ $dirname = $dirname[ 0 ];
 							$authors = [];
 							foreach (fetchAll("SELECT * FROM author_of WHERE filename = :filename", [":filename" => $filename]) as $row) {
 								$encoded_author = base64_encode($row->nick);
-								$authors[] = "<a href=\"info_artist.php?artist={$encoded_author}&sort_by=filename\">{$row->nick}</a>";
+								$authors[] = "<a class=\"green\" href=\"info_artist.php?artist={$encoded_author}&sort_by=filename\">{$row->nick}</a>";
 							}
 							?>
 							<span>
@@ -105,12 +105,6 @@ $dirname = $dirname[ 0 ];
 								?>
 							</span>
 						</div>
-
-
-
-
-
-
 
 						<div class="row d-flex justify-content-between">
 							<span>Rating:</span>

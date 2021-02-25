@@ -91,10 +91,10 @@
 	</div>
 </div>
 
-<div class="navbar navbar-expand-lg fixed-bottom navbar-dark bg-primary d-flex justify-content-between"
-     style="height: 22px;">
-	<span style="margin-left: 200px;" class="red">NComm 2.0</span> <span class="green">aSCIIaRENA</span> <span
-			style="margin-right: 200px" class="green"><?php echo Date("H:i", time()), " 00:00"; ?></span>
+<div class="mx-auto navbar navbar-expand-lg fixed-bottom navbar-dark bg-primary d-flex justify-content-lg-around" style="height: 22px;">
+	<span cass="red ml-xl-2">NComm 2.0</span>
+	<span class="green">aSCIIaRENA</span>
+	<span class="green mr-xl-2"><?php echo Date("H:i", time()), " 00:00"; ?></span>
 </div>
 
 <script>
@@ -117,20 +117,7 @@
 		}
 	});
 </script>
-<script src="/assets/js/ansiup/ansi_up.js" type="text/javascript"></script>
-<script type="text/javascript">
-	/*
-		var ansi_up = new AnsiUp;
 
-		var txt = "\n\n\033[1;33;40m 33;40  \033[1;33;41m 33;41  \033[1;33;42m 33;42  \033[1;33;43m 33;43  \033[1;33;44m 33;44  \033[1;33;45m 33;45  \033[1;33;46m 33;46  \033[1m\033[0\n\n\033[1;33;42m >> Tests OK\n\n"
-
-		var html = ansi_up.ansi_to_html(txt);
-
-		var cdiv = document.getElementById("console");
-
-		cdiv.innerHTML = html;
-	*/
-</script>
 <?php
 	if (DEBUG) {
 		echo "<pre>";

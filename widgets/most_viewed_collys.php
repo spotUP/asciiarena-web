@@ -1,6 +1,6 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
 	<div class="header col-lg-12">
-		<h2>MOST VIEWED COLLYS</h2>
+		<h2 class="ap-1">MOST VIEWED COLLYS</h2>
 	</div>
 <?php
 
@@ -13,7 +13,7 @@
 		$views = $row->view_counter;
 		?>
 		<div class="col-lg-12 d-flex justify-content-between">
-			<a href="info_release.php?filename=<?=$decodedfilename?>"><?=$filename?></a>
+			<a class="magenta" href="info_release.php?filename=<?=$decodedfilename?>"><?=$filename?></a>
 			<?=$views?>
 		</div>
 		<?php

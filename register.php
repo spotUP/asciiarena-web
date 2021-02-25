@@ -1,10 +1,11 @@
 <?php
-require_once ('dbconnect_asciiarena.php');
-//echo "<pre>";print_r($_POST);echo "</pre>";
 
-?>
+include_once 'session.php';
+include_once 'header.php';
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "https://www.w3.org/TR/html4/loose.dtd">
+$now = time();
+
+?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "https://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
 		<title>ASCIIARENA brought to you by UP ROUGH SOUNDSYSTEM</title>
@@ -27,35 +28,28 @@ require_once ('dbconnect_asciiarena.php');
 					$confirm_password=$_POST['confirm_password'];
 					$confirm_password_md5=md5($confirm_password);
 
-					$ask="SELECT * FROM users WHERE nick='$confirm_nick'";
-					$result=mysql_query($ask,$dbh);
-					while ($row=mysql_fetch_array($result))
-					{
-						$pw_hash=$row['pwhash'];							
-					}					
+					$ask="SELECT * FROM users WHERE nick=:confirm_nick";
+					$row=fetchOne($ask, ['confirm_nick' => $confirm_nick ]);
+					$pw_hash=$row->pwhash;
 
 					if ($confirm_password_md5 != $pw_hash)
 					{
 						?>
 						<table width="913px"><caption>FAILURE!</caption><tr><td>Wrong Password! Try again.</td></tr></table>
 						<meta http-equiv="Refresh" content="2; url=register.php">
-						<?
+						<?php
 						exit;
 					}
 					
 					if ($confirm_password_md5 == $pw_hash)
 					{
-						$ask_update="update users set rank='User' where nick='$confirm_nick'";
-						mysql_query($ask_update,$dbh);
-
-						$now=time();
-						$ask_update="update users set joined=$now where nick='$confirm_nick'";
-						mysql_query($ask_update,$dbh);
+						$ask_update="update users set rank='User', joined=:now where nick=:confirm_nick";
+						doQuery($ask_update,['confirm_nick' => $confirm_nick, 'now' => $now ]);
 
 						$_SESSION['password'] = $confirm_password;
 						$_SESSION['password'] = $confirm_nick;
 	
-						?><meta http-equiv="Refresh" content="0; url=login.php?activated"><?			
+						?><meta http-equiv="Refresh" content="0; url=login.php?activated"><?php
 						exit();
 					}
 				}	
@@ -70,75 +64,74 @@ require_once ('dbconnect_asciiarena.php');
 
 					if ($check_password == $check_nick)
 					{
-						?><table width="913px"><caption>FAILURE!</caption><tr><td>The nick and password must be unique!</td></tr></table><?	
-						?><meta http-equiv="Refresh" content="2; url=register.php"><?
+						?><table width="913px"><caption>FAILURE!</caption><tr><td>The nick and password must be unique!</td></tr></table><?php
+						?><meta http-equiv="Refresh" content="2; url=register.php"><?php
 						exit;
 					}
 							
 					if ($check_password!=$repeat_password)
 					{
-						?><table width="913px"><caption>FAILURE!</caption><tr><td>The passwords doesn't match!</td></tr></table><?	
-						?><meta http-equiv="Refresh" content="2; url=register.php"><?
+						?><table width="913px"><caption>FAILURE!</caption><tr><td>The passwords doesn't match!</td></tr></table><?php
+						?><meta http-equiv="Refresh" content="2; url=register.php"><?php
 						exit;
 					}
 
-					if ($spam!=iamnotarobot)
+					if ($spam!='iamnotarobot')
 					{
-						?><table width="913px"><caption>FAILURE!</caption><tr><td>Enter iamnotarobot to prove that you are human!</td></tr></table><?	
-						?><meta http-equiv="Refresh" content="2; url=register.php"><?
+						?><table width="913px"><caption>FAILURE!</caption><tr><td>Enter iamnotarobot to prove that you are human!</td></tr></table><?php
+						?><meta http-equiv="Refresh" content="2; url=register.php"><?php
 						exit;
 					}
 			
 					if (empty($check_nick))
 					{
-						?><table width="913px"><caption>FAILURE!</caption><tr><td>Error! You must fill the name field!</td></tr></table><?	
-						?><meta http-equiv="Refresh" content="2; url=register.php"><?
+						?><table width="913px"><caption>FAILURE!</caption><tr><td>Error! You must fill the name field!</td></tr></table><?php
+						?><meta http-equiv="Refresh" content="2; url=register.php"><?php
 						exit;
 					}
 
 					$mail = trim($_POST['mail']);  
 					if(!checkEmail($mail)) 
 					{
-						?><table width="913px"><caption>FAILURE!</caption><tr><td>Error! You must enter a valid E-Mail adress!</td></tr></table><?	
-						?><meta http-equiv="Refresh" content="200; url=register.php"><?
+						?><table width="913px"><caption>FAILURE!</caption><tr><td>Error! You must enter a valid E-Mail adress!</td></tr></table><?php
+						?><meta http-equiv="Refresh" content="200; url=register.php"><?php
 						exit;
 					}
 		
 					if (empty($check_password))
 					{
-						?><table width="913px"><caption>FAILURE!</caption><tr><td>Error! You must fill the password field!</td></tr></table><?	
-						?><meta http-equiv="Refresh" content="2; url=register.php"><?
+						?><table width="913px"><caption>FAILURE!</caption><tr><td>Error! You must fill the password field!</td></tr></table><?php
+						?><meta http-equiv="Refresh" content="2; url=register.php"><?php
 						exit;
 					}
 
 					$pwlenght=(strlen($check_password));
 					if ($pwlenght < 6)
 					{
-						?><table width="913px"><caption>FAILURE!</caption><tr><td>Error! The password must contain 6 characters!</td></tr></table><?	
-						?><meta http-equiv="Refresh" content="2; url=register.php"><?
+						?><table width="913px"><caption>FAILURE!</caption><tr><td>Error! The password must contain 6 characters!</td></tr></table><?php	
+						?><meta http-equiv="Refresh" content="2; url=register.php"><?php
 						exit;
 					}
-					
-					$check_nick=cleanInsert($check_nick);
-					$check_password=cleanInsert($check_password);
-					$mail=cleanInsert($mail);
-					$pwhash=cleanInsert($pwhash);
 		
-					$ask_check="select nick from users where nick='$check_nick'";
-					$result_check=mysql_query($ask_check,$dbh);
-					while($row_check=mysql_fetch_row($result_check))
+					$ask_check = $_db->prepare("SELECT nick FROM users WHERE nick = :check_nick");
+					$ask_check->execute(['check_nick' => $check_nick]);
+					$rows = $ask_check->fetchAll();
+					if(count($rows) > 0)
 					{
-						$existing_nick=$row_check[0];
-		
-						if (!empty($existing_nick))
-						{
-							?><table width="913px"><tr><td>This nick is already in use!</td></tr></table><?php		
-							?><meta http-equiv="Refresh" content="2; url=register.php"><?
-							exit;
-						}
+						?><table width="913px"><tr><td>This nick is already in use!</td></tr></table><?php		
+						?><meta http-equiv="Refresh" content="2; url=register.php"><?php
+						exit;
 					}
-					$ask="insert into users values ('$check_nick','Independent','SECRET','$pwhash',$now,(null),(null),(null),(null),'AvatarDefault.jpg',(null),'$mail',(null),0,'Inactive',(null),(null),(null),(null),(null),'- -- - aSCIIaRENa - ---- - aSCIIaRENa - -- -','Standard','No','No',(null),(null),(null),(null),(null))";
-					mysql_query($ask,$dbh);
+					$ask = $_db->prepare("INSERT INTO users
+       (nick,       crew,         password, pwhash, lastactive, current, avatar,               mail,  uploaded, `rank`,        upload_signature,                              list_view_mode, display_mail,display_messenger)
+VALUES (:check_nick,'Independent','SECRET',:pwhash, :now,       '',      'AvatarDefault.jpg', :mail,   0,        'Inactive', '- -- - aSCIIaRENa - ---- - aSCIIaRENa - -- -','Standard',     'No',        'No'            )
+");
+					$ask->execute([
+						'check_nick' => $check_nick,
+						'now' => $now,
+						'pwhash' => $pwhash,
+						'mail' => $mail
+					]);
 
 					$welcome_msg="WELCOME TO aSCIIaRENA!<br><br>".
    
@@ -158,14 +151,13 @@ require_once ('dbconnect_asciiarena.php');
 
   "/ sPOT^uP rOUGH [aSCIIaRENA sYSOP]<br>";	
 	
-					$ask="SELECT thread FROM messages ORDER BY thread DESC LIMIT 1";
-					$result=mysql_query($ask,$dbh);
-					if(mysql_num_rows($result) > 0) 
-					{ 
-						while ($row=mysql_fetch_array($result)) 
-						{ 
-							$thread=$row[0];
-						}
+					$ask = $_db->prepare("SELECT thread FROM messages ORDER BY thread DESC LIMIT 1");
+					$ask->execute();
+					$rows = $ask->fetch(PDO::FETCH_OBJ);
+					if($rows === false) 
+					{
+					    # FIXME: $row is probably wrong? 
+						$thread=$row[0];
 					}
 					if (empty($thread))
 					{
@@ -173,15 +165,23 @@ require_once ('dbconnect_asciiarena.php');
 					}
 					$thread++;
 	
-					$now=time();	
-					$ask="insert into messages values (0,$thread,'$check_nick','Spot',$now,'Welcome!','$welcome_msg',1)";
-					mysql_query($ask,$dbh);
+					$ask = $_db->prepare("INSERT INTO messages
+       (thread, postedto, postername, timestamp, subject, message, unread)
+VALUES (:thread, :check_nick,'Spot',:now,'Welcome!',:welcome_msg,1)
+");
+					$ask->execute([
+						'thread' => $thread,
+						'check_nick' => $check_nick,
+						'now' => $now,
+						'welcome_msg' => $welcome_msg
+					]);
+
 
 //-------------------------------------------------------------------------
 // SEND WELCOME MAIL					
 //-------------------------------------------------------------------------
 
-					require_once "Mail.php";
+					// require_once "Mail.php";
 
 					$from = "aSCIIaRENa <asciiarena@gmail.com>";
 					$to = "$check_nick <$mail>";
@@ -199,23 +199,23 @@ require_once ('dbconnect_asciiarena.php');
 					$headers = array ('From' => $from,
 					'To' => $to,
 					'Subject' => $subject);
-					$smtp = Mail::factory('smtp',
-					array ('host' => $host,
-						'port' => $port,
-						'auth' => true,
-						'username' => $username,
-						'password' => $password));
-
-					$mail = $smtp->send($to, $headers, $body);
-
-					if (PEAR::isError($mail)) 
-					{
-						echo("<p>" . $mail->getMessage() . "</p>");
-					} 
+					// $smtp = Mail::factory('smtp',
+					// array ('host' => $host,
+					// 	'port' => $port,
+					// 	'auth' => true,
+					// 	'username' => $username,
+					// 	'password' => $password));
+					//
+					// $mail = $smtp->send($to, $headers, $body);
+					//
+					// if (PEAR::isError($mail)) 
+					// {
+					// 	echo("<p>" . $mail->getMessage() . "</p>");
+					// } 
 					?>
 					<table width="913px">
 						<tr><td>&nbsp;</td></tr>
-						<tr><td><img class='centered' border='0' src='data/register.png'></td></tr>
+						<tr><td><img class='centered' border='0' src='assets/data/register.png'></td></tr>
 						<tr><td>&nbsp;</td></tr>
 						<tr><td align="center">Your account has been created, a mail with instructions</td></tr>
 						<tr><td align="center">has been sent to your e-mail adress.</td></tr>
@@ -228,9 +228,9 @@ require_once ('dbconnect_asciiarena.php');
 				<form action="register.php" method="post">
 						<table width="913px">
 						<tr><td colspan="5">&nbsp;</td></tr>
-						<tr><td colspan="5"><img class='centered' border='0' src='data/register.png'></td></tr>
+						<tr><td colspan="5"><img class='centered' border='0' src='assets/data/register.png'></td></tr>
 						<tr><td colspan="5">&nbsp;</td></tr>
-					<? if (!isset($_GET['confirm']))
+					<?php if (!isset($_GET['confirm']))
 					{
 						?>
 						<tr><td width="230">&nbsp;</td><td align="right" width="30">Nick</td><td width="110"><input type="text" size="14" maxlength="14" name="nick"></td><td align="right">Password</td><td><input type="password" name="password" size="14"></td></tr>
@@ -239,23 +239,20 @@ require_once ('dbconnect_asciiarena.php');
 							<tr><td colspan="5">&nbsp;</td></tr>
 						
 						<tr><td colspan="5" align="center">Enter iamnotarobot here: <input type="text" name="spam">   <input type="submit" value="Join!"></td></tr>
-						<?
+						<?php
 					}
 					if (isset($_GET['confirm']))
 					{
 						$confirm_pw_hash=$_GET['confirm'];
 
 						$ask="SELECT * FROM users WHERE pwhash='$confirm_pw_hash'";
-						$result=mysql_query($ask,$dbh);
-						while ($row=mysql_fetch_array($result))
-						{
-							$nick=$row['nick'];
-							$pw_hash=$row['pwhash'];							
-						}					
+						$row=fetchOne($ask, ['confirm_pw_hash' => $confirm_pw_hash ]);
+						$nick=$row->nick;
+						$pw_hash=$row->pwhash;
 						?>
 						<tr><td colspan="3" align="center">wELCOME <?=$nick?>, pLEASE cONFiRM yOUR pASSWORD!</td></tr>
 						<tr><td align="center">Password: <input type="hidden" name="confirm_nick" value="<?=$nick?>"><input type="password" name="confirm_password" size="14"> <input type="submit" value="Confirm!"></td></tr>
-						<?
+						<?php
 					}		
 					?>
 					</table>

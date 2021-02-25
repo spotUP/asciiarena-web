@@ -20,7 +20,7 @@
 		return str_replace(["@", "."], ["(at)", "(dot)"], $contact);
 	}
 
-	function fixOutputPost($insertstring, $base64 = true) {
+	function fixOutputPost($insertstring, $base64 = false) {
 		if ($base64) {
 			$insertstring = base64_decode($insertstring);
 			$insertstring = wordwrap($insertstring, 86, "\n", true);

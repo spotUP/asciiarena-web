@@ -1,6 +1,6 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
 	<div class="header col-lg-12">
-		<h2><a href="collys.php?sort_by=releasedate">NEW COLLYS</a> <a href='rss.php?id=0'>[RSS]</a></h2>
+		<h2 class="ap-1"><a href="collys.php?sort_by=releasedate">NEW COLLYS</a> <a href='rss.php?id=0'>[RSS]</a></h2>
 	</div>
 <?php
 	foreach (fetchAll("SELECT * FROM collys ORDER BY year DESC, month DESC, day DESC, timestamp DESC limit {$limit}") as $row) {
@@ -34,7 +34,7 @@
 
 		?>
 		<div class="col-lg-12 d-flex justify-content-between">
-			<a href="info_release.php?filename=<?=$filename?>"><?=$latestreleased?></a>
+			<a class="magenta" href="info_release.php?filename=<?=$filename?>"><?=$latestreleased?></a>
 			<?=$release_year?>-<?=$release_month?>-<?=$release_day?>
 		</div>
 		<?php
