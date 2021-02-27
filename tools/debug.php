@@ -1,6 +1,6 @@
 <?php
 
-define("DEBUG", ((php_sapi_name() == 'cli-server') || in_array($_SERVER[ "REMOTE_ADDR" ], ["127.0.0.1", "77.53.224.247", "83.252.119.214", "::1"])));
+define("DEBUG", ((php_sapi_name() == 'cli-server') || in_array($_SERVER[ "REMOTE_ADDR" ], ["127.0.0.1", "77.53.224.247", "::1"])));
 
 if (DEBUG) {
   ini_set("display_errors", 1);
