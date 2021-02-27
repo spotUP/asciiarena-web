@@ -136,6 +136,7 @@ VALUES (:thread,:posttomember,:postername,:now,:postsubject,:postmessage,1,1)
 
 				exit;
 			}
+			$postername = $_user['nick'];
 			$postsubject = cleanInsert($postsubject);
 			$postmessage = cleanInsertPost($postmessage);
 			$now = time();
@@ -143,7 +144,7 @@ VALUES (:thread,:posttomember,:postername,:now,:postsubject,:postmessage,1,1)
 			doQuery($ask, [
 			  'thread'       => $thread,
 			  'posttomember' => $posttomember,
-			  'nick'         => $nick,
+			  'nick'         => $postername,
 			  'now'          => $now,
 			  'postsubject'  => $postsubject,
 			  'postmessage'  => $postmessage
