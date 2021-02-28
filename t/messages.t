@@ -60,30 +60,31 @@ subtest 'Reply message' => sub {
   register($nick2, $pw2, $nick2 . '@example.com');
   login_ok($nick2, $pw2);
 
-  # send message from user2 to user1
+  diag("send messag from user2 to user1");
   my $subject = 'testsubject';
   my $message_line = create_message_ok($nick1, $subject, 'testmessage');
   logout_ok();
 
-  # find message
+  diag("find message in user1 inbox ($subject)");
   login_ok($nick1, $pw1);
   $t->get_ok('/messages.php');
   $message_line = $t->tx->res->dom->find('form')->grep( sub { my $a = $_->at('a.yellow'); $a && ($a->text eq $subject) })->last;
   my $thread = $message_line->at('input[name=thread]')->attr('value');
   my $messid = $message_line->at('input[name=messid]')->attr('value');
 
-  # post reply from user1 to user2
+  diag("post reply from user1 to user2: ", explain({ thread => $thread, messid => $messid }));
   $t->post_ok('/message.php', form => { postreply => 'Read', thread => $thread, messid => $messid });
-  my $form = $t->tx->res->dom->find('form')->grep(sub { $_->attr('action') eq 'messages.php?post' })->first;
+  my $form = $t->tx->res->dom->find('form')->grep(sub { $_->attr('action') eq 'message.php?post' })->first;
   my %post_fields = map { $_->attr('name') => $_->attr('value') } @{ $form->find('textarea, input')->to_array() || [] };
   $post_fields{postmessage} = 'testreply';
   my $action = $form->attr('action');
   $action = '/' . $action unless $action =~ s{^/}{};
-  $t->post_ok($action, form => { %post_fields }); 
+  diag("action: '$action': ", explain(\%post_fields));
+  $t->post_ok($action, form => { %post_fields });
 
   logout_ok();
 
-  # read reply
+  diag("read reply");
   login_ok($nick2, $pw2);
   $t->get_ok('/messages.php');
   $message_line = $t->tx->res->dom->find('form')->grep( sub { my $a = $_->at('a.yellow'); $a && ($a->text eq $subject) })->last;
