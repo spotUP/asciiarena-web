@@ -104,11 +104,11 @@ if (is_logged_in()) {
 								$messnew = $row_new->new;
 								if ($messnew == 1) {
 									?>
-								<a class="yellow" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
+								<a class="yellow" !important;" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
 									<?php
 								} else {
 									?>
-								<a class="grey" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
+								<a class="green" !important;" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
 									<?php
 								}
 
