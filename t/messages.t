@@ -42,7 +42,7 @@ subtest 'Delete message' => sub {
   my $message_line = create_message_ok($nick, 'testsubject', 'testmessage');
   my $thread = $message_line->at('input[name=thread]')->attr('value');
   my $messid = $message_line->at('input[name=messid]')->attr('value');
-  $t->post_ok('/messages.php', form => { deletemessage => 'Delete', thread => $thread, messid => $messid });
+  $t->post_ok('/message.php', form => { deletemessage => 'Delete', thread => $thread, messid => $messid });
   $t->get_ok('/messages.php');
   my $message_ids = $t->tx->res->dom->find('input[name=messid]')->grep(sub { $_->attr('value') eq $messid });
   is $message_ids->size, 0, 'Should not find message anymore';
@@ -68,12 +68,12 @@ subtest 'Reply message' => sub {
   # find message
   login_ok($nick1, $pw1);
   $t->get_ok('/messages.php');
-  $message_line = $t->tx->res->dom->find('form')->grep( sub { my $a = $_->at('span > a'); $a && ($a->text eq $subject) })->last;
+  $message_line = $t->tx->res->dom->find('form')->grep( sub { my $a = $_->at('a.yellow'); $a && ($a->text eq $subject) })->last;
   my $thread = $message_line->at('input[name=thread]')->attr('value');
   my $messid = $message_line->at('input[name=messid]')->attr('value');
 
   # post reply from user1 to user2
-  $t->post_ok('/messages.php', form => { postreply => 'Read', thread => $thread, messid => $messid });
+  $t->post_ok('/message.php', form => { postreply => 'Read', thread => $thread, messid => $messid });
   my $form = $t->tx->res->dom->find('form')->grep(sub { $_->attr('action') eq 'messages.php?post' })->first;
   my %post_fields = map { $_->attr('name') => $_->attr('value') } @{ $form->find('textarea, input')->to_array() || [] };
   $post_fields{postmessage} = 'testreply';
@@ -86,12 +86,12 @@ subtest 'Reply message' => sub {
   # read reply
   login_ok($nick2, $pw2);
   $t->get_ok('/messages.php');
-  $message_line = $t->tx->res->dom->find('form')->grep( sub { my $a = $_->at('span > a'); $a && ($a->text eq $subject) })->last;
+  $message_line = $t->tx->res->dom->find('form')->grep( sub { my $a = $_->at('a.yellow'); $a && ($a->text eq $subject) })->last;
   my $thread = $message_line->at('input[name=thread]')->attr('value');
   my $messid = $message_line->at('input[name=messid]')->attr('value');
-  $t->post_ok('/messages.php', form => { postreply => 'Read', thread => $thread, messid => $messid });
+  $t->post_ok('/message.php', form => { postreply => 'Read', thread => $thread, messid => $messid });
 
-  ok($t->tx->res->dom('div.content pre')->grep(sub { $_->all_text =~ m{testreply} })->size, 'Found reply');
+  ok($t->tx->res->dom('div.row span.white')->grep(sub { $_->all_text =~ m{testreply} })->size, 'Found reply');
 };
 
 sub login_ok {
@@ -114,9 +114,11 @@ sub create_message_ok {
 
   my $messages_link = $t->tx->res->dom->find('a.dropdown-item')->grep(sub { $_->text =~ /mail/i })->first;
   $t->get_ok($messages_link->attr('href'));
-  $t->post_ok('/messages.php?post' => form => { posttomember => $to, postsubject => $subject, postmessage => $msg, postnewmessage => 'Send Message!' })->status_is(200);
+  $t->post_ok('/message.php?post' => form => { posttomember => $to, postsubject => $subject, postmessage => $msg, postnewmessage => 'Send Message!' })->status_is(200);
   $t->get_ok('/messages.php')->status_is(200);
-  my $message_line = $t->tx->res->dom->find('form')->grep( sub { my $a = $_->at('span > a'); $a && ($a->text eq $subject) })->last;
+
+  warn $t->tx->res->body;
+  my $message_line = $t->tx->res->dom->find('form')->grep( sub { my $a = $_->at('a.yellow'); $a && ($a->text eq $subject) })->last;
   return $message_line;
 }
 
