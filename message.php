@@ -165,9 +165,10 @@ if (is_logged_in()) {
 
 			if (isset($_POST[ 'deletemessage' ])) {
 				$deleteid = ($_POST[ 'thread' ]);
+				$deletemsgid = ($_POST[ 'messid' ]);
 
-				$ask = $_db->prepare("delete from messages where thread=:deleteid and postedto=:nick");
-				$ask->execute(['deleteid' => $deleteid, 'nick' => $nick]);
+				$ask = $_db->prepare("delete from messages where thread=:deleteid and id=:messid");
+				$ask->execute(['deleteid' => $deleteid, 'messid' => $deletemsgid ]);
 			}
 
 //-----------------------------------------------------------------------------
