@@ -1,140 +1,52 @@
 <?php
-include_once "session.php";
+// Autoload all classes in classes/*
+spl_autoload_register(function ($class_name) {
+	include __DIR__ . "/classes/" . $class_name . '.php';
+});
+
+require_once "session.php";
+$h1 = ["wELCOME tO aSCIIaRENA", "bY uP rOUGH and diViNE sTYLERS"];
+include "header.php";
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "https://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-	<title>ASCIIARENA brought to you by UP ROUGH SOUNDSYSTEM</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
-	<meta name="viewport" content="width=device-width">
-	<link rel='stylesheet' href='style.css' type='text/css'>
-	<script type="text/javascript">
 
-		function add_artist_field()
+<div class="modal-body row m-0 p-0">
+	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
+
+		<?php
+		if (is_logged_in())
 		{
-			var newselect = " <select name=\"artist[]\"" + document.getElementById('total_artists').value + "><option value=\"Unknown\">Unknown</option><?php
-
-			$ask="select nick from artists";
-			$result=fetchAll($ask);
-			foreach ($result as $row)
-			{
-				$artists=$row->nick;
-				echo "<option value='$artists'>$artists</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_artist_field').innerHTML =  document.getElementById('new_artist_field').innerHTML + newselect;
-			document.getElementById('total_artists').value =  parseInt( document.getElementById('total_artists').value) + 1;
-		}
-
-	</script>
-
-	<script type="text/javascript">
-		function add_crew_field()
-		{
-			var newselect = " <select name=\"crew[]\"" + document.getElementById('total_crews').value + "><option>Independent</option><?php
-
-			$ask="select name from crews";
-			$result=fetchAll($ask);
-			foreach ($result as $row)
-			{
-				$crews=$row->name;
-				echo "<option value='$crews'>$crews</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_crew_field').innerHTML =  document.getElementById('new_crew_field').innerHTML + newselect;
-			document.getElementById('total_crews').value =  parseInt( document.getElementById('total_crews').value) + 1;
-		}
-
-	</script>
-
-	<script type="text/javascript">
-		function add_artist_crew_field()
-		{
-			var newselect = " <select name=\"artist_crew[]\"" + document.getElementById('total_artist_crews').value + "><option value=\"Unknown\">Unknown</option><?php
-
-			$ask="select name from crews";
-			$result=fetchAll($ask);
-			foreach ($result as $row)
-			{
-				$crews=$row->name;
-				echo "<option value='$crews'>$crews</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_artist_crew_field').innerHTML =  document.getElementById('new_artist_crew_field').innerHTML + newselect;
-			document.getElementById('total_artist_crews').value =  parseInt( document.getElementById('total_artist_crews').value) + 1;
-		}
-
-	</script>
-	<script type="text/javascript">
-
-		function add_crew_bbs_field()
-		{
-			var newselect = " <select name=\"add_crew_bbs[]\"" + document.getElementById('total_crew_bbses').value + "><option value=\"Unknown\">Unknown</option><?php
-
-			$ask="select name from bbses";
-			$result=fetchAll($ask);
-			foreach ($result as $row)
-			{
-				$crew_bbs=$row->name;
-				echo "<option value='$crew_bbs'>$crew_bbs</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_crew_bbs_field').innerHTML =  document.getElementById('new_crew_bbs_field').innerHTML + newselect;
-			document.getElementById('total_crew_bbses').value =  parseInt( document.getElementById('total_crew_bbses').value) + 1;
-		}
-	</script>
-</head>
-<body onload="add_artist_field(); add_crew_field(); add_artist_crew_field();">
-
-	<div class="maincontainer">
-		<div class="header">
-			<?php include ("header.php"); ?>
-		</div>
-		<div class="leftsidebar">
-			<?php include ("sidebar.php"); ?>
-		</div>
-		<div class="maincontent">
-			<div class="wrap">
-
-				<?php
-				if (is_logged_in())
-				{
 
 //---------------------------------------------------------------------------------------------------------------
 // CHECK UPLOADED APP
 //---------------------------------------------------------------------------------------------------------------
 
-					if(isset($_POST['app_author']))
-					{
-						$max_file_size=$_POST['max_file_size'];
-						$filesize = filesize($_FILES['uploaded_app']['tmp_name']);	
-						$name=$_POST['name'];
-						$app_author=$_POST['app_author'];
-						$year=$_POST['year'];
-						$month=$_POST['month'];
-						$type=$_POST['type'];
-						$now=time();
-						$name=cleanInsert($name);
-						$app_author=cleanInsert($app_author);
+			if(isset($_POST['app_author']))
+			{
+				$max_file_size=$_POST['max_file_size'];
+				$filesize = filesize($_FILES['uploaded_app']['tmp_name']);	
+				$name=$_POST['name'];
+				$app_author=$_POST['app_author'];
+				$year=$_POST['year'];
+				$month=$_POST['month'];
+				$type=$_POST['type'];
+				$now=time();
+				$name=cleanInsert($name);
+				$app_author=cleanInsert($app_author);
 
-						?>
-						<div class="headline">
-							Status
-						</div>
-						<div class="content_with_blenk">
-							Uploading ASCII app, hold on!
-						</div>	
-						<?php
-						if (file_exists("temp.diz"))
-						{
-							unlink ("temp.diz");
-						}
+				?>
+				<div class="headline">
+					Status
+				</div>
+				<div class="content_with_blenk">
+					Uploading ASCII app, hold on!
+				</div>	
+				<?php
+				if (file_exists("temp.diz"))
+				{
+					unlink ("temp.diz");
+				}
 
-						flush();
+				flush();
 		$allowed_filetypes = array('.lha','.LHA','.txt','.TXT','.dms','.DMS','.lzh','.LZH','.zip','.ZIP'); 	// allowed extensions
 		$upload_path = "apps/"; 												// upload dir
 
@@ -2553,28 +2465,33 @@ include_once "session.php";
 						</form>
 					</div>
 				</div>
-			</div>
+
+				<?php
+			}
+			else
+			{
+				?>
+				<div class="headline">
+					Please Login!
+				</div>					
+
+				<div class="content">
+					<br>You need to be logged in to use this feature.<br>
+					<a href=login.php>LOGiN.</a><br><br>
+				</div>
+				<?php
+			}
+			?>
 		</div>
 	</div>
-	<?php
-}
-else
-{
-	?>
-	<div class="headline">
-		Please Login!
-	</div>					
+</div>
+</div>
 
-	<div class="content">
-		<br>You need to be logged in to use this feature.<br>
-		<a href=login.php>LOGiN.</a><br><br>
-	</div>
-	<?php
-}
-?>
+<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+	<?php include "sidebar.php"; ?>
+</div>
+<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
+	<?php include "sidebar_right.php"; ?>
 </div>
 </div>
-</div>
-</body>
-</html>
-
+<?php include "footer.php"; ?>
