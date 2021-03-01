@@ -3,8 +3,6 @@ require_once "session.php";
 $h1 = "CREWS";
 require_once "header.php";
 
-?>
-	<?php
 
 //-----------------------------------------------------------------------------
 // CREW INFO
@@ -29,7 +27,6 @@ require_once "header.php";
 		$show_rating = round($show_rating, 2);
 
 		?>	
-		<div class="headline">
 			<?=$show_name?> 
 			<?php
 			if (isset($show_acronym))
@@ -37,36 +34,27 @@ require_once "header.php";
 				echo "[$show_acronym]";
 			}
 			?>
-		</div>
-		<div class="content_with_blenk"><br></div>
 
 		<?php
 		if (!empty($show_www))
 		{
 			?>
-			<div class="content_centered">
 				Webpage: <?=$show_www?>
-			</div>
 			<?php
 		}
 		if(!empty($how_contact))
 		{
 			?>
-			<div class="content_centered">
 				Contact: <?=$show_contact?>
-			</div>
 			<?php
 		}
 		if(!empty($how_active))
 		{
 			?>
-			<div class="content_centered">
 				Status: <?=$show_active?>
-			</div>
 			<?php
 		}
 		?>
-		<div class="content_centered">
 			Rating:
 			<?php
 			$ask_crew_rating="SELECT rating from crews where name=:showcrew";
@@ -106,7 +94,6 @@ require_once "header.php";
 				echo " $crewrating ($votecount votes)</td></tr>";
 			}
 		?>
-		</div>
 		<?php
 		$ask_members="SELECT COUNT(nick) AS count FROM member_of where crew=:showcrew";
 		$result_members=fetchAll($ask_members, [ 'showcrew' => $showcrew ]);
@@ -119,35 +106,22 @@ require_once "header.php";
 		$releases=$row_rels->count;				
 
 		?>
-		<div class="content_centered">
 			Members: <?=$members?>
-		</div>
 
-		<div class="content_centered">
 			Releases: <?=$releases?>
-		</div>
 
 		<?php
 	}
 	?>
 
-	<div class="headline">
 		Members
-	</div>
 
-	<div class="content_with_blenk"><br></div>
 	
-	<div style="clear: left; float: left; width: 170px; padding-left: 4px; padding-bottom: 2px; padding-top: 2px;"> 
 		<yellow>ARTiST</yellow>
-	</div>
 
-	<div style="float: left; width: 140px;">	
 		<yellow>RATiNG</yellow>
-	</div>
 
-	<div style="float: left; width: 350px;">	
 		<yellow>RELEASES</yellow>
-	</div>
 	
 	<?php
 	$ask="select nick from member_of where crew=:showcrew";
@@ -164,7 +138,6 @@ require_once "header.php";
 			$encoded_crewmember=base64_encode($crewmember);
 
 			?>
-			<div style="clear: left; float: left; width: 170px; padding-left: 4px; padding-bottom: 2px; padding-top: 2px;"> 
 				<a href="info_artist.php?artist=<?=$encoded_crewmember?>&sort_by=filename" /> <?=$crewmember?> 
 				<?php
 				if(!empty($membacronym))
@@ -173,9 +146,7 @@ require_once "header.php";
 				}
 				?>
 				</a>
-			</div>
 		
-			<div style="float: left; width: 140px;">	
 				<?php
 				$ask_artist_rating="SELECT rating FROM artists where nick=:crewmember";
 				$result_artist_rating=fetchAll($ask_artist_rating, [ 'crewmember' => $crewmember ]);
@@ -215,7 +186,6 @@ require_once "header.php";
 					echo "$artistrating ($votecount votes)";
 				}
 			?>
-			</div>	
 			<?php
 			$ask_memb_rels="SELECT COUNT(filename) AS count FROM author_of WHERE nick=:crewmember";
 			$result_memb_rels=fetchAll($ask_memb_rels, [ 'crewmember' => $crewmember ]);
@@ -224,9 +194,7 @@ require_once "header.php";
 				$membrels=$row_memb_rels->count;
 			}			
 			?>
-			<div style="float: left; width: 350px;">	
 				<?=$membrels?>
-			</div>
 			<?php
 		}
 	}
@@ -246,11 +214,7 @@ require_once "header.php";
 	if(!empty($bbscount))
 	{ 
 		?>
-		<div class="headline">
 			Boards
-		</div>
-
-		<div class="content_with_blenk"><br></div>
 
 		<?php
 		$ask="select name from bbs_of where crew=:showcrew";
@@ -283,13 +247,9 @@ require_once "header.php";
 				
 				?>
 
-				<div class="content">	
 					<white>Name: </white> <?=$name?> <white>Sysop: </white><?=$sysop?>
-				 </div>
 
-				<div class="content">	
 				  	<white>Address: </white><?=$address?> <white>Number: </white><?=$number?>
-				 </div>
 				
 				<?php
 			}
@@ -315,36 +275,24 @@ require_once "header.php";
 		$dirname = $dirname[0];
 		?>
 
-					<div class="maincontent">
-						<div class="headline">Latest Release</div>
-						<div class="content_with_blenk"><br></div>
+						Latest Release
 						<?php
 						if ($filename == "file_id.diz.png")
 						{
 							?>
-							<div class="release_file_id">
 							<a href="info_release.php?filename=<?=$encoded_filename?>"><img class="centered" border="0" src="collys/file_id.diz.png"></a>
-							</div>
 							<?php
 						}
 						else
 						{
 							?>	
-							<div class="release_file_id">
 								<a href="info_release.php?filename=<?=$encoded_filename?>"><img class="centered" border="0" src="collys/<?=$dirname?>/<?=$filename?>"></a>
-								<br>
-							</div>
 							<?php
 						}
 						?>
-						<div style="float: right; width: 266px;">
-						<div style="float: right; height: 16px; width: 265px;"></div>
 
-						<div class="release_div_left">
 							Artist(s):
-						</div>
 
-						<div class="release_div_right">
 						<?php
 							$authors = array();
 							$ask_author="select * from author_of where filename=:filename";
@@ -373,15 +321,10 @@ require_once "header.php";
 								$c++;
 							}
 						?>
-						</div>
 
-						<div class="content_slim_divider"></div>
 
-						<div class="release_div_left">
 							Crew:
-						</div>
 
-						<div class="release_div_right">							
 							<?php
 							$crews = array();
 							$ask_crew="select * from crew_of where filename=:filename";
@@ -410,35 +353,20 @@ require_once "header.php";
 								$c++;
 							}
 							?>
-						</div>
 
-						<div class="content_slim_divider"></div>
 				
-						<div class="release_div_left">
 							Filename:
-						</div>
 
-						<div class="release_div_right">
 								<a href="info_release.php?filename=<?=$encoded_filename?>"><?=$row->filename?></a>
-						</div>
 
-						<div class="content_slim_divider"></div>
 
-						<div class="release_div_left">
 							Size:
-						</div>
 								
-						<div class="release_div_right">
 							<?=$row->filesize?>
-						</div>
 
-						<div class="content_slim_divider"></div>
 
-						<div class="release_div_left">
 							Released:
-						</div>
 								
-						<div class="release_div_right">
 							<?php
 							if(!empty($prodday))
 							{
@@ -454,13 +382,9 @@ require_once "header.php";
 								echo "$year";
 							}
 							?>
-						</div>
 
-						<div class="content_slim_divider"></div>
 						
-						<div class="release_div_left">
 							Rating:
-						</div>
 								
 						<?php
 						$ask_collyrating="SELECT rating from collys where filename=:filename";
@@ -477,7 +401,6 @@ require_once "header.php";
 							$votecount=$row_votes->count;
 						}
 						?>
-						<div class="release_div_right">
 						<?php
 						if(empty($collyrating))
 						{
@@ -502,35 +425,20 @@ require_once "header.php";
 								echo "$collyrating ($votecount votes)";
 							}
 							?>
-						</div> 
 
-						<div class="content_slim_divider"></div>
 														
-						<div class="release_div_left">
 							Added by:
-						</div>
 								
-						<div class="release_div_right">									
 							<a href="members.php?user=<?=$uploader?>"><?=$uploader?></a>
-						</div>
 
-						<div class="content_slim_divider"></div>
 														
-						<div class="release_div_left">
 							Viewed:
-						</div>
 
-						<div class="release_div_right">
 							<?=$viewtimes?> times
-						</div>
 
-						<div class="content_slim_divider"></div>
 														
-						<div class="release_div_left">
 							Downloaded:
-						</div>
 								
-						<div class="release_div_right">
 							<?php
 							$ask="SELECT downloads from collys where filename=:filename";
 							$result=fetchAll($ask, [ 'filename' => $filename ]);
@@ -552,13 +460,10 @@ require_once "header.php";
 								echo "$downloads Times";
 							}
 							?>
-						</div>
 						
 						<?php
 						}
 					?>
-					</div>
-					</div>
 					<?php
 
 	$ask_check="SELECT a.*, b.nick AS author, c.crew FROM collys AS a INNER JOIN author_of AS b ON a.filename = b.filename INNER JOIN crew_of AS c ON a.filename = c.filename WHERE c.crew = :crew GROUP BY a.filename ORDER BY $sort_criteria ASC LIMIT 1";
@@ -569,7 +474,7 @@ require_once "header.php";
 		{
 			$encoded_crew=base64_encode($showcrew);
 			?>
-			<div class="headline">[ All <?=$show_acronym?> Releases ]                
+			[ All <?=$show_acronym?> Releases ]                
 				<yellow>Sort by:</yellow>
 				<a class="lightgreen" href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.name">Name</a>
 				<a class="lightgreen" href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.filename">Filename</a>
@@ -579,19 +484,12 @@ require_once "header.php";
 				<a class="lightgreen" href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.uploader">Uploader</a>
 			</div>
 
-		<div class="content_with_blenk"><br></div>
 
-		<div class="collyname">
 			NAME
-		</div>
 		
-		<div class="artist">			
 			FiLENAME
-		</div>
 	
-		<div class="artist">
 			ARTiST
-		</div>
 				
 		<?php
 		$ask="SELECT a.*, b.nick AS author, c.crew FROM collys AS a INNER JOIN author_of AS b ON a.filename = b.filename INNER JOIN crew_of AS c ON a.filename = c.filename WHERE c.crew = :showcrew GROUP BY a.filename ORDER BY $sort_criteria ASC";
@@ -606,23 +504,14 @@ require_once "header.php";
 
 			?>
 			
-			<div class="collyname">
 				<a href="info_release.php?filename=<?=$encoded_filename?>"><?=$name?></a>
-			</div>
 
-			<div class="artist">			
 				<a href="info_release.php?filename=<?=$encoded_filename?>"><?=$filename?></a>
-			</div>
 			
-			<div class="artist">			
 				<a href="info_artist.php?artist=<?=$encoded_author?>&sort_by=filename"><?=$author?></a>
-			</div>
 			<?php
 			}
 		}
 	}
 	?>
-</div>
-</body>
-</html>
 
