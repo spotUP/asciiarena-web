@@ -44,7 +44,7 @@ if (is_logged_in())
 					You have to make a signature before submitting!
 				</td>
 			</table>
-			<meta http-equiv='Refresh' content='2; url=crib.php>
+			<meta http-equiv="Refresh" content="2"; url="crib.php">
 			<?php
 			exit;
 		}
@@ -102,7 +102,7 @@ if (is_logged_in())
 
 		$_SESSION['nick'] = $changenick;
 		?>
-		<meta http-equiv="Refresh" content="0; url=crib.php">
+		<meta http-equiv="Refresh" content="2"; url="crib.php">
 		<?php
 	}
 	if(isset($_POST['changecrew']))
@@ -149,7 +149,7 @@ if (is_logged_in())
 		if(!checkEmail($mail)) 
 		{
 			?><table width="913px"><caption>FAILURE!</caption><tr><td>Error! You must enter a valid E-Mail adress!</td></tr></table><?php
-			?><meta http-equiv="Refresh" content="3; url=crib.php"><?php
+			?><meta http-equiv="Refresh" content="3"; url="crib.php"><?php
 			exit;
 		}
 		
@@ -194,7 +194,7 @@ if (is_logged_in())
 				The new passwords you entered doesn't match!	
 			</div>
 			
-			<meta http-equiv="Refresh" content="3; url=crib.php">
+			<meta http-equiv="Refresh" content="3"; url="crib.php">
 			<?php	
 			exit;		
 		}
@@ -217,7 +217,7 @@ if (is_logged_in())
 				The old password is wrong!
 			</div>
 			
-			<meta http-equiv="Refresh" content="3; url=crib.php">
+			<meta http-equiv="Refresh" content="3"; url="crib.php">
 			<?php	
 			exit;		
 		}
@@ -236,7 +236,7 @@ if (is_logged_in())
 			</div>
 			<?php
 			
-			?><meta http-equiv="Refresh" content="2; url=crib.php"><?php
+			?><meta http-equiv="Refresh" content="2"; url="crib.php"><?php
 			exit;
 		}
 
