@@ -58,8 +58,8 @@ $now = time();
 					$check_nick=$_POST['nick'];
 					$check_password=$_POST['password'];
 					$repeat_password=$_POST['repeat_password'];
-					$spam=$_POST['spam'] ?? '';
-					$mail=$_POST['mail'] ?? '';
+					$spam=$_POST['spam'];
+					$mail=$_POST['mail'];
 					$pwhash=md5($check_password);
 
 					if ($check_password == $check_nick)
@@ -90,7 +90,7 @@ $now = time();
 						exit;
 					}
 
-					$mail = trim($_POST['mail'] ?? '');  
+					$mail = trim($_POST['mail']);  
 					if(!checkEmail($mail)) 
 					{
 						?><table width="913px"><caption>FAILURE!</caption><tr><td>Error! You must enter a valid E-Mail adress!</td></tr></table><?php

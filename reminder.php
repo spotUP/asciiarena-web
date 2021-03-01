@@ -113,7 +113,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 			echo "<form action='$_SERVER[PHP_SELF]' method='post'>";
 			echo "<table width=\"913px\">";
 				echo "<tr><td colspan='3'><img class='centered' border='0' src='data/login.png'></td></tr>";
-				echo "<tr><td colspan='3'>&nbsp;</td></tr>";
+				echo "<tr><td colspan='3'></td></tr>";
 				if (isset($_POST['email']) && (!isset($mail))) 
 				{
 					echo "<tr><td align='center' width='165'>tHiS eMAiL aDDY dOESN'T eXiST iN tHE dATABASE!</td></td></tr>";
@@ -121,8 +121,8 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 				}
 				if (!isset($_POST['email']) && (!isset($_GET['newpassword']) && (!isset($_GET['sent']))))
 				{
-					echo "<tr><td width='260'>&nbsp;</td><td align='left' width='165'>mAIL aDDY:</td></td></tr>";
-					echo "<tr><td width='260'>&nbsp;</td><td align='left'><input type=\"text\" name=\"email\" id=\"email\" size=\"30\"></td><td align='left'><input type=\"submit\" value=\"Send Password!\"></td></tr>";
+					echo "<tr><td width='260'></td><td align='left' width='165'>mAIL aDDY:</td></td></tr>";
+					echo "<tr><td width='260'></td><td align='left'><input type=\"text\" name=\"email\" id=\"email\" size=\"30\"></td><td align='left'><input type=\"submit\" value=\"Send Password!\"></td></tr>";
 				}
 
 				if (isset($_GET['sent']))
@@ -149,8 +149,8 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 					if ($new_password == $temp_pw_hash)
 					{
 						echo "<tr><td width='460'align='center'>wELCOME bACK $nick, yOUR pASSWORD hAS bEEN rESET.</td></tr>";
-						echo "<tr><td width='260'>&nbsp;</td><td align='left' width='165'>eNTER nEW pASSWORD:</td></tr>";
-						echo "<tr><td width='260'>&nbsp;</td><td align='left'><input type=\"hidden\" name=\"nick\" value=\"$nick\"><input type=\"password\" name=\"new_user_password\" id=\"new_user_password\" size=\"30\"></td><td align='left'><input type=\"submit\" value=\"Send Password!\"></td></tr>";
+						echo "<tr><td width='260'></td><td align='left' width='165'>eNTER nEW pASSWORD:</td></tr>";
+						echo "<tr><td width='260'></td><td align='left'><input type=\"hidden\" name=\"nick\" value=\"$nick\"><input type=\"password\" name=\"new_user_password\" id=\"new_user_password\" size=\"30\"></td><td align='left'><input type=\"submit\" value=\"Send Password!\"></td></tr>";
 					}
 					else
 					{
