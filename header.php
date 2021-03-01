@@ -2,7 +2,7 @@
 header('Content-Type: text/html; charset=UTF-8');
 $logos = [];
 foreach(fetchAll("SELECT ascii FROM logos ORDER BY RAND() limit 10") as $logo) {
-	$logos[] = '<a href="/" class="logo ascii"><pre style="overflow: hidden;"><span class="magenta">' . utf8_encode(base64_decode($logo->ascii)) . '</span></pre></a>';
+	$logos[] = '<a href="/" class="logo ascii"><pre style="overflow: hidden;"><span class="magenta">' . $logo->ascii . '</span></pre></a>';
 }
 $stars1 = <<<EOD
 __/\__
@@ -100,7 +100,7 @@ EOD;
 		<a href="/" style="color: #fff" class="navbar-brand">aSCIIaRENA</a>
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
 		aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-		<span class="navbar-toggler-icon">M</span>
+		<span class="navbar-toggler-icon">mENU</span>
 	</button>
 	<div class="collapse navbar-collapse" id="navbarResponsive">
 		<ul class="navbar-nav">
