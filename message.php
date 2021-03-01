@@ -18,6 +18,7 @@ if (is_logged_in()) {
 //-----------------------------------------------------------------------------
 
 			if (isset($_POST[ 'postnewmessage' ]) && (isset($_GET[ 'post' ]))) {
+
 				$postername = $_user['nick'];
 				$posttomember = $_POST[ 'posttomember' ];
 				$postsubject = $_POST[ 'postsubject' ];
@@ -165,9 +166,10 @@ if (is_logged_in()) {
 
 			if (isset($_POST[ 'deletemessage' ])) {
 				$deleteid = ($_POST[ 'thread' ]);
+				$deletemsgid = ($_POST[ 'messid' ]);
 
-				$ask = $_db->prepare("delete from messages where thread=:deleteid and postedto=:nick");
-				$ask->execute(['deleteid' => $deleteid, 'nick' => $nick]);
+				$ask = $_db->prepare("delete from messages where thread=:deleteid and id=:messid");
+				$ask->execute(['deleteid' => $deleteid, 'messid' => $deletemsgid ]);
 			}
 
 //-----------------------------------------------------------------------------
@@ -194,7 +196,7 @@ if (is_logged_in()) {
 				$replymessage = $_GET[ 'replymessage' ] ?? 0;
 
 				?>
-				<form action="messages.php?post" method="post">
+				<form action="message.php?post" method="post">
 					<?php
 
 					foreach (fetchAll("SELECT * FROM messages WHERE id = :id", [

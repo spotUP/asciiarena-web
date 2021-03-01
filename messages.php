@@ -77,7 +77,7 @@ if (is_logged_in()) {
 
 				<?php
 
-				foreach (fetchAll("SELECT * FROM messages WHERE postedto = :nick GROUP BY thread", [":nick" => $_user[ "nick" ]]) as $row) {
+				foreach (fetchAll("SELECT * FROM messages WHERE postedto = :nick GROUP BY thread ORDER BY timestamp DESC", [":nick" => $_user[ "nick" ]]) as $row) {
 					$messid = $row->id;
 					$thread = $row->thread;
 					$messpostedto = $row->postedto;
