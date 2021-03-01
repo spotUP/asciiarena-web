@@ -13,11 +13,8 @@ if (is_logged_in())
 	{
 		$def_font=$_POST['def_font'];
 
-		$ask="update users set def_font='$def_font' where nick='$nick'";
-		mysql_query($ask,$dbh);
-
-		$ask="update users set def_fg_col='$def_fg_col' where nick='$nick'";
-		mysql_query($ask,$dbh);
+		$ask="update users set def_font=:def_font where nick=:nick";
+		doQuery($ask, [ 'def_font' => $def_font, 'nick' => $nick ] );
 	}
 
 	if(isset($_POST['set_def_fg_col']))
@@ -25,11 +22,11 @@ if (is_logged_in())
 		$def_bg_col=$_POST['set_def_bg_col'];
 		$def_fg_col=$_POST['set_def_fg_col'];
 
-		$ask="update users set def_bg_col='$def_bg_col' where nick='$nick'";
-		mysql_query($ask,$dbh);
+		$ask="update users set def_bg_col=:def_bg_col where nick=:nick";
+		doQuery($ask, [ 'def_bg_col' => $def_bg_col, 'nick' => $nick ]);
 
-		$ask="update users set def_fg_col='$def_fg_col' where nick='$nick'";
-		mysql_query($ask,$dbh);
+		$ask="update users set def_fg_col=:def_fg_col where nick=:nick";
+		doQuery($ask, [ 'def_fg_col' => $def_fg_col, 'nick' => $nick ]);
 	}
 	if(isset($_POST['setcolor']))
 	{
@@ -73,19 +70,19 @@ if (is_logged_in())
 
 		unlink("signatures/tempsignature.diz");
 
-		$ask="update users set signature='$filename' where nick='$nick'";
-		mysql_query($ask,$dbh);
+		$ask="update users set signature=:filename where nick=:nick";
+		doQuery($ask, [ 'filename' => $filename, 'nick' => $nick ]);
 
 		$sigdata=cleanInsertPost($sigdata);
-		$ask="update users set sigdata='$sigdata' where nick='$nick'";
-		mysql_query($ask,$dbh);
+		$ask="update users set sigdata=:sigdata where nick=:nick";
+		doQuery($ask,[ 'sigdata' => $sigdata, 'nick' => $nick ]);
 
 		$font=cleanInsert($font);
-		$ask="update users set forum_sig_font='$font' where nick='$nick'";
-		mysql_query($ask,$dbh);
+		$ask="update users set forum_sig_font=:font where nick=:nick";
+		doQuery($ask,[ 'font' => $font, 'nick' => $nick ]);
 
-		$ask="update users set forum_sig_color='$forum_sig_col' where nick='$nick'";
-		mysql_query($ask,$dbh);
+		$ask="update users set forum_sig_color=:forum_sig_col where nick=:nick";
+		doQuery($ask,[ 'forum_sig_col' => $forum_sig_col, 'nick' => $nick ]);
 	}
 
 	if(isset($_POST['changeuploadsignature']))
@@ -93,15 +90,15 @@ if (is_logged_in())
 		$upsig=$_POST['changeuploadsignature'];
 		$upsig=str_replace('\\',"&#92;",$upsig);
 
-		$ask="update users set upload_signature='$upsig' where nick='$nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set upload_signature=:upsig where nick=:nick";
+		doQuery($ask,[ 'upsig' => $upsig, 'nick' => $nick ]);	
 	}
 	
 	if(isset($_POST['changenick']))
 	{
 		$changenick=$_POST['changenick'];
-		$ask="update users set nick='$changenick' where nick='$nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set nick=:changenick where nick=:nick";
+		doQuery($ask,[ 'changenick' => $changenick, 'nick' => $nick ]);	
 
 		$_SESSION['nick'] = $changenick;
 		?>
@@ -111,38 +108,38 @@ if (is_logged_in())
 	if(isset($_POST['changecrew']))
 	{
 		$changecrew=$_POST['changecrew'];
-		$ask="update users set crew='$changecrew' where nick='$nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set crew=:changecrew where nick=:nick";
+		doQuery($ask,[ 'changecrew' => $changecrew, 'nick' => $nick ]);	
 	}
 	if(isset($_POST['changebyear']))
 	{
 		$changebyear=$_POST['changebyear'];
-		$ask="update users set byear=$changebyear where nick='$nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set byear=:changebyear where nick=:nick";
+		doQuery($ask,[ 'changeyear' => $changeyear, 'nick' => $nick ]);	
 	}
 	if(isset($_POST['changebmonth']))
 	{
 		$changebmonth=$_POST['changebmonth'];
-		$ask="update users set bmonth=$changebmonth where nick='$nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set bmonth=:changebmonth where nick=:nick";
+		doQuery($ask,[ 'changebmonth' => $changebmonth, 'nick' => $nick ]);	
 	}
 	if(isset($_POST['changebday']))
 	{
 		$changebday=$_POST['changebday'];
-		$ask="update users set bday=$changebday where nick='$nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set bday=:changebday where nick=:nick";
+		doQuery($ask,[ 'changebday' => $changebday, 'nick' => $nick ]);	
 	}
 	if(isset($_POST['changecountry']))
 	{
 		$changecountry=$_POST['changecountry'];
-		$ask="update users set country='$changecountry' where nick='$nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set country=:changecountry where nick=:nick";
+		doQuery($ask,[ 'changecountry' => $changecountry, 'nick' => $nick ]);	
 	}
 	if(isset($_POST['changemessenger']))
 	{
 		$changemessenger=$_POST['changemessenger'];
-		$ask="update users set messenger='$changemessenger' where nick='$nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set messenger=:changemessenger where nick=:nick";
+		doQuery($ask,[ 'changemessenger' => $changemessenger, 'nick' => $nick ]);	
 	}
 	if(isset($_POST['changemail']))
 	{
@@ -156,26 +153,26 @@ if (is_logged_in())
 			exit;
 		}
 		
-		$ask="update users set mail='$mail' where nick='$nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set mail=:mail where nick=:nick";
+		doQuery($ask,[ 'mail' => $mail, 'nick' => $nick ]);	
 	}
 	if(isset($_POST['display_mail']))
 	{
 		$display_mail=$_POST['display_mail'];
-		$ask="update users set display_mail='$display_mail' where nick='$nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set display_mail=:display_mail where nick=:nick";
+		doQuery($ask,[ 'display_mail' => $display_mail, 'nick' => $nick ]);	
 	}
 	if(isset($_POST['display_messenger']))
 	{
 		$display_messenger=$_POST['display_messenger'];
-		$ask="update users set display_messenger='$display_messenger' where nick='$nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set display_messenger=:display_messenger where nick=:nick";
+		doQuery($ask,[ 'display_messenger' => $display_messenger, 'nick' => $nick ]);	
 	}
 	if(isset($_POST['changelistviewmode']))
 	{
 		$changelistviewmode=$_POST['changelistviewmode'];
-		$ask="update users set list_view_mode='$changelistviewmode' where nick='$nick'";
-		mysql_query($ask,$dbh);	
+		$ask="update users set list_view_mode=:changelistviewmode where nick=:nick";
+		doQuery($ask,[ 'changelistviewmode' => $changelistviewmode, 'nick' => $nick ]);	
 	}		
 	if(isset($_POST['old_password']))
 	{
@@ -202,11 +199,11 @@ if (is_logged_in())
 			exit;		
 		}
 
-		$ask="select pwhash from users where nick='$nick'";
-		$result=mysql_query($ask);
-		while ($row=mysql_fetch_array($result))
+		$ask="select pwhash from users where nick=:nick";
+		$result=fetchAll($ask, [ 'nick' => $nick ]);
+		foreach($result as $row)
 		{
-			$pwhash=$row['pwhash'];		
+			$pwhash=$row->pwhash;		
 		}
 		
 		if ($pwhash != $old_password)
@@ -245,8 +242,8 @@ if (is_logged_in())
 
 		if ($pwhash == $old_password)
 		{
-			$ask="update users set pwhash='$new_password' where nick='$nick'";
-			mysql_query($ask,$dbh);	
+			$ask="update users set pwhash=:new_password where nick=:nick";
+			doQuery($ask,[ 'new_password' => $new_password, 'nick' => $nick ]);	
 			$password=$_POST['new_password'];
 			$_SESSION['password'] = $password;
 		}
@@ -315,8 +312,8 @@ if (is_logged_in())
 			imagedestroy($nybild); 		// free ram
 			imagedestroy($litenbild );
 
-			$fraga="update users set avatar='$filename' where nick='$nick'";
-			mysql_query($fraga,$dbh);
+			$fraga="update users set avatar=:filename where nick=:nick";
+			doQuery($fraga,[ 'filename' => $filename, 'nick' => $nick ]);
 		} 
 	}
 	
@@ -326,33 +323,33 @@ if (is_logged_in())
 	?>
 	<form enctype="multipart/form-data" action="crib.php" method="post">
 		<?php
-		$ask="select * from users where nick='$nick'";
-		$result=mysql_query($ask);
-		while ($row=mysql_fetch_array($result))
+		$ask="select * from users where nick=:nick";
+		$result=fetchAll($ask, [ 'nick' => $nick ]);
+		foreach($result as $row)
 		{
-			$show_nick=$row['nick'];
-			$show_crew=$row['crew'];
-			$show_byear=$row['byear'];
-			$show_bmonth=$row['bmonth'];
-			$show_bday=$row['bday'];
-			$show_country=$row['country'];
-			$show_avatar=$row['avatar'];
-			$show_messenger=$row['messenger'];
-			$show_mail=$row['mail'];
-			$show_webpage=$row['webpage'];		
-			$show_uploadsignature=$row['upload_signature'];
-			$base64=$row['sigbase64'];
-			$show_sigdata=$row['sigdata'];
+			$show_nick=$row->nick;
+			$show_crew=$row->crew;
+			$show_byear=$row->byear;
+			$show_bmonth=$row->bmonth;
+			$show_bday=$row->bday;
+			$show_country=$row->country;
+			$show_avatar=$row->avatar;
+			$show_messenger=$row->messenger;
+			$show_mail=$row->mail;
+			$show_webpage=$row->webpage;		
+			$show_uploadsignature=$row->upload_signature;
+			$base64=$row->sigbase64;
+			$show_sigdata=$row->sigdata;
 			$show_sigdata=fixOutputEdit($show_sigdata);
-			$show_viewmode=$row['list_view_mode'];
-			$def_bg_col=$row['def_bg_col'];
-			$def_fg_col=$row['def_fg_col'];
-			$show_image=$row['avatar'];
-			$show_display_mail=$row['display_mail'];
-			$show_display_messenger=$row['display_messenger'];
-			$sigfont=$row['forum_sig_font'];
-			$sigcolor=$row['forum_sig_color'];
-			$show_def_font=$row['def_font'];
+			$show_viewmode=$row->list_view_mode;
+			$def_bg_col=$row->def_bg_col;
+			$def_fg_col=$row->def_fg_col;
+			$show_image=$row->avatar;
+			$show_display_mail=$row->display_mail;
+			$show_display_messenger=$row->display_messenger;
+			$sigfont=$row->forum_sig_font;
+			$sigcolor=$row->forum_sig_color;
+			$show_def_font=$row->def_font;
 			?>
 			<div class="headline">
 				Userinfo
