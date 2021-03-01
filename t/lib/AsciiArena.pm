@@ -47,6 +47,9 @@ sub _build_ok {
 sub dump_output {
   $h->pump;
   do { note $out; undef $out; } if $out;
+  if ($err =~ m{error}i) {
+    fail('Error thrown');
+  }
   do { diag $err; undef $err; } if $err;
 }
 
