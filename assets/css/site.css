@@ -736,6 +736,7 @@ span.cyan
 {   
   color: rgb(0, 187, 187) !important;
   text-shadow: 1px 1px 10px rgba(0, 187, 187, 0.40) !important;
+  white-space: pre;
 }
 
 span.red
@@ -780,7 +781,7 @@ span.brown
 }
 
 
-span.grey
+.grey
 {   
   color: rgb(85, 85, 85) !important;
   text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
@@ -798,6 +799,7 @@ span.lightgrey
 {   
   color: rgb(255, 255, 255) !important;
   text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.40) !important;
+  white-space: pre;
 }
 
 span.lightcyan
@@ -813,7 +815,7 @@ span.lightgreen
 }
 
 
-.lightpink
+span.lightpink
 {   
   color: rgb(255, 85, 255) !important;
   text-shadow: 1px 1px 10px rgba(255, 85, 255, 0.40) !important;
@@ -873,6 +875,19 @@ a.ascii:hover{
 a.ascii:hover::before{
   content: initial !important;
 }
+
+a.grey
+{   
+  color: rgb(85, 85, 85) !important;
+  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
+}
+
+a.yellow
+{   
+  color: rgb(255,255,85);
+  text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.40)
+}
+
 .yellow
 {   
   color: rgb(255,255,85);
