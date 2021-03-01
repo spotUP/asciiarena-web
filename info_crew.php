@@ -1,27 +1,9 @@
-<?php'); ?>
+<?php
+require_once "session.php";
+$h1 = "CREWS";
+require_once "header.php";
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "https://www.w3.org/TR/html4/loose.dtd">
-<html>
-
-<head>
-	<title>ASCIIARENA brought to you by UP ROUGH SOUNDSYSTEM</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
-	<link rel='stylesheet' href='style.css' type='text/css'>
-	<meta name="viewport" content="width=device-width">
-</head>
-<body>
-
-<div class="maincontainer">
-	<div class="header">
-		<?php include ('header.php'); ?>
-	</div>
-
-	<div class="leftsidebar">
-		<?php include ('sidebar.php'); ?>
-	</div>
-
-	<div class="maincontent">
-	<div class="wrap">
+?>
 	<?php
 
 //-----------------------------------------------------------------------------
@@ -30,7 +12,6 @@
 
 	$showcrew=$_GET['crew'];
 	$showcrew=base64_decode($showcrew);
-	$showcrew=mysql_real_escape_string($showcrew); // get crew variable. (secure.)
 
 	$sort_criteria=$_GET['sort_by'];
 
@@ -146,9 +127,6 @@
 			Releases: <?=$releases?>
 		</div>
 
-		<div class="content">
-			&nbsp;
-		</div>
 		<?php
 	}
 	?>
@@ -314,10 +292,6 @@
 				<div class="content">	
 				  	<white>Address: </white><?=$address?> <white>Number: </white><?=$number?>
 				 </div>
-
-				<div class="content">
-					&nbsp;
-				</div>
 				
 				<?php
 			}
@@ -481,7 +455,6 @@
 							{
 								echo "$year";
 							}
-							echo "&nbsp;";
 							?>
 						</div>
 
@@ -583,9 +556,6 @@
 							?>
 						</div>
 						
-						<div class="content">
-							&nbsp;
-						</div>
 						<?php
 						}
 					?>
@@ -654,8 +624,6 @@
 		}
 	}
 	?>
-	</div>
-	</div>
 </div>
 </body>
 </html>
