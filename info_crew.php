@@ -10,15 +10,15 @@ require_once "header.php";
 // CREW INFO
 //-----------------------------------------------------------------------------
 
-	$showcrew=$_GET['crew'];
+	$showcrew=$_GET['crew'] ?? '';
 	$showcrew=base64_decode($showcrew);
 
-	$sort_criteria=$_GET['sort_by'];
+	$sort_criteria=$_GET['sort_by'] ?? 'a.name';
+    $sort_criteria=preg_replace('[^a-z.]','', $sort_criteria);
 
-
-	$ask="select * from crews where name='$showcrew'";
-	$result=mysql_query($ask);
-	while ($row=mysql_fetch_array($result))
+	$ask="select * from crews where name=:showcrew";
+	$result=fetchAll($ask, [ 'showcrew' => $showcrew ]);
+	foreach($result as $row)
 	{
 		$show_name=$row['name'];
 		$show_www=$row['www'];
@@ -69,9 +69,9 @@ require_once "header.php";
 		<div class="content_centered">
 			Rating:
 			<?php
-			$ask_crew_rating="SELECT rating from crews where name='$showcrew'";
-			$result_crew_rating=mysql_query($ask_crew_rating,$dbh);
-			while ($row_crew_rating=mysql_fetch_array($result_crew_rating))
+			$ask_crew_rating="SELECT rating from crews where name=:showcrew";
+			$result_crew_rating=fetchAll($ask_crew_rating, [ 'showcrew' => $showcrew ] );
+			foreach($result_crew_rating as $row_crew_rating)
 			{
 				$crewrating=$row_crew_rating[0];
 				$crewrating = round($crewrating, 2);
@@ -79,9 +79,9 @@ require_once "header.php";
 
 			if(empty($show_rating))
 			{
-				$askagain="SELECT COUNT(rating) from comments where crew='$showcrew'";
-				$resultagain=mysql_query($askagain,$dbh);
-				while ($rowagain=mysql_fetch_array($resultagain))
+				$askagain="SELECT COUNT(rating) from comments where crew=:showcrew";
+				$resultagain=fetchAll($askagain, [ 'showcrew' => $showcrew ]);
+				foreach($resultagain as $rowagain)
 				{
 					$votecount=$rowagain[0];
 				}
@@ -97,9 +97,9 @@ require_once "header.php";
 			}
 			else
 			{
-				$ask_crew_rating="SELECT COUNT(rating) from comments where crew='$showcrew'";
-				$result_crew_rating=mysql_query($ask_crew_rating,$dbh);
-				while ($row_crew_rating=mysql_fetch_array($result_crew_rating))
+				$ask_crew_rating="SELECT COUNT(rating) from comments where crew=:showcrew";
+				$result_crew_rating=fetchAll($ask_crew_rating, [ 'showcrew' => $showcrew ]);
+				foreach($result_crew_rating as $row_crew_rating)
 				{
 					$votecount=$row_crew_rating[0];
 				}
@@ -108,14 +108,14 @@ require_once "header.php";
 		?>
 		</div>
 		<?php
-		$ask_members="SELECT COUNT(nick) FROM member_of where crew='$showcrew'";
-		$result_members=mysql_query($ask_members,$dbh);
-		while ($row_members=mysql_fetch_array($result_members))
+		$ask_members="SELECT COUNT(nick) FROM member_of where crew=:showcrew";
+		$result_members=fetchAll($ask_members, [ 'showcrew' => $showcrew ]);
+		foreach($result_members as $row_members)
 		$members=$row_members[0];					
 
-		$ask_rels="SELECT COUNT(filename) FROM crew_of where crew='$showcrew'";
-		$result_rels=mysql_query($ask_rels,$dbh);
-		while ($row_rels=mysql_fetch_array($result_rels))
+		$ask_rels="SELECT COUNT(filename) FROM crew_of where crew=:showcrew";
+		$result_rels=fetchAll($ask_rels, [ 'showcrew' => $showcrew ]);
+		foreach($result_rels as $row_rels)
 		$releases=$row_rels[0];				
 
 		?>
@@ -150,15 +150,15 @@ require_once "header.php";
 	</div>
 	
 	<?php
-	$ask="select nick from member_of where crew='$showcrew'";
-	$result=mysql_query($ask,$dbh);
-	while ($row=mysql_fetch_array($result))
+	$ask="select nick from member_of where crew=:showcrew";
+	$result=fetchAll($ask, [ 'showcrew' => $showcrew ]);
+	foreach($result as $row)
 	{
 		$crewmember=$row[0];
 		
-		$ask_memb="SELECT acronym FROM artists WHERE nick='$crewmember'";
-		$result_memb=mysql_query($ask_memb,$dbh);
-		while ($row_memb=mysql_fetch_array($result_memb))
+		$ask_memb="SELECT acronym FROM artists WHERE nick=:crewmember";
+		$result_memb=fetchAll($ask_memb, [ 'crewmember' => $crewmember ]);
+		foreach($result_memb as $row_memb)
 		{
 			$membacronym=$row_memb['acronym'];
 			$encoded_crewmember=base64_encode($crewmember);
@@ -177,9 +177,9 @@ require_once "header.php";
 		
 			<div style="float: left; width: 140px;">	
 				<?php
-				$ask_artist_rating="SELECT rating FROM artists where nick='$crewmember'";
-				$result_artist_rating=mysql_query($ask_artist_rating,$dbh);
-				while ($row_artist_rating=mysql_fetch_array($result_artist_rating))
+				$ask_artist_rating="SELECT rating FROM artists where nick=:crewmember";
+				$result_artist_rating=fetchAll($ask_artist_rating, [ 'crewmember' => $crewmember ]);
+				foreach($result_artist_rating as $row_artist_rating)
 				{
 					$artistrating=$row_artist_rating[0];
 					$artistrating = round($artistrating, 2);
@@ -187,9 +187,9 @@ require_once "header.php";
 
 				if(empty($artistrating))
 				{
-					$askagain="SELECT COUNT(rating) from comments where artist='$crewmember'";
-					$resultagain=mysql_query($askagain,$dbh);
-					while ($rowagain=mysql_fetch_array($resultagain))
+					$askagain="SELECT COUNT(rating) from comments where artist=:crewmember";
+					$resultagain=fetchAll($askagain, [ 'crewmember' => $crewmember ]);
+					foreach($resultagain as $rowagain)
 					{
 						$votecount=$rowagain[0];
 					}
@@ -206,9 +206,9 @@ require_once "header.php";
 				}
 				else
 				{
-					$askagain="SELECT COUNT(rating) from comments where artist='$crewmember'";
-					$resultagain=mysql_query($askagain,$dbh);
-					while ($rowagain=mysql_fetch_array($resultagain))
+					$askagain="SELECT COUNT(rating) from comments where artist=:crewmember";
+					$resultagain=fetchAll($askagain, [ 'crewmember' => $crewmember ]);
+					foreach($resultagain as $rowagain)
 					{
 						$votecount=$rowagain[0];
 					}
@@ -217,9 +217,9 @@ require_once "header.php";
 			?>
 			</div>	
 			<?php
-			$ask_memb_rels="SELECT COUNT(filename) FROM author_of WHERE nick='$crewmember'";
-			$result_memb_rels=mysql_query($ask_memb_rels,$dbh);
-			while ($row_memb_rels=mysql_fetch_array($result_memb_rels))
+			$ask_memb_rels="SELECT COUNT(filename) FROM author_of WHERE nick=:crewmember";
+			$result_memb_rels=fetchAll($ask_memb_rels, [ 'crewmember' => $crewmember ]);
+			foreach($result_memb_rels as $row_memb_rels)
 			{
 				$membrels=$row_memb_rels[0];
 			}			
@@ -237,9 +237,9 @@ require_once "header.php";
 <!-- ----------------------------------------------------------------------------- -->
 
 	<?php
-	$ask_bbs="select name from bbs_of where crew='$showcrew'";
-	$result_bbs=mysql_query($ask_bbs,$dbh);
-	while ($row_bbs=mysql_fetch_array($result_bbs))
+	$ask_bbs="select name from bbs_of where crew=:showcrew";
+	$result_bbs=fetchAll($ask_bbs, [ 'showcrew' => $showcrew ]);
+	foreach($result_bbs as $row_bbs)
 	{
 		$bbscount=$row_bbs[0];
 	}
@@ -253,15 +253,15 @@ require_once "header.php";
 		<div class="content_with_blenk"><br></div>
 
 		<?	
-		$ask="select name from bbs_of where crew='$showcrew'";
-		$result=mysql_query($ask,$dbh);
-		while ($row=mysql_fetch_array($result))
+		$ask="select name from bbs_of where crew=:showcrew";
+		$result=fetchAll($ask, [ 'showcrew' => $showcrew ]);
+		foreach($result as $row)
 		{
 			$bbs_name=$row[0];	
 	
-			$ask_bbs="select * from bbses where name='$bbs_name'";
-			$result_bbs=mysql_query($ask_bbs,$dbh);
-			while ($row_bbs=mysql_fetch_array($result_bbs))
+			$ask_bbs="select * from bbses where name=:bbs_name";
+			$result_bbs=fetchAll($ask_bbs, [ 'bbs_name' => $bbs_name ]);
+			foreach($result_bbs as $row_bbs)
 			{
 				$name=$row_bbs[0];	
 				$sysop=$row_bbs[1];	
@@ -303,9 +303,9 @@ require_once "header.php";
 // LATEST FILE_ID
 //-----------------------------------------------------------------------------
 
-	$ask="SELECT a.*, b.nick AS author, c.crew FROM collys AS a INNER JOIN author_of AS b ON a.filename = b.filename INNER JOIN crew_of AS c ON a.filename = c.filename WHERE c.crew = '$showcrew' GROUP BY a.filename ORDER BY a.year DESC, a.month DESC, a.day DESC LIMIT 1";
-	$result=mysql_query($ask,$dbh);
-	while ($row=mysql_fetch_array($result))
+	$ask="SELECT a.*, b.nick AS author, c.crew FROM collys AS a INNER JOIN author_of AS b ON a.filename = b.filename INNER JOIN crew_of AS c ON a.filename = c.filename WHERE c.crew = :showcrew GROUP BY a.filename ORDER BY a.year DESC, a.month DESC, a.day DESC LIMIT 1";
+	$result=fetchAll($ask, [ 'showcrew' => $showcrew ]);
+	foreach($result as $row)
 	{
 		$crew = $row['crew'];
 		$viewtimes = $row['view_counter'];
@@ -349,9 +349,9 @@ require_once "header.php";
 						<div class="release_div_right">
 						<?php
 							$authors = array();
-							$ask_author="select * from author_of where filename='$filename'";
-							$result_author=mysql_query($ask_author,$dbh);
-							while ($row_author=mysql_fetch_array($result_author)) 
+							$ask_author="select * from author_of where filename=:filename";
+							$result_author=fetchAll($ask_author, [ 'filename' => $filename ]);
+							foreach($result_author as $row_author) 
 							{
 								$authors[]=$row_author[0];
 							}
@@ -386,9 +386,9 @@ require_once "header.php";
 						<div class="release_div_right">							
 							<?php
 							$crews = array();
-							$ask_crew="select * from crew_of where filename='$filename'";
-							$result_crew=mysql_query($ask_crew,$dbh);
-							while ($row_crew=mysql_fetch_array($result_crew)) 
+							$ask_crew="select * from crew_of where filename=:filename";
+							$result_crew=fetchAll($ask_crew, [ 'filename' => $filename ]);
+							foreach($result_crew as $row_crew) 
 							{
 								$crews[]=$row_crew[0];
 							}
@@ -465,16 +465,16 @@ require_once "header.php";
 						</div>
 								
 						<?php
-						$ask_collyrating="SELECT rating from collys where filename='$filename'";
-						$result_collyrating=mysql_query($ask_collyrating,$dbh);
-						while ($row_collyrating=mysql_fetch_array($result_collyrating))
+						$ask_collyrating="SELECT rating from collys where filename=:filename";
+						$result_collyrating=fetchAll($ask_collyrating, [ 'filename' => $filename ]);
+						foreach($result_collyrating as $row_collyrating)
 						{
 							$collyrating=$row_collyrating[0];
 						}
 
-						$ask_votes="SELECT COUNT(rating) from comments where filename='$filename'";
-						$result_votes=mysql_query($ask_votes,$dbh);
-						while ($row_votes=mysql_fetch_array($result_votes))
+						$ask_votes="SELECT COUNT(rating) from comments where filename=:filename";
+						$result_votes=fetchAll($ask_votes, [ 'filename' => $filename ]);
+						foreach($result_votes as $row_votes)
 						{
 							$votecount=$row_votes[0];
 						}
@@ -483,9 +483,9 @@ require_once "header.php";
 						<?php
 						if(empty($collyrating))
 						{
-							$askagain="SELECT COUNT(rating) from comments where filename='$filename'";
-							$resultagain=mysql_query($askagain,$dbh);
-							while ($rowagain=mysql_fetch_array($resultagain))
+							$askagain="SELECT COUNT(rating) from comments where filename=:filename";
+							$resultagain=fetchAll($askagain, [ 'filename' => $filename ]);
+							foreach($resultagain as $rowagain)
 							{
 								$votecount=$rowagain[0];
 								$votesleft=(3-$votecount);
@@ -534,9 +534,9 @@ require_once "header.php";
 								
 						<div class="release_div_right">
 							<?php
-							$ask="SELECT downloads from collys where filename='$filename'";
-							$result=mysql_query($ask,$dbh);
-							while ($row=mysql_fetch_array($result))
+							$ask="SELECT downloads from collys where filename=:filename";
+							$result=fetchAll($ask, [ 'filename' => $filename ]);
+							foreach($result as $row)
 							{
 								$downloads=$row[0];
 							}
@@ -563,9 +563,9 @@ require_once "header.php";
 					</div>
 					<?php
 
-	$ask_check="SELECT a.*, b.nick AS author, c.crew FROM collys AS a INNER JOIN author_of AS b ON a.filename = b.filename INNER JOIN crew_of AS c ON a.filename = c.filename WHERE c.crew = '$crew' GROUP BY a.filename ORDER BY $sort_criteria ASC LIMIT 1";
-	$result_check=mysql_query($ask_check,$dbh);
-	while ($row_check=mysql_fetch_array($result_check))
+	$ask_check="SELECT a.*, b.nick AS author, c.crew FROM collys AS a INNER JOIN author_of AS b ON a.filename = b.filename INNER JOIN crew_of AS c ON a.filename = c.filename WHERE c.crew = :crew GROUP BY a.filename ORDER BY $sort_criteria ASC LIMIT 1";
+	$result_check=fetchAll($ask_check, [ 'crew' => $showcrew ]);
+	foreach($result_check as $row_check)
 	{
 		if(!empty($row_check['filename']))
 		{
@@ -596,9 +596,9 @@ require_once "header.php";
 		</div>
 				
 		<?php
-		$ask="SELECT a.*, b.nick AS author, c.crew FROM collys AS a INNER JOIN author_of AS b ON a.filename = b.filename INNER JOIN crew_of AS c ON a.filename = c.filename WHERE c.crew = '$showcrew' GROUP BY a.filename ORDER BY $sort_criteria ASC";
-		$result=mysql_query($ask,$dbh);
-		while ($row=mysql_fetch_array($result))
+		$ask="SELECT a.*, b.nick AS author, c.crew FROM collys AS a INNER JOIN author_of AS b ON a.filename = b.filename INNER JOIN crew_of AS c ON a.filename = c.filename WHERE c.crew = :showcrew GROUP BY a.filename ORDER BY $sort_criteria ASC";
+		$result=fetchAll($ask, [ 'showcrew' => $showcrew ]);
+		foreach($result as $row)
 		{
 			$author=$row['author'];
 			$encoded_author=base64_encode($author);
