@@ -1118,7 +1118,7 @@ include "header.php";
 				$result=fetchAll($ask);
 				foreach ($result as $row)
 				{
-					$colly_author=$row[0];
+					$colly_author=$row->nick;
 					echo "<select name=\"old_colly_authors[]\">"; 
 					echo "<option selected=\"selected\">$colly_author</option>";
 					echo "<option value='Delete'>Remove Author</option>";
