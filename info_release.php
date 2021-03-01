@@ -79,7 +79,7 @@ require_once "header.php"; ?>
 			exit;
 		}
 
-		if ((isset($_POST[ 'add_comment' ]) || (isset($_POST[ 'Delete' ])))) {
+		if (isset($_POST[ 'add_comment' ]) || (isset($_POST[ 'Delete' ]))) {
 			$crew = $_POST[ 'crew' ];
 			$crew = cleanInsert($crew);
 
@@ -91,7 +91,7 @@ require_once "header.php"; ?>
 
 			$ask = "SELECT crew from crew_of where filename=:filename";
 			$result = fetchOne($ask, [ filename => $filename ]);
-			while ($row = mysql_fetch_array($result)) {
+			if ($row = $result) {
 				$crew = $row->crew;
 			}
 
@@ -136,41 +136,41 @@ require_once "header.php"; ?>
 // CALCULATE RATING FOR COLLY
 //----------------------------------------------------------------------------------------------
 
-			$ask_rate_amount = "SELECT COUNT(rating) from comments where filename='$filename' and rating>0";
-			$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
-			while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) {
-				$rate_amount = $row_rate_amount[ 0 ];
+			$ask_rate_amount = "SELECT COUNT(rating) AS count from comments where filename=:filename and rating>0";
+			$result_rate_amount = fetchOne($ask_rate_amount, [ 'filename' => $filename ]);
+			if ($row_rate_amount = $result_rate_amount) {
+				$rate_amount = $row_rate_amount->count;
 			}
 
 			if ($rate_amount > 2) {
-				$ask = "select avg(rating) from comments where filename='$filename' and rating>0";
-				$result = mysql_query($ask, $dbh);
-				while ($row = mysql_fetch_array($result)) {
-					$avgrating = $row[ 0 ];
+				$ask = "select avg(rating) AS avg from comments where filename=:filename and rating>0";
+				$result = fetchOne($ask, [ 'filename' => $filename ]);
+				if ($row = $result) {
+					$avgrating = $row->avg;
 				}
 
-				$ask = "update collys set rating=$avgrating where filename='$filename'";
-				mysql_query($ask, $dbh);
+				$ask = "update collys set rating=:avgrating where filename=:filename";
+				doQuery($ask, [ 'filename' => $filename, 'avgrating' => $avgrating ]);
 			}
 
 //----------------------------------------------------------------------------------------------
 // CALCULATE RATING FOR CREW
 //----------------------------------------------------------------------------------------------
 
-			$ask_rate_amount = "SELECT COUNT(rating) from comments where crew='$crew' and rating>0";
-			$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
-			while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) {
-				$rate_amount = $row_rate_amount[ 0 ];
+			$ask_rate_amount = "SELECT COUNT(rating) AS count from comments where crew=:crew and rating>0";
+			$result_rate_amount = fetchOne($ask_rate_amount, [ 'crew' => $crew ]);
+			if ($row_rate_amount = $result_rate_amount) {
+				$rate_amount = $row_rate_amount->count;
 			}
 			if ($rate_amount > 2) {
-				$ask = "select avg(rating) from comments where crew='$crew' and rating>0";
-				$result = mysql_query($ask, $dbh);
-				while ($row = mysql_fetch_array($result)) {
-					$avgcrewrating = $row[ 0 ];
+				$ask = "select avg(rating) AS avg from comments where crew=:crew and rating>0";
+				$result = fetchOne($ask, [ 'crew' => $crew ]);
+				if ($row = $result) {
+					$avgcrewrating = $row->avg;
 				}
 
-				$ask = "update crews set rating=$avgcrewrating where name='$crew'";
-				mysql_query($ask, $dbh);
+				$ask = "update crews set rating=:avgcrewrating where name=:crew";
+				doQuery($ask, [ 'crew' => $crew, 'avgcrewrating' => $avgcrewrating ]);
 			}
 
 //----------------------------------------------------------------------------------------------
