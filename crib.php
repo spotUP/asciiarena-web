@@ -664,66 +664,6 @@ if (is_logged_in())
 			</form>	
 			<?php
 		}
-
-//-----------------------------------------------------------------------------
-// FORUM SIGNATURE SETTINGS
-//-----------------------------------------------------------------------------
-		if (!isset ($changenick))
-		{
-			?>
-			<form name="signatureeditor" action="crib.php" method="post">
-
-				<div class="headline">
-					Edit your forum signature.
-				</div>
-
-				<div class="content_with_blenk"><br></div>
-
-				<div class="content">
-					<textarea name="signature" id="signature" wrap="physical" cols="80" rows="12" onKeyDown="textCounter(this.form.signature,this.form.remLen,960);" onKeyUp="textCounter(this.form.signature,this.form.remLen,960);"><?=$show_sigdata?></textarea>
-					<input readonly type="text" name="remLen" size="3" maxlength="3" value="960"> characters left</font>
-					Font
-					<select name='font'>
-						<?php
-						echo "<option selected='selected'>$sigfont</option>";
-						if ($sigfont!="topaz")			
-							echo "<option value='topaz'>Topaz</option>";
-						if ($sigfont!="microknight")			
-							echo "<option value='microknight'>MicroKnight</option>";
-						if ($sigfont!="mosoul")			
-							echo "<option value='mosoul'>mO'sOul</option>";
-						if ($sigfont!="pot-noodle")			
-							echo "<option value='pot-noodle'>P0T-NOoDLE</option>";
-						?>
-					</select>
-					Color
-					<select name="setcolor">
-						<option selected="selected" value="<?=$sigcolor?>" /><?=$fg_color_list["$sigcolor"]?></option>
-						<option class='black' value="0,0,0">Black</option>
-						<option class='darkblue' value="0,0,170">Dark Blue</option>
-						<option class='darkgreen' value="0,170,0">Dark Green</option>
-						<option class='darkcyan' value="0,170,170">Dark Cyan</option>
-						<option class='darkred' value="170,0,0">Dark Red</option>
-						<option class='magenta' value="170,0,170">Magenta</option>
-						<option class='brown' value="170,85,0">Brown</option>
-						<option class='darkgrey' value="85,85,85">Dark Grey</option>
-						<option class='grey' value="170,170,170">Grey</option>
-						<option class='blue' value="85,85,255">Blue</option>
-						<option class='green' value="85,255,85">Green</option>
-						<option class='cyan' value="85,85,255">Cyan</option>
-						<option class='red' value="255,85,85">Red</option>
-						<option class='magenta' value="255,85,255">Magenta</option>
-						<option class='yellow' value="255,255,85">Yellow</option>
-						<option class='white' value="255,255,255">White</option>
-					</select><input type="submit" value="Submit!">
-				</div>
-
-			</form>
-			<script type="text/javascript">
-				document.getElementById('signature').focus();
-			</script>
-			<?php
-		}
 	}
 	else
 	{
