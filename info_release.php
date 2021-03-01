@@ -83,16 +83,16 @@ require_once "header.php"; ?>
 			$crew = $_POST[ 'crew' ];
 			$crew = cleanInsert($crew);
 
-			$ask = "SELECT nick from author_of where filename='$filename'";
-			$result = mysql_query($ask, $dbh);
-			while ($row = mysql_fetch_array($result)) {
-				$artist = $row[ 0 ];
+			$ask = "SELECT nick from author_of where filename=:filename";
+			$result = fetchOne($ask, [ filename => $filename ]);
+			if ($result) {
+				$artist = $row->nick;
 			}
 
-			$ask = "SELECT crew from crew_of where filename='$filename'";
-			$result = mysql_query($ask, $dbh);
+			$ask = "SELECT crew from crew_of where filename=:filename";
+			$result = fetchOne($ask, [ filename => $filename ]);
 			while ($row = mysql_fetch_array($result)) {
-				$crew = $row[ 0 ];
+				$crew = $row->crew;
 			}
 
 //----------------------------------------------------------------------------------------------
@@ -107,27 +107,29 @@ require_once "header.php"; ?>
 					$comment = cleanInsertPost($comment);
 				}
 
-				$ask = "select nick from author_of where filename='$filename'";
-				$result = mysql_query($ask, $dbh);
-				while ($row = mysql_fetch_array($result)) {
-					$artist = $row[ 'nick' ];
+				$ask = "select nick from author_of where filename=:filename";
+				$row = fetchOne($ask, [ filename => $filename ]);
+				if ($row) {
+					$artist = $row->nick;
 				}
 
-				$ask_crew = "select crew from crew_of where filename='$filename'";
-				$result_crew = mysql_query($ask_crew, $dbh);
-				while ($row_crew = mysql_fetch_array($result_crew)) {
-					$commentcrew = $row_crew[ 'crew' ];
+				$ask_crew = "select crew from crew_of where filename=:filename";
+				$row_crew = fetchOne($ask, [ filename => $filename ]);
+				if ($row_crew) {
+					$commentcrew = $row_crew->crew;
 				}
 
-				if (empty($user_added_rating)) {
-					$ask = "insert into comments values (0,'$filename','$commentcrew','$artist','$comment',(null),'$nick',$time,1)";
-					mysql_query($ask, $dbh);
-					echo "<meta http-equiv='Refresh' content='0; url=$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
-				} else {
-					$ask = "insert into comments values (0,'$filename','$commentcrew','$artist','$comment',$user_added_rating,'$nick',$time,1)";
-					mysql_query($ask, $dbh);
-					echo "<meta http-equiv='Refresh' content='0; url=$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
-				}
+    			$ask = "insert into comments values (0,:filename,:commentcrew,:artist,:comment, :user_added_rating, :nick, :time,1)";
+				doQuery($ask, [
+				  'filename' => $filename,
+				  'commentcrew' => $commentcrew,
+				  'artist' => $artist,
+				  'comment' => $comment,
+				  'nick' => $nick,
+				  'time' => $time,
+				  'user_added_rating' => $user_added_rating, # might be empty, should end up as NULL
+				]);
+				echo "<meta http-equiv='Refresh' content='0; url=$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
 			}
 
 //----------------------------------------------------------------------------------------------
