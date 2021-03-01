@@ -2,16 +2,8 @@
 header('Content-Type: text/html; charset=UTF-8');
 $logos = [];
 foreach(fetchAll("SELECT ascii FROM logos ORDER BY RAND() limit 10") as $logo) {
-	$logos[] = '<a href="/" class="logo ascii"><pre style="overflow: hidden;"><span class="magenta">' . $logo->ascii . '</span></pre></a>';
+	$logos[] = '<a href="/" class="logo ascii"><pre style="overflow: hidden;"><span class="magenta">' . utf8_encode($logo->ascii) . '</span></pre></a>';
 }
-
-// Try to convert it to UTF-8
-$logo->ascii = iconv('ISO-8859-1', 'UTF-8', $latin1Str);
-
-// Output both
-var_dump($latin1Str);
-var_dump($utf8Str);
-
 $stars1 = <<<EOD
 __/\__
 \    / __/\__
