@@ -73,17 +73,10 @@ include "header.php";
 		if(isset($_POST['delete_sitelogo']) && is_admin())
 		{
 			$delete_sitelogo=$_POST['getsitelogo'];
-			$delete_sitelogo=cleanInsert($delete_sitelogo);
-
-			$logo_filename=$_POST['getsitelogo'];
-			$logo_filename=cleanInsert($logo_filename);
-
-			$logo_filename=addslashes($logo_filename);
-			unlink("logos/$logo_filename");
 
 			if(!empty($delete_sitelogo))
 			{
-				$ask="delete from logos where filename=:delete_sitelogo";
+				$ask="delete from logos where logo_id=:delete_sitelogo";
 				doQuery($ask, [':delete_sitelogo' => $delete_sitelogo]);
 			}
 			?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
@@ -987,11 +980,12 @@ include "header.php";
 // EDIT COLLY FIELD
 //--------------------------------------------------------------------------------
 
+    $getcollyname=$_POST['getcollyname'];
 	if(isset($_POST['getcollyname']) && (!isset($_POST['do_edit_colly'])))
 	{
-		$getcollyname=$_POST['getcollyname'];
+		error_log($getcollyname);
 		$getcollyname=cleanInsert($getcollyname);
-		
+		error_log($getcollyname);
 		$ask="select * from collys where filename=:getcollyname";
 		$result=doQuery($ask, [ ':getcollyname' => $getcollyname]);
 		foreach ($result as $row)
@@ -1730,12 +1724,12 @@ if(isset($_POST['getartist']) && is_admin())
 				$getsitelogo=$_POST['getsitelogo'];
 				$getsitelogo=cleanInsert($getsitelogo);
 
-				$ask="select * from logos where filename=:getsitelogo";
+				$ask="select * from logos where logo_id=:getsitelogo";
 				$result=fetchAll($ask, [':getsitelogo' => $getsitelogo]);
 				foreach ($result as $row)
 				{
-					$filename=$row->logo_id;
-					$logo_image="<img class=\"centered\" border=\"0\" src=logos/$filename>";
+					$logo_id=$row->logo_id;
+					$logo_image="<img class=\"centered\" border=\"0\" src=logos/$logo_id>";
 				}
 			}
 
@@ -1753,11 +1747,11 @@ if(isset($_POST['getartist']) && is_admin())
 							echo "<option selected=\"selected\">$getsitelogo</option>";
 						}
 
-						$ask="select filename from logos";
+						$ask="select logo_id from logos";
 						$result=fetchAll($ask);
 						foreach ($result as $row)
 						{
-							$show_all_site_logos=$row->filename;
+							$show_all_site_logos=$row->logo_id;
 							echo "<option>$show_all_site_logos</option>";
 						}
 						?>
@@ -1770,11 +1764,11 @@ if(isset($_POST['getartist']) && is_admin())
 			if (isset($_POST['edit_sitelogo']))
 			{
 				$editsitelogo=$_POST['getsitelogo'];
-				$ask="select * from logos where filename=:editsitelogo";
+				$ask="select * from logos where logo_id=:editsitelogo";
 				$result=fetchAll($ask, [ ':editsitelogo' => $editsitelogo]);
 				foreach ($result as $row)
 				{
-					$filename = $row->filename;
+					$logo_id = $row->logo_id;
 					$author   = $row->author;
 					$ascii    = $row->ascii;
 					$base64   = $row->base64;
