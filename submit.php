@@ -365,20 +365,23 @@ include_once "session.php";
 					file_put_contents("./apps/temp.diz", "$name by $mag_author");
 					load_ansi("apps/temp.diz","apps/$filename.diz","mosoul","transparent",0);
 				}
+				$file_status = 'Legal';
 				if(isset($_POST['edit_file_status']))
 				{
 					$file_status=$_POST['edit_file_status'];
-
-					$filename=mysql_real_escape_string($filename);
-					$ask="insert into apps values ('$name','$filename',0,$now,'$app_author',$filesize,'$filename.diz.png',0,(null),'$nick','$file_id_date','$file_status')";
-					mysql_query($ask,$dbh);
-				}
-				else
-				{
-					$filename=mysql_real_escape_string($filename);
-					$ask="insert into apps values ('$name','$filename',0,$now,'$app_author',$filesize,'$filename.diz.png',0,(null),'$nick','$file_id_date','Legal')";
-					mysql_query($ask,$dbh);
-				}
+                }
+    			$ask="INSERT INTO apps values (:name,:filename,0,:now,:app_author,:filesize,:filename,0,(null),:nick,:file_id_date,:file_status)";
+			    doQuery($ask, [
+					  'name'         => $name,
+					  'filename'     => $filename,
+					  'now'          => $now,
+					  'app_author'   => $app_author,
+					  'filesize'     => $filesize,
+					  'filename'     => "$filename.diz.png",
+					  'nick'         => $nick,
+					  'file_id_date' => $file_id_date,
+					  'file_status'  => $file_status,
+				]);
 			}
 			if (($ext == ".txt") || ($ext == ".TXT")) 
 			{ 
@@ -400,21 +403,25 @@ include_once "session.php";
 					file_put_contents("$filen".".diz", $file_id);
 					load_ansi("$filen".".diz","$filen".".diz","mosoul","transparent",0);
 					unlink ("$filen".".diz");
-				}			
+				}
+				$file_status = 'Legal';			
 				if(isset($_POST['edit_file_status']))
 				{
 					$file_status=$_POST['edit_file_status'];
-
-					$filename=mysql_real_escape_string($filename);
-					$ask="insert into apps values ('$name','$filename',$file_id_date,$now,'$app_author',$filesize,'$filename.diz.png',0,(null),'$nick','$file_id_date','$file_status')";
-					mysql_query($ask,$dbh);
-				}
-				else
-				{
-					$filename=mysql_real_escape_string($filename);
-					$ask="insert into apps values ('$name','$filename',$file_id_date,$now,'$app_author',$filesize,'$filename.diz.png',0,(null),'$nick','$file_id_date','Legal')";
-					mysql_query($ask,$dbh);
-				}
+                }
+    			$ask="INSERT INTO apps values (:name,:filename,:file_id_date,:now,:app_author,:filesize,:filename,0,(null),:nick,:file_id_date2,:file_status)";
+			    doQuery($ask, [
+					  'name'         => $name,
+					  'filename'     => $filename,
+					  'now'          => $now,
+					  'app_author'   => $app_author,
+					  'filesize'     => $filesize,
+					  'filename'     => "$filename.diz.png",
+					  'nick'         => $nick,
+					  'file_id_date' => $file_id_date,
+					  'file_id_date2' => $file_id_date,
+					  'file_status'  => $file_status,
+				]);
 			}
 			if (($ext == ".zip") || ($ext == ".ZiP")) 
 			{
@@ -547,19 +554,24 @@ include_once "session.php";
 					file_put_contents("./apps/temp.diz", "$name by $mag_author");
 					load_ansi("apps/temp.diz","apps/$filename.diz","mosoul","transparent",0);
 				}
+				$file_status = 'Legal';
 				if(isset($_POST['edit_file_status']))
-				{			
-					$filename=mysql_real_escape_string($filename);
-					$ask="insert into apps values ('$name','$filename',0,$now,'$app_author',$filesize,'$filename.diz.png',0,(null),'$nick','$file_id_date','$file_status')";
-					mysql_query($ask,$dbh);
-					unlink ("apps/temp.diz");
-				}
-				else
 				{
-					$filename=mysql_real_escape_string($filename);
-					$ask="insert into apps values ('$name','$filename',0,$now,'$app_author',$filesize,'$filename.diz.png',0,(null),'$nick','$file_id_date','Legal')";
-					mysql_query($ask,$dbh);
-				}
+					unlink ("apps/temp.diz");
+					$file_status=$_POST['edit_file_status'];
+                }
+    			$ask="INSERT INTO apps values (:name,:filename,0,:now,:app_author,:filesize,:filename,0,(null),:nick,:file_id_date,:file_status)";
+			    doQuery($ask, [
+					  'name'         => $name,
+					  'filename'     => $filename,
+					  'now'          => $now,
+					  'app_author'   => $app_author,
+					  'filesize'     => $filesize,
+					  'filename'     => "$filename.diz.png",
+					  'nick'         => $nick,
+					  'file_id_date' => $file_id_date,
+					  'file_status'  => $file_status,
+				]);
 			}				
 			if (($ext == ".dms") || ($ext == ".DMS")) 
 			{		
@@ -594,19 +606,26 @@ include_once "session.php";
 					file_put_contents("./apps/temp.diz", "$name by $mag_author");
 					load_ansi("apps/temp.diz","apps/$filename.diz","mosoul","transparent",0);
 				}
+
+
+				$file_status = 'Legal';
 				if(isset($_POST['edit_file_status']))
 				{
+					unlink ("apps/temp.diz");
 					$file_status=$_POST['edit_file_status'];
-					$filename=mysql_real_escape_string($filename);
-					$ask="insert into apps values ('$name','$filename',0,$now,'$app_author',$filesize,'$filename.diz.png',0,(null),'$nick','$file_id_date','$file_status')";
-					mysql_query($ask,$dbh);
-				}
-				else
-				{
-					$filename=mysql_real_escape_string($filename);
-					$ask="insert into apps values ('$name','$filename',0,$now,'$app_author',$filesize,'$filename.diz.png',0,(null),'$nick','$file_id_date','Legal')";
-					mysql_query($ask,$dbh);
-				}
+                }
+    			$ask="INSERT INTO apps values (:name,:filename,0,:now,:app_author,:filesize,:filename,0,(null),:nick,:file_id_date,:file_status)";
+			    doQuery($ask, [
+					  'name'         => $name,
+					  'filename'     => $filename,
+					  'now'          => $now,
+					  'app_author'   => $app_author,
+					  'filesize'     => $filesize,
+					  'filename'     => "$filename.diz.png",
+					  'nick'         => $nick,
+					  'file_id_date' => $file_id_date,
+					  'file_status'  => $file_status,
+				]);
 			}
 			?>
 			<div class="headline">
@@ -709,11 +728,11 @@ include_once "session.php";
 				}	
 
 				$checkfilename = addslashes($filename);
-				$ask_e="SELECT filename FROM mags WHERE filename='$checkfilename'";
-				$result_e=mysql_query($ask_e,$dbh);
-				while($row_e=mysql_fetch_row($result_e))
+				$ask_e="SELECT filename FROM mags WHERE filename=:checkfilename";
+				$result_e=fetchAll($ask_e, [ 'checkfilename' => $checkfilename ]);
+				foreach($result_e as $row_)
 				{
-					$existing_file=$row_e[0];
+					$existing_file=$row_e->filename;
 	
 					if($existing_file==$filename)
 					{
@@ -792,9 +811,18 @@ include_once "session.php";
 				if(isset($_POST['edit_file_status']))
 				{
 					$file_status=$_POST['edit_file_status'];
-					$filename=mysql_real_escape_string($filename);
-					$ask="insert into mags values ('$name','$filename',0,$now,'$mag_author',$filesize,'$filename.diz.png',0,(null),'$nick')";
-					mysql_query($ask,$dbh);
+        			$ask="INSERT INTO apps values (:name,:filename,0,:now,:app_author,:filesize,:filename,0,(null),:nick,:file_id_date,:file_status)";
+	    		    doQuery($ask, [
+					  'name'         => $name,
+					  'filename'     => $filename,
+					  'now'          => $now,
+					  'app_author'   => $app_author,
+					  'filesize'     => $filesize,
+					  'filename'     => "$filename.diz.png",
+					  'nick'         => $nick,
+					  'file_id_date' => $file_id_date,
+					  'file_status'  => $file_status,
+		    		]);
 				}
 			}
 			if (($ext == ".lha") || ($ext == ".LHA") || ($ext == ".lzh") || ($ext == ".LZH")) 
@@ -934,10 +962,16 @@ include_once "session.php";
 					file_put_contents("./mags/temp.diz", "$name by $mag_author");
 					load_ansi("mags/temp.diz","mags/$filename.diz","mosoul","transparent",0);
 				}
-				
-				$filename=mysql_real_escape_string($filename);
-				$ask="insert into mags values ('$name','$filename',0,$now,'$mag_author',$filesize,'$filename.diz.png',0,(null),'$nick')";
-				mysql_query($ask,$dbh);
+       			$ask="INSERT INTO mags values (:name,:filename,0,:now,:mag_author,:filesize,:filename,0,(null),:nick)";
+    		    doQuery($ask, [
+				  'name'         => $name,
+				  'filename'     => $filename,
+				  'now'          => $now,
+				  'mag_author'   => $mag_author,
+				  'filesize'     => $filesize,
+				  'filename'     => "$filename.diz.png",
+				  'nick'         => $nick,
+	    		]);
 				unlink ("mags/temp.diz");
 			}			
 			if (($ext == ".txt") && ($ext == ".TXT")) 
@@ -963,10 +997,16 @@ include_once "session.php";
 				$file_id_date=$_FILES['uploaded_mag']['name'];
 				$file_id_date=filemtime("mags/$file_id_date");
 				
-				$filename=mysql_real_escape_string($filename);
-				$ask="insert into mags values ('$name','$filename',0,$now,'$mag_author',$filesize,'$filename.diz.png',0,(null),'$nick')";
-				mysql_query($ask,$dbh);
-				
+       			$ask="INSERT INTO mags values (:name,:filename,0,:now,:mag_author,:filesize,:filename,0,(null),:nick)";
+    		    doQuery($ask, [
+				  'name'         => $name,
+				  'filename'     => $filename,
+				  'now'          => $now,
+				  'mag_author'   => $mag_author,
+				  'filesize'     => $filesize,
+				  'filename'     => "$filename.diz.png",
+				  'nick'         => $nick,
+	    		]);
 			}
 			if (($ext == ".zip") || ($ext == ".ZiP")) 
 			{
@@ -1099,30 +1139,37 @@ include_once "session.php";
 					file_put_contents("./mags/temp.diz", "$name by $mag_author");
 					load_ansi("mags/temp.diz","mags/$filename.diz","mosoul","transparent",0);
 				}				
-				$filename=mysql_real_escape_string($filename);
-				$ask="insert into mags values ('$name','$filename',0,$now,'$mag_author',$filesize,'$filename.diz.png',0,(null),'$nick')";
-				mysql_query($ask,$dbh);
+       			$ask="INSERT INTO mags values (:name,:filename,0,:now,:mag_author,:filesize,:filename,0,(null),:nick)";
+    		    doQuery($ask, [
+				  'name'         => $name,
+				  'filename'     => $filename,
+				  'now'          => $now,
+				  'mag_author'   => $mag_author,
+				  'filesize'     => $filesize,
+				  'filename'     => "$filename.diz.png",
+				  'nick'         => $nick,
+	    		]);
 				unlink ("mags/temp.diz");
 
-				$result = mysql_query("select sum(filesize) from collys where uploader='$nick'",$dbh);
-				if ($row = mysql_fetch_row($result))
+				$result = fetchOne("select sum(filesize) AS sum from collys where uploader=:nick", [ 'nick' => $nick ]);
+				if ($row = $result)
 				{
-					$collysize=$row[0];
+					$collysize=$row->sum;
 				}
 
-				$result = mysql_query("select sum(filesize) from mags where uploader='$nick'",$dbh);
-				if ($row = mysql_fetch_row($result))
+				$result = fetchOne("select sum(filesize) AS sum from mags where uploader=:nick", [ 'nick' => $nick ]);
+				if ($row = $result)
 				{
-					$magsize=$row[0];
+					$magsize=$row->sum;
 				}
 
-				$result = mysql_query("select sum(filesize) from apps where uploader='$nick'",$dbh);
-				if ($row = mysql_fetch_row($result))
+				$result = fetchOne("select sum(filesize) AS sum from apps where uploader=:nick", [ 'nick' => $nick ]);
+				if ($row = $result)
 				{
-					$appsize=$row[0];
+					$appsize=$row->sum;
 				}
 				$pumped = $collysize + $appsize + $magsize;
-				mysql_query("update users set uploaded='$pumped' where nick='$nick'", $dbh);
+				doQuery("update users set uploaded=:pumped where nick=:nick", [ 'pumped' => $pumped, 'nick' => $nick ]);
 			}
 		}	
 		?>
@@ -1148,12 +1195,12 @@ include_once "session.php";
 			$searchquery=$_FILES['uploadedfile']['name'];
 			$searchquery=str_replace(" ",",",$searchquery);
 			$searchquery=str_replace("'","&#39;",$searchquery);
-			
-			$ask="SELECT filename from collys WHERE filename='$searchquery'";
-			$result=mysql_query($ask);
-			while ($row=mysql_fetch_row($result))
+
+			$ask="SELECT filename from collys WHERE filename=:searchquery";
+			$result=fetchAll($ask, ['searchquery' => $searchquery ]);
+			foreach ($result as $row)
 			{
-				$dupe=$row[0];				
+				$dupe=$row->filename;
 			}
 
 			if (isset($dupe))
@@ -1279,11 +1326,11 @@ include_once "session.php";
 			<?php
 			exit();
 		}	
-		$ask_existing="select filename from collys where filename='$filename'";
-		$result_existing=mysql_query($ask_existing,$dbh);
-		while($row_existing=mysql_fetch_row($result_existing))
+		$ask_existing="select filename from collys where filename=:filename";
+		$result_existing=fetchAll($ask_existing, [ 'filename' => $filename ]);
+		foreach ($result_existing as $row_existing)
 		{
-	        $existing_file=$row_existing[0];
+	        $existing_file=$row_existing->filename;
 			if($existing_file==$filename)
 			{
 				?>
@@ -1341,17 +1388,34 @@ include_once "session.php";
 					file_put_contents($filen.".diz", $file_id);
 					load_ansi($filen.".diz","$filen.diz","mosoul","transparent",0);
 
-					$filename = cleanInsert($filename);
-					$filename = addslashes($filename);
-					$ask="insert into collys values ('$name',$year,'$type','$filename',$now,(null),'$nick',$filesize,$month,'$filename.diz.png',0,(null),$day,0,(null))";
-					mysql_query($ask,$dbh);
+					$ask="insert into collys values (:name,:year,:type,:filename,:now,(null),:nick,:filesize,:month,:filename_diz_png,0,(null),:day,0,(null))";
+					doQuery($ask, [
+					  'name' => $name,
+					  'year' => $year,
+					  'type' => $type,
+					  'filename' => $filename,
+					  'now'  => $now,
+					  'nick' => $nick,
+					  'filesize' => $filesize,
+					  'month' => $month,
+					  'filename_diz_png' => "$filename.diz.png",
+					  'day' => $day,
+					]);
 				}
 				else
 				{
-					$filename = cleanInsert($filename);
-					$filename = addslashes($filename);
-					$ask="insert into collys values ('$name',$year,'$type','$filename',$now,(null),'$nick',$filesize,$month,'file_id.diz.png',0,(null),$day,0,(null))";
-					mysql_query($ask,$dbh);
+					$ask="insert into collys values (:name,:year,:type,:filename,:now,(null),:nick,:filesize,:month,'file_id_diz.png',0,(null),:day,0,(null))";
+					doQuery($ask, [
+					  'name' => $name,
+					  'year' => $year,
+					  'type' => $type,
+					  'filename' => $filename,
+					  'now'  => $now,
+					  'nick' => $nick,
+					  'filesize' => $filesize,
+					  'month' => $month,
+					  'day' => $day,
+					]);
 				} 
 			}
 		}
@@ -1496,10 +1560,19 @@ include_once "session.php";
 					file_put_contents("./collys/temp.diz", "$name by $mag_author");
 					load_ansi("collys/temp.diz","collys/$filename.diz","mosoul","transparent",0);
 				}
-
-				$ask="insert into collys values ('$name',$year,'$type','$filename',$now,(null),'$nick',$filesize,$month,'$filename.diz.png',0,(null),$day,0,(null))";
-				mysql_query($ask,$dbh);
-
+				$ask="insert into collys values (:name,:year,:type,:filename,:now,(null),:nick,:filesize,:month,:filename_diz_png',0,(null),:day,0,(null))";
+				doQuery($ask, [
+				  'name' => $name,
+				  'year' => $year,
+				  'type' => $type,
+				  'filename' => $filename,
+				  'now'  => $now,
+				  'nick' => $nick,
+				  'filesize' => $filesize,
+				  'month' => $month,
+				  'day' => $day,
+				  'filename_diz_png' => "$filename.diz.png",
+				]);
 			}
 		}
 
@@ -1525,8 +1598,11 @@ include_once "session.php";
 				for($i=0;$i<count($imagenames);$i++)
 				{
 					$imagenames[$i]=str_replace("'", "&#39;",$imagenames[$i]);
-					$ask ="insert into image_of values ('$filename-mosoul','$imagenames[$i]')";
-					mysql_query($ask,$dbh);
+					$ask ="insert into image_of values (:filename_mosoul,:imagenames)";
+					doQuery($ask, [
+					  'filename_mosoul' => "$filename-mosoul",
+					  'imagenames'      => $imagenames[$i],
+					]);
 				}
 			}
 			else
@@ -1541,12 +1617,12 @@ include_once "session.php";
 					There was an error during the conversion, please inform an admin!
 				</div>
 				<?php
+                # FIXME: Danger Will Robinson, $filename should be escaped so that one can't say $filename = '%'
+				$ask ="DELETE from image_of WHERE filename LIKE :filename_pattern";
+				doQuery($ask, ['filename_pattern' => "$filename%" ]);
 
-				$ask ="DELETE from image_of WHERE filename LIKE '$filename%'";
-				mysql_query($ask,$dbh);
-
-				$ask ="DELETE from collys WHERE filename='$filename'";
-				mysql_query($ask,$dbh);
+				$ask ="DELETE from collys WHERE filename=:filename";
+				doQuery($ask, [ 'filename' => $filename ]);
 				
 				exit;
 			}
@@ -1557,8 +1633,11 @@ include_once "session.php";
 				for($i=0;$i<count($imagenames);$i++)
 				{
 					$imagenames[$i]=str_replace("'", "&#39;",$imagenames[$i]);
-					$ask ="insert into image_of values ('$filename-microknight','$imagenames[$i]')";
-					mysql_query($ask,$dbh);
+					$ask ="insert into image_of values (:filename_microknight,:imagenames)";
+					doQuery($ask, [
+					  'filename_microknight' => "$filename-microknight",
+					  'imagenames'           => $imagenames[$i],
+					]);
 				}
 			}
 			else
@@ -1572,12 +1651,13 @@ include_once "session.php";
 					There was an error during the conversion, please inform an admin!
 				</div>
 				<?php
-				$ask ="DELETE from image_of WHERE filename LIKE '$filename%'";
-				mysql_query($ask,$dbh);
+                # FIXME: Danger Will Robinson, $filename should be escaped so that one can't say $filename = '%'
+				$ask ="DELETE from image_of WHERE filename LIKE :filename_pattern";
+				doQuery($ask, ['filename_pattern' => "$filename%" ]);
 
-				$ask ="DELETE from collys WHERE filename='$filename'";
-				mysql_query($ask,$dbh);
-				
+				$ask ="DELETE from collys WHERE filename=:filename";
+				doQuery($ask, [ 'filename' => $filename ]);
+
 				exit;
 			}
 			
@@ -1587,8 +1667,11 @@ include_once "session.php";
 				for($i=0;$i<count($imagenames);$i++)
 				{
 					$imagenames[$i]=str_replace("'", "&#39;",$imagenames[$i]);
-					$ask ="insert into image_of values ('$filename-pot-noodle','$imagenames[$i]')";
-					mysql_query($ask,$dbh);
+					$ask ="insert into image_of values (:filename_pot_noodle',:imagenames)";
+					doQuery($ask, [
+					  'filename_pot_noodle' => "$filename-pot-noodle",
+					  'imagenames'          => $imagenames[$i],
+					]);
 				}
 			}
 			else
@@ -1602,24 +1685,28 @@ include_once "session.php";
 					There was an error during the conversion, please inform an admin!
 				</div>
 				<?php
-				
-				$ask ="DELETE from image_of WHERE filename LIKE '$filename%'";
-				mysql_query($ask,$dbh);
 
-				$ask ="DELETE from collys WHERE filename='$filename'";
-				mysql_query($ask,$dbh);
-				
+                # FIXME: Danger Will Robinson, $filename should be escaped so that one can't say $filename = '%'
+				$ask ="DELETE from image_of WHERE filename LIKE :filename_pattern";
+				doQuery($ask, ['filename_pattern' => "$filename%" ]);
+
+				$ask ="DELETE from collys WHERE filename=:filename";
+				doQuery($ask, [ 'filename' => $filename ]);
+
 				exit;
 			}
-						
+
 			$imagenames=load_ansi("$filen","collys/$dirname/$filename-topaz","topaz","$colors",0);
 			if ($imagenames!=-1)
 			{
 				for($i=0;$i<count($imagenames);$i++)
 				{
 					$imagenames[$i]=str_replace("'", "&#39;",$imagenames[$i]);
-					$ask ="insert into image_of values ('$filename-topaz','$imagenames[$i]')";
-					mysql_query($ask,$dbh);
+					$ask ="insert into image_of values (:filename_topaz,:imagenames)";
+					doQuery($ask, [
+					  'filename_topaz' => "$filename-topaz",
+					  'imagenames'      => $imagenames[$i],
+					]);
 				}
 			}
 			else
@@ -1633,12 +1720,14 @@ include_once "session.php";
 					There was an error during the conversion, please inform an admin!
 				</div>
 				<?php
-				$ask ="DELETE from image_of WHERE filename LIKE '$filename%'";
-				mysql_query($ask,$dbh);
 
-				$ask ="DELETE from collys WHERE filename='$filename'";
-				mysql_query($ask,$dbh);
-				
+                # FIXME: Danger Will Robinson, $filename should be escaped so that one can't say $filename = '%'
+				$ask ="DELETE from image_of WHERE filename LIKE :filename_pattern";
+				doQuery($ask, ['filename_pattern' => "$filename%" ]);
+
+				$ask ="DELETE from collys WHERE filename=:filename";
+				doQuery($ask, [ 'filename' => $filename ]);
+
 				exit;
 			}
 			
@@ -1649,8 +1738,11 @@ include_once "session.php";
 				{
 					{
 						$imagenames[$i]=str_replace("'", "&#39;",$imagenames[$i]);
-						$ask ="insert into image_of values ('$filename-topazplus','$imagenames[$i]')";
-						mysql_query($ask,$dbh);
+    					$ask ="insert into image_of values (:filename_topazplus,:imagenames)";
+	    				doQuery($ask, [
+		    			  'filename_topazplus' => "$filename-topazplus",
+			    		  'imagenames'         => $imagenames[$i],
+				    	]);
 					}
 				}
 			}
@@ -1665,12 +1757,14 @@ include_once "session.php";
 					There was an error during the conversion, please inform an admin!
 				</div>
 				<?php
-				$ask ="DELETE from image_of WHERE filename LIKE '$filename%'";
-				mysql_query($ask,$dbh);
 
-				$ask ="DELETE from collys WHERE filename='$filename'";
-				mysql_query($ask,$dbh);
-				
+                # FIXME: Danger Will Robinson, $filename should be escaped so that one can't say $filename = '%'
+				$ask ="DELETE from image_of WHERE filename LIKE :filename_pattern";
+				doQuery($ask, ['filename_pattern' => "$filename%" ]);
+
+				$ask ="DELETE from collys WHERE filename=:filename";
+				doQuery($ask, [ 'filename' => $filename ]);
+
 				exit;
 			}
 		}
@@ -1681,35 +1775,35 @@ include_once "session.php";
 
 		foreach($_POST['artist'] as $artist)
 		{
-			$ask="insert into author_of values ('$artist','$filename')";
-			mysql_query($ask,$dbh);
+			$ask="insert into author_of values (:artist,:filename)";
+			doQuery($ask, [ 'artist' => $artist, filename => $filename ]);
 		}
 
 		foreach($_POST['crew'] as $crew)
 		{
-			$ask="insert into crew_of values ('$crew','$filename')";
-			mysql_query($ask,$dbh);
+			$ask="insert into crew_of values (:crew,:filename)";
+			doQuery($ask, [ 'crew' => $crew, filename => $filename ]);
 		}
 
-		$result = mysql_query("select sum(filesize) from collys where uploader='$nick'",$dbh);
-		if ($row = mysql_fetch_row($result))
+		$result = fetchOne("select sum(filesize) AS sum from collys where uploader=:nick", [ 'nick' => $nick ]);
+		if ($row = $result)
 		{
-			$collysize=$row[0];
+			$collysize=$row->sum;
 		}
 
-		$result = mysql_query("select sum(filesize) from mags where uploader='$nick'",$dbh);
-		if ($row = mysql_fetch_row($result))
+		$result = fetchOne("select sum(filesize) AS sum from mags where uploader=:nick", [ 'nick' => $nick ]);
+		if ($row = $result)
 		{
-			$magsize=$row[0];
+			$magsize=$row->sum;
 		}
 
-		$result = mysql_query("select sum(filesize) from apps where uploader='$nick'",$dbh);
-		if ($row = mysql_fetch_row($result))
+		$result = fetchOne("select sum(filesize) AS sum from apps where uploader=:nick", [ 'nick' => $nick ]);
+		if ($row = $result)
 		{
-			$appsize=$row[0];
+			$appsize=$row->sum;
 		}
 		$pumped = $collysize + $appsize + $magsize;
-		mysql_query("update users set uploaded='$pumped' where nick='$nick'", $dbh);
+		doQuery("update users set uploaded=:pumped where nick=:nick", [ 'nick' => $nick, 'pumped' => $pumped ]);
 
 		?>
 		<div class="headline">
@@ -1726,7 +1820,6 @@ include_once "session.php";
 
 		exec("mv collys/$filename* collys/$dirname");
 		?>
-				
 		<meta http-equiv="Refresh" content="0; url=submit.php">
 		<?php
 		exit;
@@ -1770,13 +1863,19 @@ include_once "session.php";
 		{		
 			foreach($_POST[add_crew_bbs] as $add_crew_bbs)
 			{
-			$ask="insert into bbs_of values ('$add_crew_bbs','$crewname')";
-			mysql_query($ask,$dbh);
+			$ask="insert into bbs_of values (:add_crew_bbs,:crewname)";
+			doQuery($ask, ['add_crew_bbs' => $add_crew_bbs, 'crewname' => $crewname ]);
 			}
 		}
 													
-		$ask="insert into crews values ('$crewname','$crewwww','$crewcontact','$crewtatus',0,'$crewacronym')";
-		mysql_query($ask,$dbh);
+		$ask="insert into crews values (:crewname,:crewwww,:crewcontact,:crewstatus,0,:crewacronym)";
+		doQuery($ask, [
+		  'crewname' => $crewname,
+		  'crewwww' => $crewwww,
+		  'crewcontact' => $crewcontact,
+		  'crewstatus' => $crewstatus,
+		  'crewacronym' => $crewacronym
+		]);
 	
 		?>	
 		<meta http-equiv='Refresh' content='0; url=submit.php>
@@ -1802,9 +1901,9 @@ include_once "session.php";
 		$artistcrew=cleanInsert($artistcrew);
 		$artistacronym=cleanInsert($artistacronym);
 
-		$ask="SELECT nick from artists WHERE nick='$artistnick'";
-		$result=mysql_query($ask);
-		while ($row=mysql_fetch_row($result))
+		$ask="SELECT nick from artists WHERE nick=:artistnick";
+		$result=fetchAll($ask, [ 'artistnick' => $artistnick ]);
+		foreach ($result as $row)
 		{
 			$artist_dupe=$row[0];				
 
@@ -1838,16 +1937,16 @@ include_once "session.php";
 			<?php
 			exit;
 		}
-																																																											
-		$ask="insert into artists values ('$artistnick','$artistwww','$artiststatus','$country_list[$artistcountry]',0,'$artistacronym')";
-		mysql_query($ask,$dbh);
+
+		$ask="insert into artists values (:artistnick,:artistwww,:artiststatus,:artistcountry,0,:artistacronym)";
+		doQuery($ask, [ 'artistnick' => $artistnick, 'artistwww' => $artistwww, 'artiststatus' => $artiststatus, 'artistcountry' => $country_list[$artistcountry], 'artistacronym' => $artistacronym ]);
 
 		if (isset($_POST[artist_crew]))
 		{
 			foreach($_POST[artist_crew] as $artist_crew)
 			{
-			$ask="insert into member_of values ('$artist_crew','$artistnick')";
-			mysql_query($ask,$dbh);
+			$ask="insert into member_of values (:artist_crew,:artistnick)";
+			doQuery($ask, ['artist_crew' => $artist_crew, 'artistnick' => $artistnick ]);
 			}
 		}
 		?>		
@@ -1890,9 +1989,9 @@ include_once "session.php";
 			<?php
 			exit;
 		}
-																																																											
-		$ask="insert into bbses values ('$name','$sysop','$address','$number')";
-		mysql_query($ask,$dbh);
+
+		$ask="insert into bbses values (:name, :sysop, :address, :number)";
+		doQuery($ask, ['name' => $name, 'sysop' => $sysop, 'address' => $address, 'number' => $number ]);
 
 		?>
 		<div class="headline">
@@ -1953,8 +2052,8 @@ include_once "session.php";
 		exit;
 		}
 
-		$ask="insert into news values (0,'$nick',$time,'$subject','$newstext',1)";
-		mysql_query($ask,$dbh);	
+		$ask="insert into news values (0, :nick, :time, :subject, :newstext,1)";
+		doQuery($ask, [ 'nick' => $nick, 'time' => $time, 'subject' => $subject, 'newstext' => $newstext ]);
 
 		?>
 		<meta http-equiv='Refresh' content='0; url=submit.php'>
