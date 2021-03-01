@@ -3,7 +3,7 @@ header('Content-Type: text/html; charset=UTF-8');
 $logos = [];
 foreach(fetchAll("SELECT ascii FROM logos ORDER BY RAND() limit 10") as $logo) {
 
-	$logos[] = '<a href="/" class="logo ascii"><pre style="overflow: hidden;"><span class="magenta">' . mb_convert_encoding($logo->ascii) . '</span></pre></a>';
+	$logos[] = '<a href="/" class="logo ascii"><pre style="overflow: hidden;"><span class="magenta">' . mb_convert_encoding($logo->ascii, "UTF-8", "ISO-8859-1") . '</span></pre></a>';
 }
 $stars1 = <<<EOD
 __/\__
