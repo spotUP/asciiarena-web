@@ -1,12 +1,10 @@
 <?php
-	require_once "session.php";
-	$h1 = "wELCOME tO aSCIIaRENA";
-	include "header.php";
-?>
-<?php
+require_once "session.php";
+$h1 = "wELCOME tO aSCIIaRENA";
+include "header.php";
+
 if (is_logged_in())
 {
-
 	$showmember=$nick;
 
 	if(isset($_POST['def_font']))
@@ -27,62 +25,6 @@ if (is_logged_in())
 
 		$ask="update users set def_fg_col=:def_fg_col where nick=:nick";
 		doQuery($ask, [ 'def_fg_col' => $def_fg_col, 'nick' => $nick ]);
-	}
-	if(isset($_POST['setcolor']))
-	{
-		$forum_sig_col=$_POST['setcolor'];
-		$signature=$_POST['signature'];
-		$signature=utf8_decode($signature); // convert UTF-8 string to ISO-88591
-		$sigdata=$_POST['signature'];
-		$font=$_POST['font'];
-		
-		if(empty($signature))
-		{
-			?>
-			<table width="700">
-				<td>
-					You have to make a signature before submitting!
-				</td>
-			</table>
-			<meta http-equiv="Refresh" content="2"; url="crib.php">
-			<?php
-			exit;
-		}
-
-		$rgbvalue=$_POST['setcolor'];
-		$rgbvalue = explode(",", $rgbvalue);
-		$delimiter=",";
-
-		$filename="signature_$nick";
-		file_put_contents("signatures/tempsignature.diz", $signature);
-		load_ansi("signatures/tempsignature.diz","signatures/$filename","$font","transparent",0);
-
-		$old_fg_color_r="170";
-		$old_fg_color_g="170";
-		$old_fg_color_b="170";
-
-		$image = imageCreateFromPNG("signatures/$filename.png");
-
-		$fg_color = imageColorExact($image,$old_fg_color_r,$old_fg_color_g,$old_fg_color_b);	//get color to replace
-		imageColorSet($image,$fg_color,$rgbvalue[0],$rgbvalue[1],$rgbvalue[2]);		//replace color with
-
-		imagepng($image,"signatures/$filename.png");	 											// save image
-
-		unlink("signatures/tempsignature.diz");
-
-		$ask="update users set signature=:filename where nick=:nick";
-		doQuery($ask, [ 'filename' => $filename, 'nick' => $nick ]);
-
-		$sigdata=cleanInsertPost($sigdata);
-		$ask="update users set sigdata=:sigdata where nick=:nick";
-		doQuery($ask,[ 'sigdata' => $sigdata, 'nick' => $nick ]);
-
-		$font=cleanInsert($font);
-		$ask="update users set forum_sig_font=:font where nick=:nick";
-		doQuery($ask,[ 'font' => $font, 'nick' => $nick ]);
-
-		$ask="update users set forum_sig_color=:forum_sig_col where nick=:nick";
-		doQuery($ask,[ 'forum_sig_col' => $forum_sig_col, 'nick' => $nick ]);
 	}
 
 	if(isset($_POST['changeuploadsignature']))
@@ -148,9 +90,9 @@ if (is_logged_in())
 		$mail = trim($_POST['changemail']);  
 		if(!checkEmail($mail)) 
 		{
-			?><table width="913px"><caption>FAILURE!</caption><tr><td>Error! You must enter a valid E-Mail adress!</td></tr></table><?php
+			?>FAILURE! Error! You must enter a valid E-Mail adress!<?php
 			?><meta http-equiv="Refresh" content="3"; url="crib.php"><?php
-			exit;
+			//exit;
 		}
 		
 		$ask="update users set mail=:mail where nick=:nick";
@@ -196,7 +138,7 @@ if (is_logged_in())
 			
 			<meta http-equiv="Refresh" content="3"; url="crib.php">
 			<?php	
-			exit;		
+			//exit;		
 		}
 
 		$ask="select pwhash from users where nick=:nick";
@@ -219,7 +161,7 @@ if (is_logged_in())
 			
 			<meta http-equiv="Refresh" content="3"; url="crib.php">
 			<?php	
-			exit;		
+			//exit;		
 		}
 
 		$pwlenght=$_POST['new_password'];
@@ -237,7 +179,7 @@ if (is_logged_in())
 			<?php
 			
 			?><meta http-equiv="Refresh" content="2"; url="crib.php"><?php
-			exit;
+			//exit;
 		}
 
 		if ($pwhash == $old_password)
@@ -248,74 +190,6 @@ if (is_logged_in())
 			$_SESSION['password'] = $password;
 		}
 	}			
-	if(isset($_POST['max_file_size']))
-	{
-		flush();
-		$uploaddir = "uploads/";
-		$avatardir="images";
-		$filenamewithpath=$uploaddir . $filename;
-		$allowed_filetypes = array('.png','.PNG','.jpg','.JPG','.gif','.GIF','.bmp','.BMP','.jpeg','.JPEG'); 	// allowed extensions
-		if (isset($filename))
-		{
-			$filename = $_FILES['uploadedfile']['name']; 							// fetch filename with extension
-			$ext = substr($filename, strpos($filename,'.'), strlen($filename)-1); 	// extract extension 
-		 	if(!in_array($ext,$allowed_filetypes))									// filetype allowed?		
-		 	{
-		 		?>
-		 		<div class="headline">
-		 			Error
-		 		</div>
-
-		 		<div class="content">
-		 			This filetype is not allowed here!
-		 			Only PNG/JPG/GIF/BMP can do it!
-		 		</div>
-		 		<?php
-		 		exit;
-		 	}
-		 }
-
-		 if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $filenamewithpath))
-		 {
-		 	if (($ext == ".jpg") || ($ext == ".JPG")|| ($ext == ".JPEG")|| ($ext == ".jpeg"))
-		 	{
-				$nybild = imagecreatefromjpeg($filenamewithpath); 			//SKAPA ETT BILDOBJEKT - $nybild
-			}
-
-			if (($ext == ".gif") || ($ext == ".GIF"))
-			{
-			$nybild = imagecreatefromgif($filenamewithpath); 			//SKAPA ETT BILDOBJEKT - $nybild
-		}
-
-		if (($ext == ".png") || ($ext == ".PNG"))
-		{
-				$nybild = imagecreatefrompng($filenamewithpath); 			//SKAPA ETT BILDOBJEKT - $nybild
-			}
-			if (($ext == ".bmp") || ($ext == ".BMP"))
-			{
-				$nybild = imagecreatefromwbmp($filenamewithpath); 			//SKAPA ETT BILDOBJEKT - $nybild
-			}			
-			$bredd=imagesx($nybild); // check width
-			$hojd=imagesy($nybild);  // chech height 
-			
-			$nybredd=16; // set new width
-			$nyhojd=16;  // set new height
-			
-			$litenbild = imagecreatetruecolor($nybredd, $nyhojd); 			//SKAPA ETT BILDOBJEKT (MÅLfilen)
-			
-			imagecopyresampled($litenbild, $nybild, 0, 0, 0, 0, $nybredd, $nyhojd, $bredd, $hojd);
-			$filename="Avatar_$nick$ext";
-			imagejpeg($litenbild,"$avatardir/$filename"); // save image
-
-			unlink($filenamewithpath); // delete temp file
-
-			imagedestroy($nybild); 		// free ram
-			imagedestroy($litenbild );
-
-			$fraga="update users set avatar=:filename where nick=:nick";
-			doQuery($fraga,[ 'filename' => $filename, 'nick' => $nick ]);
-		} 
-	}
 	
 //-----------------------------------------------------------------------------
 // USER SETTINGS
