@@ -105,7 +105,7 @@ include_once "session.php";
 				{
 
 //---------------------------------------------------------------------------------------------------------------
-// CHECK SUBMITTED APP
+// CHECK UPLOADED APP
 //---------------------------------------------------------------------------------------------------------------
 
 					if(isset($_POST['app_author']))
@@ -635,14 +635,14 @@ include_once "session.php";
 				The app has been uploaded!
 			</div>	
 
-			<meta http-equiv="Refresh" content="200; url=submit.php">
+			<meta http-equiv="Refresh" content="2"; url="submit.php">
 			<?php
 			exit;
 		}
 
 	}
 //---------------------------------------------------------------------------------------------------------------
-// CHECK SUBMITTED MAG
+// CHECK UPLOADED MAG
 //---------------------------------------------------------------------------------------------------------------
 
 	if(isset($_POST['mag_author']))
@@ -1181,7 +1181,7 @@ include_once "session.php";
 			The mag has been uploaded!
 		</div>
 		
-		<meta http-equiv="Refresh" content="2; url=submit.php">
+		<meta http-equiv="Refresh" content="2"; url="submit.php">
 		<?php
 		exit;
 	}
@@ -1209,7 +1209,7 @@ include_once "session.php";
 			<div class="content">
 				<?=$dupe?> exists!<br><br>
 			</div>
-			<meta http-equiv="Refresh" content="2; url=submit.php">
+			<meta http-equiv="Refresh" content="2"; url="submit.php">
 			<?php
 			exit();
 		}
@@ -1219,13 +1219,13 @@ include_once "session.php";
 			<div class="content">
 				<?=$searchquery?> does NOT exist! Go on boy! Upload it!<br><br>
 			</div>
-			<meta http-equiv="Refresh" content="2; url=submit.php">
+			<meta http-equiv="Refresh" content="2"; url="submit.php">
 			<?php
 			exit();
 		}			
 	}
 //---------------------------------------------------------------------------------------------------------------
-// CHECK SUBMITTED COLLY
+// CHECK UPLOADED COLLY
 //---------------------------------------------------------------------------------------------------------------
 
 	if(isset($_POST['colly_name']))
@@ -1820,13 +1820,13 @@ include_once "session.php";
 
 		exec("mv collys/$filename* collys/$dirname");
 		?>
-		<meta http-equiv="Refresh" content="0; url=submit.php">
+		<meta http-equiv="Refresh" content="0"; url="submit.php">
 		<?php
 		exit;
 	}
 
 //---------------------------------------------------------------------------------------------------------------
-// CHECK SUBMITTED CREW
+// CHECK UPLOADED CREW
 //---------------------------------------------------------------------------------------------------------------
 
 
@@ -1878,13 +1878,13 @@ include_once "session.php";
 		]);
 
 		?>	
-		<meta http-equiv='Refresh' content='0; url=submit.php>
+		<meta http-equiv="Refresh" content="2"; url="submit.php">
 		<?php
 		exit;
 	}
 
 //---------------------------------------------------------------------------------------------------------------
-// CHECK SUBMITTED ARTIST
+// CHECK UPLOADED ARTIST
 //---------------------------------------------------------------------------------------------------------------
 
 	if(isset($_POST['artistnick']))
@@ -1959,13 +1959,13 @@ include_once "session.php";
 		</div>
 		
 		
-		<meta http-equiv='Refresh' content='0; url='submit.php'>
+		<meta http-equiv="Refresh" content="2"; url="submit.php">
 		<?php	
 		exit;
 	}
 
 //---------------------------------------------------------------------------------------------------------------
-// CHECK SUBMITTED BBS
+// CHECK UPLOADED BBS
 //---------------------------------------------------------------------------------------------------------------
 
 	if(isset($_POST['submitbbs']))
@@ -2002,13 +2002,13 @@ include_once "session.php";
 			The BBS has been posted!
 		</div>
 
-		<meta http-equiv='Refresh' content='0; url='submit.php'>
+		<meta http-equiv="Refresh" content="2"; url="submit.php">
 		<?php	
 		exit;
 	}
 
 //-----------------------------------------------------------------------------
-// CHECK SUBMITTED NEWS
+// CHECK UPLOADED NEWS
 //-----------------------------------------------------------------------------
 
 	$time=time();
@@ -2030,7 +2030,7 @@ include_once "session.php";
 			<div class="content_with_blenk">
 				You must fill the news text field!
 			</div>
-			<meta http-equiv='Refresh' content='2; url=submit.php'>
+			<meta http-equiv="Refresh" content="2"; url="submit.php">
 			<?php	
 			exit;
 		}
@@ -2047,7 +2047,7 @@ include_once "session.php";
 			</div>
 			<?php
 			?>
-			<meta http-equiv='Refresh' content='2; url=submit.php'>
+			<meta http-equiv="Refresh" content="2"; url="submit.php">
 			<?php	
 			exit;
 		}
@@ -2056,7 +2056,7 @@ include_once "session.php";
 		doQuery($ask, [ 'nick' => $nick, 'time' => $time, 'subject' => $subject, 'newstext' => $newstext ]);
 
 		?>
-		<meta http-equiv='Refresh' content='0; url=submit.php'>
+		<meta http-equiv="Refresh" content="0"; url="submit.php">
 		<?php	
 		exit;
 
@@ -2064,9 +2064,9 @@ include_once "session.php";
 	?>
 
 
-	<div class="row" >
+	<div class="row">
 		<div class="col-lg-12">
-			<h2 id="nav-tabs">Submit</h2>
+			<h2 id="nav-tabs">UPLOAD</h2>
 			<div class="bs-component">
 				<ul class="nav nav-tabs">
 					<li class="nav-item">
@@ -2088,20 +2088,12 @@ include_once "session.php";
 				<div id="myTabContent" class="tab-content">
 					<div class="tab-pane fade show active" id="colly">
 
-
-
-
-
-
-
-
-
 						<!-- -------------------------------------------------------------------------------- -->
-						<!-- SUBMIT COLLY FIELD                                                               -->
+						<!-- UPLOAD COLLY FIELD                                                               -->
 						<!-- -------------------------------------------------------------------------------- -->
 
 						<div class="headline">
-							Submit Amiga ASCII Colly/ANSI (No PC stuff!)
+							Upload Amiga ASCII Colly/ANSI (No PC stuff!)
 						</div>
 
 						<div class="content_with_blenk"><br></div>
@@ -2234,12 +2226,12 @@ include_once "session.php";
 
 
 						<!-- -------------------------------------------------------------------------------- -->
-						<!-- SUBMIT CREW FIELD                                                                -->
+						<!-- ADD CREW FIELD                                                                -->
 						<!-- -------------------------------------------------------------------------------- -->
 
 						<form enctype="multipart/form-data" action="submit.php" method="post">
 							<div class="headline">
-								Submit Crew	
+								Add Crew	
 							</div>
 
 							<div class="content_with_blenk"><br></div>
@@ -2315,13 +2307,13 @@ include_once "session.php";
 
 
 						<!-- -------------------------------------------------------------------------------- -->
-						<!-- SUBMIT ARTIST FIELD                                                              -->
+						<!-- ADD ARTIST FIELD                                                              -->
 						<!-- -------------------------------------------------------------------------------- -->
 
 						<form enctype="multipart/form-data" action="submit.php" method="post">	
 
 							<div class="headline">
-								Submit Artist	
+								Add Artist	
 							</div>
 
 							<div class="content_with_blenk"><br></div>
@@ -2401,12 +2393,12 @@ include_once "session.php";
 
 
 						<!-- -------------------------------------------------------------------------------- -->
-						<!-- SUBMIT BBS FIELD                                                               -->
+						<!-- ADD BBS FIELD                                                               -->
 						<!-- -------------------------------------------------------------------------------- -->
 
 						<form enctype="multipart/form-data" action="submit.php" method="post">
 							<div class="headline">
-								Submit BBS	
+								Add BBS	
 							</div>
 
 							<div class="content_with_blenk"><br></div>
@@ -2454,12 +2446,12 @@ include_once "session.php";
 
 
 						<!-- -------------------------------------------------------------------------------- -->
-						<!-- SUBMIT APP FIELD                                                           -->
+						<!-- UPLOAD APP FIELD                                                                 -->
 						<!-- -------------------------------------------------------------------------------- -->
 
 						<form enctype="multipart/form-data" action="submit.php" method="post">
 							<div class="headline">
-								Submit ASCII Application		
+								Upload ASCII Application		
 							</div>
 
 							<div class="content_with_blenk"><br></div>
@@ -2524,12 +2516,12 @@ include_once "session.php";
 					<div class="tab-pane fade" id="mag">
 
 						<!-- -------------------------------------------------------------------------------- -->
-						<!-- SUBMIT MAG FIELD                                                           -->
+						<!-- UPLOAD MAG FIELD                                                           -->
 						<!-- -------------------------------------------------------------------------------- -->
 
 						<form enctype="multipart/form-data" action="submit.php" method="post">
 							<div class="headline">
-								Submit ASCII Mag
+								Upload ASCII Mag
 							</div>
 
 							<div class="content_with_blenk"><br></div>
