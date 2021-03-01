@@ -20,12 +20,12 @@ require_once "header.php";
 	$result=fetchAll($ask, [ 'showcrew' => $showcrew ]);
 	foreach($result as $row)
 	{
-		$show_name=$row['name'];
-		$show_www=$row['www'];
-		$show_contact=$row['contact'];
-		$show_active=$row['active'];
-		$show_rating=$row['rating'];	
-		$show_acronym=$row['acronym'];	
+		$show_name=$row->name;
+		$show_www=$row->www;
+		$show_contact=$row->contact;
+		$show_active=$row->active;
+		$show_rating=$row->rating;	
+		$show_acronym=$row->acronym;	
 		$show_rating = round($show_rating, 2);
 
 		?>	
@@ -73,7 +73,7 @@ require_once "header.php";
 			$result_crew_rating=fetchAll($ask_crew_rating, [ 'showcrew' => $showcrew ] );
 			foreach($result_crew_rating as $row_crew_rating)
 			{
-				$crewrating=$row_crew_rating[0];
+				$crewrating=$row_crew_rating->rating;
 				$crewrating = round($crewrating, 2);
 			}
 
@@ -97,26 +97,26 @@ require_once "header.php";
 			}
 			else
 			{
-				$ask_crew_rating="SELECT COUNT(rating) from comments where crew=:showcrew";
+				$ask_crew_rating="SELECT COUNT(rating) AS count from comments where crew=:showcrew";
 				$result_crew_rating=fetchAll($ask_crew_rating, [ 'showcrew' => $showcrew ]);
 				foreach($result_crew_rating as $row_crew_rating)
 				{
-					$votecount=$row_crew_rating[0];
+					$votecount=$row_crew_rating->count;
 				}
 				echo " $crewrating ($votecount votes)</td></tr>";
 			}
 		?>
 		</div>
 		<?php
-		$ask_members="SELECT COUNT(nick) FROM member_of where crew=:showcrew";
+		$ask_members="SELECT COUNT(nick) AS count FROM member_of where crew=:showcrew";
 		$result_members=fetchAll($ask_members, [ 'showcrew' => $showcrew ]);
 		foreach($result_members as $row_members)
-		$members=$row_members[0];					
+		$members=$row_members->count;					
 
-		$ask_rels="SELECT COUNT(filename) FROM crew_of where crew=:showcrew";
+		$ask_rels="SELECT COUNT(filename) AS count FROM crew_of where crew=:showcrew";
 		$result_rels=fetchAll($ask_rels, [ 'showcrew' => $showcrew ]);
 		foreach($result_rels as $row_rels)
-		$releases=$row_rels[0];				
+		$releases=$row_rels->count;				
 
 		?>
 		<div class="content_centered">
@@ -154,13 +154,13 @@ require_once "header.php";
 	$result=fetchAll($ask, [ 'showcrew' => $showcrew ]);
 	foreach($result as $row)
 	{
-		$crewmember=$row[0];
+		$crewmember=$row->nick;
 		
 		$ask_memb="SELECT acronym FROM artists WHERE nick=:crewmember";
 		$result_memb=fetchAll($ask_memb, [ 'crewmember' => $crewmember ]);
 		foreach($result_memb as $row_memb)
 		{
-			$membacronym=$row_memb['acronym'];
+			$membacronym=$row_memb->acronym;
 			$encoded_crewmember=base64_encode($crewmember);
 
 			?>
@@ -181,17 +181,17 @@ require_once "header.php";
 				$result_artist_rating=fetchAll($ask_artist_rating, [ 'crewmember' => $crewmember ]);
 				foreach($result_artist_rating as $row_artist_rating)
 				{
-					$artistrating=$row_artist_rating[0];
+					$artistrating=$row_artist_rating->rating;
 					$artistrating = round($artistrating, 2);
 				}
 
 				if(empty($artistrating))
 				{
-					$askagain="SELECT COUNT(rating) from comments where artist=:crewmember";
+					$askagain="SELECT COUNT(rating) AS count from comments where artist=:crewmember";
 					$resultagain=fetchAll($askagain, [ 'crewmember' => $crewmember ]);
 					foreach($resultagain as $rowagain)
 					{
-						$votecount=$rowagain[0];
+						$votecount=$rowagain->count;
 					}
 
 					$votesleft=(3-$votecount);
@@ -206,28 +206,28 @@ require_once "header.php";
 				}
 				else
 				{
-					$askagain="SELECT COUNT(rating) from comments where artist=:crewmember";
+					$askagain="SELECT COUNT(rating) AS count from comments where artist=:crewmember";
 					$resultagain=fetchAll($askagain, [ 'crewmember' => $crewmember ]);
 					foreach($resultagain as $rowagain)
 					{
-						$votecount=$rowagain[0];
+						$votecount=$rowagain->count;
 					}
 					echo "$artistrating ($votecount votes)";
 				}
 			?>
 			</div>	
 			<?php
-			$ask_memb_rels="SELECT COUNT(filename) FROM author_of WHERE nick=:crewmember";
+			$ask_memb_rels="SELECT COUNT(filename) AS count FROM author_of WHERE nick=:crewmember";
 			$result_memb_rels=fetchAll($ask_memb_rels, [ 'crewmember' => $crewmember ]);
 			foreach($result_memb_rels as $row_memb_rels)
 			{
-				$membrels=$row_memb_rels[0];
+				$membrels=$row_memb_rels->count;
 			}			
 			?>
 			<div style="float: left; width: 350px;">	
 				<?=$membrels?>
 			</div>
-			<?					
+			<?php
 		}
 	}
 	?>
@@ -241,33 +241,31 @@ require_once "header.php";
 	$result_bbs=fetchAll($ask_bbs, [ 'showcrew' => $showcrew ]);
 	foreach($result_bbs as $row_bbs)
 	{
-		$bbscount=$row_bbs[0];
+		$bbscount=$row_bbs->name;
 	}
 	if(!empty($bbscount))
 	{ 
 		?>
 		<div class="headline">
-			Boards	
+			Boards
 		</div>
 
 		<div class="content_with_blenk"><br></div>
 
-		<?	
+		<?php
 		$ask="select name from bbs_of where crew=:showcrew";
 		$result=fetchAll($ask, [ 'showcrew' => $showcrew ]);
 		foreach($result as $row)
 		{
-			$bbs_name=$row[0];	
-	
+			$bbs_name=$row->name;
 			$ask_bbs="select * from bbses where name=:bbs_name";
 			$result_bbs=fetchAll($ask_bbs, [ 'bbs_name' => $bbs_name ]);
 			foreach($result_bbs as $row_bbs)
 			{
-				$name=$row_bbs[0];	
-				$sysop=$row_bbs[1];	
-				$address=$row_bbs[2];	
-				$number=$row_bbs[3];
-
+				$name=$row_bbs->name;
+				$sysop=$row_bbs->sysop;
+				$address=$row_bbs->address;
+				$number=$row_bbs->number;
 				if (empty($sysop))
 				{
 					$sysop="Unknown";
@@ -307,12 +305,12 @@ require_once "header.php";
 	$result=fetchAll($ask, [ 'showcrew' => $showcrew ]);
 	foreach($result as $row)
 	{
-		$crew = $row['crew'];
-		$viewtimes = $row['view_counter'];
-		$year = $row['year'];
-		$filename = $row['filename'];
+		$crew = $row->crew;
+		$viewtimes = $row->view_counter;
+		$year = $row->year;
+		$filename = $row->filename;
 		$encoded_filename=base64_encode($filename);
-		$uploader = $row['uploader'];
+		$uploader = $row->uploader;
 		$dirname = explode(".", $filename);
 		$dirname = $dirname[0];
 		?>
@@ -321,7 +319,7 @@ require_once "header.php";
 						<div class="headline">Latest Release</div>
 						<div class="content_with_blenk"><br></div>
 						<?php
-						if ($row[9] == "file_id.diz.png")
+						if ($filename == "file_id.diz.png")
 						{
 							?>
 							<div class="release_file_id">
@@ -333,7 +331,7 @@ require_once "header.php";
 						{
 							?>	
 							<div class="release_file_id">
-								<a href="info_release.php?filename=<?=$encoded_filename?>"><img class="centered" border="0" src="collys/<?=$dirname?>/<?=$row[9]?>"></a>
+								<a href="info_release.php?filename=<?=$encoded_filename?>"><img class="centered" border="0" src="collys/<?=$dirname?>/<?=$filename?>"></a>
 								<br>
 							</div>
 							<?php
@@ -353,7 +351,7 @@ require_once "header.php";
 							$result_author=fetchAll($ask_author, [ 'filename' => $filename ]);
 							foreach($result_author as $row_author) 
 							{
-								$authors[]=$row_author[0];
+								$authors[]=$row_author->id;
 							}
 
 							$c = 0;
@@ -390,7 +388,7 @@ require_once "header.php";
 							$result_crew=fetchAll($ask_crew, [ 'filename' => $filename ]);
 							foreach($result_crew as $row_crew) 
 							{
-								$crews[]=$row_crew[0];
+								$crews[]=$row_crew->id;
 							}
 
 							$c = 0;
@@ -421,7 +419,7 @@ require_once "header.php";
 						</div>
 
 						<div class="release_div_right">
-								<a href="info_release.php?filename=<?=$encoded_filename?>"><?=$row['filename']?></a>
+								<a href="info_release.php?filename=<?=$encoded_filename?>"><?=$row->filename?></a>
 						</div>
 
 						<div class="content_slim_divider"></div>
@@ -431,7 +429,7 @@ require_once "header.php";
 						</div>
 								
 						<div class="release_div_right">
-							<?=$row[filesize]?>
+							<?=$row->filesize?>
 						</div>
 
 						<div class="content_slim_divider"></div>
@@ -469,25 +467,25 @@ require_once "header.php";
 						$result_collyrating=fetchAll($ask_collyrating, [ 'filename' => $filename ]);
 						foreach($result_collyrating as $row_collyrating)
 						{
-							$collyrating=$row_collyrating[0];
+							$collyrating=$row_collyrating->rating;
 						}
 
-						$ask_votes="SELECT COUNT(rating) from comments where filename=:filename";
+						$ask_votes="SELECT COUNT(rating) AS count from comments where filename=:filename";
 						$result_votes=fetchAll($ask_votes, [ 'filename' => $filename ]);
 						foreach($result_votes as $row_votes)
 						{
-							$votecount=$row_votes[0];
+							$votecount=$row_votes->count;
 						}
 						?>
 						<div class="release_div_right">
 						<?php
 						if(empty($collyrating))
 						{
-							$askagain="SELECT COUNT(rating) from comments where filename=:filename";
+							$askagain="SELECT COUNT(rating) AS count from comments where filename=:filename";
 							$resultagain=fetchAll($askagain, [ 'filename' => $filename ]);
 							foreach($resultagain as $rowagain)
 							{
-								$votecount=$rowagain[0];
+								$votecount=$rowagain->count;
 								$votesleft=(3-$votecount);
 							}
 							if ($votesleft==1)
@@ -538,7 +536,7 @@ require_once "header.php";
 							$result=fetchAll($ask, [ 'filename' => $filename ]);
 							foreach($result as $row)
 							{
-								$downloads=$row[0];
+								$downloads=$row->downloads;
 							}
 	
 							if(empty($downloads))
@@ -567,9 +565,9 @@ require_once "header.php";
 	$result_check=fetchAll($ask_check, [ 'crew' => $showcrew ]);
 	foreach($result_check as $row_check)
 	{
-		if(!empty($row_check['filename']))
+		if(!empty($row_check->filename))
 		{
-			$encoded_crew=base64_encode($crew);
+			$encoded_crew=base64_encode($showcrew);
 			?>
 			<div class="headline">[ All <?=$show_acronym?> Releases ]                
 				<yellow>Sort by:</yellow>
@@ -600,11 +598,11 @@ require_once "header.php";
 		$result=fetchAll($ask, [ 'showcrew' => $showcrew ]);
 		foreach($result as $row)
 		{
-			$author=$row['author'];
+			$author=$row->author;
 			$encoded_author=base64_encode($author);
-			$filename=$row['filename'];
-			$encoded_filename=base64_encode($row['filename']);
-			$name=$row['name'];
+			$filename=$row->filename;
+			$encoded_filename=base64_encode($row->filename);
+			$name=$row->name;
 
 			?>
 			
