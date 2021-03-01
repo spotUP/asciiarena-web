@@ -1,156 +1,30 @@
 <?php
-include_once('session.php');
+require_once "session.php";
+$h1 = ["wELCOME tO aSCIIaRENA", "bY uP rOUGH and diViNE sTYLERS"];
+include "header.php";
+
 ?>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "https://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-	<title>ASCIIARENA brought to you by UP ROUGH SOUNDSYSTEM</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
-	<link rel='stylesheet' href='style.css' type='text/css'>
-	<meta name="viewport" content="width=device-width">
-	<script type="text/javascript">
-		function add_colly_crew_field() {
-			var newselect = " <select name=\"colly_crew[]\"" + document.getElementById('total_colly_crews').value + "><option>Independent</option><?php
-			foreach (fetchAll("SELECT name FROM crews") as $row) {
-				echo "<option>{$row->name}</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_colly_crew_field').innerHTML = document.getElementById('new_colly_crew_field').innerHTML + newselect;
-			document.getElementById('total_colly_crews').value = parseInt(document.getElementById('total_colly_crews').value) + 1;
-		}
-	</script>
-
-	<script type="text/javascript">
-		function add_colly_author_field() {
-			var newselect = " <select name=\"colly_author[]\"" + document.getElementById('total_colly_authors').value + "><option value=\"Unknown\">Unknown</option><?php
-			foreach (fetchAll("SELECT nick FROM artists") as $row) {
-				echo "<option>{$row->nick}</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_colly_author_field').innerHTML = document.getElementById('new_colly_author_field').innerHTML + newselect;
-			document.getElementById('total_colly_authors').value = parseInt(document.getElementById('total_colly_authors').value) + 1;
-		}
-
-	</script>
-
-
-	<script type="text/javascript">
-
-		function add_bbs_field()
-		{
-			var newselect = " <select name=\"add_bbs[]\"" + document.getElementById('total_bbses').value + "><option value=\"Unknown\">Unknown</option><?php
-
-			$ask="select name from bbses";
-			$result=fetchAll($ask);
-			foreach ($result as $row)
-			{
-				$add_bbses=$row->name;
-				echo "<option>$add_bbses</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_bbs_field').innerHTML =  document.getElementById('new_bbs_field').innerHTML + newselect;
-			document.getElementById('total_bbses').value =  parseInt( document.getElementById('total_bbses').value) + 1;
-		}
-
-	</script>
-
-	<script type="text/javascript">
-		function add_artist_crew_field()
-		{
-			var newselect = " <select name=\"artist_crew[]\"" + document.getElementById('total_artist_crews').value + "><option value=\"Unknown\">Unknown</option><?php
-
-			$ask="select name from crews";
-			$result=fetchAll($ask);
-			foreach($result as $row)
-			{
-				$crews=$row->name;
-				echo "<option value='$crews'>$crews</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_artist_crew_field').innerHTML =  document.getElementById('new_artist_crew_field').innerHTML + newselect;
-			document.getElementById('total_artist_crews').value =  parseInt( document.getElementById('total_artist_crews').value) + 1;
-		}
-
-	</script>
-
-	<script type="text/javascript">
-		function add_colly_author_field()
-		{
-			var newselect = " <select name=\"colly_author[]\"" + document.getElementById('total_colly_authors').value + "><option value=\"Unknown\">Unknown</option><?php
-
-			$ask="select nick from artists";
-			$result=fetchAll($ask);
-			foreach($result as $row)
-			{
-				$artists=$row->nick;
-				echo "<option>$artists</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_colly_author_field').innerHTML =  document.getElementById('new_colly_author_field').innerHTML + newselect;
-			document.getElementById('total_colly_authors').value =  parseInt( document.getElementById('total_colly_authors').value) + 1;
-		}
-
-	</script>
-
-	<script type="text/javascript">
-		function add_colly_crew_field()
-		{
-			var newselect = " <select name=\"colly_crew[]\"" + document.getElementById('total_colly_crews').value + "><option>Independent</option><?php
-
-			$ask="select name from crews";
-			$result=fetchAll($ask);
-			foreach ($result as $row)
-			{
-				$crews=$row->name;
-				echo "<option value='$crews'>$crews</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_colly_crew_field').innerHTML =  document.getElementById('new_colly_crew_field').innerHTML + newselect;
-			document.getElementById('total_colly_crews').value =  parseInt( document.getElementById('total_colly_crews').value) + 1;
-		}
-	</script>
-
-</head>
-<body>
-
-	<div class="maincontainer">
-		<div class="header">
-			<?php include ('header.php'); ?>
-		</div>	
-		<div class="leftsidebar">
-			<?php include ('sidebar.php'); ?>
-		</div>	
-		<div class="maincontent">
-			<?php
-			if (is_logged_in() && is_admin())
-			{
-
-		//echo "<pre>";print_r($_POST);echo "</pre>";
+<div class="modal-body row m-0 p-0">
+	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
+		<?php
 
 //---------------------------------------------------------------------------------------------------------------
 // SET COLLY TO FIXED
 //---------------------------------------------------------------------------------------------------------------
 
-				if(isset($_POST['colly_fixed']) && is_admin())
-				{
-					$fixed_colly=cleanInsert($_POST['filename']);
-					$fixed_colly=stripslashes($fixed_colly);
-					if(!empty($fixed_colly))
-					{
-						$ask="update collys set broken=0 where filename=:fixed_colly";
-						doQuery($ask,[':fixed_colly' => $fixed_colly]);
-					}
-					?>
-					<meta http-equiv="Refresh" content="0; url=admin.php">
-					<?php
-				}	
+		if(isset($_POST['colly_fixed']) && is_admin())
+		{
+			$fixed_colly=cleanInsert($_POST['filename']);
+			$fixed_colly=stripslashes($fixed_colly);
+			if(!empty($fixed_colly))
+			{
+				$ask="update collys set broken=0 where filename=:fixed_colly";
+				doQuery($ask,[':fixed_colly' => $fixed_colly]);
+			}
+			?>
+			<meta http-equiv="Refresh" content="0; url=admin.php">
+			<?php
+		}	
 
 
 
@@ -158,71 +32,71 @@ include_once('session.php');
 // DELETE USER FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-				if(isset($_POST['delete_user']) && is_admin())
-				{
-					$delete_user=$_POST['getuser'];
-					$delete_user=cleanInsert($delete_user);
+		if(isset($_POST['delete_user']) && is_admin())
+		{
+			$delete_user=$_POST['getuser'];
+			$delete_user=cleanInsert($delete_user);
 
-					if(!empty($delete_user))
-					{
-						$ask="delete from users where nick=:delete_user";
-						doQuery($ask, [ ':delete_user' => $delete_user ]);
-					}
-					?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
-				}	
+			if(!empty($delete_user))
+			{
+				$ask="delete from users where nick=:delete_user";
+				doQuery($ask, [ ':delete_user' => $delete_user ]);
+			}
+			?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
+		}	
 
 
 //---------------------------------------------------------------------------------------------------------------
 // DELETE CREW FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-				if(isset($_POST['do_delete_crew']) && is_admin())
-				{
-					$delete_crew=$_POST['getcrew'];
-					$delete_crew=cleanInsert($delete_crew);
+		if(isset($_POST['do_delete_crew']) && is_admin())
+		{
+			$delete_crew=$_POST['getcrew'];
+			$delete_crew=cleanInsert($delete_crew);
 
-					if(!empty($delete_crew))
-					{
-						$ask="delete from crews where name=:delete_crew";
-						doQuery($ask,[ ':delete_crew' => $delete_crew]);
+			if(!empty($delete_crew))
+			{
+				$ask="delete from crews where name=:delete_crew";
+				doQuery($ask,[ ':delete_crew' => $delete_crew]);
 
-						$ask="delete from bbs_of where crew=:delete_crew";
-						doQuery($ask,[ ':delete_crew' => $delete_crew]);
-					}
-					?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
-				}	
+				$ask="delete from bbs_of where crew=:delete_crew";
+				doQuery($ask,[ ':delete_crew' => $delete_crew]);
+			}
+			?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
+		}	
 
 //---------------------------------------------------------------------------------------------------------------
 // DELETE SITELOGO FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-				if(isset($_POST['delete_sitelogo']) && is_admin())
-				{
-					$delete_sitelogo=$_POST['getsitelogo'];
-					$delete_sitelogo=cleanInsert($delete_sitelogo);
+		if(isset($_POST['delete_sitelogo']) && is_admin())
+		{
+			$delete_sitelogo=$_POST['getsitelogo'];
+			$delete_sitelogo=cleanInsert($delete_sitelogo);
 
-					$logo_filename=$_POST['getsitelogo'];
-					$logo_filename=cleanInsert($logo_filename);
+			$logo_filename=$_POST['getsitelogo'];
+			$logo_filename=cleanInsert($logo_filename);
 
-					$logo_filename=addslashes($logo_filename);
-					unlink("logos/$logo_filename");
+			$logo_filename=addslashes($logo_filename);
+			unlink("logos/$logo_filename");
 
-					if(!empty($delete_sitelogo))
-					{
-						$ask="delete from logos where filename=:delete_sitelogo";
-						doQuery($ask, [':delete_sitelogo' => $delete_sitelogo]);
-					}
-					?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
-				}	
+			if(!empty($delete_sitelogo))
+			{
+				$ask="delete from logos where filename=:delete_sitelogo";
+				doQuery($ask, [':delete_sitelogo' => $delete_sitelogo]);
+			}
+			?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
+		}	
 
 //---------------------------------------------------------------------------------------------------------------
 // DELETE COLLY FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-				if(isset($_POST['do_delete_colly']) && is_admin())
-				{
-					$delete_colly=$_POST['filename'];
-					$delete_colly=cleanInsert($delete_colly);
+		if(isset($_POST['do_delete_colly']) && is_admin())
+		{
+			$delete_colly=$_POST['filename'];
+			$delete_colly=cleanInsert($delete_colly);
 
 		$ask="select uploader from collys where filename='$delete_colly'"; // fetch uploader of deleted colly
 		$result=fetchAll($ask);
@@ -2200,22 +2074,14 @@ if(isset($_POST['getartist']) && is_admin())
 								</form>
 								<?php
 							}
-						}
-						else
-						{
 							?>
-							<div class="headline">
-								Hack Attempt!
-							</div>
-							<div class="content">
-								<br>Hack attempt detected.<br>
-								Your IP has been logged and has been forwarded to the Swedish police.<br>
-								Tough luck sucka!<br><br>
-							</div>
-							<?php
-						}
-						?>
+						</div>
+
+						<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+							<?php include "sidebar.php"; ?>
+						</div>
+						<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
+							<?php include "sidebar_right.php"; ?>
+						</div>
 					</div>
-				</div>
-			</body>
-			</html>
+					<?php include "footer.php"; ?>
