@@ -14,7 +14,7 @@ include "header.php";
 		<?php
 		if (is_logged_in())
 		{
-			$showmember=$nick;
+			$nick=$_user['nick'];
 
 			if(isset($_POST['def_font']))
 			{
