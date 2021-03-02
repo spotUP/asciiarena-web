@@ -66,7 +66,7 @@ include "header.php";
 			{
 				$changebyear=$_POST['changebyear'];
 				$ask="update users set byear=:changebyear where nick=:nick";
-				doQuery($ask,[ 'changeyear' => $changeyear, 'nick' => $nick ]);	
+				doQuery($ask,[ 'changebyear' => $changebyear, 'nick' => $nick ]);	
 			}
 			if(isset($_POST['changebmonth']))
 			{
