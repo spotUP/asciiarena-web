@@ -33,7 +33,8 @@ $dirname = $dirname[ 0 ];
 					<div class="col-lg-8 d-flex justify-content-center justify-content-lg-start" style="position: relative; top: -16px;">
 						<span>
 							<?php if ($colly->file_id == "file_id.diz.png") {
-								$file_id_diz = file_get_contents("collections/file_id.diz.txt");
+//								$file_id_diz = file_get_contents("collections/file_id.diz.txt");
+								$file_id_diz = file_get_contents(__DIR__ , "/collections/file_id.diz.txt");
 								echo "<pre style=\"color: red\">";
 								echo $file_id_diz;
 								echo "</pre>";
