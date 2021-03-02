@@ -344,7 +344,7 @@ include "header.php";
 			</div>
 
 			<div class="row">
-				<div class="col-6">
+				<div class="col-8">
 
 					<?php
 					if ($filename == "file_id.diz.png")
@@ -361,173 +361,175 @@ include "header.php";
 					}
 					?>
 				</div>
-				<div class="col-6">
+				<div class="col-4">
+					<div class="row d-flex justify-content-between">
 
-					Artist(s):
+						Artist(s):
 
-					<?php
-					$authors = array();
-					$ask_author="select * from author_of where filename=:filename";
-					$result_author=fetchAll($ask_author, [ 'filename' => $filename ]);
-					foreach($result_author as $row_author) 
-					{
-						$authors[]=$row_author->id;
-					}
-
-					$c = 0;
-					foreach($authors as $author) 
-					{
-						$encoded_author=base64_encode($author);
-						if($c > 0) 
+						<?php
+						$authors = array();
+						$ask_author="select * from author_of where filename=:filename";
+						$result_author=fetchAll($ask_author, [ 'filename' => $filename ]);
+						foreach($result_author as $row_author) 
 						{
-							if($c == count($authors)-1) 
+							$authors[]=$row_author->id;
+						}
+
+						$c = 0;
+						foreach($authors as $author) 
+						{
+							$encoded_author=base64_encode($author);
+							if($c > 0) 
 							{
-								echo ' &amp; ';
-							} 
-							else 
+								if($c == count($authors)-1) 
+								{
+									echo ' &amp; ';
+								} 
+								else 
+								{
+									echo ', ';
+								}
+							}
+							echo "<a href=\"info_artist.php?artist=$encoded_author&sort_by=filename\">$author</a>";
+							$c++;
+						}
+						?>
+					</div>
+					<div class="row d-flex justify-content-between">
+						Crew:
+
+						<?php
+						$crews = array();
+						$ask_crew="select * from crew_of where filename=:filename";
+						$result_crew=fetchAll($ask_crew, [ 'filename' => $filename ]);
+						foreach($result_crew as $row_crew) 
+						{
+							$crews[]=$row_crew->id;
+						}
+
+						$c = 0;
+						foreach($crews as $crew) 
+						{
+							$encoded_crew=base64_encode($crew);
+							if($c > 0) 
 							{
-								echo ', ';
+								if($c == count($crews)-1) 
+								{
+									echo ' <magenta>&amp;</magenta> ';
+								} 
+								else 
+								{
+									echo ', ';
+								}
+							}
+							echo "<a href=\"info_crew.php?crew=$encoded_crew&sort_by=a.filename\">$crew</a>";
+							$c++;
+						}
+						?>
+					</div>
+					<div class="row d-flex justify-content-between">
+						Filename:
+						<a href="info_release.php?filename=<?=$encoded_filename?>"><?=$row->filename?></a>
+					</div>
+					<div class="row d-flex justify-content-between">	
+						<span>Size:</span>
+						<?=$row->filesize?>
+					</div>
+					<div class="row d-flex justify-content-between">
+						<span>Released:</span>
+						<?php
+						if(!empty($prodday))
+						{
+							echo "$prodday ";
+						}
+						if(isset($prodmonth))
+						{
+							if ($month_list[$prodmonth]!=Unknown)
+								echo "$month_list[$prodmonth] ";
+						}
+						if(!empty($year))
+						{
+							echo "$year";
+						}
+						?>
+					</div>
+					<div class="row d-flex justify-content-between">
+						<span>Rating:</span>
+
+						<?php
+						$ask_collyrating="SELECT rating from collys where filename=:filename";
+						$result_collyrating=fetchAll($ask_collyrating, [ 'filename' => $filename ]);
+						foreach($result_collyrating as $row_collyrating)
+						{
+							$collyrating=$row_collyrating->rating;
+						}
+
+						$ask_votes="SELECT COUNT(rating) AS count from comments where filename=:filename";
+						$result_votes=fetchAll($ask_votes, [ 'filename' => $filename ]);
+						foreach($result_votes as $row_votes)
+						{
+							$votecount=$row_votes->count;
+						}
+						?>
+						<?php
+						if(empty($collyrating))
+						{
+							$askagain="SELECT COUNT(rating) AS count from comments where filename=:filename";
+							$resultagain=fetchAll($askagain, [ 'filename' => $filename ]);
+							foreach($resultagain as $rowagain)
+							{
+								$votecount=$rowagain->count;
+								$votesleft=(3-$votecount);
+							}
+							if ($votesleft==1)
+							{
+								echo "Awaiting $votesleft vote";
+							}
+							elseif ($votesleft > 1)
+							{
+								echo "Awaiting $votesleft votes";
 							}
 						}
-						echo "<a href=\"info_artist.php?artist=$encoded_author&sort_by=filename\">$author</a>";
-						$c++;
-					}
-					?>
-					<br>
-
-					Crew:
-
-					<?php
-					$crews = array();
-					$ask_crew="select * from crew_of where filename=:filename";
-					$result_crew=fetchAll($ask_crew, [ 'filename' => $filename ]);
-					foreach($result_crew as $row_crew) 
-					{
-						$crews[]=$row_crew->id;
-					}
-
-					$c = 0;
-					foreach($crews as $crew) 
-					{
-						$encoded_crew=base64_encode($crew);
-						if($c > 0) 
+						else
 						{
-							if($c == count($crews)-1) 
-							{
-								echo ' <magenta>&amp;</magenta> ';
-							} 
-							else 
-							{
-								echo ', ';
-							}
+							echo "$collyrating ($votecount votes)";
 						}
-						echo "<a href=\"info_crew.php?crew=$encoded_crew&sort_by=a.filename\">$crew</a>";
-						$c++;
-					}
-					?>
-					<br>
+						?>
+					</div>
+					<div class="row d-flex justify-content-between">
+						<span>Added by:</span>
 
-					Filename:
-					<a href="info_release.php?filename=<?=$encoded_filename?>"><?=$row->filename?></a>
-					<br>
+						<a href="members.php?user=<?=$uploader?>"><?=$uploader?></a>
+					</div>
 
-					Size:
-					<?=$row->filesize?>
-					<br>
-
-					Released:
-					<?php
-					if(!empty($prodday))
-					{
-						echo "$prodday ";
-					}
-					if(isset($prodmonth))
-					{
-						if ($month_list[$prodmonth]!=Unknown)
-							echo "$month_list[$prodmonth] ";
-					}
-					if(!empty($year))
-					{
-						echo "$year";
-					}
-					?>
-					<br>
-
-					Rating:
-
-					<?php
-					$ask_collyrating="SELECT rating from collys where filename=:filename";
-					$result_collyrating=fetchAll($ask_collyrating, [ 'filename' => $filename ]);
-					foreach($result_collyrating as $row_collyrating)
-					{
-						$collyrating=$row_collyrating->rating;
-					}
-
-					$ask_votes="SELECT COUNT(rating) AS count from comments where filename=:filename";
-					$result_votes=fetchAll($ask_votes, [ 'filename' => $filename ]);
-					foreach($result_votes as $row_votes)
-					{
-						$votecount=$row_votes->count;
-					}
-					?>
-					<?php
-					if(empty($collyrating))
-					{
-						$askagain="SELECT COUNT(rating) AS count from comments where filename=:filename";
-						$resultagain=fetchAll($askagain, [ 'filename' => $filename ]);
-						foreach($resultagain as $rowagain)
+					<div class="row d-flex justify-content-between">
+						<span>Viewed:</span>
+						<?=$viewtimes?> times
+					</div>
+					<div class="row d-flex justify-content-between">
+						<span>Downloaded:</span>
+						<?php
+						$ask="SELECT downloads from collys where filename=:filename";
+						$result=fetchAll($ask, [ 'filename' => $filename ]);
+						foreach($result as $row)
 						{
-							$votecount=$rowagain->count;
-							$votesleft=(3-$votecount);
+							$downloads=$row->downloads;
 						}
-						if ($votesleft==1)
+
+						if(empty($downloads))
 						{
-							echo "Awaiting $votesleft vote";
+							echo "0 Times";
 						}
-						elseif ($votesleft > 1)
+						elseif($downloads == 1)
 						{
-							echo "Awaiting $votesleft votes";
+							echo "$downloads Time";
 						}
-					}
-					else
-					{
-						echo "$collyrating ($votecount votes)";
-					}
-					?>
-					<br>
-
-					Added by:
-
-					<a href="members.php?user=<?=$uploader?>"><?=$uploader?></a>
-					<br>
-
-					Viewed:
-					<?=$viewtimes?> times
-					<br>
-
-					Downloaded:
-					<?php
-					$ask="SELECT downloads from collys where filename=:filename";
-					$result=fetchAll($ask, [ 'filename' => $filename ]);
-					foreach($result as $row)
-					{
-						$downloads=$row->downloads;
-					}
-
-					if(empty($downloads))
-					{
-						echo "0 Times";
-					}
-					elseif($downloads == 1)
-					{
-						echo "$downloads Time";
-					}
-					else
-					{
-						echo "$downloads Times";
-					}
-					?>
-					<br>
+						else
+						{
+							echo "$downloads Times";
+						}
+						?>
+					</div>
 					<?php
 				}
 				?>
