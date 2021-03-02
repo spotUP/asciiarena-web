@@ -1847,11 +1847,11 @@ include "header.php";
 
 		$ask="insert into artists (id, nick, www, active, country, rating, acronym, user_id) values (0, :artistnick, :artistwww, :artiststatus, :artistcountry, 0, :artistacronym)";
 		doQuery($ask, [
-		  'artistnick' => $artistnick,
-		  'artistwww' => $artistwww,
-		  'artiststatus' => $artiststatus,
-		  'artistcountry' => $country_list[$artistcountry],
-		  'artistacronym' => $artistacronym
+			'artistnick' => $artistnick,
+			'artistwww' => $artistwww,
+			'artiststatus' => $artiststatus,
+			'artistcountry' => $country_list[$artistcountry],
+			'artistacronym' => $artistacronym
 		]);
 
 		if (isset($_POST[artist_crew]))
@@ -2472,27 +2472,24 @@ include "header.php";
 			else
 			{
 				?>
-				<div class="headline">
-					Please Login!
-				</div>					
-
-				<div class="content">
-					<br>You need to be logged in to use this feature.<br>
-					<a href=login.php>LOGiN.</a><br><br>
+				<div class="col-lg-12">
+					<div class="bs-component">
+						<div class="alert alert-dismissible alert-primary">
+							<button type="button" class="close" data-dismiss="alert">x</button>
+							You need to be <a class="ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">logged in</a> in to use this feature.
+						</div>
+					</div>
 				</div>
 				<?php
 			}
 			?>
+
+		</div>
+		<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+			<?php include "sidebar.php"; ?>
+		</div>
+		<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
+			<?php include "sidebar_right.php"; ?>
 		</div>
 	</div>
-</div>
-</div>
-
-<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
-	<?php include "sidebar.php"; ?>
-</div>
-<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
-	<?php include "sidebar_right.php"; ?>
-</div>
-</div>
-<?php include "footer.php"; ?>
+	<?php include "footer.php"; ?>

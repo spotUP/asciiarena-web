@@ -443,9 +443,19 @@ include "header.php";
 			else
 			{
 				?>
-				Please Login!
-				<br>You need to be logged in to use this feature.
-				<a href=login.php>LOGiN.</a>
+
+
+
+				<div class="col-lg-12">
+					<div class="bs-component">
+						<div class="alert alert-dismissible alert-primary">
+							<button type="button" class="close" data-dismiss="alert">x</button>
+							You need to be <a class="ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">logged in</a> in to use this feature.
+
+						</div>
+					</div>
+				</div>
+				
 				<?php
 			}
 			?>
