@@ -38,7 +38,7 @@ subtest 'Register' => sub {
 };
 
 subtest 'Delete message' => sub {
-  login_ok($nick, $pw);
+  $t->login_ok($nick, $pw);
   my $message_line = create_message_ok($nick, 'testsubject', 'testmessage');
   my $thread = $message_line->at('input[name=thread]')->attr('value');
   my $messid = $message_line->at('input[name=messid]')->attr('value');
@@ -52,21 +52,21 @@ subtest 'Reply message' => sub {
   my $nick1 = 'user1';
   my $pw1   = 'userpw1';
   register($nick1, $pw1, $nick1 . '@example.com');
-  login_ok($nick1, $pw1);
-  logout_ok();
+  $t->login_ok($nick1, $pw1);
+  $t->logout_ok();
 
   my $nick2 = 'user2';
   my $pw2   = 'userpw2';
   register($nick2, $pw2, $nick2 . '@example.com');
-  login_ok($nick2, $pw2);
+  $t->login_ok($nick2, $pw2);
 
   diag("send messag from user2 to user1");
   my $subject = 'testsubject';
   my $message_line = create_message_ok($nick1, $subject, 'testmessage');
-  logout_ok();
+  $t->logout_ok();
 
   diag("find message in user1 inbox ($subject)");
-  login_ok($nick1, $pw1);
+  $t->login_ok($nick1, $pw1);
   $t->get_ok('/messages.php');
   $message_line = $t->tx->res->dom->find('form')->grep( sub { my $a = $_->at('a.yellow'); $a && ($a->text eq $subject) })->last;
   my $thread = $message_line->at('input[name=thread]')->attr('value');
@@ -82,10 +82,10 @@ subtest 'Reply message' => sub {
   diag("action: '$action': ", explain(\%post_fields));
   $t->post_ok($action, form => { %post_fields });
 
-  logout_ok();
+  $t->logout_ok();
 
   diag("read reply");
-  login_ok($nick2, $pw2);
+  $t->login_ok($nick2, $pw2);
   $t->get_ok('/messages.php');
   $message_line = $t->tx->res->dom->find('form')->grep( sub { my $a = $_->at('a.yellow'); $a && ($a->text eq $subject) })->last;
   my $thread = $message_line->at('input[name=thread]')->attr('value');
@@ -94,21 +94,6 @@ subtest 'Reply message' => sub {
 
   ok($t->tx->res->dom('div.row span.white')->grep(sub { $_->all_text =~ m{testreply} })->size, 'Found reply');
 };
-
-sub login_ok {
-  my ($nick, $pw) = @_;
-  $t->post_ok('/cmds.php?cmd=login', form => { nick => $nick, password => $pw });
-  $t->status_is(302)->header_is('Location' => '/');
-  $t->get_ok($t->tx->res->headers->header('Location'))->status_is(200);
-  $t->element_exists_not('.nav-link[href=#login]', 'Should not be a login link when we are logged in');
-}
-
-sub logout_ok {
-  $t->get_ok('/cmds.php?cmd=logout');
-  $t->status_is(302)->header_is('Location' => '/');
-  $t->get_ok($t->tx->res->headers->header('Location'))->status_is(200);
-  $t->element_exists('.nav-link[href=#login]', 'Should be a login link when we are logged out');
-}
 
 sub create_message_ok {
   my ($to, $subject, $msg) = @_;
