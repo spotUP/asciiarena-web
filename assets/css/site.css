@@ -456,18 +456,36 @@ html {
 }
 
 
-input,
-button,
-select,
-optgroup,
-textarea {
+input, optgroup, textarea {
+  color: #ededed !important;
   font-family: 'TopazPlus_a1200' !important;
   font-size: 16px;
+  background: #444444 !important;
+}
+
+input:hover, optgroup:hover {
+  color: #000000 !important;
+  font-family: 'TopazPlus_a1200' !important;
+  font-size: 16px;
+  background: #2a2a2a !important;
+}
+
+select {
+  color: #999999 !important;
+  font-family: 'TopazPlus_a1200' !important;
+  font-size: 16px;
+  background: #444444 !important;
+}
+
+select:hover {
+  color: #000000 !important;
+  font-family: 'TopazPlus_a1200' !important;
+  font-size: 16px;
+  background: #999999 !important;
 }
 
 .btn-primary {
-  color: #000000;
-  border-color: #000000;
+  color: #999999 !important;
   background-color: #bbbbbb;
   margin-left: 0px !important;
   margin-right: 8px !important; 
@@ -475,12 +493,27 @@ textarea {
   text-align: center;
 }
 
+.btn-primary:hover {
+  color: #000000 !important;
+  background-color: #999999 !important;
+  margin-left: 0px !important;
+  margin-right: 8px !important; 
+  width: 132px; 
+  text-align: center;
+}
 
+/*
+.btn-primary:hover {
+  color: #000000;
+  border-color: #000000;
+  margin-right: 8px !important;
+  width: 132px;
+  text-align: center;
+}
 
 .btn-primary:active {
   color: #000000;
   border-color: #000000;
-  background-color: #bbbbbb;
   margin-right: 8px !important;
   width: 132px;
   text-align: center;
@@ -489,7 +522,6 @@ textarea {
 .btn-primary:focus {
   color: #000000;
   border-color: #000000;
-  background-color: #bbbbbb;
   margin-right: 8px !important;
   width: 132px;
   text-align: center;
@@ -525,6 +557,7 @@ textarea {
   width: 132px;
   text-align: center;
 }
+*/
 
 pre,
 code,
@@ -861,7 +894,7 @@ a.dropdown-item:focus{
 a:hover{
   background: transparent;
   color: #ffffff;
-/*  margin-left: 8px; */
+  /*  margin-left: 8px; */
 }
 
 a:hover::before{
@@ -1148,24 +1181,14 @@ textarea.fig-txt{
 }
 
 input, button, select, optgroup {
-  /* line-height: 16px; */
   border: 0;
-  /*  margin: -1px !important; */
-  /* padding: 0 !important; */
-  /* height: 16px; */
-  /* line-height: 16px !important; */
   max-height: 16px;
   min-height: 16px;
   border: 0 !important;
 }
 
 input:active, button:active, select:active, optgroup:active {
-  /* line-height: 16px; */
   border: 0;
-  /*  margin: -1px !important; */
-  /* padding: 0 !important; */
-  /* height: 16px; */
-  /* line-height: 16px !important; */
   max-height: 16px;
   min-height: 16px;
 }
@@ -1598,7 +1621,7 @@ input[type=text]{
 }
 
 .dropup, .dropright, .dropdown, .dropleft {
-    line-height: 14px;
-    height: 16px;
+  line-height: 14px;
+  height: 16px;
 }
 
