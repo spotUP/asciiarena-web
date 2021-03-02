@@ -391,11 +391,11 @@ include "header.php";
 		{
 			$artist=$row->nick;
 
-			$ask_rating="select avg(rating) from comments where artist=:artist and rating>0";
+			$ask_rating="select avg(rating) AS avg from comments where artist=:artist and rating>0";
 			$result_rating=fetchAll($ask_rating,['artist' => $artist]);
 			foreach ($result_rating as $row_rating)
 			{
-				$avg_artist_rating=$row_rating[0];
+				$avg_artist_rating=$row_rating->avg;
 			}
 
 			if(!isset($avg_artist_rating))
@@ -412,11 +412,11 @@ include "header.php";
 		{
 			$crew=$row->crew;
 
-			$ask_rating="select avg(rating) from comments where crew=:crew and rating>0";
+			$ask_rating="select avg(rating) AS avg from comments where crew=:crew and rating>0";
 			$result_rating=fetchAll($ask_rating,[ 'crew' => $crew ]);
 			foreach ($result_rating as $row)
 			{
-				$avg_crew_rating=$row_rating[0];
+				$avg_crew_rating=$row_rating->avg;
 			}
 			if(!isset($avg_crew_rating))
 			{
@@ -1413,7 +1413,7 @@ if(isset($_POST['getartist']) && is_admin())
 					$result_crews=fetchAll($ask_crews);
 					foreach ($result_crews as $row_crews)
 					{
-						$crews=$row_crews[0];
+						$crews=$row_crews->name;
 						echo "<option>$crews</option>";
 					}
 					echo "</select>";
