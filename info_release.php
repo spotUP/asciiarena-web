@@ -821,7 +821,7 @@ require_once "header.php"; ?>
 
         $def_color = fetchOne("SELECT def_bg_col FROM users WHERE nick = :nick", [":nick" => $nick]);
         if (($def_color) && ($def_color->def_bg_col)) {
-            $bgcolor = $font->def_bg_col;
+            $bgcolor = $def_color->def_bg_col;
         } else if (isset($_POST['background_color'])) {
             $bgcolor = $_POST['background_color'];
         } else {
