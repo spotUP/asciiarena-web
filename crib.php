@@ -125,7 +125,7 @@ include "header.php";
 				$ask="update users set list_view_mode=:changelistviewmode where nick=:nick";
 				doQuery($ask,[ 'changelistviewmode' => $changelistviewmode, 'nick' => $nick ]);	
 			}		
-			if(isset($_POST['old_password']))
+			if(isset($_POST['old_password']) && $_POST['old_password'])
 			{
 				$old_password=$_POST['old_password'];
 				$new_password=$_POST['new_password'];
