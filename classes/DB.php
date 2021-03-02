@@ -24,10 +24,11 @@ class DB {
     $dsn = sprintf("%s:dbname=%s;host=%s", $driver, $db, $host);
     try {
       $this->dbh = new PDO($dsn, $user, $password);
+      $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
     catch (PDOException $e) {
       // @todo: log this somewhere?
-      echo "Database error: " . $e->getMessage();
+      error_log("Database error: " . $e->getMessage());
       die();
     }
   }
