@@ -47,8 +47,32 @@ sub _build_ok {
 sub dump_output {
   $h->pump;
   do { note $out; undef $out; } if $out;
+  if ($err =~ m{error}i) {
+    fail('Error thrown');
+  }
   do { diag $err; undef $err; } if $err;
 }
+
+=head2 App testing functions
+
+=cut
+
+sub login_ok {
+  my ($t, $nick, $pw) = @_;
+  $t->post_ok('/cmds.php?cmd=login', form => { nick => $nick, password => $pw });
+  $t->status_is(302)->header_is('Location' => '/');
+  $t->get_ok($t->tx->res->headers->header('Location'))->status_is(200);
+  $t->element_exists_not('.nav-link[href=#login]', 'Should not be a login link when we are logged in');
+}
+
+sub logout_ok {
+  my $t = shift;
+  $t->get_ok('/cmds.php?cmd=logout');
+  $t->status_is(302)->header_is('Location' => '/');
+  $t->get_ok($t->tx->res->headers->header('Location'))->status_is(200);
+  $t->element_exists('.nav-link[href=#login]', 'Should be a login link when we are logged out');
+}
+
 
 DESTROY {
   $h->kill_kill;
