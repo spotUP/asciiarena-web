@@ -12,6 +12,7 @@
 			"rank" => "Inactive",
 			"settings" => []
 		];
+	require_once "tools/autoload.php";
 	require_once "tools/db.php";
 	require_once "tools/users.php";
 	require_once "tools/widgets.php";
