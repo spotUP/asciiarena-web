@@ -142,8 +142,7 @@ include_once "header.php";
 				<div class="bs-component">
 					<div class="alert alert-dismissible alert-primary">
 						<button type="button" class="close" data-dismiss="alert">x</button>
-						You need to be <a class="ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">logged in</a> in to use this feature.
-
+						You need to be <a class="ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">logged in</a>to use this feature.
 					</div>
 				</div>
 			</div>
@@ -152,8 +151,6 @@ include_once "header.php";
 		?>
 
 	</div>
-
-
 	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
 		<?php include "sidebar.php"; ?>
 	</div>
