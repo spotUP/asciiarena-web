@@ -1,9 +1,4 @@
 <?php
-// Autoload all classes in classes/*
-spl_autoload_register(function ($class_name) {
-  include __DIR__ . "/classes/" . $class_name . '.php';
-});
-
 require_once "session.php";
 $h1 = ["wELCOME tO aSCIIaRENA", "bY uP rOUGH and diViNE sTYLERS"];
 include "header.php";

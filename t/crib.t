@@ -14,7 +14,7 @@ my $mail = 'test@example.com';
 
 my $t = AsciiArena->new;
 
-system(qq{php -r 'include("autoload.php"); User::register("$nick", "$pw", "$mail", "Admin");'});
+system(qq{php -r 'include("tools/autoload.php"); User::register("$nick", "$pw", "$mail", "Admin");'});
 $t->login_ok($nick, $pw);
 $t->get_ok('/crib.php');
 
