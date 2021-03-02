@@ -794,7 +794,7 @@ require_once "header.php"; ?>
 
 			echo "<input type='submit' class='btn-primary amb-1' name='hide' value='Hide Colly!'" . ((!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) ? " style='display:none'" : "") . "> ";
 			echo "<input type='submit' class='btn-primary amb-1' name='view' value='View Colly'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
-
+			echo "<input type='submit' class='btn-primary amb-1' name='fullscreen' value='Fullscreen'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
 
 			if (is_logged_in()) {
 				echo "<input type='submit' class='btn-primary amb-1' name=addcomment value='Comment'> ";
