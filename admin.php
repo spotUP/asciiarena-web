@@ -1,156 +1,30 @@
 <?php
-include_once('session.php');
+require_once "session.php";
+$h1 = ["wELCOME tO aSCIIaRENA", "bY uP rOUGH and diViNE sTYLERS"];
+include "header.php";
+
 ?>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "https://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-	<title>ASCIIARENA brought to you by UP ROUGH SOUNDSYSTEM</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
-	<link rel='stylesheet' href='style.css' type='text/css'>
-	<meta name="viewport" content="width=device-width">
-	<script type="text/javascript">
-		function add_colly_crew_field() {
-			var newselect = " <select name=\"colly_crew[]\"" + document.getElementById('total_colly_crews').value + "><option>Independent</option><?php
-			foreach (fetchAll("SELECT name FROM crews") as $row) {
-				echo "<option>{$row->name}</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_colly_crew_field').innerHTML = document.getElementById('new_colly_crew_field').innerHTML + newselect;
-			document.getElementById('total_colly_crews').value = parseInt(document.getElementById('total_colly_crews').value) + 1;
-		}
-	</script>
-
-	<script type="text/javascript">
-		function add_colly_author_field() {
-			var newselect = " <select name=\"colly_author[]\"" + document.getElementById('total_colly_authors').value + "><option value=\"Unknown\">Unknown</option><?php
-			foreach (fetchAll("SELECT nick FROM artists") as $row) {
-				echo "<option>{$row->nick}</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_colly_author_field').innerHTML = document.getElementById('new_colly_author_field').innerHTML + newselect;
-			document.getElementById('total_colly_authors').value = parseInt(document.getElementById('total_colly_authors').value) + 1;
-		}
-
-	</script>
-
-
-	<script type="text/javascript">
-
-		function add_bbs_field()
-		{
-			var newselect = " <select name=\"add_bbs[]\"" + document.getElementById('total_bbses').value + "><option value=\"Unknown\">Unknown</option><?php
-
-			$ask="select name from bbses";
-			$result=fetchAll($ask);
-			foreach ($result as $row)
-			{
-				$add_bbses=$row->name;
-				echo "<option>$add_bbses</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_bbs_field').innerHTML =  document.getElementById('new_bbs_field').innerHTML + newselect;
-			document.getElementById('total_bbses').value =  parseInt( document.getElementById('total_bbses').value) + 1;
-		}
-
-	</script>
-
-	<script type="text/javascript">
-		function add_artist_crew_field()
-		{
-			var newselect = " <select name=\"artist_crew[]\"" + document.getElementById('total_artist_crews').value + "><option value=\"Unknown\">Unknown</option><?php
-
-			$ask="select name from crews";
-			$result=fetchAll($ask);
-			foreach($result as $row)
-			{
-				$crews=$row->name;
-				echo "<option value='$crews'>$crews</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_artist_crew_field').innerHTML =  document.getElementById('new_artist_crew_field').innerHTML + newselect;
-			document.getElementById('total_artist_crews').value =  parseInt( document.getElementById('total_artist_crews').value) + 1;
-		}
-
-	</script>
-
-	<script type="text/javascript">
-		function add_colly_author_field()
-		{
-			var newselect = " <select name=\"colly_author[]\"" + document.getElementById('total_colly_authors').value + "><option value=\"Unknown\">Unknown</option><?php
-
-			$ask="select nick from artists";
-			$result=fetchAll($ask);
-			foreach($result as $row)
-			{
-				$artists=$row->nick;
-				echo "<option>$artists</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_colly_author_field').innerHTML =  document.getElementById('new_colly_author_field').innerHTML + newselect;
-			document.getElementById('total_colly_authors').value =  parseInt( document.getElementById('total_colly_authors').value) + 1;
-		}
-
-	</script>
-
-	<script type="text/javascript">
-		function add_colly_crew_field()
-		{
-			var newselect = " <select name=\"colly_crew[]\"" + document.getElementById('total_colly_crews').value + "><option>Independent</option><?php
-
-			$ask="select name from crews";
-			$result=fetchAll($ask);
-			foreach ($result as $row)
-			{
-				$crews=$row->name;
-				echo "<option value='$crews'>$crews</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_colly_crew_field').innerHTML =  document.getElementById('new_colly_crew_field').innerHTML + newselect;
-			document.getElementById('total_colly_crews').value =  parseInt( document.getElementById('total_colly_crews').value) + 1;
-		}
-	</script>
-
-</head>
-<body>
-
-	<div class="maincontainer">
-		<div class="header">
-			<?php include ('header.php'); ?>
-		</div>	
-		<div class="leftsidebar">
-			<?php include ('sidebar.php'); ?>
-		</div>	
-		<div class="maincontent">
-			<?php
-			if (is_logged_in() && is_admin())
-			{
-
-		//echo "<pre>";print_r($_POST);echo "</pre>";
+<div class="modal-body row m-0 p-0">
+	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
+		<?php
 
 //---------------------------------------------------------------------------------------------------------------
 // SET COLLY TO FIXED
 //---------------------------------------------------------------------------------------------------------------
 
-				if(isset($_POST['colly_fixed']) && is_admin())
-				{
-					$fixed_colly=cleanInsert($_POST['filename']);
-					$fixed_colly=stripslashes($fixed_colly);
-					if(!empty($fixed_colly))
-					{
-						$ask="update collys set broken=0 where filename=:fixed_colly";
-						doQuery($ask,[':fixed_colly' => $fixed_colly]);
-					}
-					?>
-					<meta http-equiv="Refresh" content="0; url=admin.php">
-					<?php
-				}	
+		if(isset($_POST['colly_fixed']) && is_admin())
+		{
+			$fixed_colly=cleanInsert($_POST['filename']);
+			$fixed_colly=stripslashes($fixed_colly);
+			if(!empty($fixed_colly))
+			{
+				$ask="update collys set broken=0 where filename=:fixed_colly";
+				doQuery($ask,['fixed_colly' => $fixed_colly]);
+			}
+			?>
+			<meta http-equiv="Refresh" content="0; url=admin.php">
+			<?php
+		}	
 
 
 
@@ -158,71 +32,64 @@ include_once('session.php');
 // DELETE USER FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-				if(isset($_POST['delete_user']) && is_admin())
-				{
-					$delete_user=$_POST['getuser'];
-					$delete_user=cleanInsert($delete_user);
+		if(isset($_POST['delete_user']) && is_admin())
+		{
+			$delete_user=$_POST['getuser'];
+			$delete_user=cleanInsert($delete_user);
 
-					if(!empty($delete_user))
-					{
-						$ask="delete from users where nick=:delete_user";
-						doQuery($ask, [ ':delete_user' => $delete_user ]);
-					}
-					?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
-				}	
+			if(!empty($delete_user))
+			{
+				$ask="delete from users where nick=:delete_user";
+				doQuery($ask, [ 'delete_user' => $delete_user ]);
+			}
+			?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
+		}	
 
 
 //---------------------------------------------------------------------------------------------------------------
 // DELETE CREW FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-				if(isset($_POST['do_delete_crew']) && is_admin())
-				{
-					$delete_crew=$_POST['getcrew'];
-					$delete_crew=cleanInsert($delete_crew);
+		if(isset($_POST['do_delete_crew']) && is_admin())
+		{
+			$delete_crew=$_POST['getcrew'];
+			$delete_crew=cleanInsert($delete_crew);
 
-					if(!empty($delete_crew))
-					{
-						$ask="delete from crews where name=:delete_crew";
-						doQuery($ask,[ ':delete_crew' => $delete_crew]);
+			if(!empty($delete_crew))
+			{
+				$ask="delete from crews where name=:delete_crew";
+				doQuery($ask,[ 'delete_crew' => $delete_crew]);
 
-						$ask="delete from bbs_of where crew=:delete_crew";
-						doQuery($ask,[ ':delete_crew' => $delete_crew]);
-					}
-					?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
-				}	
+				$ask="delete from bbs_of where crew=:delete_crew";
+				doQuery($ask,[ 'delete_crew' => $delete_crew]);
+			}
+			?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
+		}	
 
 //---------------------------------------------------------------------------------------------------------------
 // DELETE SITELOGO FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-				if(isset($_POST['delete_sitelogo']) && is_admin())
-				{
-					$delete_sitelogo=$_POST['getsitelogo'];
-					$delete_sitelogo=cleanInsert($delete_sitelogo);
+		if(isset($_POST['delete_sitelogo']) && is_admin())
+		{
+			$delete_sitelogo=$_POST['getsitelogo'];
 
-					$logo_filename=$_POST['getsitelogo'];
-					$logo_filename=cleanInsert($logo_filename);
-
-					$logo_filename=addslashes($logo_filename);
-					unlink("logos/$logo_filename");
-
-					if(!empty($delete_sitelogo))
-					{
-						$ask="delete from logos where filename=:delete_sitelogo";
-						doQuery($ask, [':delete_sitelogo' => $delete_sitelogo]);
-					}
-					?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
-				}	
+			if(!empty($delete_sitelogo))
+			{
+				$ask="delete from logos where logo_id=:delete_sitelogo";
+				doQuery($ask, ['delete_sitelogo' => $delete_sitelogo]);
+			}
+			?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
+		}	
 
 //---------------------------------------------------------------------------------------------------------------
 // DELETE COLLY FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-				if(isset($_POST['do_delete_colly']) && is_admin())
-				{
-					$delete_colly=$_POST['filename'];
-					$delete_colly=cleanInsert($delete_colly);
+		if(isset($_POST['do_delete_colly']) && is_admin())
+		{
+			$delete_colly=$_POST['filename'];
+			$delete_colly=cleanInsert($delete_colly);
 
 		$ask="select uploader from collys where filename='$delete_colly'"; // fetch uploader of deleted colly
 		$result=fetchAll($ask);
@@ -277,19 +144,19 @@ include_once('session.php');
 			doQuery("DELETE FROM author_of WHERE filename LIKE :delete_colly", [ ":delete_colly" => "$delete_colly%" ]); 
 		}
 
-		$row = fetchOne("select sum(filesize) AS sum_filesize from collys where uploader=':nick'", [":nick" => $nick]);
+		$row = fetchOne("select sum(filesize) AS sum_filesize from collys where uploader=:nick", [":nick" => $nick]);
 		if ($row)
 		{
 			$collysize=$row->sum_filesize;
 		}
 
-		$row = fetchOne("select sum(filesize) AS sum_filesize from mags where uploader=':nick'", [":nick" => $nick]);
+		$row = fetchOne("select sum(filesize) AS sum_filesize from mags where uploader=:nick", [":nick" => $nick]);
 		if ($row)
 		{
 			$magsize=$row->sum_filesize;
 		}
 
-		$row = fetchOne("select sum(filesize) AS sum_filesize from apps where uploader=':nick'", [":nick" => $nick]);
+		$row = fetchOne("select sum(filesize) AS sum_filesize from apps where uploader=:nick", [":nick" => $nick]);
 		if ($row)
 		{
 			$appsize=$row->sum_filesize;
@@ -308,14 +175,14 @@ include_once('session.php');
 			$artist=$row->nick;
 
 			$ask_avg="select avg(rating) AS avg_rating from comments where artist= :artist and rating > 0";
-			$result_avg=fetchAll($ask_avg, [':artist' => $artist]);
+			$result_avg=fetchAll($ask_avg, ['artist' => $artist]);
 			foreach ($result_avg as $row_avg)
 			{
 				$avg_artist_rating=$row_avg->avg_rating;
 			}
 			
 			$ask_rate_amount="SELECT COUNT(rating) AS count_rating from comments where artist=:artist and rating>0";
-			$result_rate_amount=fetchAll($ask_rate_amount,[ ':artist' => $artist ]);
+			$result_rate_amount=fetchAll($ask_rate_amount,[ 'artist' => $artist ]);
 			foreach ($result_rate_amount as $row_rate_amount)
 			{
 				$rate_amount=$row_rate_amount->count_rating;
@@ -324,7 +191,7 @@ include_once('session.php');
 			if ($rate_amount >2)
 			{
 				$ask_update="update artists set rating=:avg_artist_rating where nick=:artist";
-				doQuery($ask_update, [ ':artist' => $artist, ':avg_artist_rating' => $avg_artist_rating]);	
+				doQuery($ask_update, [ 'artist' => $artist, 'avg_artist_rating' => $avg_artist_rating]);	
 			}
 		}
 
@@ -341,7 +208,7 @@ include_once('session.php');
 
 			# FIXME: Probably fetchOne ?
 			$ask_rating="select avg(rating) AS avg_rating from comments where crew=:crew and rating>0";
-			$result_rating=fetchAll($ask_rating, [':crew' => $crew ]);
+			$result_rating=fetchAll($ask_rating, ['crew' => $crew ]);
 			foreach ($result_rating as $avg_crew_rating)
 			{
 				$avg_crew_rating=$row_rating->avg_rating;
@@ -351,7 +218,7 @@ include_once('session.php');
 				$avg_crew_rating=0;
 			}	
 			$ask_update="update crews set rating=:avg_crew_rating where name=:crew ";
-			doQuery($ask_update,[':avg_crew_rating' => $avg_crew_rating, ':crew' => $crew]);	
+			doQuery($ask_update,['avg_crew_rating' => $avg_crew_rating, 'crew' => $crew]);	
 		}
 		?>
 		<meta http-equiv="Refresh" content="0; url=admin.php">
@@ -371,7 +238,7 @@ include_once('session.php');
 		if(!empty($delete_bbs))
 		{
 			$ask="delete from bbses where name=:delete_bbs";
-			doQuery($ask,[ ':delete_bbs' => $delete_bbs ]);
+			doQuery($ask,[ 'delete_bbs' => $delete_bbs ]);
 		}
 		?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
 	}	
@@ -387,10 +254,10 @@ include_once('session.php');
 		if(!empty($delete_artist))
 		{
 			$ask="delete from artists where nick=:delete_artist";
-			doQuery($ask, [':delete_artist' => $delete_artist]);
+			doQuery($ask, ['delete_artist' => $delete_artist]);
 
 			$ask="delete from member_of where nick=:delete_artist";
-			doQuery($ask, [':delete_artist' => $delete_artist]);
+			doQuery($ask, ['delete_artist' => $delete_artist]);
 		}
 		?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
 	}	
@@ -409,7 +276,7 @@ include_once('session.php');
 			$edit_colly_name=$_POST['edit_colly_name'];
 			$edit_colly_name = cleanInsert($edit_colly_name); 
 			$ask="update collys set name=:edit_colly_name where filename=:filename";	
-			doQuery($ask, [':edit_colly_name' => $edit_colly_name, ':filename' => $filename]);
+			doQuery($ask, ['edit_colly_name' => $edit_colly_name, 'filename' => $filename]);
 		}
 
 		if(isset($_POST['old_colly_authors']) || (isset($_POST['colly_author']) && is_admin()))
@@ -418,7 +285,7 @@ include_once('session.php');
 			$filename=cleanInsert($filename);
 
 			$ask="delete from author_of where filename=:filename";
-			doQuery($ask, [':filename' => $filename]);
+			doQuery($ask, ['filename' => $filename]);
 
 			if (isset($_POST['old_colly_authors']))
 			{			
@@ -426,7 +293,7 @@ include_once('session.php');
 				{
 					$colly_author=cleanInsert($colly_author);
 					$ask="insert into author_of values (:colly_author,:filename)";
-					doQuery($ask, [':colly_author' => $colly_author, ':filename' => $filename]);
+					doQuery($ask, ['colly_author' => $colly_author, 'filename' => $filename]);
 				}
 			}
 
@@ -436,11 +303,11 @@ include_once('session.php');
 				{
 					$new_colly_author=cleanInsert($new_colly_author);
 					$ask="insert into author_of values (:new_colly_author,:filename)";
-					doQuery($ask,[':new_colly_author' => $new_colly_author, ':filename' => $filename]);
+					doQuery($ask,['new_colly_author' => $new_colly_author, 'filename' => $filename]);
 				}
 			}
 			$ask="delete from author_of where filename=:filename and nick='Delete'";
-			doQuery($ask,[':filename' => $filename ]);
+			doQuery($ask,['filename' => $filename ]);
 		}
 		if(isset($_POST['old_colly_crews']) || (isset($_POST['colly_crew']) && is_admin()))
 		{
@@ -448,14 +315,14 @@ include_once('session.php');
 			$filename=cleanInsert($filename);
 
 			$ask="delete from crew_of where filename=:filename";
-			doQuery($ask,[':filename' => $filename]);
+			doQuery($ask,['filename' => $filename]);
 
 			if (isset($_POST[old_colly_crews]))
 			{			
 				foreach($_POST[old_colly_crews] as $colly_crew)
 				{
 					$ask="insert into crew_of values (:colly_crew,:filename)";
-					doQuery($ask,[':colly_crew' => $colly_crew, ':filename' => $filename]);
+					doQuery($ask,['colly_crew' => $colly_crew, 'filename' => $filename]);
 				}
 			}
 
@@ -464,12 +331,12 @@ include_once('session.php');
 				foreach($_POST[colly_crew] as $new_colly_crew)
 				{
 					$ask="insert into crew_of values (:new_colly_crew, :filename)";
-					doQuery($ask, [':new_colly_crew' => $new_colly_crew, ':filename' => $filename]);
+					doQuery($ask, ['new_colly_crew' => $new_colly_crew, 'filename' => $filename]);
 				}
 			}
 			
 			$ask="delete from crew_of where filename=:filename and crew='Delete'";
-			doQuery($ask,[':filename' => $filename]);
+			doQuery($ask,['filename' => $filename]);
 		}
 		if(isset($_POST['edit_colly_year']) && is_admin())
 		{
@@ -478,7 +345,7 @@ include_once('session.php');
 			$edit_colly_year=$_POST['edit_colly_year'];
 			$edit_colly_year= cleanInsert($edit_colly_year); 
 			$ask="update collys set year=:edit_colly_year where filename=:filename";	
-			doQuery($ask,[':edit_colly_year' => $edit_colly_year, ':filename' => $filename]);	
+			doQuery($ask,['edit_colly_year' => $edit_colly_year, 'filename' => $filename]);	
 		}
 		if(isset($_POST['edit_colly_type']) && is_admin())
 		{
@@ -489,7 +356,7 @@ include_once('session.php');
 			$edit_colly_type=cleanInsert($edit_colly_type); 
 
 			$ask="update collys set type=:edit_colly_type where filename=:filename";	
-			doQuery($ask,[':edit_colly_type' => $edit_colly_type, ':filename' => $filename]);	
+			doQuery($ask,['edit_colly_type' => $edit_colly_type, 'filename' => $filename]);	
 		}
 		if(isset($_POST['edit_colly_month']) && is_admin())
 		{
@@ -500,7 +367,7 @@ include_once('session.php');
 			$edit_colly_month=cleanInsert($edit_colly_month);
 			
 			$ask="update collys set month='$edit_colly_month' where filename='$filename'";	
-			doQuery($ask,[':edit_colly_month' => $edit_colly_month, ':filename' => $filename]);	
+			doQuery($ask,['edit_colly_month' => $edit_colly_month, 'filename' => $filename]);	
 		}
 		if(isset($_POST['edit_colly_day']) && is_admin())
 		{
@@ -511,7 +378,7 @@ include_once('session.php');
 			$edit_colly_day=cleanInsert($edit_colly_day); 
 			
 			$ask="update collys set day=:edit_colly_day where filename=:filename";	
-			doQuery($ask,[':edit_colly_day' => $edit_colly_day, ':filename' => $filename]);	
+			doQuery($ask,['edit_colly_day' => $edit_colly_day, 'filename' => $filename]);	
 		}
 
 //---------------------------------------------------------------------------------------------------------------
@@ -524,11 +391,11 @@ include_once('session.php');
 		{
 			$artist=$row->nick;
 
-			$ask_rating="select avg(rating) from comments where artist=:artist and rating>0";
-			$result_rating=fetchAll($ask_rating,[':artist' => $artist]);
+			$ask_rating="select avg(rating) AS avg from comments where artist=:artist and rating>0";
+			$result_rating=fetchAll($ask_rating,['artist' => $artist]);
 			foreach ($result_rating as $row_rating)
 			{
-				$avg_artist_rating=$row_rating[0];
+				$avg_artist_rating=$row_rating->avg;
 			}
 
 			if(!isset($avg_artist_rating))
@@ -537,7 +404,7 @@ include_once('session.php');
 			}	
 
 			$ask_update="update artists set rating=:avg_artist_rating where nick=:artist";
-			doQuery($ask,[':avg_artist_rating' => $avg_artist_rating, ':artist' => $artist]);	
+			doQuery($ask,['avg_artist_rating' => $avg_artist_rating, 'artist' => $artist]);	
 		}
 		$ask="select crew from crew_of";
 		$result=fetchAll($ask);
@@ -545,18 +412,18 @@ include_once('session.php');
 		{
 			$crew=$row->crew;
 
-			$ask_rating="select avg(rating) from comments where crew=:crew and rating>0";
-			$result_rating=fetchAll($ask_rating,[ ':crew' => $crew ]);
+			$ask_rating="select avg(rating) AS avg from comments where crew=:crew and rating>0";
+			$result_rating=fetchAll($ask_rating,[ 'crew' => $crew ]);
 			foreach ($result_rating as $row)
 			{
-				$avg_crew_rating=$row_rating[0];
+				$avg_crew_rating=$row_rating->avg;
 			}
 			if(!isset($avg_crew_rating))
 			{
 				$avg_crew_rating=0;
 			}	
 			$ask_update="update crews set rating=:avg_crew_rating where name=:crew";
-			doQuery($ask_update,[':avg_crew_rating' => $avg_crew_rating, ':crew' => $crew]);	
+			doQuery($ask_update,['avg_crew_rating' => $avg_crew_rating, 'crew' => $crew]);	
 		}
 		?>
 		<meta http-equiv="Refresh" content="0; url=admin.php">
@@ -579,10 +446,10 @@ include_once('session.php');
 			$edit_crew_name=$_POST['edit_crew_name'];
 			$edit_crew_name=cleanInsert($edit_crew_name); 
 
-			doQuery("update crews     set name=:edit_crew_name where name=:crew", [':edit_crew_name' => $edit_crew_name, ':crew' => $crew]);
-			doQuery("update crew_of   set crew=:edit_crew_name where crew=:crew", [':edit_crew_name' => $edit_crew_name, ':crew' => $crew]);	
-			doQuery("update bbs_of    set crew=:edit_crew_name where crew=:crew", [':edit_crew_name' => $edit_crew_name, ':crew' => $crew]);	
-			doQuery("update member_of set crew=:edit_crew_name where crew=:crew", [':edit_crew_name' => $edit_crew_name, ':crew' => $crew]);	
+			doQuery("update crews     set name=:edit_crew_name where name=:crew", ['edit_crew_name' => $edit_crew_name, 'crew' => $crew]);
+			doQuery("update crew_of   set crew=:edit_crew_name where crew=:crew", ['edit_crew_name' => $edit_crew_name, 'crew' => $crew]);	
+			doQuery("update bbs_of    set crew=:edit_crew_name where crew=:crew", ['edit_crew_name' => $edit_crew_name, 'crew' => $crew]);	
+			doQuery("update member_of set crew=:edit_crew_name where crew=:crew", ['edit_crew_name' => $edit_crew_name, 'crew' => $crew]);	
 		}
 		if(isset($_POST['edit_crew_www']) && is_admin())
 		{
@@ -592,14 +459,14 @@ include_once('session.php');
 			$edit_crew_www=$_POST['edit_crew_www'];
 			$edit_crew_www=cleanInsert($edit_crew_www); 
 
-			doQuery("update crews set www=:edit_crew_www where name=:edit_crew_name", [':edit_creq_www' => $edit_crew_www, ':edit_crew_name' => $edit_crew_name]);	
+			doQuery("update crews set www=:edit_crew_www where name=:edit_crew_name", ['edit_creq_www' => $edit_crew_www, 'edit_crew_name' => $edit_crew_name]);	
 		}
 
 		if(isset($_POST['add_bbs']) && is_admin())
 		{
 				foreach($_POST[add_bbs] as $add_bbs) // add new bbses
 				{
-					doQuery("insert into bbs_of values (:add_bbs,:crew)", [':add_bbs' => $add_bbs, ':crew' => $crew]);
+					doQuery("insert into bbs_of values (:add_bbs,:crew)", ['add_bbs' => $add_bbs, 'crew' => $crew]);
 				}
 			}
 
@@ -612,7 +479,7 @@ include_once('session.php');
 				$edit_crew_contact=cleanInsert($edit_crew_contact); 
 
 				$ask="update crews set contact='$edit_crew_contact' where name='$edit_crew_name'";	
-				doQuery($ask, [':edit_crew_contact' => $edit_crew_contact, ':edit_crew_name' => $edit_crew_name]);	
+				doQuery($ask, ['edit_crew_contact' => $edit_crew_contact, 'edit_crew_name' => $edit_crew_name]);	
 			}
 			if(isset($_POST['edit_crew_status']) && is_admin())
 			{
@@ -623,7 +490,7 @@ include_once('session.php');
 				$edit_crew_status=cleanInsert($edit_crew_status); 
 
 				$ask="update crews set active=:edit_crew_status where name=:edit_crew_name";	
-				doQuery($ask, [':edit_crew_status' => $edit_crew_status, ':edit_crew_name' => $edit_crew_name]);	
+				doQuery($ask, ['edit_crew_status' => $edit_crew_status, 'edit_crew_name' => $edit_crew_name]);	
 			}
 			if(isset($_POST['edit_crew_acronym']) && is_admin())
 			{
@@ -634,7 +501,7 @@ include_once('session.php');
 				$edit_crew_acronym=cleanInsert($edit_crew_acronym); 
 
 				$ask="update crews set acronym=:edit_crew_acronym where name=:edit_crew_name";
-				doQuery($ask, [':edit_crew_acronym' => $edit_crew_acronym, ':edit_crew_name' => $edit_crew_name ]);
+				doQuery($ask, ['edit_crew_acronym' => $edit_crew_acronym, 'edit_crew_name' => $edit_crew_name ]);
 			}
 		}
 //---------------------------------------------------------------------------------------------------------------
@@ -652,13 +519,13 @@ include_once('session.php');
 				$edit_artist_nick = cleanInsert($edit_artist_nick); 
 
 				$ask="update artists   set nick=:edit_artist_nick where nick=:artist";	
-				doQuery($ask,[':edit_artist_nick' => $edit_artist_nick, ':artist' => $artist]);	
+				doQuery($ask,['edit_artist_nick' => $edit_artist_nick, 'artist' => $artist]);	
 
 				$ask="update member_of set nick=:edit_artist_nick' where nick=:artist";	
-				doQuery($ask,[':edit_artist_nick' => $edit_artist_nick, ':artist' => $artist]);	
+				doQuery($ask,['edit_artist_nick' => $edit_artist_nick, 'artist' => $artist]);	
 
 				$ask="update author_of set nick=:edit_artist_nick' where nick=:artist";	
-				doQuery($ask,[':edit_artist_nick' => $edit_artist_nick, ':artist' => $artist]);	
+				doQuery($ask,['edit_artist_nick' => $edit_artist_nick, 'artist' => $artist]);	
 
 			}
 			if(isset($_POST['edit_artist_www']) && is_admin())
@@ -670,7 +537,7 @@ include_once('session.php');
 				$edit_artist_www = cleanInsert($edit_artist_www); 
 
 				$ask="update artists set www=:edit_artist_www where nick=:edit_artist_nick";	
-				doQuery($ask,[':edit_artist_www' => $edit_artist_www, ':edit_artist_nick' => $edit_artist_nick]);	
+				doQuery($ask,['edit_artist_www' => $edit_artist_www, 'edit_artist_nick' => $edit_artist_nick]);	
 			}
 			if(isset($_POST['edit_artist_status']) && is_admin())
 			{
@@ -681,7 +548,7 @@ include_once('session.php');
 				$edit_artist_status = cleanInsert($edit_artist_status); 
 
 				$ask="update artists set active=:edit_artist_status where nick=:edit_artist_nick";	
-				doQuery($ask, [':edit_artist_status' => $edit_artist_status, ':edit_artist_nick' => $edit_artist_nick]);	
+				doQuery($ask, ['edit_artist_status' => $edit_artist_status, 'edit_artist_nick' => $edit_artist_nick]);	
 			}
 			if(isset($_POST['old_artist_crews']) || (isset($_POST['artist_crew']) && is_admin()))
 			{
@@ -689,14 +556,14 @@ include_once('session.php');
 				$artist=cleanInsert($artist);
 
 				$ask="delete from member_of where nick=:edit_artist_nick";
-				doQuery($ask, [':edit_artist_nick' => $edit_artist_nick]);
+				doQuery($ask, ['edit_artist_nick' => $edit_artist_nick]);
 
 				if (isset($_POST[old_artist_crews]))			
 				{
 					foreach($_POST[old_artist_crews] as $artist_crew)
 					{
 						$ask="insert into member_of values (:artist_crew,:edit_artist_nick)";
-						doQuery($ask,[':artist_crew' => $artist_crew, ':edit_artist_nick' => $edit_artist_nick]);
+						doQuery($ask,['artist_crew' => $artist_crew, 'edit_artist_nick' => $edit_artist_nick]);
 					}
 				}
 				if (isset($_POST[artist_crew]))
@@ -704,12 +571,12 @@ include_once('session.php');
 					foreach($_POST[artist_crew] as $new_artist_crew)
 					{
 						$ask="insert into member_of values (:new_artist_crew,:edit_artist_nick)";
-						doQuery($ask,[':new_artist_crew' => $new_artist_crew, ':edit_artist_nick' => $edit_artist_nick]);
+						doQuery($ask,['new_artist_crew' => $new_artist_crew, 'edit_artist_nick' => $edit_artist_nick]);
 					}
 				}
 
 				$ask="delete from member_of where nick=:edit_artist_nick and crew='Delete'";
-				doQuery($ask, [':edit_artist_nick' => $edit_artist_nick]);
+				doQuery($ask, ['edit_artist_nick' => $edit_artist_nick]);
 			}
 
 			if(isset($_POST['change_artist_country']) && is_admin())
@@ -720,7 +587,7 @@ include_once('session.php');
 				if (!empty($change_artist_country))
 				{
 					$ask="update artists set country=:change_artist_country where nick=:edit_artist_nick";	
-					doQuery($ask, [':change_artist_country' => $country_list[$change_artist_country], ':edit_artist_nick' => $edit_artist_nick]);	
+					doQuery($ask, ['change_artist_country' => $country_list[$change_artist_country], 'edit_artist_nick' => $edit_artist_nick]);	
 				}
 			}
 
@@ -733,7 +600,7 @@ include_once('session.php');
 				$edit_artist_acronym=cleanInsert($edit_artist_acronym); 
 
 				$ask="update artists set acronym=:edit_artist_acronym where nick=:edit_artist_nick";	
-				doQuery($ask,['edit_artist_acronym' => $edit_artist_acronym, ':edit_artist_nick' => $edit_artist_nick]);	
+				doQuery($ask,['edit_artist_acronym' => $edit_artist_acronym, 'edit_artist_nick' => $edit_artist_nick]);	
 			}
 		}
 
@@ -752,10 +619,10 @@ include_once('session.php');
 				$edit_bbs_name=cleanInsert($edit_bbs_name); 
 
 				$ask="update bbses set name=:edit_bbs_name where name=:bbs_name";	
-				doQuery($ask, [':edit_bbs_name' => $edit_bbs_name, ':bbs_name' => $bbs_name]);	
+				doQuery($ask, ['edit_bbs_name' => $edit_bbs_name, 'bbs_name' => $bbs_name]);	
 
 				$ask="update bbs_of set name=:edit_bbs_name where name=:bbs_name";	
-				doQuery($ask, [':edit_bbs_name' => $edit_bbs_name, ':bbs_name' => $bbs_name]);	
+				doQuery($ask, ['edit_bbs_name' => $edit_bbs_name, 'bbs_name' => $bbs_name]);	
 			}
 			if(isset($_POST['edit_bbs_sysop']) && is_admin())
 			{
@@ -766,7 +633,7 @@ include_once('session.php');
 				$edit_bbs_sysop= cleanInsert($edit_bbs_sysop); 
 
 				$ask="update bbses set sysop=:edit_bbs_sysop where name=:edit_bbs_name";	
-				doQuery($ask,[':edit_bbs_sysop' => $edit_bbs_sysop, ':edit_bbs_name' => $edit_bbs_name]);	
+				doQuery($ask,['edit_bbs_sysop' => $edit_bbs_sysop, 'edit_bbs_name' => $edit_bbs_name]);	
 			}
 			if(isset($_POST['edit_bbs_address']) && is_admin())
 			{
@@ -777,7 +644,7 @@ include_once('session.php');
 				$edit_bbs_address = cleanInsert($edit_bbs_address); 
 
 				$ask="update bbses set address=:edit_bbs_address where name=:edit_bbs_name";	
-				doQuery($ask, [':edit_bbs_address' => $edit_bbs_address, ':edit_bbs_name' => $edit_bbs_name]);	
+				doQuery($ask, ['edit_bbs_address' => $edit_bbs_address, 'edit_bbs_name' => $edit_bbs_name]);	
 			}
 			if(isset($_POST['edit_bbs_number']) && is_admin())
 			{
@@ -788,7 +655,7 @@ include_once('session.php');
 				$edit_bbs_number=cleanInsert($edit_bbs_number); 
 
 				$ask="update bbses set number=:edit_bbs_number where name=:edit_bbs_name";	
-				doQuery($ask,[':edit_bbs_number' => $edit_bbs_number, ':edit_bbs_name' => $edit_bbs_name]);	
+				doQuery($ask,['edit_bbs_number' => $edit_bbs_number, 'edit_bbs_name' => $edit_bbs_name]);	
 			}
 		}
 
@@ -810,7 +677,7 @@ include_once('session.php');
 				$new_forum_id=cleanInsert($new_forum_id);
 
 				$ask="insert into forum_access values (:new_forum_member, :new_forum_name, :new_forum_id";	
-				doQuery($ask, [':new_forum_member' => $new_forum_member, ':new_forum_name' => $new_forum_name, ':new_forum_id' => $new_forum_id]);	
+				doQuery($ask, ['new_forum_member' => $new_forum_member, 'new_forum_name' => $new_forum_name, 'new_forum_id' => $new_forum_id]);	
 			}
 			
 			if(isset($_POST['do_add_new_forum']) && is_admin())
@@ -837,7 +704,7 @@ include_once('session.php');
 			}
 
 			$ask="insert into forum_forum values (:new_forum_id,:new_forum_name,:new_forum_public)";	
-			doQuery($ask,[':new_forum_id' => $new_forum_id, ':new_forum_name' => $new_forum_name, ':new_forum_public' => $new_forum_public]);	
+			doQuery($ask,['new_forum_id' => $new_forum_id, 'new_forum_name' => $new_forum_name, 'new_forum_public' => $new_forum_public]);	
 		}
 	}
 
@@ -854,7 +721,7 @@ include_once('session.php');
 		$user_nick=cleanInsert($user_nick);
 
 		$ask="update users set nick=:change_user_nick where nick=:user_nick";
-		doQuery($ask, [':change_user_nick' => $change_user_nick, ':user_nick' => $user_nick]);	
+		doQuery($ask, ['change_user_nick' => $change_user_nick, 'user_nick' => $user_nick]);	
 	}
 	if(isset($_POST['changeusercrew']))
 	{
@@ -868,7 +735,7 @@ include_once('session.php');
 		$user_nick=cleanInsert($user_nick);
 		
 		$ask="update users set crew=:changecrew where nick=:change_user_nick";
-		doQuery($ask,[':changecrew' => $changecrew, ':change_user_nick' => $change_user_nick ]);	
+		doQuery($ask,['changecrew' => $changecrew, 'change_user_nick' => $change_user_nick ]);	
 	}
 	if(isset($_POST['edit_user_rank']))
 	{
@@ -882,7 +749,7 @@ include_once('session.php');
 		$user_nick=cleanInsert($user_nick);
 
 		$ask="update users set rank=:edit_user_rank where nick=:change_user_nick";
-		doQuery($ask, [':edit_user_rank' => $edit_user_rank, ':change_user_nick' => $change_user_nick]);	
+		doQuery($ask, ['edit_user_rank' => $edit_user_rank, 'change_user_nick' => $change_user_nick]);	
 	}
 	if(isset($_POST['changeuserbyear']))
 	{
@@ -896,7 +763,7 @@ include_once('session.php');
 		$user_nick=cleanInsert($user_nick);
 
 		$ask="update users set byear=:changebyear where nick=:change_user_nick";
-		doQuery($ask, [':changebyear' => $changebyear, ':change_user_nick' => $change_user_nick]);	
+		doQuery($ask, ['changebyear' => $changebyear, 'change_user_nick' => $change_user_nick]);	
 	}
 	if(isset($_POST['changeuserbmonth']))
 	{
@@ -910,7 +777,7 @@ include_once('session.php');
 		$user_nick=cleanInsert($user_nick);
 
 		$ask="update users set bmonth=:changebmonth where nick=:change_user_nick";
-		doQuery($ask, [':changebmonth' => $changebmonth, ':change_user_nick' => $change_user_nick]);	
+		doQuery($ask, ['changebmonth' => $changebmonth, 'change_user_nick' => $change_user_nick]);	
 	}
 	if(isset($_POST['changeuserbday']))
 	{
@@ -924,7 +791,7 @@ include_once('session.php');
 		$user_nick=cleanInsert($user_nick);
 
 		$ask="update users set bday=:changebday where nick=:change_user_nick";
-		doQuery($ask, [':changebday' => $changebday, ':change_user_nick' => $change_user_nick]);	
+		doQuery($ask, ['changebday' => $changebday, 'change_user_nick' => $change_user_nick]);	
 	}
 	if(isset($_POST['changeusercountry']))
 	{
@@ -937,8 +804,8 @@ include_once('session.php');
 		$user_nick=$_POST['usernick'];
 		$user_nick=cleanInsert($user_nick);
 
-		$ask="update users set country=':change_country' where nick=:change_user_nick";
-		doQuery($ask,[':change_country' => $country_list[$change_country], ':change_user_nick' => $change_user_nick ]);	
+		$ask="update users set country=:change_country where nick=:change_user_nick";
+		doQuery($ask,['change_country' => $country_list[$change_country], 'change_user_nick' => $change_user_nick ]);	
 	}
 	if(isset($_POST['changeusermessenger']))
 	{
@@ -952,7 +819,7 @@ include_once('session.php');
 		$user_nick=cleanInsert($user_nick);
 		
 		$ask="update users set messenger=:changemessenger where nick=:change_user_nick";
-		doQuery($ask,[':changemessenger' => $changemessenger, ':change_user_nick' => $change_user_nick]);	
+		doQuery($ask,['changemessenger' => $changemessenger, 'change_user_nick' => $change_user_nick]);	
 	}
 	if(isset($_POST['changeusermail']))
 	{
@@ -980,7 +847,7 @@ include_once('session.php');
 		$user_nick=cleanInsert($user_nick);
 
 		$ask="update users set mail=:mail where nick=:change_user_nick";
-		doQuery($ask, [':mail' => $mail, ':change_user_nick' => $change_user_nick ]);	
+		doQuery($ask, ['mail' => $mail, 'change_user_nick' => $change_user_nick ]);	
 	}
 	
 //---------------------------------------------------------------------------------------------------------------
@@ -1039,11 +906,11 @@ include_once('session.php');
 		imagepng($image,"signatures/$user_signature.png");	 											// save image		
 
 		$ask="update users set signature=:user_signature where nick=:edit_user_nick";
-		doQuery($ask, [':user_signature' => $user_signature, ':edit_user_nick' => $edit_user_nick]);
+		doQuery($ask, ['user_signature' => $user_signature, 'edit_user_nick' => $edit_user_nick]);
 
 		$sigdata=cleanInsertPost($sigdata);
 		$ask="update users set sigdata=:sigdata where nick=:edit_user_nick";
-		doQuery($ask, [':sigdata' => $sigdata, ':edit_user_nick' => $edit_user_nick]);
+		doQuery($ask, ['sigdata' => $sigdata, 'edit_user_nick' => $edit_user_nick]);
 
 		unlink ("signatures/tempsignature.diz");
 		unlink ("signatures/tempsignature.diz.png");
@@ -1103,27 +970,27 @@ include_once('session.php');
 
 		$editedsitelogodata=cleanInsertPost($editedsitelogodata);
 		$ask_update="update logos set ascii=:editedsitelogodata where filename=:logo";
-		doQuery($ask_update,[':editedsitelogodata' => $editedsitelogodata, ':logo' => $logo]);	
+		doQuery($ask_update,['editedsitelogodata' => $editedsitelogodata, 'logo' => $logo]);	
 
 		$ask_update="update logos set base64='1' where filename=:logo";
-		doQuery($ask_update,[':logo' => $logo]);	
+		doQuery($ask_update,['logo' => $logo]);	
 	}
 
 //--------------------------------------------------------------------------------
 // EDIT COLLY FIELD
 //--------------------------------------------------------------------------------
 
-	if(isset($_POST['getcollyname']) && (!isset($_POST['do_edit_colly'])))
+    $getcollyname=$_POST['getcollyname'] ?? '';
+	if($getcollyname && (!isset($_POST['do_edit_colly'])))
 	{
-		$getcollyname=$_POST['getcollyname'];
+	error_log($getcollyname);
 		$getcollyname=cleanInsert($getcollyname);
-		
 		$ask="select * from collys where filename=:getcollyname";
-		$result=doQuery($ask, [ ':getcollyname' => $getcollyname]);
+		$result=fetchAll($ask, [ 'getcollyname' => $getcollyname]);
 		foreach ($result as $row)
 		{
 			$show_colly_name  = $row->name;
-			$show_colly_crew  = $row->crew;
+			$show_colly_crew  = $row->crews;
 			$show_colly_year  = $row->year;
 			$show_colly_month = $row->month;
 			$show_colly_day   = $row->day;
@@ -1244,7 +1111,7 @@ include_once('session.php');
 				$result=fetchAll($ask);
 				foreach ($result as $row)
 				{
-					$colly_author=$row[0];
+					$colly_author=$row->nick;
 					echo "<select name=\"old_colly_authors[]\">"; 
 					echo "<option selected=\"selected\">$colly_author</option>";
 					echo "<option value='Delete'>Remove Author</option>";
@@ -1271,7 +1138,7 @@ include_once('session.php');
 
 				<?php
 				$ask="select crew from crew_of where filename=:getcollyname";
-				$result=fetchAll($ask, [':getcollyname' => $getcollyname]);
+				$result=fetchAll($ask, ['getcollyname' => $getcollyname]);
 				foreach ($result as $row)
 				{
 					$colly_crew=$row->crew;
@@ -1282,7 +1149,7 @@ include_once('session.php');
 					$result_crews=fetchAll($ask_crews);
 					foreach ($result_crews as $row_crews)
 					{
-						$crews=$row_crews[0];
+						$crews=$row_crews->name;
 						echo "<option>$crews</option>";
 					}
 					echo "</select>";
@@ -1312,12 +1179,11 @@ if(isset($_POST['getcrew']) && is_admin())
 	$getcrew=$_POST['getcrew'];
 	$getcrew=cleanInsert($getcrew);
 	$ask="select * from crews where name=:getcrew";
-	$result=fetchAll($ask, [ ':getcrew' => $getcrew ]);
+	$result=fetchAll($ask, [ 'getcrew' => $getcrew ]);
 	foreach ($result as $row)
 	{
 		$show_crew_name    = $row->name;
 		$show_crew_www     = $row->www;
-		$show_crew_bbs     = $row->bbs;
 		$show_crew_contact = $row->contact;
 		$show_crew_status  = $row->active;
 		$show_crew_acronym = $row->acronym;
@@ -1355,12 +1221,11 @@ if(isset($_POST['getcrew']) && (isset($_POST['open_edit_crew_field'])))
 	$getcrew=cleanInsert($getcrew);
 
 	$ask="select * from crews where name=:getcrew";
-	$result=fetchAll($ask, [':getcrew' => $getcrew ]);
+	$result=fetchAll($ask, ['getcrew' => $getcrew ]);
 	foreach ($result as $row)
 	{
 		$show_crew_name=$row->name;
 		$show_crew_www=$row->www;
-		$show_crew_bbs=$row->bbs;
 		$show_crew_contact=$row->contact;
 		$show_crew_status=$row->active;
 		$show_crew_acronym=$row->acronym;
@@ -1400,7 +1265,7 @@ if(isset($_POST['getcrew']) && (isset($_POST['open_edit_crew_field'])))
 		<div class="content">		
 			<?php
 			$ask="select name from bbs_of where crew = :getcrew ";
-			$result=fetchAll($ask, [ ':getcrew' => $getcrew ]);
+			$result=fetchAll($ask, [ 'getcrew' => $getcrew ]);
 			foreach ($result as $row)
 			{
 				$bbs = $row->name;
@@ -1463,14 +1328,12 @@ if(isset($_POST['getartist']) && is_admin())
 	$getartist=cleanInsert($getartist);
 
 	$ask="select * from artists where nick=:getartist";
-	$result=fetchAll($ask, [':getartist' => $getartist]);
+	$result=fetchAll($ask, ['getartist' => $getartist]);
 	foreach ($result as $row)
 	{
 		$show_artist_nick=$row->nick;
 		$show_artist_www=$row->www;
 		$show_artist_status=$row->active;
-		$show_artist_crew=$row->crew;
-		$show_artist_bbs=$row->bbs;
 		$show_artist_country=$row->country;
 		$show_artist_acronym=$row->acronym;
 	}
@@ -1540,7 +1403,7 @@ if(isset($_POST['getartist']) && is_admin())
 			$result=fetchAll($ask);
 			foreach ($result as $row)
 			{
-				$artist_crew=$row[0];
+				$artist_crew=$row->crew;
 				?>
 				<select name="old_artist_crews[]"> 
 					<option selected="selected"><?=$artist_crew?></option>
@@ -1550,7 +1413,7 @@ if(isset($_POST['getartist']) && is_admin())
 					$result_crews=fetchAll($ask_crews);
 					foreach ($result_crews as $row_crews)
 					{
-						$crews=$row_crews[0];
+						$crews=$row_crews->name;
 						echo "<option>$crews</option>";
 					}
 					echo "</select>";
@@ -1618,14 +1481,13 @@ if(isset($_POST['getartist']) && is_admin())
 			$getuser=cleanInsert($getuser);
 
 			$ask="select * from users where nick=:getuser";
-			$result=fetchAll($ask, [ ':getuser' => $getuser]);
+			$result=fetchAll($ask, [ 'getuser' => $getuser]);
 			foreach ($result as $row)
 			{
 				$show_user_nick=$row->nick;
 				$show_user_www=$row->www;
 				$show_user_status=$row->active;
 				$show_user_crew=$row->crew;
-				$show_user_bbs=$row->bbs;
 				$show_user_country=$row->country;
 				$show_user_acronym=$row->acronym;
 				$show_user_rank=$row->rank;
@@ -1664,7 +1526,7 @@ if(isset($_POST['getartist']) && is_admin())
 			<form enctype="multipart/form-data" action="admin.php" method="post">
 				<?php
 				$ask="select * from users where nick=:getuser";
-				$result=fetchAll($ask, [ ':getuser' => $getuser ]);
+				$result=fetchAll($ask, [ 'getuser' => $getuser ]);
 
 				foreach ($result as $row)
 				{
@@ -1856,12 +1718,12 @@ if(isset($_POST['getartist']) && is_admin())
 				$getsitelogo=$_POST['getsitelogo'];
 				$getsitelogo=cleanInsert($getsitelogo);
 
-				$ask="select * from logos where filename=:getsitelogo";
-				$result=fetchAll($ask, [':getsitelogo' => $getsitelogo]);
+				$ask="select * from logos where logo_id=:getsitelogo";
+				$result=fetchAll($ask, ['getsitelogo' => $getsitelogo]);
 				foreach ($result as $row)
 				{
-					$filename=$row->logo_id;
-					$logo_image="<img class=\"centered\" border=\"0\" src=logos/$filename>";
+					$logo_id=$row->logo_id;
+					$logo_image="<img class=\"centered\" border=\"0\" src=logos/$logo_id>";
 				}
 			}
 
@@ -1879,11 +1741,11 @@ if(isset($_POST['getartist']) && is_admin())
 							echo "<option selected=\"selected\">$getsitelogo</option>";
 						}
 
-						$ask="select filename from logos";
+						$ask="select logo_id from logos";
 						$result=fetchAll($ask);
 						foreach ($result as $row)
 						{
-							$show_all_site_logos=$row->filename;
+							$show_all_site_logos=$row->logo_id;
 							echo "<option>$show_all_site_logos</option>";
 						}
 						?>
@@ -1896,11 +1758,11 @@ if(isset($_POST['getartist']) && is_admin())
 			if (isset($_POST['edit_sitelogo']))
 			{
 				$editsitelogo=$_POST['getsitelogo'];
-				$ask="select * from logos where filename=:editsitelogo";
-				$result=fetchAll($ask, [ ':editsitelogo' => $editsitelogo]);
+				$ask="select * from logos where logo_id=:editsitelogo";
+				$result=fetchAll($ask, [ 'editsitelogo' => $editsitelogo]);
 				foreach ($result as $row)
 				{
-					$filename = $row->filename;
+					$logo_id = $row->logo_id;
 					$author   = $row->author;
 					$ascii    = $row->ascii;
 					$base64   = $row->base64;
@@ -1975,7 +1837,7 @@ if(isset($_POST['getartist']) && is_admin())
 			{
 				$getbbs=$_POST['getbbs'];
 				$ask="select * from bbses where name=:getbbs";
-				$result=fetchAll($ask, [ ':getbbs' => $getbbs ]);
+				$result=fetchAll($ask, [ 'getbbs' => $getbbs ]);
 				foreach ($result as $row)
 				{
 					$show_bbs_name    = $row->name;
@@ -2115,7 +1977,7 @@ if(isset($_POST['getartist']) && is_admin())
 								<?php
 
 								$ask_members="SELECT nick FROM forum_access where forum_id=:forum_id ORDER BY nick ASC";
-								$result_members=fetchAll($ask_members,[':forum_id' => $forum_id]);
+								$result_members=fetchAll($ask_members,['forum_id' => $forum_id]);
 								foreach ($result_members as $row_members)
 								{
 									$forum_member=$row_members->nick;				
@@ -2200,22 +2062,14 @@ if(isset($_POST['getartist']) && is_admin())
 								</form>
 								<?php
 							}
-						}
-						else
-						{
 							?>
-							<div class="headline">
-								Hack Attempt!
-							</div>
-							<div class="content">
-								<br>Hack attempt detected.<br>
-								Your IP has been logged and has been forwarded to the Swedish police.<br>
-								Tough luck sucka!<br><br>
-							</div>
-							<?php
-						}
-						?>
+						</div>
+
+						<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+							<?php include "sidebar.php"; ?>
+						</div>
+						<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
+							<?php include "sidebar_right.php"; ?>
+						</div>
 					</div>
-				</div>
-			</body>
-			</html>
+					<?php include "footer.php"; ?>
