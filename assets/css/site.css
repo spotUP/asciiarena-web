@@ -1639,3 +1639,26 @@ element.style {
     font-family: 'TopazPlus_a1200' !important;
 }
 
+.fullscreen{
+  position: absolute !important;
+  top:0;
+  font-size: 32px !important;
+  line-height: 32px !important;
+  z-index: 999999 !important;  
+}
+
+#blacker{
+  position: fixed;
+  background-color: #000000;
+  width: 100vw;
+  height: 100vh;
+  top:0;
+  left:0;
+  z-index: 999998 !important;
+  display: none;
+}
+
+.show{
+  display: block;
+}
+

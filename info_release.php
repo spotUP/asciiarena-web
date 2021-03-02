@@ -1,6 +1,8 @@
-<?php
+x<?php
 require_once "session.php";
 require_once "header.php"; ?>
+			<div id="blacker"></div>
+
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
 		<?php
@@ -794,7 +796,7 @@ require_once "header.php"; ?>
 
 			echo "<input type='submit' class='btn-primary amb-1' name='hide' value='Hide Colly!'" . ((!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) ? " style='display:none'" : "") . "> ";
 			echo "<input type='submit' class='btn-primary amb-1' name='view' value='View Colly'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
-			echo "<input type='submit' class='btn-primary amb-1' name='fullscreen' value='Fullscreen'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
+			echo "<input type='button' onclick='myFunction()' class='btn-primary amb-1' name='fullscreen' value='Fullscreen'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:block'" : "") . "> ";
 
 			if (is_logged_in()) {
 				echo "<input type='submit' class='btn-primary amb-1' name=addcomment value='Comment'> ";
@@ -841,11 +843,10 @@ require_once "header.php"; ?>
         if ($type != "ANSI") {
         	?>
         	<div class="apb-0">
-
         		<select name="font">
-        			<option value="MicroKnight"<?php if ($font == 'MicroKnight') echo ' selected'; ?>>MicroKnight</option>
-        			<option value="MicroKnightPlus"<?php if ($font == 'MicroKnightPlus') echo ' selected'; ?>>MicroKnightPlus</option>
-        			<option value="mOsOul"<?php if ($font == 'mOsOul') echo ' selected'; ?>>mOsOul</option>
+        			<option class="dropdown-item" value="MicroKnight"<?php if ($font == 'MicroKnight') echo ' selected'; ?>>MicroKnight</option>
+        			<option class="dropdown-item" value="MicroKnightPlus"<?php if ($font == 'MicroKnightPlus') echo ' selected'; ?>>MicroKnightPlus</option>
+        			<option class="dropdown-item" value="mOsOul"<?php if ($font == 'mOsOul') echo ' selected'; ?>>mOsOul</option>
         			<option value="P0T-NOoDLE"<?php if ($font == 'P0T-NOoDLE') echo ' selected'; ?>>P0T-NOoDLE</option>
         			<option value="Topaz_a500"<?php if ($font == 'Topaz_a500') echo ' selected'; ?>>Topaz_a500</option>
         			<option value="Topaz_a1200"<?php if ($font == 'Topaz_a1200') echo ' selected'; ?>>Topaz_a1200</option>
@@ -984,7 +985,7 @@ require_once "header.php"; ?>
 
 		if ($type == "ASCII") {
 			?>
-			<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;"><pre style="font-family: '<?=$font;?>';color: <?=$fgcolor?>;"><?php
+			<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;"><pre id="colly" style="font-family: '<?=$font;?>';color: <?=$fgcolor?>;"><?php
 			if (file_exists(__DIR__ . "/collections/{$dirname}/{$filename}")) {
 				$content = file_get_contents(__DIR__ . "/collections/{$dirname}/{$filename}");
 				echo "<br><br><br><br>";

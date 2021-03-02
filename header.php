@@ -8,33 +8,33 @@ $stars1 = <<<EOD
 __/\__
 \    / __/\__
 /_  _\ \    /
-  \/   /_  _\
-  __/\__ \/
-  \    /
-  /_  _\
-    \/
+\/   /_  _\
+__/\__ \/
+\    /
+/_  _\
+\/
 EOD;
 $stars2 = <<<EOD
-        __/\__
+__/\__
 __/\__  \    /
 \    /  /_  _\
 /_  _\    \/
-  \/ __/\__
-     \    /
-     /_  _\
-       \/
+\/ __/\__
+\    /
+/_  _\
+\/
 EOD;
 $mobilelogo = <<<EOD
-                      .
-      ______________    _______  ____________
+.
+______________    _______  ____________
 o   ._\___    /  __/___/   ___/_/_____/_____/  o
-  . |   L/   /___     /   /    /     /     / .
-  __|_______/________/________/_____/_____/_____
+. |   L/   /___     /   /    /     /     / .
+__|_______/________/________/_____/_____/_____
 ._\____   /\___  /_.   _   /____ |   |_\___    /
 |   L/   /    |    |   ___/_    \|   |   L/   / 
 |_______/ ____|    |_______/___\_____|_______/ .
-              |____|spot               .
-                                         o
+|____|spot               .
+o
 EOD;
 ?>
 <!DOCTYPE html>
@@ -51,6 +51,14 @@ EOD;
 	integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 	<script src="https://unpkg.com/@popperjs/core@2"></script>
 	<script src="/assets/js/bootstrap.bundle.js"></script>
+	<script type="text/javascript">
+		function myFunction() {
+			var element = document.getElementById("colly");
+			element.classList.toggle("fullscreen");
+			var element = document.getElementById("blacker");
+			element.classList.toggle("show");
+		}
+	</script>
 	<script type="text/javascript">
 		function add_colly_crew_field() {
 			var newselect = " <select name=\"colly_crew[]\"" + document.getElementById('total_colly_crews').value + "><option>Independent</option><?php
