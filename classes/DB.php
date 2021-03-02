@@ -91,7 +91,8 @@ class DB {
   public function fetch(
     string $query = "",
     array $binds = [],
-    array $unset = []
+    array $unset = [],
+    string $asClass = ''
   ) {
     // If the query does not have a limit, impose a LIMIT 1 for optimization
     $hasLimit = stripos($query, "LIMIT");
@@ -100,14 +101,19 @@ class DB {
     }
     if ($statement = $this->dbh->prepare($query)) {
       $statement->execute($binds);
-      $obj = $statement->fetch(PDO::FETCH_OBJ);
-      // remove unwanted properties
-      if (!empty($unset)) {
-        foreach ($unset as $prop) {
-          unset($obj->$prop);
+      if ($asClass) {
+        $statement->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, $asClass);
+        return $statement->fetch();
+      } else {
+        $obj = $statement->fetch(PDO::FETCH_OBJ);
+        // remove unwanted properties
+        if (!empty($unset)) {
+          foreach ($unset as $prop) {
+            unset($obj->$prop);
+          }
         }
+        return $obj;
       }
-      return $obj;
     }
     return false;
   }
@@ -122,11 +128,17 @@ class DB {
    */
   public function fetchAll(
     string $query = "",
-    array $binds = []
+    array $binds = [],
+    string $asClass = ''
   ) {
     if ($statement = $this->dbh->prepare($query)) {
-      $statement->execute($binds);
-      return $statement->fetchAll(PDO::FETCH_OBJ);
+      if ($asClass) {
+        $statement->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, $asClass);
+        return $statement->fetchAll();
+      } else {
+        $statement->execute($binds);
+        return $statement->fetchAll(PDO::FETCH_OBJ);
+      }
     }
     return false;
   }
