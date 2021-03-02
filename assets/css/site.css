@@ -1625,3 +1625,17 @@ input[type=text]{
   height: 16px;
 }
 
+
+element.style {
+}
+
+.alert {
+    padding: 0 8px 16px;
+    font-size: 16px !important;
+}
+
+.alert-dismissible .close {
+    font-size: 16px !important;
+    font-family: 'TopazPlus_a1200' !important;
+}
+

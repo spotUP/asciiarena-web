@@ -4,13 +4,10 @@ $h1 = "mAiL";
 include_once "header.php";
 ?>
 
-<?php
-if (is_logged_in()) {
-//echo "<pre>";print_r($_POST);echo "</pre>";
-	?>
-	<div class="modal-body row m-0 p-0">
-		<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
-			<?php
+<div class="modal-body row m-0 p-0">
+	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
+		<?php
+		if (is_logged_in()) {
 //-----------------------------------------------------------------------------
 // DELETE MESSAGE
 //-----------------------------------------------------------------------------
@@ -72,11 +69,8 @@ if (is_logged_in()) {
 // MESSAGE LIST 
 //-----------------------------------------------------------------------------
 
-			if (!isset($_POST[ 'open_postnewmessage' ])) {
-				?>
-
-				<?php
-
+			if (!isset($_POST[ 'open_postnewmessage' ])) 
+			{
 				foreach (fetchAll("SELECT * FROM messages WHERE postedto = :nick GROUP BY thread ORDER BY timestamp DESC", [":nick" => $_user[ "nick" ]]) as $row) {
 					$messid = $row->id;
 					$thread = $row->thread;
@@ -92,33 +86,26 @@ if (is_logged_in()) {
 
 					?>
 					<form enctype="multipart/form-data" action="message.php" method="post">
-
 						<div style="width: 100vw; float: left; display: inline-block;">
-
 							<div style="min-width: 15vw; display: inline-block;">
-
-
-							<?php
-
-							foreach (fetchAll("SELECT new FROM messages WHERE thread = :thread ORDER BY new DESC LIMIT 1", [":thread" => $thread]) as $row_new) {
-								$messnew = $row_new->new;
-								if ($messnew == 1) {
+								<?php
+								foreach (fetchAll("SELECT new FROM messages WHERE thread = :thread ORDER BY new DESC LIMIT 1", [":thread" => $thread]) as $row_new) {
+									$messnew = $row_new->new;
+									if ($messnew == 1) {
+										?>
+										<a class="yellow" !important;" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
+										<?php
+									} else {
+										?>
+										<a class="green" !important;" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
+										<?php
+									}
 									?>
-								<a class="yellow" !important;" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
-									<?php
-								} else {
-									?>
-								<a class="green" !important;" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
-									<?php
-								}
-
-								?>
-							</div>
-
-							<div style="min-width: 20vw; display: inline-block;">
-								<span class="cyan">From</span><span class="blue">:</span>
-								<span class="white"><?=$messpostername?></span>
-							</div>
+								</div>
+								<div style="min-width: 20vw; display: inline-block;">
+									<span class="cyan">From</span><span class="blue">:</span>
+									<span class="white"><?=$messpostername?></span>
+								</div>
 
 								<div style="display: inline-block; width: 50px;">
 									<input type="hidden" name="thread" value="<?=$thread?>">
@@ -131,10 +118,7 @@ if (is_logged_in()) {
 									<input type="hidden" name="messid" value="<?=$messid?>">
 									<input type="submit" name="deletemessage" value="Delete">
 								</div>
-
 							</div>
-							<?php
-							?>
 						</form>
 						<?php
 					}
@@ -150,29 +134,34 @@ if (is_logged_in()) {
 					<?php
 				}
 			}
-		} else {
+		} 
+		else
+		{
 			?>
-			<div class="headline">
-				Please Login!
-			</div>
-			<div class="content">
-				You need to be logged in to use this feature.
-				<a href=login.php>LOGiN.</a>
+			<div class="col-lg-12">
+				<div class="bs-component">
+					<div class="alert alert-dismissible alert-primary">
+						<button type="button" class="close" data-dismiss="alert">x</button>
+						You need to be <a class="ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">logged in</a> in to use this feature.
+
+					</div>
+				</div>
 			</div>
 			<?php
 		}
 		?>
+
 	</div>
+
+
 	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
 		<?php include "sidebar.php"; ?>
 	</div>
 	<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
 		<?php include "sidebar_right.php"; ?>
 	</div>
-
 </div>
-
-	<?php include "footer.php";
+<?php include "footer.php"; ?>
 
 
 
