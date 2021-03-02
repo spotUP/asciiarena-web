@@ -59,7 +59,7 @@ include "header.php";
 					if (!empty($show_www))
 					{
 						?>
-						Webpage: <?=$show_www?>
+						Webpage: <a href="<?=$show_www?>"><?=$show_www?></a>
 						<?php
 					}
 					?>
