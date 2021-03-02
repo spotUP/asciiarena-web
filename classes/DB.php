@@ -133,15 +133,21 @@ class DB {
     string $asClass = ''
   ) {
     if ($statement = $this->dbh->prepare($query)) {
+      $statement->execute($binds);
       if ($asClass) {
         $statement->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, $asClass);
         return $statement->fetchAll();
       } else {
-        $statement->execute($binds);
         return $statement->fetchAll(PDO::FETCH_OBJ);
       }
     }
     return false;
+  }
+
+  public function lastInsertId() {
+    $sth = $this->dbh->prepare("SELECT LAST_INSERT_ID()");
+    $sth->execute();
+    return $sth->fetch(PDO::FETCH_COLUMN, 0);
   }
 
 }
