@@ -1775,7 +1775,7 @@ include "header.php";
 		{		
 			foreach($_POST[add_crew_bbs] as $add_crew_bbs)
 			{
-				$ask="insert into bbs_of values (:add_crew_bbs,:crewname)";
+				$ask="insert into bbs_of (id, crew, name) values (0, :add_crew_bbs,:crewname)";
 				doQuery($ask, ['add_crew_bbs' => $add_crew_bbs, 'crewname' => $crewname ]);
 			}
 		}
@@ -1850,8 +1850,14 @@ include "header.php";
 			exit;
 		}
 
-		$ask="insert into artists values (:artistnick,:artistwww,:artiststatus,:artistcountry,0,:artistacronym)";
-		doQuery($ask, [ 'artistnick' => $artistnick, 'artistwww' => $artistwww, 'artiststatus' => $artiststatus, 'artistcountry' => $country_list[$artistcountry], 'artistacronym' => $artistacronym ]);
+		$ask="insert into artists (id, nick, www, active, country, rating, acronym, user_id) values (0, :artistnick, :artistwww, :artiststatus, :artistcountry, 0, :artistacronym)";
+		doQuery($ask, [
+		  'artistnick' => $artistnick,
+		  'artistwww' => $artistwww,
+		  'artiststatus' => $artiststatus,
+		  'artistcountry' => $country_list[$artistcountry],
+		  'artistacronym' => $artistacronym
+		]);
 
 		if (isset($_POST[artist_crew]))
 		{
@@ -1902,7 +1908,7 @@ include "header.php";
 			exit;
 		}
 
-		$ask="insert into bbses values (:name, :sysop, :address, :number)";
+		$ask="insert into bbses (id, name, sysop, address, number) values (0, :name, :sysop, :address, :number)";
 		doQuery($ask, ['name' => $name, 'sysop' => $sysop, 'address' => $address, 'number' => $number ]);
 
 		?>
