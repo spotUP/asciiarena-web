@@ -779,7 +779,7 @@ require_once "header.php"; ?>
 
 
 		?>
-		<div class="container-fluid bg-secondary amb-1">
+		<div class="container-fluid bg-secondary amb-1 apb-1">
 			<script>
 				$(document).ready(function() {
 					$("#ctrlForm select").change(function() {
