@@ -769,15 +769,23 @@ require_once "header.php"; ?>
 
 
 		?>
-		<div class="container-fluid bg-secondary amb-1"><?php
-		echo "<form action='$_SERVER[PHP_SELF]?filename=$decoded_filename' method='post' enctype='multipart/form-data'>";
+		<div class="container-fluid bg-secondary amb-1">
+        <script>
+            $(document).ready(function() {
+                $("#ctrlForm select").change(function() {
+                    $("#ctrlForm input[name='view']").click();
+                });
+            });
 
-		if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) {
-			echo "<input type='submit' class='btn-primary amb-1' name='hide' value='Hide Colly!'> ";
-		}
-		if (!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) {
-			echo "<input type='submit' class='btn-primary amb-1' name='view' value='View Colly'> ";
-		}
+        </script>
+
+        <?php
+		echo "<form action='$_SERVER[PHP_SELF]?filename=$decoded_filename' method='post'  id='ctrlForm'>";
+
+        echo "<input type='submit' class='btn-primary amb-1' name='hide' value='Hide Colly!'" . ((!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) ? " style='display:none'" : "") . "> ";
+        echo "<input type='submit' class='btn-primary amb-1' name='view' value='View Colly'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
+
+
 		if (is_logged_in()) {
 			echo "<input type='submit' class='btn-primary amb-1' name=addcomment value='Comment'> ";
 			echo "<input type='submit' class='btn-primary amb-1' name=favourite value='Favourite'> ";
@@ -790,37 +798,85 @@ require_once "header.php"; ?>
 		if (!isset($_POST[ 'download' ])) {
 			echo "<input type='submit' class='btn-primary amb-1' name=download value='Download'> ";
 		} elseif (isset($_POST[ 'download' ])) {
-					$ask = "select downloads from collys where filename='$filename'"; // download counter
-					$result = mysql_query($ask, $dbh);
-					while ($row = mysql_fetch_array($result)) {
-						$downloads = $row[ 'downloads' ];
-						$downloads++;
-					}
+            $ask = "select downloads from collys where filename=:filename"; // download counter
+            $row = fetchOne("SELECT view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
+            $downloads = $row->downloads+1;
 
-					$ask = "update collys set downloads=$downloads where filename='$filename'";
-					mysql_query($ask, $dbh);
+            doQuery("update collys set downloads=:downloads where filename=:filename", [":downloads" => $downloads, ":filename" => $filename]);
+            ?>
+            <meta content="1; URL=<?=$filenameandpath?>" http-equiv="Refresh">
+            <?php
+        }
 
-					?>
-					<meta content="1; URL=<?=$filenameandpath?>" http-equiv="Refresh">
-					<?php
-				}
-				
-				if ($type != "ANSI") {
+        $font = fetchOne("SELECT def_font FROM users WHERE nick = :nick", [":nick" => $nick]);
+        if (($font) && ($font->def_font)) {
+            $font = $font->def_font;
+        } else if (isset($_POST['font'])) {
+            $font = $_POST['font'];
+        } else {
+            $font = "mOsOul";
+        }
+
+        $fgcolor = (isset($_POST[ 'foreground_color'])) ? $_POST[ 'foreground_color'] : '';
+
+        $def_color = fetchOne("SELECT def_bg_col FROM users WHERE nick = :nick", [":nick" => $nick]);
+        if (($def_color) && ($def_color->def_bg_col)) {
+            $bgcolor = $font->def_bg_col;
+        } else if (isset($_POST['background_color'])) {
+            $bgcolor = $_POST['background_color'];
+        } else {
+            $bgcolor = "#000000";
+        }
+
+                    if ($type != "ANSI") {
 					?>
 					<div class="apb-0">
 
-						<input type='submit' class='btn-primary amb-1' name=fullscreen value='Fullscreen'>
-
+                        <select name="font">
+                            <option value="MicroKnight"<?php if ($font == 'MicroKnight') echo ' selected'; ?>>MicroKnight</option>
+                            <option value="MicroKnightPlus"<?php if ($font == 'MicroKnightPlus') echo ' selected'; ?>>MicroKnightPlus</option>
+                            <option value="mOsOul"<?php if ($font == 'mOsOul') echo ' selected'; ?>>mOsOul</option>
+                            <option value="P0T-NOoDLE"<?php if ($font == 'P0T-NOoDLE') echo ' selected'; ?>>P0T-NOoDLE</option>
+                            <option value="Topaz_a500"<?php if ($font == 'Topaz_a500') echo ' selected'; ?>>Topaz_a500</option>
+                            <option value="Topaz_a1200"<?php if ($font == 'Topaz_a1200') echo ' selected'; ?>>Topaz_a1200</option>
+                            <option value="TopazPlus_a500"<?php if ($font == 'TopazPlus_a500') echo ' selected'; ?>>TopazPlus_a500</option>
+                            <option value="TopazPlus_a1200"<?php if ($font == 'TopazPlus_a1200') echo ' selected'; ?>>TopazPlus_a1200</option>
+                        </select>
+                        <!--
 						<div class="btn-group" role="group">
 							<button id="btnGroupDrop1" type="button" class="btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Font </button>
 							<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-								<a class="dropdown-item" href="#">Topaz</a>
-								<a class="dropdown-item" href="#">MicroKnight</a>
-								<a class="dropdown-item" href="#">mO'sOul</a>
-								<a class="dropdown-item" href="#">P0T-NOoDLE</a>
+                                <a class="dropdown-item" href="#">MicroKnight</a>
+                                <a class="dropdown-item" href="#">MicroKnightPlus</a>
+                                <a class="dropdown-item" href="#">mOsOul</a>
+                                <a class="dropdown-item" href="#">P0T-NOoDLE</a>
+                                <a class="dropdown-item" href="#">Topaz_a500</a>
+                                <a class="dropdown-item" href="#">Topaz_a1200</a>
+                                <a class="dropdown-item" href="#">TopazPlus_a500</a>
+                                <a class="dropdown-item" href="#">TopazPlus_a1200</a>
 							</div>
 						</div>
-
+-->
+                        <select name="background_color">
+                            <option value=""<?php if ($bgcolor == '') echo ' selected'; ?>>BG Color</option>
+                            <option value="Black"<?php if ($bgcolor == 'Black') echo ' selected'; ?>>Black</option>
+                            <option value="DarkBlue"<?php if ($bgcolor == 'DarkBlue') echo ' selected'; ?>>Dark Blue</option>
+                            <option value="DarkGreen"<?php if ($bgcolor == 'DarkGreen') echo ' selected'; ?>>Dark Green</option>
+                            <option value="DarkCyan"<?php if ($bgcolor == 'DarkCyan') echo ' selected'; ?>>Dark Cyan</option>
+                            <option value="DarkRed"<?php if ($bgcolor == 'DarkRed') echo ' selected'; ?>>Dark Red</option>
+                            <option value="Magenta"<?php if ($bgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
+                            <option value="Brown"<?php if ($bgcolor == 'Brown') echo ' selected'; ?>>Brown</option>
+                            <option value="DarkGrey"<?php if ($bgcolor == 'DarkGrey') echo ' selected'; ?>>Dark Grey</option>
+                            <option value="Grey"<?php if ($bgcolor == 'Grey') echo ' selected'; ?>>Grey</option>
+                            <option value="Blue"<?php if ($bgcolor == 'Blue') echo ' selected'; ?>>Blue</option>
+                            <option value="Green"<?php if ($bgcolor == 'Green') echo ' selected'; ?>>Green</option>
+                            <option value="Cyan"<?php if ($bgcolor == 'Cyan') echo ' selected'; ?>>Cyan</option>
+                            <option value="Red"<?php if ($bgcolor == 'Red') echo ' selected'; ?>>Red</option>
+                            <option value="Magenta"<?php if ($bgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
+                            <option value="Yellow"<?php if ($bgcolor == 'Yellow') echo ' selected'; ?>>Yellow</option>
+                            <option value="White"<?php if ($bgcolor == 'White') echo ' selected'; ?>>White</option>
+                        </select>
+                        <!--
 						<div class="btn-group" role="group">
 							<button id="btnGroupDrop1" type="button" class="btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">BG Color </button>
 							<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
@@ -843,8 +899,28 @@ require_once "header.php"; ?>
 								<a class="dropdown-item" href="#">White</a>
 							</div>
 						</div>
-
-						<div class="btn-group" role="group">
+                        -->
+                        <select name="foreground_color">
+                            <option value=""<?php if ($fgcolor == '') echo ' selected'; ?>>FG Color</option>
+                            <option value="Black"<?php if ($fgcolor == 'Black') echo ' selected'; ?>>Black</option>
+                            <option value="DarkBlue"<?php if ($fgcolor == 'DarkBlue') echo ' selected'; ?>>Dark Blue</option>
+                            <option value="DarkGreen"<?php if ($fgcolor == 'DarkGreen') echo ' selected'; ?>>Dark Green</option>
+                            <option value="DarkCyan"<?php if ($fgcolor == 'DarkCyan') echo ' selected'; ?>>Dark Cyan</option>
+                            <option value="DarkRed"<?php if ($fgcolor == 'DarkRed') echo ' selected'; ?>>Dark Red</option>
+                            <option value="Magenta"<?php if ($fgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
+                            <option value="Brown"<?php if ($fgcolor == 'Brown') echo ' selected'; ?>>Brown</option>
+                            <option value="DarkGrey"<?php if ($fgcolor == 'DarkGrey') echo ' selected'; ?>>Dark Grey</option>
+                            <option value="Grey"<?php if ($fgcolor == 'Grey') echo ' selected'; ?>>Grey</option>
+                            <option value="Blue"<?php if ($fgcolor == 'Blue') echo ' selected'; ?>>Blue</option>
+                            <option value="Green"<?php if ($fgcolor == 'Green') echo ' selected'; ?>>Green</option>
+                            <option value="Cyan"<?php if ($fgcolor == 'Cyan') echo ' selected'; ?>>Cyan</option>
+                            <option value="Red"<?php if ($fgcolor == 'Red') echo ' selected'; ?>>Red</option>
+                            <option value="Magenta"<?php if ($fgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
+                            <option value="Yellow"<?php if ($fgcolor == 'Yellow') echo ' selected'; ?>>Yellow</option>
+                            <option value="White"<?php if ($fgcolor == 'White') echo ' selected'; ?>>White</option>
+                        </select>
+                        <!--
+                        <div class="btn-group" role="group">
 							<button id="btnGroupDrop1" type="button" class="btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">FG Color </button>
 							<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
 								<a class="dropdown-item" href="#">Black</a>
@@ -866,6 +942,7 @@ require_once "header.php"; ?>
 								<a class="dropdown-item" href="#">White</a>
 							</div>
 						</div>
+						-->
 					</form>
 				</div>
 			</div>
@@ -878,9 +955,7 @@ require_once "header.php"; ?>
 //----------------------------------------------------------------------------------------------
 
 		if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) {
-			$fgcolor = $_POST[ 'foreground_color' ];
 
-			$font = fetchOne("SELECT def_font FROM users WHERE nick = :nick", [":nick" => $nick])->def_font ?? "mosoul";
 
 			if (isset($_POST[ 'change' ])) {
 				$bgcolor = $_POST[ 'background_color' ];
@@ -898,12 +973,8 @@ require_once "header.php"; ?>
 			]);
 
 			if ($type == "ASCII") {
-				if (empty($bgcolor)) {
-					$def_color = fetchOne("SELECT def_bg_col FROM users WHERE nick = :nick", [":nick" => $nick])->def_bg_col;
-					$bgcolor = (empty($def_color)) ? "#000000" : $def_color;
-				}
 				?>
-				<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>; color: <?=$fgcolor?>;"><pre><?php
+				<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;"><pre style="font-family: '<?=$font;?>';color: <?=$fgcolor?>;"><?php
 				if (file_exists(__DIR__ . "/collections/{$dirname}/{$filename}")) {
 					$content = file_get_contents(__DIR__ . "/collections/{$dirname}/{$filename}");
 					echo "<br><br><br><br>";
