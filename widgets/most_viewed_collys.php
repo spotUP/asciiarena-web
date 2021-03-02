@@ -1,6 +1,6 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
 	<div class="header col-lg-12">
-		<h2 class="ap-1">MOST VIEWED COLLYS</h2>
+		<h2 class="ap-1 bg-header">MOST VIEWED COLLYS</h2>
 	</div>
 <?php
 

@@ -1,6 +1,6 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
 	<div class="header col-lg-12">
-		<h2 class="ap-1"><a class="lightgreen" href="collys.php?sort_by=timestamp">LATEST ADDED COLLYS</a> <a class="lightgreen"
+		<h2 class="ap-1 bg-header"><a class="lightgreen" href="collys.php?sort_by=timestamp">LATEST ADDED COLLYS</a> <a class="lightgreen"
 		                                                                                         href="rss.php?id=1">[RSS]</a>
 		</h2>
 	</div>

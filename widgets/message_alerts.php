@@ -4,7 +4,7 @@
 		return;
 	}
 ?>
-<div class="header col-12"><h2 class="ap-1">ALERT!</h2></div>
+<div class="header col-12"><h2 class="ap-1 bg-header">ALERT!</h2></div>
 <div class="col-12">
 	<a class="lightgreen" href="messages.php">You have <?=$messages?> new message<?=($messages > 1) ? "s" : ""?></a>
 </div>
