@@ -980,16 +980,17 @@ include "header.php";
 // EDIT COLLY FIELD
 //--------------------------------------------------------------------------------
 
-    $getcollyname=$_POST['getcollyname'];
-	if(isset($_POST['getcollyname']) && (!isset($_POST['do_edit_colly'])))
+    $getcollyname=$_POST['getcollyname'] ?? '';
+	if($getcollyname && (!isset($_POST['do_edit_colly'])))
 	{
+	error_log($getcollyname);
 		$getcollyname=cleanInsert($getcollyname);
 		$ask="select * from collys where filename=:getcollyname";
-		$result=doQuery($ask, [ 'getcollyname' => $getcollyname]);
+		$result=fetchAll($ask, [ 'getcollyname' => $getcollyname]);
 		foreach ($result as $row)
 		{
 			$show_colly_name  = $row->name;
-			$show_colly_crew  = $row->crew;
+			$show_colly_crew  = $row->crews;
 			$show_colly_year  = $row->year;
 			$show_colly_month = $row->month;
 			$show_colly_day   = $row->day;
@@ -1148,7 +1149,7 @@ include "header.php";
 					$result_crews=fetchAll($ask_crews);
 					foreach ($result_crews as $row_crews)
 					{
-						$crews=$row_crews[0];
+						$crews=$row_crews->name;
 						echo "<option>$crews</option>";
 					}
 					echo "</select>";
@@ -1183,7 +1184,6 @@ if(isset($_POST['getcrew']) && is_admin())
 	{
 		$show_crew_name    = $row->name;
 		$show_crew_www     = $row->www;
-		$show_crew_bbs     = $row->bbs;
 		$show_crew_contact = $row->contact;
 		$show_crew_status  = $row->active;
 		$show_crew_acronym = $row->acronym;
@@ -1226,7 +1226,6 @@ if(isset($_POST['getcrew']) && (isset($_POST['open_edit_crew_field'])))
 	{
 		$show_crew_name=$row->name;
 		$show_crew_www=$row->www;
-		$show_crew_bbs=$row->bbs;
 		$show_crew_contact=$row->contact;
 		$show_crew_status=$row->active;
 		$show_crew_acronym=$row->acronym;
@@ -1335,8 +1334,6 @@ if(isset($_POST['getartist']) && is_admin())
 		$show_artist_nick=$row->nick;
 		$show_artist_www=$row->www;
 		$show_artist_status=$row->active;
-		$show_artist_crew=$row->crew;
-		$show_artist_bbs=$row->bbs;
 		$show_artist_country=$row->country;
 		$show_artist_acronym=$row->acronym;
 	}
@@ -1406,7 +1403,7 @@ if(isset($_POST['getartist']) && is_admin())
 			$result=fetchAll($ask);
 			foreach ($result as $row)
 			{
-				$artist_crew=$row[0];
+				$artist_crew=$row->crew;
 				?>
 				<select name="old_artist_crews[]"> 
 					<option selected="selected"><?=$artist_crew?></option>
@@ -1491,7 +1488,6 @@ if(isset($_POST['getartist']) && is_admin())
 				$show_user_www=$row->www;
 				$show_user_status=$row->active;
 				$show_user_crew=$row->crew;
-				$show_user_bbs=$row->bbs;
 				$show_user_country=$row->country;
 				$show_user_acronym=$row->acronym;
 				$show_user_rank=$row->rank;
