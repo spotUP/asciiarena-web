@@ -42,7 +42,7 @@ include "header.php";
 
 			<div class="row apb-1">
 				<div class="col-12">
-					<h1><?=$show_name?>
+					<h2 class="ap-1"><?=$show_name?>
 					<?php
 					if (isset($show_acronym))
 					{
@@ -150,7 +150,7 @@ include "header.php";
 		</div>
 		<div class="row apb-1 apt-1">
 			<div class="col-12">
-				<h2>Members</h2>											
+				<h2 class="ap-1">Members</h2>											
 			</div>
 		</div>
 
@@ -262,7 +262,7 @@ include "header.php";
 
 			<div class="row apt-1">
 				<div class="col-12">
-					<h2>Boards</h2>											
+					<h2 class="ap-1">Boards</h2>											
 				</div>
 			</div>
 			<?php
@@ -344,7 +344,7 @@ include "header.php";
 
 			<div class="row apb-1 apt-1">
 				<div class="col-12">
-					<h2>Latest Release</h2>											
+					<h2 class="ap-1">Latest Release</h2>											
 				</div>
 			</div>
 
@@ -549,7 +549,7 @@ include "header.php";
 			{
 				$encoded_crew=base64_encode($showcrew);
 				?>
-				<h2 class="amb-1 amt-1">All <?=$show_acronym?> Releases</h2>            
+				<h2 class="amb-1 amt-1 ap-1">All <?=$show_acronym?> Releases</h2>            
 				<span class="yellow">Sort by:</span>
 				<a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.name">Name</a>
 				<a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.filename">Filename</a>
