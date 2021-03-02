@@ -208,8 +208,8 @@ include "header.php";
 					$show_sigdata=$row->sigdata;
 					$show_sigdata=fixOutputEdit($show_sigdata);
 					$show_viewmode=$row->list_view_mode;
-					$def_bg_col=$row->def_bg_col;
-					$def_fg_col=$row->def_fg_col;
+					$def_bg_col=$row->def_bg_col ?? "#000000";
+					$def_fg_col=$row->def_fg_col ?? "255,255,255";
 					$show_display_mail=$row->display_mail;
 					$sigfont=$row->forum_sig_font;
 					$sigcolor=$row->forum_sig_color;
@@ -294,7 +294,7 @@ include "header.php";
 								}
 								else
 								{
-									echo "<option selected='selected' value=\"$symbol\">Unknown</option>";					
+									echo "<option selected='selected' value=\"\">Unknown</option>";
 								}
 
 								foreach($country_list as $symbol => $country)
@@ -316,9 +316,9 @@ include "header.php";
 								<select name="display_mail">
 									<option selected="selected"><?=$show_display_mail?></option>
 									<?php
-									if($show_display_mail!=Yes)
+									if($show_display_mail!="Yes")
 										echo "<option>Yes</option>";
-									if($show_display_mail!=No)
+									if($show_display_mail!="No")
 										echo "<option>No</option>"; 
 									?>
 								</select>
@@ -361,9 +361,9 @@ include "header.php";
 								<select name="changelistviewmode">
 									<option selected="selected"><?=$show_viewmode?></option>
 									<?php
-									if($show_viewmode!=BBS)
+									if($show_viewmode!="BBS")
 										echo "<option>BBS</option>";
-									if($show_viewmode!=Standard)
+									if($show_viewmode!="Standard")
 										echo "<option>Standard</option>"; ?>
 								</select>
 							</div>
