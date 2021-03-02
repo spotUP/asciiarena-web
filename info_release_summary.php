@@ -35,7 +35,7 @@ $dirname = $dirname[ 0 ];
 							<?php if ($colly->file_id == "file_id.diz.png") {
 //								$file_id_diz = file_get_contents("collections/file_id.diz.txt");
 								$file_id_diz = file_get_contents(__DIR__ , "/collections/file_id.diz.txt");
-								echo "dir: __DIR__ , \"/collections/file_id.diz.txt\"";
+								echo "dir:" . __DIR__ , "/collections/file_id.diz.txt";
 								echo "<pre style=\"color: red\">";
 								echo $file_id_diz;
 								echo "</pre>";
