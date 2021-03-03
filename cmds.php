@@ -63,7 +63,7 @@
 				]);
 			}
 			if ($is_ajax) {
-				foreach (fetchAll("(SELECT * FROM wallposts WHERE wall_id = :wall_id ORDER BY id DESC LIMIT 10) ORDER BY id ASC", [":wall_id" => (int)$wall]) as $row) { ?>
+				foreach (fetchAll("(SELECT * FROM wallposts WHERE wall_id = :wall_id ORDER BY id DESC LIMIT 12) ORDER BY id ASC", [":wall_id" => (int)$wall]) as $row) { ?>
 					<div class="col-lg-12 d-flex justify-content-between">
 						<pre class="wall"><span class="cyan"><?=$row->tag?></span></pre>
 						<span class="pink"><?=$row->nick?></span>
