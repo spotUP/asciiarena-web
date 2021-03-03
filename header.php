@@ -52,6 +52,11 @@ EOD;
 	<script src="https://unpkg.com/@popperjs/core@2"></script>
 	<script src="/assets/js/bootstrap.bundle.js"></script>
 	<script type="text/javascript">
+		$("#setRemoveClassBtn").click(function(){
+			$("#div1").toggleClass("bigSizeDivs");
+		});
+	</script>
+	<script type="text/javascript">
 		function myFunction() {
 			var element = document.getElementById("colly");
 			element.classList.toggle("fullscreen");
