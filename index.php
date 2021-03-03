@@ -8,6 +8,7 @@ include "header.php";
 		<?php widgets([
 			["file" => "latest/releases", "header" => "LATEST RELEASES", "columns" => 2],
 			["file" => "wall", "header" => "WALL OF FAME"],
+			["file" => "cedd_sessions", "header" => "ACTIVE CEDD ONLINE SESSIONS"],
 		]); ?>
 	</div>
 	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
