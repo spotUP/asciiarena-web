@@ -30,13 +30,9 @@ require_once "header.php"; ?>
 
 			?>
 			<form enctype="multipart/form-data" action="info_release.php?filename=<?=$filename?>" method="post">
-				<div class="headline">
 					Enter a comment describing the problem.
-				</div>
-				<div class="content_with_blenk">
 					<textarea rows="5" cols="82" id="broken_comment" name="broken_comment"></textarea>
-					<input type="submit" class="btn-primary" name="do_report_broken" value="Report">
-				</div>
+					<input type="submit" class="btn-big" name="do_report_broken" value="Report">
 			</form>
 			<?php
 		}
@@ -644,7 +640,7 @@ require_once "header.php"; ?>
 				</div>
 
 				<div class="col-6">
-					<select name="edit_colly_type" class="btn-primary">
+					<select name="edit_colly_type" class="btn-big">
 						<option><?=$show_colly_type?></option>
 						<option>ASCII</option>
 						<option>ANSI</option>
@@ -656,7 +652,7 @@ require_once "header.php"; ?>
 				</div>
 
 				<div class="col-6">
-					<select name="colors" class="btn-primary">
+					<select name="colors" class="btn-big">
 						<option value="transparent">ANSI</option>
 						<option>Workbench</option>
 					</select>
@@ -666,7 +662,7 @@ require_once "header.php"; ?>
 
 				<div class="info_release_right">
 					<?php
-					echo "<select name='edit_colly_year' class='btn-primary'>";
+					echo "<select name='edit_colly_year' class='btn-big'>";
 					$countyear = 1986;
 					$maxyear = date("Y");
 					echo "<option>$show_colly_year</option>";
@@ -677,7 +673,7 @@ require_once "header.php"; ?>
 
 					?>
 				</select>
-				<select name="edit_colly_month" class="btn-primary">
+				<select name="edit_colly_month" class="btn-big">
 					<option selected='selected'><?=$show_colly_month?></option>
 					<option value="0">Unknown</option>
 					<option value="1">January</option>
@@ -693,7 +689,7 @@ require_once "header.php"; ?>
 					<option value="11">November</option>
 					<option value="12">December</option>
 				</select>
-				<select name="edit_colly_day" class="btn-primary">
+				<select name="edit_colly_day" class="btn-big">
 					<?php
 					echo "<option selected='selected' value='0'>$show_colly_day</option>";
 					echo "<option value='0'>Unknown</option>";
@@ -717,7 +713,7 @@ require_once "header.php"; ?>
 				$result = mysql_query($ask, $dbh);
 				while ($row = mysql_fetch_array($result)) {
 					$colly_author = $row[ 0 ];
-					echo "<select name=\"old_colly_authors[]\" class='btn-primary'>";
+					echo "<select name=\"old_colly_authors[]\" class='btn-big'>";
 					echo "<option selected=\"selected\">$colly_author</option>";
 					echo "<option value='Delete'>Remove Author</option>";
 
@@ -747,7 +743,7 @@ require_once "header.php"; ?>
 				$result = mysql_query($ask, $dbh);
 				while ($row = mysql_fetch_array($result)) {
 					$colly_crew = $row[ 0 ];
-					echo "<select name=\"old_colly_crews[]\" class='btn-primary'>";
+					echo "<select name=\"old_colly_crews[]\" class='btn-big'>";
 					echo "<option selected=\"selected\">$colly_crew</option>";
 					echo "<option value='Delete'>Remove Crew</option>";
 					$ask_crews = "select name from crews";
@@ -767,7 +763,7 @@ require_once "header.php"; ?>
 
 			<div class="row">
 				<input type="hidden" name="filename" value="<?=$getcollyname?>">
-				<input type="submit" class="btn-primary" name="do_edit_colly" value="Change">
+				<input type="submit" class="btn-big" name="do_edit_colly" value="Change">
 			</div>
 		</form>
 		<?php
@@ -796,21 +792,21 @@ require_once "header.php"; ?>
 			<?php
 			echo "<form action='$_SERVER[PHP_SELF]?filename=$decoded_filename' method='post'  id='ctrlForm'>";
 
-			echo "<input type='submit' class='btn-primary amb-1' name='hide' value='Hide Colly!'" . ((!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) ? " style='display:none'" : "") . "> ";
-			echo "<input type='submit' class='btn-primary amb-1' name='view' value='View Colly'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
-			echo "<input type='button' onclick='myFunction()' class='btn-primary amb-1' name='fullscreen' value='Fullscreen'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:block'" : "") . "> ";
+			echo "<input type='submit' class='btn-big amb-1' name='hide' value='Hide Colly!'" . ((!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) ? " style='display:none'" : "") . "> ";
+			echo "<input type='submit' class='btn-big amb-1' name='view' value='View Colly'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
+			echo "<input type='button' onclick='myFunction()' class='btn-big amb-1' name='fullscreen' value='Fullscreen'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:block'" : "") . "> ";
 
 			if (is_logged_in()) {
-				echo "<input type='submit' class='btn-primary amb-1' name=addcomment value='Comment'> ";
-				echo "<input type='submit' class='btn-primary amb-1' name=favourite value='Favourite'> ";
-				echo "<input type='submit' class='btn-primary amb-1' name=broken value='Report Broken'> ";
+				echo "<input type='submit' class='btn-big amb-1' name=addcomment value='Comment'> ";
+				echo "<input type='submit' class='btn-big amb-1' name=favourite value='Favourite'> ";
+				echo "<input type='submit' class='btn-big amb-1' name=broken value='Report Broken'> ";
 				if ($_user[ "nick" ] === $uploader || is_admin()) {
 					echo "<input type='hidden' name='filename' value=$filename>";
-					echo "<input type='submit' class='btn-primary amb-1' name=edit_colly value='Edit Colly'> ";
+					echo "<input type='submit' class='btn-big amb-1' name=edit_colly value='Edit Colly'> ";
 				}
 			}
 			if (!isset($_POST[ 'download' ])) {
-				echo "<input type='submit' class='btn-primary amb-1' name=download value='Download'> ";
+				echo "<input type='submit' class='btn-big amb-1' name=download value='Download'> ";
 			} elseif (isset($_POST[ 'download' ])) {
             $ask = "select downloads from collys where filename=:filename"; // download counter
             $row = fetchOne("SELECT view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
@@ -857,7 +853,7 @@ require_once "header.php"; ?>
         		</select>
                         <!--
 						<div class="btn-group" role="group">
-							<button id="btnGroupDrop1" type="button" class="btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Font </button>
+							<button id="btnGroupDrop1" type="button" class="btn-big dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Font </button>
 							<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
                                 <a class="dropdown-item" href="#">MicroKnight</a>
                                 <a class="dropdown-item" href="#">MicroKnightPlus</a>
@@ -891,7 +887,7 @@ require_once "header.php"; ?>
 					</select>
                         <!--
 						<div class="btn-group" role="group">
-							<button id="btnGroupDrop1" type="button" class="btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">BG Color </button>
+							<button id="btnGroupDrop1" type="button" class="btn-big dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">BG Color </button>
 							<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
 								<a class="dropdown-item" href="#">Black</a>
 								<a class="dropdown-item" href="#">Dark Blue</a>
@@ -934,7 +930,7 @@ require_once "header.php"; ?>
 					</select>
                         <!--
                         <div class="btn-group" role="group">
-							<button id="btnGroupDrop1" type="button" class="btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">FG Color </button>
+							<button id="btnGroupDrop1" type="button" class="btn-big dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">FG Color </button>
 							<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
 								<a class="dropdown-item" href="#">Black</a>
 								<a class="dropdown-item" href="#">Dark Blue</a>
@@ -1026,7 +1022,7 @@ if (!isset($_POST[ 'edit' ])) {
 					<div class="bg-secondary col-12 ap-1 amb-1">
 						<span class="cyan"><?=$comment?></span>
 						<div class="col-12 p-0 m-0 apt-1">
-							<input type="hidden" name="commentid" value="<?=$commentid?>"/><input type="submit" class="btn-primary" name="edit" value="Edit">
+							<input type="hidden" name="commentid" value="<?=$commentid?>"/><input type="submit" class="btn-big" name="edit" value="Edit">
 						</div>
 					</div>
 					<?php
@@ -1059,9 +1055,9 @@ if (!isset($_POST[ 'edit' ])) {
 				<div class="bg-secondary col-12 ap-1 amb-1">
 					<span class="cyan"><?=$comment?></span>
 					<div class="col-12 p-0 m-0 apt-1">
-						<input type="hidden" class="btn-primary" name="commentid" value="<?=$commentid?>">
-						<input type="submit" class="btn-primary" name="edit" value="Edit">
-						<input type="submit" class="btn-primary" name="Delete" value="Delete">
+						<input type="hidden" class="btn-big" name="commentid" value="<?=$commentid?>">
+						<input type="submit" class="btn-big" name="edit" value="Edit">
+						<input type="submit" class="btn-big" name="Delete" value="Delete">
 					</div>
 				</div>
 
@@ -1080,8 +1076,8 @@ if (!isset($_POST[ 'edit' ])) {
 					<div class="col-12 ap-1 amb-1">
 						<span class="cyan"><?=$comment?></span>
 						<div class="col-12 p-0 m-0 apt-1">
-							<input type="hidden" class="btn-primary" name="commentid" value="<?=$commentid?>">
-							<input type="submit" class="btn-primary" name="edit" value="Edit">
+							<input type="hidden" class="btn-big" name="commentid" value="<?=$commentid?>">
+							<input type="submit" class="btn-big" name="edit" value="Edit">
 						</div>
 					</div>
 					<?php
@@ -1111,8 +1107,8 @@ if (!isset($_POST[ 'edit' ])) {
 					<span class="cyan"><?=$comment?></span>
 					<input type="hidden" name="commentid" value="<?=$commentid?>">
 					<div class="col-12 p-0 m-0 apt-1">
-						<input type="submit" class="btn-primary" name="edit" value="Edit">
-						<input type="submit" class="btn-primary" name="Delete" value="Delete">
+						<input type="submit" class="btn-big" name="edit" value="Edit">
+						<input type="submit" class="btn-big" name="Delete" value="Delete">
 					</div>
 				</div>
 				<?php
@@ -1156,7 +1152,7 @@ if (isset($_POST[ 'addcomment' ])) {
 			<div class="row">
 				<textarea rows="5" cols="82" id="commentvote" name="comment"></textarea>
 				<input type="hidden" name="crew" align="right" value="<?=$crew?>"><input type="hidden" name="artist" align="right" value="<?=$artist?>">
-				<input type="submit" class="btn-primary" name="add_comment" align="right" value="Comment">
+				<input type="submit" class="btn-big" name="add_comment" align="right" value="Comment">
 			</div>
 		</form>
 		<script type="text/javascript">
@@ -1185,7 +1181,7 @@ if (isset($_POST[ 'addcomment' ])) {
 		</select>
 		<input type="hidden" name="crew" align="right" value="<?=$crew?>"><input type="hidden" name="artist"
 		align="right" value="<?=$artist?>">
-		<input type="submit" class="btn-primary" name="add_comment" align="right" value="Comment">
+		<input type="submit" class="btn-big" name="add_comment" align="right" value="Comment">
 	</form>
 	<script type="text/javascript">
 		document.getElementById('comment').focus();
@@ -1217,7 +1213,7 @@ if (isset($_POST[ 'edit' ])) {
 	<div class="row">
 		<textarea rows="5" cols="82" name="edit_message"><?=$comment?></textarea>
 		<input type="hidden" name="commentid" value="<?=$commentid?>"/>
-		<input type="submit" class="btn-primary" name="writeedit" align="right" value="Submit">
+		<input type="submit" class="btn-big" name="writeedit" align="right" value="Submit">
 	</form>
 </div>
 <?php
