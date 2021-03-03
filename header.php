@@ -57,6 +57,8 @@ EOD;
 			element.classList.toggle("fullscreen");
 			var element = document.getElementById("blacker");
 			element.classList.toggle("show");
+			var element = document.getElementById("spotclose");
+			element.classList.toggle("show");
 		}
 	</script>
 	<script type="text/javascript">
