@@ -18,7 +18,7 @@
 				$broken_comment=$row->broken_comment;
 
 				?>
-				<a href="info_release.php?filename=<?=$encoded_filename?>"><?php=$filename?></a>
+				<a href="info_release.php?filename=<?=$encoded_filename?>"><?=$filename?></a>
 				<input type="hidden" name="filename" value="<?=$filename?>">
 				<input type="submit" name="colly_fixed" value="Fixed">
 				Comment: <?php=$broken_comment?>
