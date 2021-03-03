@@ -4,7 +4,7 @@
 	$form = "form_{$wall_id}";
 	$tag = "tag_{$wall_id}";
 ?>
-<div class="container-fluid" style="padding-bottom: 16px;">
+<div class="container-fluid">
 	<div class="row m-0 p-0" id="<?=$wall?>"></div>
 	<?php if (is_logged_in()): ?>
 		<div class="row">
