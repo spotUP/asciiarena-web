@@ -17,7 +17,7 @@
 	}
 	foreach ($collys as $colly) {
 		?>
-		<div class="col-<?=$breakpoint?><?=(round(12 / $columns))?>">
+		<div class="col-<?=$breakpoint?><?=(round(12 / $columns))?>" style="min-height: 240px;">
 			<div class="bs-component">
 				<div class="card text-white bg-transparent mb-3">
 					<div class="card-body">
