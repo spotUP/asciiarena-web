@@ -21,7 +21,7 @@ if(isset($_POST['getartist']) && is_admin())
 }
 ?>
 <div class="tab-pane fade" id="artist">
-	<form enctype="multipart/form-data" action="#" method="post">
+	<form enctype="multipart/form-data" action="#artist" method="post">
 
 		Edit Artist				
 

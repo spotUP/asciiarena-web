@@ -22,7 +22,7 @@ if(isset($_POST['getcrew']) && is_admin())
 ?>
 
 	<div class="tab-pane fade" id="crew">
-		<form enctype="multipart/form-data" action="admin.php" method="post">
+		<form enctype="multipart/form-data" action="#crew" method="post">
 			Edit Crew				
 			<select name="getcrew">
 				<?php

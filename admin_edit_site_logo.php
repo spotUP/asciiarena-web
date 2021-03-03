@@ -18,7 +18,7 @@ if(isset($_POST['getsitelogo']) && is_admin())
 }
 ?>
 <div class="tab-pane fade" id="sitelogo">
-	<form enctype="multipart/form-data" action="#" method="post">
+	<form enctype="multipart/form-data" action="#sitelogo" method="post">
 		Edit Site Logos			
 
 		<select name="getsitelogo">
