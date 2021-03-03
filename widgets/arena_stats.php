@@ -1,5 +1,5 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
-<div class="header col-12 ap-1">
+<div class="header col-12">
 	<h2 class="ap-1 bg-header">aSCIIaRENA STATS</h2>
 </div>
 <div class="col-12 d-flex justify-content-between">
