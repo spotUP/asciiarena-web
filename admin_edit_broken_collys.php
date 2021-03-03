@@ -7,7 +7,7 @@
 
 		Broken Collys
 
-		<form enctype="multipart/form-data" action="admin.php" method="post">
+		<form enctype="multipart/form-data" action="#broken" method="post">
 			<?php
 			$ask="SELECT * FROM collys WHERE broken='1' ORDER BY filename ASC";
 			$result=fetchAll($ask);

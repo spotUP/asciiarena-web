@@ -20,7 +20,7 @@ if(isset($_POST['getbbs']) && is_admin())
 ?>
 <div class="tab-pane fade" id="bbs">
 	Edit BBS			
-	<form enctype="multipart/form-data" action="admin.php" method="post">
+	<form enctype="multipart/form-data" action="#bbs" method="post">
 		<select name="getbbs">
 			<?php
 			if (isset($_POST['getbbs']))

@@ -23,7 +23,7 @@ if(isset($_POST['getuser']) && is_admin())
 }
 ?>
 	<div class="tab-pane fade" id="edituser">
-		<form enctype="multipart/form-data" action="#" method="post">
+		<form enctype="multipart/form-data" action="#edituser" method="post">
 			Edit User				
 
 			<select name="getuser">

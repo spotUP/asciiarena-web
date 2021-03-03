@@ -23,7 +23,7 @@ if($getcollyname && (!isset($_POST['do_edit_colly'])))
 
 <div class="tab-pane fade show active" id="colly">
 
-	<form enctype="multipart/form-data" action="admin.php" method="post">		
+	<form enctype="multipart/form-data" action="#colly" method="post">		
 		Edit ASCII Collection				
 		<select name="getcollyname">
 			<?php 
