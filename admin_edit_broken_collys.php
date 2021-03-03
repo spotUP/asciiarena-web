@@ -21,7 +21,7 @@
 				<a href="info_release.php?filename=<?=$encoded_filename?>"><?=$filename?></a>
 				<input type="hidden" name="filename" value="<?=$filename?>">
 				<input type="submit" name="colly_fixed" value="Fixed">
-				Comment: <?php=$broken_comment?>
+				Comment: <?=$broken_comment?>
 				<?php
 			}
 			?>
