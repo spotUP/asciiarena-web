@@ -118,6 +118,35 @@
 	});
 </script>
 
+<script type="text/javascript">
+	$(document).ready(function () {
+    $(document).keydown(function(e){
+       
+        if(e.keyCode == 27) {
+            if ($('pre').hasClass('fullscreen')) 
+            {
+                $('pre').removeClass('fullscreen');
+            } 
+            else 
+            {
+                $('pre').addClass('fullscreen');
+            }
+            if ($('.blacker').hasClass('show')) 
+            {
+                $('.blacker').removeClass('show');
+            } 
+            else 
+            {
+                $('.blacker').addClass('show');
+            }
+        }
+    });
+})
+</script>
+
+
+
+
 <?php
 	if (DEBUG) {
 		echo "<pre>";
