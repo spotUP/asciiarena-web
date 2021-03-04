@@ -1179,6 +1179,7 @@ textarea.fig-txt{
   margin: 0px !important;
   resize: none !important;
   padding: 16px !important;
+  background: #2a2a2a !important;
 }
 
 input, button, select, optgroup {
@@ -1253,11 +1254,12 @@ input:active, button:active, select:active, optgroup:active {
   padding-left: 16px;
   padding-right: 16px;
   margin-right: 0;
-  background-color: #111111 !important;
+  background-color: #1a1a1a !important;
   border-bottom: 0;
   color: #eeee44 !important;
   height: 16px !important;
 }
+
 
 .nav-tabs .nav-link:focus {
   color: #ffffff !important;
@@ -1278,6 +1280,43 @@ input:active, button:active, select:active, optgroup:active {
   color: #ffffff !important;
   background-color: #1a1a1a !important;
 }
+
+
+
+
+
+
+
+
+
+.nav-tabs .nav-link a:focus {
+  color: #ffffff !important;
+  background-color: #1a1a1a !important;
+}
+
+.nav-tabs .nav-link a:focus-within {
+  color: #ffffff !important;
+  background-color: #1a1a1a !important;
+}
+
+.nav-tabs .nav-link a:active {
+  color: #ffffff !important;
+  background-color: #1a1a1a !important;
+}
+
+.nav-tabs .nav-link a:hover {
+  color: #ffffff !important;
+  background-color: #1a1a1a !important;
+}
+
+
+
+
+
+
+
+
+
 
 .nav-tabs {
   height: 16px;
