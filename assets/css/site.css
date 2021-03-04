@@ -1701,15 +1701,14 @@ input[type=text]{
 }
 
 #blacker{
-  position: fixed;
-  background-color: #000000;
-  width: 100vw;
-  height: 100vh;
-  top:0;
-  left:0;
+  position: fixed !important;
+  background-color: #000000 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  top:0 !important;
+  left:0 !important;
   z-index: 999997 !important;
-  display: none;
-  transition: width 5s, height 5s;
+  display: none ;
 }
 
 .show{

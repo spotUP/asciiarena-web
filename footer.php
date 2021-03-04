@@ -123,21 +123,21 @@
     $(document).keydown(function(e){
        
         if(e.keyCode == 27) {
-            if ($('pre').hasClass('fullscreen')) 
+            if ($('#colly').hasClass('fullscreen')) 
             {
-                $('pre').removeClass('fullscreen');
+                $('#colly').removeClass('fullscreen');
             } 
             else 
             {
-                $('pre').addClass('fullscreen');
+                $('#colly').addClass('fullscreen');
             }
-            if ($('.blacker').hasClass('show')) 
+            if ($('#blacker').hasClass('show')) 
             {
-                $('.blacker').removeClass('show');
+                $('#blacker').removeClass('show');
             } 
             else 
             {
-                $('.blacker').addClass('show');
+                $('#blacker').addClass('show');
             }
         }
     });
