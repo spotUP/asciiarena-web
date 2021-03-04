@@ -1,5 +1,5 @@
 			<div id="spotclose" class="spotclose" onclick='myFunction()'><div class="noevents">x</div></div>
-			<div id="blacker"></div>
+			<div id="blacker" class="blacker"></div>
 
 <?php
 require_once "session.php";
