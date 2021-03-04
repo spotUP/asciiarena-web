@@ -492,6 +492,14 @@ select:hover {
   margin-right: 8px !important; 
   width: 132px; 
   text-align: center;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
+}
+
+input, button, select, optgroup, textarea {
+    margin: 0;
+    font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
+    line-height: 16px;
+    font-size: 16px;
 }
 
 .btn-primary:hover {
@@ -501,6 +509,7 @@ select:hover {
   margin-right: 8px !important; 
   width: 132px; 
   text-align: center;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
 }
 
 /*
