@@ -21,7 +21,7 @@ include "header.php";
 
         <span class="white">ASCII FONT EDITOR</span><br><br>
 		<span class="cyan">Code by ....</span><br>        
-		<span class="cyan">Concept/UI/HTML/CSS by Spot</span><br><br><br>
+		<span class="cyan">Concept/UI/HTML/CSS by Spot</span><br>
 		<span class="cyan">Based on a web adaption of FIGLET by PatorJK</span><br><br><br>
 
 		<span class="white">ADMiNS</span><br><br>
