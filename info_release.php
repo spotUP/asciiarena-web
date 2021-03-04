@@ -2,7 +2,6 @@
 require_once "session.php";
 require_once "header.php"; ?>
 
-<div id="spotclose" class="spotclose" onclick='myFunction()'><div class="noevents">x</div></div>
 <div id="blacker"></div>
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">

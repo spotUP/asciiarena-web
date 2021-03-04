@@ -1742,8 +1742,8 @@ a.disabled{
   width: 33px;
   height: 33px;
   border-radius: 50%;
-  top:40;
-  right:40;
+  top:40px !important;
+  right:40px !important; 
   z-index: 999999 !important;
   /*  display: none; */
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;

@@ -186,6 +186,7 @@ EOD;
 </head>
 
 <body style="overflow-x: hidden;">
+	<div id="spotclose" class="spotclose" onclick='myFunction()'><div class="noevents">x</div></div>
 	<div class="scanlines"></div>
 	<!-- <div class="overlay"></div> -->
 	<div class="vignette"></div>

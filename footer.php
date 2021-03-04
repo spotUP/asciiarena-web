@@ -139,6 +139,14 @@
             {
                 $('#blacker').addClass('show');
             }
+            if ($('#spotclose').hasClass('show')) 
+            {
+                $('#spotclose').removeClass('show');
+            } 
+            else 
+            {
+                $('#spotclose').addClass('show');
+            }
         }
     });
 })
