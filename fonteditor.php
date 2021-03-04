@@ -12,7 +12,7 @@ include "header.php";
             <html ng-app="figfont">
             <div class="row" >
                 <div class="col-lg-12">
-                    <h2 class="bg-header" id="nav-tabs">PRIVATE FONT EDITOR</h2>
+                    <h2 class="bg-header" id="nav-tabs">ASCII STYLE DESIGNER</h2>
                     <div class="bs-component">
                         <ul class="nav nav-tabs">
                             <li class="nav-item">
