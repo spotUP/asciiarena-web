@@ -8,13 +8,24 @@ include "header.php";
 
 		CREDITS<br><br>
 
-		Idea/Concept/Design/Code by Spot<br>
-		Code: Fred, Hamlet, Origo, Phiwer, Nicomen, Stalvik, TZ, Ziphoid (should be completed with details)<br><br>
+		aSCIIaRENA Site<br><br>
+		Code by Hamlet, Nicomen, TZ, Ziphoid, Spot <br>
+		Concept and Design by Spot<br>
+		(should be completed with details)<br><br>
 
-		Admins:<br>
+		Cygnus Edditor Online<br><br>
+		Code by  Fred, Phiwer, Origo<br>
+		UI/HTML/CSS by Spot<br>
+
+		Hippoplayer Online<br><br>
+		Code by  Stalvik<br>
+		UI/HTML/CSS by Spot<br>
+		Add refs to player libs here<br><br>
+
+		Admins:<br><br>
 		Ne7, Zito, Dino, Etc etc.. complete this...<br><br>
 
-		Thanks to...<br>
+		Thanks to...<br><br>
 		Yonx, (Complete this...)<br><br>
 
 	</div>
