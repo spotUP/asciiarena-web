@@ -263,7 +263,7 @@ EOD;
 											onclick="window.open('/up-rough-amp/index.html','name','width=275,height=450')">MUSIC PLAYER </a>
 										</li>
 										<li class="nav-item">
-											<a class="nav-link ascii" style="padding-right: 8px; href="/about.php">ABOUT</a>
+											<a class="nav-link ascii" style="padding-right: 8px;" href="/about.php">ABOUT</a>
 										</li>
 										<li class="nav-item">
 											<a class="nav-link ascii" href="/fonteditor.php">ASCII STYLE DESIGNER </a>
