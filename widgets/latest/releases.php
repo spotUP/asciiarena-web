@@ -11,7 +11,6 @@
 	foreach ($res as $row) {
 		$dirname = explode(".", $row->filename);
 		$filename = BASEDIR . "/collections/{$dirname[0]}/{$row->filename}.diz";
-echo "filename: $filename <br>";
 		if (file_exists($filename) && count($collys) < $columns) {
 			$collys[] = utf8_encode(file_get_contents($filename));
 		}
