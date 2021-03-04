@@ -1,10 +1,9 @@
-			<div id="spotclose" class="spotclose" onclick='myFunction()'><div class="noevents">x</div></div>
-			<div id="blacker"></div>
-
 <?php
 require_once "session.php";
 require_once "header.php"; ?>
 
+<div id="spotclose" class="spotclose" onclick='myFunction()'><div class="noevents">x</div></div>
+<div id="blacker"></div>
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
 		<?php
@@ -30,9 +29,9 @@ require_once "header.php"; ?>
 
 			?>
 			<form enctype="multipart/form-data" action="info_release.php?filename=<?=$filename?>" method="post">
-					Enter a comment describing the problem.
-					<textarea rows="5" cols="82" id="broken_comment" name="broken_comment"></textarea>
-					<input type="submit" class="btn-big" name="do_report_broken" value="Report">
+				Enter a comment describing the problem.
+				<textarea rows="5" cols="82" id="broken_comment" name="broken_comment"></textarea>
+				<input type="submit" class="btn-big" name="do_report_broken" value="Report">
 			</form>
 			<?php
 		}
