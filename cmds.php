@@ -66,7 +66,7 @@
 				foreach (fetchAll("(SELECT * FROM wallposts WHERE wall_id = :wall_id ORDER BY id DESC LIMIT 13) ORDER BY id ASC", [":wall_id" => (int)$wall]) as $row) { ?>
 					<div class="col-lg-12 d-flex justify-content-between">
 						<pre class="wall"><span class="cyan"><?=$row->tag?></span></pre>
-						<span class="lightpink"><?=$row->nick?></span>
+						<span class="lightpink"><a href="members/<?=$row->user_id?>"><?=$row->nick?></a></span>
 					</div>
 				<?php }
 				exit();
