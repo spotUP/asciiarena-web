@@ -1,8 +1,83 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
 </div>
+
+<div class="mx-auto navbar navbar-expand-lg fixed-bottom navbar-dark bg-primary d-flex justify-content-lg-around" style="height: 22px;">
+	<span cass="red ml-xl-2">NComm 2.0</span>
+	<span class="green">aSCIIaRENA</span>
+	<span class="green mr-xl-2"><?php echo Date("H:i", time()), " 00:00"; ?></span>
+</div>
+
+<script>
+	document.addEventListener("visibilitychange", () => {
+		if (document.visibilityState === 'visible') {
+			window.switchers.forEach((s, idx) => {
+				const elements = $(s[1]).length;
+				let start = 1;
+				if (elements === 2 && s[0] !== 1) {
+					start = 2;
+				} else if (elements !== s[0]) {
+					start = s[0] + 1;
+				}
+				switcharoo(s[1], s[2], idx, start);
+			});
+		} else {
+			window.switchers.forEach(s => {
+				clearInterval(s[3]);
+			});
+		}
+	});
+</script>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+    $(document).keydown(function(e){
+       
+        if(e.keyCode == 27) {
+            if ($('#colly').hasClass('fullscreen')) 
+            {
+                $('#colly').removeClass('fullscreen');
+            } 
+            else 
+            {
+                $('#colly').addClass('fullscreen');
+            }
+            if ($('#blacker').hasClass('show')) 
+            {
+                $('#blacker').removeClass('show');
+            } 
+            else 
+            {
+                $('#blacker').addClass('show');
+            }
+            if ($('#spotclose').hasClass('show')) 
+            {
+                $('#spotclose').removeClass('show');
+            } 
+            else 
+            {
+                $('#spotclose').addClass('show');
+            }
+        }
+    });
+})
+</script>
+
+<?php
+	if (DEBUG) {
+		echo "<pre>";
+		print_r($_user);
+		$stats = fetchAll("SHOW profiles");
+		print_r($stats);
+		print_r($_queries);
+		print_r($_SERVER);
+		echo "</pre>";
+	}
+?>
+
 <!-- Modal -->
+
 <div class="modal" id="login" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-	<div class="modal-dialog" role="document">
+	<div class="modal-dialog animate__animated animate__backInLeft" role="document">
 		<div class="modal-content">
 			<div class="modal-header ap-1" style="background-color: #444444;">
 				<span class="modal-title" id="exampleModalLabel">LOGiN</span>
@@ -90,81 +165,5 @@
 		</div>
 	</div>
 </div>
-
-<div class="mx-auto navbar navbar-expand-lg fixed-bottom navbar-dark bg-primary d-flex justify-content-lg-around" style="height: 22px;">
-	<span cass="red ml-xl-2">NComm 2.0</span>
-	<span class="green">aSCIIaRENA</span>
-	<span class="green mr-xl-2"><?php echo Date("H:i", time()), " 00:00"; ?></span>
-</div>
-
-<script>
-	document.addEventListener("visibilitychange", () => {
-		if (document.visibilityState === 'visible') {
-			window.switchers.forEach((s, idx) => {
-				const elements = $(s[1]).length;
-				let start = 1;
-				if (elements === 2 && s[0] !== 1) {
-					start = 2;
-				} else if (elements !== s[0]) {
-					start = s[0] + 1;
-				}
-				switcharoo(s[1], s[2], idx, start);
-			});
-		} else {
-			window.switchers.forEach(s => {
-				clearInterval(s[3]);
-			});
-		}
-	});
-</script>
-
-<script type="text/javascript">
-	$(document).ready(function () {
-    $(document).keydown(function(e){
-       
-        if(e.keyCode == 27) {
-            if ($('#colly').hasClass('fullscreen')) 
-            {
-                $('#colly').removeClass('fullscreen');
-            } 
-            else 
-            {
-                $('#colly').addClass('fullscreen');
-            }
-            if ($('#blacker').hasClass('show')) 
-            {
-                $('#blacker').removeClass('show');
-            } 
-            else 
-            {
-                $('#blacker').addClass('show');
-            }
-            if ($('#spotclose').hasClass('show')) 
-            {
-                $('#spotclose').removeClass('show');
-            } 
-            else 
-            {
-                $('#spotclose').addClass('show');
-            }
-        }
-    });
-})
-</script>
-
-
-
-
-<?php
-	if (DEBUG) {
-		echo "<pre>";
-		print_r($_user);
-		$stats = fetchAll("SHOW profiles");
-		print_r($stats);
-		print_r($_queries);
-		print_r($_SERVER);
-		echo "</pre>";
-	}
-?>
 </body>
 </html>

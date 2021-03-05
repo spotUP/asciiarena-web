@@ -409,36 +409,7 @@ small,
   opacity: .5;
 }
 
-.modal-title {
-  line-height: 16px;
-}
 
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 100;
-  width: 100vw;
-  height: 100vh;
-  background-color: #000;
-  opacity: 0.95;
-  pointer-events: none;
-}
-
-.modal-dialog {
-  margin: auto;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
-.modal-body{
-  padding: 16px 16px;
-}
-
-.modal-content {
-  min-width: 500px;
-}
 .tooltip {
   line-height: 16px;
   font-size: 16px;
@@ -496,10 +467,10 @@ select:hover {
 }
 
 input, button, select, optgroup, textarea {
-    margin: 0;
-    font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
-    line-height: 16px;
-    font-size: 16px;
+  margin: 0;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
+  line-height: 16px;
+  font-size: 16px;
 }
 
 .btn-primary:hover {
@@ -1564,17 +1535,6 @@ input[type=text]{
   font-size: 15px !important;
 }
 
-#myModal {
-  position: relative;
-}
-
-.modal-dialog {
-  position: fixed;
-  width: 100%;
-  margin: 0;
-  padding: 10px;
-}
-
 .logoswitcher{
   overflow: hidden !important;
 }
@@ -1784,4 +1744,79 @@ a.disabled{
     transform: scale(1, 1);
   }
 }
+
+#myModal {
+  /*  position: relative; */
+}
+
+
+.modal-title {
+  line-height: 16px;
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+
+.modal-body{
+  padding: 16px 16px;
+}
+
+.modal-content {
+  min-width: 500px;
+}
+
+.modal-dialog {
+  position: relative;
+  width: 500px;
+  pointer-events: none;
+  margin: auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1050;
+  display: none;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  outline: 0;
+  -webkit-filter: drop-shadow(7px 8px 0 black);
+  filter: drop-shadow(7px 8px 0 black);
+  /* margin-right: 200px; */
+  /* margin-bottom: 200px; */
+  /* padding: 200px; */
+  margin: auto;
+}
+
+.modal.fade{
+  opacity:1
+}
+.modal.fade .modal-dialog{
+  -webkit-transform:translate(0);-moz-transform:translate(0);transform:translate(0)
+}
+
+ .modal .modal-dialog {
+ -webkit-transform: translate(0);
+ -moz-transform: translate(0);
+ transform: translate(0);
+ }
+
+
+
 
