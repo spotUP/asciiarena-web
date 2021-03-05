@@ -16,13 +16,15 @@ require_once "header.php"; ?>
 
 		$user_added_rating = $_POST[ 'user_added_rating' ] ?? "";
 
-		if (isset($_POST[ 'favourite' ]) && is_logged_in()) {
+		if (isset($_POST[ 'favourite' ]) && is_logged_in()) 
+		{
 			$decoded_filename = $_GET[ 'filename' ] ?? "";
 			$filename = base64_decode($decoded_filename);
 			doQuery("INSERT INTO favourites VALUES (:nick, :filename)", [":nick" => $nick, ":filename" => $filename]);
 		}
 
-		if (isset($_POST[ 'broken' ])) {
+		if (isset($_POST[ 'broken' ])) 
+		{
 			$filename = $_GET[ 'filename' ] ?? "";
 			$decoded_filename = base64_decode($filename);
 
@@ -34,7 +36,8 @@ require_once "header.php"; ?>
 			</form>
 			<?php
 		}
-		if (isset($_POST[ 'do_report_broken' ])) {
+		if (isset($_POST[ 'do_report_broken' ])) 
+		{
 			$filename = $_GET[ 'filename' ] ?? "";
 			$decoded_filename = base64_decode($filename);
 			$broken_comment = $_POST[ 'broken_comment' ] ?? "";
@@ -62,11 +65,13 @@ require_once "header.php"; ?>
 // WRITE EDITED MESSAGE TO DB
 //----------------------------------------------------------------------------------------------
 
-		if (isset($_POST[ 'edit_message' ]) && (isset($_GET[ 'comment' ]))) {
+		if (isset($_POST[ 'edit_message' ]) && (isset($_GET[ 'comment' ]))) 
+		{
 			$commentid = $_POST[ 'commentid' ] ?? "";
 			$edit_message = $_POST[ 'edit_message' ] ?? "";
 
-			if (is_numeric($commentid)) {
+			if (is_numeric($commentid)) 
+			{
 				doQuery("UPDATE comments SET comment = :comment, base64 = 1 WHERE commentid = :commentid", [
 					":comment" => $edit_message,
 					":commentid" => $commentid
@@ -77,19 +82,22 @@ require_once "header.php"; ?>
 			exit;
 		}
 
-		if (isset($_POST[ 'add_comment' ]) || (isset($_POST[ 'Delete' ]))) {
+		if (isset($_POST[ 'add_comment' ]) || (isset($_POST[ 'Delete' ]))) 
+		{
 			$crew = $_POST[ 'crew' ];
 			$crew = cleanInsert($crew);
 
 			$ask = "SELECT nick from author_of where filename=:filename";
 			$result = fetchOne($ask, [ filename => $filename ]);
-			if ($result) {
+			if ($result) 
+			{
 				$artist = $row->nick;
 			}
 
 			$ask = "SELECT crew from crew_of where filename=:filename";
 			$result = fetchOne($ask, [ filename => $filename ]);
-			if ($row = $result) {
+			if ($row = $result) 
+			{
 				$crew = $row->crew;
 			}
 
@@ -97,23 +105,27 @@ require_once "header.php"; ?>
 // WRITE COMMENT TO DATABASE
 //----------------------------------------------------------------------------------------------
 
-			if (isset($_POST[ 'comment' ]) && (isset($_GET[ 'comment' ]))) {
+			if (isset($_POST[ 'comment' ]) && (isset($_GET[ 'comment' ]))) 
+			{
 				$comment = cleanInsertPost($comment);
 
-				if (empty($comment)) {
+				if (empty($comment)) 
+				{
 					$comment = "$nick voted $user_added_rating";
 					$comment = cleanInsertPost($comment);
 				}
 
 				$ask = "select nick from author_of where filename=:filename";
 				$row = fetchOne($ask, [ filename => $filename ]);
-				if ($row) {
+				if ($row) 
+				{
 					$artist = $row->nick;
 				}
 
 				$ask_crew = "select crew from crew_of where filename=:filename";
 				$row_crew = fetchOne($ask, [ filename => $filename ]);
-				if ($row_crew) {
+				if ($row_crew) 
+				{
 					$commentcrew = $row_crew->crew;
 				}
 
@@ -136,14 +148,17 @@ require_once "header.php"; ?>
 
 			$ask_rate_amount = "SELECT COUNT(rating) AS count from comments where filename=:filename and rating>0";
 			$result_rate_amount = fetchOne($ask_rate_amount, [ 'filename' => $filename ]);
-			if ($row_rate_amount = $result_rate_amount) {
+			if ($row_rate_amount = $result_rate_amount) 
+			{
 				$rate_amount = $row_rate_amount->count;
 			}
 
-			if ($rate_amount > 2) {
+			if ($rate_amount > 2) 
+			{
 				$ask = "select avg(rating) AS avg from comments where filename=:filename and rating>0";
 				$result = fetchOne($ask, [ 'filename' => $filename ]);
-				if ($row = $result) {
+				if ($row = $result) 
+				{
 					$avgrating = $row->avg;
 				}
 
@@ -157,13 +172,16 @@ require_once "header.php"; ?>
 
 			$ask_rate_amount = "SELECT COUNT(rating) AS count from comments where crew=:crew and rating>0";
 			$result_rate_amount = fetchOne($ask_rate_amount, [ 'crew' => $crew ]);
-			if ($row_rate_amount = $result_rate_amount) {
+			if ($row_rate_amount = $result_rate_amount) 
+			{
 				$rate_amount = $row_rate_amount->count;
 			}
-			if ($rate_amount > 2) {
+			if ($rate_amount > 2) 
+			{
 				$ask = "select avg(rating) AS avg from comments where crew=:crew and rating>0";
 				$result = fetchOne($ask, [ 'crew' => $crew ]);
-				if ($row = $result) {
+				if ($row = $result) 
+				{
 					$avgcrewrating = $row->avg;
 				}
 
@@ -177,20 +195,24 @@ require_once "header.php"; ?>
 
 			$ask = "select nick from author_of where filename='$filename'";
 			$result = mysql_query($ask, $dbh);
-			while ($row = mysql_fetch_array($result)) {
+			while ($row = mysql_fetch_array($result)) 
+			{
 				$artist = $row[ 0 ];
 			}
 			$ask = "select avg(rating) from comments where artist='$artist' and rating>0";
 			$result = mysql_query($ask, $dbh);
-			while ($row = mysql_fetch_array($result)) {
+			while ($row = mysql_fetch_array($result)) 
+			{
 				$avg_artist_rating = $row[ 0 ];
 			}
 			$ask_rate_amount = "SELECT COUNT(rating) from comments where artist='$artist' and rating>0";
 			$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
-			while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) {
+			while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) 
+			{
 				$rate_amount = $row_rate_amount[ 0 ];
 			}
-			if ($rate_amount > 2) {
+			if ($rate_amount > 2) 
+			{
 				$ask = "update artists set rating=$avg_artist_rating where nick='$artist'";
 				mysql_query($ask, $dbh);
 			}
@@ -201,8 +223,10 @@ require_once "header.php"; ?>
 // DELETE COMMENTS
 //----------------------------------------------------------------------------------------------
 
-		if (isset($_POST[ 'Delete' ])) {
-			if ($rank = "Admin") {
+		if (isset($_POST[ 'Delete' ])) 
+		{
+			if ($rank = "Admin") 
+			{
 				$commentid = $_POST[ 'commentid' ];
 				$commentid = cleanInsert($commentid);
 				mysql_query("DELETE FROM comments where filename='$filename' and commentid='$commentid'", $dbh);
@@ -210,59 +234,71 @@ require_once "header.php"; ?>
 
 			$ask = "select nick from author_of where filename='$filename'";
 			$result = mysql_query($ask, $dbh);
-			while ($row = mysql_fetch_array($result)) {
+			while ($row = mysql_fetch_array($result)) 
+			{
 				$artist = $row[ 0 ];
 			}
 
 			$ask = "select avg(rating) from comments where artist='$artist' and rating>0";
 			$result = mysql_query($ask, $dbh);
-			while ($row = mysql_fetch_array($result)) {
+			while ($row = mysql_fetch_array($result)) 
+			{
 				$avg_artist_rating = $row[ 0 ];
 			}
-			if (!isset($avg_artist_rating)) {
+			if (!isset($avg_artist_rating)) 
+			{
 				$avg_artist_rating = 0;
 			}
 
 			$ask_rate_amount = "SELECT COUNT(rating) from comments where artist='$artist' and rating>0";
 			$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
-			while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) {
+			while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) 
+			{
 				$rate_amount = $row_rate_amount[ 0 ];
 			}
-			if ($rate_amount > 2) {
+			if ($rate_amount > 2) 
+			{
 				$ask = "update artists set rating=$avg_artist_rating where nick='$artist'";
 				mysql_query($ask, $dbh);
 			}
 			$ask = "select avg(rating) from comments where filename='$filename' and rating>0";
 			$result = mysql_query($ask, $dbh);
-			while ($row = mysql_fetch_array($result)) {
+			while ($row = mysql_fetch_array($result)) 
+			{
 				$avg_colly_rating = $row[ 0 ];
 			}
-			if (!isset($avg_colly_rating)) {
+			if (!isset($avg_colly_rating)) 
+			{
 				$avg_colly_rating = 0;
 			}
 
 			$ask = "select crew from crew_of where filename='$filename'";
 			$result = mysql_query($ask, $dbh);
-			while ($row = mysql_fetch_array($result)) {
+			while ($row = mysql_fetch_array($result)) 
+			{
 				$crew = $row[ 0 ];
 			}
 
 			$ask = "select avg(rating) from comments where crew='$crew' and rating>0";
 			$result = mysql_query($ask, $dbh);
-			while ($row = mysql_fetch_array($result)) {
+			while ($row = mysql_fetch_array($result)) 
+			{
 				$avg_crew_rating = $row[ 0 ];
 			}
-			if (!isset($avg_crew_rating)) {
+			if (!isset($avg_crew_rating)) 
+			{
 				$avg_crew_rating = 0;
 			}
 
 			$ask_rate_amount = "SELECT COUNT(rating) from comments where crew='$crew' and rating>0";
 			$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
-			while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) {
+			while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) 
+			{
 				$rate_amount = $row_rate_amount[ 0 ];
 			}
 
-			if ($rate_amount > 2) {
+			if ($rate_amount > 2) 
+			{
 				$ask = "update crews set rating=$avg_crew_rating where name='$crew'";
 				mysql_query($ask, $dbh);
 
@@ -273,15 +309,18 @@ require_once "header.php"; ?>
 // WRITE COLLY INFO TO DB
 //---------------------------------------------------------------------------------------------------------------
 
-		if (isset($_POST[ 'do_edit_colly' ])) {
+		if (isset($_POST[ 'do_edit_colly' ])) 
+		{
 			$filename = $_POST[ 'filename' ];
 			$filename = cleanInsert($filename);
 			$ask = "select uploader from collys where filename='$filename'";
 			$result = mysql_query($ask);
-			while ($row = mysql_fetch_array($result)) {
+			while ($row = mysql_fetch_array($result)) 
+			{
 				$uploader = $row[ 0 ];
 			}
-			if (isset($_POST[ 'edit_colly_name' ]) && $nick == "$uploader") {
+			if (isset($_POST[ 'edit_colly_name' ]) && $nick == "$uploader") 
+			{
 				$filename = $_POST[ 'filename' ];
 				$filename = cleanInsert($filename);
 
@@ -292,15 +331,18 @@ require_once "header.php"; ?>
 				mysql_query($ask, $dbh);
 			}
 
-			if (isset($_POST[ 'old_colly_authors' ]) || (isset($_POST[ 'colly_author' ]) && $nick == "$uploader") || (isset($_POST[ 'colly_author' ]) && $rank == "Admin")) {
+			if (isset($_POST[ 'old_colly_authors' ]) || (isset($_POST[ 'colly_author' ]) && $nick == "$uploader") || (isset($_POST[ 'colly_author' ]) && $rank == "Admin")) 
+			{
 				$filename = $_POST[ 'filename' ];
 				$filename = cleanInsert($filename);
 
 				$ask = "delete from author_of where filename='$filename'";
 				mysql_query($ask, $dbh);
 
-				if (isset($_POST[ old_colly_authors ])) {
-					foreach ($_POST[ old_colly_authors ] as $colly_author) {
+				if (isset($_POST[ old_colly_authors ])) 
+				{
+					foreach ($_POST[ old_colly_authors ] as $colly_author) 
+					{
 						$colly_author = cleanInsert($colly_author);
 						$ask = "insert into author_of values ('$colly_author','$filename')";
 						mysql_query($ask, $dbh);
@@ -310,8 +352,10 @@ require_once "header.php"; ?>
 				}
 			}
 
-			if (isset($_POST[ colly_author ])) {
-				foreach ($_POST[ colly_author ] as $new_colly_author) {
+			if (isset($_POST[ colly_author ])) 
+			{
+				foreach ($_POST[ colly_author ] as $new_colly_author) 
+				{
 					$new_colly_author = cleanInsert($new_colly_author);
 					$ask = "insert into author_of values ('$new_colly_author','$filename')";
 					mysql_query($ask, $dbh);
@@ -321,23 +365,28 @@ require_once "header.php"; ?>
 				mysql_query($ask, $dbh);
 			}
 
-			if (isset($_POST[ 'old_colly_crews' ]) || (isset($_POST[ 'colly_crew' ]))) {
+			if (isset($_POST[ 'old_colly_crews' ]) || (isset($_POST[ 'colly_crew' ]))) 
+			{
 				$filename = $_POST[ 'filename' ];
 				$filename = cleanInsert($filename);
 
 				$ask = "delete from crew_of where filename='$filename'";
 				mysql_query($ask, $dbh);
 
-				if (isset($_POST[ old_colly_crews ])) {
-					foreach ($_POST[ old_colly_crews ] as $colly_crew) {
+				if (isset($_POST[ old_colly_crews ])) 
+				{
+					foreach ($_POST[ old_colly_crews ] as $colly_crew) 
+					{
 						$colly_crew = cleanInsert($colly_crew);
 						$ask = "insert into crew_of values ('$colly_crew','$filename')";
 						mysql_query($ask, $dbh);
 					}
 				}
 
-				if (isset($_POST[ colly_crew ])) {
-					foreach ($_POST[ colly_crew ] as $new_colly_crew) {
+				if (isset($_POST[ colly_crew ])) 
+				{
+					foreach ($_POST[ colly_crew ] as $new_colly_crew) 
+					{
 						$new_colly_crew = cleanInsert($new_colly_crew);
 						$ask = "insert into crew_of values ('$new_colly_crew','$filename')";
 						mysql_query($ask, $dbh);
@@ -347,7 +396,8 @@ require_once "header.php"; ?>
 				mysql_query($ask, $dbh);
 			}
 
-			if (isset($_POST[ 'edit_colly_year' ]) && $nick == "$uploader") {
+			if (isset($_POST[ 'edit_colly_year' ]) && $nick == "$uploader") 
+			{
 				$filename = $_POST[ 'filename' ];
 				$filename = cleanInsert($filename);
 				$edit_colly_year = $_POST[ 'edit_colly_year' ];
@@ -356,7 +406,8 @@ require_once "header.php"; ?>
 				mysql_query($ask, $dbh);
 			}
 
-			if (isset($_POST[ 'edit_colly_type' ]) && $nick == "$uploader") {
+			if (isset($_POST[ 'edit_colly_type' ]) && $nick == "$uploader") 
+			{
 				$filename = $_POST[ 'filename' ];
 				$filename = cleanInsert($filename);
 
@@ -366,7 +417,8 @@ require_once "header.php"; ?>
 				$ask = "update collys set type='$edit_colly_type' where filename='$filename'";
 				mysql_query($ask, $dbh);
 			}
-			if (isset($_POST[ 'edit_colly_month' ]) && $nick == "$uploader") {
+			if (isset($_POST[ 'edit_colly_month' ]) && $nick == "$uploader") 
+			{
 				$filename = $_POST[ 'filename' ];
 				$filename = cleanInsert($filename);
 
@@ -375,7 +427,8 @@ require_once "header.php"; ?>
 				$ask = "update collys set month='$edit_colly_month' where filename='$filename'";
 				mysql_query($ask, $dbh);
 			}
-			if (isset($_POST[ 'edit_colly_day' ]) && $nick == "$uploader") {
+			if (isset($_POST[ 'edit_colly_day' ]) && $nick == "$uploader") 
+			{
 				$filename = $_POST[ 'filename' ];
 				$filename = cleanInsert($filename);
 
@@ -386,7 +439,8 @@ require_once "header.php"; ?>
 				mysql_query($ask, $dbh);
 			}
 
-			if (isset($_POST[ 'colors' ])) {
+			if (isset($_POST[ 'colors' ])) 
+			{
 				$colors = cleanInsert($_POST[ 'colors' ]);
 				$filename = cleanInsert($_POST[ 'filename' ]);
 
@@ -397,13 +451,17 @@ require_once "header.php"; ?>
 				mysql_query($ask, $dbh);
 
 				$imagenames = load_ansi("collections/$dirname/$filename", "collections/$dirname/$filename-mosoul", "mosoul", "$colors", 0);
-				if ($imagenames != -1) {
-					for ($i = 0; $i < count($imagenames); $i++) {
+				if ($imagenames != -1) 
+				{
+					for ($i = 0; $i < count($imagenames); $i++) 
+					{
 						$imagenames[ $i ] = str_replace("'", "&#39;", $imagenames[ $i ]);
 						$ask = "insert into image_of values ('$filename-mosoul','$imagenames[$i]')";
 						mysql_query($ask, $dbh);
 					}
-				} else {
+				} 
+				else 
+				{
 					?>
 					<div class="row">
 						<div class="col-lg-4">
@@ -426,13 +484,17 @@ require_once "header.php"; ?>
 					exit;
 				}
 				$imagenames = load_ansi("collections/$dirname/$filename", "collections/$dirname/$filename-microknight", "microknight", "$colors", 0);
-				if ($imagenames != -1) {
-					for ($i = 0; $i < count($imagenames); $i++) {
+				if ($imagenames != -1) 
+				{
+					for ($i = 0; $i < count($imagenames); $i++) 
+					{
 						$imagenames[ $i ] = str_replace("'", "&#39;", $imagenames[ $i ]);
 						$ask = "insert into image_of values ('$filename-microknight','$imagenames[$i]')";
 						mysql_query($ask, $dbh);
 					}
-				} else {
+				} 
+				else 
+				{
 					?>
 					<div class="row">
 						<div class="col-lg-4">
@@ -454,13 +516,17 @@ require_once "header.php"; ?>
 					exit;
 				}
 				$imagenames = load_ansi("collections/$dirname/$filename", "collections/$dirname/$filename-pot-noodle", "pot-noodle", "$colors", 0);
-				if ($imagenames != -1) {
-					for ($i = 0; $i < count($imagenames); $i++) {
+				if ($imagenames != -1) 
+				{
+					for ($i = 0; $i < count($imagenames); $i++) 
+					{
 						$imagenames[ $i ] = str_replace("'", "&#39;", $imagenames[ $i ]);
 						$ask = "insert into image_of values ('$filename-pot-noodle','$imagenames[$i]')";
 						mysql_query($ask, $dbh);
 					}
-				} else {
+				} 
+				else 
+				{
 					?>
 					<div class="row">
 						<div class="col-lg-4">
@@ -483,13 +549,17 @@ require_once "header.php"; ?>
 					exit;
 				}
 				$imagenames = load_ansi("collections/$dirname/$filename", "collections/$dirname/$filename-topaz", "pot-topaz", "$colors", 0);
-				if ($imagenames != -1) {
-					for ($i = 0; $i < count($imagenames); $i++) {
+				if ($imagenames != -1) 
+				{
+					for ($i = 0; $i < count($imagenames); $i++) 
+					{
 						$imagenames[ $i ] = str_replace("'", "&#39;", $imagenames[ $i ]);
 						$ask = "insert into image_of values ('$filename-topaz','$imagenames[$i]')";
 						mysql_query($ask, $dbh);
 					}
-				} else {
+				} 
+				else 
+				{
 					?>
 					<div class="row">
 						<div class="col-lg-4">
@@ -511,15 +581,19 @@ require_once "header.php"; ?>
 					exit;
 				}
 				$imagenames = load_ansi("collections/$dirname/$filename", "collections/$dirname/$filename-topazplus", "topazplus", "$colors", 0);
-				if ($imagenames != -1) {
-					for ($i = 0; $i < count($imagenames); $i++) {
+				if ($imagenames != -1) 
+				{
+					for ($i = 0; $i < count($imagenames); $i++) 
+					{
 						{
 							$imagenames[ $i ] = str_replace("'", "&#39;", $imagenames[ $i ]);
 							$ask = "insert into image_of values ('$filename-topazplus','$imagenames[$i]')";
 							mysql_query($ask, $dbh);
 						}
 					}
-				} else {
+				} 
+				else 
+				{
 					?>
 					<div class="row">
 						<div class="col-lg-4">
@@ -547,48 +621,58 @@ require_once "header.php"; ?>
 
 			$ask = "select nick from author_of";
 			$result = mysql_query($ask, $dbh);
-			while ($row = mysql_fetch_array($result)) {
+			while ($row = mysql_fetch_array($result)) 
+			{
 				$artist = $row[ 0 ];
 
 				$ask_rating = "select avg(rating) from comments where artist='$artist' and rating>0";
 				$result_rating = mysql_query($ask_rating, $dbh);
-				while ($row_rating = mysql_fetch_array($result_rating)) {
+				while ($row_rating = mysql_fetch_array($result_rating)) 
+				{
 					$avg_artist_rating = $row_rating[ 0 ];
 				}
-				if (!isset($avg_artist_rating)) {
+				if (!isset($avg_artist_rating)) 
+				{
 					$avg_artist_rating = 0;
 				}
 
 				$ask_rate_amount = "SELECT COUNT(rating) from comments where artist='$artist' and rating>0";
 				$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
-				while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) {
+				while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) 
+				{
 					$rate_amount = $row_rate_amount[ 0 ];
 				}
-				if ($rate_amount > 2) {
+				if ($rate_amount > 2) 
+				{
 					$ask_update = "update artists set rating=$avg_artist_rating where nick='$artist'";
 					mysql_query($ask_update, $dbh);
 				}
 			}
 			$ask = "select crew from crew_of";
 			$result = mysql_query($ask, $dbh);
-			while ($row = mysql_fetch_array($result)) {
+			while ($row = mysql_fetch_array($result)) 
+			{
 				$crew = $row[ 0 ];
 
 				$ask_rating = "select avg(rating) from comments where crew='$crew' and rating>0";
 				$result_rating = mysql_query($ask_rating, $dbh);
-				while ($row = mysql_fetch_array($result_rating)) {
+				while ($row = mysql_fetch_array($result_rating)) 
+				{
 					$avg_crew_rating = $row_rating[ 0 ];
 				}
-				if (!isset($avg_crew_rating)) {
+				if (!isset($avg_crew_rating)) 
+				{
 					$avg_crew_rating = 0;
 				}
 
 				$ask_rate_amount = "SELECT COUNT(rating) from comments where crew='$crew' and rating>0";
 				$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
-				while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) {
+				while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) 
+				{
 					$rate_amount = $row_rate_amount[ 0 ];
 				}
-				if ($rate_amount > 2) {
+				if ($rate_amount > 2) 
+				{
 
 					$ask_update = "update crews set rating=$avg_crew_rating where name='$crew'";
 					mysql_query($ask_update, $dbh);
@@ -602,13 +686,15 @@ require_once "header.php"; ?>
 // EDIT COLLY FIELD
 //----------------------------------------------------------------------------------------------
 
-		if (isset($_POST[ 'edit_colly' ])) {
+		if (isset($_POST[ 'edit_colly' ])) 
+		{
 			$getcollyname = $_POST[ 'filename' ];
 			$getcollyname = cleanInsert($getcollyname);
 
 			$ask = "select * from collys where filename='$getcollyname'";
 			$result = mysql_query($ask);
-			while ($row = mysql_fetch_array($result)) {
+			while ($row = mysql_fetch_array($result)) 
+			{
 				$show_colly_name = $row[ 'filename' ];
 				$show_colly_name = $row[ 'name' ];
 				$show_colly_crew = $row[ 'crew' ];
@@ -664,7 +750,8 @@ require_once "header.php"; ?>
 					$countyear = 1986;
 					$maxyear = date("Y");
 					echo "<option>$show_colly_year</option>";
-					while ($countyear <= $maxyear) {
+					while ($countyear <= $maxyear) 
+					{
 						echo "<option>$countyear</option>";
 						$countyear++;
 					}
@@ -693,7 +780,8 @@ require_once "header.php"; ?>
 					echo "<option value='0'>Unknown</option>";
 					$min_day = 1;
 					$max_day = 31;
-					while ($min_day <= $max_day) {
+					while ($min_day <= $max_day)
+					{
 						echo "<option>$min_day</option>";
 						$min_day++;
 					}
@@ -709,7 +797,8 @@ require_once "header.php"; ?>
 				<?php
 				$ask = "select nick from author_of where filename='$getcollyname'";
 				$result = mysql_query($ask, $dbh);
-				while ($row = mysql_fetch_array($result)) {
+				while ($row = mysql_fetch_array($result)) 
+				{
 					$colly_author = $row[ 0 ];
 					echo "<select name=\"old_colly_authors[]\" class='btn-big'>";
 					echo "<option selected=\"selected\">$colly_author</option>";
@@ -717,7 +806,8 @@ require_once "header.php"; ?>
 
 					$ask_authors = "select nick from artists";
 					$result_authors = mysql_query($ask_authors, $dbh);
-					while ($row_authors = mysql_fetch_array($result_authors)) {
+					while ($row_authors = mysql_fetch_array($result_authors)) 
+					{
 						$authors = $row_authors[ 0 ];
 						echo "<option>$authors</option>";
 					}
@@ -739,14 +829,16 @@ require_once "header.php"; ?>
 				<?php
 				$ask = "select crew from crew_of where filename='$getcollyname'";
 				$result = mysql_query($ask, $dbh);
-				while ($row = mysql_fetch_array($result)) {
+				while ($row = mysql_fetch_array($result)) 
+				{
 					$colly_crew = $row[ 0 ];
 					echo "<select name=\"old_colly_crews[]\" class='btn-big'>";
 					echo "<option selected=\"selected\">$colly_crew</option>";
 					echo "<option value='Delete'>Remove Crew</option>";
 					$ask_crews = "select name from crews";
 					$result_crews = mysql_query($ask_crews, $dbh);
-					while ($row_crews = mysql_fetch_array($result_crews)) {
+					while ($row_crews = mysql_fetch_array($result_crews)) 
+					{
 						$crews = $row_crews[ 0 ];
 						echo "<option>$crews</option>";
 					}
@@ -772,15 +864,18 @@ require_once "header.php"; ?>
 // TOP CONTROL TABLE
 //----------------------------------------------------------------------------------------------
 
-	if (!isset($_POST[ 'edit_colly' ])) {
+	if (!isset($_POST[ 'edit_colly' ])) 
+	{
 		$type = fetchOne("SELECT type FROM collys WHERE filename = :filename", [":filename" => $filename])->type ?? "";
 
 
 		?>
 		<div class="container-fluid bg-secondary amb-1 apb-1">
 			<script>
-				$(document).ready(function() {
-					$("#ctrlForm select").change(function() {
+				$(document).ready(function() 
+				{
+					$("#ctrlForm select").change(function() 
+					{
 						$("#ctrlForm input[name='view']").click();
 					});
 				});
@@ -792,211 +887,173 @@ require_once "header.php"; ?>
 
 			echo "<input type='submit' class='btn-big amb-1' name='hide' value='Hide Colly!'" . ((!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) ? " style='display:none'" : "") . "> ";
 			echo "<input type='submit' class='btn-big amb-1' name='view' value='View Colly'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
-			echo "<input type='button' onclick='myFunction()' class='btn-big amb-1' name='fullscreen' value='Fullscreen'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:block'" : "") . "> ";
+			echo "<input type='button' onclick='myFunction()' class='btn-big amb-1' name='fullscreen' value='Fullscreen'" . ((isset($_POST[ 'change' ]) || (!isset($_POST[ 'view' ]))) ? " style='display:none'" : "") . "> ";
 
-			if (is_logged_in()) {
+			if (is_logged_in()) 
+			{
 				echo "<input type='submit' class='btn-big amb-1' name=addcomment value='Comment'> ";
 				echo "<input type='submit' class='btn-big amb-1' name=favourite value='Favourite'> ";
 				echo "<input type='submit' class='btn-big amb-1' name=broken value='Report Broken'> ";
-				if ($_user[ "nick" ] === $uploader || is_admin()) {
+				if ($_user[ "nick" ] === $uploader || is_admin()) 
+				{
 					echo "<input type='hidden' name='filename' value=$filename>";
 					echo "<input type='submit' class='btn-big amb-1' name=edit_colly value='Edit Colly'> ";
 				}
 			}
-			if (!isset($_POST[ 'download' ])) {
+			if (!isset($_POST[ 'download' ])) 
+			{
 				echo "<input type='submit' class='btn-big amb-1' name=download value='Download'> ";
-			} elseif (isset($_POST[ 'download' ])) {
+			} 
+			elseif (isset($_POST[ 'download' ])) 
+			{
             $ask = "select downloads from collys where filename=:filename"; // download counter
             $row = fetchOne("SELECT view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
             $downloads = $row->downloads+1;
 
             doQuery("update collys set downloads=:downloads where filename=:filename", [":downloads" => $downloads, ":filename" => $filename]);
-            ?>
-            <meta content="1; URL=<?=$filenameandpath?>" http-equiv="Refresh">
-            <?php
+            ?><meta content="1"; URL="<?=$filenameandpath?>" http-equiv="Refresh"><?php
         }
 
         $font = fetchOne("SELECT def_font FROM users WHERE nick = :nick", [":nick" => $nick]);
-        if (($font) && ($font->def_font)) {
+        if (($font) && ($font->def_font)) 
+        {
         	$font = $font->def_font;
-        } else if (isset($_POST['font'])) {
+        } 
+        else if (isset($_POST['font'])) 
+        {
         	$font = $_POST['font'];
-        } else {
+        } 
+        else
+        {
         	$font = "mOsOul";
         }
 
         $fgcolor = (isset($_POST[ 'foreground_color'])) ? $_POST[ 'foreground_color'] : '';
 
         $def_color = fetchOne("SELECT def_bg_col FROM users WHERE nick = :nick", [":nick" => $nick]);
-        if (($def_color) && ($def_color->def_bg_col)) {
+        if (($def_color) && ($def_color->def_bg_col)) 
+        {
         	$bgcolor = $def_color->def_bg_col;
-        } else if (isset($_POST['background_color'])) {
+        }
+        else if (isset($_POST['background_color'])) 
+        {
         	$bgcolor = $_POST['background_color'];
-        } else {
+        }
+        else
+        {
         	$bgcolor = "#000000";
         }
 
-        if ($type != "ANSI") {
+        if ($type != "ANSI") 
+        {
+        	if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) 
+        	{
+        		?>
+        		<div class="apb-0">
+        			<select name="font">
+        				<option class="dropdown-item" value="MicroKnight"<?php if ($font == 'MicroKnight') echo ' selected'; ?>>MicroKnight</option>
+        				<option class="dropdown-item" value="MicroKnightPlus"<?php if ($font == 'MicroKnightPlus') echo ' selected'; ?>>MicroKnightPlus</option>
+        				<option class="dropdown-item" value="mOsOul"<?php if ($font == 'mOsOul') echo ' selected'; ?>>mOsOul</option>
+        				<option value="P0T-NOoDLE"<?php if ($font == 'P0T-NOoDLE') echo ' selected'; ?>>P0T-NOoDLE</option>
+        				<option value="Topaz_a500"<?php if ($font == 'Topaz_a500') echo ' selected'; ?>>Topaz_a500</option>
+        				<option value="Topaz_a1200"<?php if ($font == 'Topaz_a1200') echo ' selected'; ?>>Topaz_a1200</option>
+        				<option value="TopazPlus_a500"<?php if ($font == 'TopazPlus_a500') echo ' selected'; ?>>TopazPlus_a500</option>
+        				<option value="TopazPlus_a1200"<?php if ($font == 'TopazPlus_a1200') echo ' selected'; ?>>TopazPlus_a1200</option>
+        			</select>
+        			<select name="background_color">
+        				<option value=""<?php if ($bgcolor == '') echo ' selected'; ?>>BG Color</option>
+        				<option value="Black"<?php if ($bgcolor == 'Black') echo ' selected'; ?>>Black</option>
+        				<option value="DarkBlue"<?php if ($bgcolor == 'DarkBlue') echo ' selected'; ?>>Dark Blue</option>
+        				<option value="DarkGreen"<?php if ($bgcolor == 'DarkGreen') echo ' selected'; ?>>Dark Green</option>
+        				<option value="DarkCyan"<?php if ($bgcolor == 'DarkCyan') echo ' selected'; ?>>Dark Cyan</option>
+        				<option value="DarkRed"<?php if ($bgcolor == 'DarkRed') echo ' selected'; ?>>Dark Red</option>
+        				<option value="Magenta"<?php if ($bgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
+        				<option value="Brown"<?php if ($bgcolor == 'Brown') echo ' selected'; ?>>Brown</option>
+        				<option value="DarkGrey"<?php if ($bgcolor == 'DarkGrey') echo ' selected'; ?>>Dark Grey</option>
+        				<option value="Grey"<?php if ($bgcolor == 'Grey') echo ' selected'; ?>>Grey</option>
+        				<option value="Blue"<?php if ($bgcolor == 'Blue') echo ' selected'; ?>>Blue</option>
+        				<option value="Green"<?php if ($bgcolor == 'Green') echo ' selected'; ?>>Green</option>
+        				<option value="Cyan"<?php if ($bgcolor == 'Cyan') echo ' selected'; ?>>Cyan</option>
+        				<option value="Red"<?php if ($bgcolor == 'Red') echo ' selected'; ?>>Red</option>
+        				<option value="Magenta"<?php if ($bgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
+        				<option value="Yellow"<?php if ($bgcolor == 'Yellow') echo ' selected'; ?>>Yellow</option>
+        				<option value="White"<?php if ($bgcolor == 'White') echo ' selected'; ?>>White</option>
+        			</select>
+        			<select name="foreground_color">
+        				<option value=""<?php if ($fgcolor == '') echo ' selected'; ?>>FG Color</option>
+        				<option value="Black"<?php if ($fgcolor == 'Black') echo ' selected'; ?>>Black</option>
+        				<option value="DarkBlue"<?php if ($fgcolor == 'DarkBlue') echo ' selected'; ?>>Dark Blue</option>
+        				<option value="DarkGreen"<?php if ($fgcolor == 'DarkGreen') echo ' selected'; ?>>Dark Green</option>
+        				<option value="DarkCyan"<?php if ($fgcolor == 'DarkCyan') echo ' selected'; ?>>Dark Cyan</option>
+        				<option value="DarkRed"<?php if ($fgcolor == 'DarkRed') echo ' selected'; ?>>Dark Red</option>
+        				<option value="Magenta"<?php if ($fgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
+        				<option value="Brown"<?php if ($fgcolor == 'Brown') echo ' selected'; ?>>Brown</option>
+        				<option value="DarkGrey"<?php if ($fgcolor == 'DarkGrey') echo ' selected'; ?>>Dark Grey</option>
+        				<option value="Grey"<?php if ($fgcolor == 'Grey') echo ' selected'; ?>>Grey</option>
+        				<option value="Blue"<?php if ($fgcolor == 'Blue') echo ' selected'; ?>>Blue</option>
+        				<option value="Green"<?php if ($fgcolor == 'Green') echo ' selected'; ?>>Green</option>
+        				<option value="Cyan"<?php if ($fgcolor == 'Cyan') echo ' selected'; ?>>Cyan</option>
+        				<option value="Red"<?php if ($fgcolor == 'Red') echo ' selected'; ?>>Red</option>
+        				<option value="Magenta"<?php if ($fgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
+        				<option value="Yellow"<?php if ($fgcolor == 'Yellow') echo ' selected'; ?>>Yellow</option>
+        				<option value="White"<?php if ($fgcolor == 'White') echo ' selected'; ?>>White</option>
+        			</select>
+        		</div>
+        		<?php
+        	}
         	?>
-        	<div class="apb-0">
-        		<select name="font">
-        			<option class="dropdown-item" value="MicroKnight"<?php if ($font == 'MicroKnight') echo ' selected'; ?>>MicroKnight</option>
-        			<option class="dropdown-item" value="MicroKnightPlus"<?php if ($font == 'MicroKnightPlus') echo ' selected'; ?>>MicroKnightPlus</option>
-        			<option class="dropdown-item" value="mOsOul"<?php if ($font == 'mOsOul') echo ' selected'; ?>>mOsOul</option>
-        			<option value="P0T-NOoDLE"<?php if ($font == 'P0T-NOoDLE') echo ' selected'; ?>>P0T-NOoDLE</option>
-        			<option value="Topaz_a500"<?php if ($font == 'Topaz_a500') echo ' selected'; ?>>Topaz_a500</option>
-        			<option value="Topaz_a1200"<?php if ($font == 'Topaz_a1200') echo ' selected'; ?>>Topaz_a1200</option>
-        			<option value="TopazPlus_a500"<?php if ($font == 'TopazPlus_a500') echo ' selected'; ?>>TopazPlus_a500</option>
-        			<option value="TopazPlus_a1200"<?php if ($font == 'TopazPlus_a1200') echo ' selected'; ?>>TopazPlus_a1200</option>
-        		</select>
-                        <!--
-						<div class="btn-group" role="group">
-							<button id="btnGroupDrop1" type="button" class="btn-big dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Font </button>
-							<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                <a class="dropdown-item" href="#">MicroKnight</a>
-                                <a class="dropdown-item" href="#">MicroKnightPlus</a>
-                                <a class="dropdown-item" href="#">mOsOul</a>
-                                <a class="dropdown-item" href="#">P0T-NOoDLE</a>
-                                <a class="dropdown-item" href="#">Topaz_a500</a>
-                                <a class="dropdown-item" href="#">Topaz_a1200</a>
-                                <a class="dropdown-item" href="#">TopazPlus_a500</a>
-                                <a class="dropdown-item" href="#">TopazPlus_a1200</a>
-							</div>
-						</div>
-					-->
-					<select name="background_color">
-						<option value=""<?php if ($bgcolor == '') echo ' selected'; ?>>BG Color</option>
-						<option value="Black"<?php if ($bgcolor == 'Black') echo ' selected'; ?>>Black</option>
-						<option value="DarkBlue"<?php if ($bgcolor == 'DarkBlue') echo ' selected'; ?>>Dark Blue</option>
-						<option value="DarkGreen"<?php if ($bgcolor == 'DarkGreen') echo ' selected'; ?>>Dark Green</option>
-						<option value="DarkCyan"<?php if ($bgcolor == 'DarkCyan') echo ' selected'; ?>>Dark Cyan</option>
-						<option value="DarkRed"<?php if ($bgcolor == 'DarkRed') echo ' selected'; ?>>Dark Red</option>
-						<option value="Magenta"<?php if ($bgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
-						<option value="Brown"<?php if ($bgcolor == 'Brown') echo ' selected'; ?>>Brown</option>
-						<option value="DarkGrey"<?php if ($bgcolor == 'DarkGrey') echo ' selected'; ?>>Dark Grey</option>
-						<option value="Grey"<?php if ($bgcolor == 'Grey') echo ' selected'; ?>>Grey</option>
-						<option value="Blue"<?php if ($bgcolor == 'Blue') echo ' selected'; ?>>Blue</option>
-						<option value="Green"<?php if ($bgcolor == 'Green') echo ' selected'; ?>>Green</option>
-						<option value="Cyan"<?php if ($bgcolor == 'Cyan') echo ' selected'; ?>>Cyan</option>
-						<option value="Red"<?php if ($bgcolor == 'Red') echo ' selected'; ?>>Red</option>
-						<option value="Magenta"<?php if ($bgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
-						<option value="Yellow"<?php if ($bgcolor == 'Yellow') echo ' selected'; ?>>Yellow</option>
-						<option value="White"<?php if ($bgcolor == 'White') echo ' selected'; ?>>White</option>
-					</select>
-                        <!--
-						<div class="btn-group" role="group">
-							<button id="btnGroupDrop1" type="button" class="btn-big dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">BG Color </button>
-							<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-								<a class="dropdown-item" href="#">Black</a>
-								<a class="dropdown-item" href="#">Dark Blue</a>
-								<a class="dropdown-item" href="#">Dark Green</a>
-								<a class="dropdown-item" href="#">Dark Cyan</a>
-								<a class="dropdown-item" href="#">Dark Red</a>
-								<a class="dropdown-item" href="#">Magenta</a>
-								<a class="dropdown-item" href="#">Brown</a>
-								<a class="dropdown-item" href="#">Dark Grey</a>
-								<a class="dropdown-item" href="#">Grey</a>
-								<a class="dropdown-item" href="#">Blue</a>
-								<a class="dropdown-item" href="#">Green</a>
-								<a class="dropdown-item" href="#">Cyan</a>
-								<a class="dropdown-item" href="#">Red</a>
-								<a class="dropdown-item" href="#">Magenta</a>
-								<a class="dropdown-item" href="#">Yellow</a>
-								<a class="dropdown-item" href="#">Magenta</a>
-								<a class="dropdown-item" href="#">White</a>
-							</div>
-						</div>
-					-->
-					<select name="foreground_color">
-						<option value=""<?php if ($fgcolor == '') echo ' selected'; ?>>FG Color</option>
-						<option value="Black"<?php if ($fgcolor == 'Black') echo ' selected'; ?>>Black</option>
-						<option value="DarkBlue"<?php if ($fgcolor == 'DarkBlue') echo ' selected'; ?>>Dark Blue</option>
-						<option value="DarkGreen"<?php if ($fgcolor == 'DarkGreen') echo ' selected'; ?>>Dark Green</option>
-						<option value="DarkCyan"<?php if ($fgcolor == 'DarkCyan') echo ' selected'; ?>>Dark Cyan</option>
-						<option value="DarkRed"<?php if ($fgcolor == 'DarkRed') echo ' selected'; ?>>Dark Red</option>
-						<option value="Magenta"<?php if ($fgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
-						<option value="Brown"<?php if ($fgcolor == 'Brown') echo ' selected'; ?>>Brown</option>
-						<option value="DarkGrey"<?php if ($fgcolor == 'DarkGrey') echo ' selected'; ?>>Dark Grey</option>
-						<option value="Grey"<?php if ($fgcolor == 'Grey') echo ' selected'; ?>>Grey</option>
-						<option value="Blue"<?php if ($fgcolor == 'Blue') echo ' selected'; ?>>Blue</option>
-						<option value="Green"<?php if ($fgcolor == 'Green') echo ' selected'; ?>>Green</option>
-						<option value="Cyan"<?php if ($fgcolor == 'Cyan') echo ' selected'; ?>>Cyan</option>
-						<option value="Red"<?php if ($fgcolor == 'Red') echo ' selected'; ?>>Red</option>
-						<option value="Magenta"<?php if ($fgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
-						<option value="Yellow"<?php if ($fgcolor == 'Yellow') echo ' selected'; ?>>Yellow</option>
-						<option value="White"<?php if ($fgcolor == 'White') echo ' selected'; ?>>White</option>
-					</select>
-                        <!--
-                        <div class="btn-group" role="group">
-							<button id="btnGroupDrop1" type="button" class="btn-big dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">FG Color </button>
-							<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-								<a class="dropdown-item" href="#">Black</a>
-								<a class="dropdown-item" href="#">Dark Blue</a>
-								<a class="dropdown-item" href="#">Dark Green</a>
-								<a class="dropdown-item" href="#">Dark Cyan</a>
-								<a class="dropdown-item" href="#">Dark Red</a>
-								<a class="dropdown-item" href="#">Magenta</a>
-								<a class="dropdown-item" href="#">Brown</a>
-								<a class="dropdown-item" href="#">Dark Grey</a>
-								<a class="dropdown-item" href="#">Grey</a>
-								<a class="dropdown-item" href="#">Blue</a>
-								<a class="dropdown-item" href="#">Green</a>
-								<a class="dropdown-item" href="#">Cyan</a>
-								<a class="dropdown-item" href="#">Red</a>
-								<a class="dropdown-item" href="#">Magenta</a>
-								<a class="dropdown-item" href="#">Yellow</a>
-								<a class="dropdown-item" href="#">Magenta</a>
-								<a class="dropdown-item" href="#">White</a>
-							</div>
-						</div>
-					-->
-				</form>
-			</div>
-		</div>
-		<?php
-	}
+        </form>
+    </div>
+    <?php
+}
 
 //----------------------------------------------------------------------------------------------
 // SHOW COLLY?
 //----------------------------------------------------------------------------------------------
 
-	if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) {
+if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) 
+{
 
 
-		if (isset($_POST[ 'change' ])) {
-			$bgcolor = $_POST[ 'background_color' ];
+	if (isset($_POST[ 'change' ])) 
+	{
+		$bgcolor = $_POST[ 'background_color' ];
 
-			$font = $_POST[ 'font' ];
+		$font = $_POST[ 'font' ];
+	}
+	$row = fetchOne("SELECT view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
+	$type = $row->type;
+	$counter = $row->view_counter;
+	$counter++;
+
+	doQuery("UPDATE collys SET view_counter = :counter WHERE filename = :filename", [
+		":counter" => $counter,
+		":filename" => $filename
+	]);
+
+	if ($type == "ASCII") 
+	{
+		?>
+		<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;"><pre id="colly" style="font-family: '<?=$font;?>';color: <?=$fgcolor?>;"><?php
+		if (file_exists(__DIR__ . "/collections/{$dirname}/{$filename}")) 
+		{
+			$content = file_get_contents(__DIR__ . "/collections/{$dirname}/{$filename}");
+			echo "<br><br><br><br>";
+			echo utf8_encode($content);
+			echo "<br><br><br><br>";
 		}
-		$row = fetchOne("SELECT view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
-		$type = $row->type;
-		$counter = $row->view_counter;
-		$counter++;
-
-		doQuery("UPDATE collys SET view_counter = :counter WHERE filename = :filename", [
-			":counter" => $counter,
-			":filename" => $filename
-		]);
-
-		if ($type == "ASCII") {
-			?>
-			<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;"><pre id="colly" style="font-family: '<?=$font;?>';color: <?=$fgcolor?>;"><?php
-			if (file_exists(__DIR__ . "/collections/{$dirname}/{$filename}")) {
-				$content = file_get_contents(__DIR__ . "/collections/{$dirname}/{$filename}");
-				echo "<br><br><br><br>";
-				echo utf8_encode($content);
-				echo "<br><br><br><br>";
-			}
-			?></pre>
-		</div>
-	<?php }
+		?></pre>
+	</div>
+<?php }
 }
 
 //----------------------------------------------------------------------------------------------
 //SHOW COMMENTS
 //----------------------------------------------------------------------------------------------
-if (!isset($_POST[ 'edit' ])) {
-	foreach (fetchAll("SELECT comment, rating, nick, timestamp, commentid, base64 FROM comments WHERE filename = :filename ORDER BY timestamp ASC", [":filename" => $filename]) as $row) {
+if (!isset($_POST[ 'edit' ])) 
+{
+	foreach (fetchAll("SELECT comment, rating, nick, timestamp, commentid, base64 FROM comments WHERE filename = :filename ORDER BY timestamp ASC", [":filename" => $filename]) as $row) 
+	{
 		$comment = $row->comment;
 		$userrating = $row->rating;
 		$commentnick = $row->nick;
@@ -1005,9 +1062,12 @@ if (!isset($_POST[ 'edit' ])) {
 		$comment = fixOutputPost($comment, (boolean)$row->base64);
 
 		echo "<form action='$_SERVER[PHP_SELF]?filename=$decoded_filename&post' method='post'>";
-		if ($userrating > 0) {
-			if (!is_admin()) {
-				if ($commentnick === $_user[ "nick" ]) {
+		if ($userrating > 0) 
+		{
+			if (!is_admin()) 
+			{
+				if ($commentnick === $_user[ "nick" ]) 
+				{
 					?>
 					<div class="header bg-header col-12 ap-1">
 						<span> BY:</span>
@@ -1024,7 +1084,9 @@ if (!isset($_POST[ 'edit' ])) {
 						</div>
 					</div>
 					<?php
-				} else {
+				}
+				else 
+				{
 					?>
 					<div class="header bg-header col-12 ap-1">
 						<span> BY:</span>
@@ -1040,7 +1102,8 @@ if (!isset($_POST[ 'edit' ])) {
 					<?php
 				}
 			}
-			if (is_admin()) {
+			if (is_admin()) 
+			{
 				?>
 				<div class="header bg-header col-12 ap-1">
 					<span> BY:</span>
@@ -1061,9 +1124,13 @@ if (!isset($_POST[ 'edit' ])) {
 
 				<?php
 			}
-		} else {
-			if (!is_admin()) {
-				if ($commentnick === $_user[ "nick" ]) {
+		} 
+		else 
+		{
+			if (!is_admin()) 
+			{
+				if ($commentnick === $_user[ "nick" ]) 
+				{
 					?>
 					<div class="header bg-header col-12 ap-1">
 						<span> BY:</span>
@@ -1079,7 +1146,9 @@ if (!isset($_POST[ 'edit' ])) {
 						</div>
 					</div>
 					<?php
-				} else {
+				}
+				else
+				{
 					?>
 					<div class="header bg-header col-12 ap-1">
 						<span> BY:</span>
@@ -1093,7 +1162,8 @@ if (!isset($_POST[ 'edit' ])) {
 					<?php
 				}
 			}
-			if (is_admin()) {
+			if (is_admin()) 
+			{
 				?>
 				<div class="bg-header header col-12 ap-1">
 					<span> BY:</span>
@@ -1121,26 +1191,32 @@ if (!isset($_POST[ 'edit' ])) {
 // ADD COMMENT FIELD
 //----------------------------------------------------------------------------------------------
 
-if (isset($_POST[ 'addcomment' ])) {
+if (isset($_POST[ 'addcomment' ])) 
+{
 	$ask = "SELECT crew FROM crew_of WHERE filename='$filename'";
 	$result = mysql_query($ask, $dbh);
-	if ($row = mysql_fetch_array($result)) {
+	if ($row = mysql_fetch_array($result)) 
+	{
 		$crew = $row[ 0 ];
 	}
 
 	$ask = "SELECT nick FROM author_of WHERE filename='$filename'";
 	$result = mysql_query($ask, $dbh);
-	if ($row = mysql_fetch_array($result)) {
+	if ($row = mysql_fetch_array($result)) 
+	{
 		$artist = $row[ 0 ];
 	}
 
-	if (!isset($_POST[ 'edit' ])) {
+	if (!isset($_POST[ 'edit' ])) 
+	{
 		$ask = "select sum(rating) from comments where filename='$filename' and nick='$nick' and rating>0";
 		$result = mysql_query($ask, $dbh);
-		if ($row = mysql_fetch_array($result)) {
+		if ($row = mysql_fetch_array($result)) 
+		{
 			$hasrated = $row[ 0 ];
 		}
-		if ($hasrated > 0) {
+		if ($hasrated > 0) 
+		{
 			echo "<form action=\"info_release.php?filename=$decoded_filename&comment\" method=\"post\">";
 			?>
 			<div class="row">
@@ -1173,7 +1249,8 @@ if (isset($_POST[ 'addcomment' ])) {
 		RATING
 		<select name="user_added_rating">
 			<option value="0" selected="selected">Blank</option><?php
-			for ($i = 1; $i < 11; $i++) {
+			for ($i = 1; $i < 11; $i++) 
+			{
 				echo "<option value=$i>$i</option>";
 			} ?>
 		</select>
@@ -1192,13 +1269,15 @@ if (isset($_POST[ 'addcomment' ])) {
 // EDIT COMMENT FIELD
 //--------------------------------------------------------------------------------------------------
 
-if (isset($_POST[ 'edit' ])) {
+if (isset($_POST[ 'edit' ])) 
+{
 	echo "<form action=\"$_SERVER[PHP_SELF]?filename=$decoded_filename&comment\" method=\"post\">";
 	$commentid = cleanInsert($_POST[ 'commentid' ]);
 
 	$ask = "select comment, base64 from comments where commentid='$commentid'";
 	$result = mysql_query($ask, $dbh);
-	while ($row = mysql_fetch_array($result)) {
+	while ($row = mysql_fetch_array($result)) 
+	{
 		$base64 = $row[ 'base64' ];
 		$comment = fixOutputEdit($row[ 'comment' ]);
 	}
