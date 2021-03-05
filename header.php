@@ -311,9 +311,9 @@ EOD;
 								<?php }
 							}
 							?>
-							<div class="col-12 p-0 m-0 apb-1">
+							<div class="col-12 p-0 m-0 apb-1 amt-1">
 								<div class="bs-component">
-									<div class="alert alert-dismissible alert-danger hide-on-landscape">
+									<div class="animate__animated animate__tada alert alert-dismissible alert-danger hide-on-landscape">
 										<button type="button" class="close" data-dismiss="alert">x</button>
 										Rotate your phone for a better viewing experience.
 									</div>
