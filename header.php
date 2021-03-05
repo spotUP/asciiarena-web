@@ -51,6 +51,9 @@ EOD;
 	integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 	<script src="https://unpkg.com/@popperjs/core@2"></script>
 	<script src="/assets/js/bootstrap.bundle.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+
 	<script type="text/javascript">
 		$("#setRemoveClassBtn").click(function(){
 			$("#div1").toggleClass("bigSizeDivs");
@@ -66,6 +69,7 @@ EOD;
 			element.classList.toggle("show");
 		}
 	</script>
+
 	<script type="text/javascript">
 		function add_colly_crew_field() {
 			var newselect = " <select name=\"colly_crew[]\"" + document.getElementById('total_colly_crews').value + "><option>Independent</option><?php
@@ -74,8 +78,7 @@ EOD;
 			}
 			echo "</select>\"\n";
 			?>
-			document.getElementById('new_colly_crew_field').innerHTML = document.getElementById('new_colly_crew_field').innerHTML + newselect;
-			document.getElementById('total_colly_crews').value = parseInt(document.getElementById('total_colly_crews').value) + 1;
+			document.getElementById('new_colly_crew_field').innerHTML = document.getElementById('new_colly_crew_field').innerHTML + newselect; document.getElementById('total_colly_crews').value = parseInt(document.getElementById('total_colly_crews').value) + 1;
 		}
 	</script>
 	<script type="text/javascript">
@@ -92,8 +95,7 @@ EOD;
 			}
 			echo "</select>\"\n";
 			?>
-			document.getElementById('new_artist_crew_field').innerHTML =  document.getElementById('new_artist_crew_field').innerHTML + newselect;
-			document.getElementById('total_artist_crews').value =  parseInt( document.getElementById('total_artist_crews').value) + 1;
+			document.getElementById('new_artist_crew_field').innerHTML =  document.getElementById('new_artist_crew_field').innerHTML + newselect; document.getElementById('total_artist_crews').value =  parseInt( document.getElementById('total_artist_crews').value) + 1;
 		}
 
 	</script>
@@ -111,8 +113,7 @@ EOD;
 			}
 			echo "</select>\"\n";
 			?>
-			document.getElementById('new_colly_author_field').innerHTML =  document.getElementById('new_colly_author_field').innerHTML + newselect;
-			document.getElementById('total_colly_authors').value =  parseInt( document.getElementById('total_colly_authors').value) + 1;
+			document.getElementById('new_colly_author_field').innerHTML =  document.getElementById('new_colly_author_field').innerHTML + newselect; document.getElementById('total_colly_authors').value =  parseInt( document.getElementById('total_colly_authors').value) + 1;
 		}
 
 	</script>
@@ -131,8 +132,7 @@ EOD;
 			}
 			echo "</select>\"\n";
 			?>
-			document.getElementById('new_colly_crew_field').innerHTML =  document.getElementById('new_colly_crew_field').innerHTML + newselect;
-			document.getElementById('total_colly_crews').value =  parseInt( document.getElementById('total_colly_crews').value) + 1;
+			document.getElementById('new_colly_crew_field').innerHTML =  document.getElementById('new_colly_crew_field').innerHTML + newselect; document.getElementById('total_colly_crews').value =  parseInt( document.getElementById('total_colly_crews').value) + 1;
 		}
 	</script>
 	<script type="text/javascript">
@@ -150,8 +150,7 @@ EOD;
 			}
 			echo "</select>\"\n";
 			?>
-			document.getElementById('new_bbs_field').innerHTML =  document.getElementById('new_bbs_field').innerHTML + newselect;
-			document.getElementById('total_bbses').value =  parseInt( document.getElementById('total_bbses').value) + 1;
+			document.getElementById('new_bbs_field').innerHTML =  document.getElementById('new_bbs_field').innerHTML + newselect; document.getElementById('total_bbses').value =  parseInt( document.getElementById('total_bbses').value) + 1;
 		}
 	</script>
 	<style>
