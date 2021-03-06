@@ -255,10 +255,12 @@ EOD;
 											<?php
 										}
 										?>
+										<!--
 										<li class="nav-item">
-											<a class="nav-link ascii" style="padding-right: 8px; color: #eeee44" target="popup"
+											<a class="nav-link ascii" style="padding-right: 8px;" target="popup"
 											onclick="window.open('/up-rough-amp/index.html','name','width=275,height=450')">MUSIC PLAYER </a>
 										</li>
+										-->
 										<li class="nav-item">
 											<a class="nav-link ascii" style="padding-right: 8px;" href="/about.php">ABOUT</a>
 										</li>
