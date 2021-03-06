@@ -201,8 +201,8 @@ EOD;
 <div class="navbar navbar-expand-lg fixed-top bg-blue" style="top: 22px; height: 21px">
 	<div class="container-fluid m-0 p-0">
 		<a href="/" style="color: #fff" class="navbar-brand">aSCIIaRENA</a>
-		<a class="navbar-toggler" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">mENU</a>
-	<div class="collapse navbar-collapse apt-1 apb-1" id="navbarResponsive">
+		<a class="navbar-toggler ascii" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">mENU</a>
+	<div class="collapse navbar-collapse" id="navbarResponsive">
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
 				<a class="nav-link dropdown-toggle ascii" style="padding-right: 8px;" data-toggle="dropdown" href="/collys.php?sort_by=releasedate" id="themes">COLLYS<span class="caret" style="padding-right: 8px;"></span></a>
