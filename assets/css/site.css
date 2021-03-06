@@ -1820,6 +1820,27 @@ a.disabled{
  transform: translate(0);
  }
 
+.navbar-toggler-icon {
+    display: block;
+    width: 16px !important;
+    height: 16px !important;
+    vertical-align: middle;
+    content: "";
+    background: no-repeat center center;
+    background-size: 100% 100%;
+}
 
+.navbar-toggler {
+    outline: 0;
+    background: transparent;
+    height: 16px !important;
+    margin: 0px !important;
+    padding: 0px !important;
+    line-height: 15px !important;
+    position: fixed;
+    right: 42px;
+    top: -4px;
+    color: white;
+}
 
 
