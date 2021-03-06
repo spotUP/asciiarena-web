@@ -1229,7 +1229,6 @@ button.btn.btn-primary{
   position: absolute !important;
   /*  top: 100%; */
   left: 0px;
-  width: 100%;
   display: none;
   float: left;
   color: #111111;
@@ -1711,6 +1710,10 @@ a.disabled{
   }
   .dropdown-item {
     z-index: 999999;
+  }
+  .dropdown-menu {
+    position: absolute !important;
+    width: 100%;
   }
 }
 
