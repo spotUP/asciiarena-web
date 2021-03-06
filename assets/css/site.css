@@ -1227,7 +1227,7 @@ button.btn.btn-primary{
 
 .dropdown-menu {
   position: absolute !important;
-/*  top: 100%; */
+  /*  top: 100%; */
   left: 0px;
   width: 100%;
   display: none;
@@ -1235,7 +1235,7 @@ button.btn.btn-primary{
   color: #111111;
   text-align: left;
   list-style: none;
-/*  background-color: red; */
+  /*  background-color: red; */
   background-clip: unset;
   border: 2px solid black;
   padding: 4px;
@@ -1673,21 +1673,24 @@ a.disabled{
 }
 
 .navbar-toggler {
-    outline: 0;
-    background: transparent;
-    height: 16px !important;
-    margin: 0px !important;
-    padding: 0px !important;
-    line-height: 15px !important;
-    position: absolute;
-    right: 8px;
-    top: 6px;
-    color: white;
+  outline: 0;
+  background: transparent;
+  height: 16px !important;
+  margin: 0px !important;
+  padding: 0px !important;
+  line-height: 15px !important;
+  position: absolute;
+  right: 8px;
+  top: 6px;
+  color: white;
 }
 
-  .navbar-collapse {
-    background: transparent !important;
-  }
+.navbar-collapse {
+  background: transparent !important;
+}
+.navbar-nav {
+  background: none;
+}
 @media only screen and (max-width: 768px) {
   .show{
     border: 0;
@@ -1695,9 +1698,7 @@ a.disabled{
   .dropdown-item {
     margin-left: 12px;
   }
- /* .navbar-nav .dropdown-menu {
-    background: none; */
-  }
+
   .navbar-collapse {
     background: #bbbbbb;
   }
