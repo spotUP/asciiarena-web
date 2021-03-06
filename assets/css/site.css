@@ -1704,6 +1704,9 @@ a.disabled{
   .navbar-nav {
     background: #bbbbbb !important;
     margin: 0px;
+    margin-top: 5px;
+    padding-bottom: 16px;
+    padding-top: 16px;
   }
   .nav-item{
     background: #bbbbbb;
@@ -1714,6 +1717,29 @@ a.disabled{
   .dropdown-menu {
     position: absolute !important;
     width: 100%;
+  }
+  .nav-link {
+    color: black;
+  }
+  .nav-link:hover {
+    color: white;
+    background: black;
+  }
+  .nav-link .dropdown-toggle{
+    color: black;
+  }
+  .nav-link .dropdown-toggle:hover{
+    color: white;
+    background: black;
+  }
+  .nav-link .dropdown-toggle:focus{
+    color: black;
+  }
+  .nav-link .dropdown-toggle:focus-within{
+    color: green;
+  }
+  .dropdown-divider {
+    display: none;
   }
 }
 
@@ -1836,3 +1862,19 @@ body > div.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-white > span
   position: relative;
   top: -3px;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
