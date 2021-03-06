@@ -795,10 +795,11 @@ span.brown
 }
 
 
-.grey
+span.grey
 {   
   color: rgb(85, 85, 85) !important;
   text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
+  white-space: pre;
 }         
 
 
@@ -806,6 +807,7 @@ span.lightgrey
 {   
   color: rgb(170, 170, 170) !important;
   text-shadow: 1px 1px 10px rgba(170, 170, 170, 0.40) !important;
+  white-space: pre;
 }
 
 
@@ -1167,6 +1169,7 @@ input, button, select, optgroup {
   max-height: 16px;
   min-height: 16px;
   border: 0 !important;
+  white-space: pre;
 }
 
 input:active, button:active, select:active, optgroup:active {
