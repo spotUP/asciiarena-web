@@ -89,23 +89,21 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "<div>\n" +
     "    <div class=\"row\">\n" +
     "        <div class=\"col-md-6\">\n" +
-    "            <div style=\"margin-top:16px\"></div>\n" +
-    "            <div class=\"fig-pad\">\n" +
-    "                <label class=\"fig-draw-label\" for=\"figCharSelect\">Character:</label>\n" +
-    "                <select\n" +
-    "                    id=\"figCharSelect\"\n" +
-    "                    ng-model=\"input.selectedChar\"\n" +
-    "                    ng-options=\"elm.code as elm.character for elm in figCharDropDown\"\n" +
-    "                    class=\"fig-chardropdown\"\n" +
-    "                    size=\"1\"\n" +
-    "                ></select><br><br>\n" +
-    "            </div>\n" +
-    "            <label class=\"fig-draw-label\" for=\"figCharArt\">ASCII Art:<br><br></label>\n" +
-    "            <textarea id=\"figCharArt\" ng-model=\"input.figChars[input.selectedChar]\" ng-trim='false' class=\"fig-txt fig-font bg-secondary\"></textarea>\n" +
+    "            <div class=\"row\">\n" +
+    "               <div class=\"col-md-6\">\n" +
+    "                   <label class=\"fig-draw-label\" for=\"figCharSelect\">Character:</label>\n" +
+    "               </div>\n" +
+    "               <div class=\"col-md-6\">\n" +
+    "                   <select id=\"figCharSelect\" ng-model=\"input.selectedChar\" ng-options=\"elm.code as elm.character for elm in figCharDropDown\" class=\"fig-chardropdown\" size=\"1\"></select>\n" +
+    "               </div>\n" +
+    "           </div>\n" +
+    "           <div class=\"row\">\n" +
+    "               <div class=\"col-md-12\">\n" +
+    "                   <textarea id=\"figCharArt\" ng-model=\"input.figChars[input.selectedChar]\" ng-trim='false' class=\"fig-txt fig-font bg-secondary\"></textarea>\n" +
+    "               </div>\n" +
+    "           </div>\n" +
     "        </div>\n" +
-    "\n" +
     "        <div class=\"col-md-6\">\n" +
-    "\n" +
     "            <div class=\"row\">\n" +
     "               <div class=\"col-md-6\">\n" +
     "                     <label class=\"fig-opt-label\" for=\"hlayout\">Horizontal Layout:</label>\n" +
@@ -114,7 +112,6 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                     <select id=\"hlayout\" ng-model=\"input.horizontalLayout\" ng-options=\"elm as elm for elm in input.layouts\"></select>\n" +
     "                </div>\n" +
     "            </div>\n" +
-    "\n" +
     "            <div ng-show=\"input.horizontalLayout==='Controlled Smushing'\">\n" +
     "                <div class=\"fig-opt-entry\" ng-repeat=\"idx in [1, 6] | makeRange\">\n" +
     "                    <div class=\"fig-opt\">\n" +
@@ -130,7 +127,6 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                    <strong>Note:</strong> Not selecting any smushing rules is the same as selecting \"Universal Smushing\".\n" +
     "                </div>\n" +
     "            </div>\n" +
-    "\n" +
     "            <div class=\"row\">\n" +
     "               <div class=\"col-md-6\">\n" +
     "                    <label for=\"vlayout\" class=\"fig-opt-label\">Vertical Layout:</label>\n" +
@@ -142,7 +138,6 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                <div class=\"fig-opt-info2\">\n" +
     "                    <span class=\"glyphicon glyphicon-info-sign fig-opt-tips fig-icon\" data-toggle=\"tooltip\" title=\"The vertical kerning for the font.\"></span>\n" +
     "                </div>\n" +
-    "\n" +
     "            <div ng-show=\"input.verticalLayout==='Controlled Smushing'\">\n" +
     "                <div class=\"fig-opt-entry\" ng-repeat=\"idx in [1, 5] | makeRange\">\n" +
     "                    <div class=\"fig-opt\">\n" +
@@ -154,7 +149,6 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                    <strong>Note:</strong> Not selecting any smushing rules is the same as selecting \"Universal Smushing\".\n" +
     "                </div>\n" +
     "            </div>\n" +
-    "\n" +
     "            <div class=\"row\">\n" +
     "               <div class=\"col-md-6\">\n" +
     "                    <label class=\"fig-opt-label\" for=\"printDirection\">Print Direction:</label>\n" +
@@ -168,19 +162,14 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                    ></select>\n" +
     "               </div>\n" +
     "            </div>\n" +
-    "\n" +
     "            <div class=\"row\">\n" +
     "               <div class=\"col-md-6\">\n" +
-    "                    <label class=\"fig-opt-label\" for=\"caseInsensitive\">Case Insensitive:</label>\n" +
-    "                </div>\n" +
-    "               <div class=\"col-md-6\">\n" +
-    "                    <input type=\"checkbox\" id=\"caseInsensitive\" ng-model=\"input.caseInsensitive\" />\n" +
-    "                </div>\n" +
-    "               <div class=\"col-md-6\">\n" +
-    "                    <span class=\"glyphicon glyphicon-info-sign fig-opt-tips fig-icon\" data-toggle=\"tooltip\" title=\"Makes a-z the same as A-Z.\"></span>\n" +
+    "                       <div class=\"custom-control custom-switch\">\n" +
+    "                           <input type=\"checkbox\" class=\"custom-control-input\" id=\"caseInsensitive\"  ng-model=\"input.caseInsensitive\" checked>\n" +
+    "                           <label class=\"fig-opt-label custom-control-label\" for=\"caseInsensitive\">Case Insensitive:</label>\n" +
+    "                       </div>\n" +
     "                </div>\n" +
     "            </div>\n" +
-    "\n" +
     "            <div class=\"row\">\n" +
     "               <div class=\"col-md-6\">\n" +
     "                    <label class=\"fig-opt-label\" for=\"hardBlank\">Hard blank:</label>\n" +
@@ -189,7 +178,6 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                    <input id=\"hardBlank\" type=\"text\" class=\"txt-single-input\" maxlength=1 ng-model=\"input.hardBlank\"></input>\n" +
     "              </div>\n" +
     "            </div>\n" +
-    "\n" +
     "            <div class=\"row\">\n" +
     "               <div class=\"col-md-6\">\n" +
     "                    <label class=\"fig-opt-label\" for=\"baseline\">Baseline:</label>\n" +
@@ -198,15 +186,11 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                    <input id=\"baseline\" type=\"text\" class=\"txt-single-input\" maxlength=1 ng-model=\"input.baseline\"></input>\n" +
     "                </div>\n" +
     "            </div>\n" +
-    "\n" +
-    "\n" +
-    "\n" +
     "            <div class=\"fig-opt-entry\">\n" +
     "                <button class=\"btn btn-default\" ng-click=\"export()\">Export</button>\n" +
     "                <button class=\"btn btn-default\" ng-click=\"import()\">Import</button>\n" +
     "                <button class=\"btn btn-default\" ng-click=\"submitFont()\"> Save </button>\n" +
     "            </div>\n" +
-    "\n" +
     "        </div>\n" +
     "    </div>\n" +
     "    <br/>\n" +
