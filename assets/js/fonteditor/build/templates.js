@@ -87,7 +87,7 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('partials/main.htm',
     "<div>\n" +
-    "    <div class=\"row\">\n" +
+    "    <div class=\"row apt-1 apb-1\">\n" +
     "        <div class=\"col-md-6\">\n" +
     "            <div class=\"row\">\n" +
     "               <div class=\"col-md-6\">\n" +
@@ -98,7 +98,7 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "               </div>\n" +
     "           </div>\n" +
     "           <div class=\"row\">\n" +
-    "               <div class=\"col-md-12\">\n" +
+    "               <div class=\"col-md-12 apt-1\">\n" +
     "                   <textarea id=\"figCharArt\" ng-model=\"input.figChars[input.selectedChar]\" ng-trim='false' class=\"fig-txt fig-font bg-secondary\"></textarea>\n" +
     "               </div>\n" +
     "           </div>\n" +
@@ -127,7 +127,7 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                    <strong>Note:</strong> Not selecting any smushing rules is the same as selecting \"Universal Smushing\".\n" +
     "                </div>\n" +
     "            </div>\n" +
-    "            <div class=\"row\">\n" +
+    "            <div class=\"row apt-1\">\n" +
     "               <div class=\"col-md-6\">\n" +
     "                    <label for=\"vlayout\" class=\"fig-opt-label\">Vertical Layout:</label>\n" +
     "               </div>\n" +
@@ -149,7 +149,7 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                    <strong>Note:</strong> Not selecting any smushing rules is the same as selecting \"Universal Smushing\".\n" +
     "                </div>\n" +
     "            </div>\n" +
-    "            <div class=\"row\">\n" +
+    "            <div class=\"row apt-1\">\n" +
     "               <div class=\"col-md-6\">\n" +
     "                    <label class=\"fig-opt-label\" for=\"printDirection\">Print Direction:</label>\n" +
     "               </div>\n" +
@@ -162,15 +162,7 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                    ></select>\n" +
     "               </div>\n" +
     "            </div>\n" +
-    "            <div class=\"row\">\n" +
-    "               <div class=\"col-md-6\">\n" +
-    "                       <div class=\"custom-control custom-switch\">\n" +
-    "                           <input type=\"checkbox\" class=\"custom-control-input\" id=\"caseInsensitive\"  ng-model=\"input.caseInsensitive\" checked>\n" +
-    "                           <label class=\"fig-opt-label custom-control-label\" for=\"caseInsensitive\">Case Insensitive:</label>\n" +
-    "                       </div>\n" +
-    "                </div>\n" +
-    "            </div>\n" +
-    "            <div class=\"row\">\n" +
+    "            <div class=\"row apt-1\">\n" +
     "               <div class=\"col-md-6\">\n" +
     "                    <label class=\"fig-opt-label\" for=\"hardBlank\">Hard blank:</label>\n" +
     "              </div>\n" +
@@ -178,7 +170,7 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                    <input id=\"hardBlank\" type=\"text\" class=\"txt-single-input\" maxlength=1 ng-model=\"input.hardBlank\"></input>\n" +
     "              </div>\n" +
     "            </div>\n" +
-    "            <div class=\"row\">\n" +
+    "            <div class=\"row apt-1\">\n" +
     "               <div class=\"col-md-6\">\n" +
     "                    <label class=\"fig-opt-label\" for=\"baseline\">Baseline:</label>\n" +
     "                </div>\n" +
@@ -186,14 +178,28 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                    <input id=\"baseline\" type=\"text\" class=\"txt-single-input\" maxlength=1 ng-model=\"input.baseline\"></input>\n" +
     "                </div>\n" +
     "            </div>\n" +
-    "            <div class=\"fig-opt-entry\">\n" +
-    "                <button class=\"btn btn-default\" ng-click=\"export()\">Export</button>\n" +
-    "                <button class=\"btn btn-default\" ng-click=\"import()\">Import</button>\n" +
-    "                <button class=\"btn btn-default\" ng-click=\"submitFont()\"> Save </button>\n" +
+    "            <div class=\"row apt-1\">\n" +
+    "               <div class=\"col-md-12\">\n" +
+    "                   <div class=\"col-md-6 p-0\">\n" +
+    "                       <div class=\"custom-control custom-switch\">\n" +
+    "                           <input type=\"checkbox\" class=\"custom-control-input\" id=\"caseInsensitive\"  ng-model=\"input.caseInsensitive\" checked>\n" +
+    "                           <label class=\"fig-opt-label custom-control-label\" for=\"caseInsensitive\">Case Insensitive</label>\n" +
+    "                       </div>\n" +
+    "                   </div>\n" +
+    "               </div>\n" +
+    "            </div>\n" +
+    "            <div class=\"container\">\n"+
+    "               <div class=\"row align-items-end\">\n" +
+    "               <br><br><br><br><br><br>\n" +
+    "                   <div class=\"fig-opt-entry\">\n" +
+    "                       <button class=\"btn btn-default\" ng-click=\"export()\">Export</button>\n" +
+    "                       <button class=\"btn btn-default\" ng-click=\"import()\">Import</button>\n" +
+    "                       <button class=\"btn btn-default\" ng-click=\"submitFont()\"> Save </button>\n" +
+    "                   </div>\n" +
+    "               </div>\n" +
     "            </div>\n" +
     "        </div>\n" +
     "    </div>\n" +
-    "    <br/>\n" +
     "</div>"
   );
 
