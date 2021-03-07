@@ -89,7 +89,6 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "<div>\n" +
     "    <div class=\"row\">\n" +
     "        <div class=\"col-md-6\">\n" +
-    "            <!--<h2>Draw</h2>-->\n" +
     "            <div style=\"margin-top:16px\"></div>\n" +
     "            <div class=\"fig-pad\">\n" +
     "                <label class=\"fig-draw-label\" for=\"figCharSelect\">Character:</label>\n" +
@@ -106,18 +105,14 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "        </div>\n" +
     "\n" +
     "        <div class=\"col-md-6\">\n" +
-    "            <!-- <h2>Options</h2> --> \n" +
-    "            <div style=\"margin-top:16px\"></div>\n" +
     "\n" +
-    "            <div class=\"fig-opt-entry\">\n" +
-    "                <div class=\"fig-opt\">\n" +
-    "                    <label class=\"fig-opt-label\" for=\"hlayout\">Horizontal Layout:</label>\n" +
-    "                    <select id=\"hlayout\" ng-model=\"input.horizontalLayout\" ng-options=\"elm as elm for elm in input.layouts\"></select>\n" +
+    "            <div class=\"row\">\n" +
+    "               <div class=\"col-md-6\">\n" +
+    "                     <label class=\"fig-opt-label\" for=\"hlayout\">Horizontal Layout:</label>\n" +
+    "             </div>\n" +
+    "                <div class=\"col-md-6\">\n" +
+    "                     <select id=\"hlayout\" ng-model=\"input.horizontalLayout\" ng-options=\"elm as elm for elm in input.layouts\"></select>\n" +
     "                </div>\n" +
-    "                <div class=\"fig-opt-info2\">\n" +
-    "                    <span class=\"glyphicon glyphicon-info-sign fig-opt-tips fig-icon\" data-toggle=\"tooltip\" title=\"The horizontal kerning for the font\"></span>\n" +
-    "                </div>\n" +
-    "                <div style=\"clear:both\"></div>\n" +
     "            </div>\n" +
     "\n" +
     "            <div ng-show=\"input.horizontalLayout==='Controlled Smushing'\">\n" +
@@ -136,16 +131,17 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                </div>\n" +
     "            </div>\n" +
     "\n" +
-    "            <div class=\"fig-opt-entry\">\n" +
-    "                <div class=\"fig-opt\">\n" +
+    "            <div class=\"row\">\n" +
+    "               <div class=\"col-md-6\">\n" +
     "                    <label for=\"vlayout\" class=\"fig-opt-label\">Vertical Layout:</label>\n" +
+    "               </div>\n" +
+    "               <div class=\"col-md-6\">\n" +
     "                    <select id=\"vlayout\" ng-model=\"input.verticalLayout\" ng-options=\"elm as elm for elm in input.layouts\"></select>\n" +
+    "                </div>\n" +
     "                </div>\n" +
     "                <div class=\"fig-opt-info2\">\n" +
     "                    <span class=\"glyphicon glyphicon-info-sign fig-opt-tips fig-icon\" data-toggle=\"tooltip\" title=\"The vertical kerning for the font.\"></span>\n" +
     "                </div>\n" +
-    "                <div style=\"clear:both\"></div>\n" +
-    "            </div>\n" +
     "\n" +
     "            <div ng-show=\"input.verticalLayout==='Controlled Smushing'\">\n" +
     "                <div class=\"fig-opt-entry\" ng-repeat=\"idx in [1, 5] | makeRange\">\n" +
@@ -153,80 +149,62 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                        <label class=\"fig-opt-label\" for=\"vrule{{idx}}\">Rule #{{idx}}:</label>\n" +
     "                        <input id=\"vrule{{idx}}\" ng-model=\"input.vrule[idx]\" type=\"checkbox\"/>\n" +
     "                    </div>\n" +
-    "                    <div class=\"fig-opt-info2\">\n" +
-    "                        <span class=\"glyphicon glyphicon-info-sign fig-opt-tips fig-icon\" data-toggle=\"tooltip\" title=\"{{ruleToolTip('v', idx)}}\"></span>\n" +
-    "                    </div>\n" +
-    "                    <div style=\"clear:both\"></div>\n" +
     "                </div>\n" +
     "                <div style=\"margin-bottom:16px;\" ng-show=\"input.vrule[1] === false && input.vrule[2] === false && input.vrule[3] === false && input.vrule[4] === false && input.vrule[5] === false\">\n" +
     "                    <strong>Note:</strong> Not selecting any smushing rules is the same as selecting \"Universal Smushing\".\n" +
     "                </div>\n" +
     "            </div>\n" +
     "\n" +
-    "            <div class=\"fig-opt-entry\">\n" +
-    "                <div class=\"fig-opt\">\n" +
+    "            <div class=\"row\">\n" +
+    "               <div class=\"col-md-6\">\n" +
     "                    <label class=\"fig-opt-label\" for=\"printDirection\">Print Direction:</label>\n" +
+    "               </div>\n" +
+    "               <div class=\"col-md-6\">\n" +
     "                    <select\n" +
     "                        id=\"printDirection\"\n" +
     "                        ng-model=\"input.printDirection\"\n" +
     "                        ng-options=\"elm.value as elm.label for elm in printDirection\"\n" +
     "                        size=\"1\"\n" +
     "                    ></select>\n" +
-    "                </div>\n" +
-    "                <div class=\"fig-opt-info\">\n" +
-    "                    <span class=\"glyphicon glyphicon-info-sign fig-opt-tips fig-icon\" data-toggle=\"tooltip\" title=\"How the font should print when typed.\"></span>\n" +
-    "                </div>\n" +
-    "                <div style=\"clear:both\"></div>\n" +
+    "               </div>\n" +
     "            </div>\n" +
     "\n" +
-    "            <div class=\"fig-opt-entry\">\n" +
-    "                <div class=\"fig-opt\">\n" +
+    "            <div class=\"row\">\n" +
+    "               <div class=\"col-md-6\">\n" +
     "                    <label class=\"fig-opt-label\" for=\"caseInsensitive\">Case Insensitive:</label>\n" +
+    "                </div>\n" +
+    "               <div class=\"col-md-6\">\n" +
     "                    <input type=\"checkbox\" id=\"caseInsensitive\" ng-model=\"input.caseInsensitive\" />\n" +
     "                </div>\n" +
-    "                <div class=\"fig-opt-info2\">\n" +
+    "               <div class=\"col-md-6\">\n" +
     "                    <span class=\"glyphicon glyphicon-info-sign fig-opt-tips fig-icon\" data-toggle=\"tooltip\" title=\"Makes a-z the same as A-Z.\"></span>\n" +
     "                </div>\n" +
-    "                <div style=\"clear:both\"></div>\n" +
     "            </div>\n" +
     "\n" +
-    "            <div class=\"fig-opt-entry\">\n" +
-    "                <div class=\"fig-opt\">\n" +
+    "            <div class=\"row\">\n" +
+    "               <div class=\"col-md-6\">\n" +
     "                    <label class=\"fig-opt-label\" for=\"hardBlank\">Hard blank:</label>\n" +
+    "              </div>\n" +
+    "               <div class=\"col-md-6\">\n" +
     "                    <input id=\"hardBlank\" type=\"text\" class=\"txt-single-input\" maxlength=1 ng-model=\"input.hardBlank\"></input>\n" +
-    "                </div>\n" +
-    "                <div class=\"fig-opt-info\">\n" +
-    "                    <span class=\"glyphicon glyphicon-info-sign fig-opt-tips fig-icon\" data-toggle=\"tooltip\" title=\"Special Character: Indicates empty spaces that can't be smushed for non-full width layouts.\"></span>\n" +
-    "                </div>\n" +
-    "                <div style=\"clear:both\"></div>\n" +
+    "              </div>\n" +
     "            </div>\n" +
     "\n" +
-    "            <div class=\"fig-opt-entry\">\n" +
-    "                <div class=\"fig-opt\">\n" +
+    "            <div class=\"row\">\n" +
+    "               <div class=\"col-md-6\">\n" +
     "                    <label class=\"fig-opt-label\" for=\"baseline\">Baseline:</label>\n" +
+    "                </div>\n" +
+    "               <div class=\"col-md-6\">\n" +
     "                    <input id=\"baseline\" type=\"text\" class=\"txt-single-input\" maxlength=1 ng-model=\"input.baseline\"></input>\n" +
     "                </div>\n" +
-    "                <div class=\"fig-opt-info\">\n" +
-    "                    <span class=\"glyphicon glyphicon-info-sign fig-opt-tips fig-icon\" data-toggle=\"tooltip\" title=\"The row in the text that represents the base of a standard character. If left blank a value will be auto-genereated.\"></span>\n" +
-    "                </div>\n" +
-    "                <div style=\"clear:both\"></div>\n" +
     "            </div>\n" +
     "\n" +
     "\n" +
     "\n" +
     "            <div class=\"fig-opt-entry\">\n" +
-    "                <label class=\"fig-opt-label\">Export:</label>\n" +
     "                <button class=\"btn btn-default\" ng-click=\"export()\">Export</button>\n" +
-    "            </div>\n" +
-    "\n" +
-    "            <div class=\"fig-opt-entry\">\n" +
-    "                <label class=\"fig-opt-label\">Import:</label>\n" +
     "                <button class=\"btn btn-default\" ng-click=\"import()\">Import</button>\n" +
-    "            </div>\n" +
-    "\n" +
-    "            <div class=\"fig-opt-entry\">\n" +
-    "                <label class=\"fig-opt-label\">Submit:</label>\n" +
-    "                <button class=\"btn btn-default\" ng-click=\"submitFont()\">Submit</button>\n" +
+    "                <button class=\"btn btn-default\" ng-click=\"submitFont()\"> Save </button>\n" +
     "            </div>\n" +
     "\n" +
     "        </div>\n" +
