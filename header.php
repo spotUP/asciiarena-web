@@ -6,8 +6,8 @@ foreach(fetchAll("SELECT ascii FROM logos ORDER BY RAND() limit 10") as $logo) {
 //echo 'IGNORE   : ', iconv("UTF-8", "ISO-8859-1//IGNORE", $text);
 //echo 'Plain    : ', iconv("UTF-8", "ISO-8859-1", $text);
 
-//	$logos[] = '<a href="/" class="logo ascii"><pre style="overflow: hidden;"><span class="magenta">' . iconv("UTF-8", "ISO-8859-1", ($logo->ascii)) . '</span></pre></a>';
-	$logos[] = '<a href="/" class="logo ascii"><pre style="overflow: hidden;"><span class="magenta">' . utf8_encode($logo->ascii) . '</span></pre></a>';
+	$logos[] = '<a href="/" class="logo ascii"><pre style="overflow: hidden;"><span class="magenta">' . iconv("UTF-8", "ISO-8859-1", ($logo->ascii)) . '</span></pre></a>';
+//	$logos[] = '<a href="/" class="logo ascii"><pre style="overflow: hidden;"><span class="magenta">' . utf8_encode($logo->ascii) . '</span></pre></a>';
 }
 $stars1 = <<<EOD
 __/\__
