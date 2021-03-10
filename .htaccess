@@ -1,5 +1,3 @@
-option +multiviews
-
 RewriteEngine On
 RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /(.*)\.php
 RewriteRule ^ /%1 [L,R=301]
