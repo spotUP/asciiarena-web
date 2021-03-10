@@ -1,16 +1,4 @@
 RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-d 
-RewriteCond %{REQUEST_FILENAME}.htm -f 
-RewriteRule ^(.*)$ $1.htm
-
-RewriteCond %{REQUEST_FILENAME} !-d 
-RewriteCond %{REQUEST_FILENAME}.html -f 
-RewriteRule ^(.*)$ $1.html
-
-RewriteCond %{REQUEST_FILENAME} !-d 
-RewriteCond %{REQUEST_FILENAME}.php -f 
-RewriteRule ^(.*)$ $1.php
-</Directory>
 
 # Installation directory
 RewriteBase /
