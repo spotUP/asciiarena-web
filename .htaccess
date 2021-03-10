@@ -1,9 +1,7 @@
 RewriteEngine On
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(filename1.*)$ members.php?path=$1 [NC,L,QSA]
-RewriteRule ^(filename2.*)$ crews.php?path=$1 [NC,L,QSA]
+RewriteRule ^([^\.]+)$ $1.php [NC,L]
 
 
 # Installation directory
