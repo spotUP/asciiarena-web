@@ -1,3 +1,5 @@
+Options +Multiviews
+
 # Turn on URL rewriting
 RewriteEngine On
 
@@ -21,4 +23,3 @@ RewriteBase /
 #RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
 #Header always set Content-Security-Policy "upgrade-insecure-requests;"
 
-Options +Multiviews
