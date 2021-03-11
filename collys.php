@@ -252,7 +252,7 @@ switch ($sort_by) {
 					$day = "0$day";
 				}
 				$orig = (file_exists(BASEDIR . "/collections/{$dirname}/{$filename}.diz")) ? file_get_contents(BASEDIR . "/collections/{$dirname}/{$filename}.diz") : "";
-				$orig = utf8_encode(file_get_contents($orig));
+				$orig = utf8_encode($orig);
 
 				$a = htmlentities($orig);
 				{
