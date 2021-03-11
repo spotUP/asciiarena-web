@@ -335,6 +335,14 @@ include "header.php";
 			$uploader = $row->uploader;
 			$dirname = explode(".", $filename);
 			$dirname = $dirname[0];
+
+			$file_id = "collections/" . $dirname . "/" . $filename . ".diz";
+			if (file_exists($file_id)) 
+			{
+				$file_id = utf8_encode(file_get_contents($file_id));
+			}
+			else
+				$file_id = utf8_encode(file_get_contents("collections/file_id.diz.txt"));	
 			?>
 
 			<div class="row apb-1 apt-1">
@@ -343,29 +351,17 @@ include "header.php";
 				</div>
 			</div>
 
-			<div class="row">
+			<div class="row apr-1">
 				<div class="col-8">
-
 					<?php
-					if ($filename == "file_id.diz.png")
-					{
-						?>
-						<a href="info_release.php?filename=<?=$encoded_filename?>"><img class="centered" border="0" src="collys/file_id.diz.png"></a>
-						<?php
-					}
-					else
-					{
-						?>	
-						<a href="info_release.php?filename=<?=$encoded_filename?>"><img class="centered" border="0" src="collys/<?=$dirname?>/<?=$filename?>"></a>
-						<?php
-					}
+					?>	
+					<a class="ascii" href="info_release.php?filename=<?=$encoded_filename?>"><pre><?=$file_id?></pre></a>
+					<?php
 					?>
 				</div>
 				<div class="col-4">
 					<div class="row d-flex justify-content-between">
-
 						Artist(s):
-
 						<?php
 						$authors = array();
 						$ask_author="select * from author_of where filename=:filename";
