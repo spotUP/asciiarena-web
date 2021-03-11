@@ -430,7 +430,7 @@ include "header.php";
 					<div class="row d-flex justify-content-between">
 						Filename:
 
-						<a href="info_release.php?filename=<?=$encoded_filename?>"><?=mb_strimwidth($row->filename, 0, 10);?></a>
+						<a href="info_release.php?filename=<?=$encoded_filename?>"><?=mb_strimwidth($row->filename, 0, 12);?></a>
 					</div>
 					<div class="row d-flex justify-content-between">	
 						<span>Size:</span>
