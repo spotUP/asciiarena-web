@@ -252,6 +252,8 @@ switch ($sort_by) {
 					$day = "0$day";
 				}
 				$orig = (file_exists(BASEDIR . "/collections/{$dirname}/{$filename}.diz")) ? file_get_contents(BASEDIR . "/collections/{$dirname}/{$filename}.diz") : "";
+				$orig = utf8_encode(file_get_contents($orig));
+
 				$a = htmlentities($orig);
 				{
 					?>
@@ -264,7 +266,7 @@ switch ($sort_by) {
 							?>
 						</div>
 						<div class="col-6 apb-1" style="margin-top: -16px;">				
-							<pre style="overflow: hidden;"><a class="magenta ascii" href="info_release.php?filename=<?=$encoded_filename?>"><?=$orig?></a></pre>
+							<pre style="overflow: hidden;"><a class="magenta ascii" href="info_release.php?filename=<?=$encoded_filename?>">test<?=$orig?></a></pre>
 						</div>
 					</div>
 					<div class="row apb-1">
