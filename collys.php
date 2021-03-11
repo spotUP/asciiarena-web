@@ -266,7 +266,7 @@ switch ($sort_by) {
 							?>
 						</div>
 						<div class="col-6 apb-1" style="margin-top: -16px;">				
-							<pre style="overflow: hidden;"><a class="magenta ascii" href="info_release.php?filename=<?=$encoded_filename?>">test<?=$orig?></a></pre>
+							<pre style="overflow: hidden;"><a class="magenta ascii" href="info_release.php?filename=<?=$encoded_filename?>"><?=$orig?></a></pre>
 						</div>
 					</div>
 					<div class="row apb-1">
