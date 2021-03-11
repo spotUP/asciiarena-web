@@ -415,7 +415,7 @@ include "header.php";
 							{
 								if($c == count($crews)-1) 
 								{
-									echo ' <magenta>&amp;</magenta> ';
+									echo ' <span class="magenta">&amp;</span> ';
 								} 
 								else 
 								{
