@@ -383,7 +383,7 @@ include "header.php";
 							{
 								if($c == count($authors)-1) 
 								{
-									echo ' <span class="magenta" &amp; </span>';
+									echo ' <span class="magenta"> &amp; </span>';
 								} 
 								else 
 								{
