@@ -544,23 +544,18 @@ include "header.php";
 				$encoded_crew=base64_encode($showcrew);
 				?>
 				<h2 class="amb-1 amt-1 ap-1">All <?=$show_acronym?> Releases</h2>            
-				<span class="yellow">Sort by:</span>
-				<a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.name">Name</a>
-				<a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.filename">Filename</a>
-				<a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=b.nick">Artist</a>
-				<a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.year, a.month">Release Date</a>
-				<a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.timestamp">Upload Date</a>
-				<a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.uploader">Uploader</a>
-
 				<div class="row amt-1 amb-1">
-					<div class="col-4">
-						NAME
+					<div class="col-3">
+						<a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.name">NAME</a>
 					</div>
-					<div class="col-4">
-						FiLENAME
+					<div class="col-3">
+						<a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.filename">FiLENAME</a>
 					</div>
-					<div class="col-4">
-						ARTiST
+					<div class="col-3">
+						<a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=b.nick">ARTiST</a>
+					</div>
+					<div class="col-3">
+				<a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.year, a.month">RELEASE DATE</a>
 					</div>
 				</div>
 				<?php
@@ -570,25 +565,28 @@ include "header.php";
 				{
 					$author=$row->author;
 					$encoded_author=base64_encode($author);
-					$filename=$row->filename;
 					$encoded_filename=base64_encode($row->filename);
 					$name=$row->name;
-
+					$year=$row->year;
 					?>
 					<div class="row">
-						<div class="col-4">
-							<a href="info_release.php?filename=<?=$encoded_filename?>"><?=$name?></a>
+						<div class="col-3">
+							<a class="magenta" href="info_release.php?filename=<?=$encoded_filename?>"><?=mb_strimwidth($row->name, 0, 20, "...");?></a>
+						</div>
+						<div class="col-3">
+							<a class="magenta" href="info_release.php?filename=<?=$encoded_filename?>"><?=mb_strimwidth($row->filename, 0, 12);?></a>
 						</div>
 
-						<div class="col-4">
+						<div class="col-3">
 
-							<a href="info_release.php?filename=<?=$encoded_filename?>"><?=$filename?></a>
+							<a class="green" href="info_artist.php?artist=<?=$encoded_author?>&sort_by=filename"><?=$author?></a>
 						</div>
 
-						<div class="col-4">
+						<div class="col-3">
 
-							<a href="info_artist.php?artist=<?=$encoded_author?>&sort_by=filename"><?=$author?></a>
+							<span class="lightgrey" href="info_artist.php?artist=<?=$encoded_author?>&sort_by=filename"><?php if (!empty($year)) { echo $year; }?></span>
 						</div>
+
 					</div>
 
 					<?php
