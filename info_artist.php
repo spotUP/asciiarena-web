@@ -12,8 +12,9 @@ include "header.php";
     <?php
 
     $validSorts = array(
-      'a.name' => 'Name',
       'a.filename' => 'Filename',
+      'a.name' => 'Name',
+      'a.crew' => 'Crew',
       'a.year, a.month' => 'Release Date'
     );
 
@@ -27,10 +28,14 @@ include "header.php";
       $show_www=$row['www'];
       $show_status=$row['active'];
       $show_country=$row['country'];
-      $show_rating=$row['rating'];	
+      $show_rating=$row['rating'];  
 
       ?>
-
+      <div class="row apb-1">
+        <div class="header col-lg-12">
+          <h2 class="ap-1 bg-header"><?=$show_artist?></h2>
+        </div>
+      </div>
       <div class="col-lg-12 pl-0">
         Nick: <?=$show_artist?>
       </div>
@@ -154,7 +159,7 @@ foreach (fetchAll($q, $p) as $row) {
   <div class="maincontent">
     <div class="row apt-1">
       <div class="header col-lg-12">
-        <h1>Latest Release</h1>
+        <h2 class="ap-1 bg-header">Latest Release</h2>
       </div>
     </div>
     <div class="container-fluid">
@@ -384,16 +389,17 @@ $encoded_artist=base64_encode($artist);
 
 <div class="row apt-1 apb-1">
   <div class="header col-lg-12">
-    <h1>[ All <?=$acronym?> Releases ] <span class="yellow">Sort by:</span>
-      <?php
-      foreach ($validSorts as $key => $val) {
-        echo "<a class=\"lightgreen\" href=\"info_artist.php?artist={$encoded_artist}&sort_by={$key}\">{$val} </a>";
-      }
-      ?>
-    </h1>
+    <h2 class="ap-1 bg-header">All <?=$acronym?> Releases</h2>
   </div>
 </div>
+<div class="col-lg-12 d-flex justify-content-between pl-0">
+  <?php
+  foreach ($validSorts as $key => $val) {
+    echo "<div class=\"col-lg-3 pl-0 amb-1\"><a class=\"lightgreen\" href=\"info_artist.php?artist={$encoded_artist}&sort_by={$key}\">{$val}</a></div>";
+  }
+  ?>
 
+</div>
 <?php
 $sort_criteria=$_GET['sort_by'];
 $q = "SELECT a.*, b.nick AS author, c.crew FROM collys AS a " .
@@ -412,40 +418,42 @@ foreach (fetchAll($q, $p) as $row) {
   $author=$row['author'];
   $filename=$row['filename'];
   $encoded_filename=base64_encode($row['filename']);
+  $year=$row['year'];
   $name=$row['name'];
   $crew=$row['crew'];
   $encoded_crew=base64_encode($row['crew']);
+  $filename=str_replace("&#39;", "'",$filename);        // replace ' with &#39  
+  $filename=myTruncate($filename, 12);            // truncate
+  $filename=str_replace("'", "&#39;",$filename);        // replace ' with &#39
+  $name=str_replace("&#39;", "'",$name);            // replace ' with &#39  
+  $name=myTruncate($name, 35);                // truncate
+  $name=str_replace("'", "&#39;",$name);            // replace ' with &#39
 
-			$filename=str_replace("&#39;", "'",$filename);				// replace ' with &#39	
-			$filename=myTruncate($filename, 12);						// truncate
-			$filename=str_replace("'", "&#39;",$filename);				// replace ' with &#39
-			$name=str_replace("&#39;", "'",$name);						// replace ' with &#39	
-			$name=myTruncate($name, 35);								// truncate
-			$name=str_replace("'", "&#39;",$name);						// replace ' with &#39
-
-			?>
-      <div class="col-lg-12 d-flex justify-content-between pl-0">
-
-        <div class="col-lg-3 pl-0">
-          <a href="info_release.php?filename=<?=$encoded_filename?>" ><?=$filename?></a>
-        </div>
-
-        <div class="col-lg-6 pl-0">            
-          <a href="info_release.php?filename=<?=$encoded_filename?>" ><?=$name?></a> 
-        </div>
-        <div class="col-lg-3 pl-0">            
-          <a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.filename"> <?=$crew?></a>
-        </div>
-      </div>
-
-      <?php
-    }
-    ?>
+ ?>
+ <div class="col-lg-12 d-flex justify-content-between pl-0">
+  <div class="col-lg-3 pl-0">
+    <a class="magenta" href="info_release.php?filename=<?=$encoded_filename?>" ><?=$filename?></a>
   </div>
-  <div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
-    <?php include "sidebar.php"; ?>
+
+  <div class="col-lg-3 pl-0">            
+    <a class="magenta" href="info_release.php?filename=<?=$encoded_filename?>" ><?=$name?></a> 
   </div>
-  <div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
-    <?php include "sidebar_right.php"; ?>
+  <div class="col-lg-3 pl-0">            
+    <a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.filename"> <?=$crew?></a>
   </div>
-  <?php include "footer.php"; ?>
+  <div class="col-lg-3 pl-0">            
+    <span class="lightgrey"><?php if(!empty($year)){ echo "$year"; }?></span>
+  </div>
+</div>
+
+<?php
+}
+?>
+</div>
+<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+  <?php include "sidebar.php"; ?>
+</div>
+<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
+  <?php include "sidebar_right.php"; ?>
+</div>
+<?php include "footer.php"; ?>
