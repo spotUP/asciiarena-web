@@ -363,64 +363,23 @@ include "header.php";
 					<div class="row d-flex justify-content-between">
 						Artist(s):
 						<?php
-						$authors = array();
-						$ask_author="select * from author_of where filename=:filename";
-						$result_author=fetchAll($ask_author, [ 'filename' => $filename ]);
-						foreach($result_author as $row_author) 
-						{
-							$authors[]=$row_author->id;
+						$authors = [];
+						foreach(fetchAll("SELECT * FROM author_of WHERE filename = :filename GROUP BY nick", [ ':filename' => $filename ]) as $author) {
+							$encoded_author = base64_encode($author->artist_id);
+							$authors[] = "<a href=\"info_artist.php?artist={$encoded_author}&sort_by=filename\">{$author->nick}</a>";
 						}
-
-						$c = 0;
-						foreach($authors as $author) 
-						{
-							$encoded_author=base64_encode($author);
-							if($c > 0) 
-							{
-								if($c == count($authors)-1) 
-								{
-									echo ' <span class="magenta"> &amp; </span>';
-								} 
-								else 
-								{
-									echo ', ';
-								}
-							}
-							echo "<a href=\"info_artist.php?artist=$encoded_author&sort_by=filename\">$author</a>";
-							$c++;
-						}
+						echo pluralize($authors, '<span class="magenta"> & </span>');
 						?>
 					</div>
 					<div class="row d-flex justify-content-between">
-						Crew:
-
+						Crew(s):
 						<?php
-						$crews = array();
-						$ask_crew="select * from crew_of where filename=:filename";
-						$result_crew=fetchAll($ask_crew, [ 'filename' => $filename ]);
-						foreach($result_crew as $row_crew) 
-						{
-							$crews[]=$row_crew->id;
-						}
-
-						$c = 0;
-						foreach($crews as $crew) 
-						{
-							$encoded_crew=base64_encode($crew);
-							if($c > 0) 
-							{
-								if($c == count($crews)-1) 
-								{
-									echo ' <span class="magenta">&amp;</span> ';
-								} 
-								else 
-								{
-									echo ', ';
-								}
+							$crews = [];
+							foreach(fetchAll("SELECT * FROM crew_of WHERE filename = :filename GROUP BY crew", [ ':filename' => $filename ]) as $crew) {
+								$encoded_crew = base64_encode($crew->crew_id);
+								$crews[] = "<a href=\"info_crew.php?crew={$encoded_crew}&sort_by=filename\">{$crew->crew}</a>";
 							}
-							echo "<a href=\"info_crew.php?crew=$encoded_crew&sort_by=a.filename\">$crew</a>";
-							$c++;
-						}
+							echo pluralize($crews, '<span class="magenta"> & </span>');
 						?>
 					</div>
 					<div class="row d-flex justify-content-between">
