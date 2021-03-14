@@ -60,12 +60,19 @@
 		return $string . $pad;
 	}
 
-	function pluralize($a = []) {
+	/**
+	 * Pluralize an array into a nice string.
+	 * @param array $a
+	 * @param string $f // Separator before last element
+	 * @param string $s // Separator between each element
+	 * @return string
+	 */
+	function pluralize($a = [], $f = " & ", $s = ", ") {
 		if (count($a) < 3) {
-			return implode(" & ", $a);
+			return implode($f, $a);
 		}
 		$last = array_pop($a);
-		return implode(", ", $a) . " & {$last}";
+		return implode($s, $a) . "{$f}{$last}";
 	}
 
 	function combinize($names = "", $ids = "", $base = "/", $fallback = "") {
