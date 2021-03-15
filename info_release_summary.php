@@ -29,8 +29,8 @@ $dirname = $dirname[ 0 ];
 
 
 			<div class="container-fluid">
-				<div class="row ap-1 bg-secondary">
-					<div class="col-lg-8 d-flex justify-content-center justify-content-lg-start" style="position: relative; top: -16px;">
+				<div class="row ap-1 bg-secondary overflow-hidden">
+					<div class="animate__animated animate__backInLeft col-lg-8 d-flex justify-content-center justify-content-lg-start" style="position: relative; top: -16px;">
 						<span>
 							<?php if ($colly->file_id == "file_id.diz.png") {
 								$file_id_diz = file_get_contents(__DIR__ . "/collections/file_id.diz.txt");
