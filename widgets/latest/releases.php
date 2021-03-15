@@ -17,8 +17,8 @@ foreach ($res as $row) {
 }
 foreach ($collys as $colly) {
 	?>
-	<div class="col-<?=$breakpoint?><?=(round(12 / $columns))?>">
-		<div class="row justify-content-md-center">
+	<div class="col-<?=$breakpoint?><?=(round(12 / $columns))?> overflow-hidden">
+		<div class="row justify-content-md-center animate__animated animate__backInUp">
 			<pre><a href="/info_release.php?filename=" class="ascii"><?=$colly?></a></pre>
 		</div>
 	</div>
