@@ -21,7 +21,7 @@
 	}
 
 	function fixOutputPost($insertstring, $base64 = false) {
-		if ($base64) {
+		if($base64) {
 			$insertstring = base64_decode($insertstring);
 			$insertstring = wordwrap($insertstring, 86, "\n", true);
 			$insertstring = htmlspecialchars($insertstring);
@@ -37,7 +37,7 @@
 	function fixOutputEdit($insertstring) {
 		global $base64;
 
-		if ($base64 == 1) {
+		if($base64 == 1) {
 			$insertstring = base64_decode($insertstring);
 		}
 		$insertstring = wordwrap($insertstring, 86, "\n", true);
@@ -50,11 +50,11 @@
 //-----------------------------------------------------------
 
 	function myTruncate($string, $limit, $break = " ", $pad = "") {
-		if (strlen($string) <= $limit) {
+		if(strlen($string) <= $limit) {
 			return $string;
 		} // return with no change if string is shorter than $limit
 		$string = substr($string, 0, $limit);
-		if (false !== ($breakpoint = strrpos($string, $break))) {
+		if(false !== ($breakpoint = strrpos($string, $break))) {
 			$string = substr($string, 0, $breakpoint);
 		}
 		return $string . $pad;
@@ -68,26 +68,52 @@
 	 * @return string
 	 */
 	function pluralize($a = [], $f = " & ", $s = ", ") {
-		if (count($a) < 3) {
+		if(count($a) < 3) {
 			return implode($f, $a);
 		}
 		$last = array_pop($a);
 		return implode($s, $a) . "{$f}{$last}";
 	}
 
+	/**
+	 * Split up names and ids and then combine into an array of links again
+	 * @param string $names
+	 * @param string $ids
+	 * @param string $base
+	 * @param string $fallback
+	 * @return mixed|string
+	 */
 	function combinize($names = "", $ids = "", $base = "/", $fallback = "") {
-		if (!empty($names) && !empty($ids)) {
+		if(!empty($names)) {
 			$a = array_map("trim", preg_split("([&,])", $names));
-			$b = explode(",", $ids);
+			if(empty($ids)) {
+				$b = array_map("base64_encode", $a);
+			} else {
+				$b = explode(",", $names);
+			}
 			$links = [];
-			if (count($a) === count($b)) {
-				foreach ($a as $k => $v) {
+			if(count($a) === count($b)) {
+				foreach($a as $k => $v) {
 					$links[] = "<a href='{$base}{$b[$k]}'>{$v}</a>";
 				}
 				return pluralize($links);
 			}
 		}
 		return $fallback;
+	}
+
+	/**
+	 * Takes a stringed list of values and base64_encodes them
+	 * @param string $values
+	 * @return string
+	 */
+	function b64ize($values = "") {
+		$a = array_map("trim", preg_split("([&,])", $values));
+		$ret = [];
+		foreach($a as $v) {
+			$ret[] = base64_encode($v);
+		}
+		return pluralize($ret);
 	}
 
 //---------------------------------------------------------------------------------------------------------------
@@ -153,7 +179,7 @@
 		"September",
 		"October",
 		"November",
-		"December"
+		"December",
 	];
 
 //---------------------------------------------------------------------------------------------------------------
@@ -353,5 +379,5 @@
 		"Vietnam",
 		"Yemen",
 		"Zambia",
-		"Zimbabwe"
+		"Zimbabwe",
 	];

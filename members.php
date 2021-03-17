@@ -149,9 +149,10 @@
 								<a href="/info_release.php?filename=<?=base64_encode($row->filename)?>"><?=myTruncate($row->name, 24, " ", "...")?></a>
 							</div>
 							<div class="col-4">
-								<a href="/info_artist.php?artist=<?=base64_encode($row->artists)?>&sort_by=filename"><?=$row->artists?></a>
+								<?=combinize($row->artists, "", "info_artist.php?artist=", $row->artists)?>
 							</div>
-							<div class="col-4"><a href="/info_crew.php?crew=<?=base64_encode($row->crews)?>&sort_by=filename"><?=$row->crews?></a>
+							<div class="col-4">
+								<?=combinize($row->crews, "", "info_crew.php?crew=", $row->crews)?>
 							</div>
 						</div>
 						<?php
@@ -180,10 +181,10 @@
 								href="/info_release.php?filename=<?=$encoded_filename?>"><?=myTruncate($row->name, 24, " ", "...")?></a>
 						</div>
 						<div class="col-4">
-							<a href="/info_artist.php?artist=<?=base64_encode($row->artists)?>&sort_by=filename"><?=$row->artists?></a>
+							<?=combinize($row->artists, "", "info_artist.php?artist=", $row->artists)?>
 						</div>
 						<div class="col-4">
-							<a href="/info_crew.php?crew=<?=base64_encode($row->crews)?>&sort_by=filename"><?=$row->crews?></a>
+							<?=combinize($row->crews, "", "info_crew.php?crew=", $row->crews)?>
 							<?php if($member->id === $_user[ "id" ]) { ?>
 								<input type="submit" class="float-right remove-button" data-id="<?=$row->colly_id?>" value="Remove">
 							<?php } ?>
