@@ -23,7 +23,7 @@ $dirname = $dirname[ 0 ];
 			?>
 			<div class="row">
 				<div class="header col-lg-12">
-					<h1 class="ap-1"><?=$colly->name?></h1>
+					<h1 class="ap-1 bg-header"><?=$colly->name?></h1>
 				</div>
 			</div>
 
