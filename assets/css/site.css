@@ -1885,25 +1885,31 @@ body > div.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-white > span
 }
 
 .select-selected {
-  background-color: #444444;
+    background-color: #444444;
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
 }
 
 /*style the arrow inside the select element:*/
 .select-selected:after {
   position: absolute;
   content: "";
-  top: 6px;
-  right: 8px;
+  top: 20px;
+  right: 16px;
   width: 0;
   height: 0;
   border: 6px solid transparent;
   border-color: #fff transparent transparent transparent;
+  z-index: 99999;
 }
 
 /*point the arrow upwards when the select box is open (active):*/
 .select-selected.select-arrow-active:after {
   border-color: transparent transparent #fff transparent;
-  top: 0px;
+  top: 16px;
+  z-index: 99999;
 }
 
 /*style the items (options), including the selected item:*/
@@ -1914,7 +1920,7 @@ body > div.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-white > span
   border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
   cursor: pointer;
   user-select: none;
-  height: 16px !important;
+/*  height: 16px !important; */
 
 }
 
@@ -1926,6 +1932,12 @@ body > div.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-white > span
   left: 0;
   right: 0;
   z-index: 99;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+div.select-items > div:last-child{
+  padding-bottom: 16px;
 }
 
 /*hide the items when the select box is closed:*/
