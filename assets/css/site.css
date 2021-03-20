@@ -205,13 +205,6 @@ h5, .h5 {
   padding: 0px 0px;
 }
 
-
-a
-{   
-
-}
-
-
 .lead {
   font-size: 16px;
   line-height: 20px;
@@ -483,63 +476,6 @@ input, button, select, optgroup, textarea {
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
 }
 
-/*
-.btn-primary:hover {
-  color: #000000;
-  border-color: #000000;
-  margin-right: 8px !important;
-  width: 132px;
-  text-align: center;
-}
-
-.btn-primary:active {
-  color: #000000;
-  border-color: #000000;
-  margin-right: 8px !important;
-  width: 132px;
-  text-align: center;
-}
-
-.btn-primary:focus {
-  color: #000000;
-  border-color: #000000;
-  margin-right: 8px !important;
-  width: 132px;
-  text-align: center;
-  outline: 0;
-}
-
-.btn-secondary {
-  color: #000000;
-  border-color: #000000;
-  background-color: #bbbbbb;
-  margin-left: 0px !important;
-  margin-right: 8px !important; 
-  width: 132px; 
-  text-align: center;
-}
-
-
-
-.btn-secondary:active {
-  color: #000000;
-  border-color: #000000;
-  background-color: #bbbbbb;
-  margin-right: 8px !important;
-  width: 132px;
-  text-align: center;
-}
-
-.btn-secondary:focus {
-  color: #000000;
-  border-color: #000000;
-  background-color: #bbbbbb;
-  margin-right: 8px !important;
-  width: 132px;
-  text-align: center;
-}
-*/
-
 pre,
 code,
 kbd,
@@ -666,14 +602,14 @@ option {
   background: rgb(255, 85, 85); 
 }
 
-span.black
+.black
 {   
   color: #000000 !important;
   text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.40) !important;
 }
 
 
-span.blue
+.blue
 {   
   color: rgb(0, 0, 170) !important;
   text-shadow: 1px 1px 10px rgba(0, 0, 170, 0.40) !important;
@@ -692,14 +628,13 @@ span.blue
 }
 
 
-span.cyan
+.cyan
 {   
   color: rgb(0, 187, 187) !important;
   text-shadow: 1px 1px 10px rgba(0, 187, 187, 0.40) !important;
-  white-space: pre;
 }
 
-span.red
+.red
 {   
   color: #aa0000 !important;
   text-shadow: 1px 1px 10px rgba(170, 0, 0, 0.40) !important;
@@ -717,7 +652,7 @@ span.red
   text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
 }
 
-span.pink
+.pink
 {   
   color: #bb00bb !important;
   text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
@@ -734,26 +669,24 @@ span.pink
   text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.40) !important;
 }
 
-span.brown
+.brown
 {   
   color: #aa5500 !important;
   text-shadow: 1px 1px 10px rgba(170, 85, 0, 0.40) !important;
 }
 
 
-span.grey
+.grey
 {   
   color: rgb(85, 85, 85) !important;
   text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
-  white-space: pre;
 }         
 
 
-span.lightgrey
+.lightgrey
 {   
   color: rgb(170, 170, 170) !important;
   text-shadow: 1px 1px 10px rgba(170, 170, 170, 0.40) !important;
-  white-space: pre;
 }
 
 
@@ -761,36 +694,35 @@ span.lightgrey
 {   
   color: rgb(255, 255, 255) !important;
   text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.40) !important;
-  white-space: pre;
 }
 
-span.lightcyan
+.lightcyan
 {   
   color: rgb(85, 255, 255) !important;
   text-shadow: 1px 1px 10px rgba(85, 255, 255, 0.40) !important;
 }
 
-span.lightgreen
+.lightgreen
 {   
   color: rgb(85, 255, 85) !important;
   text-shadow: 1px 1px 10px rgba(85, 255, 85, 0.40) !important;
 }
 
 
-span.lightpink
+.lightpink
 {   
   color: rgb(255, 85, 255) !important;
   text-shadow: 1px 1px 10px rgba(255, 85, 255, 0.40) !important;
 }
 
-span.lightblue
+.lightblue
 {   
   color: rgb(85, 85, 255) !important;
   text-shadow: 1px 1px 10px rgba(85, 85, 255, 0.40) !important;
 }
 
 
-span.lightred
+.lightred
 {   
   color: rgb(255, 85, 85) !important;
   text-shadow: 1px 1px 10px rgba(255, 85, 85, 0.40) !important;
@@ -1878,6 +1810,8 @@ body > div.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-white > span
 /*the container must be positioned relative:*/
 .custom-select {
   position: relative;
+  height: initial !important;
+  margin-bottom: 16px;
 }
 
 .custom-select select {
@@ -1920,8 +1854,7 @@ body > div.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-white > span
   border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
   cursor: pointer;
   user-select: none;
-/*  height: 16px !important; */
-
+  height: initial !important;
 }
 
 /*style items (options):*/

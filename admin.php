@@ -655,55 +655,6 @@ include "header.php";
 		}
 
 //---------------------------------------------------------------------------------------------------------------
-// WRITE FORUM DATA TO DB
-//---------------------------------------------------------------------------------------------------------------
-
-		if(isset($_POST['do_edit_forum']) && is_admin())
-		{
-			if(isset($_POST['do_add_new_forum_member']) && is_admin())
-			{
-				$new_forum_member=$_POST['new_forum_member'];
-				$new_forum_member=cleanInsert($new_forum_member);
-
-				$new_forum_name=$_POST['new_forum_name'];
-				$new_forum_name=cleanInsert($new_forum_name);
-
-				$new_forum_id=$_POST['new_forum_id'];
-				$new_forum_id=cleanInsert($new_forum_id);
-
-				$ask="insert into forum_access values (:new_forum_member, :new_forum_name, :new_forum_id";	
-				doQuery($ask, ['new_forum_member' => $new_forum_member, 'new_forum_name' => $new_forum_name, 'new_forum_id' => $new_forum_id]);	
-			}
-			
-			if(isset($_POST['do_add_new_forum']) && is_admin())
-			{
-				$new_forum_name=$_POST['new_forum_name'];
-				$new_forum_name=cleanInsert($new_forum_name); 
-
-				$new_forum_public=$_POST['new_forum_public'];
-				$new_forum_public=cleanInsert($new_forum_public); 
-
-				$ask="select forum_id from forum_forum ORDER BY forum_id DESC LIMIT 1"; // grab latest id
-				$result=fetchAll($ask);
-				foreach ($result as $row)
-				{
-					$new_forum_id=$row->forum_id;
-				}
-				if(!isset($new_forum_id))
-				{
-					$new_forum_id=1;
-				}
-				else
-				{
-					$new_forum_id=$new_forum_id+1;
-				}
-
-				$ask="insert into forum_forum values (:new_forum_id,:new_forum_name,:new_forum_public)";	
-				doQuery($ask,['new_forum_id' => $new_forum_id, 'new_forum_name' => $new_forum_name, 'new_forum_public' => $new_forum_public]);	
-			}
-		}
-
-//---------------------------------------------------------------------------------------------------------------
 // WRITE USER INFO TO DB
 //---------------------------------------------------------------------------------------------------------------
 
@@ -990,7 +941,7 @@ include "header.php";
 						<a class="nav-link" data-toggle="tab" href="#broken">Broken Collys</a>
 					</li>
 				</ul>
-				<div id="myTabContent" class="tab-content">
+				<div id="myTabContent" class="tab-content apt-1" style="background-color: #1a1a1a;">
 
 					<?php
 
