@@ -33,6 +33,9 @@ include "header.php";
   	.hippoinfo-dialogue-width{
   		width: 384px;
   	}  
+      .hipposcope-dialogue-width{
+      width: 384px;
+    }  
   }
 
 /* 
@@ -64,6 +67,9 @@ include "header.php";
   	.hippoinfo-dialogue-width{
   		width: 384px;
   	}  
+      .hipposcope-dialogue-width{
+      width: 384px;
+    }  
   }
 
 /* 
@@ -95,6 +101,9 @@ include "header.php";
   	.hippoinfo-dialogue-width{
   		width: 384px;
   	}  
+      .hipposcope-dialogue-width{
+      width: 384px;
+    }  
   }
 
 /* 
@@ -130,7 +139,10 @@ include "header.php";
 
   	.hippoinfo-dialogue-width{
   		width: 100%;
-  	}  
+  	}
+    .hipposcope-dialogue-width{
+      width: 100%;
+    }  
   }
 
 /* 
@@ -163,6 +175,9 @@ include "header.php";
   	.hippoinfo-dialogue-width{
   		width: 100%;
   	}  
+      .hipposcope-dialogue-width{
+      width: 100%;
+    }  
   }
 
 /* 
@@ -195,6 +210,9 @@ include "header.php";
   	.hippoinfo-dialogue-width{
   		width: 100%;
   	}  
+      .hipposcope-dialogue-width{
+      width: 100%;
+    }  
   }
   .hip-header{
   	position: relative;
@@ -1081,6 +1099,27 @@ include "header.php";
 	background-position: center;
 	color: #000;
 }
+
+.hipposcope{
+  width: 100% !important;
+  height: 170px !important;
+  background: #aaaaaa;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  border-top: 2px solid black !important;
+  border-left: 2px solid black !important;
+  border-bottom: 2px solid white !important;
+  border-right: 2px solid white !important;
+  overflow: hidden;
+  background-image: url("assets/data/hippo/plistbg.png");
+  box-sizing: border-box !important;
+  margin-top: 0px;
+  background-repeat: no-repeat;
+  background-position: center;
+  color: #000;
+}
+
 .nobg{
 	background-image: none;
 }
@@ -1811,6 +1850,24 @@ and (max-device-width : 480px)
 
 			</div>
 		</div>
+    <!-- HIPPOPLAYER EMPTY -->
+
+    <div class="req-container hippo hipposcope-dialogue-width"> <!-- original width: 264px -->
+      <div class="req-title-padding">HippoScope</div>
+      <div class="req-close-button"></div>
+      <div class="req-size-gadget"></div>
+      <div class="req-cycle-gadget"></div>
+      <div class="req-border-3">
+        <div class="req-border-2">
+          <div class="req-border-1">
+            <div class="req-content nobottomborder">
+              <div class="hipposcope nooverflow"> 
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
 		<!-- HIPPOINFO -->
 
