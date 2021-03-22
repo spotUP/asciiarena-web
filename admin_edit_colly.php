@@ -23,24 +23,22 @@ if($getcollyname && (!isset($_POST['do_edit_colly'])))
 	<form enctype="multipart/form-data" action="#colly" method="post">		
 		<div class="row">
 			<div class="col-6">
-				<div class="custom-select">
-					<select name="getcollyname" onchange="this.form.submit();">
-						<?php 
-						if (isset($show_colly_name))
-						{
-							?><option><?=$show_colly_name?></option><?php
-						}
-						$ask="SELECT name, filename FROM collys ORDER BY filename";
-						$result=fetchAll($ask);
-						foreach ($result as $row)
-						{
-							$show_all_colly_names=$row->name;
-							$show_all_colly_filenames=$row->filename;
-							?><option><?=$show_all_colly_filenames?></option><?php
-						}
-						?>
-					</select>
-				</div>
+				<select name="getcollyname" onchange="this.form.submit();">
+					<?php 
+					if (isset($show_colly_name))
+					{
+						?><option><?=$show_colly_name?></option><?php
+					}
+					$ask="SELECT name, filename FROM collys ORDER BY filename";
+					$result=fetchAll($ask);
+					foreach ($result as $row)
+					{
+						$show_all_colly_names=$row->name;
+						$show_all_colly_filenames=$row->filename;
+						?><option><?=$show_all_colly_filenames?></option><?php
+					}
+					?>
+				</select>
 			</div>
 			<div class="col-4">
 				<input type="submit" name="open_edit_colly_field" value="Edit">
