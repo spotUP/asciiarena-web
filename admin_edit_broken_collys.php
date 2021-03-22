@@ -16,7 +16,7 @@
 			$broken_comment=$row->broken_comment;
 
 			?>
-			<div class="row ap-0">
+			<div class="row apb-1">
 
 				<div class="col-2">
 					<a href="info_release.php?filename=<?=$encoded_filename?>"><?=$filename?></a>
