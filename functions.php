@@ -25,8 +25,6 @@
 			$insertstring = base64_decode($insertstring);
 			$insertstring = wordwrap($insertstring, 86, "\n", true);
 			$insertstring = htmlspecialchars($insertstring);
-//			$insertstring = str_replace(" ", "&nbsp;", $insertstring);
-//		$insertstring=makeClickableLinks($insertstring);
 			$insertstring = nl2br($insertstring);
 			$insertstring = str_replace("<br />", "<br>", $insertstring);
 		}
