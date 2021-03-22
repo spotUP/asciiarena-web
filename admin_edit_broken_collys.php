@@ -16,19 +16,27 @@
 			$broken_comment=$row->broken_comment;
 
 			?>
-			<div class="row apb-1">
+				<div class="row apb-1">
+					<div class="col-12">
+						<h1 class="ap-1 bg-header"><a href="info_release.php?filename=<?=$encoded_filename?>"><?=$filename?></a></h1>
+					</div>
+				</div>
 
-				<div class="col-2">
-					<a href="info_release.php?filename=<?=$encoded_filename?>"><?=$filename?></a>
+				<div class="row apl-1 apr-1 apb-1">
+					<div class="col-10">
+						Comment: <?=$broken_comment?>
+					</div>
 				</div>
-				<div class="col-8">
-					Comment: <?=$broken_comment?>
+
+				<div class="row apl-1 apr-1 apb-1">
+					<div class="col-2">
+						<input type="hidden" name="filename" value="<?=$filename?>">
+						<input type="submit" name="colly_fixed" value="Fixed">
+					</div>
 				</div>
-				<div class="col-2">
-					<input type="hidden" name="filename" value="<?=$filename?>">
-					<input type="submit" name="colly_fixed" value="Fixed">
+				<div class="row" style="background-color: #111111;">
+					<br>
 				</div>
-			</div>
 			<?php
 		}
 		?>
