@@ -19,9 +19,7 @@ if(isset($_POST['getsitelogo']) && is_admin())
 ?>
 <div class="tab-pane fade" id="sitelogo">
 	<form enctype="multipart/form-data" action="#sitelogo" method="post">
-		Edit Site Logos			
-
-		<select name="getsitelogo">
+		<select name="getsitelogo" onchange="this.form.submit();">
 			<?php
 			if (isset($_POST['getsitelogo']))
 			{
@@ -41,7 +39,6 @@ if(isset($_POST['getsitelogo']) && is_admin())
 			}
 			?>
 		</select>
-		<input type="submit" value="Select">
 	</form>
 	<?php
 

@@ -20,31 +20,29 @@ if(isset($_POST['getartist']) && is_admin())
 	}
 }
 ?>
-<div class="tab-pane fade" id="artist">
+<div class="tab-pane fade ap-1" id="artist">
 	<form enctype="multipart/form-data" action="#artist" method="post">
-
-		Edit Artist				
-
-		<select name="getartist">
-			<?php
-			if (isset($show_artist_nick))
-			{
-				?>
-				<option selected="selected" value="$show_all_user_names"><?=$show_artist_nick?></option>
+		<div class="custom-select">
+			<select name="getartist" onchange="this.form.submit();">
 				<?php
-			}
-			$ask="select nick from artists";
-			$result=fetchAll($ask);
-			foreach ($result as $row)
-			{
-				$show_all_artist_names=$row->nick;
+				if (isset($show_artist_nick))
+				{
+					?>
+					<option selected="selected" value="$show_all_user_names"><?=$show_artist_nick?></option>
+					<?php
+				}
+				$ask="select nick from artists";
+				$result=fetchAll($ask);
+				foreach ($result as $row)
+				{
+					$show_all_artist_names=$row->nick;
+					?>
+					<option><?=$show_all_artist_names?></option>
+					<?php
+				}
 				?>
-				<option><?=$show_all_artist_names?></option>
-				<?php
-			}
-			?>
-		</select>
-		<input type="submit" value="Select">
+			</select>
+		</div>
 	</form>
 	<form enctype="multipart/form-data" action="#" method="post">
 		<?php
