@@ -807,8 +807,8 @@ include "header.php";
 			$sigdata=$_POST['signature'];
 			$sigdata=cleanInsert($sigdata);
 
-			$font=$_POST['font'];
-			$font=cleanInsert($font);
+//			$font=$_POST['font'];
+//			$font=cleanInsert($font);
 
 			$user_nick=$_POST['usernick'];
 			$user_nick=cleanInsert($user_nick);
@@ -825,23 +825,23 @@ include "header.php";
 				exit();
 			}
 
-			$rgbvalue=$_POST['setcolor'];
-			$rgbvalue = explode(",", $rgbvalue);
-			$delimiter=",";
+//			$rgbvalue=$_POST['setcolor'];
+//			$rgbvalue = explode(",", $rgbvalue);
+//			$delimiter=",";
 
-			file_put_contents("signatures/tempsignature.diz", $signature);
-			load_ansi("signatures/tempsignature.diz","signatures/tempsignature.diz","$font","transparent",0);
+//			file_put_contents("signatures/tempsignature.diz", $signature);
+//			load_ansi("signatures/tempsignature.diz","signatures/tempsignature.diz","$font","transparent",0);
 
-			$old_fg_color_r="170";
-			$old_fg_color_g="170";
-			$old_fg_color_b="170";
+//			$old_fg_color_r="170";
+//			$old_fg_color_g="170";
+//			$old_fg_color_b="170";
 
-			$image = imageCreateFromPNG("signatures/tempsignature.diz.png");
+//			$image = imageCreateFromPNG("signatures/tempsignature.diz.png");
 
-			$fg_color = imageColorExact($image,$old_fg_color_r,$old_fg_color_g,$old_fg_color_b);	//get color to replace
-			imageColorSet($image,$fg_color,$rgbvalue[0],$rgbvalue[1],$rgbvalue[2]);		//replace color with
+//			$fg_color = imageColorExact($image,$old_fg_color_r,$old_fg_color_g,$old_fg_color_b);	//get color to replace
+//			imageColorSet($image,$fg_color,$rgbvalue[0],$rgbvalue[1],$rgbvalue[2]);		//replace color with
 
-			imagepng($image,"signatures/$user_signature.png");	 											// save image		
+//			imagepng($image,"signatures/$user_signature.png");	 											// save image		
 
 			$ask="update users set signature=:user_signature where nick=:edit_user_nick";
 			doQuery($ask, ['user_signature' => $user_signature, 'edit_user_nick' => $edit_user_nick]);
@@ -850,8 +850,8 @@ include "header.php";
 			$ask="update users set sigdata=:sigdata where nick=:edit_user_nick";
 			doQuery($ask, ['sigdata' => $sigdata, 'edit_user_nick' => $edit_user_nick]);
 
-			unlink ("signatures/tempsignature.diz");
-			unlink ("signatures/tempsignature.diz.png");
+//			unlink ("signatures/tempsignature.diz");
+//			unlink ("signatures/tempsignature.diz.png");
 		}
 
 //---------------------------------------------------------------------------------------------------------------
@@ -865,8 +865,8 @@ include "header.php";
 
 			$editedsitelogodata=$_POST['editedsitelogo'];
 
-			$font=$_POST['font'];
-			$font=cleanInsert($font);
+//			$font=$_POST['font'];
+//			$font=cleanInsert($font);
 
 		$editedsitelogodata=utf8_decode($editedsitelogodata); // convert UTF-8 string to ISO-88591
 
@@ -874,40 +874,40 @@ include "header.php";
 		{
 			?>
 			Error
-			You submit an empty logo!
+			You can not submit an empty logo!
 			<meta http-equiv="Refresh" content="2; url=admin.php">
 			<?php
 			exit();
 		}
 
-		$rgbvalue=$_POST['set_edited_logo_color'];
-		$rgbvalue=cleanInsert($rgbvalue);
-		$rgbvalue = explode(",", $rgbvalue);
-		$delimiter=",";
+//		$rgbvalue=$_POST['set_edited_logo_color'];
+//		$rgbvalue=cleanInsert($rgbvalue);
+//		$rgbvalue = explode(",", $rgbvalue);
+//		$delimiter=",";
 
-		file_put_contents("templogo.diz", $editedsitelogodata);
-		load_ansi("templogo.diz","templogo.diz","$font","transparent",0);
+//		file_put_contents("templogo.diz", $editedsitelogodata);
+//		load_ansi("templogo.diz","templogo.diz","$font","transparent",0);
 
-		$old_fg_color_r="170";
-		$old_fg_color_g="170";
-		$old_fg_color_b="170";
+//		$old_fg_color_r="170";
+//		$old_fg_color_g="170";
+//		$old_fg_color_b="170";
 
-		$image = imageCreateFromPNG("templogo.diz.png");
+//		$image = imageCreateFromPNG("templogo.diz.png");
 
-		$fg_color = imageColorExact($image,$old_fg_color_r,$old_fg_color_g,$old_fg_color_b);	//get color to replace
-		imageColorSet($image,$fg_color,$rgbvalue[0],$rgbvalue[1],$rgbvalue[2]);		//replace color with
+//		$fg_color = imageColorExact($image,$old_fg_color_r,$old_fg_color_g,$old_fg_color_b);	//get color to replace
+//		imageColorSet($image,$fg_color,$rgbvalue[0],$rgbvalue[1],$rgbvalue[2]);		//replace color with
 
-		imagepng($image,"logos/$logo");	 											// save image		
+//		imagepng($image,"logos/$logo");	 											// save image		
 
-		unlink ("templogo.diz");
-		unlink ("templogo.diz.png");
+//		unlink ("templogo.diz");
+//		unlink ("templogo.diz.png");
 
 		$editedsitelogodata=cleanInsertPost($editedsitelogodata);
 		$ask_update="update logos set ascii=:editedsitelogodata where filename=:logo";
 		doQuery($ask_update,['editedsitelogodata' => $editedsitelogodata, 'logo' => $logo]);	
 
-		$ask_update="update logos set base64='1' where filename=:logo";
-		doQuery($ask_update,['logo' => $logo]);	
+//		$ask_update="update logos set base64='1' where filename=:logo";
+//		doQuery($ask_update,['logo' => $logo]);	
 	}
 
 //----------------------------------------------------------------------------------------------------------------------------
