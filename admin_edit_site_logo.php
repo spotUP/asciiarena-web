@@ -56,7 +56,7 @@ if(isset($_POST['getsitelogo']) && is_admin())
 		?>
 		<form enctype="multipart/form-data" action="#" method="post">
 
-			<textarea name="editedsitelogo" wrap="physical" cols="80" rows="8"><?=$ascii?></textarea>
+			<textarea name="editedsitelogo" wrap="physical" cols="80" rows="8"><pre><?=$ascii?></pre></textarea>
 
 			<select name="font">
 				<option value="topaz">Topaz</option>
