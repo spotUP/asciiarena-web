@@ -55,12 +55,12 @@ if(isset($_POST['getsitelogo']) && is_admin())
 		?>
 		<form enctype="multipart/form-data" action="#" method="post">
 			<div class="row apb-1 apt-1">
-				<div class="col-12">
-					<textarea name="editedsitelogo" wrap="physical" cols="80" rows="10"><?=$ascii?></textarea>
+				<div class="col-12 d-flex justify-content-center">
+					<textarea name="editedsitelogo" wrap="physical" class="w-100" rows="10"><?=$ascii?></textarea>
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-9 d-flex justify-content-between">
+				<div class="col-12 d-flex justify-content-between">
 					<input type="hidden" name="getsitelogo" value="<?=$editsitelogo?>">
 					<input type="submit" name="delete_sitelogo" value="Delete">
 					<input type="submit" value="Save">
