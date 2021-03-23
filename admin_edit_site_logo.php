@@ -39,6 +39,7 @@ if(isset($_POST['getsitelogo']) && is_admin())
 			}
 			?>
 		</select>
+		<input type="hidden" name="getsitelogo" value="<?=$editsitelogo?>">
 	</form>
 	<?php
 	if (isset($_POST['getsitelogo']) && (!isset($_POST['edit_sitelogo'])))
