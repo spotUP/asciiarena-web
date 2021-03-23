@@ -16,7 +16,7 @@ if(isset($_POST['getsitelogo']) && is_admin())
 		$ascii=$row->ascii;
 	}
 }
-		echo "$ascii";
+		echo "asciilogo $ascii";
 
 ?>
 <div class="tab-pane fade ap-1" id="sitelogo">
