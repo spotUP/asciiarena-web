@@ -56,7 +56,7 @@ if(isset($_POST['getsitelogo']) && is_admin())
 		<form enctype="multipart/form-data" action="#" method="post">
 			<div class="row apb-1 apt-1">
 				<div class="col-12">
-					<textarea name="editedsitelogo" wrap="physical" cols="80" rows="8"><?=$ascii?></textarea>
+					<textarea name="editedsitelogo" wrap="physical" cols="80" rows="10"><?=$ascii?></textarea>
 				</div>
 			</div>
 			<div class="row">
