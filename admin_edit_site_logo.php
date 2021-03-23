@@ -13,20 +13,23 @@ if(isset($_POST['getsitelogo']) && is_admin())
 	foreach ($result as $row)
 	{
 		$logo_id=$row->logo_id;
+		$author=$row->author;		
 		$ascii=$row->ascii;
 	}
 }
-		echo "asciilogo $ascii";
+		echo "AUTHOR: $author<br>";
+		echo "LOGO ID: $getsitelogo<br>";
+		echo "$ascii<br>";
 
 ?>
 <div class="tab-pane fade ap-1" id="sitelogo">
-	<form enctype="multipart/form-data" action="#sitelogo" method="post">
+	<form action="#sitelogo" method="post">
 		<select class="w-100" name="getsitelogo" onchange="this.form.submit();">
 			<?php
 			if (isset($_POST['getsitelogo']))
 			{
 				?>
-				<option selected="selected"><?=$getsitelogo?></option>
+				<option selected="selected">Logo <?=$getsitelogo?> by <?=$author?></option>
 				<?php
 			}
 
@@ -55,7 +58,7 @@ if(isset($_POST['getsitelogo']) && is_admin())
 				$ascii = htmlspecialchars($row->ascii);
 			}
 			?>
-			<form enctype="multipart/form-data" action="#" method="post">
+			<form action="#" method="post">
 				<div class="row apb-1 apt-1">
 					<div class="col-12">
 						<textarea name="editedsitelogo" wrap="physical" cols="80" rows="8"><?=$ascii?></textarea>
