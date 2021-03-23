@@ -12,14 +12,10 @@ if(isset($_POST['getsitelogo']) && is_admin())
 	$result=fetchAll($ask, ['getsitelogo' => $getsitelogo]);
 	foreach ($result as $row)
 	{
-		$logo_id=$row->logo_id;
 		$author=$row->author;		
 		$ascii=$row->ascii;
 	}
 }
-		echo "AUTHOR: $author<br>";
-		echo "LOGO ID: $getsitelogo<br>";
-		echo "$ascii<br>";
 
 ?>
 <div class="tab-pane fade ap-1" id="sitelogo">
@@ -45,43 +41,46 @@ if(isset($_POST['getsitelogo']) && is_admin())
 			?>
 		</select>
 		<?php
-
-		if (isset($_POST['edit_sitelogo']))
+		if (isset($_POST['getsitelogo']) && (!isset($_POST['edit_sitelogo'])))
 		{
-			$editsitelogo=$_POST['getsitelogo'];
-			$ask="select * from logos where logo_id=:editsitelogo";
-			$result=fetchAll($ask, [ 'editsitelogo' => $editsitelogo]);
-			foreach ($result as $row)
-			{
-				$logo_id = $row->logo_id;
-				$author = $row->author;
-				$ascii = htmlspecialchars($row->ascii);
-			}
 			?>
-			<form action="#" method="post">
-				<div class="row apb-1 apt-1">
-					<div class="col-12">
-						<textarea name="editedsitelogo" wrap="physical" cols="80" rows="8"><?=$ascii?></textarea>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-12">
-						<input type="hidden" name="getsitelogo" value="<?=$editsitelogo?>">
-						<input type="submit" value="Submit">
-					</div>
-				</div>
-				<?php
-			} 
+			<input type="hidden" name="getsitelogo" value="<?=$_POST['getsitelogo']?>">
+			<input type="submit" name="edit_sitelogo" value="Edit">
+			<input type="submit" name="delete_sitelogo" value="Delete">
 
-			if (isset($_POST['getsitelogo']) && (!isset($_POST['edit_sitelogo'])))
-			{
-				?>
-				<input type="hidden" name="getsitelogo" value="<?=$_POST['getsitelogo']?>">
-				<input type="submit" name="edit_sitelogo" value="Edit">
-				<input type="submit" name="delete_sitelogo" value="Delete">
+			<?php
+		} 
+		?>
+	</form>
 
-				<?php
-			} 
-			?>
-		</form>
-	</div>
+	<?php
+
+	if (isset($_POST['edit_sitelogo']))
+	{
+		$editsitelogo=$_POST['getsitelogo'];
+		$ask="select * from logos where logo_id=:editsitelogo";
+		$result=fetchAll($ask, [ 'editsitelogo' => $editsitelogo]);
+		foreach ($result as $row)
+		{
+			$logo_id = $row->logo_id;
+			$author = $row->author;
+			$ascii = htmlspecialchars($row->ascii);
+		}
+		?>
+		<form action="#" method="post">
+			<div class="row apb-1 apt-1">
+				<div class="col-12">
+					<textarea name="editedsitelogo" wrap="physical" cols="80" rows="8"><?=$ascii?></textarea>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12">
+					<input type="hidden" name="getsitelogo" value="<?=$editsitelogo?>">
+					<input type="submit" value="Submit">
+				</div>
+			</div>
+			<?php
+		} 
+		?>
+	</form>
+</div>
