@@ -12,20 +12,19 @@ if(isset($_POST['getsitelogo']) && is_admin())
 	$result=fetchAll($ask, ['getsitelogo' => $getsitelogo]);
 	foreach ($result as $row)
 	{
-		$author=$row->author;		
+		$logo_id=$row->logo_id;
 		$ascii=$row->ascii;
 	}
 }
-
 ?>
 <div class="tab-pane fade ap-1" id="sitelogo">
-	<form action="#sitelogo" method="post">
+	<form enctype="multipart/form-data" action="#sitelogo" method="post">
 		<select class="w-100" name="getsitelogo" onchange="this.form.submit();">
 			<?php
 			if (isset($_POST['getsitelogo']))
 			{
 				?>
-				<option selected="selected">Logo <?=$getsitelogo?> by <?=$author?></option>
+				<option selected="selected"><?=$getsitelogo?></option>
 				<?php
 			}
 
@@ -40,22 +39,9 @@ if(isset($_POST['getsitelogo']) && is_admin())
 			}
 			?>
 		</select>
-		<?php
-		if (isset($_POST['getsitelogo']) && (!isset($_POST['edit_sitelogo'])))
-		{
-			?>
-			<input type="hidden" name="getsitelogo" value="<?=$_POST['getsitelogo']?>">
-			<input type="submit" name="edit_sitelogo" value="Edit">
-			<input type="submit" name="delete_sitelogo" value="Delete">
-
-			<?php
-		} 
-		?>
 	</form>
-
 	<?php
-
-	if (isset($_POST['edit_sitelogo']))
+	if (isset($_POST['getsitelogo']) && (!isset($_POST['edit_sitelogo'])))
 	{
 		$editsitelogo=$_POST['getsitelogo'];
 		$ask="select * from logos where logo_id=:editsitelogo";
@@ -67,20 +53,21 @@ if(isset($_POST['getsitelogo']) && is_admin())
 			$ascii = htmlspecialchars($row->ascii);
 		}
 		?>
-		<form action="#" method="post">
+		<form enctype="multipart/form-data" action="#" method="post">
 			<div class="row apb-1 apt-1">
 				<div class="col-12">
 					<textarea name="editedsitelogo" wrap="physical" cols="80" rows="8"><?=$ascii?></textarea>
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-12">
+				<div class="col-9 d-flex justify-content-between">
 					<input type="hidden" name="getsitelogo" value="<?=$editsitelogo?>">
-					<input type="submit" value="Submit">
+					<input type="submit" name="delete_sitelogo" value="Delete">
+					<input type="submit" value="Save">
 				</div>
 			</div>
-			<?php
-		} 
-		?>
-	</form>
+		</form>
+		<?php
+	} 
+	?>
 </div>
