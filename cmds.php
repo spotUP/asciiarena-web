@@ -7,16 +7,6 @@
 
 	$is_ajax = ($_SERVER[ "HTTP_X_REQUESTED_WITH" ] === "XMLHttpRequest") ?? false;
 
-	function json_out($data = [], $code = 200) {
-		http_response_code($code);
-		header("Content-Type: application/json");
-		try {
-			return json_encode($data, JSON_THROW_ON_ERROR);
-		} catch (JsonException $e) {
-			return "[]";
-		}
-	}
-
 	switch ($cmd) {
 		case "login":
 			$pw = $_POST[ "password" ] ?? "";
