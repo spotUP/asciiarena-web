@@ -228,8 +228,14 @@ EOD;
 				else 
 				{
 					?>
-					<li class="nav-item">
-						<a class="nav-link ascii" href="/submit.php">SUBMiT</a>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle ascii" style="padding-right: 8px;" data-toggle="dropdown" href="/admin.php" id="themes">SUBMiT<span class="caret" style="padding-right: 8px;"></span></a>
+						<div class="dropdown-menu ascii" aria-labelledby="themes">
+							<a class="dropdown-item ascii" href="/submit.php#colly">Colly<span style="padding-left: 7px;">       </span></a>
+							<a class="dropdown-item ascii" href="/submit.php#crew">Crew<span style="padding-left: 4px;">    </span></a>
+							<a class="dropdown-item ascii" href="/submit.php#artist">Artist<span style="padding-left: 10px;">     </span></a>
+							<a class="dropdown-item ascii" href="/submit.php#bbs">BBS<span style="font-size: 16px;"> </span></a>
+						</div>
 					</li>
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle ascii" style="padding-right: 8px;" data-toggle="dropdown" href="#">ACCOUNT<span class="caret" style="padding-right: 8px;"></span></a>
