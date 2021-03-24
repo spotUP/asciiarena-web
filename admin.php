@@ -227,23 +227,6 @@ $(document).ready(function() {
 		}	
 
 //---------------------------------------------------------------------------------------------------------------
-// DELETE BBS FROM DB
-//---------------------------------------------------------------------------------------------------------------
-
-		if(isset($_POST['delete_bbs']) && is_admin())
-		{
-			$delete_bbs=$_POST['getbbs'];
-			$delete_bbs=cleanInsert($delete_bbs);
-
-			if(!empty($delete_bbs))
-			{
-				$ask="delete from bbses where name=:delete_bbs";
-				doQuery($ask,[ 'delete_bbs' => $delete_bbs ]);
-			}
-			?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
-		}	
-
-//---------------------------------------------------------------------------------------------------------------
 // DELETE ARTIST FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
@@ -601,61 +584,6 @@ $(document).ready(function() {
 
 				$ask="update artists set acronym=:edit_artist_acronym where nick=:edit_artist_nick";	
 				doQuery($ask,['edit_artist_acronym' => $edit_artist_acronym, 'edit_artist_nick' => $edit_artist_nick]);	
-			}
-		}
-
-//---------------------------------------------------------------------------------------------------------------
-// WRITE BBS INFO TO DB
-//---------------------------------------------------------------------------------------------------------------
-
-		if(isset($_POST['do_edit_bbs']) && is_admin())
-		{
-			if(isset($_POST['edit_bbs_name']) && is_admin())
-			{
-				$bbs_name=$_POST['getbbs'];
-				$bbs_name=cleanInsert($bbs_name);
-
-				$edit_bbs_name=$_POST['edit_bbs_name'];
-				$edit_bbs_name=cleanInsert($edit_bbs_name); 
-
-				$ask="update bbses set name=:edit_bbs_name where name=:bbs_name";	
-				doQuery($ask, ['edit_bbs_name' => $edit_bbs_name, 'bbs_name' => $bbs_name]);	
-
-				$ask="update bbs_of set name=:edit_bbs_name where name=:bbs_name";	
-				doQuery($ask, ['edit_bbs_name' => $edit_bbs_name, 'bbs_name' => $bbs_name]);	
-			}
-			if(isset($_POST['edit_bbs_sysop']) && is_admin())
-			{
-				$bbs_name=$_POST['getbbs'];
-				$bbs_name=cleanInsert($bbs_name);
-
-				$edit_bbs_sysop=$_POST['edit_bbs_sysop'];
-				$edit_bbs_sysop= cleanInsert($edit_bbs_sysop); 
-
-				$ask="update bbses set sysop=:edit_bbs_sysop where name=:edit_bbs_name";	
-				doQuery($ask,['edit_bbs_sysop' => $edit_bbs_sysop, 'edit_bbs_name' => $edit_bbs_name]);	
-			}
-			if(isset($_POST['edit_bbs_address']) && is_admin())
-			{
-				$bbs_name=$_POST['getbbs'];
-				$bbs_name=cleanInsert($bbs_name);
-
-				$edit_bbs_address = $_POST['edit_bbs_address'];
-				$edit_bbs_address = cleanInsert($edit_bbs_address); 
-
-				$ask="update bbses set address=:edit_bbs_address where name=:edit_bbs_name";	
-				doQuery($ask, ['edit_bbs_address' => $edit_bbs_address, 'edit_bbs_name' => $edit_bbs_name]);	
-			}
-			if(isset($_POST['edit_bbs_number']) && is_admin())
-			{
-				$bbs_name=$_POST['getbbs'];
-				$bbs_name=cleanInsert($bbs_name);
-
-				$edit_bbs_number=$_POST['edit_bbs_number'];
-				$edit_bbs_number=cleanInsert($edit_bbs_number); 
-
-				$ask="update bbses set number=:edit_bbs_number where name=:edit_bbs_name";	
-				doQuery($ask,['edit_bbs_number' => $edit_bbs_number, 'edit_bbs_name' => $edit_bbs_name]);	
 			}
 		}
 
