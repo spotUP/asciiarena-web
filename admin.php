@@ -916,6 +916,7 @@ include "header.php";
 
 	<div class="row">
 		<div class="col-lg-12">
+			<?php if(is_admin()) { ?>
 			<h2 class="bg-header" id="nav-tabs">ADMiN</h2>
 			<div class="bs-component">
 				<ul class="nav nav-tabs">
@@ -956,10 +957,17 @@ include "header.php";
 					?>
 				</div>
 			</div>
+			<?php } else { ?>
+				<div class="bs-component">
+					<div class="animate__animated animate__shakeX alert alert-dismissible alert-primary">
+						<button type="button" class="close" data-dismiss="alert">x</button>
+						You need to be <a class="ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">an admin</a>to use this feature.
+					</div>
+				</div>
+			<?php } ?>
 		</div>
 	</div>
 </div>
-
 <div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
 	<?php include "sidebar.php"; ?>
 </div>
@@ -968,4 +976,4 @@ include "header.php";
 	<?php include "sidebar_right.php"; ?>
 </div>
 
-<?php include "footer.php"; ?>
+<?php include "footer.php";
