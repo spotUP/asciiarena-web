@@ -47,8 +47,7 @@ EOD;
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 	<link rel="stylesheet" href="/assets/css/bootstrap.css" media="screen">
 	<link rel="stylesheet" href="/assets/css/site.css" media="screen">
-	<script src="https://code.jquery.com/jquery-3.5.1.min.js"
-	integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 	<script src="https://unpkg.com/@popperjs/core@2"></script>
 	<script src="/assets/js/bootstrap.bundle.js"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
@@ -207,114 +206,114 @@ EOD;
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle ascii" style="padding-right: 8px;" data-toggle="dropdown" href="/collys.php?sort_by=releasedate" id="themes">COLLYS<span class="caret" style="padding-right: 8px;"></span></a>
 					<div class="dropdown-menu ascii" aria-labelledby="themes">
-						<a class="dropdown-item ascii" href="/collys.php?sort_by=name">By Name<span
-							style="padding-left: 7px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
-							<a class="dropdown-item ascii" href="/collys.php?sort_by=filename">By Filename<span
-								style="padding-left: 4px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
-								<a class="dropdown-item ascii" href="/collys.php?sort_by=nick">By Artist<span
-									style="padding-left: 10px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
-									<a class="dropdown-item ascii" href="/collys.php?sort_by=releasedate">By Release Date<span
-										style="font-size: 16px; font-family:Monaco, monospace;">&nbsp;</span></a>
-										<a class="dropdown-item ascii" href="/collys.php?sort_by=timestamp">By Upload Date<span
-											style="padding-left: 8px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;</span></a>
-											<a class="dropdown-item ascii" href="/collys.php?sort_by=uploader">By Uploader<span
-												style="padding-left: 13px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;</span></a>
-											</div>
-										</li>
-										<li class="nav-item">
-											<a class="nav-link ascii" style="padding-right: 8px;" href="artists.php?sort_by=nick">ARTiSTS</a>
-										</li>
-										<li class="nav-item">
-											<a class="nav-link ascii" style="padding-right: 8px;" href="crews.php">CREWS</a>
-										</li>
-										<?php
-										if(!is_logged_in()) {
-											?>
-											<a class="nav-link ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">LOGiN</a>
-											<?php
-										} else {
-											?>
-											<li class="nav-item">
-												<a class="nav-link ascii" href="/submit.php">SUBMiT</a>
-											</li>
-											<li class="nav-item dropdown">
-												<a class="nav-link dropdown-toggle ascii" style="padding-right: 8px;" data-toggle="dropdown" href="#">ACCOUNT<span class="caret" style="padding-right: 8px;"></span></a>
-												<div class="dropdown-menu ascii" aria-labelledby="account"><a class="dropdown-item ascii" href="/messages.php">MAiL<span style="padding-left: 4px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;</span></a>
-													<a class="dropdown-item ascii" href="/crib.php">CRiB<span style="padding-left: 4px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;</span></a>
-													<div class="dropdown-divider">~~~~~~~~</div>
-													<?php
-													if(is_admin()) {
-														echo "<a class='dropdown-item ascii' href='/admin.php'>ADMiN<span style='padding-left: 5px; font-size: 16px; font-family:Monaco, monospace;'>&nbsp;&nbsp;</span></a>";
-													}
-													?>
-													<div class="dropdown-divider">~~~~~~~~</div>
-													<a class="dropdown-item ascii" href="/cmds.php?cmd=logout">LOGOUT<span
-														style="padding-left: 7px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;</span></a>
-													</div>
-												</li>
-												<?php
-											}
-											?>
-										<!--
-										<li class="nav-item">
-											<a class="nav-link ascii" style="padding-right: 8px;" target="popup"
-											onclick="window.open('/up-rough-amp/index.html','name','width=275,height=450')">MUSIC PLAYER </a>
-										</li>
-									-->
-									<li class="nav-item">
-										<a class="nav-link ascii" style="padding-right: 8px;" href="/about.php">ABOUT</a>
-									</li>
-									<li class="nav-item">
-										<a class="nav-link ascii" href="/fonteditor.php">ASCII STYLE DESIGNER </a>
-									</li>
-								</ul>
-							</div>
-						</div>
+						<a class="dropdown-item ascii" href="/collys.php?sort_by=name">By Name<span style="padding-left: 7px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
+						<a class="dropdown-item ascii" href="/collys.php?sort_by=filename">By Filename<span style="padding-left: 4px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
+						<a class="dropdown-item ascii" href="/collys.php?sort_by=nick">By Artist<span style="padding-left: 10px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
+						<a class="dropdown-item ascii" href="/collys.php?sort_by=releasedate">By Release Date<span style="font-size: 16px; font-family:Monaco, monospace;">&nbsp;</span></a>
+						<a class="dropdown-item ascii" href="/collys.php?sort_by=timestamp">By Upload Date<span style="padding-left: 8px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;</span></a>
+						<a class="dropdown-item ascii" href="/collys.php?sort_by=uploader">By Uploader<span style="padding-left: 13px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;</span></a>
 					</div>
-
-					<div class="container-fluid m-0 p-0">
-						<div class="row" style="padding-top: 58px; padding-bottom: 16px;">
-							<div class="col-12 d-flex justify-content-center">
-								<pre class="overflow-hidden d-none d-lg-block" style="position: relative; left: 32px;"><span class="magenta"><?=$stars1?></span></pre>
-								<div class="overflow-hidden d-none d-lg-block mx-auto">
-									<div id="logoswitcher">
-										<div class="logo nolink overflow-hidden"><?=implode('</div><div class="logo nolink" style="display: none;">', $logos)?></div>
-									</div>
-								</div>
-								<pre class="overflow-hidden d-lg-none"><span class="magenta nolink"><?=$mobilelogo?></span></pre>
-								<pre class="overflow-hidden d-none d-lg-block aml-1" style="position: relative; left: -32px;"><span class="magenta"><?=$stars2?></span></pre>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link ascii" style="padding-right: 8px;" href="artists.php?sort_by=nick">ARTiSTS</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link ascii" style="padding-right: 8px;" href="crews.php">CREWS</a>
+				</li>
+				<?php
+				if(!is_logged_in()) 
+				{
+					?><a class="nav-link ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">LOGiN</a><?php
+				} 
+				else 
+				{
+					?>
+					<li class="nav-item">
+						<a class="nav-link ascii" href="/submit.php">SUBMiT</a>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle ascii" style="padding-right: 8px;" data-toggle="dropdown" href="#">ACCOUNT<span class="caret" style="padding-right: 8px;"></span></a>
+						<div class="dropdown-menu ascii" aria-labelledby="account"><a class="dropdown-item ascii" href="/messages.php">MAiL<span style="padding-left: 4px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;</span></a>
+							<a class="dropdown-item ascii" href="/crib.php">CRiB<span style="padding-left: 4px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;</span></a>
+							<a class="dropdown-item ascii" href="/cmds.php?cmd=logout">LOGOUT<span
+								style="padding-left: 7px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;</span></a>
 							</div>
-						</div>
-						<script>
-							switcharoo("#logoswitcher > div", 60000);
-						</script>
-						<?php if(!empty($h1)) {
-							$switcher = (is_array($h1)) ? "switcher" : ""; ?>
-							<div class="page-header">
-								<div class="row">
-									<div class="col-12">
-										<h1 class="bg-header <?=$switcher?>" style="min-height: 16px;">
-											<span><?php if(!empty($switcher)) {
-												echo implode("</span><span style='display: none;'>", $h1);
-											} else {
-												echo $h1;
-											} ?></span>
-										</h1>
-									</div>
+						</li>
+						<!--<li class="nav-item"><a class="nav-link ascii" style="padding-right: 8px;" target="popup" onclick="window.open('/up-rough-amp/index.html','name','width=275,height=450')">MUSIC PLAYER </a> </li> -->
+						<?php
+						if(is_admin()) 
+						{
+							?>
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle ascii" style="padding-right: 8px;" data-toggle="dropdown" href="/admin.php" id="themes">ADMiN<span class="caret" style="padding-right: 8px;"></span></a>
+								<div class="dropdown-menu ascii" aria-labelledby="themes">
+									<a class="dropdown-item ascii" href="/admin.php#colly">Edit Colly<span style="padding-left: 7px;">       </span></a>
+									<a class="dropdown-item ascii" href="/admin.php#crew">Edit Crew<span style="padding-left: 4px;">    </span></a>
+									<a class="dropdown-item ascii" href="/admin.php#artist">Edit Artist<span style="padding-left: 10px;">     </span></a>
+									<a class="dropdown-item ascii" href="/admin.php#edituser">Edit User<span style="font-size: 16px;"> </span></a>
+									<a class="dropdown-item ascii" href="/admin.php#sitelogo">Edit Logo<span style="padding-left: 8px;"> </span></a>
+									<a class="dropdown-item ascii" href="/admin.php#bbs">Edit BBS<span style="padding-left: 13px;">   </span></a>
+									<a class="dropdown-item ascii" href="/admin.php#broken">Broken Collys<span style="padding-left: 13px;">   </span></a>
 								</div>
-							</div>
-							<?php if(!empty($switcher)) { ?>
-								<script>
-									switcharoo(".switcher > span", 2890);
-								</script>
-							<?php }
+							</li>
+							<?php
 						}
-						?>
-						<div class="col-12 p-0 m-0 apb-1 amt-1">
-							<div class="bs-component">
-								<div class="animate__animated animate__tada alert alert-dismissible alert-danger hide-on-landscape">
-									<button type="button" class="close" data-dismiss="alert">x</button>
-									Rotate your phone for a better viewing experience.
-								</div>
-							</div>
-						</div>
+					}
+					?>
+					<li class="nav-item">
+						<a class="nav-link ascii" style="padding-right: 8px;" href="/about.php">ABOUT</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link ascii" href="/fonteditor.php">ASCII STYLE DESIGNER </a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid m-0 p-0">
+		<div class="row" style="padding-top: 58px; padding-bottom: 16px;">
+			<div class="col-12 d-flex justify-content-center">
+				<pre class="overflow-hidden d-none d-lg-block" style="position: relative; left: 32px;"><span class="magenta"><?=$stars1?></span></pre>
+				<div class="overflow-hidden d-none d-lg-block mx-auto">
+					<div id="logoswitcher">
+						<div class="logo nolink overflow-hidden"><?=implode('</div><div class="logo nolink" style="display: none;">', $logos)?></div>
+					</div>
+				</div>
+				<pre class="overflow-hidden d-lg-none"><span class="magenta nolink"><?=$mobilelogo?></span></pre>
+				<pre class="overflow-hidden d-none d-lg-block aml-1" style="position: relative; left: -32px;"><span class="magenta"><?=$stars2?></span></pre>
+			</div>
+		</div>
+		<script>
+			switcharoo("#logoswitcher > div", 60000);
+		</script>
+		<?php if(!empty($h1)) {
+			$switcher = (is_array($h1)) ? "switcher" : ""; ?>
+			<div class="page-header">
+				<div class="row">
+					<div class="col-12">
+						<h1 class="bg-header <?=$switcher?>" style="min-height: 16px;">
+							<span><?php if(!empty($switcher)) {
+								echo implode("</span><span style='display: none;'>", $h1);
+							} else {
+								echo $h1;
+							} ?></span>
+						</h1>
+					</div>
+				</div>
+			</div>
+			<?php if(!empty($switcher)) { ?>
+				<script>
+					switcharoo(".switcher > span", 2890);
+				</script>
+			<?php }
+		}
+		?>
+		<div class="col-12 p-0 m-0 apb-1 amt-1">
+			<div class="bs-component">
+				<div class="animate__animated animate__tada alert alert-dismissible alert-danger hide-on-landscape">
+					<button type="button" class="close" data-dismiss="alert">x</button>
+					Rotate your phone for a better viewing experience.
+				</div>
+			</div>
+		</div>
