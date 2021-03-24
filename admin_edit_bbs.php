@@ -6,8 +6,8 @@
 <script>
 	function getBBS() {
 		const id = $("#fetch_id").val();
-		if(id > 0) {
-			$.get(`/admin_cmds.php?cmd=get_bbs&id=${id}`, function(data) {
+		if (id > 0) {
+			$.get(`/admin_cmds.php?cmd=get_bbs&id=${id}`, function (data) {
 				$('#bbs_id').val(data[0].id);
 				$('#bbs_name').val(data[0].name);
 				$('#bbs_sysop').val(data[0].sysop);
@@ -23,14 +23,44 @@
 		let bbslist = $("#fetch_id");
 		bbslist.empty();
 		bbslist.append($("<option/>").val("0").text("Select BBS"));
-		$.get("/admin_cmds.php?cmd=get_bbs", function(data) {
-			$.each(data, function(i, bbs) {
+		$.get("/admin_cmds.php?cmd=get_bbs", function (data) {
+			$.each(data, function (i, bbs) {
 				bbslist.append($("<option/>").val(bbs.id).text(bbs.name));
 			});
 		});
 	}
+
+	function delBBS() {
+		const activeName = $("#bbs_name").val();
+		if (activeName !== "") {
+			if (confirm(`Are you sure you want to delete ${activeName}?`)) {
+				const form = $("#del_bbs_form");
+				$("#del_bbs_id").val($("#bbs_id").val());
+				const url = form.attr("action");
+				$.ajax({
+					"type": "POST",
+					"url": url,
+					"data": form.serialize(),
+					"success": () => {
+						showAlert("BBS deleted!", "#bbs");
+						$("#bbs_id, #bbs_name, #bbs_sysop, #bbs_number, #bbs_address").val('');
+						getBBSList();
+					}
+				});
+			}
+		}
+	}
+
+	function showAlert(content, prependTo) {
+		const alertContent = `<div class="bs-component quick-alert amb-1"><div class="animate__animated animate__shakeX alert alert-dismissible alert-primary"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div></div>`;
+		$(prependTo).prepend(alertContent);
+	}
+
 </script>
 <div class="tab-pane fade ap-1" id="bbs">
+	<form id="del_bbs_form" action="/admin_cmds.php?cmd=del_bbs" method="post">
+		<input type="hidden" name="id" id="del_bbs_id">
+	</form>
 	<div class="row apb-1">
 		<div class="col-12">
 			<form>
@@ -79,7 +109,7 @@
 		<div class="row apt-1">
 			<div class="col-12">
 				<input type="submit" name="do_edit_bbs" value="Submit">
-				<input type="button" id="delete_bbs" name="delete_bbs" value="Delete">
+				<input type="button" id="delete_bbs" name="delete_bbs" value="Delete" onclick="delBBS();">
 			</div>
 		</div>
 	</form>
@@ -95,7 +125,7 @@
 				"url": url,
 				"data": form.serialize(),
 				"success": () => {
-					alert("BBS saved!");
+					showAlert("BBS saved!", "#bbs");
 					$("#bbs_id, #bbs_name, #bbs_sysop, #bbs_number, #bbs_address").val('');
 					getBBSList();
 				}

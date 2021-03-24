@@ -30,19 +30,14 @@
 					exit(json_out($data));
 				}
 				exit(json_out(["status" => false], 404));
-			case "delete_bbs":
-				if(isset($_POST[ 'delete_bbs' ])) {
-					$delete_bbs = $_POST[ 'getbbs' ];
-					$delete_bbs = cleanInsert($delete_bbs);
-
-					if(!empty($delete_bbs)) {
-						$ask = "delete from bbses where name=:delete_bbs";
-						doQuery($ask, ['delete_bbs' => $delete_bbs]);
+			case "del_bbs":
+				if(!empty($_POST[ 'id' ])) {
+					$id = (int)$_POST[ 'id' ];
+					if($id && doQuery("DELETE FROM bbses WHERE id = :id", [":id" => $id])) {
+						exit(json_out(["status" => true]));
 					}
-					?>
-					<meta http-equiv="Refresh" content="0; url=admin.php"><?php
 				}
-				break;
+				exit(json_out(["status" => false], 404));
 			case "save_bbs":
 				$response = 200;
 				$data = [
