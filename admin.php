@@ -2,8 +2,13 @@
 require_once "session.php";
 $h1 = ["wELCOME tO aSCIIaRENA", "bY uP rOUGH and diViNE sTYLERS"];
 include "header.php";
-
 ?>
+<script type="text/javascript">
+$(document).ready(function() {
+   var hash = window.location.hash;
+   hash && $('ul.nav a[href="' + hash + '"]').tab('show');
+});
+</script>
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
 <?php
