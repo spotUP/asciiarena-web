@@ -52,7 +52,7 @@
 	}
 
 	function showAlert(content, prependTo) {
-		const alertContent = `<div class="bs-component quick-alert amb-1"><div class="animate__animated animate__shakeX alert alert-dismissible alert-primary"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div></div>`;
+		const alertContent = `<div class="bs-component quick-alert amb-1"><div id="#success-alert" class="animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div></div>`;
 		$(prependTo).prepend(alertContent);
 	}
 
