@@ -118,8 +118,8 @@
 		http_response_code($code);
 		header("Content-Type: application/json");
 		try {
-			return json_encode($data, JSON_THROW_ON_ERROR);
-		} catch (JsonException $e) {
+			return json_encode($data);
+		} catch (Exception $e) {
 			return "[]";
 		}
 	}
