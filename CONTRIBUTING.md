@@ -13,3 +13,14 @@ echo FLUSH PRIVILEGES | sudo mysql
 for a in `ls -1St database/`; echo "Applying $a"; cat $a | sudo mysql $DBNAME; done;
 php -S localhost:8000
 ```
+
+## RUNNING TESTS
+
+```bash
+# Once
+curl -L https://cpanmin.us | perl - App::cpanminus
+cpanm Mojolicious Test::Simple Path::Tiny
+
+# Execute tests
+prove -lvr t
+```
