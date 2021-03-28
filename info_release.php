@@ -88,14 +88,14 @@ require_once "header.php"; ?>
 			$crew = cleanInsert($crew);
 
 			$ask = "SELECT nick from author_of where filename=:filename";
-			$result = fetchOne($ask, [ filename => $filename ]);
-			if ($result) 
+			$result = fetchOne($ask, [ 'filename' => $filename ]);
+			if (isset($row->nick))
 			{
 				$artist = $row->nick;
 			}
 
 			$ask = "SELECT crew from crew_of where filename=:filename";
-			$result = fetchOne($ask, [ filename => $filename ]);
+			$result = fetchOne($ask, [ 'filename' => $filename ]);
 			if ($row = $result) 
 			{
 				$crew = $row->crew;
@@ -109,27 +109,28 @@ require_once "header.php"; ?>
 			{
 				$comment = cleanInsertPost($comment);
 
-				if (empty($comment)) 
+				if (empty($comment))
 				{
 					$comment = "$nick voted $user_added_rating";
 					$comment = cleanInsertPost($comment);
 				}
 
 				$ask = "select nick from author_of where filename=:filename";
-				$row = fetchOne($ask, [ filename => $filename ]);
-				if ($row) 
+				$row = fetchOne($ask, [ 'filename' => $filename ]);
+				if (isset($row->nick))
 				{
 					$artist = $row->nick;
 				}
 
 				$ask_crew = "select crew from crew_of where filename=:filename";
-				$row_crew = fetchOne($ask, [ filename => $filename ]);
-				if ($row_crew) 
+				$row_crew = fetchOne($ask_crew, [ 'filename' => $filename ]);
+				if (isset($row_crew->crew))
 				{
 					$commentcrew = $row_crew->crew;
 				}
 
-				$ask = "insert into comments values (0,:filename,:commentcrew,:artist,:comment, :user_added_rating, :nick, :time,1)";
+				$ask = "insert into comments (colly_id, filename, crew, artist, comment, rating, nick, timestamp,user_id) 
+					values ((select id from collys where filename=:filename),:filename,:commentcrew,:artist,:comment, :user_added_rating, :nick, :time, :user_id)";
 				doQuery($ask, [
 					'filename' => $filename,
 					'commentcrew' => $commentcrew,
@@ -137,7 +138,8 @@ require_once "header.php"; ?>
 					'comment' => $comment,
 					'nick' => $nick,
 					'time' => $time,
-				  'user_added_rating' => $user_added_rating, # might be empty, should end up as NULL
+				  	'user_added_rating' => $user_added_rating, # might be empty, should end up as NULL
+					'user_id' => $_user['id'],
 				]);
 				echo "<meta http-equiv='Refresh' content='0; url=$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
 			}
@@ -1197,28 +1199,19 @@ if (!isset($_POST[ 'edit' ]))
 
 if (isset($_POST[ 'addcomment' ])) 
 {
-	$ask = "SELECT crew FROM crew_of WHERE filename='$filename'";
-	$result = mysql_query($ask, $dbh);
-	if ($row = mysql_fetch_array($result)) 
-	{
-		$crew = $row[ 0 ];
-	}
+	$ask = "SELECT crew FROM crew_of WHERE filename=:filename";
+	$row = fetchOne($ask, ['filename' => $filename ]);
+	$crew = $row->crew;
 
-	$ask = "SELECT nick FROM author_of WHERE filename='$filename'";
-	$result = mysql_query($ask, $dbh);
-	if ($row = mysql_fetch_array($result)) 
-	{
-		$artist = $row[ 0 ];
-	}
+	$ask = "SELECT nick FROM author_of WHERE filename=:filename";
+	$row = fetchOne($ask, ['filename' => $filename ]);
+	$artist = $row->nick;
 
 	if (!isset($_POST[ 'edit' ])) 
 	{
-		$ask = "select sum(rating) from comments where filename='$filename' and nick='$nick' and rating>0";
-		$result = mysql_query($ask, $dbh);
-		if ($row = mysql_fetch_array($result)) 
-		{
-			$hasrated = $row[ 0 ];
-		}
+		$ask = "select sum(rating) as rating from comments where filename=:filename and nick=:artist and rating>0";
+		$row = fetchOne($ask, [':filename' => $filename, ':artist' => $artist ]);
+		$hasrated = $row->rating;
 		if ($hasrated > 0) 
 		{
 			echo "<form action=\"info_release.php?filename=$decoded_filename&comment\" method=\"post\">";
