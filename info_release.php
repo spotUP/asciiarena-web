@@ -693,18 +693,18 @@ require_once "header.php"; ?>
 			$getcollyname = $_POST[ 'filename' ];
 			$getcollyname = cleanInsert($getcollyname);
 
-			$ask = "select * from collys where filename='$getcollyname'";
-			$result = mysql_query($ask);
-			while ($row = mysql_fetch_array($result)) 
+			$ask = "select * from collys where filename=:filename";
+			$result = fetchAll($ask, [':filename' => $getcollyname ]);
+			foreach ($result as $row)
 			{
-				$show_colly_name = $row[ 'filename' ];
-				$show_colly_name = $row[ 'name' ];
-				$show_colly_crew = $row[ 'crew' ];
-				$show_colly_year = $row[ 'year' ];
-				$show_colly_month = $row[ 'month' ];
-				$show_colly_day = $row[ 'day' ];
-				$show_colly_type = $row[ 'type' ];
-				$encoded_filename = base64_encode($row[ 'filename' ]);
+				$show_colly_name = $row->filename;
+				$show_colly_name = $row->name;
+				$show_colly_crew = $row->crews;
+				$show_colly_year = $row->year;
+				$show_colly_month = $row->month;
+				$show_colly_day = $row->day;
+				$show_colly_type = $row->type;
+				$encoded_filename = base64_encode($row->filename);
 			}
 			?>
 			<form enctype="multipart/form-data" action="info_release.php?filename=<?=$encoded_filename?>" method="post">
@@ -797,20 +797,20 @@ require_once "header.php"; ?>
 
 			<div class="col-6">
 				<?php
-				$ask = "select nick from author_of where filename='$getcollyname'";
-				$result = mysql_query($ask, $dbh);
-				while ($row = mysql_fetch_array($result)) 
+				$ask = "select nick from author_of where filename=:filename";
+				$result = fetchAll($ask, [ 'filename' => $getcollyname ]);
+				foreach ($result as $row)
 				{
-					$colly_author = $row[ 0 ];
+					$colly_author = $row->nick;
 					echo "<select name=\"old_colly_authors[]\" class='btn-big'>";
 					echo "<option selected=\"selected\">$colly_author</option>";
 					echo "<option value='Delete'>Remove Author</option>";
 
 					$ask_authors = "select nick from artists";
-					$result_authors = mysql_query($ask_authors, $dbh);
-					while ($row_authors = mysql_fetch_array($result_authors)) 
+					$result_authors = fetchAll($ask_authors);
+					foreach ($result_authors as $row_authors)
 					{
-						$authors = $row_authors[ 0 ];
+						$authors = $row_authors->nick;
 						echo "<option>$authors</option>";
 					}
 					echo "</select>";
@@ -829,11 +829,11 @@ require_once "header.php"; ?>
 			<div class="col-6">
 
 				<?php
-				$ask = "select crew from crew_of where filename='$getcollyname'";
-				$result = mysql_query($ask, $dbh);
-				while ($row = mysql_fetch_array($result)) 
+				$ask = "select crew from crew_of where filename=:filename";
+				$result = fetchAll($ask, [ 'filename' => $getcollyname ]);
+				foreach ($result as $row)
 				{
-					$colly_crew = $row[ 0 ];
+					$colly_crew = $row->crew;
 					echo "<select name=\"old_colly_crews[]\" class='btn-big'>";
 					echo "<option selected=\"selected\">$colly_crew</option>";
 					echo "<option value='Delete'>Remove Crew</option>";
