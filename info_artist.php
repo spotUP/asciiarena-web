@@ -14,7 +14,7 @@ include "header.php";
     $validSorts = array(
       'a.filename' => 'Filename',
       'a.name' => 'Name',
-      'a.crew' => 'Crew',
+      'c.crew' => 'Crew',
       'a.year, a.month' => 'Release Date'
     );
 
