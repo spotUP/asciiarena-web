@@ -20,7 +20,9 @@ require_once "header.php"; ?>
 		{
 			$decoded_filename = $_GET[ 'filename' ] ?? "";
 			$filename = base64_decode($decoded_filename);
-			doQuery("INSERT INTO favourites VALUES (:nick, :filename)", [":nick" => $nick, ":filename" => $filename]);
+			doQuery("INSERT INTO favourites (user_id, colly_id, nick, filename)
+				VALUES (:user_id, (select id from collys where filename=:filename), :nick, :filename)",
+				[":user_id" => $_user["id"], ":nick" => $nick, ":filename" => $filename]);
 		}
 
 		if (isset($_POST[ 'broken' ])) 
