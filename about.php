@@ -1,6 +1,6 @@
 <?php
 require_once "session.php";
-$h1 = ["About aSCIIaRENA", "bY uP rOUGH and diViNE sTYLERS"];
+$h1 = "About aSCIIaRENA";
 include "header.php";
 ?>
 <div class="modal-body row m-0 p-0">

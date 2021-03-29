@@ -1,6 +1,6 @@
 <?php
 require_once "session.php";
-$h1 = ["wELCOME tO aSCIIaRENA", "bY uP rOUGH and diViNE sTYLERS"];
+$h1 = "ASCII STYLE DESIGNER";
 include "header.php";
 ?>
 <div class="modal-body row m-0 p-0">
@@ -12,9 +12,9 @@ include "header.php";
             <html ng-app="figfont">
             <div class="row" >
                 <div class="col-lg-12">
-                    <h2 class="bg-header" id="nav-tabs">ASCII STYLE DESIGNER</h2>
+                    <h2 class="bg-header" id="nav-tabs"></h2>
                     <div class="bs-component">
-                        <ul class="nav nav-tabs">
+                        <ul class="nav nav-tabs apt-1 bg-secondary">
                             <li class="nav-item">
                                 <p><a class="nav-link" href='fonteditor.php#/edit'>Edit </a></p>
                             </li>
@@ -25,11 +25,7 @@ include "header.php";
                     </div>
                 </div>
                 <div id="view-container" class="container">
-                    <div id='view' 
-                    class='page'
-                    ng-view="" 
-                    ng-cloak
-                    ></div>
+                    <div id='view' class='page apt-1 bg-secondary' ng-view="" ng-cloak></div>
                 </div>
                 <div dialog-export></div>
                 <div dialog-import></div>

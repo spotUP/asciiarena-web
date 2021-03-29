@@ -728,15 +728,27 @@ option {
   text-shadow: 1px 1px 10px rgba(255, 85, 85, 0.40) !important;
 }
 
+a.nav-link{
+  padding-top: 0px !important;
+  margin-top: 0px !important;
+  color: #aaa !important;
+}
+
 a.nav-link:hover{
+  padding-top: 0px !important;
+  margin-top: 0px !important;
   color: #aaa !important;
 }
 
 a.nav-link:active{
+  padding-top: 0px !important;
+  margin-top: 0px !important;
   color: #aaa !important;
 }
 
 a.nav-link:focus{
+  padding-top: 0px !important;
+  margin-top: 0px !important;
   color: #aaa !important;
 }
 
@@ -1675,6 +1687,14 @@ a.disabled{
   }
 }
 
+.nav-tabs {
+  height: 16px;
+  margin-left: 0;
+  padding-left: 0;
+  border-bottom: 0;
+  margin-bottom: 0px;
+}
+
 .nav-tabs .nav-link {
   border: 0;
   margin-top: 16px;
@@ -1732,15 +1752,6 @@ a.disabled{
   color: #ffffff !important;
   background-color: #1a1a1a !important;
 }
-
-.nav-tabs {
-  height: 16px;
-  margin-left: 0;
-  padding-left: 0;
-  border-bottom: 0;
-  margin-bottom: 16px;
-}
-
 
 .navbar-nav .nav-link {
   padding-right: 0px;

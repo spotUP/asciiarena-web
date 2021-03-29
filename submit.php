@@ -1,6 +1,6 @@
 <?php
 require_once "session.php";
-$h1 = ["wELCOME tO aSCIIaRENA", "bY uP rOUGH and diViNE sTYLERS"];
+$h1 = "SUBMIT";
 include "header.php";
 ?>
 <script type="text/javascript">
@@ -24,13 +24,8 @@ include "header.php";
 			?>
 			<div class="row">
 				<div class="col-lg-12">
-					<h2 id="nav-tabs">UPLOAD</h2>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-lg-12">
 					<div class="bs-component">
-						<ul class="nav nav-tabs">
+						<ul class="nav nav-tabs apt-1 bg-secondary">
 							<li class="nav-item">
 								<a class="nav-link active" data-toggle="tab" href="#colly">Colly</a>
 							</li>
