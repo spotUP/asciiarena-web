@@ -238,79 +238,74 @@ include "header.php";
 							Birth:
 						</div>
 						<div class="col-3">
-							<div class="custom-select">
+							<select name='changebyear'>
+								<?php
+								echo "<option>$show_byear</option>";
+								$countyear=1900;
+								$maxyear=date("Y")-5;
+								while($countyear<$maxyear)
+								{
+									echo "<option>$countyear</option>";
+									$countyear++;
+								}
+								echo "</select>";	
+								echo "<select name='changebmonth'>";
+								if ($show_bmonth<10)
+									echo "<option selected='selected'>0$show_bmonth</option>"; 
+								if ($show_bmonth>9)	
+									echo "<option selected='selected'>$show_bmonth</option>";
+								$countmonth=1;
+								$maxmonth=12;
+								while($countmonth<=$maxmonth)
+								{
+									if ($countmonth<10)
+										echo "<option>0$countmonth</option>"; 
+									if ($countmonth>9)	
+										echo "<option>$countmonth</option>";
 
-								<select name='changebyear'>
-									<?php
-									echo "<option>$show_byear</option>";
-									$countyear=1900;
-									$maxyear=date("Y")-5;
-									while($countyear<$maxyear)
-									{
-										echo "<option>$countyear</option>";
-										$countyear++;
-									}
-									echo "</select>";	
-									echo "<select name='changebmonth'>";
-									if ($show_bmonth<10)
-										echo "<option selected='selected'>0$show_bmonth</option>"; 
-									if ($show_bmonth>9)	
-										echo "<option selected='selected'>$show_bmonth</option>";
-									$countmonth=1;
-									$maxmonth=12;
-									while($countmonth<=$maxmonth)
-									{
-										if ($countmonth<10)
-											echo "<option>0$countmonth</option>"; 
-										if ($countmonth>9)	
-											echo "<option>$countmonth</option>";
+									$countmonth++;
+								}
+								echo "</select>";
 
-										$countmonth++;
-									}
-									echo "</select>";
-
-									echo "<select name='changebday'>";
-									if ($show_bday<10)	
-										echo "<option selected='selected'>0$show_bday</option>"; 
-									if ($show_bday>9)	
-										echo "<option selected='selected'>$show_bday</option>";
-									$countday=1;
-									$maxday=31;
-									while($countday<=$maxday)
-									{
-										if ($countday<10)
-											echo "<option>0$countday\n</option>"; 
-										if ($countday>9)	
-											echo "<option>$countday\n</option>";
-										$countday++;
-									}
-									?>
-								</select>		
-							</div>
+								echo "<select name='changebday'>";
+								if ($show_bday<10)	
+									echo "<option selected='selected'>0$show_bday</option>"; 
+								if ($show_bday>9)	
+									echo "<option selected='selected'>$show_bday</option>";
+								$countday=1;
+								$maxday=31;
+								while($countday<=$maxday)
+								{
+									if ($countday<10)
+										echo "<option>0$countday\n</option>"; 
+									if ($countday>9)	
+										echo "<option>$countday\n</option>";
+									$countday++;
+								}
+								?>
+							</select>		
 						</div>
 						<div class="col-2">
 							Country:
 						</div>
 						<div class="col-4">
-							<div class="custom-select">
-								<select name="changecountry"> 
-									<?php
-									if (!empty($show_country))
-									{
-										?><option selected="selected" value="<?=$show_country?>"/><?=$country_list["$show_country"]?></option><?php
-									}
-									else
-									{
-										echo "<option selected='selected' value=\"\">Unknown</option>";
-									}
+							<select name="changecountry"> 
+								<?php
+								if (!empty($show_country))
+								{
+									?><option selected="selected" value="<?=$show_country?>"/><?=$country_list["$show_country"]?></option><?php
+								}
+								else
+								{
+									echo "<option selected='selected' value=\"\">Unknown</option>";
+								}
 
-									foreach($country_list as $symbol => $country)
-									{
-										echo "<option value=\"$symbol\">$country</option>";
-									}
-									echo "</select>";
-									?>
-								</div>
+								foreach($country_list as $symbol => $country)
+								{
+									echo "<option value=\"$symbol\">$country</option>";
+								}
+								echo "</select>";
+								?>
 							</div>
 						</div>
 
@@ -325,17 +320,15 @@ include "header.php";
 								Show E-Mail:
 							</div>
 							<div class="col-4">	
-								<div class="custom-select">	
-									<select name="display_mail">
-										<option selected="selected"><?=$show_display_mail?></option>
-										<?php
-										if($show_display_mail!="Yes")
-											echo "<option>Yes</option>";
-										if($show_display_mail!="No")
-											echo "<option>No</option>"; 
-										?>
-									</select>
-								</div>
+								<select name="display_mail">
+									<option selected="selected"><?=$show_display_mail?></option>
+									<?php
+									if($show_display_mail!="Yes")
+										echo "<option>Yes</option>";
+									if($show_display_mail!="No")
+										echo "<option>No</option>"; 
+									?>
+								</select>
 							</div>
 						</div>
 						<div class="row amb-1">
@@ -378,16 +371,14 @@ include "header.php";
 								File list mode:
 							</div>
 							<div class="col-3">	
-								<div class="custom-select">	
-									<select name="changelistviewmode">
-										<option selected="selected"><?=$show_viewmode?></option>
-										<?php
-										if($show_viewmode!="BBS")
-											echo "<option>BBS</option>";
-										if($show_viewmode!="Standard")
-											echo "<option>Standard</option>"; ?>
-									</select>
-								</div>
+								<select name="changelistviewmode">
+									<option selected="selected"><?=$show_viewmode?></option>
+									<?php
+									if($show_viewmode!="BBS")
+										echo "<option>BBS</option>";
+									if($show_viewmode!="Standard")
+										echo "<option>Standard</option>"; ?>
+								</select>
 							</div>
 						</div>
 						<div class="row amb-1">
@@ -395,28 +386,25 @@ include "header.php";
 								Default Colly BG:
 							</div>
 							<div class="col-3">	
-								<div class="custom-select">	
-
-									<select name="set_def_bg_col">
-										<option selected="selected" value="<?=$def_bg_col?>" /><?=$bg_color_list["$def_bg_col"]?></option>
-										<option class='black' value="#000000">Black</option>
-										<option class='darkblue' value="#0000aa">Dark Blue</option>
-										<option class='darkgreen' value="#00aa00">Dark Green</option>
-										<option class='darkcyan' value="#00aaaa">Dark Cyan</option>
-										<option class='darkred' value="#aa0000">Dark Red</option>
-										<option class='magenta' value="#aa00aa">Magenta</option>
-										<option class='brown' value="#aa5500">Brown</option>
-										<option class='darkgrey' value="#555555">Dark Grey</option>
-										<option class='grey' value="#aaaaaa">Grey</option>
-										<option class='blue' value="#5555ff">Blue</option>
-										<option class='green' value="#55ff55">Green</option>
-										<option class='cyan' value="#5555ff">Cyan</option>
-										<option class='red' value="#ff5555">Red</option>
-										<option class='magenta' value="#ff55ff">Magenta</option>
-										<option class='yellow' value="#ffff55">Yellow</option>
-										<option class='white' value="#ffffff">White</option>
-									</select>
-								</div>
+								<select name="set_def_bg_col">
+									<option selected="selected" value="<?=$def_bg_col?>" /><?=$bg_color_list["$def_bg_col"]?></option>
+									<option class='black' value="#000000">Black</option>
+									<option class='darkblue' value="#0000aa">Dark Blue</option>
+									<option class='darkgreen' value="#00aa00">Dark Green</option>
+									<option class='darkcyan' value="#00aaaa">Dark Cyan</option>
+									<option class='darkred' value="#aa0000">Dark Red</option>
+									<option class='magenta' value="#aa00aa">Magenta</option>
+									<option class='brown' value="#aa5500">Brown</option>
+									<option class='darkgrey' value="#555555">Dark Grey</option>
+									<option class='grey' value="#aaaaaa">Grey</option>
+									<option class='blue' value="#5555ff">Blue</option>
+									<option class='green' value="#55ff55">Green</option>
+									<option class='cyan' value="#5555ff">Cyan</option>
+									<option class='red' value="#ff5555">Red</option>
+									<option class='magenta' value="#ff55ff">Magenta</option>
+									<option class='yellow' value="#ffff55">Yellow</option>
+									<option class='white' value="#ffffff">White</option>
+								</select>
 							</div>
 						</div>
 						<div class="row amb-1">
@@ -424,27 +412,25 @@ include "header.php";
 								Default Colly FG:
 							</div>
 							<div class="col-3">	
-								<div class="custom-select">	
-									<select name="set_def_fg_col">
-										<option selected="selected" value="<?=$def_fg_col?>" /><?=$fg_color_list["$def_fg_col"]?></option>
-										<option class='black' value="0,0,0">Black</option>
-										<option class='darkblue' value="0,0,170">Dark Blue</option>
-										<option class='darkgreen' value="0,170,0">Dark Green</option>
-										<option class='darkcyan' value="0,170,170">Dark Cyan</option>
-										<option class='darkred' value="170,0,0">Dark Red</option>
-										<option class='magenta' value="170,0,170">Magenta</option>
-										<option class='brown' value="170,85,0">Brown</option>
-										<option class='darkgrey' value="85,85,85">Dark Grey</option>
-										<option class='grey' value="170,170,170">Grey</option>
-										<option class='blue' value="85,85,255">Blue</option>
-										<option class='green' value="85,255,85">Green</option>
-										<option class='cyan' value="85,85,255">Cyan</option>
-										<option class='red' value="255,85,85">Red</option>
-										<option class='magenta' value="255,85,255">Magenta</option>
-										<option class='yellow' value="255,255,85">Yellow</option>
-										<option class='white' value="255,255,255">White</option>
-									</select>
-								</div>
+								<select name="set_def_fg_col">
+									<option selected="selected" value="<?=$def_fg_col?>" /><?=$fg_color_list["$def_fg_col"]?></option>
+									<option class='black' value="0,0,0">Black</option>
+									<option class='darkblue' value="0,0,170">Dark Blue</option>
+									<option class='darkgreen' value="0,170,0">Dark Green</option>
+									<option class='darkcyan' value="0,170,170">Dark Cyan</option>
+									<option class='darkred' value="170,0,0">Dark Red</option>
+									<option class='magenta' value="170,0,170">Magenta</option>
+									<option class='brown' value="170,85,0">Brown</option>
+									<option class='darkgrey' value="85,85,85">Dark Grey</option>
+									<option class='grey' value="170,170,170">Grey</option>
+									<option class='blue' value="85,85,255">Blue</option>
+									<option class='green' value="85,255,85">Green</option>
+									<option class='cyan' value="85,85,255">Cyan</option>
+									<option class='red' value="255,85,85">Red</option>
+									<option class='magenta' value="255,85,255">Magenta</option>
+									<option class='yellow' value="255,255,85">Yellow</option>
+									<option class='white' value="255,255,255">White</option>
+								</select>
 							</div>
 						</div>
 						<div class="row amb-1">
@@ -452,21 +438,19 @@ include "header.php";
 								Default Colly Font:
 							</div>
 							<div class="col-3">	
-								<div class="custom-select">	
-									<select name='def_font'>
-										<?php
-										echo "<option selected='selected'>$show_def_font</option>";
-										if ($show_def_font != "topaz")			
-											echo "<option value='topaz'>Topaz</option>";
-										if ($show_def_font != "microknight")			
-											echo "<option value='microknight'>MicroKnight</option>";
-										if ($show_def_font != "mosoul")			
-											echo "<option value='mosoul'>mO'sOul</option>";
-										if ($show_def_font != "pot-noodle")			
-											echo "<option value='pot-noodle'>P0T-NOoDLE</option>";
-										?>
-									</select>
-								</div>
+								<select name='def_font'>
+									<?php
+									echo "<option selected='selected'>$show_def_font</option>";
+									if ($show_def_font != "topaz")			
+										echo "<option value='topaz'>Topaz</option>";
+									if ($show_def_font != "microknight")			
+										echo "<option value='microknight'>MicroKnight</option>";
+									if ($show_def_font != "mosoul")			
+										echo "<option value='mosoul'>mO'sOul</option>";
+									if ($show_def_font != "pot-noodle")			
+										echo "<option value='pot-noodle'>P0T-NOoDLE</option>";
+									?>
+								</select>
 							</div>
 						</div>
 						<div class="row amb-1 apt-1">
