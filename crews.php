@@ -76,7 +76,7 @@ require_once "header.php";
 			$encoded_crew = base64_encode($crew->name);
 			?>
 			<div class="row">
-				<div class="col-4">
+				<div class="col-4 text-truncate">
 					<a href="info_crew.php?crew=<?=$encoded_crew?>"><?=$crew->name;?><?=($acronym) ? " (" . $acronym .")" : '' ?></a>
 				</div>
 				<div class="col-3 green">
