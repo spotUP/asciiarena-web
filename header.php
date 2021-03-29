@@ -199,7 +199,7 @@ EOD;
 </div>
 <div class="navbar navbar-expand-lg fixed-top bg-blue" style="top: 22px; height: 21px">
 	<div class="container-fluid m-0 p-0">
-		<a href="/" style="color: #fff" class="navbar-brand">aSCIIaRENA</a>
+		<a href="/" style="color: #fff" class="navbar-brand ascii">aSCIIaRENA</a>
 		<a class="navbar-toggler ascii" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">mENU</a>
 		<div class="collapse navbar-collapse" id="navbarResponsive">
 			<ul class="navbar-nav">
