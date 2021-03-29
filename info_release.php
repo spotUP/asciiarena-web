@@ -31,10 +31,24 @@ require_once "header.php"; ?>
 			$decoded_filename = base64_decode($filename);
 
 			?>
-			<form enctype="multipart/form-data" action="info_release.php?filename=<?=$filename?>" method="post">
-				Enter a comment describing the problem.
-				<textarea rows="5" cols="82" id="broken_comment" name="broken_comment"></textarea>
-				<input type="submit" class="btn-big" name="do_report_broken" value="Report">
+			<form action="info_release.php?filename=<?=$filename?>" method="post">
+				<div class="container-fluid bg-secondary amb-1 apb-1">
+					<div class="row">
+						<div class="col-12 amt-1">
+							<span class="white">DESCRiBE THE PROBLEM</span>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-12 amt-1 amb-1">
+							<textarea class="w-100" rows="5" id="broken_comment" name="broken_comment"></textarea>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<input type="submit" class="btn-big" name="do_report_broken" value="Report">
+						</div>
+					</div>
+				</div>
 			</form>
 			<?php
 		}
@@ -49,8 +63,8 @@ require_once "header.php"; ?>
 			]);
 			?>
 			<div class="row">
-				<div class="col-lg-4">
-					<div class="bs-component">
+				<div class="col-lg-12">
+					<div class="bs-component aml-1 amb-1">
 						<div class="alert alert-dismissible alert-success">
 							<button type="button" class="close" data-dismiss="alert">x</button>
 							You reported <?=$decoded_filename?> as broken!
@@ -60,7 +74,6 @@ require_once "header.php"; ?>
 			</div>
 			<?php
 			echo "<meta http-equiv='Refresh' content='2; url=$_SERVER[PHP_SELF]?filename=$filename'>";
-			exit;
 		}
 
 //----------------------------------------------------------------------------------------------
@@ -866,7 +879,7 @@ require_once "header.php"; ?>
 // TOP CONTROL TABLE
 //----------------------------------------------------------------------------------------------
 
-	if (!isset($_POST[ 'edit_colly' ])) 
+	if (!isset($_POST[ 'edit_colly' ]) && !isset($_POST[ 'broken' ])) 
 	{
 		$type = fetchOne("SELECT type FROM collys WHERE filename = :filename", [":filename" => $filename])->type ?? "";
 
