@@ -136,10 +136,10 @@ switch ($sort_by) {
 							<a href="info_release.php?filename=<?=base64_encode($row->filename)?>"><?=myTruncate($row->name, 48, " ", "...")?></a>
 						</div>
 						<div class="col-lg-4 green">
-							<?=combinize($row->artists, $row->artist_ids, "/artists/", $row->artists)?>
+							<span class="yellow"><?=combinize($row->artists, $row->artist_ids, "/artists/", $row->artists)?></span>
 						</div>
 						<div class="col-lg-4 yellow">
-							<?=combinize($row->crews, $row->crew_ids, "/crews/", $row->crews)?>
+							<span class="yellow"><?=combinize($row->crews, $row->crew_ids, "/crews/", $row->crews)?></span>
 						</div>
 					</div>
 					<?php
@@ -197,10 +197,10 @@ switch ($sort_by) {
 							<a class="magenta" href="info_release.php?filename=<?=base64_encode($row->filename)?>"><?=myTruncate($row->name, 40, " ", "...")?></a>
 						</div>
 						<div class="col-3">
-							<?=combinize($row->artists, $row->artist_ids, "/artists/", $row->artists)?>
+							<span class="yellow"><?=combinize($row->artists, $row->artist_ids, "/artists/", $row->artists)?></span>
 						</div>
 						<div class="col-4">
-							<?=combinize($row->crews, $row->crew_ids, "/crews/", $row->crews)?>
+							<span class="yellow"><?=combinize($row->crews, $row->crew_ids, "/crews/", $row->crews)?></span>
 						</div>
 						<?php
 					} ?>
