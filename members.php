@@ -52,19 +52,6 @@ include "header.php";
 				</div>
 				<?php
 			}
-			if(!empty($member->messenger) && ($member->display_messenger === "Yes")) {
-				?>
-				<div style="background: #ff0000; padding-left: 4px; width: 70px; float: left;">
-					MSN/ICQ:
-				</div>
-
-				<div style="padding-left: 4px; width: 620px; float: left;">
-					<?=spamFix($member->messenger)?>
-				</div>
-				<?php
-			}
-			?>
-			<?php
 			if(!empty($member->mail) && ($member->display_mail === "Yes")) {
 				?>
 				Mail:
