@@ -33,8 +33,8 @@ include "header.php";
   	.hippoinfo-dialogue-width{
   		width: 384px;
   	}  
-      .hipposcope-dialogue-width{
-      width: 384px;
+    .hipposcope-dialogue-width{
+      width: 340px;
     }  
   }
 
@@ -67,8 +67,8 @@ include "header.php";
   	.hippoinfo-dialogue-width{
   		width: 384px;
   	}  
-      .hipposcope-dialogue-width{
-      width: 384px;
+    .hipposcope-dialogue-width{
+      width: 340px;
     }  
   }
 
@@ -101,8 +101,8 @@ include "header.php";
   	.hippoinfo-dialogue-width{
   		width: 384px;
   	}  
-      .hipposcope-dialogue-width{
-      width: 384px;
+    .hipposcope-dialogue-width{
+      width: 340px;
     }  
   }
 
@@ -175,7 +175,7 @@ include "header.php";
   	.hippoinfo-dialogue-width{
   		width: 100%;
   	}  
-      .hipposcope-dialogue-width{
+    .hipposcope-dialogue-width{
       width: 100%;
     }  
   }
@@ -210,7 +210,7 @@ include "header.php";
   	.hippoinfo-dialogue-width{
   		width: 100%;
   	}  
-      .hipposcope-dialogue-width{
+    .hipposcope-dialogue-width{
       width: 100%;
     }  
   }
@@ -241,8 +241,41 @@ include "header.php";
   	border-bottom: 2px solid white !important;
   }
   .hippo{
-  	background-image: url('assets/data/hippo/hippobg.png')
+  	background-image: url('assets/data/hippo/hippobg.png');
 
+  }
+
+  .hippovu1{
+    background-image: url('assets/data/hippo/vu.png');
+    width: 6px;
+    height: 124px;
+    position: absolute;
+    left:19px;
+    top: 4px;
+  }
+    .hippovu2{
+    background-image: url('assets/data/hippo/vu.png');
+    width: 6px;
+    height: 124px;
+    position: absolute;
+    left: 91px;
+    top: 4px;
+  }
+    .hippovu3{
+    background-image: url('assets/data/hippo/vu.png');
+    width: 6px;
+    height: 124px;
+    position: absolute;
+    left: 163px;
+    top: 4px;
+  }
+    .hippovu4{
+    background-image: url('assets/data/hippo/vu.png');
+    width: 6px;
+    height: 124px;
+    position: absolute;
+    left: 267px;
+    top: 4px;
   }
   .req-close-button
   {
@@ -898,35 +931,35 @@ include "header.php";
   .checkbox-hip > input:checked {
   	background: url(assets/data/cedd/checkmark.png);
   	background-repeat: no-repeat;
-	background-position: center;
+   background-position: center;
 
-  }
-  .checkbox-hip > input:checked + span::before {
-  	display: block;
-  	text-align: center;
-  	color: #000;
-  	position: absolute;
-  	left: 6px;
-  	top: 1px;
-  }
+ }
+ .checkbox-hip > input:checked + span::before {
+   display: block;
+   text-align: center;
+   color: #000;
+   position: absolute;
+   left: 6px;
+   top: 1px;
+ }
 
-  ::-webkit-input-placeholder { /* Edge */
-  	color: #000;
-  	font-smooth: never !important;
-  	-webkit-font-smooth : none !important;
-  }
+ ::-webkit-input-placeholder { /* Edge */
+   color: #000;
+   font-smooth: never !important;
+   -webkit-font-smooth : none !important;
+ }
 
-  :-ms-input-placeholder { /* Internet Explorer 10-11 */
-  	color: #000;
-  	font-smooth: never !important;
-  	-webkit-font-smooth : none !important;
-  }
+ :-ms-input-placeholder { /* Internet Explorer 10-11 */
+   color: #000;
+   font-smooth: never !important;
+   -webkit-font-smooth : none !important;
+ }
 
-  ::placeholder {
-  	color: #000;
-  	font-smooth: never !important;
-  	-webkit-font-smooth : none !important;
-  }
+ ::placeholder {
+   color: #000;
+   font-smooth: never !important;
+   -webkit-font-smooth : none !important;
+ }
 }
 .req-double-border {
 	border-left: 2px solid #000 !important;
@@ -1102,7 +1135,7 @@ include "header.php";
 
 .hipposcope{
   width: 100% !important;
-  height: 170px !important;
+  height: 134px !important;
   background: #aaaaaa;
   position: relative;
   top: 0px;
@@ -1112,12 +1145,12 @@ include "header.php";
   border-bottom: 2px solid white !important;
   border-right: 2px solid white !important;
   overflow: hidden;
-  background-image: url("assets/data/hippo/plistbg.png");
   box-sizing: border-box !important;
   margin-top: 0px;
   background-repeat: no-repeat;
   background-position: center;
   color: #000;
+  padding: 2px;
 }
 
 .nobg{
@@ -1851,17 +1884,27 @@ and (max-device-width : 480px)
 			</div>
 		</div>
     <!-- HIPPOPLAYER EMPTY -->
-
-    <div class="req-container hippo hipposcope-dialogue-width"> <!-- original width: 264px -->
+    <div class="req-container hipposcope-dialogue-width">
       <div class="req-title-padding">HippoScope</div>
       <div class="req-close-button"></div>
-      <div class="req-size-gadget"></div>
       <div class="req-cycle-gadget"></div>
       <div class="req-border-3">
         <div class="req-border-2">
           <div class="req-border-1">
             <div class="req-content nobottomborder">
-              <div class="hipposcope nooverflow"> 
+              <div class="hipposcope">
+                <div class="hippovu1"></div>
+                <div class="hippovu2"></div>
+                <div class="hippovu3"></div>
+                <div class="hippovu4"></div>
+                <pre class="black">28 E-2 1A02!B-2 1A02!C-2 1A02!D-3 1A02</pre>
+                <pre class="black">28 E-2 1A02!B-2 1A02!C-2 1A02!D-3 1A02</pre>
+                <pre class="black">28 E-2 1A02!B-2 1A02!C-2 1A02!D-3 1A02</pre>
+                <pre class="black">28 E-2 1A02!B-2 1A02!C-2 1A02!D-3 1A02</pre>
+                <pre class="black">28 E-2 1A02!B-2 1A02!C-2 1A02!D-3 1A02</pre>
+                <pre class="black">28 E-2 1A02!B-2 1A02!C-2 1A02!D-3 1A02</pre>
+                <pre class="black">28 E-2 1A02!B-2 1A02!C-2 1A02!D-3 1A02</pre>
+                <pre class="black">28 E-2 1A02!B-2 1A02!C-2 1A02!D-3 1A02</pre>
               </div>
             </div>
           </div>
@@ -1869,73 +1912,73 @@ and (max-device-width : 480px)
       </div>
     </div>
 
-		<!-- HIPPOINFO -->
+    <!-- HIPPOINFO -->
 
-		<div class="req-container hippo hippoinfo-dialogue-width"> <!-- original width: 384px -->
-			<div class="req-title-padding"><span>HippoInfo<span></div>
-				<div class="req-close-button"></div>
-				<div class="req-cycle-gadget"></div>
+    <div class="req-container hippo hippoinfo-dialogue-width"> <!-- original width: 384px -->
+     <div class="req-title-padding"><span>HippoInfo<span></div>
+      <div class="req-close-button"></div>
+      <div class="req-cycle-gadget"></div>
 
-				<div class="req-border-3">
-					<div class="req-border-2">
-						<div class="req-border-1">
-							<div class="req-content nobottomborder">
+      <div class="req-border-3">
+       <div class="req-border-2">
+        <div class="req-border-1">
+         <div class="req-content nobottomborder">
 
-								<div class="hip-scrollbar-border infowindow-offset-1 mobileHide"></div>
-								<div class="hip-scrollbar-border-offset infowindow-offset-2 mobileHide"></div>
-								<div class="hip-scrollbar-divider infowindow-offset-3 mobileHide"></div>
+          <div class="hip-scrollbar-border infowindow-offset-1 mobileHide"></div>
+          <div class="hip-scrollbar-border-offset infowindow-offset-2 mobileHide"></div>
+          <div class="hip-scrollbar-divider infowindow-offset-3 mobileHide"></div>
 
-								<div class="hip-playlist nobg" dir="rtl" style="margin-top: 0px;">
-									<ul>
-										<li>Name: Youafrica-Dia</li>
-										<li>Type: Protracker</li>
-										<li>Size: 197674<span>($0012AB00-$0015AF2A)</span></li>
-										<li>Comment: Rene Bidstrup | Megademo 2 |</li>
-										<li>------------------------------------------</li>
-										<li>01 ST-26:goes with da bong<span>15730</span></li>
-										<li>02 ST-21:rough cutz<span>12245</span></li>
-										<li>03 ST-24:mod.The Dreamer<span>334</span></li>
-										<li>04 ST-21:mod.To Be In Love REMiX<span>3344</span></li>
-										<li>05 ST-26:mod.UnderneathOurHome<span>3434</span></li>
-										<li>06 ST-12:mod.upperz delight<span>89898</span></li>
-										<li>07 ST-26:mod.welcome<span>242</span></li>
-										<li>08 ST-21:mod.Super_Subway_1986<span>234422</span></li>
-										<li>09 ST-13:dbm.Live_Axxion<span>2344</span></li>
-										<li>10 ST-27:THX.crystal_cracktro<span>2342</span></li>
-										<li>11 ST-17:THX.Summerluvin'[+++]<span>11334</span></li>
-										<li>12 ST-23:Steal_Da_Wheelz_Riddim.xm<span>243</span></li>
-										<li>13 ST-23:mod.Monotone Bitch<span>74777</span></li>
-										<li>14 ST-21:mod.Optimistique<span>9984</span></li>
-										<li>15 ST-27:mod.static_amiga_megamix<span>244</span></li>
-										<li>16 ST-10:mod.Introe81.mod<span>2323</span></li>
-										<li>17 ST-27:mod.8909<span>26622</span></li>
-										<li>18 ST-21:mod.Ass Up!<span>8744</span></li>
-										<li>19 ST-17:mod.ASS!_FUCK!_HOE!_TITS!<span>2244</span></li>
-										<li>20 ST-03:mod.bring it down<span>88842</span></li>
-										<li>21 ST-27:21 mod.disko divas<span>22244</span></li>
-										<li>22 <span>0</span></li>
-										<li>23 <span>0</span></li>
-										<li>24 <span>0</span></li>
-										<li>25 <span>0</span></li>
-										<li>26 <span>0</span></li>
-										<li>27 <span>0</span></li>
-										<li>28 <span>0</span></li>
-										<li>29 <span>0</span></li>
-										<li>30 <span>0</span></li>
-										<li>31 <span>0</span></li>
-									</ul>
-								</div>
-							</div>
+          <div class="hip-playlist nobg" dir="rtl" style="margin-top: 0px;">
+           <ul>
+            <li>Name: Youafrica-Dia</li>
+            <li>Type: Protracker</li>
+            <li>Size: 197674<span>($0012AB00-$0015AF2A)</span></li>
+            <li>Comment: Rene Bidstrup | Megademo 2 |</li>
+            <li>------------------------------------------</li>
+            <li>01 ST-26:goes with da bong<span>15730</span></li>
+            <li>02 ST-21:rough cutz<span>12245</span></li>
+            <li>03 ST-24:mod.The Dreamer<span>334</span></li>
+            <li>04 ST-21:mod.To Be In Love REMiX<span>3344</span></li>
+            <li>05 ST-26:mod.UnderneathOurHome<span>3434</span></li>
+            <li>06 ST-12:mod.upperz delight<span>89898</span></li>
+            <li>07 ST-26:mod.welcome<span>242</span></li>
+            <li>08 ST-21:mod.Super_Subway_1986<span>234422</span></li>
+            <li>09 ST-13:dbm.Live_Axxion<span>2344</span></li>
+            <li>10 ST-27:THX.crystal_cracktro<span>2342</span></li>
+            <li>11 ST-17:THX.Summerluvin'[+++]<span>11334</span></li>
+            <li>12 ST-23:Steal_Da_Wheelz_Riddim.xm<span>243</span></li>
+            <li>13 ST-23:mod.Monotone Bitch<span>74777</span></li>
+            <li>14 ST-21:mod.Optimistique<span>9984</span></li>
+            <li>15 ST-27:mod.static_amiga_megamix<span>244</span></li>
+            <li>16 ST-10:mod.Introe81.mod<span>2323</span></li>
+            <li>17 ST-27:mod.8909<span>26622</span></li>
+            <li>18 ST-21:mod.Ass Up!<span>8744</span></li>
+            <li>19 ST-17:mod.ASS!_FUCK!_HOE!_TITS!<span>2244</span></li>
+            <li>20 ST-03:mod.bring it down<span>88842</span></li>
+            <li>21 ST-27:21 mod.disko divas<span>22244</span></li>
+            <li>22 <span>0</span></li>
+            <li>23 <span>0</span></li>
+            <li>24 <span>0</span></li>
+            <li>25 <span>0</span></li>
+            <li>26 <span>0</span></li>
+            <li>27 <span>0</span></li>
+            <li>28 <span>0</span></li>
+            <li>29 <span>0</span></li>
+            <li>30 <span>0</span></li>
+            <li>31 <span>0</span></li>
+          </ul>
+        </div>
+      </div>
 
-						</div>
-					</div>
-				</div>
+    </div>
+  </div>
+</div>
 
-			</div>
-		</div>
+</div>
+</div>
 
 
 
-		<?php include "footer.php";
+<?php include "footer.php";
 
 

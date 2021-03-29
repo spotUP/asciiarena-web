@@ -20,7 +20,7 @@
 			</style>
 			<div class="col-lg-12" style="padding-top: 16px;">
 				<form id="<?=$form?>" action="/cmds.php?cmd=tag" method="post" class="form-inline my-2 my-lg-0">
-					<input class="form-control col-11 tagtext" type="text" maxlength="68" name="tagtext"
+					<input class="form-control col-11 tagtext" type="text" name="tagtext"
 					       placeholder="Tag the wall"
 					       id="<?=$tag?>" required autocomplete="off">
 					<button class="btn-primary col-1" style="margin: 0 !important; padding: 0 !important" type="submit">Tag</button>
