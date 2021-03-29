@@ -40,13 +40,12 @@ switch ($sort_by) {
 			</form>
 		</div>
 
-		<div class="content_slim_divider"></div>
-		<div class="row">
-			<div class="forum_nick col-2">
-				<a href="artists.php?sort_by=nick">ARTiST</a>
+		<div class="row amb-1 amt-1">
+			<div class="col-2">
+				<a class="white" href="artists.php?sort_by=nick">ARTiST</a>
 			</div>
-			<div class="artist_crew col-10">
-				<a href="artists.php?sort_by=crew">CREW</a>
+			<div class="col-10">
+				<a class="white" href="artists.php?sort_by=crew">CREW</a>
 			</div>
 		</div>
 
