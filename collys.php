@@ -122,9 +122,9 @@ switch ($sort_by) {
 			} else {
 				?>
 				<div class="row apb-1">
-					<div class="col-4">NAME</div>
-					<div class="col-4">ARTiST</div>
-					<div class="col-4">CREW</div>
+					<div class="col-4"><span class="white">NAME</span></div>
+					<div class="col-4"><span class="white">ARTiST</span></div>
+					<div class="col-4"><span class="white">CREW</span></div>
 				</div>
 				<?php
 				$searchquery = str_replace(" ", ",", $searchquery);
@@ -176,15 +176,9 @@ switch ($sort_by) {
 			{
 				?>
 				<div class="row amb-1">
-					<div class="col-5">
-						NAME
-					</div>
-					<div class="col-3">
-						ARTIST
-					</div>
-					<div class="col-4">
-						CREW
-					</div>
+					<div class="col-5"><span class="white">NAME</span></div>
+					<div class="col-3"><span class="white">ARTIST</span></div>
+					<div class="col-4"><span class="white">CREW</span></div>
 				</div>
 
 				<div class="row">
