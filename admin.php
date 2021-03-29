@@ -880,7 +880,7 @@ $(document).ready(function() {
 					<?php
 
 					include ("admin_edit_colly.php");
-//			include {"admin_edit_crew.php"};
+					include ("admin_edit_crew.php");
 					include ("admin_edit_artist.php");
 					include ("admin_edit_user.php");
 					include ("admin_edit_site_logo.php");
