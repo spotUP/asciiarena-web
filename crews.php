@@ -6,34 +6,30 @@ require_once "header.php";
 ?>
 <div class="row">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2">
-		<?php
+		<div class="row apl-1">
+			<div class="col-12 d-flex justify-content-between">
+				<?php
+				require_once "pagination.php";
 
-		require_once "pagination.php";
+				$sort_by = $_GET[ 'sort_by' ] ?? "";
+				switch ($sort_by) {
+					case "members":
+					case "releases":
+					$sort_order = "DESC";
+					break;
+					default:
+					$sort_order = "ASC";
+					$sort_by = "name";
+					break;
+				}
 
-		$sort_by = $_GET[ 'sort_by' ] ?? "";
-		switch ($sort_by) {
-			case "members":
-			case "releases":
-			$sort_order = "DESC";
-			break;
-			default:
-			$sort_order = "ASC";
-			$sort_by = "name";
-			break;
-		}
-
-		$pageno = $_GET[ 'pageno' ] ?? 1;
-		$rows_per_page = 138;
-		$pagination = pagination("crews", $pageno, $rows_per_page, "&sort_by={$sort_by}");
-		if (!isset($_POST[ "search" ])) {
-			echo $pagination[ "pager" ];
-		}
-		?>
-
-
-
-		<div class="row amb-1">
-			<div class="col-4">
+				$pageno = $_GET[ 'pageno' ] ?? 1;
+				$rows_per_page = 138;
+				$pagination = pagination("crews", $pageno, $rows_per_page, "&sort_by={$sort_by}");
+				if (!isset($_POST[ "search" ])) {
+					echo $pagination[ "pager" ];
+				}
+				?>
 				<form action="?sort_by=<?=$sort_by?>" method="post">
 					<label>Search for: <input type="text" name="search"></label>
 				</form>
