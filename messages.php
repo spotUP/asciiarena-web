@@ -1,6 +1,6 @@
 <?php
 include_once "session.php";
-$h1 = "mAiL";
+$h1 = "MAiL";
 include_once "header.php";
 ?>
 
@@ -72,6 +72,14 @@ include_once "header.php";
 
 			if (!isset($_POST[ 'open_postnewmessage' ])) 
 			{
+
+				?>
+				<form enctype="multipart/form-data" action="messages.php" method="post">
+					<div class="row apb-1 apl-1">
+						<input type="submit" colspan="4" name="open_postnewmessage" value="New Message!">
+					</div>
+				</form>
+				<?php
 				foreach (fetchAll("SELECT * FROM messages WHERE postedto = :nick GROUP BY thread ORDER BY timestamp DESC", [":nick" => $_user[ "nick" ]]) as $row) {
 					$messid = $row->id;
 					$thread = $row->thread;
@@ -82,42 +90,35 @@ include_once "header.php";
 					$postsubject = $row->subject;
 					$postmessage = $row->message;
 					$postsubject = fixOutputPost($postsubject);
-					$postsubject = myTruncate($postsubject, 17, " ", "...");
 					$postmessage = fixOutputPost($postmessage);
 
 					?>
-					<form enctype="multipart/form-data" action="message.php" method="post">
-						<div style="width: 100vw; float: left; display: inline-block;">
-							<div style="min-width: 15vw; display: inline-block;">
-								<?php
-								foreach (fetchAll("SELECT new FROM messages WHERE thread = :thread ORDER BY new DESC LIMIT 1", [":thread" => $thread]) as $row_new) {
-									$messnew = $row_new->new;
-									if ($messnew == 1) {
-										?>
-										<a class="yellow" !important;" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
-										<?php
-									} else {
-										?>
-										<a class="green" !important;" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
-										<?php
-									}
+					<form action="message.php" method="post">
+						<div class="row">
+							<?php
+							foreach (fetchAll("SELECT new FROM messages WHERE thread = :thread ORDER BY new DESC LIMIT 1", [":thread" => $thread]) as $row_new) {
+								$messnew = $row_new->new;
+								if ($messnew == 1) {
 									?>
+									<div class="col-7">
+										<a class="yellow text-truncate !important;" href="message.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
+									</div>
+									<?php
+								} else {
+									?>
+									<div class="col-7">
+										<a class="green text-truncate !important;" href="message.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
+									</div>
+									<?php
+								}
+								?>
+								<div class="col-3">
+									<span class="cyan">From:</span> <span class="white"><?=$messpostername?></span>
 								</div>
-								<div style="min-width: 20vw; display: inline-block;">
-									<span class="cyan">From</span><span class="blue">:</span>
-									<span class="white"><?=$messpostername?></span>
-								</div>
-
-								<div style="display: inline-block; width: 50px;">
+								<div class="col-2">
 									<input type="hidden" name="thread" value="<?=$thread?>">
 									<input type="hidden" name="messid" value="<?=$messid?>">
-									<input type="submit" name="postreply" value="Read">
-								</div>
-
-								<div style="display: inline-block; width: 64px;">
-									<input type="hidden" name="thread" value="<?=$thread?>">
-									<input type="hidden" name="messid" value="<?=$messid?>">
-									<input type="submit" name="deletemessage" value="Delete">
+									<div class="float-right apr-1"><input type="submit" name="deletemessage" value="Delete"></div>
 								</div>
 							</div>
 						</form>
@@ -125,15 +126,7 @@ include_once "header.php";
 					}
 				}
 
-				if (!isset($_POST[ 'open_postnewmessage' ])) {
-					?>
-					<form enctype="multipart/form-data" action="messages.php" method="post">
-						<div class="content_right">
-							<input type="submit" colspan="4" name="open_postnewmessage" value="New Message!">
-						</div>
-					</form>
-					<?php
-				}
+
 			}
 		} 
 		else
