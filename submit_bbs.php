@@ -6,46 +6,42 @@
 	<!-- -------------------------------------------------------------------------------- -->
 
 	<form enctype="multipart/form-data" action="submit.php" method="post">
-		<div class="headline">
-			Add BBS	
-		</div>
+		<div class="container-fluid bg-secondary ap-1">
+			<div class="row apl-1 ">
+				Name
+			</div>
 
-		<div class="content_with_blenk"><br></div>
+			<div class="row apl-1 apb-1">
+				<input type="text" size="24" name="name">
+			</div>
 
-		<div class="content">
-			Name
-		</div>
+			<div class="row apl-1">
+				Sysop
+			</div>
 
-		<div class="content">
-			<input type="text" size="24" name="name">
-		</div>
+			<div class="row apl-1 apb-1">
+				<input type="text" size="24" name="sysop">
+			</div>
 
-		<div class="content">
-			Sysop
-		</div>
+			<div class="row apl-1">
+				Address
+			</div>
 
-		<div class="content">
-			<input type="text" size="24" name="sysop">
-		</div>
+			<div class="row apl-1 apb-1">
+				<input type="text" size="24" name="address">
+			</div>
 
-		<div class="content">
-			Address
-		</div>
+			<div class="row apl-1">
+				Phone Number
+			</div>
 
-		<div class="content">
-			<input type="text" size="24" name="address">
-		</div>
+			<div class="row apl-1 apb-1">			
+				<input type="text" size="24" name="number">
+			</div>
 
-		<div class="content">
-			Phone Number
-		</div>
-
-		<div class="content">			
-			<input type="text" size="24" name="number">
-		</div>
-
-		<div class="content">
-			<input type="SUBMIT" name="submitbbs" value="Submit">
+			<div class="row apl-1 apb-1">
+				<input type="SUBMIT" name="submitbbs" value="Submit">
+			</div>
 		</div>
 	</form>
 </div>
