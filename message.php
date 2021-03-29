@@ -213,29 +213,26 @@ include_once "header.php";
 								?>
 								<div class="row">
 									<div class="col-6">
-										<span class="cyan">Date</span><span class="blue">:</span>
+										<span class="cyan">Date:</span>
 										<span class="white"><?=$messtime?></span>
 									</div>
 									<div class="col-6">
-										<span class="cyan text-truncate">Subject</span>
-										<span class="blue">:</span> <span class="white"><?=$postsubject?></span>
+										<span class="cyan text-truncate">Subject:</span> <span class="white"><?=$postsubject?></span>
 									</div>
 								</div>
 								<div class="row">
 									<div class="col-6">
-										<span class="cyan">From</span>
-										<span class="blue">:</span>
+										<span class="cyan">From:</span>
 										<span class="white"><?=$messpostername?></span>
 									</div>
 									<div class="col-6">
-										<span class="cyan">Status </span>  <span class="blue">:</span>
+										<span class="cyan">Status:</span>
 										<span class="white">Private</span>
 									</div>
 								</div>
 								<div class="row">
 									<div class="col-6">
-										<span class="cyan">To  </span>
-										<span class="blue">:</span>
+										<span class="cyan">To:</span>
 										<span class="white"><?=$messpostedto?></span>
 									</div>
 								</div>
