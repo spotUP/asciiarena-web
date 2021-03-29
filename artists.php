@@ -29,7 +29,7 @@ switch ($sort_by) {
 					echo $pagination[ "pager" ];
 				}
 				?>				
-				<div class="collys_search">
+				<div>
 					<form action="?sort_by=<?=$sort_by?>" method="post">
 						<label>Search for: <input type="text" name="search"></label>
 					</form>
@@ -80,10 +80,16 @@ switch ($sort_by) {
 			</div>
 			<?php
 		}
-		if (!isset($_POST[ "search" ])) {
-			echo $pagination[ "pager" ];
-		}
 		?>
+		<div class="row apl-1 apt-1">
+			<div class="col-12">
+				<?php
+				if (!isset($_POST[ "search" ])) {
+					echo $pagination[ "pager" ];
+				}
+				?>
+			</div>
+		</div>
 	</div>
 
 	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
