@@ -1,0 +1,89 @@
+<?php
+
+//---------------------------------------------------------------------------------------------------------------
+// CHECK UPLOADED ARTIST
+//---------------------------------------------------------------------------------------------------------------
+
+	if(isset($_POST['artistnick']))
+	{
+		$artistnick=$_POST['artistnick'];
+		$artistwww=$_POST['artistwww'];
+		$artiststatus=$_POST['artiststatus'];
+		$artistcrew=$_POST['artistcrew'];
+		$artistcountry=$_POST['artistcountry'];
+		$artistacronym=$_POST['artistacronym'];
+
+		$artistnick=cleanInsert($artistnick);
+		$artiststatus=cleanInsert($artiststatus);
+		$artistcrew=cleanInsert($artistcrew);
+		$artistacronym=cleanInsert($artistacronym);
+
+		$ask="SELECT nick from artists WHERE nick=:artistnick";
+		$result=fetchAll($ask, [ 'artistnick' => $artistnick ]);
+		foreach ($result as $row)
+		{
+			$artist_dupe=$row[0];				
+
+			if (strcasecmp($artistnick, $artist_dupe) == 0) 
+			{
+				?>
+				<div class="headline">
+					Error
+				</div>
+
+				<div class="content_with_blenk">
+					The artist already exists!
+				</div>
+
+				<?php
+				exit;
+			}
+		}
+
+		if (empty($artistnick))
+		{
+			?>
+			<div class="headline">
+				Error
+			</div>
+
+			<div class="content_with_blenk">
+				You must fill the artist nick field!
+			</div>
+
+			<?php
+			exit;
+		}
+
+		$ask="insert into artists (id, nick, www, active, country, rating, acronym, user_id) values (0, :artistnick, :artistwww, :artiststatus, :artistcountry, 0, :artistacronym)";
+		doQuery($ask, [
+			'artistnick' => $artistnick,
+			'artistwww' => $artistwww,
+			'artiststatus' => $artiststatus,
+			'artistcountry' => $country_list[$artistcountry],
+			'artistacronym' => $artistacronym
+		]);
+
+		if (isset($_POST[artist_crew]))
+		{
+			foreach($_POST[artist_crew] as $artist_crew)
+			{
+				$ask="insert into member_of values (:artist_crew,:artistnick)";
+				doQuery($ask, ['artist_crew' => $artist_crew, 'artistnick' => $artistnick ]);
+			}
+		}
+		?>		
+		<div class="headline">
+			Status
+		</div>
+
+		<div class="content_with_blenk">
+			The artist has been posted!
+		</div>
+
+
+		<meta http-equiv="Refresh" content="2"; url="submit.php">
+		<?php	
+		exit;
+	}
+?>
