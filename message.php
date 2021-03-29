@@ -6,7 +6,7 @@ include_once "header.php";
 
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
-		<?php
+		<?php		
 		if (is_logged_in()) 
 		{
 
@@ -175,13 +175,13 @@ include_once "header.php";
 //-----------------------------------------------------------------------------
 
 			if (isset($_REQUEST[ 'postreply' ])) {
-				if (isset($_POST[ 'thread' ])) {
-					$thread = $_POST[ 'thread' ];
-				}
+//				if (isset($_POST[ 'thread' ])) {
+//					$thread = $_POST[ 'thread' ];
+//				}
 
-				if (isset($_POST[ 'messid' ])) {
-					$messid = $_POST[ 'messid' ];
-				}
+//				if (isset($_POST[ 'messid' ])) {
+//					$messid = $_POST[ 'messid' ];
+//				}
 
 				if (isset($_GET[ 'thread' ])) {
 					$thread = $_GET[ 'thread' ];
@@ -257,12 +257,12 @@ include_once "header.php";
 							?>
 							<div class="row">
 								<div class="col-12 apt-1 apb-1">
-									<span class="white"><pre><?=$postmessage?></pre></span>
+									<span class="white" style="white-space: pre-wrap;"><?=$postmessage?></span>
 								</div>
 							</div>
 							<div class="row">
 								<div class="col-1">
-									<span class="cyan"><?=$signature?></pre>
+									<span class="cyan" style="white-space: pre-wrap;"><?=$signature?></span>
 								</div>
 							</div>
 							<div class="row apb-1">
