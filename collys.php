@@ -138,8 +138,8 @@ switch ($sort_by) {
 				foreach (fetchAll($ask, [":searchquery" => $searchquery]) as $row) {
 					?>
 					<div class="row">
-						<div class="col-4">
-							<a href="info_release.php?filename=<?=base64_encode($row->filename)?>"><?=myTruncate($row->name, 48, " ", "...")?></a>
+						<div class="col-4 text-truncate">
+							<a href="info_release.php?filename=<?=base64_encode($row->filename)?>"><?=$row->name?></a>
 						</div>
 						<div class="col-lg-4 green">
 							<span class="yellow"><?=combinize($row->artists, $row->artist_ids, "/artists/", $row->artists)?></span>
@@ -187,8 +187,8 @@ switch ($sort_by) {
 												$day = "0$day";
 											}
 											?>
-											<div class="col-4">
-												<a class="magenta" href="info_release.php?filename=<?=base64_encode($row->filename)?>"><?=myTruncate($row->name, 32, " ", "...")?></a>
+											<div class="col-4 text-truncate">
+												<a class="magenta" href="info_release.php?filename=<?=base64_encode($row->filename)?>"><?=$row->name?></a>
 											</div>
 											<div class="col-2">
 												<span class="yellow"><?=$row->filename?></span>

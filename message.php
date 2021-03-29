@@ -9,10 +9,7 @@ include_once "header.php";
 		<?php
 		if (is_logged_in()) 
 		{
-			?>
-			<div class="modal-body row m-0 p-0">
-				<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
-					<?php
+
 //-----------------------------------------------------------------------------
 // WRITE NEW MESSAGE TO DB
 //-----------------------------------------------------------------------------
@@ -216,12 +213,11 @@ include_once "header.php";
 								?>
 								<div class="row">
 									<div class="col-6">
-										<span class="cyan">Date</span>
-										<span class="blue">:</span>
+										<span class="cyan">Date</span><span class="blue">:</span>
 										<span class="white"><?=$messtime?></span>
 									</div>
 									<div class="col-6">
-										<span class="cyan">Subject</span>
+										<span class="cyan text-truncate">Subject</span>
 										<span class="blue">:</span> <span class="white"><?=$postsubject?></span>
 									</div>
 								</div>
