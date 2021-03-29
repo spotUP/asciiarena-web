@@ -228,7 +228,6 @@ if($getcollyname && (!isset($_POST['do_edit_colly'])))
 				</div>
 			</div>
 		</form>
-
 		<?php
 	}
 	?>
