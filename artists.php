@@ -19,26 +19,28 @@ switch ($sort_by) {
 ?>
 <div class="row">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2">
-		<?php
-
-		$pageno = $_GET[ 'pageno' ] ?? 1;
-		$rows_per_page = 138;
-		$pagination = pagination("artists", $pageno, $rows_per_page, "&sort_by={$sort_by}");
-		if (!isset($_POST[ "search" ])) {
-			echo $pagination[ "pager" ];
-		}
-
-	//-----------------------------------------------------------------------------
-	// SHOW ARTISTS
-	//-----------------------------------------------------------------------------
-
-		?>
-
-		<div class="collys_search">
-			<form action="?sort_by=<?=$sort_by?>" method="post">
-				<label>Search for: <input type="text" name="search"></label>
-			</form>
+		<div class="row apl-1">
+			<div class="col-12 d-flex justify-content-between">
+				<?php
+				$pageno = $_GET[ 'pageno' ] ?? 1;
+				$rows_per_page = 138;
+				$pagination = pagination("artists", $pageno, $rows_per_page, "&sort_by={$sort_by}");
+				if (!isset($_POST[ "search" ])) {
+					echo $pagination[ "pager" ];
+				}
+				?>				
+				<div class="collys_search">
+					<form action="?sort_by=<?=$sort_by?>" method="post">
+						<label>Search for: <input type="text" name="search"></label>
+					</form>
+				</div>
+			</div>
 		</div>
+		<?php
+		//-----------------------------------------------------------------------------
+		// SHOW ARTISTS
+		//-----------------------------------------------------------------------------
+		?>
 
 		<div class="row amb-1 amt-1">
 			<div class="col-2">
