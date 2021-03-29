@@ -262,7 +262,7 @@ include_once "header.php";
 								?>
 								<div class="row">
 									<div class="col-12">
-										<span class="white"><?=$postmessage?></span>
+										<span class="white"><pre><?=$postmessage?></pre></span>
 									</div>
 								</div>
 								<div class="row">

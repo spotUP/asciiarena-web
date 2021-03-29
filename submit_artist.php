@@ -3,7 +3,7 @@
 	<!-- ADD ARTIST FIELD                                                              -->
 	<!-- -------------------------------------------------------------------------------- -->
 
-	<form enctype="multipart/form-data" action="submit.php" method="post">	
+	<form action="submit.php" method="post">	
 		<div class="container-fluid bg-secondary ap-1">
 
 			<div class="row apl-1">
