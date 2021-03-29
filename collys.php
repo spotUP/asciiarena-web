@@ -30,7 +30,7 @@ switch ($sort_by) {
 ?>
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
-		<div class="row apl-1">
+		<div class="row apl-1 apb-1">
 			<div class="col-12 d-flex justify-content-between">
 				<?php
 				require_once "pagination.php";
@@ -284,11 +284,18 @@ switch ($sort_by) {
 											<?php
 										}
 									}
-									echo $pagination[ "pager" ];
-
 								}
 							}				
 							?>
+							<div class="row apl-1 apt-1">
+								<div class="col-12">
+									<?php
+									if (!isset($_POST[ "search" ])) {
+										echo $pagination[ "pager" ];
+									}
+									?>
+								</div>
+							</div>
 						</div>
 						<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
 							<?php include "sidebar.php"; ?>

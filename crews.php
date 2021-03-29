@@ -6,7 +6,7 @@ require_once "header.php";
 ?>
 <div class="row">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2">
-		<div class="row apl-1">
+		<div class="row apl-1 apb-1">
 			<div class="col-12 d-flex justify-content-between">
 				<?php
 				require_once "pagination.php";
@@ -91,14 +91,15 @@ require_once "header.php";
 			</div>
 			<?php
 		}
-		if (!isset($_POST[ "search" ])) {
-			echo $pagination[ "pager" ];
-		}
 		?>
-		<div class="collys_search">
-			<form action="?sort_by=<?=$sort_by?>" method="post">
-				<label>Search for: <input type="text" name="search"></label>
-			</form>
+		<div class="row apl-1 apt-1">
+			<div class="col-12">
+				<?php
+				if (!isset($_POST[ "search" ])) {
+					echo $pagination[ "pager" ];
+				}
+				?>
+			</div>
 		</div>
 	</div>
 	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
