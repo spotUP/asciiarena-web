@@ -296,9 +296,9 @@ EOD;
 		<?php if(!empty($h1)) {
 			$switcher = (is_array($h1)) ? "switcher" : ""; ?>
 			<div class="page-header">
-				<div class="row">
+				<div class="row apl-1 apr-1">
 					<div class="col-12">
-						<h1 class="bg-header <?=$switcher?>" style="min-height: 16px;">
+						<h1 class="bg-header ap-1 <?=$switcher?>" style="min-height: 16px;">
 							<span><?php if(!empty($switcher)) {
 								echo implode("</span><span style='display: none;'>", $h1);
 							} else {
@@ -315,7 +315,7 @@ EOD;
 			<?php }
 		}
 		?>
-		<div class="col-12 p-0 m-0 apb-1 amt-1">
+		<div class="col-12 p-0 m-0 apb-1">
 			<div class="bs-component">
 				<div class="animate__animated animate__tada alert alert-dismissible alert-danger hide-on-landscape">
 					<button type="button" class="close" data-dismiss="alert">x</button>

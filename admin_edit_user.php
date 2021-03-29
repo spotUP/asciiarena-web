@@ -26,27 +26,25 @@ if(isset($_POST['getuser']) && is_admin())
 	<div class="row apb-1">
 		<div class="col-12">
 			<form enctype="multipart/form-data" action="#edituser" method="post">
-				<div class="custom-select">
-					<select name="getuser">
-						<?php
-						if (isset($show_user_nick))
-						{
-							?>
-							<option selected value="$show_all_user_names"><?=$show_user_nick?></option>
-							<?php
-						}
-						$ask="SELECT nick FROM users";
-						$result=fetchAll($ask);
-						foreach ($result as $row)
-						{
-							$show_all_user_names=$row->nick;
-							?>
-							<option><?=$show_all_user_names?></option>
-							<?php
-						}
+				<select name="getuser">
+					<?php
+					if (isset($show_user_nick))
+					{
 						?>
-					</select>
-				</div>
+						<option selected value="$show_all_user_names"><?=$show_user_nick?></option>
+						<?php
+					}
+					$ask="SELECT nick FROM users";
+					$result=fetchAll($ask);
+					foreach ($result as $row)
+					{
+						$show_all_user_names=$row->nick;
+						?>
+						<option><?=$show_all_user_names?></option>
+						<?php
+					}
+					?>
+				</select>
 			</form>
 		</div>
 	</div>

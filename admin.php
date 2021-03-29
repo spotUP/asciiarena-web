@@ -1,6 +1,6 @@
 <?php
 require_once "session.php";
-$h1 = ["wELCOME tO aSCIIaRENA", "bY uP rOUGH and diViNE sTYLERS"];
+$h1 = "aDMiN";
 include "header.php";
 ?>
 <script type="text/javascript">
@@ -850,9 +850,8 @@ $(document).ready(function() {
 	<div class="row">
 		<div class="col-lg-12">
 			<?php if(is_admin()) { ?>
-			<h2 class="bg-header" id="nav-tabs">ADMiN</h2>
 			<div class="bs-component">
-				<ul class="nav nav-tabs">
+				<ul class="nav nav-tabs apt-1 bg-secondary">
 					<li class="nav-item">
 						<a class="nav-link active" data-toggle="tab" href="#colly">Colly</a>
 					</li>

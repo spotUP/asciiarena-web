@@ -7,7 +7,6 @@
 
 if(isset($_POST['getcrew']) && is_admin())
 {
-echo "toooooo";
 	$getcrew=$_POST['getcrew'];
 	$getcrew=cleanInsert($getcrew);
 	$ask="select * from crews where name=:getcrew";

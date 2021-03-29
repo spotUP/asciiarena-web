@@ -4,7 +4,7 @@ $h1 = "CREWS";
 require_once "header.php";
 
 ?>
-<div class="row">
+<div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2">
 		<div class="row apl-1 apb-1">
 			<div class="col-12 d-flex justify-content-between">
