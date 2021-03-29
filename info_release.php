@@ -40,7 +40,7 @@ require_once "header.php"; ?>
 					</div>
 					<div class="row">
 						<div class="col-12 amt-1 amb-1">
-							<textarea class="w-100" rows="5" id="broken_comment" name="broken_comment"></textarea>
+							<textarea class="w-100" style="height: 64px;" id="broken_comment" name="broken_comment"></textarea>
 						</div>
 					</div>
 					<div class="row">
