@@ -15,7 +15,7 @@
 				File
 			</div>
 			<div class="row apl-1 apb-1">
-				<input type="file" name="uploadedfile"><input type="SUBMIT" name="dupecheck" value="Dupe Check">
+				<input type="file" name="uploadedfile"><span class="apl-1"><input type="SUBMIT" name="dupecheck" value="Dupe Check"></span>
 			</div>
 
 			<div class="row apl-1">
