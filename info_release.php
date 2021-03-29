@@ -88,15 +88,15 @@ require_once "header.php"; ?>
 			$crew = cleanInsert($crew);
 
 			$ask = "SELECT nick from author_of where filename=:filename";
-			$result = fetchOne($ask, [ 'filename' => $filename ]);
+			$row = fetchOne($ask, [ 'filename' => $filename ]);
 			if (isset($row->nick))
 			{
 				$artist = $row->nick;
 			}
 
 			$ask = "SELECT crew from crew_of where filename=:filename";
-			$result = fetchOne($ask, [ 'filename' => $filename ]);
-			if ($row = $result) 
+			$row = fetchOne($ask, [ 'filename' => $filename ]);
+			if (isset($row->crew))
 			{
 				$crew = $row->crew;
 			}
