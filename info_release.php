@@ -145,7 +145,7 @@ require_once "header.php"; ?>
 				}
 
 				$ask = "insert into comments (colly_id, filename, crew, artist, comment, rating, nick, timestamp,user_id) 
-					values ((select id from collys where filename=:filename),:filename,:commentcrew,:artist,:comment, :user_added_rating, :nick, :time, :user_id)";
+				values ((select id from collys where filename=:filename),:filename,:commentcrew,:artist,:comment, :user_added_rating, :nick, :time, :user_id)";
 				doQuery($ask, [
 					'filename' => $filename,
 					'commentcrew' => $commentcrew,
@@ -154,8 +154,8 @@ require_once "header.php"; ?>
 					'nick' => $nick,
 					'time' => $time,
 				  	'user_added_rating' => $user_added_rating, # might be empty, should end up as NULL
-					'user_id' => $_user['id'],
-				]);
+				  	'user_id' => $_user['id'],
+				  ]);
 				echo "<meta http-equiv='Refresh' content='0; url=$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
 			}
 
@@ -1254,25 +1254,32 @@ if (isset($_POST[ 'addcomment' ]))
 	{
 		echo "<form action=$_SERVER[PHP_SELF]?filename=$decoded_filename&comment method=\"post\">";
 		?>
-		<div class="row">
-			<h2>Enter your comment...</h2>
+		<div class="row apl-1 apr-1">
+			<div class="header bg-header col-12 ap-1">ENTER YOUR COMMENT</div>
 		</div>
 
 		<div class="row">
-			<textarea rows="5" cols="82" id="comment" name="comment"></textarea>
+			<div class="col-12 aml-1 amr-1">
+				<textarea style="height: 128px; width: 100%;" class="bg-secondary cyan ap-1" id="comment" name="comment"></textarea>
+			</div>
 		</div>
 
-		RATING
-		<select name="user_added_rating">
-			<option value="0" selected="selected">Blank</option><?php
-			for ($i = 1; $i < 11; $i++) 
-			{
-				echo "<option value=$i>$i</option>";
-			} ?>
-		</select>
-		<input type="hidden" name="crew" align="right" value="<?=$crew?>"><input type="hidden" name="artist"
-		align="right" value="<?=$artist?>">
-		<input type="submit" class="btn-big" name="add_comment" align="right" value="Comment">
+		<div class="row aml-1 apl-1 apr-1">
+			<div class="col-12 apl-1 apr-1 apb-1 apt-1 bg-secondary">
+
+				RATING
+				<select name="user_added_rating">
+					<option value="0" selected="selected">Blank</option><?php
+					for ($i = 1; $i < 11; $i++) 
+					{
+						echo "<option value=$i>$i</option>";
+					} ?>
+				</select>
+				<input type="hidden" name="crew" align="right" value="<?=$crew?>"><input type="hidden" name="artist"
+				align="right" value="<?=$artist?>">
+				<input type="submit" class="btn-big" name="add_comment" align="right" value="Comment">
+			</div>
+		</div>
 	</form>
 	<script type="text/javascript">
 		document.getElementById('comment').focus();
