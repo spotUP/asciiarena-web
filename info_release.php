@@ -908,6 +908,10 @@ require_once "header.php"; ?>
 
 			if (is_logged_in()) 
 			{
+				$ask = "select uploader from collys where filename=:filename";
+				$result_uploader = fetchOne($ask, [ 'filename' => base64_decode($filename) ]);
+				if (isset($result_uploader->uploader)) $uploader = $result_uploader->uploader;
+
 				echo "<input type='submit' class='btn-big amb-1' name=addcomment value='Comment'> ";
 				echo "<input type='submit' class='btn-big amb-1' name=favourite value='Favourite'> ";
 				echo "<input type='submit' class='btn-big amb-1' name=broken value='Report Broken'> ";
