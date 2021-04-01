@@ -1,7 +1,7 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
 	<div class="header col-lg-12">
-		<h2 class="ap-1 bg-header"><a class="lightgreen" href="mags.php?sort_by=timestamp">LATEST ADDED MAGS</a> <a class="lightgreen"
-		                                                                                     href="rss.php?class=0">[RSS]</a>
+		<h2 class="ap-1 bg-header"><a class="lightgreen" href="/mags.php?sort_by=timestamp">LATEST ADDED MAGS</a> <a class="lightgreen"
+		                                                                                     href="/rss.php?class=0">[RSS]</a>
 		</h2>
 	</div>
 <?php
@@ -17,7 +17,7 @@
 
 		?>
 		<div class="col-lg-12 d-flex justify-content-between">
-			<a class="magenta" href="mags.php?sort_by=timestamp"><?=$filename?></a>
+			<a class="magenta" href="/mags.php?sort_by=timestamp"><?=$filename?></a>
 			<?=$upload_date?>
 		</div>
 		<?php
