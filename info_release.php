@@ -87,7 +87,7 @@ require_once "header.php"; ?>
 
 			if (is_numeric($commentid)) 
 			{
-				doQuery("UPDATE comments SET comment = :comment, base64 = 1 WHERE commentid = :commentid", [
+				doQuery("UPDATE comments SET comment = :comment WHERE commentid = :commentid", [
 					":comment" => $edit_message,
 					":commentid" => $commentid
 				]);
@@ -1077,14 +1077,13 @@ if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ])))
 //----------------------------------------------------------------------------------------------
 if (!isset($_POST[ 'edit' ])) 
 {
-	foreach (fetchAll("SELECT comment, rating, nick, timestamp, commentid, base64 FROM comments WHERE filename = :filename ORDER BY timestamp ASC", [":filename" => $filename]) as $row) 
+	foreach (fetchAll("SELECT comment, rating, nick, timestamp, commentid FROM comments WHERE filename = :filename ORDER BY timestamp ASC", [":filename" => $filename]) as $row) 
 	{
 		$comment = $row->comment;
 		$userrating = $row->rating;
 		$commentnick = $row->nick;
 		$commentid = $row->commentid;
 		$commenttime = date("Y-m-d H:i", $row->timestamp);
-		$comment = fixOutputPost($comment, (boolean)$row->base64);
 
 		echo "<form action='$_SERVER[PHP_SELF]?filename=$decoded_filename&post' method='post'>";
 		if ($userrating > 0) 
@@ -1297,11 +1296,10 @@ if (isset($_POST[ 'edit' ]))
 	echo "<form action=\"$_SERVER[PHP_SELF]?filename=$decoded_filename&comment\" method=\"post\">";
 	$commentid = cleanInsert($_POST[ 'commentid' ]);
 
-	$ask = "select comment, base64 from comments where commentid='$commentid'";
+	$ask = "select comment from comments where commentid='$commentid'";
 	$result = mysql_query($ask, $dbh);
 	while ($row = mysql_fetch_array($result)) 
 	{
-		$base64 = $row[ 'base64' ];
 		$comment = fixOutputEdit($row[ 'comment' ]);
 	}
 	echo "<form action=$_SERVER[PHP_SELF]?filename=$decoded_filename&comment method=\"post\">";
