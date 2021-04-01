@@ -72,7 +72,7 @@ include "header.php";
               echo ', ';
             }
           }
-          echo '<a href="info_crew.php?crew='.$encoded_crew.'&sort_by=a.filename">'.$crew.'</a>';
+          echo '<a href="/crew/'.urlsafe($crew).'">'.$crew.'</a>';
           $c++;
         }
       }
@@ -243,7 +243,7 @@ foreach (fetchAll($q, $p) as $row) {
               echo ', ';
             }
           }
-          echo "<a href=\"info_crew.php?crew=$encoded_crew&sort_by=a.filename\">$crew</a>";
+          echo "<a href=\"/crew/".urlsafe($encoded_crew)."\">$crew</a>";
           $c++;
         }
         ?>
@@ -439,7 +439,7 @@ foreach (fetchAll($q, $p) as $row) {
     <a class="magenta" href="info_release.php?filename=<?=$encoded_filename?>" ><?=$name?></a> 
   </div>
   <div class="col-lg-3 pl-0">            
-    <a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.filename"> <?=$crew?></a>
+    <a href="/crew/<?=urlsafe($crew)?>/"> <?=$crew?></a>
   </div>
   <div class="col-lg-3 pl-0">            
     <span class="lightgrey"><?php if(!empty($year)){ echo "$year"; }?></span>

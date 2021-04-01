@@ -66,7 +66,7 @@ switch ($sort_by) {
 				$artists[ $row->nick ] = [];
 			}
 			if (!in_array($row->crew, $artists[ $row->nick ], true)) {
-				$artists[ $row->nick ][] = "<a href=\"info_crew.php?" . base64_encode($row->crew) . "\">{$row->crew}</a>";
+				$artists[ $row->nick ][] = "<a href=\"/crew/" . urlsafe($row->crew) . "\">{$row->crew}</a>";
 			}
 		}
 		foreach ($artists as $artist => $crews) {

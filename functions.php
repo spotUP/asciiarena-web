@@ -389,3 +389,16 @@
 		"Zambia",
 		"Zimbabwe",
 	];
+
+//-----------------------------------------------------------
+// FUNCTION: create url safe string
+//-----------------------------------------------------------
+
+function urlsafe($string) {
+   $string = strtolower(iconv("utf-8", "us-ascii//TRANSLIT", $string));
+   $string = preg_replace('/[\s\!]+/', '-', $string);
+   $string = preg_replace('/[^-a-z0-9_]+/', '', $string);
+   $string = preg_replace('/-+$/', '-', $string);
+   $string = preg_replace('/-+/', '-', $string);
+   return $string;
+}

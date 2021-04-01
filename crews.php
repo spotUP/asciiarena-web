@@ -77,7 +77,7 @@ require_once "header.php";
 			?>
 			<div class="row">
 				<div class="col-4 text-truncate">
-					<a href="info_crew.php?crew=<?=$encoded_crew?>"><?=$crew->name;?><?=($acronym) ? " (" . $acronym .")" : '' ?></a>
+					<a href="/crew/<?=urlsafe($crew->name)?>"><?=$crew->name;?><?=($acronym) ? " (" . $acronym .")" : '' ?></a>
 				</div>
 				<div class="col-3 green">
 					<?=(int)$crew->members?>
