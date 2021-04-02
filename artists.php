@@ -70,11 +70,10 @@ switch ($sort_by) {
 			}
 		}
 		foreach ($artists as $artist => $crews) {
-			$encoded_artist = base64_encode($artist);
 			?>
 			<div class="row">
 				<div class="forum_nick col-2">
-					<a href="info_artist.php?artist=<?=$encoded_artist?>&sort_by=filename"><?=$artist?></a>
+					<a href="/artist/<?=urlsafe($artist)?>"><?=$artist?></a>
 				</div>
 				<div class="artist_crew col-10"><?=pluralize($crews)?></div>
 			</div>
