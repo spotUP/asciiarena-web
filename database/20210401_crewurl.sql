@@ -1,3 +1,4 @@
+ALTER TABLE `crews` ADD `crewurl` CHAR(60) NOT NULL AFTER `acronym`, ADD INDEX `crewurl` (`crewurl`); 
 UPDATE crews SET crewurl='mystic' WHERE id=1;
 UPDATE crews SET crewurl='up-rough' WHERE id=2;
 UPDATE crews SET crewurl='style' WHERE id=3;
