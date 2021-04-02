@@ -85,7 +85,9 @@
 		if(!empty($names)) {
 			$a = array_map("trim", preg_split("([&,])", $names));
 			if(empty($ids)) {
-				$b = array_map("base64_encode", $a);
+				// works for pretty crews but breaks artist links temporarily
+				//$b = array_map("base64_encode", $a);
+				$b = $a;
 			} else {
 				$b = explode(",", $names);
 			}
