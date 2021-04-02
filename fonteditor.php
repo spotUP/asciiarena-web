@@ -25,7 +25,7 @@ include "header.php";
                     </div>
                 </div>
                 <div id="view-container" class="container">
-                    <div id='view' class='page apt-1 bg-secondary' ng-view="" ng-cloak></div>
+                    <div id='view' class='page apt-1 apl-1 apr-1 bg-secondary' ng-view="" ng-cloak></div>
                 </div>
                 <div dialog-export></div>
                 <div dialog-import></div>
