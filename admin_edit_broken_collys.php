@@ -3,7 +3,7 @@
 // BROKEN COLLYS                                                                    
 // -------------------------------------------------------------------------------- 
 ?>
-<div class="tab-pane fade" id="broken">
+<div class="tab-pane fade apt-1" id="broken">
 
 	<form enctype="multipart/form-data" action="#broken" method="post">
 		<?php
