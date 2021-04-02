@@ -182,12 +182,11 @@ include "header.php";
 			foreach($result_memb as $row_memb)
 			{
 				$membacronym=$row_memb->acronym;
-				$encoded_crewmember=base64_encode($crewmember);
 
 				?>
 				<div class="row">
 					<div class="col-4">
-						<a href="/info_artist.php?artist=<?=$encoded_crewmember?>&sort_by=filename" /> <?=$crewmember?> 
+						<a href="/artist/<?=urlsafe($crewmember)?>" /> <?=$crewmember?> 
 						<?php
 						if(!empty($membacronym))
 						{
@@ -373,8 +372,7 @@ include "header.php";
 						<?php
 						$authors = [];
 						foreach(fetchAll("SELECT * FROM author_of WHERE filename = :filename GROUP BY nick", [ ':filename' => $filename ]) as $author) {
-							$encoded_author = base64_encode($author->artist_id);
-							$authors[] = "<a href=\"/info_artist.php?artist={$encoded_author}&sort_by=filename\">{$author->nick}</a>";
+							$authors[] = "<a href=\"/artist/".urlsafe($author->nick)."\">{$author->nick}</a>";
 						}
 						echo pluralize($authors, '<span class="magenta"> & </span>');
 						?>
@@ -531,7 +529,6 @@ include "header.php";
 				foreach($result as $row)
 				{
 					$author=$row->author;
-					$encoded_author=base64_encode($author);
 					$encoded_filename=base64_encode($row->filename);
 					$name=$row->name;
 					$year=$row->year;
@@ -546,12 +543,12 @@ include "header.php";
 
 						<div class="col-3">
 
-							<a class="green" href="/info_artist.php?artist=<?=$encoded_author?>&sort_by=filename"><?=$author?></a>
+							<a class="green" href="/artist/<?=urlsafe($author)?>"><?=$author?></a>
 						</div>
 
 						<div class="col-3">
 
-							<span class="lightgrey" href="/info_artist.php?artist=<?=$encoded_author?>&sort_by=filename"><?php if (!empty($year)) { echo $year; }?></span>
+							<span class="lightgrey" href="/artist/<?=urlsafe($author)?>"><?php if (!empty($year)) { echo $year; }?></span>
 						</div>
 
 					</div>
