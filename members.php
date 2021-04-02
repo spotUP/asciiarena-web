@@ -134,7 +134,7 @@ include "header.php";
 						<a href="/info_release.php?filename=<?=base64_encode($row->filename)?>"><?=myTruncate($row->name, 24, " ", "...")?></a>
 					</div>
 					<div class="col-4">
-						<?=combinize($row->artists, "", "info_artist.php?artist=", $row->artists)?>
+						<?=combinize($row->artists, "", "/artist/", $row->artists)?>
 					</div>
 					<div class="col-4">
 						<?=combinize($row->crews, "", "/crew/", $row->crews)?>
@@ -166,7 +166,7 @@ include "header.php";
 							href="/info_release.php?filename=<?=$encoded_filename?>"><?=myTruncate($row->name, 24, " ", "...")?></a>
 						</div>
 						<div class="col-4">
-							<?=combinize($row->artists, "", "info_artist.php?artist=", $row->artists)?>
+							<?=combinize($row->artists, "", "/artist/", $row->artists)?>
 						</div>
 						<div class="col-4">
 							<?=combinize($row->crews, "", "/crew/", $row->crews)?>
