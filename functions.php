@@ -85,8 +85,6 @@
 		if(!empty($names)) {
 			$a = array_map("trim", preg_split("([&,])", $names));
 			if(empty($ids)) {
-				// works for pretty crews but breaks artist links temporarily
-				//$b = array_map("base64_encode", $a);
 				$b = $a;
 			} else {
 				$b = explode(",", $names);
@@ -94,7 +92,7 @@
 			$links = [];
 			if(count($a) === count($b)) {
 				foreach($a as $k => $v) {
-					$links[] = "<a href='{$base}{$b[$k]}'>{$v}</a>";
+					$links[] = "<a href='{$base}".urlsafe($b[$k])."'>{$v}</a>";
 				}
 				return pluralize($links);
 			}
