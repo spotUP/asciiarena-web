@@ -18,7 +18,15 @@ include "header.php";
       'a.year, a.month' => 'Release Date'
     );
 
-    $showartist=base64_decode($_GET['artist']);
+    $artisturl = $_GET['artist'];
+    $result = fetchOne("select nick from artists where artisturl=:artisturl", [ 'artisturl' => $artisturl ]);
+    if (isset($result->nick)) 
+    {
+    	$showartist = $result->nick;
+    } else {
+    	echo "artist not found";
+    	exit;
+    }
 
     $q = "select * from artists where nick=:nick";
     $p = [":nick" => $showartist];
@@ -196,7 +204,6 @@ foreach (fetchAll($q, $p) as $row) {
 
             $c = 0;
             foreach($authors as $author) {
-              $encoded_author=base64_encode($author);
               if($c > 0)
               {
                 if($c == count($authors)-1)
@@ -208,7 +215,7 @@ foreach (fetchAll($q, $p) as $row) {
                   echo ', ';
                 }
               }
-              echo "<a href=\"info_artist.php?artist=$encoded_author&sort_by=a.filename\">$author</a>";
+              echo "<a href=\"/artist/".urlsafe($author)."\">$author</a>";
               $c++;
             }
             ?>
@@ -231,7 +238,6 @@ foreach (fetchAll($q, $p) as $row) {
 
           $c = 0;
           foreach($crews as $crew) {
-            $encoded_crew=base64_encode($crew);
             if($c > 0) 
             {
              if($c == count($crews)-1) 
@@ -243,7 +249,7 @@ foreach (fetchAll($q, $p) as $row) {
               echo ', ';
             }
           }
-          echo "<a href=\"/crew/".urlsafe($encoded_crew)."\">$crew</a>";
+          echo "<a href=\"/crew/".urlsafe($crew)."\">$crew</a>";
           $c++;
         }
         ?>
@@ -381,8 +387,6 @@ $q = "SELECT acronym FROM artists where nick=:nick";
 $p = [":nick" => $artist];
 $result = fetchOne($q, $p);
 $acronym = $result->acronym;
-
-$encoded_artist=base64_encode($artist);
 ?>
 <div style="clear: both"></div>
 
@@ -395,13 +399,13 @@ $encoded_artist=base64_encode($artist);
 <div class="col-lg-12 d-flex justify-content-between pl-0">
   <?php
   foreach ($validSorts as $key => $val) {
-    echo "<div class=\"col-lg-3 pl-0 amb-1\"><a class=\"lightgreen\" href=\"info_artist.php?artist={$encoded_artist}&sort_by={$key}\">{$val}</a></div>";
+    echo "<div class=\"col-lg-3 pl-0 amb-1\"><a class=\"lightgreen\" href=\"/artist/".urlsafe($artist)."?&sort_by={$key}\">{$val}</a></div>";
   }
   ?>
 
 </div>
 <?php
-$sort_criteria=$_GET['sort_by'];
+$sort_criteria = (isset($_GET['sort_by'])) ? $_GET['sort_by'] : 'a.filename';
 $q = "SELECT a.*, b.nick AS author, c.crew FROM collys AS a " .
 "  INNER JOIN author_of AS b ON a.filename = b.filename " .
 "  INNER JOIN crew_of AS c ON a.filename = c.filename " .

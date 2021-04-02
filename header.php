@@ -215,10 +215,10 @@ EOD;
 					</div>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link ascii" style="padding-right: 8px;" href="artists.php?sort_by=nick">ARTiSTS</a>
+					<a class="nav-link ascii" style="padding-right: 8px;" href="/artists.php?sort_by=nick">ARTiSTS</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link ascii" style="padding-right: 8px;" href="crews.php">CREWS</a>
+					<a class="nav-link ascii" style="padding-right: 8px;" href="/crews.php">CREWS</a>
 				</li>
 				<?php
 				if(!is_logged_in()) 

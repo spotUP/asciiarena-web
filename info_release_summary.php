@@ -56,8 +56,8 @@ $dirname = $dirname[ 0 ];
 							<?php
 							$authors = [];
 							foreach (fetchAll("SELECT * FROM author_of WHERE filename = :filename", [":filename" => $filename]) as $row) {
-								$encoded_author = base64_encode($row->nick);
-								$authors[] = "<a class=\"green\" href=\"info_artist.php?artist={$encoded_author}&sort_by=filename\">{$row->nick}</a>";
+								$author = $row->nick;
+								$authors[] = "<a class=\"green\" href=\"/artist/".urlsafe($author)."\">{$row->nick}</a>";
 							}
 							?>
 							<span>
@@ -72,7 +72,7 @@ $dirname = $dirname[ 0 ];
 							$crews = [];
 							foreach (fetchAll("SELECT * FROM crew_of WHERE filename = :filename", [":filename" => $filename]) as $row) {
 								$encoded_crew = base64_encode($row->crew);
-								$crews[] = "<a href=\"/crew/".urlsafe($row->crew)."/?sort_by=filename\">{$row->crew}</a>";
+								$crews[] = "<a href=\"/crew/".urlsafe($row->crew)."\">{$row->crew}</a>";
 							}
 							?>
 							<span>
