@@ -72,7 +72,7 @@ $dirname = $dirname[ 0 ];
 							$crews = [];
 							foreach (fetchAll("SELECT * FROM crew_of WHERE filename = :filename", [":filename" => $filename]) as $row) {
 								$encoded_crew = base64_encode($row->crew);
-								$crews[] = "<a href=\"info_crew.php?crew={$encoded_crew}&sort_by=filename\">{$row->crew}</a>";
+								$crews[] = "<a href=\"/crew/".urlsafe($row->crew)."/?sort_by=filename\">{$row->crew}</a>";
 							}
 							?>
 							<span>

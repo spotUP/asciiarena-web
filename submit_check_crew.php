@@ -7,18 +7,12 @@
 
 if(isset($_POST['crewname']))
 {
+	var_dump($_POST);
 	$crewname=$_POST['crewname'];
 	$crewacronym=$_POST['crewacronym'];
 	$crewwww=$_POST['crewwww'];
 	$crewcontact=$_POST['crewcontact'];
-	$crewtatus=$_POST['crewtatus'];
-
-	$crewname=cleanInsert($crewname);
-	$crewacronym=cleanInsert($crewacronym);
-	$crewwww=cleanInsert($crewwww);
-	$crewbbs=cleanInsert($crewbbs);
-	$crewcontact=cleanInsert($crewcontact);
-	$crewstatus=cleanInsert($crewstatus);
+	$crewstatus=$_POST['crewstatus'];
 
 	if (empty($crewname))
 	{
@@ -43,13 +37,14 @@ if(isset($_POST['crewname']))
 		}
 	}
 
-	$ask="insert into crews values (:crewname,:crewwww,:crewcontact,:crewstatus,0,:crewacronym)";
+	$ask="insert into crews (name, www, contact, active, rating, acronym, crewurl) values (:crewname,:crewwww,:crewcontact,:crewstatus,0,:crewacronym,:crewurl)";
 	doQuery($ask, [
 		'crewname' => $crewname,
 		'crewwww' => $crewwww,
 		'crewcontact' => $crewcontact,
 		'crewstatus' => $crewstatus,
-		'crewacronym' => $crewacronym
+		'crewacronym' => $crewacronym,
+		'crewurl' => urlsafe($crewname)
 	]);
 
 	?>	
