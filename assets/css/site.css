@@ -1117,6 +1117,8 @@ input:active, button:active, select:active, optgroup:active {
 
 .ng-scope{
   background: #1a1a1a;
+  padding-left: 0px !important;
+  padding-right: 0px !important; 
 }
 
 input.form-control {
