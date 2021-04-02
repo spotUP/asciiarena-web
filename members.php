@@ -137,7 +137,7 @@ include "header.php";
 						<?=combinize($row->artists, "", "info_artist.php?artist=", $row->artists)?>
 					</div>
 					<div class="col-4">
-						<?=combinize($row->crews, "", "info_crew.php?crew=", $row->crews)?>
+						<?=combinize($row->crews, "", "/crew/", $row->crews)?>
 					</div>
 				</div>
 				<?php
@@ -169,7 +169,7 @@ include "header.php";
 							<?=combinize($row->artists, "", "info_artist.php?artist=", $row->artists)?>
 						</div>
 						<div class="col-4">
-							<?=combinize($row->crews, "", "info_crew.php?crew=", $row->crews)?>
+							<?=combinize($row->crews, "", "/crew/", $row->crews)?>
 							<?php if($member->id === $_user[ "id" ]) { ?>
 								<input type="submit" class="float-right remove-button" data-id="<?=$row->colly_id?>" value="Remove">
 							<?php } ?>

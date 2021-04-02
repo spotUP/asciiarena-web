@@ -14,17 +14,25 @@ include "header.php";
 // CREW INFO
 //-----------------------------------------------------------------------------
 
-		$showcrew=$_GET['crew'] ?? '';
-		$showcrew=base64_decode($showcrew);
+		$crewurl=$_GET['crew'] ?? '';
+		$result = fetchOne("select name from crews where crewurl=:crewurl", [ 'crewurl' => $crewurl ]);
+		if (isset($result->name)) 
+		{
+			$showcrew = $result->name;
+		} else {
+			echo "crew not found";
+			exit;
+		}
 
 		$sort_criteria=$_GET['sort_by'] ?? 'a.name';
 		$sort_criteria=preg_replace('[^a-z.]','', $sort_criteria);
 
-		$ask="select * from crews where name=:showcrew";
-		$result=fetchAll($ask, [ 'showcrew' => $showcrew ]);
+		$ask="select * from crews where crewurl=:crewurl";
+		$result=fetchAll($ask, [ 'crewurl' => $crewurl ]);
 		foreach($result as $row)
 		{
 			$show_name=$row->name;
+			$showcrew=$row->name;
 			$show_www=$row->www;
 			$show_contact=$row->contact;
 			$show_active=$row->active;
@@ -93,11 +101,11 @@ include "header.php";
 
 					if(empty($show_rating))
 					{
-						$askagain="SELECT COUNT(rating) from comments where crew=:showcrew";
+						$askagain="SELECT COUNT(rating) as cnt from comments where crew=:showcrew";
 						$resultagain=fetchAll($askagain, [ 'showcrew' => $showcrew ]);
 						foreach($resultagain as $rowagain)
 						{
-							$votecount=$rowagain[0];
+							$votecount=$rowagain->cnt;
 						}
 						$votesleft=(3-$votecount);
 						if ($votesleft==1)
@@ -179,7 +187,7 @@ include "header.php";
 				?>
 				<div class="row">
 					<div class="col-4">
-						<a href="info_artist.php?artist=<?=$encoded_crewmember?>&sort_by=filename" /> <?=$crewmember?> 
+						<a href="/info_artist.php?artist=<?=$encoded_crewmember?>&sort_by=filename" /> <?=$crewmember?> 
 						<?php
 						if(!empty($membacronym))
 						{
@@ -355,7 +363,7 @@ include "header.php";
 				<div class="col-8">
 					<?php
 					?>	
-					<a class="ascii" href="info_release.php?filename=<?=$encoded_filename?>"><pre><?=$file_id?></pre></a>
+					<a class="ascii" href="/info_release.php?filename=<?=$encoded_filename?>"><pre><?=$file_id?></pre></a>
 					<?php
 					?>
 				</div>
@@ -366,7 +374,7 @@ include "header.php";
 						$authors = [];
 						foreach(fetchAll("SELECT * FROM author_of WHERE filename = :filename GROUP BY nick", [ ':filename' => $filename ]) as $author) {
 							$encoded_author = base64_encode($author->artist_id);
-							$authors[] = "<a href=\"info_artist.php?artist={$encoded_author}&sort_by=filename\">{$author->nick}</a>";
+							$authors[] = "<a href=\"/info_artist.php?artist={$encoded_author}&sort_by=filename\">{$author->nick}</a>";
 						}
 						echo pluralize($authors, '<span class="magenta"> & </span>');
 						?>
@@ -377,7 +385,7 @@ include "header.php";
 							$crews = [];
 							foreach(fetchAll("SELECT * FROM crew_of WHERE filename = :filename GROUP BY crew", [ ':filename' => $filename ]) as $crew) {
 								$encoded_crew = base64_encode($crew->crew_id);
-								$crews[] = "<a href=\"info_crew.php?crew={$encoded_crew}&sort_by=filename\">{$crew->crew}</a>";
+								$crews[] = "<a href=\"/crew/".urlsafe($crew->crew)."/\">{$crew->crew}</a>";
 							}
 							echo pluralize($crews, '<span class="magenta"> & </span>');
 						?>
@@ -385,7 +393,7 @@ include "header.php";
 					<div class="row d-flex justify-content-between">
 						Filename:
 
-						<a href="info_release.php?filename=<?=$encoded_filename?>"><?=mb_strimwidth($row->filename, 0, 12);?></a>
+						<a href="/info_release.php?filename=<?=$encoded_filename?>"><?=mb_strimwidth($row->filename, 0, 12);?></a>
 					</div>
 					<div class="row d-flex justify-content-between">	
 						<span>Size:</span>
@@ -455,7 +463,7 @@ include "header.php";
 					<div class="row d-flex justify-content-between">
 						<span>Added by:</span>
 
-						<a href="members.php?user=<?=$uploader?>"><?=$uploader?></a>
+						<a href="/members.php?user=<?=$uploader?>"><?=$uploader?></a>
 					</div>
 
 					<div class="row d-flex justify-content-between">
@@ -505,16 +513,16 @@ include "header.php";
 				<h2 class="amb-1 amt-1 ap-1 bg-header">All <?=$show_acronym?> Releases</h2>            
 				<div class="row amt-1 amb-1">
 					<div class="col-3">
-						<a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.name">NAME</a>
+						<a href="/crew/<?=urlsafe($showcrew)?>/?sort_by=a.name">NAME</a>
 					</div>
 					<div class="col-3">
-						<a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.filename">FiLENAME</a>
+						<a href="/crew/<?=urlsafe($showcrew)?>/?sort_by=a.filename">FiLENAME</a>
 					</div>
 					<div class="col-3">
-						<a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=b.nick">ARTiST</a>
+						<a href="/crew/<?=urlsafe($showcrew)?>/?sort_by=b.nick">ARTiST</a>
 					</div>
 					<div class="col-3">
-				<a href="info_crew.php?crew=<?=$encoded_crew?>&sort_by=a.year, a.month">RELEASE DATE</a>
+						<a href="/crew/<?=urlsafe($showcrew)?>/?sort_by=a.year, a.month">RELEASE DATE</a>
 					</div>
 				</div>
 				<?php
@@ -530,20 +538,20 @@ include "header.php";
 					?>
 					<div class="row">
 						<div class="col-3">
-							<a class="magenta" href="info_release.php?filename=<?=$encoded_filename?>"><?=mb_strimwidth($row->name, 0, 20, "...");?></a>
+							<a class="magenta" href="/info_release.php?filename=<?=$encoded_filename?>"><?=mb_strimwidth($row->name, 0, 20, "...");?></a>
 						</div>
 						<div class="col-3">
-							<a class="magenta" href="info_release.php?filename=<?=$encoded_filename?>"><?=mb_strimwidth($row->filename, 0, 12);?></a>
-						</div>
-
-						<div class="col-3">
-
-							<a class="green" href="info_artist.php?artist=<?=$encoded_author?>&sort_by=filename"><?=$author?></a>
+							<a class="magenta" href="/info_release.php?filename=<?=$encoded_filename?>"><?=mb_strimwidth($row->filename, 0, 12);?></a>
 						</div>
 
 						<div class="col-3">
 
-							<span class="lightgrey" href="info_artist.php?artist=<?=$encoded_author?>&sort_by=filename"><?php if (!empty($year)) { echo $year; }?></span>
+							<a class="green" href="/info_artist.php?artist=<?=$encoded_author?>&sort_by=filename"><?=$author?></a>
+						</div>
+
+						<div class="col-3">
+
+							<span class="lightgrey" href="/info_artist.php?artist=<?=$encoded_author?>&sort_by=filename"><?php if (!empty($year)) { echo $year; }?></span>
 						</div>
 
 					</div>
