@@ -100,7 +100,6 @@ require_once "header.php"; ?>
 		if (isset($_POST[ 'add_comment' ]) || (isset($_POST[ 'Delete' ]))) 
 		{
 			$crew = $_POST[ 'crew' ];
-			$crew = cleanInsert($crew);
 
 			$ask = "SELECT nick from author_of where filename=:filename";
 			$row = fetchOne($ask, [ 'filename' => $filename ]);
@@ -210,28 +209,28 @@ require_once "header.php"; ?>
 // CALCULATE RATING FOR ARTISTS
 //----------------------------------------------------------------------------------------------
 
-			$ask = "select nick from author_of where filename='$filename'";
-			$result = mysql_query($ask, $dbh);
-			while ($row = mysql_fetch_array($result)) 
+			$ask = "select nick from author_of where filename=:filename";
+			$result = fetchOne($ask, [ 'filename' => $filename ]);
+			if (isset($result)) 
 			{
-				$artist = $row[ 0 ];
+				$artist = $result->nick;
 			}
-			$ask = "select avg(rating) from comments where artist='$artist' and rating>0";
-			$result = mysql_query($ask, $dbh);
-			while ($row = mysql_fetch_array($result)) 
+			$ask = "select avg(rating) as rating from comments where artist=:artist and rating>0";
+			$result = fetchOne($ask, [ 'artist' => $artist ]);
+			if (isset($result)) 
 			{
-				$avg_artist_rating = $row[ 0 ];
+				$avg_artist_rating = $result->rating;
 			}
-			$ask_rate_amount = "SELECT COUNT(rating) from comments where artist='$artist' and rating>0";
-			$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
-			while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) 
+			$ask = "SELECT COUNT(rating) as cnt from comments where artist=:artist and rating>0";
+			$result = fetchOne($ask, [ 'artist' => $artist ]);
+			if (isset($result)) 
 			{
-				$rate_amount = $row_rate_amount[ 0 ];
+				$rate_amount = $result->cnt;
 			}
 			if ($rate_amount > 2) 
 			{
-				$ask = "update artists set rating=$avg_artist_rating where nick='$artist'";
-				mysql_query($ask, $dbh);
+				$ask = "update artists set rating=:rating where nick=:nick";
+				doQuery($ask, [ 'rating' => $avg_artist_rating, 'nick' => $artist ]);
 			}
 			echo "<meta http-equiv='Refresh' content='0; url=$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
 		}
@@ -246,78 +245,73 @@ require_once "header.php"; ?>
 			{
 				$commentid = $_POST[ 'commentid' ];
 				$commentid = cleanInsert($commentid);
-				mysql_query("DELETE FROM comments where filename='$filename' and commentid='$commentid'", $dbh);
+				$ask = "DELETE FROM comments where filename=:filename and commentid=:commentid";
+				doQuery($ask, [ 'filename' => $filename, 'commentid' => $commentid ]);
 			}
 
-			$ask = "select nick from author_of where filename='$filename'";
-			$result = mysql_query($ask, $dbh);
-			while ($row = mysql_fetch_array($result)) 
+			$ask = "select nick from author_of where filename=:filename";
+			$result = fetchOne($ask, [ 'filename' => $filename ]);
+			if (isset($result)) 
 			{
-				$artist = $row[ 0 ];
+				$artist = $result->nick;
 			}
 
-			$ask = "select avg(rating) from comments where artist='$artist' and rating>0";
-			$result = mysql_query($ask, $dbh);
-			while ($row = mysql_fetch_array($result)) 
+			$ask = "select avg(rating) as rating from comments where artist=:artist and rating>0";
+			$result = fetchOne($ask, [ 'artist' => $artist]);
+			if (isset($result)) 
 			{
-				$avg_artist_rating = $row[ 0 ];
-			}
-			if (!isset($avg_artist_rating)) 
-			{
+				$avg_artist_rating = $result->rating;
+			} else { 
 				$avg_artist_rating = 0;
 			}
 
-			$ask_rate_amount = "SELECT COUNT(rating) from comments where artist='$artist' and rating>0";
-			$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
-			while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) 
+			$ask = "SELECT COUNT(rating) as rating from comments where artist=:artist and rating>0";
+			$result = fetchOne($ask, [ 'artist' => $artist]);
+			if (isset($result)) 
 			{
-				$rate_amount = $row_rate_amount[ 0 ];
+				$rate_amount = $result->rating;
 			}
 			if ($rate_amount > 2) 
 			{
-				$ask = "update artists set rating=$avg_artist_rating where nick='$artist'";
-				mysql_query($ask, $dbh);
+				$ask = "update artists set rating=:rating where nick=:nick";
+				doQuery($ask, [ 'rating' => $avg_artist_rating, 'nick' => $artist ]);
 			}
-			$ask = "select avg(rating) from comments where filename='$filename' and rating>0";
-			$result = mysql_query($ask, $dbh);
-			while ($row = mysql_fetch_array($result)) 
+			$ask = "select avg(rating) as rating from comments where filename=:filename and rating>0";
+			$result = fetchOne($ask, [ 'filename' => $filename ]);
+			if (isset($result)) 
 			{
-				$avg_colly_rating = $row[ 0 ];
-			}
-			if (!isset($avg_colly_rating)) 
-			{
+				$avg_colly_rating = $result->rating;
+			} else {
 				$avg_colly_rating = 0;
 			}
 
-			$ask = "select crew from crew_of where filename='$filename'";
-			$result = mysql_query($ask, $dbh);
-			while ($row = mysql_fetch_array($result)) 
+			$ask = "select crew from crew_of where filename=:filename";
+			$result = fetchOne($ask, [ 'filename' => $filename ]);
+			if (isset($result)) 
 			{
-				$crew = $row[ 0 ];
+				$crew = $result->crew;
 			}
 
-			$ask = "select avg(rating) from comments where crew='$crew' and rating>0";
-			$result = mysql_query($ask, $dbh);
-			while ($row = mysql_fetch_array($result)) 
+			$ask = "select avg(rating) as rating from comments where crew=:crew and rating>0";
+			$result = fetchOne($ask, [ 'crew' => $crew ]);
+			if (isset($result)) 
 			{
-				$avg_crew_rating = $row[ 0 ];
-			}
-			if (!isset($avg_crew_rating)) 
-			{
+				$avg_crew_rating = $result->rating;
+			} else { 
 				$avg_crew_rating = 0;
 			}
 
-			$ask_rate_amount = "SELECT COUNT(rating) from comments where crew='$crew' and rating>0";
-			$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
-			while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) 
+			$ask_rate_amount = "SELECT COUNT(rating) as rating from comments where crew=:crew and rating>0";
+			$result = fetchOne($ask, [ 'crew' => $crew ]);
+			if (isset($result)) 
 			{
-				$rate_amount = $row_rate_amount[ 0 ];
+				$rate_amount = $result->rating;
 			}
 
 			if ($rate_amount > 2) 
 			{
-				$ask = "update crews set rating=$avg_crew_rating where name='$crew'";
-				mysql_query($ask, $dbh);
+				$ask = "update crews set rating=:rating where name=:crew";
+				doQuery($ask, [ 'rating' => $avg_artist_rating, 'crew' => $crew ]);
 
 			}
 		}
