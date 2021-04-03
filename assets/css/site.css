@@ -988,6 +988,7 @@ pointer-events: none;
   position: fixed;
   z-index: 999999;
   pointer-events: none;
+  opacity: 0.5;
 }
 .scanlines_old {
   top: -50%;
