@@ -49,7 +49,7 @@ $now = time();
 					$_SESSION['password'] = $confirm_password;
 					$_SESSION['password'] = $confirm_nick;
 
-					?><meta http-equiv="Refresh" content="0; url=login.php?activated"><?php
+					?><meta http-equiv="Refresh" content="0"; url="login.php?activated"><?php
 					exit();
 				}
 			}	

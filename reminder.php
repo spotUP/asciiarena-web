@@ -91,7 +91,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 					else
 					{
 						$recipient = $_POST['email'];
-						?><meta http-equiv="Refresh" content="0; url=reminder.php?sent=sent&recipient=<?=$recipient?>"><?php
+						?><meta http-equiv="Refresh" content="0"; url="reminder.php?sent=sent&recipient=<?=$recipient?>"><?php
 					}
 				}
 			}
@@ -107,7 +107,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 
 				$ask_update="update users set temp_pw_hash=(null) where nick=:nick";
 				doQuery($ask_update, ['nick' => $nick ]);
-				?><meta http-equiv="Refresh" content="0; url=login.php"><?php
+				?><meta http-equiv="Refresh" content="0"; url="login.php"><?php
 			}
 			
 			echo "<form action='$_SERVER[PHP_SELF]' method='post'>";

@@ -4,14 +4,14 @@ $h1 = "aDMiN";
 include "header.php";
 ?>
 <script type="text/javascript">
-$(document).ready(function() {
-   var hash = window.location.hash;
-   hash && $('ul.nav a[href="' + hash + '"]').tab('show');
-});
+	$(document).ready(function() {
+		var hash = window.location.hash;
+		hash && $('ul.nav a[href="' + hash + '"]').tab('show');
+	});
 </script>
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
-<?php
+		<?php
 
 //---------------------------------------------------------------------------------------------------------------
 // SET COLLY TO FIXED
@@ -27,7 +27,7 @@ $(document).ready(function() {
 				doQuery($ask,['fixed_colly' => $fixed_colly]);
 			}
 			?>
-			<meta http-equiv="Refresh" content="0; url=admin.php">
+			<meta http-equiv="Refresh" content="0"; url="admin.php">
 			<?php
 		}	
 
@@ -45,7 +45,7 @@ $(document).ready(function() {
 				$ask="delete from users where nick=:delete_user";
 				doQuery($ask, [ 'delete_user' => $delete_user ]);
 			}
-			?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
+			?><meta http-equiv="Refresh" content="0"; url="admin.php"><?php
 		}	
 
 //---------------------------------------------------------------------------------------------------------------
@@ -65,7 +65,7 @@ $(document).ready(function() {
 				$ask="delete from bbs_of where crew=:delete_crew";
 				doQuery($ask,[ 'delete_crew' => $delete_crew]);
 			}
-			?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
+			?><meta http-equiv="Refresh" content="0"; url="admin.php"><?php
 		}	
 
 //---------------------------------------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ $(document).ready(function() {
 				$ask="delete from logos where logo_id=:delete_sitelogo";
 				doQuery($ask, ['delete_sitelogo' => $delete_sitelogo]);
 			}
-			?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
+			?><meta http-equiv="Refresh" content="0"; url="admin.php"><?php
 		}	
 
 //---------------------------------------------------------------------------------------------------------------
@@ -221,7 +221,7 @@ $(document).ready(function() {
 				doQuery($ask_update,['avg_crew_rating' => $avg_crew_rating, 'crew' => $crew]);	
 			}
 			?>
-			<meta http-equiv="Refresh" content="0; url=admin.php">
+			<meta http-equiv="Refresh" content="0"; url="admin.php">
 			<?php
 			exit;
 		}	
@@ -242,7 +242,7 @@ $(document).ready(function() {
 				$ask="delete from member_of where nick=:delete_artist";
 				doQuery($ask, ['delete_artist' => $delete_artist]);
 			}
-			?><meta http-equiv="Refresh" content="0; url=admin.php"><?php
+			?><meta http-equiv="Refresh" content="0"; url="admin.php"><?php
 		}	
 
 //---------------------------------------------------------------------------------------------------------------
@@ -409,7 +409,7 @@ $(document).ready(function() {
 				doQuery($ask_update,['avg_crew_rating' => $avg_crew_rating, 'crew' => $crew]);	
 			}
 			?>
-			<meta http-equiv="Refresh" content="0; url=admin.php">
+			<meta http-equiv="Refresh" content="0"; url="admin.php">
 			<?php
 			exit;
 		}	
@@ -712,11 +712,13 @@ $(document).ready(function() {
 			if(!checkEmail($mail)) 
 			{
 				?>
-				Error
-				You must enter a valid E-Mail adress!
-				<meta http-equiv="Refresh" content="2; url=admin.php">
+				<div class="bs-component">
+					<div class="animate__animated animate__shakeX alert alert-dismissible alert-danger">
+						<button type="button" class="close" data-dismiss="alert">x</button>
+						<span>You can not submit an empty logo!<span>
+					</div>
+				</div>
 				<?php
-				exit();
 			}
 			$user_nick=$_POST['usernick'];
 			$user_nick=cleanInsert($user_nick);
@@ -751,11 +753,13 @@ $(document).ready(function() {
 			if(empty($signature))
 			{
 				?>
-				Error
-				You have to make a signature before submitting!
-				<meta http-equiv="Refresh" content="2; url=admin.php">
+				<div class="bs-component">
+					<div class="animate__animated animate__shakeX alert alert-dismissible alert-danger">
+						<button type="button" class="close" data-dismiss="alert">x</button>
+						<span>You have to make a signature before submitting!<span>
+					</div>
+				</div>				
 				<?php
-				exit();
 			}
 
 //			$rgbvalue=$_POST['setcolor'];
@@ -803,15 +807,17 @@ $(document).ready(function() {
 //		htmlspecialchars_decode($editedsitelogodata, ENT_QUOTES);
 //		$editedsitelogodata=utf8_encode($editedsitelogodata);
 
-		if(empty($editedsitelogodata))
-		{
-			?>
-			Error
-			You can not submit an empty logo!
-			<meta http-equiv="Refresh" content="2; url=admin.php">
-			<?php
-			exit();
-		}
+			if(empty($editedsitelogodata))
+			{
+				?>
+				<div class="bs-component">
+					<div class="animate__animated animate__shakeX alert alert-dismissible alert-danger">
+						<button type="button" class="close" data-dismiss="alert">x</button>
+						<span>You can not submit an empty logo!<span>
+					</div>
+				</div>
+				<?php
+			}
 
 //		$rgbvalue=$_POST['set_edited_logo_color'];
 //		$rgbvalue=cleanInsert($rgbvalue);
@@ -836,76 +842,76 @@ $(document).ready(function() {
 //		unlink ("templogo.diz.png");
 
 		//$editedsitelogodata=cleanInsertPost($editedsitelogodata);
-		$ask_update="update logos set ascii=:editedsitelogodata where logo_id=:logo";
-		doQuery($ask_update,['editedsitelogodata' => $editedsitelogodata, 'logo' => $logo]);	
+			$ask_update="update logos set ascii=:editedsitelogodata where logo_id=:logo";
+			doQuery($ask_update,['editedsitelogodata' => $editedsitelogodata, 'logo' => $logo]);	
 
 //		$ask_update="update logos set base64='1' where filename=:logo";
 //		doQuery($ask_update,['logo' => $logo]);	
-	}
+		}
 
 //----------------------------------------------------------------------------------------------------------------------------
 
-	?>
+		?>
 
-	<div class="row">
-		<div class="col-lg-12">
-			<?php if(is_admin()) { ?>
-			<div class="bs-component">
-				<ul class="nav nav-tabs apt-1 bg-secondary">
-					<li class="nav-item">
-						<a class="nav-link active" data-toggle="tab" href="#colly">Colly</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" data-toggle="tab" href="#crew">Crew</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" data-toggle="tab" href="#artist">Artist</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" data-toggle="tab" href="#edituser">User</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" data-toggle="tab" href="#sitelogo">Site Logo</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" data-toggle="tab" href="#bbs">BBS</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" data-toggle="tab" href="#broken">Broken Collys</a>
-					</li>
-				</ul>
-				<div id="myTabContent" class="tab-content apt-1" style="background-color: #1a1a1a;">
+		<div class="row">
+			<div class="col-lg-12">
+				<?php if(is_admin()) { ?>
+					<div class="bs-component">
+						<ul class="nav nav-tabs apt-1 bg-secondary">
+							<li class="nav-item">
+								<a class="nav-link active" data-toggle="tab" href="#colly">Colly</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" data-toggle="tab" href="#crew">Crew</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" data-toggle="tab" href="#artist">Artist</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" data-toggle="tab" href="#edituser">User</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" data-toggle="tab" href="#sitelogo">Site Logo</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" data-toggle="tab" href="#bbs">BBS</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" data-toggle="tab" href="#broken">Broken Collys</a>
+							</li>
+						</ul>
+						<div id="myTabContent" class="tab-content apt-1" style="background-color: #1a1a1a;">
 
-					<?php
+							<?php
 
-					include ("admin_edit_colly.php");
-					include ("admin_edit_crew.php");
-					include ("admin_edit_artist.php");
-					include ("admin_edit_user.php");
-					include ("admin_edit_site_logo.php");
-					include ("admin_edit_bbs.php");
-					include ("admin_edit_broken_collys.php");
+							include ("admin_edit_colly.php");
+							include ("admin_edit_crew.php");
+							include ("admin_edit_artist.php");
+							include ("admin_edit_user.php");
+							include ("admin_edit_site_logo.php");
+							include ("admin_edit_bbs.php");
+							include ("admin_edit_broken_collys.php");
 
-					?>
-				</div>
-			</div>
-			<?php } else { ?>
-				<div class="bs-component">
-					<div class="animate__animated animate__shakeX alert alert-dismissible alert-primary">
-						<button type="button" class="close" data-dismiss="alert">x</button>
-						You need to be <a class="ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">an admin</a>to use this feature.
+							?>
+						</div>
 					</div>
-				</div>
-			<?php } ?>
+				<?php } else { ?>
+					<div class="bs-component">
+						<div class="animate__animated animate__shakeX alert alert-dismissible alert-primary">
+							<button type="button" class="close" data-dismiss="alert">x</button>
+							You need to be <a class="ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">an admin</a>to use this feature.
+						</div>
+					</div>
+				<?php } ?>
+			</div>
 		</div>
 	</div>
-</div>
-<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
-	<?php include "sidebar.php"; ?>
-</div>
+	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+		<?php include "sidebar.php"; ?>
+	</div>
 
-<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
-	<?php include "sidebar_right.php"; ?>
-</div>
+	<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
+		<?php include "sidebar_right.php"; ?>
+	</div>
 
-<?php include "footer.php";
+	<?php include "footer.php";
