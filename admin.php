@@ -799,7 +799,7 @@ $(document).ready(function() {
 //			$font=$_POST['font'];
 //			$font=cleanInsert($font);
 
-		$editedsitelogodata=utf8_decode($editedsitelogodata); // convert UTF-8 string to ISO-88591
+		$editedsitelogodata=utf8_encode($editedsitelogodata); // convert UTF-8 string to ISO-88591
 
 		if(empty($editedsitelogodata))
 		{
