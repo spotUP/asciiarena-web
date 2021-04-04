@@ -6,11 +6,10 @@
 if(isset($_POST['getsitelogo']) && is_admin())
 {
 	$getsitelogo=$_POST['getsitelogo'];
-	$getsitelogo=cleanInsert($getsitelogo);
 
 	$ask="select * from logos where logo_id=:getsitelogo";
-	$result=fetchAll($ask, ['getsitelogo' => $getsitelogo]);
-	foreach ($result as $row)
+	$row=fetchOne($ask, ['getsitelogo' => $getsitelogo]);
+	if (isset($row))
 	{
 		$logo_id=$row->logo_id;
 		$ascii=$row->ascii;
@@ -39,14 +38,14 @@ if(isset($_POST['getsitelogo']) && is_admin())
 			}
 			?>
 		</select>
+	</form>
 		<?php
-
-		if (isset($_POST['edit_sitelogo']))
+		if (isset($_POST['getsitelogo']))
 		{
 			$editsitelogo=$_POST['getsitelogo'];
 			$ask="select * from logos where logo_id=:editsitelogo";
-			$result=fetchAll($ask, [ 'editsitelogo' => $editsitelogo]);
-			foreach ($result as $row)
+			$row=fetchOne($ask, [ 'editsitelogo' => $editsitelogo]);
+			if (isset($row))
 			{
 				$logo_id = $row->logo_id;
 				$author = $row->author;
@@ -62,9 +61,11 @@ if(isset($_POST['getsitelogo']) && is_admin())
 				<div class="row">
 					<div class="col-12">
 						<input type="hidden" name="getsitelogo" value="<?=$editsitelogo?>">
-						<input type="submit" value="Submit">
+						<input type="submit" value="Save">
 					</div>
 				</div>
+			</form>
+			<form enctype="multipart/form-data" action="#" method="post">
 				<?php
 			} 
 
@@ -72,11 +73,10 @@ if(isset($_POST['getsitelogo']) && is_admin())
 			{
 				?>
 				<input type="hidden" name="getsitelogo" value="<?=$_POST['getsitelogo']?>">
-				<input type="submit" name="edit_sitelogo" value="Edit">
 				<input type="submit" name="delete_sitelogo" value="Delete">
 
 				<?php
 			} 
 			?>
-		</form>
+			</form>
 	</div>

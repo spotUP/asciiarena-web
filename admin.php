@@ -794,8 +794,6 @@ $(document).ready(function() {
 		if(isset($_POST['editedsitelogo']))
 		{
 			$logo=$_POST['getsitelogo'];
-			$logo=cleanInsert($logo);
-
 			$editedsitelogodata=$_POST['editedsitelogo'];
 
 //			$font=$_POST['font'];
@@ -835,8 +833,8 @@ $(document).ready(function() {
 //		unlink ("templogo.diz");
 //		unlink ("templogo.diz.png");
 
-		$editedsitelogodata=cleanInsertPost($editedsitelogodata);
-		$ask_update="update logos set ascii=:editedsitelogodata where filename=:logo";
+		//$editedsitelogodata=cleanInsertPost($editedsitelogodata);
+		$ask_update="update logos set ascii=:editedsitelogodata where logo_id=:logo";
 		doQuery($ask_update,['editedsitelogodata' => $editedsitelogodata, 'logo' => $logo]);	
 
 //		$ask_update="update logos set base64='1' where filename=:logo";
