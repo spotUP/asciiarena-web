@@ -13,6 +13,8 @@ if(isset($_POST['getsitelogo']) && is_admin())
 	{
 		$logo_id=$row->logo_id;
 		$ascii=$row->ascii;
+		$ascii = htmlspecialchars($row->ascii, ENT_QUOTES);
+
 	}
 }
 ?>
@@ -49,7 +51,7 @@ if(isset($_POST['getsitelogo']) && is_admin())
 			{
 				$logo_id = $row->logo_id;
 				$author = $row->author;
-				$ascii = htmlspecialchars($row->ascii);
+				$ascii = htmlspecialchars($row->ascii, ENT_QUOTES);
 			}
 			?>
 			<form enctype="multipart/form-data" action="#" method="post">

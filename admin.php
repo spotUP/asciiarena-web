@@ -798,8 +798,10 @@ $(document).ready(function() {
 
 //			$font=$_POST['font'];
 //			$font=cleanInsert($font);
+//		$editedsitelogodata = htmlspecialchars($editedsitelogodata, ENT_QUOTES);
 
-		$editedsitelogodata=utf8_encode($editedsitelogodata); // convert UTF-8 string to ISO-88591
+//		htmlspecialchars_decode($editedsitelogodata, ENT_QUOTES);
+//		$editedsitelogodata=utf8_encode($editedsitelogodata);
 
 		if(empty($editedsitelogodata))
 		{
