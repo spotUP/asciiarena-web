@@ -242,7 +242,8 @@ include "header.php";
 				$ask="delete from member_of where nick=:delete_artist";
 				doQuery($ask, ['delete_artist' => $delete_artist]);
 			}
-			?><meta http-equiv="Refresh" content="0"; url="admin.php"><?php
+			?>
+			<meta http-equiv="Refresh" content="0"; url="admin.php"><?php
 		}	
 
 //---------------------------------------------------------------------------------------------------------------

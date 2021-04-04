@@ -73,7 +73,7 @@ require_once "header.php"; ?>
 				</div>
 			</div>
 			<?php
-			echo "<meta http-equiv='Refresh' content='2; url=$_SERVER[PHP_SELF]?filename=$filename'>";
+			echo "<meta http-equiv='Refresh' content='2'; url='$_SERVER[PHP_SELF]?filename=$filename'>";
 		}
 
 //----------------------------------------------------------------------------------------------
@@ -155,7 +155,7 @@ require_once "header.php"; ?>
 				  	'user_added_rating' => $user_added_rating, # might be empty, should end up as NULL
 				  	'user_id' => $_user['id'],
 				  ]);
-				echo "<meta http-equiv='Refresh' content='0; url=$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
+				echo "<meta http-equiv='Refresh' content='0'; url='$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
 			}
 
 //----------------------------------------------------------------------------------------------
@@ -232,7 +232,7 @@ require_once "header.php"; ?>
 				$ask = "update artists set rating=:rating where nick=:nick";
 				doQuery($ask, [ 'rating' => $avg_artist_rating, 'nick' => $artist ]);
 			}
-			echo "<meta http-equiv='Refresh' content='0; url=$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
+			echo "<meta http-equiv='Refresh' content='0'; url='$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
 		}
 
 //----------------------------------------------------------------------------------------------
@@ -688,7 +688,7 @@ require_once "header.php"; ?>
 					$ask_update = "update crews set rating=$avg_crew_rating where name='$crew'";
 					mysql_query($ask_update, $dbh);
 				}
-				echo "<meta http-equiv='Refresh' content='0; url=$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
+				echo "<meta http-equiv='Refresh' content='0'; url='$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
 				exit;
 			}
 		}
