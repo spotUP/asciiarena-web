@@ -80,7 +80,7 @@ include_once "header.php";
 					'postmessage' => $postmessage
 				]);
 				?>
-				<meta http-equiv="Refresh" content="0; url=messages.php">
+				<meta http-equiv="Refresh" content="0"; url="messages.php">
 				<?php
 			}
 
@@ -154,7 +154,7 @@ include_once "header.php";
 				]);
 
 				?>
-				<meta http-equiv="Refresh" content="0; url=messages.php">
+				<meta http-equiv="Refresh" content="0"; url="messages.php">
 				<?php
 			}
 
