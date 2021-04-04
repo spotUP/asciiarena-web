@@ -746,7 +746,7 @@ $(document).ready(function() {
 			$user_nick=$_POST['usernick'];
 			$user_nick=cleanInsert($user_nick);
 
-//			$signature=utf8_decode($signature); // convert UTF-8 string to ISO-88591
+			$signature=utf8_encode($signature); // convert UTF-8 string to ISO-88591
 
 			if(empty($signature))
 			{
