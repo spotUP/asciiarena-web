@@ -572,14 +572,14 @@ require_once "header.php"; ?>
 				$result = fetchAll($ask, [':filename' => $getcollyname ]);
 				foreach ($result as $row)
 				{
-					$show_colly_name = $row->filename;
-					$show_colly_name = $row->name;
-					$show_colly_crew = $row->crews;
-					$show_colly_year = $row->year;
-					$show_colly_month = $row->month;
-					$show_colly_day = $row->day;
-					$show_colly_type = $row->type;
-					$encoded_filename = base64_encode($row->filename);
+					$show_colly_name = htmlspecialchars($row->filename, ENT_QUOTES);
+					$show_colly_name = htmlspecialchars($row->name, ENT_QUOTES);
+					$show_colly_crew = htmlspecialchars($row->crews, ENT_QUOTES);
+					$show_colly_year = htmlspecialchars($row->year, ENT_QUOTES);
+					$show_colly_month = htmlspecialchars($row->month, ENT_QUOTES);
+					$show_colly_day = htmlspecialchars($row->day, ENT_QUOTES);
+					$show_colly_type = htmlspecialchars($row->type, ENT_QUOTES);
+					$encoded_filename = base64_encode($row->filename, ENT_QUOTES);
 				}
 				?>
 				<form enctype="multipart/form-data" action="info_release.php?filename=<?=$encoded_filename?>" method="post">
@@ -702,9 +702,7 @@ require_once "header.php"; ?>
 							?>
 						</div>
 						<div class="col-4">
-							<span id="new_colly_author_field"></span> <span onclick="add_colly_author_field();"
-							style="cursor: pointer; cursor: hand;"><button
-							type="button">Add Author!</button></span>
+							<span id="new_colly_author_field"></span> <span onclick="add_colly_author_field();" style="cursor: pointer; cursor: hand;"><button type="button">Add Author!</button></span>
 							<input type="hidden" name="total_colly_authors" id="total_colly_authors" value="0">
 						</div>
 					</div>
@@ -788,21 +786,26 @@ require_once "header.php"; ?>
 						$ask = "select uploader from collys where filename=:filename";
 						$result_uploader = fetchOne($ask, [ 'filename' => base64_decode($filename) ]);
 						if (isset($result_uploader->uploader)) $uploader = $result_uploader->uploader;
-
-						echo "<input type='submit' class='btn-big amb-1' name=addcomment value='Comment'> ";
-						echo "<input type='submit' class='btn-big amb-1' name=favourite value='Favourite'> ";
-						echo "<input type='submit' class='btn-big amb-1' name=broken value='Report Broken'> ";
+						?>
+						<input type="submit" class="btn-big amb-1" name="addcomment" value="Comment">
+						<input type="submit" class="btn-big amb-1" name="favourite" value="Favourite">
+						<input type="submit" class="btn-big amb-1" name="broken" value="Report Broken">
+						<?php
 						if ($_user[ "nick" ] === $uploader || is_admin()) 
 						{
-							echo "<input type='hidden' name='filename' value=$filename>";
-							echo "<input type='submit' class='btn-big amb-1' name=edit_colly value='Edit Colly'> ";
+							?>
+							<input type="hidden" name="filename" value="<?=$filename?>">
+							<input type="submit" class="btn-big amb-1" name="edit_colly" value="Edit Colly">
+							<?php
 						}
 					}
 					if (!isset($_POST[ 'download' ])) 
 					{
-						echo "<input type='submit' class='btn-big amb-1' name=download value='Download'> ";
+						?>
+						<input type="submit" class="btn-big amb-1" name="download" value="Download">
+						<?php
 					} 
-					elseif (isset($_POST[ 'download' ])) 
+					elseif (isset($_POST[ "download" ])) 
 					{
             $ask = "select downloads from collys where filename=:filename"; // download counter
             $row = fetchOne("SELECT view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
@@ -920,9 +923,9 @@ if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ])))
 	if (isset($_POST[ 'change' ])) 
 	{
 		$bgcolor = $_POST[ 'background_color' ];
-
 		$font = $_POST[ 'font' ];
 	}
+	
 	$row = fetchOne("SELECT view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
 	$type = $row->type;
 	$counter = $row->view_counter;
