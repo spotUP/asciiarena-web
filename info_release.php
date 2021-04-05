@@ -347,446 +347,447 @@ require_once "header.php"; ?>
 				</div>
 				<?php
 			}
+		}
 
 //---------------------------------------------------------------------------------------------------------------
 // WRITE COLLY INFO TO DB
 //---------------------------------------------------------------------------------------------------------------
 
-			if (isset($_POST[ 'do_edit_colly' ])) 
+		if (isset($_POST[ 'do_edit_colly' ])) 
+		{
+			$filename = $_POST[ 'filename' ];
+			$filename = cleanInsert($filename);
+			$ask = "select uploader from collys where filename='$filename'";
+			$result = mysql_query($ask);
+			while ($row = mysql_fetch_array($result)) 
+			{
+				$uploader = $row[ 0 ];
+			}
+			if (isset($_POST[ 'edit_colly_name' ]) && $nick == "$uploader") 
 			{
 				$filename = $_POST[ 'filename' ];
 				$filename = cleanInsert($filename);
-				$ask = "select uploader from collys where filename='$filename'";
-				$result = mysql_query($ask);
-				while ($row = mysql_fetch_array($result)) 
+
+				$edit_colly_name = $_POST[ 'edit_colly_name' ];
+				$edit_colly_name = cleanInsert($edit_colly_name);
+
+				$ask = "update collys set name='$edit_colly_name' where filename='$filename'";
+				mysql_query($ask, $dbh);
+			}
+
+			if (isset($_POST[ 'old_colly_authors' ]) || (isset($_POST[ 'colly_author' ]) && $nick == "$uploader") || (isset($_POST[ 'colly_author' ]) && $rank == "Admin")) 
+			{
+				$filename = $_POST[ 'filename' ];
+				$filename = cleanInsert($filename);
+
+				$ask = "delete from author_of where filename='$filename'";
+				mysql_query($ask, $dbh);
+
+				if (isset($_POST[ old_colly_authors ])) 
 				{
-					$uploader = $row[ 0 ];
-				}
-				if (isset($_POST[ 'edit_colly_name' ]) && $nick == "$uploader") 
-				{
-					$filename = $_POST[ 'filename' ];
-					$filename = cleanInsert($filename);
-
-					$edit_colly_name = $_POST[ 'edit_colly_name' ];
-					$edit_colly_name = cleanInsert($edit_colly_name);
-
-					$ask = "update collys set name='$edit_colly_name' where filename='$filename'";
-					mysql_query($ask, $dbh);
-				}
-
-				if (isset($_POST[ 'old_colly_authors' ]) || (isset($_POST[ 'colly_author' ]) && $nick == "$uploader") || (isset($_POST[ 'colly_author' ]) && $rank == "Admin")) 
-				{
-					$filename = $_POST[ 'filename' ];
-					$filename = cleanInsert($filename);
-
-					$ask = "delete from author_of where filename='$filename'";
-					mysql_query($ask, $dbh);
-
-					if (isset($_POST[ old_colly_authors ])) 
+					foreach ($_POST[ old_colly_authors ] as $colly_author) 
 					{
-						foreach ($_POST[ old_colly_authors ] as $colly_author) 
-						{
-							$colly_author = cleanInsert($colly_author);
-							$ask = "insert into author_of values ('$colly_author','$filename')";
-							mysql_query($ask, $dbh);
-						}
-						$ask = "delete from author_of where filename='$filename' and nick='Delete'";
+						$colly_author = cleanInsert($colly_author);
+						$ask = "insert into author_of values ('$colly_author','$filename')";
 						mysql_query($ask, $dbh);
 					}
-				}
-
-				if (isset($_POST[ colly_author ])) 
-				{
-					foreach ($_POST[ colly_author ] as $new_colly_author) 
-					{
-						$new_colly_author = cleanInsert($new_colly_author);
-						$ask = "insert into author_of values ('$new_colly_author','$filename')";
-						mysql_query($ask, $dbh);
-					}
-
 					$ask = "delete from author_of where filename='$filename' and nick='Delete'";
 					mysql_query($ask, $dbh);
 				}
+			}
 
-				if (isset($_POST[ 'old_colly_crews' ]) || (isset($_POST[ 'colly_crew' ]))) 
+			if (isset($_POST[ colly_author ])) 
+			{
+				foreach ($_POST[ colly_author ] as $new_colly_author) 
 				{
-					$filename = $_POST[ 'filename' ];
-					$filename = cleanInsert($filename);
-
-					$ask = "delete from crew_of where filename='$filename'";
+					$new_colly_author = cleanInsert($new_colly_author);
+					$ask = "insert into author_of values ('$new_colly_author','$filename')";
 					mysql_query($ask, $dbh);
+				}
 
-					if (isset($_POST[ old_colly_crews ])) 
+				$ask = "delete from author_of where filename='$filename' and nick='Delete'";
+				mysql_query($ask, $dbh);
+			}
+
+			if (isset($_POST[ 'old_colly_crews' ]) || (isset($_POST[ 'colly_crew' ]))) 
+			{
+				$filename = $_POST[ 'filename' ];
+				$filename = cleanInsert($filename);
+
+				$ask = "delete from crew_of where filename='$filename'";
+				mysql_query($ask, $dbh);
+
+				if (isset($_POST[ old_colly_crews ])) 
+				{
+					foreach ($_POST[ old_colly_crews ] as $colly_crew) 
 					{
-						foreach ($_POST[ old_colly_crews ] as $colly_crew) 
-						{
-							$colly_crew = cleanInsert($colly_crew);
-							$ask = "insert into crew_of values ('$colly_crew','$filename')";
-							mysql_query($ask, $dbh);
-						}
+						$colly_crew = cleanInsert($colly_crew);
+						$ask = "insert into crew_of values ('$colly_crew','$filename')";
+						mysql_query($ask, $dbh);
 					}
+				}
 
-					if (isset($_POST[ colly_crew ])) 
+				if (isset($_POST[ colly_crew ])) 
+				{
+					foreach ($_POST[ colly_crew ] as $new_colly_crew) 
 					{
-						foreach ($_POST[ colly_crew ] as $new_colly_crew) 
-						{
-							$new_colly_crew = cleanInsert($new_colly_crew);
-							$ask = "insert into crew_of values ('$new_colly_crew','$filename')";
-							mysql_query($ask, $dbh);
-						}
+						$new_colly_crew = cleanInsert($new_colly_crew);
+						$ask = "insert into crew_of values ('$new_colly_crew','$filename')";
+						mysql_query($ask, $dbh);
 					}
-					$ask = "delete from crew_of where filename='$filename' and crew='Delete'";
-					mysql_query($ask, $dbh);
 				}
+				$ask = "delete from crew_of where filename='$filename' and crew='Delete'";
+				mysql_query($ask, $dbh);
+			}
 
-				if (isset($_POST[ 'edit_colly_year' ]) && $nick == "$uploader") 
-				{
-					$filename = $_POST[ 'filename' ];
-					$filename = cleanInsert($filename);
-					$edit_colly_year = $_POST[ 'edit_colly_year' ];
-					$edit_colly_year = cleanInsert($edit_colly_year);
-					$ask = "update collys set year='$edit_colly_year' where filename='$filename'";
-					mysql_query($ask, $dbh);
-				}
+			if (isset($_POST[ 'edit_colly_year' ]) && $nick == "$uploader") 
+			{
+				$filename = $_POST[ 'filename' ];
+				$filename = cleanInsert($filename);
+				$edit_colly_year = $_POST[ 'edit_colly_year' ];
+				$edit_colly_year = cleanInsert($edit_colly_year);
+				$ask = "update collys set year='$edit_colly_year' where filename='$filename'";
+				mysql_query($ask, $dbh);
+			}
 
-				if (isset($_POST[ 'edit_colly_type' ]) && $nick == "$uploader") 
-				{
-					$filename = $_POST[ 'filename' ];
-					$filename = cleanInsert($filename);
+			if (isset($_POST[ 'edit_colly_type' ]) && $nick == "$uploader") 
+			{
+				$filename = $_POST[ 'filename' ];
+				$filename = cleanInsert($filename);
 
-					$edit_colly_type = $_POST[ 'edit_colly_type' ];
-					$edit_colly_type = cleanInsert($edit_colly_type);
+				$edit_colly_type = $_POST[ 'edit_colly_type' ];
+				$edit_colly_type = cleanInsert($edit_colly_type);
 
-					$ask = "update collys set type='$edit_colly_type' where filename='$filename'";
-					mysql_query($ask, $dbh);
-				}
-				if (isset($_POST[ 'edit_colly_month' ]) && $nick == "$uploader") 
-				{
-					$filename = $_POST[ 'filename' ];
-					$filename = cleanInsert($filename);
+				$ask = "update collys set type='$edit_colly_type' where filename='$filename'";
+				mysql_query($ask, $dbh);
+			}
+			if (isset($_POST[ 'edit_colly_month' ]) && $nick == "$uploader") 
+			{
+				$filename = $_POST[ 'filename' ];
+				$filename = cleanInsert($filename);
 
-					$edit_colly_month = $_POST[ 'edit_colly_month' ];
-					$edit_colly_month = cleanInsert($edit_colly_month);
-					$ask = "update collys set month='$edit_colly_month' where filename='$filename'";
-					mysql_query($ask, $dbh);
-				}
-				if (isset($_POST[ 'edit_colly_day' ]) && $nick == "$uploader") 
-				{
-					$filename = $_POST[ 'filename' ];
-					$filename = cleanInsert($filename);
+				$edit_colly_month = $_POST[ 'edit_colly_month' ];
+				$edit_colly_month = cleanInsert($edit_colly_month);
+				$ask = "update collys set month='$edit_colly_month' where filename='$filename'";
+				mysql_query($ask, $dbh);
+			}
+			if (isset($_POST[ 'edit_colly_day' ]) && $nick == "$uploader") 
+			{
+				$filename = $_POST[ 'filename' ];
+				$filename = cleanInsert($filename);
 
-					$edit_colly_day = $_POST[ 'edit_colly_day' ];
-					$edit_colly_day = cleanInsert($edit_colly_day);
+				$edit_colly_day = $_POST[ 'edit_colly_day' ];
+				$edit_colly_day = cleanInsert($edit_colly_day);
 
-					$ask = "update collys set day=$edit_colly_day where filename='$filename'";
-					mysql_query($ask, $dbh);
-				}
-				?>
-				<div class="row">
-					<div class="col-lg-12">
-						<div class="bs-component aml-1 amb-1">
-							<div class="alert alert-dismissible alert-success">
-								<button type="button" class="close" data-dismiss="alert">x</button>
-								Colly successfully edited!
-							</div>
+				$ask = "update collys set day=$edit_colly_day where filename='$filename'";
+				mysql_query($ask, $dbh);
+			}
+			?>
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="bs-component aml-1 amb-1">
+						<div class="alert alert-dismissible alert-success">
+							<button type="button" class="close" data-dismiss="alert">x</button>
+							Colly successfully edited!
 						</div>
 					</div>
 				</div>
-				<?php
-			}
+			</div>
+			<?php
+		}
 //---------------------------------------------------------------------------------------------------------------
 // RECALCULATE RATINGS
 //---------------------------------------------------------------------------------------------------------------
 
-			$ask = "select nick from author_of";
-			$result = mysql_query($ask, $dbh);
-			while ($row = mysql_fetch_array($result)) 
+		$ask = "select nick from author_of";
+		$result = mysql_query($ask, $dbh);
+		while ($row = mysql_fetch_array($result)) 
+		{
+			$artist = $row[ 0 ];
+
+			$ask_rating = "select avg(rating) from comments where artist='$artist' and rating>0";
+			$result_rating = mysql_query($ask_rating, $dbh);
+			while ($row_rating = mysql_fetch_array($result_rating)) 
 			{
-				$artist = $row[ 0 ];
-
-				$ask_rating = "select avg(rating) from comments where artist='$artist' and rating>0";
-				$result_rating = mysql_query($ask_rating, $dbh);
-				while ($row_rating = mysql_fetch_array($result_rating)) 
-				{
-					$avg_artist_rating = $row_rating[ 0 ];
-				}
-				if (!isset($avg_artist_rating)) 
-				{
-					$avg_artist_rating = 0;
-				}
-
-				$ask_rate_amount = "SELECT COUNT(rating) from comments where artist='$artist' and rating>0";
-				$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
-				while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) 
-				{
-					$rate_amount = $row_rate_amount[ 0 ];
-				}
-				if ($rate_amount > 2) 
-				{
-					$ask_update = "update artists set rating=$avg_artist_rating where nick='$artist'";
-					mysql_query($ask_update, $dbh);
-				}
+				$avg_artist_rating = $row_rating[ 0 ];
 			}
-			$ask = "select crew from crew_of";
-			$result = mysql_query($ask, $dbh);
-			while ($row = mysql_fetch_array($result)) 
+			if (!isset($avg_artist_rating)) 
 			{
-				$crew = $row[ 0 ];
+				$avg_artist_rating = 0;
+			}
 
-				$ask_rating = "select avg(rating) from comments where crew='$crew' and rating>0";
-				$result_rating = mysql_query($ask_rating, $dbh);
-				while ($row = mysql_fetch_array($result_rating)) 
-				{
-					$avg_crew_rating = $row_rating[ 0 ];
-				}
-				if (!isset($avg_crew_rating)) 
-				{
-					$avg_crew_rating = 0;
-				}
-
-				$ask_rate_amount = "SELECT COUNT(rating) from comments where crew='$crew' and rating>0";
-				$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
-				while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) 
-				{
-					$rate_amount = $row_rate_amount[ 0 ];
-				}
-				if ($rate_amount > 2) 
-				{
-
-					$ask_update = "update crews set rating=$avg_crew_rating where name='$crew'";
-					mysql_query($ask_update, $dbh);
-				}
+			$ask_rate_amount = "SELECT COUNT(rating) from comments where artist='$artist' and rating>0";
+			$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
+			while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) 
+			{
+				$rate_amount = $row_rate_amount[ 0 ];
+			}
+			if ($rate_amount > 2) 
+			{
+				$ask_update = "update artists set rating=$avg_artist_rating where nick='$artist'";
+				mysql_query($ask_update, $dbh);
 			}
 		}
+		$ask = "select crew from crew_of";
+		$result = mysql_query($ask, $dbh);
+		while ($row = mysql_fetch_array($result)) 
+		{
+			$crew = $row[ 0 ];
+
+			$ask_rating = "select avg(rating) from comments where crew='$crew' and rating>0";
+			$result_rating = mysql_query($ask_rating, $dbh);
+			while ($row = mysql_fetch_array($result_rating)) 
+			{
+				$avg_crew_rating = $row_rating[ 0 ];
+			}
+			if (!isset($avg_crew_rating)) 
+			{
+				$avg_crew_rating = 0;
+			}
+
+			$ask_rate_amount = "SELECT COUNT(rating) from comments where crew='$crew' and rating>0";
+			$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
+			while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) 
+			{
+				$rate_amount = $row_rate_amount[ 0 ];
+			}
+			if ($rate_amount > 2) 
+			{
+
+				$ask_update = "update crews set rating=$avg_crew_rating where name='$crew'";
+				mysql_query($ask_update, $dbh);
+			}
+		}
+	}
 
 //----------------------------------------------------------------------------------------------
 // EDIT COLLY FIELD
 //----------------------------------------------------------------------------------------------
 
-		if (isset($_POST[ 'edit_colly' ])) 
+	if (isset($_POST[ 'edit_colly' ])) 
+	{
+		$getcollyname = $_POST[ 'filename' ];
+		$getcollyname = cleanInsert($getcollyname);
+
+		$ask = "select * from collys where filename=:filename";
+		$result = fetchAll($ask, [':filename' => $getcollyname ]);
+		foreach ($result as $row)
 		{
-			$getcollyname = $_POST[ 'filename' ];
-			$getcollyname = cleanInsert($getcollyname);
-
-			$ask = "select * from collys where filename=:filename";
-			$result = fetchAll($ask, [':filename' => $getcollyname ]);
-			foreach ($result as $row)
-			{
-				$show_colly_name = $row->filename;
-				$show_colly_name = $row->name;
-				$show_colly_crew = $row->crews;
-				$show_colly_year = $row->year;
-				$show_colly_month = $row->month;
-				$show_colly_day = $row->day;
-				$show_colly_type = $row->type;
-				$encoded_filename = base64_encode($row->filename);
-			}
-			?>
-			<form enctype="multipart/form-data" action="info_release.php?filename=<?=$encoded_filename?>" method="post">
-
-				<div class="row">
-					<h2>Edit ASCII Collection</h2>
-				</div>
-
-				<div class="col-6">
-					Name
-				</div>
-
-				<div class="col-6">
-					<input type="text" size="32" name="edit_colly_name" value="<?=$show_colly_name?>">
-				</div>
-
-				<div class="col-6">
-					Type
-				</div>
-
-				<div class="col-6">
-					<select name="edit_colly_type" class="btn-big">
-						<option><?=$show_colly_type?></option>
-						<option>ASCII</option>
-						<option>ANSI</option>
-					</select>
-				</div>
-
-				<div class="col-6">
-					ANSI Colors
-				</div>
-
-				<div class="col-6">
-					<select name="colors" class="btn-big">
-						<option value="transparent">ANSI</option>
-						<option>Workbench</option>
-					</select>
-				</div>
-
-				<div class="info_release_left">Release Date</div>
-
-				<div class="info_release_right">
-					<?php
-					echo "<select name='edit_colly_year' class='btn-big'>";
-					$countyear = 1986;
-					$maxyear = date("Y");
-					echo "<option>$show_colly_year</option>";
-					while ($countyear <= $maxyear) 
-					{
-						echo "<option>$countyear</option>";
-						$countyear++;
-					}
-
-					?>
-				</select>
-				<select name="edit_colly_month" class="btn-big">
-					<option selected='selected'><?=$show_colly_month?></option>
-					<option value="0">Unknown</option>
-					<option value="1">January</option>
-					<option value="2">February</option>
-					<option value="3">Mars</option>
-					<option value="4">April</option>
-					<option value="5">May</option>
-					<option value="6">June</option>
-					<option value="7">July</option>
-					<option value="8">August</option>
-					<option value="9">September</option>
-					<option value="10">October</option>
-					<option value="11">November</option>
-					<option value="12">December</option>
-				</select>
-				<select name="edit_colly_day" class="btn-big">
-					<?php
-					echo "<option selected='selected' value='0'>$show_colly_day</option>";
-					echo "<option value='0'>Unknown</option>";
-					$min_day = 1;
-					$max_day = 31;
-					while ($min_day <= $max_day)
-					{
-						echo "<option>$min_day</option>";
-						$min_day++;
-					}
-					?>
-				</select>
-			</div>
-
-			<div class="col-6">
-				Artist(s)
-			</div>
-
-			<div class="col-6">
-				<?php
-				$ask = "select nick from author_of where filename=:filename";
-				$result = fetchAll($ask, [ 'filename' => $getcollyname ]);
-				foreach ($result as $row)
-				{
-					$colly_author = $row->nick;
-					echo "<select name=\"old_colly_authors[]\" class='btn-big'>";
-					echo "<option selected=\"selected\">$colly_author</option>";
-					echo "<option value='Delete'>Remove Author</option>";
-
-					$ask_authors = "select nick from artists";
-					$result_authors = fetchAll($ask_authors);
-					foreach ($result_authors as $row_authors)
-					{
-						$authors = $row_authors->nick;
-						echo "<option>$authors</option>";
-					}
-					echo "</select>";
-				}
-				?>
-				<span id="new_colly_author_field"></span> <span onclick="add_colly_author_field();"
-				style="cursor: pointer; cursor: hand;"><button
-				type="button">Add Author!</button></span>
-				<input type="hidden" name="total_colly_authors" id="total_colly_authors" value="0">
-			</div>
-
-			<div class="col-6">
-				Crew(s)
-			</div>
-
-			<div class="col-6">
-
-				<?php
-				$ask = "select crew from crew_of where filename=:filename";
-				$result = fetchAll($ask, [ 'filename' => $getcollyname ]);
-				foreach ($result as $row)
-				{
-					$colly_crew = $row->crew;
-					echo "<select name=\"old_colly_crews[]\" class='btn-big'>";
-					echo "<option selected=\"selected\">$colly_crew</option>";
-					echo "<option value='Delete'>Remove Crew</option>";
-					$ask_crews = "select name from crews";
-					$result_crews = mysql_query($ask_crews, $dbh);
-					while ($row_crews = mysql_fetch_array($result_crews)) 
-					{
-						$crews = $row_crews[ 0 ];
-						echo "<option>$crews</option>";
-					}
-					echo "</select>";
-				}
-				?>
-
-				<span id="new_colly_crew_field"></span> <span onclick="add_colly_crew_field();"
-				style="cursor: pointer; cursor: hand;"><button type="button">Add Crew!</button></span>
-				<input type="hidden" name="total_colly_crews" id="total_colly_crews" value="0">
-			</div>
+			$show_colly_name = $row->filename;
+			$show_colly_name = $row->name;
+			$show_colly_crew = $row->crews;
+			$show_colly_year = $row->year;
+			$show_colly_month = $row->month;
+			$show_colly_day = $row->day;
+			$show_colly_type = $row->type;
+			$encoded_filename = base64_encode($row->filename);
+		}
+		?>
+		<form enctype="multipart/form-data" action="info_release.php?filename=<?=$encoded_filename?>" method="post">
 
 			<div class="row">
-				<input type="hidden" name="filename" value="<?=$getcollyname?>">
-				<input type="submit" class="btn-big" name="do_edit_colly" value="Change">
+				<h2>Edit ASCII Collection</h2>
 			</div>
-		</form>
-		<?php
-	}
-	include('info_release_summary.php');
+
+			<div class="col-6">
+				Name
+			</div>
+
+			<div class="col-6">
+				<input type="text" size="32" name="edit_colly_name" value="<?=$show_colly_name?>">
+			</div>
+
+			<div class="col-6">
+				Type
+			</div>
+
+			<div class="col-6">
+				<select name="edit_colly_type" class="btn-big">
+					<option><?=$show_colly_type?></option>
+					<option>ASCII</option>
+					<option>ANSI</option>
+				</select>
+			</div>
+
+			<div class="col-6">
+				ANSI Colors
+			</div>
+
+			<div class="col-6">
+				<select name="colors" class="btn-big">
+					<option value="transparent">ANSI</option>
+					<option>Workbench</option>
+				</select>
+			</div>
+
+			<div class="info_release_left">Release Date</div>
+
+			<div class="info_release_right">
+				<?php
+				echo "<select name='edit_colly_year' class='btn-big'>";
+				$countyear = 1986;
+				$maxyear = date("Y");
+				echo "<option>$show_colly_year</option>";
+				while ($countyear <= $maxyear) 
+				{
+					echo "<option>$countyear</option>";
+					$countyear++;
+				}
+
+				?>
+			</select>
+			<select name="edit_colly_month" class="btn-big">
+				<option selected='selected'><?=$show_colly_month?></option>
+				<option value="0">Unknown</option>
+				<option value="1">January</option>
+				<option value="2">February</option>
+				<option value="3">Mars</option>
+				<option value="4">April</option>
+				<option value="5">May</option>
+				<option value="6">June</option>
+				<option value="7">July</option>
+				<option value="8">August</option>
+				<option value="9">September</option>
+				<option value="10">October</option>
+				<option value="11">November</option>
+				<option value="12">December</option>
+			</select>
+			<select name="edit_colly_day" class="btn-big">
+				<?php
+				echo "<option selected='selected' value='0'>$show_colly_day</option>";
+				echo "<option value='0'>Unknown</option>";
+				$min_day = 1;
+				$max_day = 31;
+				while ($min_day <= $max_day)
+				{
+					echo "<option>$min_day</option>";
+					$min_day++;
+				}
+				?>
+			</select>
+		</div>
+
+		<div class="col-6">
+			Artist(s)
+		</div>
+
+		<div class="col-6">
+			<?php
+			$ask = "select nick from author_of where filename=:filename";
+			$result = fetchAll($ask, [ 'filename' => $getcollyname ]);
+			foreach ($result as $row)
+			{
+				$colly_author = $row->nick;
+				echo "<select name=\"old_colly_authors[]\" class='btn-big'>";
+				echo "<option selected=\"selected\">$colly_author</option>";
+				echo "<option value='Delete'>Remove Author</option>";
+
+				$ask_authors = "select nick from artists";
+				$result_authors = fetchAll($ask_authors);
+				foreach ($result_authors as $row_authors)
+				{
+					$authors = $row_authors->nick;
+					echo "<option>$authors</option>";
+				}
+				echo "</select>";
+			}
+			?>
+			<span id="new_colly_author_field"></span> <span onclick="add_colly_author_field();"
+			style="cursor: pointer; cursor: hand;"><button
+			type="button">Add Author!</button></span>
+			<input type="hidden" name="total_colly_authors" id="total_colly_authors" value="0">
+		</div>
+
+		<div class="col-6">
+			Crew(s)
+		</div>
+
+		<div class="col-6">
+
+			<?php
+			$ask = "select crew from crew_of where filename=:filename";
+			$result = fetchAll($ask, [ 'filename' => $getcollyname ]);
+			foreach ($result as $row)
+			{
+				$colly_crew = $row->crew;
+				echo "<select name=\"old_colly_crews[]\" class='btn-big'>";
+				echo "<option selected=\"selected\">$colly_crew</option>";
+				echo "<option value='Delete'>Remove Crew</option>";
+				$ask_crews = "select name from crews";
+				$result_crews = mysql_query($ask_crews, $dbh);
+				while ($row_crews = mysql_fetch_array($result_crews)) 
+				{
+					$crews = $row_crews[ 0 ];
+					echo "<option>$crews</option>";
+				}
+				echo "</select>";
+			}
+			?>
+
+			<span id="new_colly_crew_field"></span> <span onclick="add_colly_crew_field();"
+			style="cursor: pointer; cursor: hand;"><button type="button">Add Crew!</button></span>
+			<input type="hidden" name="total_colly_crews" id="total_colly_crews" value="0">
+		</div>
+
+		<div class="row">
+			<input type="hidden" name="filename" value="<?=$getcollyname?>">
+			<input type="submit" class="btn-big" name="do_edit_colly" value="Change">
+		</div>
+	</form>
+	<?php
+}
+include('info_release_summary.php');
 
 //----------------------------------------------------------------------------------------------
 // TOP CONTROL TABLE
 //----------------------------------------------------------------------------------------------
 
-	if (!isset($_POST[ 'edit_colly' ]) && !isset($_POST[ 'broken' ])) 
-	{
-		$type = fetchOne("SELECT type FROM collys WHERE filename = :filename", [":filename" => $filename])->type ?? "";
+if (!isset($_POST[ 'edit_colly' ]) && !isset($_POST[ 'broken' ])) 
+{
+	$type = fetchOne("SELECT type FROM collys WHERE filename = :filename", [":filename" => $filename])->type ?? "";
 
 
-		?>
-		<div class="container-fluid bg-secondary amb-1 apb-1" style="height: 132px;">
-			<script>
-				$(document).ready(function() 
+	?>
+	<div class="container-fluid bg-secondary amb-1 apb-1" style="height: 132px;">
+		<script>
+			$(document).ready(function() 
+			{
+				$("#ctrlForm select").change(function() 
 				{
-					$("#ctrlForm select").change(function() 
-					{
-						$("#ctrlForm input[name='view']").click();
-					});
+					$("#ctrlForm input[name='view']").click();
 				});
+			});
 
-			</script>
+		</script>
 
-			<?php
-			echo "<form action='$_SERVER[PHP_SELF]?filename=$decoded_filename' method='post'  id='ctrlForm'>";
+		<?php
+		echo "<form action='$_SERVER[PHP_SELF]?filename=$decoded_filename' method='post'  id='ctrlForm'>";
 
-			echo "<input type='submit' class='btn-big amb-1' name='hide' value='Hide Colly!'" . ((!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) ? " style='display:none'" : "") . "> ";
-			echo "<input type='submit' class='btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s' name='view' value='View Colly'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
-			echo "<input type='button' onclick='myFunction()' class='btn-big amb-1' name='fullscreen' value='Fullscreen'" . ((isset($_POST[ 'change' ]) || (!isset($_POST[ 'view' ]))) ? " style='display:none'" : "") . "> ";
+		echo "<input type='submit' class='btn-big amb-1' name='hide' value='Hide Colly!'" . ((!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) ? " style='display:none'" : "") . "> ";
+		echo "<input type='submit' class='btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s' name='view' value='View Colly'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
+		echo "<input type='button' onclick='myFunction()' class='btn-big amb-1' name='fullscreen' value='Fullscreen'" . ((isset($_POST[ 'change' ]) || (!isset($_POST[ 'view' ]))) ? " style='display:none'" : "") . "> ";
 
-			if (is_logged_in()) 
+		if (is_logged_in()) 
+		{
+			$ask = "select uploader from collys where filename=:filename";
+			$result_uploader = fetchOne($ask, [ 'filename' => base64_decode($filename) ]);
+			if (isset($result_uploader->uploader)) $uploader = $result_uploader->uploader;
+
+			echo "<input type='submit' class='btn-big amb-1' name=addcomment value='Comment'> ";
+			echo "<input type='submit' class='btn-big amb-1' name=favourite value='Favourite'> ";
+			echo "<input type='submit' class='btn-big amb-1' name=broken value='Report Broken'> ";
+			if ($_user[ "nick" ] === $uploader || is_admin()) 
 			{
-				$ask = "select uploader from collys where filename=:filename";
-				$result_uploader = fetchOne($ask, [ 'filename' => base64_decode($filename) ]);
-				if (isset($result_uploader->uploader)) $uploader = $result_uploader->uploader;
-
-				echo "<input type='submit' class='btn-big amb-1' name=addcomment value='Comment'> ";
-				echo "<input type='submit' class='btn-big amb-1' name=favourite value='Favourite'> ";
-				echo "<input type='submit' class='btn-big amb-1' name=broken value='Report Broken'> ";
-				if ($_user[ "nick" ] === $uploader || is_admin()) 
-				{
-					echo "<input type='hidden' name='filename' value=$filename>";
-					echo "<input type='submit' class='btn-big amb-1' name=edit_colly value='Edit Colly'> ";
-				}
+				echo "<input type='hidden' name='filename' value=$filename>";
+				echo "<input type='submit' class='btn-big amb-1' name=edit_colly value='Edit Colly'> ";
 			}
-			if (!isset($_POST[ 'download' ])) 
-			{
-				echo "<input type='submit' class='btn-big amb-1' name=download value='Download'> ";
-			} 
-			elseif (isset($_POST[ 'download' ])) 
-			{
+		}
+		if (!isset($_POST[ 'download' ])) 
+		{
+			echo "<input type='submit' class='btn-big amb-1' name=download value='Download'> ";
+		} 
+		elseif (isset($_POST[ 'download' ])) 
+		{
             $ask = "select downloads from collys where filename=:filename"; // download counter
             $row = fetchOne("SELECT view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
             $downloads = $row->downloads+1;
