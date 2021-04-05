@@ -19,7 +19,7 @@ if($getcollyname && (!isset($_POST['do_edit_colly'])))
 	}
 }
 ?>
-<div class="tab-pane fade show active ap-1" id="colly">
+<div class="tab-pane fade show active ap-1" id="div-colly">
 	<form enctype="multipart/form-data" action="#colly" method="post">		
 		<div class="row">
 			<div class="col-6">
@@ -41,13 +41,15 @@ if($getcollyname && (!isset($_POST['do_edit_colly'])))
 				</select>
 			</div>
 			<div class="col-4">
-				<input type="hidden" name="filename" value="<?=$getcollyname?>">
+				<input type="hidden" name="open_edit_colly_field" value="1">
 			</div>
 		</div>
+	</form>
 		<?php
 		if(isset($_POST['getcollyname']) && (isset($_POST['open_edit_colly_field'])))
 		{
 			$getcollyname=$_POST['getcollyname']; ?>
+	<form enctype="multipart/form-data" action="#colly" method="post">		
 			<div class="row">
 				<div class="col-5">
 					<div class="col-12">
@@ -149,8 +151,8 @@ if($getcollyname && (!isset($_POST['do_edit_colly'])))
 						</div>
 						<div class="col-3">
 							<?php
-							$ask="select nick from author_of where filename='$getcollyname'";
-							$result=fetchAll($ask);
+							$ask="select nick from author_of where filename=:filename";
+							$result=fetchAll($ask, [ 'filename' => $getcollyname]);
 							foreach ($result as $row)
 							{
 								$colly_author=$row->nick;
