@@ -697,6 +697,7 @@ require_once "header.php"; ?>
 									}
 									?>
 								</select>
+								<?php
 							}
 							?>
 						</div>
@@ -709,10 +710,10 @@ require_once "header.php"; ?>
 					</div>
 					hej 5
 					<div class="row">										
-						<div class="col-6">
+						<div class="col-4">
 							Crew(s)
 						</div>
-						<div class="col-6">
+						<div class="col-4">
 							<?php
 							$ask = "select crew from crew_of where filename=:filename";
 							$result = fetchAll($ask, [ 'filename' => $getcollyname ]);
@@ -739,12 +740,11 @@ require_once "header.php"; ?>
 							}
 							?>
 						</div>
+						<div class="col-4">
+							<span id="new_colly_crew_field"></span> <span onclick="add_colly_crew_field();" style="cursor: pointer; cursor: hand;"><button type="button">Add Crew!</button></span>
+							<input type="hidden" name="total_colly_crews" id="total_colly_crews" value="0">
+						</div>
 					</div>
-					<div class="row">															
-						<span id="new_colly_crew_field"></span> <span onclick="add_colly_crew_field();" style="cursor: pointer; cursor: hand;"><button type="button">Add Crew!</button></span>
-						<input type="hidden" name="total_colly_crews" id="total_colly_crews" value="0">
-					</div>
-
 					<div class="row">
 						<input type="hidden" name="filename" value="<?=$getcollyname?>">
 						<input type="submit" class="btn-big" name="do_edit_colly" value="Change">
