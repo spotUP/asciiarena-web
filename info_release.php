@@ -713,7 +713,6 @@ require_once "header.php"; ?>
 							Crew(s)
 						</div>
 						<div class="col-6">
-
 							<?php
 							$ask = "select crew from crew_of where filename=:filename";
 							$result = fetchAll($ask, [ 'filename' => $getcollyname ]);
@@ -753,58 +752,59 @@ require_once "header.php"; ?>
 				</form>
 				<?php
 			}
-			include('info_release_summary.php');
+		}
+		include('info_release_summary.php');
 
 //----------------------------------------------------------------------------------------------
 // TOP CONTROL TABLE
 //----------------------------------------------------------------------------------------------
 
-			if (!isset($_POST[ 'edit_colly' ]) && !isset($_POST[ 'broken' ])) 
-			{
-				$type = fetchOne("SELECT type FROM collys WHERE filename = :filename", [":filename" => $filename])->type ?? "";
+		if (!isset($_POST[ 'edit_colly' ]) && !isset($_POST[ 'broken' ])) 
+		{
+			$type = fetchOne("SELECT type FROM collys WHERE filename = :filename", [":filename" => $filename])->type ?? "";
 
 
-				?>
-				<div class="container-fluid bg-secondary amb-1 apb-1" style="height: 132px;">
-					<script>
-						$(document).ready(function() 
+			?>
+			<div class="container-fluid bg-secondary amb-1 apb-1" style="height: 132px;">
+				<script>
+					$(document).ready(function() 
+					{
+						$("#ctrlForm select").change(function() 
 						{
-							$("#ctrlForm select").change(function() 
-							{
-								$("#ctrlForm input[name='view']").click();
-							});
+							$("#ctrlForm input[name='view']").click();
 						});
+					});
 
-					</script>
+				</script>
 
-					<?php
-					echo "<form action='$_SERVER[PHP_SELF]?filename=$decoded_filename' method='post'  id='ctrlForm'>";
+				<?php
+				echo "<form action='$_SERVER[PHP_SELF]?filename=$decoded_filename' method='post'  id='ctrlForm'>";
 
-					echo "<input type='submit' class='btn-big amb-1' name='hide' value='Hide Colly!'" . ((!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) ? " style='display:none'" : "") . "> ";
-					echo "<input type='submit' class='btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s' name='view' value='View Colly'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
-					echo "<input type='button' onclick='myFunction()' class='btn-big amb-1' name='fullscreen' value='Fullscreen'" . ((isset($_POST[ 'change' ]) || (!isset($_POST[ 'view' ]))) ? " style='display:none'" : "") . "> ";
+				echo "<input type='submit' class='btn-big amb-1' name='hide' value='Hide Colly!'" . ((!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) ? " style='display:none'" : "") . "> ";
+				echo "<input type='submit' class='btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s' name='view' value='View Colly'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
+				echo "<input type='button' onclick='myFunction()' class='btn-big amb-1' name='fullscreen' value='Fullscreen'" . ((isset($_POST[ 'change' ]) || (!isset($_POST[ 'view' ]))) ? " style='display:none'" : "") . "> ";
 
-					if (is_logged_in()) 
+				if (is_logged_in()) 
+				{
+					$ask = "select uploader from collys where filename=:filename";
+					$result_uploader = fetchOne($ask, [ 'filename' => base64_decode($filename) ]);
+					if (isset($result_uploader->uploader)) $uploader = $result_uploader->uploader;
+
+					echo "<input type='submit' class='btn-big amb-1' name=addcomment value='Comment'> ";
+					echo "<input type='submit' class='btn-big amb-1' name=favourite value='Favourite'> ";
+					echo "<input type='submit' class='btn-big amb-1' name=broken value='Report Broken'> ";
+					if ($_user[ "nick" ] === $uploader || is_admin()) 
 					{
-						$ask = "select uploader from collys where filename=:filename";
-						$result_uploader = fetchOne($ask, [ 'filename' => base64_decode($filename) ]);
-						if (isset($result_uploader->uploader)) $uploader = $result_uploader->uploader;
-
-						echo "<input type='submit' class='btn-big amb-1' name=addcomment value='Comment'> ";
-						echo "<input type='submit' class='btn-big amb-1' name=favourite value='Favourite'> ";
-						echo "<input type='submit' class='btn-big amb-1' name=broken value='Report Broken'> ";
-						if ($_user[ "nick" ] === $uploader || is_admin()) 
-						{
-							echo "<input type='hidden' name='filename' value=$filename>";
-							echo "<input type='submit' class='btn-big amb-1' name=edit_colly value='Edit Colly'> ";
-						}
+						echo "<input type='hidden' name='filename' value=$filename>";
+						echo "<input type='submit' class='btn-big amb-1' name=edit_colly value='Edit Colly'> ";
 					}
-					if (!isset($_POST[ 'download' ])) 
-					{
-						echo "<input type='submit' class='btn-big amb-1' name=download value='Download'> ";
-					} 
-					elseif (isset($_POST[ 'download' ])) 
-					{
+				}
+				if (!isset($_POST[ 'download' ])) 
+				{
+					echo "<input type='submit' class='btn-big amb-1' name=download value='Download'> ";
+				} 
+				elseif (isset($_POST[ 'download' ])) 
+				{
             $ask = "select downloads from collys where filename=:filename"; // download counter
             $row = fetchOne("SELECT view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
             $downloads = $row->downloads+1;
