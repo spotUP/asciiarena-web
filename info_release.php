@@ -710,6 +710,7 @@ require_once "header.php"; ?>
 						</div>
 					</form>
 				</div>
+				<?php
 			}
 		}
 
