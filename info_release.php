@@ -633,7 +633,6 @@ require_once "header.php"; ?>
 								}
 								?>
 							</select>
-							hej
 							<select name="edit_colly_month" class="btn-big">
 								<option selected='selected'><?=$show_colly_month?></option>
 								<option value="0">Unknown</option>
@@ -650,7 +649,6 @@ require_once "header.php"; ?>
 								<option value="11">November</option>
 								<option value="12">December</option>
 							</select>
-							hej
 							<select name="edit_colly_day" class="btn-big">
 								
 								<option selected="selected" value="0"><?=$show_colly_day?></option>
@@ -665,7 +663,6 @@ require_once "header.php"; ?>
 								}
 								?>
 							</select>
-							hej2
 						</div>
 					</div>
 
@@ -673,7 +670,6 @@ require_once "header.php"; ?>
 						<div class="col-4">
 							Artist(s)
 						</div>
-						hej3
 						<div class="col-4">
 							<?php
 							$ask = "select nick from author_of where filename=:filename";
@@ -702,11 +698,10 @@ require_once "header.php"; ?>
 							?>
 						</div>
 						<div class="col-4">
-							<span id="new_colly_author_field"></span> <span onclick="add_colly_author_field();" style="cursor: pointer; cursor: hand;"><button type="button">Add Author!</button></span>
+							<span id="new_colly_author_field"></span> <span onclick="add_colly_author_field();" style="cursor: hand;"><button type="button">Add Author!</button></span>
 							<input type="hidden" name="total_colly_authors" id="total_colly_authors" value="0">
 						</div>
 					</div>
-					hej 5
 					<div class="row">										
 						<div class="col-4">
 							Crew(s)
@@ -851,58 +846,54 @@ require_once "header.php"; ?>
         	{
         		?>
         		<div class="apb-0">
-        			<div class="custom-select" style="width: 142px">
-        				<select name="font">
-        					<option class="dropdown-item" value="MicroKnight"<?php if ($font == 'MicroKnight') echo ' selected'; ?>>MicroKnight</option>
-        					<option class="dropdown-item" value="MicroKnightPlus"<?php if ($font == 'MicroKnightPlus') echo ' selected'; ?>>MicroKnight+</option>
-        					<option class="dropdown-item" value="mOsOul"<?php if ($font == 'mOsOul') echo ' selected'; ?>>mOsOul</option>
-        					<option value="P0T-NOoDLE"<?php if ($font == 'P0T-NOoDLE') echo ' selected'; ?>>P0T-NOoDLE</option>
-        					<option value="Topaz_a500"<?php if ($font == 'Topaz_a500') echo ' selected'; ?>>A500 Topaz</option>
-        					<option value="TopazPlus_a500"<?php if ($font == 'TopazPlus_a500') echo ' selected'; ?>>A500 Topaz+</option>
-        					<option value="Topaz_a1200"<?php if ($font == 'Topaz_a1200') echo ' selected'; ?>>A1200 Topaz</option>
-        					<option value="TopazPlus_a1200"<?php if ($font == 'TopazPlus_a1200') echo ' selected'; ?>>A1200 Topaz+</option>
-        				</select>
-        				<select name="background_color">
-        					<option value=""<?php if ($bgcolor == '') echo ' selected'; ?>>BG Color</option>
-        					<option value="Black"<?php if ($bgcolor == 'Black') echo ' selected'; ?>>Black</option>
-        					<option value="DarkBlue"<?php if ($bgcolor == 'DarkBlue') echo ' selected'; ?>>Dark Blue</option>
-        					<option value="DarkGreen"<?php if ($bgcolor == 'DarkGreen') echo ' selected'; ?>>Dark Green</option>
-        					<option value="DarkCyan"<?php if ($bgcolor == 'DarkCyan') echo ' selected'; ?>>Dark Cyan</option>
-        					<option value="DarkRed"<?php if ($bgcolor == 'DarkRed') echo ' selected'; ?>>Dark Red</option>
-        					<option value="Magenta"<?php if ($bgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
-        					<option value="Brown"<?php if ($bgcolor == 'Brown') echo ' selected'; ?>>Brown</option>
-        					<option value="DarkGrey"<?php if ($bgcolor == 'DarkGrey') echo ' selected'; ?>>Dark Grey</option>
-        					<option value="Grey"<?php if ($bgcolor == 'Grey') echo ' selected'; ?>>Grey</option>
-        					<option value="Blue"<?php if ($bgcolor == 'Blue') echo ' selected'; ?>>Blue</option>
-        					<option value="Green"<?php if ($bgcolor == 'Green') echo ' selected'; ?>>Green</option>
-        					<option value="Cyan"<?php if ($bgcolor == 'Cyan') echo ' selected'; ?>>Cyan</option>
-        					<option value="Red"<?php if ($bgcolor == 'Red') echo ' selected'; ?>>Red</option>
-        					<option value="Magenta"<?php if ($bgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
-        					<option value="Yellow"<?php if ($bgcolor == 'Yellow') echo ' selected'; ?>>Yellow</option>
-        					<option value="White"<?php if ($bgcolor == 'White') echo ' selected'; ?>>White</option>
-        				</select>
-        			</div>
-        			<div class="custom-select" style="width: 142px">
-        				<select name="foreground_color">
-        					<option value=""<?php if ($fgcolor == '') echo ' selected'; ?>>FG Color</option>
-        					<option value="Black"<?php if ($fgcolor == 'Black') echo ' selected'; ?>>Black</option>
-        					<option value="DarkBlue"<?php if ($fgcolor == 'DarkBlue') echo ' selected'; ?>>Dark Blue</option>
-        					<option value="DarkGreen"<?php if ($fgcolor == 'DarkGreen') echo ' selected'; ?>>Dark Green</option>
-        					<option value="DarkCyan"<?php if ($fgcolor == 'DarkCyan') echo ' selected'; ?>>Dark Cyan</option>
-        					<option value="DarkRed"<?php if ($fgcolor == 'DarkRed') echo ' selected'; ?>>Dark Red</option>
-        					<option value="Magenta"<?php if ($fgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
-        					<option value="Brown"<?php if ($fgcolor == 'Brown') echo ' selected'; ?>>Brown</option>
-        					<option value="DarkGrey"<?php if ($fgcolor == 'DarkGrey') echo ' selected'; ?>>Dark Grey</option>
-        					<option value="Grey"<?php if ($fgcolor == 'Grey') echo ' selected'; ?>>Grey</option>
-        					<option value="Blue"<?php if ($fgcolor == 'Blue') echo ' selected'; ?>>Blue</option>
-        					<option value="Green"<?php if ($fgcolor == 'Green') echo ' selected'; ?>>Green</option>
-        					<option value="Cyan"<?php if ($fgcolor == 'Cyan') echo ' selected'; ?>>Cyan</option>
-        					<option value="Red"<?php if ($fgcolor == 'Red') echo ' selected'; ?>>Red</option>
-        					<option value="Magenta"<?php if ($fgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
-        					<option value="Yellow"<?php if ($fgcolor == 'Yellow') echo ' selected'; ?>>Yellow</option>
-        					<option value="White"<?php if ($fgcolor == 'White') echo ' selected'; ?>>White</option>
-        				</select>
-        			</div>
+        			<select name="font">
+        				<option class="dropdown-item" value="MicroKnight"<?php if ($font == 'MicroKnight') echo ' selected'; ?>>MicroKnight</option>
+        				<option class="dropdown-item" value="MicroKnightPlus"<?php if ($font == 'MicroKnightPlus') echo ' selected'; ?>>MicroKnight+</option>
+        				<option class="dropdown-item" value="mOsOul"<?php if ($font == 'mOsOul') echo ' selected'; ?>>mOsOul</option>
+        				<option value="P0T-NOoDLE"<?php if ($font == 'P0T-NOoDLE') echo ' selected'; ?>>P0T-NOoDLE</option>
+        				<option value="Topaz_a500"<?php if ($font == 'Topaz_a500') echo ' selected'; ?>>A500 Topaz</option>
+        				<option value="TopazPlus_a500"<?php if ($font == 'TopazPlus_a500') echo ' selected'; ?>>A500 Topaz+</option>
+        				<option value="Topaz_a1200"<?php if ($font == 'Topaz_a1200') echo ' selected'; ?>>A1200 Topaz</option>
+        				<option value="TopazPlus_a1200"<?php if ($font == 'TopazPlus_a1200') echo ' selected'; ?>>A1200 Topaz+</option>
+        			</select>
+        			<select name="background_color">
+        				<option value=""<?php if ($bgcolor == '') echo ' selected'; ?>>BG Color</option>
+        				<option value="Black"<?php if ($bgcolor == 'Black') echo ' selected'; ?>>Black</option>
+        				<option value="DarkBlue"<?php if ($bgcolor == 'DarkBlue') echo ' selected'; ?>>Dark Blue</option>
+        				<option value="DarkGreen"<?php if ($bgcolor == 'DarkGreen') echo ' selected'; ?>>Dark Green</option>
+        				<option value="DarkCyan"<?php if ($bgcolor == 'DarkCyan') echo ' selected'; ?>>Dark Cyan</option>
+        				<option value="DarkRed"<?php if ($bgcolor == 'DarkRed') echo ' selected'; ?>>Dark Red</option>
+        				<option value="Magenta"<?php if ($bgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
+        				<option value="Brown"<?php if ($bgcolor == 'Brown') echo ' selected'; ?>>Brown</option>
+        				<option value="DarkGrey"<?php if ($bgcolor == 'DarkGrey') echo ' selected'; ?>>Dark Grey</option>
+        				<option value="Grey"<?php if ($bgcolor == 'Grey') echo ' selected'; ?>>Grey</option>
+        				<option value="Blue"<?php if ($bgcolor == 'Blue') echo ' selected'; ?>>Blue</option>
+        				<option value="Green"<?php if ($bgcolor == 'Green') echo ' selected'; ?>>Green</option>
+        				<option value="Cyan"<?php if ($bgcolor == 'Cyan') echo ' selected'; ?>>Cyan</option>
+        				<option value="Red"<?php if ($bgcolor == 'Red') echo ' selected'; ?>>Red</option>
+        				<option value="Magenta"<?php if ($bgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
+        				<option value="Yellow"<?php if ($bgcolor == 'Yellow') echo ' selected'; ?>>Yellow</option>
+        				<option value="White"<?php if ($bgcolor == 'White') echo ' selected'; ?>>White</option>
+        			</select>
+        			<select name="foreground_color">
+        				<option value=""<?php if ($fgcolor == '') echo ' selected'; ?>>FG Color</option>
+        				<option value="Black"<?php if ($fgcolor == 'Black') echo ' selected'; ?>>Black</option>
+        				<option value="DarkBlue"<?php if ($fgcolor == 'DarkBlue') echo ' selected'; ?>>Dark Blue</option>
+        				<option value="DarkGreen"<?php if ($fgcolor == 'DarkGreen') echo ' selected'; ?>>Dark Green</option>
+        				<option value="DarkCyan"<?php if ($fgcolor == 'DarkCyan') echo ' selected'; ?>>Dark Cyan</option>
+        				<option value="DarkRed"<?php if ($fgcolor == 'DarkRed') echo ' selected'; ?>>Dark Red</option>
+        				<option value="Magenta"<?php if ($fgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
+        				<option value="Brown"<?php if ($fgcolor == 'Brown') echo ' selected'; ?>>Brown</option>
+        				<option value="DarkGrey"<?php if ($fgcolor == 'DarkGrey') echo ' selected'; ?>>Dark Grey</option>
+        				<option value="Grey"<?php if ($fgcolor == 'Grey') echo ' selected'; ?>>Grey</option>
+        				<option value="Blue"<?php if ($fgcolor == 'Blue') echo ' selected'; ?>>Blue</option>
+        				<option value="Green"<?php if ($fgcolor == 'Green') echo ' selected'; ?>>Green</option>
+        				<option value="Cyan"<?php if ($fgcolor == 'Cyan') echo ' selected'; ?>>Cyan</option>
+        				<option value="Red"<?php if ($fgcolor == 'Red') echo ' selected'; ?>>Red</option>
+        				<option value="Magenta"<?php if ($fgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
+        				<option value="Yellow"<?php if ($fgcolor == 'Yellow') echo ' selected'; ?>>Yellow</option>
+        				<option value="White"<?php if ($fgcolor == 'White') echo ' selected'; ?>>White</option>
+        			</select>
         		</div>
         		<?php
         	}

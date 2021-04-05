@@ -64,19 +64,17 @@
 	<div class="row apb-1">
 		<div class="col-12">
 			<form>
-				<div class="custom-selects">
-					<select name="bbs_id" id="fetch_id" class="w-100" onchange="getBBS();">
-						<option value="0">Select BBS</option>
-						<?php
-							$result = fetchAll("SELECT id, name FROM bbses ORDER BY name");
-							foreach($result as $row) {
-								?>
-								<option value="<?=$row->id?>"><?=$row->name?></option>
-								<?php
-							}
+				<select name="bbs_id" id="fetch_id" class="w-100" onchange="getBBS();">
+					<option value="0">Select BBS</option>
+					<?php
+					$result = fetchAll("SELECT id, name FROM bbses ORDER BY name");
+					foreach($result as $row) {
 						?>
-					</select>
-				</div>
+						<option value="<?=$row->id?>"><?=$row->name?></option>
+						<?php
+					}
+					?>
+				</select>
 			</form>
 		</div>
 	</div>
