@@ -670,40 +670,44 @@ require_once "header.php"; ?>
 					</div>
 
 					<div class="row">										
-						<div class="col-6">
+						<div class="col-4">
 							Artist(s)
 						</div>
 						hej3
-						<div class="col-6">
+						<div class="col-4">
 							<?php
 							$ask = "select nick from author_of where filename=:filename";
 							$result = fetchAll($ask, [ 'filename' => $getcollyname ]);
 							foreach ($result as $row)
 							{
 								$colly_author = $row->nick;
-								echo "<select name=\"old_colly_authors[]\" class='btn-big'>";
-								echo "<option selected=\"selected\">$colly_author</option>";
-								echo "<option value='Delete'>Remove Author</option>";
-
-								$ask_authors = "select nick from artists";
-								$result_authors = fetchAll($ask_authors);
-								foreach ($result_authors as $row_authors)
-								{
-									$authors = $row_authors->nick;
-									?>
-									<option><?=$authors?></option>
-									<?php
-								}
 								?>
-							</select>
-						}
-						?>
-						<span id="new_colly_author_field"></span> <span onclick="add_colly_author_field();"
-						style="cursor: pointer; cursor: hand;"><button
-						type="button">Add Author!</button></span>
-						<input type="hidden" name="total_colly_authors" id="total_colly_authors" value="0">
+								<select name="old_colly_authors[]" class="btn-big">
+									<option selected="selected"><?=$colly_author?></option>
+									<option value="Delete">Remove Author</option>
+									<?php
+									$ask_authors = "select nick from artists";
+									$result_authors = fetchAll($ask_authors);
+									foreach ($result_authors as $row_authors)
+									{
+										$authors = $row_authors->nick;
+										?>
+										<option><?=$authors?></option>
+										<?php
+									}
+									?>
+								</select>
+							}
+							?>
+						</div>
+						<div class="col-4">
+							<span id="new_colly_author_field"></span> <span onclick="add_colly_author_field();"
+							style="cursor: pointer; cursor: hand;"><button
+							type="button">Add Author!</button></span>
+							<input type="hidden" name="total_colly_authors" id="total_colly_authors" value="0">
+						</div>
 					</div>
-
+					hej 5
 					<div class="row">										
 						<div class="col-6">
 							Crew(s)
@@ -716,23 +720,30 @@ require_once "header.php"; ?>
 							foreach ($result as $row)
 							{
 								$colly_crew = $row->crew;
-								echo "<select name=\"old_colly_crews[]\" class='btn-big'>";
-								echo "<option selected=\"selected\">$colly_crew</option>";
-								echo "<option value='Delete'>Remove Crew</option>";
-								$ask_crews = "select name from crews";
-								$result_crews = mysql_query($ask_crews, $dbh);
-								while ($row_crews = mysql_fetch_array($result_crews)) 
-								{
-									$crews = $row_crews[ 0 ];
-									echo "<option>$crews</option>";
-								}
-								echo "</select>";
+								?>
+								<select name="old_colly_crews[]" class="btn-big">
+									<option selected="selected"><?=$colly_crew?></option>
+									<option value='Delete'>Remove Crew</option>
+									<?php
+									$ask_crews = "select name from crews";
+									$result_crews = mysql_query($ask_crews, $dbh);
+									while ($row_crews = mysql_fetch_array($result_crews)) 
+									{
+										$crews = $row_crews[ 0 ];
+										?>
+										<option><?=$crews?></option>
+										<?php
+									}
+									?>
+								</select>
+								<?php
 							}
 							?>
-
-							<span id="new_colly_crew_field"></span> <span onclick="add_colly_crew_field();" style="cursor: pointer; cursor: hand;"><button type="button">Add Crew!</button></span>
-							<input type="hidden" name="total_colly_crews" id="total_colly_crews" value="0">
 						</div>
+					</div>
+					<div class="row">															
+						<span id="new_colly_crew_field"></span> <span onclick="add_colly_crew_field();" style="cursor: pointer; cursor: hand;"><button type="button">Add Crew!</button></span>
+						<input type="hidden" name="total_colly_crews" id="total_colly_crews" value="0">
 					</div>
 
 					<div class="row">
