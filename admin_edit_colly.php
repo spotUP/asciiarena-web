@@ -9,13 +9,14 @@ if($getcollyname && (!isset($_POST['do_edit_colly'])))
 	$result=fetchAll($ask, [ 'getcollyname' => $getcollyname]);
 	foreach ($result as $row)
 	{
-		$show_colly_name  = $row->name;
-		$show_colly_crew  = $row->crews;
-		$show_colly_year  = $row->year;
-		$show_colly_month = $row->month;
-		$show_colly_day   = $row->day;
-		$show_colly_type  = $row->type;
-		$show_colly_diz   = $row->file_id;
+		$show_colly_name  = htmlspecialchars_decode($row->name, ENT_QUOTES);
+		$show_colly_name = preg_replace('/[^(\x20-\x7F)]*/','', $show_colly_name);
+		$show_colly_crew  = htmlspecialchars_decode($row->crews, ENT_QUOTES);
+		$show_colly_year  = htmlspecialchars_decode($row->year, ENT_QUOTES);
+		$show_colly_month = htmlspecialchars_decode($row->month, ENT_QUOTES);
+		$show_colly_day   = htmlspecialchars_decode($row->day, ENT_QUOTES);
+		$show_colly_type  = htmlspecialchars_decode($row->type, ENT_QUOTES);
+		$show_colly_diz   = htmlspecialchars_decode($row->file_id, ENT_QUOTES);
 	}
 }
 ?>
@@ -27,6 +28,7 @@ if($getcollyname && (!isset($_POST['do_edit_colly'])))
 					<?php 
 					if (isset($show_colly_name))
 					{
+
 						?><option><?=$show_colly_name?></option><?php
 					}
 					$ask="SELECT name, filename FROM collys ORDER BY filename";
