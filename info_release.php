@@ -579,7 +579,7 @@ require_once "header.php"; ?>
 					$show_colly_month = htmlspecialchars($row->month, ENT_QUOTES);
 					$show_colly_day = htmlspecialchars($row->day, ENT_QUOTES);
 					$show_colly_type = htmlspecialchars($row->type, ENT_QUOTES);
-					$encoded_filename = base64_encode($row->filename, ENT_QUOTES);
+					$encoded_filename = base64_encode($row->filename);
 				}
 				?>
 				<form enctype="multipart/form-data" action="info_release.php?filename=<?=$encoded_filename?>" method="post">
