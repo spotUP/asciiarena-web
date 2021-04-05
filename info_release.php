@@ -85,7 +85,6 @@ require_once "header.php"; ?>
 					</div>
 				</div>
 				<?php
-				echo "<meta http-equiv='Refresh' content='2'; url='$_SERVER[PHP_SELF]?filename=$filename'>";
 			}
 
 //----------------------------------------------------------------------------------------------
@@ -255,7 +254,6 @@ require_once "header.php"; ?>
 					$ask = "update artists set rating=:rating where nick=:nick";
 					doQuery($ask, [ 'rating' => $avg_artist_rating, 'nick' => $artist ]);
 				}
-				echo "<meta http-equiv='Refresh' content='0'; url='$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
 			}
 
 //----------------------------------------------------------------------------------------------
@@ -335,8 +333,19 @@ require_once "header.php"; ?>
 				{
 					$ask = "update crews set rating=:rating where name=:crew";
 					doQuery($ask, [ 'rating' => $avg_artist_rating, 'crew' => $crew ]);
-
 				}
+				?>
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="bs-component aml-1 amb-1">
+							<div class="alert alert-dismissible alert-success">
+								<button type="button" class="close" data-dismiss="alert">x</button>
+								<?=$filename?> deleted!
+							</div>
+						</div>
+					</div>
+				</div>
+				<?php
 			}
 
 //---------------------------------------------------------------------------------------------------------------
