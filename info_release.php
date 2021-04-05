@@ -585,7 +585,7 @@ require_once "header.php"; ?>
 				<form enctype="multipart/form-data" action="info_release.php?filename=<?=$encoded_filename?>" method="post">
 
 					<div class="row">
-						<div class="col-12"><h2>Edit ASCII Collection</h2></div>
+						<div class="col-12"><h1 class="ap-1 bg-header">Edit ASCII Collection</h1></div>
 					</div>
 
 					<div class="row">
@@ -633,6 +633,7 @@ require_once "header.php"; ?>
 								}
 								?>
 							</select>
+							hej
 							<select name="edit_colly_month" class="btn-big">
 								<option selected='selected'><?=$show_colly_month?></option>
 								<option value="0">Unknown</option>
@@ -649,10 +650,12 @@ require_once "header.php"; ?>
 								<option value="11">November</option>
 								<option value="12">December</option>
 							</select>
+							hej
 							<select name="edit_colly_day" class="btn-big">
+								
+								<option selected="selected" value="0"><?=$show_colly_day?></option>
+								<option value='0'>Unknown</option>
 								<?php
-								echo "<option selected='selected' value='0'>$show_colly_day</option>";
-								echo "<option value='0'>Unknown</option>";
 								$min_day = 1;
 								$max_day = 31;
 								while ($min_day <= $max_day)
@@ -662,6 +665,7 @@ require_once "header.php"; ?>
 								}
 								?>
 							</select>
+							hej2
 						</div>
 					</div>
 
@@ -669,7 +673,7 @@ require_once "header.php"; ?>
 						<div class="col-6">
 							Artist(s)
 						</div>
-
+						hej3
 						<div class="col-6">
 							<?php
 							$ask = "select nick from author_of where filename=:filename";
@@ -686,16 +690,18 @@ require_once "header.php"; ?>
 								foreach ($result_authors as $row_authors)
 								{
 									$authors = $row_authors->nick;
-									echo "<option>$authors</option>";
+									?>
+									<option><?=$authors?></option>
+									<?php
 								}
-								echo "</select>";
-							}
-							?>
-							<span id="new_colly_author_field"></span> <span onclick="add_colly_author_field();"
-							style="cursor: pointer; cursor: hand;"><button
-							type="button">Add Author!</button></span>
-							<input type="hidden" name="total_colly_authors" id="total_colly_authors" value="0">
-						</div>
+								?>
+							</select>
+						}
+						?>
+						<span id="new_colly_author_field"></span> <span onclick="add_colly_author_field();"
+						style="cursor: pointer; cursor: hand;"><button
+						type="button">Add Author!</button></span>
+						<input type="hidden" name="total_colly_authors" id="total_colly_authors" value="0">
 					</div>
 
 					<div class="row">										
