@@ -26,7 +26,7 @@ include "header.php";
 				doQuery($ask,['fixed_colly' => $fixed_colly]);
 			}
 			?>
-			<meta http-equiv="Refresh" content="5"; url="admin.php">
+			<meta http-equiv="Refresh" content="0"; url="admin.php">
 			<?php
 		}	
 
@@ -254,10 +254,8 @@ include "header.php";
 			if(isset($_POST['edit_colly_name']) && is_admin())
 			{
 				$filename=$_POST['filename'];
-				$filename=cleanInsert($filename);
 
 				$edit_colly_name=$_POST['edit_colly_name'];
-				$edit_colly_name = cleanInsert($edit_colly_name); 
 				$ask="update collys set name=:edit_colly_name where filename=:filename";	
 				doQuery($ask, ['edit_colly_name' => $edit_colly_name, 'filename' => $filename]);
 			}
@@ -265,7 +263,6 @@ include "header.php";
 			if(isset($_POST['old_colly_authors']) || (isset($_POST['colly_author']) && is_admin()))
 			{
 				$filename=$_POST['filename'];
-				$filename=cleanInsert($filename);
 
 				$ask="delete from author_of where filename=:filename";
 				doQuery($ask, ['filename' => $filename]);
@@ -274,8 +271,12 @@ include "header.php";
 				{			
 					foreach($_POST['old_colly_authors'] as $colly_author)
 					{
-						$colly_author=cleanInsert($colly_author);
-						$ask="insert into author_of values (:colly_author,:filename)";
+						$ask="insert into author_of (nick, filename, colly_id, user_id, artist_id) 
+							values (:colly_author,:filename,
+								(select id from collys where filename=:filename),
+								(select user_id from artists where nick=:colly_author),
+								(select id from artists where nick=:colly_author)
+							)";
 						doQuery($ask, ['colly_author' => $colly_author, 'filename' => $filename]);
 					}
 				}
@@ -284,7 +285,6 @@ include "header.php";
 				{
 					foreach($_POST['colly_author'] as $new_colly_author)
 					{
-						$new_colly_author=cleanInsert($new_colly_author);
 						$ask="insert into author_of values (:new_colly_author,:filename)";
 						doQuery($ask,['new_colly_author' => $new_colly_author, 'filename' => $filename]);
 					}
@@ -295,26 +295,33 @@ include "header.php";
 			if(isset($_POST['old_colly_crews']) || (isset($_POST['colly_crew']) && is_admin()))
 			{
 				$filename=$_POST['filename'];
-				$filename=cleanInsert($filename);
 
 				$ask="delete from crew_of where filename=:filename";
 				doQuery($ask,['filename' => $filename]);
 
-				if (isset($_POST[old_colly_crews]))
+				if (isset($_POST['old_colly_crews']))
 				{			
-					foreach($_POST[old_colly_crews] as $colly_crew)
+					foreach($_POST['old_colly_crews'] as $colly_crew)
 					{
-						$ask="insert into crew_of values (:colly_crew,:filename)";
-						doQuery($ask,['colly_crew' => $colly_crew, 'filename' => $filename]);
+						$ask="insert into crew_of (crew, filename, crew_id, colly_id)
+							values (:crew, :filename,
+							(select id from crews where name=:crew),
+							(select id from collys where filename=:filename)
+							)";
+						doQuery($ask,['crew' => $colly_crew, 'filename' => $filename]);
 					}
 				}
 
-				if (isset($_POST[colly_crew]))
+				if (isset($_POST['colly_crew']))
 				{
 					foreach($_POST[colly_crew] as $new_colly_crew)
 					{
-						$ask="insert into crew_of values (:new_colly_crew, :filename)";
-						doQuery($ask, ['new_colly_crew' => $new_colly_crew, 'filename' => $filename]);
+						$ask="insert into crew_of (crew, filename, crew_id, colly_id)
+							values (:crew, :filename,
+							(select id from crews where name=:crew),
+							(select id from collys where filename=:filename)
+							)";
+						doQuery($ask, ['crew' => $new_colly_crew, 'filename' => $filename]);
 					}
 				}
 
@@ -324,19 +331,15 @@ include "header.php";
 			if(isset($_POST['edit_colly_year']) && is_admin())
 			{
 				$filename=$_POST['filename'];
-				$filename=cleanInsert($filename);
 				$edit_colly_year=$_POST['edit_colly_year'];
-				$edit_colly_year= cleanInsert($edit_colly_year); 
 				$ask="update collys set year=:edit_colly_year where filename=:filename";	
 				doQuery($ask,['edit_colly_year' => $edit_colly_year, 'filename' => $filename]);	
 			}
 			if(isset($_POST['edit_colly_type']) && is_admin())
 			{
 				$filename=$_POST['filename'];
-				$filename=cleanInsert($filename);
 
 				$edit_colly_type=$_POST['edit_colly_type'];
-				$edit_colly_type=cleanInsert($edit_colly_type); 
 
 				$ask="update collys set type=:edit_colly_type where filename=:filename";	
 				doQuery($ask,['edit_colly_type' => $edit_colly_type, 'filename' => $filename]);	
@@ -344,10 +347,8 @@ include "header.php";
 			if(isset($_POST['edit_colly_month']) && is_admin())
 			{
 				$filename=$_POST['filename'];
-				$filename=cleanInsert($filename);
 
 				$edit_colly_month=$_POST['edit_colly_month'];
-				$edit_colly_month=cleanInsert($edit_colly_month);
 
 				$ask="update collys set month='$edit_colly_month' where filename='$filename'";	
 				doQuery($ask,['edit_colly_month' => $edit_colly_month, 'filename' => $filename]);	
@@ -355,10 +356,8 @@ include "header.php";
 			if(isset($_POST['edit_colly_day']) && is_admin())
 			{
 				$filename=$_POST['filename'];
-				$filename=cleanInsert($filename);
 
 				$edit_colly_day=$_POST['edit_colly_day'];
-				$edit_colly_day=cleanInsert($edit_colly_day); 
 
 				$ask="update collys set day=:edit_colly_day where filename=:filename";	
 				doQuery($ask,['edit_colly_day' => $edit_colly_day, 'filename' => $filename]);	
