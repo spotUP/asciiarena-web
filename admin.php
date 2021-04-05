@@ -29,73 +29,81 @@ include "header.php";
 			<div class="bs-component">
 				<div class="animate__animated animate__tada alert alert-dismissible alert-success">
 					<button type="button" class="close" data-dismiss="alert">x</button>
-					<span>Good bwai! Colly marked as fixed!<span>
+					<span>Good bwai! Colly marked as fixed!</span>
 				</div>
 			</div>				
 			<?php
-			}	
+		}	
 
 //---------------------------------------------------------------------------------------------------------------
 // DELETE USER FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-			if(isset($_POST['delete_user']) && is_admin())
-			{
-				$delete_user=$_POST['getuser'];
-				$delete_user=cleanInsert($delete_user);
+		if(isset($_POST['delete_user']) && is_admin())
+		{
+			$delete_user=$_POST['getuser'];
+			$delete_user=cleanInsert($delete_user);
 
-				if(!empty($delete_user))
-				{
-					$ask="delete from users where nick=:delete_user";
-					doQuery($ask, [ 'delete_user' => $delete_user ]);
-				}
-				?><meta http-equiv="Refresh" content="0"; url="admin.php"><?php
-			}	
+			if(!empty($delete_user))
+			{
+				$ask="delete from users where nick=:delete_user";
+				doQuery($ask, [ 'delete_user' => $delete_user ]);
+			}
+			?><meta http-equiv="Refresh" content="0"; url="admin.php"><?php
+		}	
 
 //---------------------------------------------------------------------------------------------------------------
 // DELETE CREW FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-			if(isset($_POST['do_delete_crew']) && is_admin())
+		if(isset($_POST['do_delete_crew']) && is_admin())
+		{
+			$delete_crew=$_POST['getcrew'];
+			$delete_crew=cleanInsert($delete_crew);
+
+			if(!empty($delete_crew))
 			{
-				$delete_crew=$_POST['getcrew'];
-				$delete_crew=cleanInsert($delete_crew);
+				$ask="delete from crews where name=:delete_crew";
+				doQuery($ask,[ 'delete_crew' => $delete_crew]);
 
-				if(!empty($delete_crew))
-				{
-					$ask="delete from crews where name=:delete_crew";
-					doQuery($ask,[ 'delete_crew' => $delete_crew]);
-
-					$ask="delete from bbs_of where crew=:delete_crew";
-					doQuery($ask,[ 'delete_crew' => $delete_crew]);
-				}
-				?><meta http-equiv="Refresh" content="0"; url="admin.php"><?php
-			}	
+				$ask="delete from bbs_of where crew=:delete_crew";
+				doQuery($ask,[ 'delete_crew' => $delete_crew]);
+			}
+			?><meta http-equiv="Refresh" content="0"; url="admin.php"><?php
+		}	
 
 //---------------------------------------------------------------------------------------------------------------
 // DELETE SITELOGO FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-			if(isset($_POST['delete_sitelogo']) && is_admin())
-			{
-				$delete_sitelogo=$_POST['getsitelogo'];
+		if(isset($_POST['delete_sitelogo']) && is_admin())
+		{
+			$delete_sitelogo=$_POST['getsitelogo'];
 
-				if(!empty($delete_sitelogo))
-				{
-					$ask="delete from logos where logo_id=:delete_sitelogo";
-					doQuery($ask, ['delete_sitelogo' => $delete_sitelogo]);
-				}
-				?><meta http-equiv="Refresh" content="0"; url="admin.php"><?php
-			}	
+			if(!empty($delete_sitelogo))
+			{
+				$ask="delete from logos where logo_id=:delete_sitelogo";
+				doQuery($ask, ['delete_sitelogo' => $delete_sitelogo]);
+			}
+			?><meta http-equiv="Refresh" content="0"; url="admin.php"><?php
+			?>
+			<div class="bs-component">
+				<div class="animate__animated animate__tada alert alert-dismissible alert-success">
+					<button type="button" class="close" data-dismiss="alert">x</button>
+					<span>Logo successfully deleted!</span>
+				</div>
+			</div>				
+			<?php
+		}	
 
 //---------------------------------------------------------------------------------------------------------------
 // DELETE COLLY FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-			if(isset($_POST['do_delete_colly']) && is_admin())
-			{
-				$delete_colly=$_POST['filename'];
-				$delete_colly=cleanInsert($delete_colly);
+		if(isset($_POST['do_delete_colly']) && is_admin())
+		{
+			$delete_colly=$_POST['filename'];
+			$delete_colly=cleanInsert($delete_colly);
 			$ask="select uploader from collys where filename='$delete_colly'"; // fetch uploader of deleted colly
 			$result=fetchAll($ask);
 			foreach ($result as $row)
@@ -227,7 +235,6 @@ include "header.php";
 			?>
 			<meta http-equiv="Refresh" content="0"; url="admin.php">
 			<?php
-			exit;
 		}	
 
 //---------------------------------------------------------------------------------------------------------------
@@ -247,7 +254,13 @@ include "header.php";
 				doQuery($ask, ['delete_artist' => $delete_artist]);
 			}
 			?>
-			<meta http-equiv="Refresh" content="0"; url="admin.php"><?php
+			<div class="bs-component">
+				<div class="animate__animated animate__tada alert alert-dismissible alert-success">
+					<button type="button" class="close" data-dismiss="alert">x</button>
+					<span>Artist successfully deleted!</span>
+				</div>
+			</div>	
+			<?php
 		}	
 
 //---------------------------------------------------------------------------------------------------------------
@@ -703,38 +716,38 @@ if(isset($_POST['do_change_crew']) && is_admin())
 				<div class="bs-component">
 					<div class="animate__animated animate__shakeX alert alert-dismissible alert-danger">
 						<button type="button" class="close" data-dismiss="alert">x</button>
-						<span>You can not submit an empty logo!<span>
-						</div>
+						<span>You can not submit an empty logo!</span>
 					</div>
-					<?php
-				}
-				$user_nick=$_POST['usernick'];
-				$user_nick=cleanInsert($user_nick);
-
-				$ask="update users set mail=:mail where nick=:change_user_nick";
-				doQuery($ask, ['mail' => $mail, 'change_user_nick' => $change_user_nick ]);	
+				</div>
+				<?php
 			}
+			$user_nick=$_POST['usernick'];
+			$user_nick=cleanInsert($user_nick);
+
+			$ask="update users set mail=:mail where nick=:change_user_nick";
+			doQuery($ask, ['mail' => $mail, 'change_user_nick' => $change_user_nick ]);	
+		}
 
 //---------------------------------------------------------------------------------------------------------------
 // WRITE USER SIGNATURE TO DB
 //---------------------------------------------------------------------------------------------------------------
 
-			if(isset($_POST['setcolor']))
-			{
-				$signature=$_POST['signature'];
-				$signature=cleanInsert($signature);
+		if(isset($_POST['setcolor']))
+		{
+			$signature=$_POST['signature'];
+			$signature=cleanInsert($signature);
 
-				$user_signature=$_POST['user_signature'];
-				$user_signature=cleanInsert($user_signature);
+			$user_signature=$_POST['user_signature'];
+			$user_signature=cleanInsert($user_signature);
 
-				$sigdata=$_POST['signature'];
-				$sigdata=cleanInsert($sigdata);
+			$sigdata=$_POST['signature'];
+			$sigdata=cleanInsert($sigdata);
 
 //			$font=$_POST['font'];
 //			$font=cleanInsert($font);
 
-				$user_nick=$_POST['usernick'];
-				$user_nick=cleanInsert($user_nick);
+			$user_nick=$_POST['usernick'];
+			$user_nick=cleanInsert($user_nick);
 
 			$signature=utf8_encode($signature); // convert UTF-8 string to ISO-88591
 
@@ -744,11 +757,11 @@ if(isset($_POST['do_change_crew']) && is_admin())
 				<div class="bs-component">
 					<div class="animate__animated animate__shakeX alert alert-dismissible alert-danger">
 						<button type="button" class="close" data-dismiss="alert">x</button>
-						<span>You have to make a signature before submitting!<span>
-						</div>
-					</div>				
-					<?php
-				}
+						<span>You have to make a signature before submitting!</span>
+					</div>
+				</div>				
+				<?php
+			}
 
 //			$rgbvalue=$_POST['setcolor'];
 //			$rgbvalue = explode(",", $rgbvalue);
@@ -768,25 +781,25 @@ if(isset($_POST['do_change_crew']) && is_admin())
 
 //			imagepng($image,"signatures/$user_signature.png");	 											// save image		
 
-				$ask="update users set signature=:user_signature where nick=:edit_user_nick";
-				doQuery($ask, ['user_signature' => $user_signature, 'edit_user_nick' => $edit_user_nick]);
+			$ask="update users set signature=:user_signature where nick=:edit_user_nick";
+			doQuery($ask, ['user_signature' => $user_signature, 'edit_user_nick' => $edit_user_nick]);
 
-				$sigdata=cleanInsertPost($sigdata);
-				$ask="update users set sigdata=:sigdata where nick=:edit_user_nick";
-				doQuery($ask, ['sigdata' => $sigdata, 'edit_user_nick' => $edit_user_nick]);
+			$sigdata=cleanInsertPost($sigdata);
+			$ask="update users set sigdata=:sigdata where nick=:edit_user_nick";
+			doQuery($ask, ['sigdata' => $sigdata, 'edit_user_nick' => $edit_user_nick]);
 
 //			unlink ("signatures/tempsignature.diz");
 //			unlink ("signatures/tempsignature.diz.png");
-			}
+		}
 
 //---------------------------------------------------------------------------------------------------------------
 // WRITE EDITED LOGO TO DISK
 //---------------------------------------------------------------------------------------------------------------
 
-			if(isset($_POST['editedsitelogo']))
-			{
-				$logo=$_POST['getsitelogo'];
-				$editedsitelogodata=$_POST['editedsitelogo'];
+		if(isset($_POST['editedsitelogo']))
+		{
+			$logo=$_POST['getsitelogo'];
+			$editedsitelogodata=$_POST['editedsitelogo'];
 
 //			$font=$_POST['font'];
 //			$font=cleanInsert($font);
@@ -795,17 +808,17 @@ if(isset($_POST['do_change_crew']) && is_admin())
 //		htmlspecialchars_decode($editedsitelogodata, ENT_QUOTES);
 //		$editedsitelogodata=utf8_encode($editedsitelogodata);
 
-				if(empty($editedsitelogodata))
-				{
-					?>
-					<div class="bs-component">
-						<div class="animate__animated animate__shakeX alert alert-dismissible alert-danger">
-							<button type="button" class="close" data-dismiss="alert">x</button>
-							<span>You can not submit an empty logo!<span>
-							</div>
+			if(empty($editedsitelogodata))
+			{
+				?>
+				<div class="bs-component">
+					<div class="animate__animated animate__shakeX alert alert-dismissible alert-danger">
+						<button type="button" class="close" data-dismiss="alert">x</button>
+						<span>You can not submit an empty logo!</span>
 						</div>
-						<?php
-					}
+					</div>
+					<?php
+				}
 
 //		$rgbvalue=$_POST['set_edited_logo_color'];
 //		$rgbvalue=cleanInsert($rgbvalue);
@@ -830,11 +843,21 @@ if(isset($_POST['do_change_crew']) && is_admin())
 //		unlink ("templogo.diz.png");
 
 		//$editedsitelogodata=cleanInsertPost($editedsitelogodata);
-					$ask_update="update logos set ascii=:editedsitelogodata where logo_id=:logo";
-					doQuery($ask_update,['editedsitelogodata' => $editedsitelogodata, 'logo' => $logo]);	
+				$ask_update="update logos set ascii=:editedsitelogodata where logo_id=:logo";
+				doQuery($ask_update,['editedsitelogodata' => $editedsitelogodata, 'logo' => $logo]);	
 
 //		$ask_update="update logos set base64='1' where filename=:logo";
 //		doQuery($ask_update,['logo' => $logo]);	
+
+				?>
+				<div class="bs-component">
+					<div class="animate__animated animate__tada alert alert-dismissible alert-success">
+						<button type="button" class="close" data-dismiss="alert">x</button>
+						<span>Logo saved!</span>
+						</div>
+					</div>				
+					<?php
+
 				}
 
 //----------------------------------------------------------------------------------------------------------------------------
@@ -887,7 +910,7 @@ if(isset($_POST['do_change_crew']) && is_admin())
 							<div class="bs-component">
 								<div class="animate__animated animate__shakeX alert alert-dismissible alert-primary">
 									<button type="button" class="close" data-dismiss="alert">x</button>
-									You need to be <a class="ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">an admin</a>to use this feature.
+									<span>You need to be <a class="ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">an admin</a>to use this feature.</span>
 								</div>
 							</div>
 						<?php } ?>
