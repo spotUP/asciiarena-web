@@ -151,8 +151,8 @@ if($getcollyname && (!isset($_POST['do_edit_colly'])))
 						</div>
 						<div class="col-3">
 							<?php
-							$ask="select nick from author_of where filename='$getcollyname'";
-							$result=fetchAll($ask);
+							$ask="select nick from author_of where filename=:filename";
+							$result=fetchAll($ask, [ 'filename' => $getcollyname]);
 							foreach ($result as $row)
 							{
 								$colly_author=$row->nick;
