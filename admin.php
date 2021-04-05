@@ -19,15 +19,14 @@ include "header.php";
 
 		if(isset($_POST['colly_fixed']) && is_admin())
 		{
-			$fixed_colly=cleanInsert($_POST['filename']);
-			$fixed_colly=stripslashes($fixed_colly);
+			$fixed_colly=$_POST['filename'];
 			if(!empty($fixed_colly))
 			{
 				$ask="update collys set broken=0 where filename=:fixed_colly";
 				doQuery($ask,['fixed_colly' => $fixed_colly]);
 			}
 			?>
-			<meta http-equiv="Refresh" content="0"; url="admin.php">
+			<meta http-equiv="Refresh" content="5"; url="admin.php">
 			<?php
 		}	
 
