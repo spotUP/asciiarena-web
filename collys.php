@@ -64,6 +64,10 @@ switch ($sort_by) {
 	//-----------------------------------------------------------
 
 		if ($is_search) {
+			$searchquery = str_replace(" ", ",", $searchquery);
+			$ask = "SELECT * FROM collys WHERE MATCH(filename, name, artists, crews) against (:searchquery in boolean mode) {$limit}";
+			$rows = fetchAll($ask, [":searchquery" => $searchquery]);
+
 			if ($viewmode === "BBS") {
 				$todaysday = date("D");
 				$todaystime = date("d-m-y");
@@ -75,11 +79,7 @@ switch ($sort_by) {
 				</div>
 
 				<?php
-				$searchquery = $_POST[ 'search' ];
-				$searchquery = str_replace(" ", ",", $searchquery);
-				$ask = "SELECT collys.*, author_of.nick, crew_of.crew FROM collys LEFT JOIN author_of ON collys.id = author_of.colly_id LEFT JOIN crew_of ON collys.id = crew_of.colly_id where match(collys.filename, name, nick, crew) against (:searchquery in boolean mode) GROUP BY collys.filename ORDER BY collys.filename DESC {$limit}";
-				foreach (fetchAll($ask, [":searchquery" => $searchquery]) as $row) {
-					$author = $row->author;
+				foreach ($rows as $row) {
 					$filename = $row->filename;
 					$encoded_filename = base64_encode($filename);
 					$name = $row->name;
@@ -133,9 +133,7 @@ switch ($sort_by) {
 					<div class="col-4"><span class="white">CREW</span></div>
 				</div>
 				<?php
-				$searchquery = str_replace(" ", ",", $searchquery);
-				$ask = "SELECT * FROM collys WHERE MATCH(filename, name, artists, crews) against (:searchquery in boolean mode) {$limit}";
-				foreach (fetchAll($ask, [":searchquery" => $searchquery]) as $row) {
+				foreach ($rows as $row) {
 					?>
 					<div class="row">
 						<div class="col-4 text-truncate">
@@ -218,7 +216,6 @@ switch ($sort_by) {
 									<?php
 									$ask = "SELECT collys.*, author_of.nick, crew_of.crew FROM collys LEFT JOIN author_of ON collys.id = author_of.colly_id LEFT JOIN crew_of ON collys.id = crew_of.colly_id GROUP BY collys.filename ORDER BY :criteria DESC {$limit}";
 									foreach (fetchAll($ask, [":criteria" => $sort_criteria]) as $row) {
-										$author = $row->author;
 										$filename = $row->filename;
 										$encoded_filename = base64_encode($filename);
 										$name = $row->name;
