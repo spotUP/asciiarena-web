@@ -7,8 +7,6 @@
 	<span class="green mr-xl-2"><?php echo Date("H:i", time()), " 00:00"; ?></span>
 </div>
 
-<script src="assets/js/customselect.js"></script>
-
 <script>
 	document.addEventListener("visibilitychange", () => {
 		if (document.visibilityState === 'visible') {
