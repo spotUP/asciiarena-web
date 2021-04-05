@@ -588,205 +588,207 @@ require_once "header.php"; ?>
 						<h2>Edit ASCII Collection</h2>
 					</div>
 
-					<div class="col-6">
-						Name
+					<div class="row">
+						<div class="col-6">Name</div>
+						<div class="col-6"><input type="text" size="32" name="edit_colly_name" value="<?=$show_colly_name?>"></div>
 					</div>
 
-					<div class="col-6">
-						<input type="text" size="32" name="edit_colly_name" value="<?=$show_colly_name?>">
+					<div class="row">
+						<div class="col-6">Type</div>
+						<div class="col-6">
+							<select name="edit_colly_type" class="btn-big">
+								<option><?=$show_colly_type?></option>
+								<option>ASCII</option>
+								<option>ANSI</option>
+							</select>
+						</div>
 					</div>
 
-					<div class="col-6">
-						Type
+					<div class="row">					
+						<div class="col-6">ANSI Colors</div>
+						<div class="col-6">
+							<select name="colors" class="btn-big">
+								<option value="transparent">ANSI</option>
+								<option>Workbench</option>
+							</select>
+						</div>
 					</div>
 
-					<div class="col-6">
-						<select name="edit_colly_type" class="btn-big">
-							<option><?=$show_colly_type?></option>
-							<option>ASCII</option>
-							<option>ANSI</option>
-						</select>
+					<div class="row">										
+						<div class="col-6">Release Date</div>
+						<div class="col-6">
+							<select name='edit_colly_year' class='btn-big'>
+								<?php
+								$countyear = 1986;
+								$maxyear = date("Y");
+								?>
+								<option><?=$show_colly_year?></option>
+								<?php
+								while ($countyear <= $maxyear) 
+								{
+									?>
+									<option><?=$countyear?></option>
+									<?php
+									$countyear++;
+								}
+								?>
+							</select>
+							<select name="edit_colly_month" class="btn-big">
+								<option selected='selected'><?=$show_colly_month?></option>
+								<option value="0">Unknown</option>
+								<option value="1">January</option>
+								<option value="2">February</option>
+								<option value="3">Mars</option>
+								<option value="4">April</option>
+								<option value="5">May</option>
+								<option value="6">June</option>
+								<option value="7">July</option>
+								<option value="8">August</option>
+								<option value="9">September</option>
+								<option value="10">October</option>
+								<option value="11">November</option>
+								<option value="12">December</option>
+							</select>
+							<select name="edit_colly_day" class="btn-big">
+								<?php
+								echo "<option selected='selected' value='0'>$show_colly_day</option>";
+								echo "<option value='0'>Unknown</option>";
+								$min_day = 1;
+								$max_day = 31;
+								while ($min_day <= $max_day)
+								{
+									echo "<option>$min_day</option>";
+									$min_day++;
+								}
+								?>
+							</select>
+						</div>
 					</div>
 
-					<div class="col-6">
-						ANSI Colors
+					<div class="row">										
+						<div class="col-6">
+							Artist(s)
+						</div>
+
+						<div class="col-6">
+							<?php
+							$ask = "select nick from author_of where filename=:filename";
+							$result = fetchAll($ask, [ 'filename' => $getcollyname ]);
+							foreach ($result as $row)
+							{
+								$colly_author = $row->nick;
+								echo "<select name=\"old_colly_authors[]\" class='btn-big'>";
+								echo "<option selected=\"selected\">$colly_author</option>";
+								echo "<option value='Delete'>Remove Author</option>";
+
+								$ask_authors = "select nick from artists";
+								$result_authors = fetchAll($ask_authors);
+								foreach ($result_authors as $row_authors)
+								{
+									$authors = $row_authors->nick;
+									echo "<option>$authors</option>";
+								}
+								echo "</select>";
+							}
+							?>
+							<span id="new_colly_author_field"></span> <span onclick="add_colly_author_field();"
+							style="cursor: pointer; cursor: hand;"><button
+							type="button">Add Author!</button></span>
+							<input type="hidden" name="total_colly_authors" id="total_colly_authors" value="0">
+						</div>
 					</div>
 
-					<div class="col-6">
-						<select name="colors" class="btn-big">
-							<option value="transparent">ANSI</option>
-							<option>Workbench</option>
-						</select>
+					<div class="row">										
+						<div class="col-6">
+							Crew(s)
+						</div>
+						<div class="col-6">
+
+							<?php
+							$ask = "select crew from crew_of where filename=:filename";
+							$result = fetchAll($ask, [ 'filename' => $getcollyname ]);
+							foreach ($result as $row)
+							{
+								$colly_crew = $row->crew;
+								echo "<select name=\"old_colly_crews[]\" class='btn-big'>";
+								echo "<option selected=\"selected\">$colly_crew</option>";
+								echo "<option value='Delete'>Remove Crew</option>";
+								$ask_crews = "select name from crews";
+								$result_crews = mysql_query($ask_crews, $dbh);
+								while ($row_crews = mysql_fetch_array($result_crews)) 
+								{
+									$crews = $row_crews[ 0 ];
+									echo "<option>$crews</option>";
+								}
+								echo "</select>";
+							}
+							?>
+
+							<span id="new_colly_crew_field"></span> <span onclick="add_colly_crew_field();"
+							style="cursor: pointer; cursor: hand;"><button type="button">Add Crew!</button></span>
+							<input type="hidden" name="total_colly_crews" id="total_colly_crews" value="0">
+						</div>
 					</div>
 
-					<div class="info_release_left">Release Date</div>
-
-					<div class="info_release_right">
-						<?php
-						echo "<select name='edit_colly_year' class='btn-big'>";
-						$countyear = 1986;
-						$maxyear = date("Y");
-						echo "<option>$show_colly_year</option>";
-						while ($countyear <= $maxyear) 
-						{
-							echo "<option>$countyear</option>";
-							$countyear++;
-						}
-
-						?>
-					</select>
-					<select name="edit_colly_month" class="btn-big">
-						<option selected='selected'><?=$show_colly_month?></option>
-						<option value="0">Unknown</option>
-						<option value="1">January</option>
-						<option value="2">February</option>
-						<option value="3">Mars</option>
-						<option value="4">April</option>
-						<option value="5">May</option>
-						<option value="6">June</option>
-						<option value="7">July</option>
-						<option value="8">August</option>
-						<option value="9">September</option>
-						<option value="10">October</option>
-						<option value="11">November</option>
-						<option value="12">December</option>
-					</select>
-					<select name="edit_colly_day" class="btn-big">
-						<?php
-						echo "<option selected='selected' value='0'>$show_colly_day</option>";
-						echo "<option value='0'>Unknown</option>";
-						$min_day = 1;
-						$max_day = 31;
-						while ($min_day <= $max_day)
-						{
-							echo "<option>$min_day</option>";
-							$min_day++;
-						}
-						?>
-					</select>
-				</div>
-
-				<div class="col-6">
-					Artist(s)
-				</div>
-
-				<div class="col-6">
-					<?php
-					$ask = "select nick from author_of where filename=:filename";
-					$result = fetchAll($ask, [ 'filename' => $getcollyname ]);
-					foreach ($result as $row)
-					{
-						$colly_author = $row->nick;
-						echo "<select name=\"old_colly_authors[]\" class='btn-big'>";
-						echo "<option selected=\"selected\">$colly_author</option>";
-						echo "<option value='Delete'>Remove Author</option>";
-
-						$ask_authors = "select nick from artists";
-						$result_authors = fetchAll($ask_authors);
-						foreach ($result_authors as $row_authors)
-						{
-							$authors = $row_authors->nick;
-							echo "<option>$authors</option>";
-						}
-						echo "</select>";
-					}
-					?>
-					<span id="new_colly_author_field"></span> <span onclick="add_colly_author_field();"
-					style="cursor: pointer; cursor: hand;"><button
-					type="button">Add Author!</button></span>
-					<input type="hidden" name="total_colly_authors" id="total_colly_authors" value="0">
-				</div>
-
-				<div class="col-6">
-					Crew(s)
-				</div>
-
-				<div class="col-6">
-
-					<?php
-					$ask = "select crew from crew_of where filename=:filename";
-					$result = fetchAll($ask, [ 'filename' => $getcollyname ]);
-					foreach ($result as $row)
-					{
-						$colly_crew = $row->crew;
-						echo "<select name=\"old_colly_crews[]\" class='btn-big'>";
-						echo "<option selected=\"selected\">$colly_crew</option>";
-						echo "<option value='Delete'>Remove Crew</option>";
-						$ask_crews = "select name from crews";
-						$result_crews = mysql_query($ask_crews, $dbh);
-						while ($row_crews = mysql_fetch_array($result_crews)) 
-						{
-							$crews = $row_crews[ 0 ];
-							echo "<option>$crews</option>";
-						}
-						echo "</select>";
-					}
-					?>
-
-					<span id="new_colly_crew_field"></span> <span onclick="add_colly_crew_field();"
-					style="cursor: pointer; cursor: hand;"><button type="button">Add Crew!</button></span>
-					<input type="hidden" name="total_colly_crews" id="total_colly_crews" value="0">
-				</div>
-
-				<div class="row">
-					<input type="hidden" name="filename" value="<?=$getcollyname?>">
-					<input type="submit" class="btn-big" name="do_edit_colly" value="Change">
-				</div>
-			</form>
-			<?php
-		}
-		include('info_release_summary.php');
+					<div class="row">
+						<input type="hidden" name="filename" value="<?=$getcollyname?>">
+						<input type="submit" class="btn-big" name="do_edit_colly" value="Change">
+					</div>
+				</form>
+				<?php
+			}
+			include('info_release_summary.php');
 
 //----------------------------------------------------------------------------------------------
 // TOP CONTROL TABLE
 //----------------------------------------------------------------------------------------------
 
-		if (!isset($_POST[ 'edit_colly' ]) && !isset($_POST[ 'broken' ])) 
-		{
-			$type = fetchOne("SELECT type FROM collys WHERE filename = :filename", [":filename" => $filename])->type ?? "";
+			if (!isset($_POST[ 'edit_colly' ]) && !isset($_POST[ 'broken' ])) 
+			{
+				$type = fetchOne("SELECT type FROM collys WHERE filename = :filename", [":filename" => $filename])->type ?? "";
 
 
-			?>
-			<div class="container-fluid bg-secondary amb-1 apb-1" style="height: 132px;">
-				<script>
-					$(document).ready(function() 
-					{
-						$("#ctrlForm select").change(function() 
+				?>
+				<div class="container-fluid bg-secondary amb-1 apb-1" style="height: 132px;">
+					<script>
+						$(document).ready(function() 
 						{
-							$("#ctrlForm input[name='view']").click();
+							$("#ctrlForm select").change(function() 
+							{
+								$("#ctrlForm input[name='view']").click();
+							});
 						});
-					});
 
-				</script>
+					</script>
 
-				<?php
-				echo "<form action='$_SERVER[PHP_SELF]?filename=$decoded_filename' method='post'  id='ctrlForm'>";
+					<?php
+					echo "<form action='$_SERVER[PHP_SELF]?filename=$decoded_filename' method='post'  id='ctrlForm'>";
 
-				echo "<input type='submit' class='btn-big amb-1' name='hide' value='Hide Colly!'" . ((!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) ? " style='display:none'" : "") . "> ";
-				echo "<input type='submit' class='btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s' name='view' value='View Colly'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
-				echo "<input type='button' onclick='myFunction()' class='btn-big amb-1' name='fullscreen' value='Fullscreen'" . ((isset($_POST[ 'change' ]) || (!isset($_POST[ 'view' ]))) ? " style='display:none'" : "") . "> ";
+					echo "<input type='submit' class='btn-big amb-1' name='hide' value='Hide Colly!'" . ((!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) ? " style='display:none'" : "") . "> ";
+					echo "<input type='submit' class='btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s' name='view' value='View Colly'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
+					echo "<input type='button' onclick='myFunction()' class='btn-big amb-1' name='fullscreen' value='Fullscreen'" . ((isset($_POST[ 'change' ]) || (!isset($_POST[ 'view' ]))) ? " style='display:none'" : "") . "> ";
 
-				if (is_logged_in()) 
-				{
-					$ask = "select uploader from collys where filename=:filename";
-					$result_uploader = fetchOne($ask, [ 'filename' => base64_decode($filename) ]);
-					if (isset($result_uploader->uploader)) $uploader = $result_uploader->uploader;
-
-					echo "<input type='submit' class='btn-big amb-1' name=addcomment value='Comment'> ";
-					echo "<input type='submit' class='btn-big amb-1' name=favourite value='Favourite'> ";
-					echo "<input type='submit' class='btn-big amb-1' name=broken value='Report Broken'> ";
-					if ($_user[ "nick" ] === $uploader || is_admin()) 
+					if (is_logged_in()) 
 					{
-						echo "<input type='hidden' name='filename' value=$filename>";
-						echo "<input type='submit' class='btn-big amb-1' name=edit_colly value='Edit Colly'> ";
+						$ask = "select uploader from collys where filename=:filename";
+						$result_uploader = fetchOne($ask, [ 'filename' => base64_decode($filename) ]);
+						if (isset($result_uploader->uploader)) $uploader = $result_uploader->uploader;
+
+						echo "<input type='submit' class='btn-big amb-1' name=addcomment value='Comment'> ";
+						echo "<input type='submit' class='btn-big amb-1' name=favourite value='Favourite'> ";
+						echo "<input type='submit' class='btn-big amb-1' name=broken value='Report Broken'> ";
+						if ($_user[ "nick" ] === $uploader || is_admin()) 
+						{
+							echo "<input type='hidden' name='filename' value=$filename>";
+							echo "<input type='submit' class='btn-big amb-1' name=edit_colly value='Edit Colly'> ";
+						}
 					}
-				}
-				if (!isset($_POST[ 'download' ])) 
-				{
-					echo "<input type='submit' class='btn-big amb-1' name=download value='Download'> ";
-				} 
-				elseif (isset($_POST[ 'download' ])) 
-				{
+					if (!isset($_POST[ 'download' ])) 
+					{
+						echo "<input type='submit' class='btn-big amb-1' name=download value='Download'> ";
+					} 
+					elseif (isset($_POST[ 'download' ])) 
+					{
             $ask = "select downloads from collys where filename=:filename"; // download counter
             $row = fetchOne("SELECT view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
             $downloads = $row->downloads+1;
