@@ -585,7 +585,7 @@ require_once "header.php"; ?>
 				<form enctype="multipart/form-data" action="info_release.php?filename=<?=$encoded_filename?>" method="post">
 
 					<div class="row">
-						<h2>Edit ASCII Collection</h2>
+						<div class="col-12"><h2>Edit ASCII Collection</h2></div>
 					</div>
 
 					<div class="row">
@@ -724,8 +724,7 @@ require_once "header.php"; ?>
 							}
 							?>
 
-							<span id="new_colly_crew_field"></span> <span onclick="add_colly_crew_field();"
-							style="cursor: pointer; cursor: hand;"><button type="button">Add Crew!</button></span>
+							<span id="new_colly_crew_field"></span> <span onclick="add_colly_crew_field();" style="cursor: pointer; cursor: hand;"><button type="button">Add Crew!</button></span>
 							<input type="hidden" name="total_colly_crews" id="total_colly_crews" value="0">
 						</div>
 					</div>
