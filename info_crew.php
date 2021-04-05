@@ -1,6 +1,6 @@
 <?php
 require_once "session.php";
-$h1 = ["cREW dETAiLS", "bY uP rOUGH and diViNE sTYLERS"];
+$h1 = "cREW dETAiLS";
 include "header.php";
 
 ?>
