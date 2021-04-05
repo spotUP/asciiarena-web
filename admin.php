@@ -285,8 +285,13 @@ include "header.php";
 				{
 					foreach($_POST['colly_author'] as $new_colly_author)
 					{
-						$ask="insert into author_of values (:new_colly_author,:filename)";
-						doQuery($ask,['new_colly_author' => $new_colly_author, 'filename' => $filename]);
+						$ask="insert into author_of (nick, filename, colly_id, user_id, artist_id) 
+							values (:colly_author,:filename,
+								(select id from collys where filename=:filename),
+								(select user_id from artists where nick=:colly_author),
+								(select id from artists where nick=:colly_author)
+							)";
+						doQuery($ask,['colly_author' => $new_colly_author, 'filename' => $filename]);
 					}
 				}
 				$ask="delete from author_of where filename=:filename and nick='Delete'";
@@ -350,7 +355,7 @@ include "header.php";
 
 				$edit_colly_month=$_POST['edit_colly_month'];
 
-				$ask="update collys set month='$edit_colly_month' where filename='$filename'";	
+				$ask="update collys set month=:edit_colly_month where filename=:filename";	
 				doQuery($ask,['edit_colly_month' => $edit_colly_month, 'filename' => $filename]);	
 			}
 			if(isset($_POST['edit_colly_day']) && is_admin())
@@ -367,46 +372,25 @@ include "header.php";
 // RECALCULATE RATINGS
 //---------------------------------------------------------------------------------------------------------------
 
-			$ask="select nick from author_of";
-			$result=fetchAll($ask);
-			foreach ($result as $row)
-			{
-				$artist=$row->nick;
 
-				$ask_rating="select avg(rating) AS avg from comments where artist=:artist and rating>0";
-				$result_rating=fetchAll($ask_rating,['artist' => $artist]);
-				foreach ($result_rating as $row_rating)
-				{
-					$avg_artist_rating=$row_rating->avg;
-				}
+			$ask="update artists a
+				inner join (
+    					select avg(rating) as avgrating, artist from comments
+    					where rating>0 group by artist
+  				) as r on a.nick=r.artist
+				set a.rating = r.avgrating";
+			doQuery($ask);
 
-				if(!isset($avg_artist_rating))
-				{
-					$avg_artist_rating=0;
-				}	
+			$ask="update crews c
+				  inner join (
+				    select avg(rating) as avgrating, crew from comments
+				    where rating>0 group by crew
+				  ) as r on c.name=r.crew
+				set c.rating = r.avgrating";
+			doQuery($ask);
 
-				$ask_update="update artists set rating=:avg_artist_rating where nick=:artist";
-				doQuery($ask,['avg_artist_rating' => $avg_artist_rating, 'artist' => $artist]);	
-			}
 			$ask="select crew from crew_of";
 			$result=fetchAll($ask);
-			foreach ($result as $row)
-			{
-				$crew=$row->crew;
-
-				$ask_rating="select avg(rating) AS avg from comments where crew=:crew and rating>0";
-				$result_rating=fetchAll($ask_rating,[ 'crew' => $crew ]);
-				foreach ($result_rating as $row)
-				{
-					$avg_crew_rating=$row_rating->avg;
-				}
-				if(!isset($avg_crew_rating))
-				{
-					$avg_crew_rating=0;
-				}	
-				$ask_update="update crews set rating=:avg_crew_rating where name=:crew";
-				doQuery($ask_update,['avg_crew_rating' => $avg_crew_rating, 'crew' => $crew]);	
-			}
 			?>
 			<meta http-equiv="Refresh" content="0"; url="admin.php">
 			<?php
