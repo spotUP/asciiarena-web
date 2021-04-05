@@ -340,7 +340,7 @@ require_once "header.php"; ?>
 						<div class="bs-component aml-1 amb-1">
 							<div class="alert alert-dismissible alert-success">
 								<button type="button" class="close" data-dismiss="alert">x</button>
-								<?=$filename?> deleted!
+								Comment deleted!
 							</div>
 						</div>
 					</div>
