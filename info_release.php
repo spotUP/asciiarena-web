@@ -167,7 +167,18 @@ require_once "header.php"; ?>
 				  	'user_added_rating' => $user_added_rating, # might be empty, should end up as NULL
 				  	'user_id' => $_user['id'],
 				  ]);
-					echo "<meta http-equiv='Refresh' content='0'; url='$_SERVER[PHP_SELF]?filename=$decoded_filename'>";
+				  ?>
+				  <div class="row">
+				  	<div class="col-lg-12">
+				  		<div class="bs-component aml-1 amb-1">
+				  			<div class="alert alert-dismissible alert-success">
+				  				<button type="button" class="close" data-dismiss="alert">x</button>
+				  				Comment added successfully!
+				  			</div>
+				  		</div>
+				  	</div>
+				  </div>
+				  <?php
 				}
 
 //----------------------------------------------------------------------------------------------
