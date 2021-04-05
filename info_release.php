@@ -355,23 +355,20 @@ require_once "header.php"; ?>
 			if (isset($_POST[ 'do_edit_colly' ])) 
 			{
 				$filename = $_POST[ 'filename' ];
-				$filename = cleanInsert($filename);
-				$ask = "select uploader from collys where filename='$filename'";
-				$result = mysql_query($ask);
-				while ($row = mysql_fetch_array($result)) 
+				$ask = "select uploader from collys where filename=:filename";
+				$row = fetchOne($ask, [ ":filename" => $filename ]);
+				if (isset($row)) 
 				{
-					$uploader = $row[ 0 ];
+					$uploader = $row->uploader;
 				}
 				if (isset($_POST[ 'edit_colly_name' ]) && $nick == "$uploader") 
 				{
 					$filename = $_POST[ 'filename' ];
-					$filename = cleanInsert($filename);
 
 					$edit_colly_name = $_POST[ 'edit_colly_name' ];
-					$edit_colly_name = cleanInsert($edit_colly_name);
 
-					$ask = "update collys set name='$edit_colly_name' where filename='$filename'";
-					mysql_query($ask, $dbh);
+					$ask = "update collys set name=:colly where filename=:filename";
+					doQuery($ask, [ 'colly' => $edit_colly_name, 'filename' => $filename] );
 				}
 
 				if (isset($_POST[ 'old_colly_authors' ]) || (isset($_POST[ 'colly_author' ]) && $nick == "$uploader") || (isset($_POST[ 'colly_author' ]) && $rank == "Admin")) 
@@ -379,19 +376,23 @@ require_once "header.php"; ?>
 					$filename = $_POST[ 'filename' ];
 					$filename = cleanInsert($filename);
 
-					$ask = "delete from author_of where filename='$filename'";
-					mysql_query($ask, $dbh);
+					$ask = "delete from author_of where filename=:filename";
+					doQuery($ask, [ 'filename' => $filename] );
 
 					if (isset($_POST[ old_colly_authors ])) 
 					{
 						foreach ($_POST[ old_colly_authors ] as $colly_author) 
 						{
-							$colly_author = cleanInsert($colly_author);
-							$ask = "insert into author_of values ('$colly_author','$filename')";
-							mysql_query($ask, $dbh);
+                                              		$ask="insert into author_of (nick, filename, colly_id, user_id, artist_id) 
+                                              			values (:colly_author,:filename,
+                                              			(select id from collys where filename=:filename),
+                                              			(select user_id from artists where nick=:colly_author),
+       	                                      			(select id from artists where nick=:colly_author)
+	                                      		)";
+	                                      		doQuery($ask, ['colly_author' => $colly_author, 'filename' => $filename]);
 						}
-						$ask = "delete from author_of where filename='$filename' and nick='Delete'";
-						mysql_query($ask, $dbh);
+						$ask = "delete from author_of where filename=:filename and nick='Delete'";
+						doQuery($ask, [ 'filename' => $filename] );
 					}
 				}
 
@@ -399,30 +400,35 @@ require_once "header.php"; ?>
 				{
 					foreach ($_POST[ colly_author ] as $new_colly_author) 
 					{
-						$new_colly_author = cleanInsert($new_colly_author);
-						$ask = "insert into author_of values ('$new_colly_author','$filename')";
-						mysql_query($ask, $dbh);
+                                              	$ask="insert into author_of (nick, filename, colly_id, user_id, artist_id) 
+                                              		values (:colly_author,:filename,
+                                              		(select id from collys where filename=:filename),
+                                              		(select user_id from artists where nick=:colly_author),
+       	                                      		(select id from artists where nick=:colly_author)
+	                                      	)";
+	                                      	doQuery($ask, ['colly_author' => $new_colly_author, 'filename' => $filename]);
 					}
 
-					$ask = "delete from author_of where filename='$filename' and nick='Delete'";
-					mysql_query($ask, $dbh);
+					$ask = "delete from author_of where filename=:filename and nick='Delete'";
+					doQuery($ask, [ 'filename' => $filename] );
 				}
 
 				if (isset($_POST[ 'old_colly_crews' ]) || (isset($_POST[ 'colly_crew' ]))) 
 				{
 					$filename = $_POST[ 'filename' ];
-					$filename = cleanInsert($filename);
 
-					$ask = "delete from crew_of where filename='$filename'";
-					mysql_query($ask, $dbh);
+					$ask = "delete from crew_of where filename=:filename";
+					doQuery($ask, [ 'filename' => $filename] );
 
 					if (isset($_POST[ old_colly_crews ])) 
 					{
 						foreach ($_POST[ old_colly_crews ] as $colly_crew) 
 						{
-							$colly_crew = cleanInsert($colly_crew);
-							$ask = "insert into crew_of values ('$colly_crew','$filename')";
-							mysql_query($ask, $dbh);
+                      					$ask = "insert into crew_of (crew, filename, crew_id, colly_id)
+                      						values (:crew, :filename,
+                      						(select id from crews where name=:crew),
+                      						(select id from collys where filename=:filename)";
+              						doQuery($ask, ['crew' => $colly_crew, 'filename' => $filename]);
 						}
 					}
 
@@ -430,121 +436,70 @@ require_once "header.php"; ?>
 					{
 						foreach ($_POST[ colly_crew ] as $new_colly_crew) 
 						{
-							$new_colly_crew = cleanInsert($new_colly_crew);
-							$ask = "insert into crew_of values ('$new_colly_crew','$filename')";
-							mysql_query($ask, $dbh);
+                      					$ask = "insert into crew_of (crew, filename, crew_id, colly_id)
+                      						values (:crew, :filename,
+                      						(select id from crews where name=:crew),
+                      						(select id from collys where filename=:filename)";
+              						doQuery($ask, ['crew' => $new_colly_crew, 'filename' => $filename]);
+
 						}
 					}
-					$ask = "delete from crew_of where filename='$filename' and crew='Delete'";
-					mysql_query($ask, $dbh);
+					$ask = "delete from crew_of where filename=:filename and crew='Delete'";
+					doQuery($ask, [ 'filename' => $filename] );
 				}
 
 				if (isset($_POST[ 'edit_colly_year' ]) && $nick == "$uploader") 
 				{
 					$filename = $_POST[ 'filename' ];
-					$filename = cleanInsert($filename);
 					$edit_colly_year = $_POST[ 'edit_colly_year' ];
-					$edit_colly_year = cleanInsert($edit_colly_year);
-					$ask = "update collys set year='$edit_colly_year' where filename='$filename'";
-					mysql_query($ask, $dbh);
+					$ask = "update collys set year=:year where filename=:filename";
+              				doQuery($ask, ['year' => $edit_colly_year, 'filename' => $filename]);
 				}
 
 				if (isset($_POST[ 'edit_colly_type' ]) && $nick == "$uploader") 
 				{
 					$filename = $_POST[ 'filename' ];
-					$filename = cleanInsert($filename);
-
 					$edit_colly_type = $_POST[ 'edit_colly_type' ];
 					$edit_colly_type = cleanInsert($edit_colly_type);
 
-					$ask = "update collys set type='$edit_colly_type' where filename='$filename'";
-					mysql_query($ask, $dbh);
+					$ask = "update collys set type=:type where filename=:filename";
+              				doQuery($ask, ['type' => $edit_colly_type, 'filename' => $filename]);
 				}
 				if (isset($_POST[ 'edit_colly_month' ]) && $nick == "$uploader") 
 				{
 					$filename = $_POST[ 'filename' ];
-					$filename = cleanInsert($filename);
-
 					$edit_colly_month = $_POST[ 'edit_colly_month' ];
-					$edit_colly_month = cleanInsert($edit_colly_month);
-					$ask = "update collys set month='$edit_colly_month' where filename='$filename'";
-					mysql_query($ask, $dbh);
+					$ask = "update collys set month=:month where filename=:filename";
+              				doQuery($ask, ['month' => $edit_colly_month, 'filename' => $filename]);
 				}
 				if (isset($_POST[ 'edit_colly_day' ]) && $nick == "$uploader") 
 				{
 					$filename = $_POST[ 'filename' ];
-					$filename = cleanInsert($filename);
-
 					$edit_colly_day = $_POST[ 'edit_colly_day' ];
-					$edit_colly_day = cleanInsert($edit_colly_day);
-
-					$ask = "update collys set day=$edit_colly_day where filename='$filename'";
-					mysql_query($ask, $dbh);
+					$ask = "update collys set day=:day where filename=:filename";
+              				doQuery($ask, ['date' => $edit_colly_day, 'filename' => $filename]);
 				}
 
 				//---------------------------------------------------------------------------------------------------------------
 				// RECALCULATE RATINGS
 				//---------------------------------------------------------------------------------------------------------------
 
-				$ask = "select nick from author_of";
-				$result = mysql_query($ask, $dbh);
-				while ($row = mysql_fetch_array($result)) 
-				{
-					$artist = $row[ 0 ];
+				$ask = "update artists a
+					inner join (
+						select avg(rating) as avgrating, artist from comments
+						where rating>0 group by artist
+					) as r on a.nick=r.artist
+					set a.rating = r.avgrating";
+				doQuery($ask);
 
-					$ask_rating = "select avg(rating) from comments where artist='$artist' and rating>0";
-					$result_rating = mysql_query($ask_rating, $dbh);
-					while ($row_rating = mysql_fetch_array($result_rating)) 
-					{
-						$avg_artist_rating = $row_rating[ 0 ];
-					}
-					if (!isset($avg_artist_rating)) 
-					{
-						$avg_artist_rating = 0;
-					}
+				$ask = "update crews c
+					inner join (
+						select avg(rating) as avgrating, crew from comments
+						where rating>0 group by crew
+					) as r on c.name=r.crew
+					set c.rating = r.avgrating";
+				doQuery($ask);
 
-					$ask_rate_amount = "SELECT COUNT(rating) from comments where artist='$artist' and rating>0";
-					$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
-					while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) 
-					{
-						$rate_amount = $row_rate_amount[ 0 ];
-					}
-					if ($rate_amount > 2) 
-					{
-						$ask_update = "update artists set rating=$avg_artist_rating where nick='$artist'";
-						mysql_query($ask_update, $dbh);
-					}
-				}
-				$ask = "select crew from crew_of";
-				$result = mysql_query($ask, $dbh);
-				while ($row = mysql_fetch_array($result)) 
-				{
-					$crew = $row[ 0 ];
-
-					$ask_rating = "select avg(rating) from comments where crew='$crew' and rating>0";
-					$result_rating = mysql_query($ask_rating, $dbh);
-					while ($row = mysql_fetch_array($result_rating)) 
-					{
-						$avg_crew_rating = $row_rating[ 0 ];
-					}
-					if (!isset($avg_crew_rating)) 
-					{
-						$avg_crew_rating = 0;
-					}
-
-					$ask_rate_amount = "SELECT COUNT(rating) from comments where crew='$crew' and rating>0";
-					$result_rate_amount = mysql_query($ask_rate_amount, $dbh);
-					while ($row_rate_amount = mysql_fetch_array($result_rate_amount)) 
-					{
-						$rate_amount = $row_rate_amount[ 0 ];
-					}
-					if ($rate_amount > 2) 
-					{
-
-						$ask_update = "update crews set rating=$avg_crew_rating where name='$crew'";
-						mysql_query($ask_update, $dbh);
-					}
-				}
 				?>
 				<div class="row">
 					<div class="col-lg-12">
@@ -566,7 +521,6 @@ require_once "header.php"; ?>
 			if (isset($_POST[ 'edit_colly' ])) 
 			{
 				$getcollyname = $_POST[ 'filename' ];
-				$getcollyname = cleanInsert($getcollyname);
 
 				$ask = "select * from collys where filename=:filename";
 				$result = fetchAll($ask, [':filename' => $getcollyname ]);
@@ -719,10 +673,10 @@ require_once "header.php"; ?>
 									<option value='Delete'>Remove Crew</option>
 									<?php
 									$ask_crews = "select name from crews";
-									$result_crews = mysql_query($ask_crews, $dbh);
-									while ($row_crews = mysql_fetch_array($result_crews)) 
+									$result = fetchAll($ask_crews);
+									foreach ($result as $row_crews)
 									{
-										$crews = $row_crews[ 0 ];
+										$crews = $row_crews->name;
 										?>
 										<option><?=$crews?></option>
 										<?php
@@ -1167,11 +1121,11 @@ if (isset($_POST[ 'edit' ]))
 	echo "<form action=\"$_SERVER[PHP_SELF]?filename=$decoded_filename&comment\" method=\"post\">";
 	$commentid = cleanInsert($_POST[ 'commentid' ]);
 
-	$ask = "select comment from comments where commentid='$commentid'";
-	$result = mysql_query($ask, $dbh);
-	while ($row = mysql_fetch_array($result)) 
+	$ask = "select comment from comments where commentid=:commentid";
+	$result = fetchAll($ask, [ 'commentid' => $commentid ]);
+	foreach ($result as $row)
 	{
-		$comment = fixOutputEdit($row[ 'comment' ]);
+		$comment = fixOutputEdit($row->comment);
 	}
 	echo "<form action=$_SERVER[PHP_SELF]?filename=$decoded_filename&comment method=\"post\">";
 	?>
