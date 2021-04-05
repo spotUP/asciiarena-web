@@ -26,71 +26,76 @@ include "header.php";
 				doQuery($ask,['fixed_colly' => $fixed_colly]);
 			}
 			?>
-			<meta http-equiv="Refresh" content="0"; url="admin.php">
+			<div class="bs-component">
+				<div class="animate__animated animate__tada alert alert-dismissible alert-success">
+					<button type="button" class="close" data-dismiss="alert">x</button>
+					<span>Good bwai! Colly marked as fixed!<span>
+				</div>
+			</div>				
 			<?php
-		}	
+			}	
 
 //---------------------------------------------------------------------------------------------------------------
 // DELETE USER FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-		if(isset($_POST['delete_user']) && is_admin())
-		{
-			$delete_user=$_POST['getuser'];
-			$delete_user=cleanInsert($delete_user);
-
-			if(!empty($delete_user))
+			if(isset($_POST['delete_user']) && is_admin())
 			{
-				$ask="delete from users where nick=:delete_user";
-				doQuery($ask, [ 'delete_user' => $delete_user ]);
-			}
-			?><meta http-equiv="Refresh" content="0"; url="admin.php"><?php
-		}	
+				$delete_user=$_POST['getuser'];
+				$delete_user=cleanInsert($delete_user);
+
+				if(!empty($delete_user))
+				{
+					$ask="delete from users where nick=:delete_user";
+					doQuery($ask, [ 'delete_user' => $delete_user ]);
+				}
+				?><meta http-equiv="Refresh" content="0"; url="admin.php"><?php
+			}	
 
 //---------------------------------------------------------------------------------------------------------------
 // DELETE CREW FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-		if(isset($_POST['do_delete_crew']) && is_admin())
-		{
-			$delete_crew=$_POST['getcrew'];
-			$delete_crew=cleanInsert($delete_crew);
-
-			if(!empty($delete_crew))
+			if(isset($_POST['do_delete_crew']) && is_admin())
 			{
-				$ask="delete from crews where name=:delete_crew";
-				doQuery($ask,[ 'delete_crew' => $delete_crew]);
+				$delete_crew=$_POST['getcrew'];
+				$delete_crew=cleanInsert($delete_crew);
 
-				$ask="delete from bbs_of where crew=:delete_crew";
-				doQuery($ask,[ 'delete_crew' => $delete_crew]);
-			}
-			?><meta http-equiv="Refresh" content="0"; url="admin.php"><?php
-		}	
+				if(!empty($delete_crew))
+				{
+					$ask="delete from crews where name=:delete_crew";
+					doQuery($ask,[ 'delete_crew' => $delete_crew]);
+
+					$ask="delete from bbs_of where crew=:delete_crew";
+					doQuery($ask,[ 'delete_crew' => $delete_crew]);
+				}
+				?><meta http-equiv="Refresh" content="0"; url="admin.php"><?php
+			}	
 
 //---------------------------------------------------------------------------------------------------------------
 // DELETE SITELOGO FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-		if(isset($_POST['delete_sitelogo']) && is_admin())
-		{
-			$delete_sitelogo=$_POST['getsitelogo'];
-
-			if(!empty($delete_sitelogo))
+			if(isset($_POST['delete_sitelogo']) && is_admin())
 			{
-				$ask="delete from logos where logo_id=:delete_sitelogo";
-				doQuery($ask, ['delete_sitelogo' => $delete_sitelogo]);
-			}
-			?><meta http-equiv="Refresh" content="0"; url="admin.php"><?php
-		}	
+				$delete_sitelogo=$_POST['getsitelogo'];
+
+				if(!empty($delete_sitelogo))
+				{
+					$ask="delete from logos where logo_id=:delete_sitelogo";
+					doQuery($ask, ['delete_sitelogo' => $delete_sitelogo]);
+				}
+				?><meta http-equiv="Refresh" content="0"; url="admin.php"><?php
+			}	
 
 //---------------------------------------------------------------------------------------------------------------
 // DELETE COLLY FROM DB
 //---------------------------------------------------------------------------------------------------------------
 
-		if(isset($_POST['do_delete_colly']) && is_admin())
-		{
-			$delete_colly=$_POST['filename'];
-			$delete_colly=cleanInsert($delete_colly);
+			if(isset($_POST['do_delete_colly']) && is_admin())
+			{
+				$delete_colly=$_POST['filename'];
+				$delete_colly=cleanInsert($delete_colly);
 			$ask="select uploader from collys where filename='$delete_colly'"; // fetch uploader of deleted colly
 			$result=fetchAll($ask);
 			foreach ($result as $row)
@@ -272,163 +277,163 @@ include "header.php";
 					foreach($_POST['old_colly_authors'] as $colly_author)
 					{
 						$ask="insert into author_of (nick, filename, colly_id, user_id, artist_id) 
-							values (:colly_author,:filename,
-								(select id from collys where filename=:filename),
-								(select user_id from artists where nick=:colly_author),
-								(select id from artists where nick=:colly_author)
-							)";
-						doQuery($ask, ['colly_author' => $colly_author, 'filename' => $filename]);
-					}
+						values (:colly_author,:filename,
+						(select id from collys where filename=:filename),
+						(select user_id from artists where nick=:colly_author),
+						(select id from artists where nick=:colly_author)
+					)";
+					doQuery($ask, ['colly_author' => $colly_author, 'filename' => $filename]);
 				}
+			}
 
-				if (isset($_POST['colly_author']))
+			if (isset($_POST['colly_author']))
+			{
+				foreach($_POST['colly_author'] as $new_colly_author)
 				{
-					foreach($_POST['colly_author'] as $new_colly_author)
-					{
-						$ask="insert into author_of (nick, filename, colly_id, user_id, artist_id) 
-							values (:colly_author,:filename,
-								(select id from collys where filename=:filename),
-								(select user_id from artists where nick=:colly_author),
-								(select id from artists where nick=:colly_author)
-							)";
-						doQuery($ask,['colly_author' => $new_colly_author, 'filename' => $filename]);
-					}
-				}
-				$ask="delete from author_of where filename=:filename and nick='Delete'";
-				doQuery($ask,['filename' => $filename ]);
+					$ask="insert into author_of (nick, filename, colly_id, user_id, artist_id) 
+					values (:colly_author,:filename,
+					(select id from collys where filename=:filename),
+					(select user_id from artists where nick=:colly_author),
+					(select id from artists where nick=:colly_author)
+				)";
+				doQuery($ask,['colly_author' => $new_colly_author, 'filename' => $filename]);
 			}
-			if(isset($_POST['old_colly_crews']) || (isset($_POST['colly_crew']) && is_admin()))
+		}
+		$ask="delete from author_of where filename=:filename and nick='Delete'";
+		doQuery($ask,['filename' => $filename ]);
+	}
+	if(isset($_POST['old_colly_crews']) || (isset($_POST['colly_crew']) && is_admin()))
+	{
+		$filename=$_POST['filename'];
+
+		$ask="delete from crew_of where filename=:filename";
+		doQuery($ask,['filename' => $filename]);
+
+		if (isset($_POST['old_colly_crews']))
+		{			
+			foreach($_POST['old_colly_crews'] as $colly_crew)
 			{
-				$filename=$_POST['filename'];
+				$ask="insert into crew_of (crew, filename, crew_id, colly_id)
+				values (:crew, :filename,
+				(select id from crews where name=:crew),
+				(select id from collys where filename=:filename)
+			)";
+			doQuery($ask,['crew' => $colly_crew, 'filename' => $filename]);
+		}
+	}
 
-				$ask="delete from crew_of where filename=:filename";
-				doQuery($ask,['filename' => $filename]);
+	if (isset($_POST['colly_crew']))
+	{
+		foreach($_POST[colly_crew] as $new_colly_crew)
+		{
+			$ask="insert into crew_of (crew, filename, crew_id, colly_id)
+			values (:crew, :filename,
+			(select id from crews where name=:crew),
+			(select id from collys where filename=:filename)
+		)";
+		doQuery($ask, ['crew' => $new_colly_crew, 'filename' => $filename]);
+	}
+}
 
-				if (isset($_POST['old_colly_crews']))
-				{			
-					foreach($_POST['old_colly_crews'] as $colly_crew)
-					{
-						$ask="insert into crew_of (crew, filename, crew_id, colly_id)
-							values (:crew, :filename,
-							(select id from crews where name=:crew),
-							(select id from collys where filename=:filename)
-							)";
-						doQuery($ask,['crew' => $colly_crew, 'filename' => $filename]);
-					}
-				}
+$ask="delete from crew_of where filename=:filename and crew='Delete'";
+doQuery($ask,['filename' => $filename]);
+}
+if(isset($_POST['edit_colly_year']) && is_admin())
+{
+	$filename=$_POST['filename'];
+	$edit_colly_year=$_POST['edit_colly_year'];
+	$ask="update collys set year=:edit_colly_year where filename=:filename";	
+	doQuery($ask,['edit_colly_year' => $edit_colly_year, 'filename' => $filename]);	
+}
+if(isset($_POST['edit_colly_type']) && is_admin())
+{
+	$filename=$_POST['filename'];
 
-				if (isset($_POST['colly_crew']))
-				{
-					foreach($_POST[colly_crew] as $new_colly_crew)
-					{
-						$ask="insert into crew_of (crew, filename, crew_id, colly_id)
-							values (:crew, :filename,
-							(select id from crews where name=:crew),
-							(select id from collys where filename=:filename)
-							)";
-						doQuery($ask, ['crew' => $new_colly_crew, 'filename' => $filename]);
-					}
-				}
+	$edit_colly_type=$_POST['edit_colly_type'];
 
-				$ask="delete from crew_of where filename=:filename and crew='Delete'";
-				doQuery($ask,['filename' => $filename]);
-			}
-			if(isset($_POST['edit_colly_year']) && is_admin())
-			{
-				$filename=$_POST['filename'];
-				$edit_colly_year=$_POST['edit_colly_year'];
-				$ask="update collys set year=:edit_colly_year where filename=:filename";	
-				doQuery($ask,['edit_colly_year' => $edit_colly_year, 'filename' => $filename]);	
-			}
-			if(isset($_POST['edit_colly_type']) && is_admin())
-			{
-				$filename=$_POST['filename'];
+	$ask="update collys set type=:edit_colly_type where filename=:filename";	
+	doQuery($ask,['edit_colly_type' => $edit_colly_type, 'filename' => $filename]);	
+}
+if(isset($_POST['edit_colly_month']) && is_admin())
+{
+	$filename=$_POST['filename'];
 
-				$edit_colly_type=$_POST['edit_colly_type'];
+	$edit_colly_month=$_POST['edit_colly_month'];
 
-				$ask="update collys set type=:edit_colly_type where filename=:filename";	
-				doQuery($ask,['edit_colly_type' => $edit_colly_type, 'filename' => $filename]);	
-			}
-			if(isset($_POST['edit_colly_month']) && is_admin())
-			{
-				$filename=$_POST['filename'];
+	$ask="update collys set month=:edit_colly_month where filename=:filename";	
+	doQuery($ask,['edit_colly_month' => $edit_colly_month, 'filename' => $filename]);	
+}
+if(isset($_POST['edit_colly_day']) && is_admin())
+{
+	$filename=$_POST['filename'];
 
-				$edit_colly_month=$_POST['edit_colly_month'];
+	$edit_colly_day=$_POST['edit_colly_day'];
 
-				$ask="update collys set month=:edit_colly_month where filename=:filename";	
-				doQuery($ask,['edit_colly_month' => $edit_colly_month, 'filename' => $filename]);	
-			}
-			if(isset($_POST['edit_colly_day']) && is_admin())
-			{
-				$filename=$_POST['filename'];
-
-				$edit_colly_day=$_POST['edit_colly_day'];
-
-				$ask="update collys set day=:edit_colly_day where filename=:filename";	
-				doQuery($ask,['edit_colly_day' => $edit_colly_day, 'filename' => $filename]);	
-			}
+	$ask="update collys set day=:edit_colly_day where filename=:filename";	
+	doQuery($ask,['edit_colly_day' => $edit_colly_day, 'filename' => $filename]);	
+}
 
 //---------------------------------------------------------------------------------------------------------------
 // RECALCULATE RATINGS
 //---------------------------------------------------------------------------------------------------------------
 
 
-			$ask="update artists a
-				inner join (
-    					select avg(rating) as avgrating, artist from comments
-    					where rating>0 group by artist
-  				) as r on a.nick=r.artist
-				set a.rating = r.avgrating";
-			doQuery($ask);
+$ask="update artists a
+inner join (
+select avg(rating) as avgrating, artist from comments
+where rating>0 group by artist
+) as r on a.nick=r.artist
+set a.rating = r.avgrating";
+doQuery($ask);
 
-			$ask="update crews c
-				  inner join (
-				    select avg(rating) as avgrating, crew from comments
-				    where rating>0 group by crew
-				  ) as r on c.name=r.crew
-				set c.rating = r.avgrating";
-			doQuery($ask);
+$ask="update crews c
+inner join (
+select avg(rating) as avgrating, crew from comments
+where rating>0 group by crew
+) as r on c.name=r.crew
+set c.rating = r.avgrating";
+doQuery($ask);
 
-			$ask="select crew from crew_of";
-			$result=fetchAll($ask);
-			?>
-			<meta http-equiv="Refresh" content="0"; url="admin.php">
-			<?php
-			exit;
-		}	
+$ask="select crew from crew_of";
+$result=fetchAll($ask);
+?>
+<meta http-equiv="Refresh" content="0"; url="admin.php">
+<?php
+exit;
+}	
 
 //---------------------------------------------------------------------------------------------------------------
 // WRITE CREW INFO TO DB
 //---------------------------------------------------------------------------------------------------------------
 
-		if(isset($_POST['do_change_crew']) && is_admin())
-		{
-			if(isset($_POST['edit_crew_name']) && is_admin())
-			{
-				$crew=$_POST['getcrew'];
-				$crew=cleanInsert($crew);
+if(isset($_POST['do_change_crew']) && is_admin())
+{
+	if(isset($_POST['edit_crew_name']) && is_admin())
+	{
+		$crew=$_POST['getcrew'];
+		$crew=cleanInsert($crew);
 
-				$edit_crew_name=$_POST['edit_crew_name'];
-				$edit_crew_name=cleanInsert($edit_crew_name); 
+		$edit_crew_name=$_POST['edit_crew_name'];
+		$edit_crew_name=cleanInsert($edit_crew_name); 
 
-				doQuery("update crews     set name=:edit_crew_name where name=:crew", ['edit_crew_name' => $edit_crew_name, 'crew' => $crew]);
-				doQuery("update crew_of   set crew=:edit_crew_name where crew=:crew", ['edit_crew_name' => $edit_crew_name, 'crew' => $crew]);	
-				doQuery("update bbs_of    set crew=:edit_crew_name where crew=:crew", ['edit_crew_name' => $edit_crew_name, 'crew' => $crew]);	
-				doQuery("update member_of set crew=:edit_crew_name where crew=:crew", ['edit_crew_name' => $edit_crew_name, 'crew' => $crew]);	
-			}
-			if(isset($_POST['edit_crew_www']) && is_admin())
-			{
-				$crew=$_POST['getcrew'];
-				$crew=cleanInsert($crew);
+		doQuery("update crews     set name=:edit_crew_name where name=:crew", ['edit_crew_name' => $edit_crew_name, 'crew' => $crew]);
+		doQuery("update crew_of   set crew=:edit_crew_name where crew=:crew", ['edit_crew_name' => $edit_crew_name, 'crew' => $crew]);	
+		doQuery("update bbs_of    set crew=:edit_crew_name where crew=:crew", ['edit_crew_name' => $edit_crew_name, 'crew' => $crew]);	
+		doQuery("update member_of set crew=:edit_crew_name where crew=:crew", ['edit_crew_name' => $edit_crew_name, 'crew' => $crew]);	
+	}
+	if(isset($_POST['edit_crew_www']) && is_admin())
+	{
+		$crew=$_POST['getcrew'];
+		$crew=cleanInsert($crew);
 
-				$edit_crew_www=$_POST['edit_crew_www'];
-				$edit_crew_www=cleanInsert($edit_crew_www); 
+		$edit_crew_www=$_POST['edit_crew_www'];
+		$edit_crew_www=cleanInsert($edit_crew_www); 
 
-				doQuery("update crews set www=:edit_crew_www where name=:edit_crew_name", ['edit_creq_www' => $edit_crew_www, 'edit_crew_name' => $edit_crew_name]);	
-			}
+		doQuery("update crews set www=:edit_crew_www where name=:edit_crew_name", ['edit_creq_www' => $edit_crew_www, 'edit_crew_name' => $edit_crew_name]);	
+	}
 
-			if(isset($_POST['add_bbs']) && is_admin())
-			{
+	if(isset($_POST['add_bbs']) && is_admin())
+	{
 				foreach($_POST[add_bbs] as $add_bbs) // add new bbses
 				{
 					doQuery("insert into bbs_of values (:add_bbs,:crew)", ['add_bbs' => $add_bbs, 'crew' => $crew]);
@@ -699,37 +704,37 @@ include "header.php";
 					<div class="animate__animated animate__shakeX alert alert-dismissible alert-danger">
 						<button type="button" class="close" data-dismiss="alert">x</button>
 						<span>You can not submit an empty logo!<span>
+						</div>
 					</div>
-				</div>
-				<?php
-			}
-			$user_nick=$_POST['usernick'];
-			$user_nick=cleanInsert($user_nick);
+					<?php
+				}
+				$user_nick=$_POST['usernick'];
+				$user_nick=cleanInsert($user_nick);
 
-			$ask="update users set mail=:mail where nick=:change_user_nick";
-			doQuery($ask, ['mail' => $mail, 'change_user_nick' => $change_user_nick ]);	
-		}
+				$ask="update users set mail=:mail where nick=:change_user_nick";
+				doQuery($ask, ['mail' => $mail, 'change_user_nick' => $change_user_nick ]);	
+			}
 
 //---------------------------------------------------------------------------------------------------------------
 // WRITE USER SIGNATURE TO DB
 //---------------------------------------------------------------------------------------------------------------
 
-		if(isset($_POST['setcolor']))
-		{
-			$signature=$_POST['signature'];
-			$signature=cleanInsert($signature);
+			if(isset($_POST['setcolor']))
+			{
+				$signature=$_POST['signature'];
+				$signature=cleanInsert($signature);
 
-			$user_signature=$_POST['user_signature'];
-			$user_signature=cleanInsert($user_signature);
+				$user_signature=$_POST['user_signature'];
+				$user_signature=cleanInsert($user_signature);
 
-			$sigdata=$_POST['signature'];
-			$sigdata=cleanInsert($sigdata);
+				$sigdata=$_POST['signature'];
+				$sigdata=cleanInsert($sigdata);
 
 //			$font=$_POST['font'];
 //			$font=cleanInsert($font);
 
-			$user_nick=$_POST['usernick'];
-			$user_nick=cleanInsert($user_nick);
+				$user_nick=$_POST['usernick'];
+				$user_nick=cleanInsert($user_nick);
 
 			$signature=utf8_encode($signature); // convert UTF-8 string to ISO-88591
 
@@ -740,10 +745,10 @@ include "header.php";
 					<div class="animate__animated animate__shakeX alert alert-dismissible alert-danger">
 						<button type="button" class="close" data-dismiss="alert">x</button>
 						<span>You have to make a signature before submitting!<span>
-					</div>
-				</div>				
-				<?php
-			}
+						</div>
+					</div>				
+					<?php
+				}
 
 //			$rgbvalue=$_POST['setcolor'];
 //			$rgbvalue = explode(",", $rgbvalue);
@@ -763,25 +768,25 @@ include "header.php";
 
 //			imagepng($image,"signatures/$user_signature.png");	 											// save image		
 
-			$ask="update users set signature=:user_signature where nick=:edit_user_nick";
-			doQuery($ask, ['user_signature' => $user_signature, 'edit_user_nick' => $edit_user_nick]);
+				$ask="update users set signature=:user_signature where nick=:edit_user_nick";
+				doQuery($ask, ['user_signature' => $user_signature, 'edit_user_nick' => $edit_user_nick]);
 
-			$sigdata=cleanInsertPost($sigdata);
-			$ask="update users set sigdata=:sigdata where nick=:edit_user_nick";
-			doQuery($ask, ['sigdata' => $sigdata, 'edit_user_nick' => $edit_user_nick]);
+				$sigdata=cleanInsertPost($sigdata);
+				$ask="update users set sigdata=:sigdata where nick=:edit_user_nick";
+				doQuery($ask, ['sigdata' => $sigdata, 'edit_user_nick' => $edit_user_nick]);
 
 //			unlink ("signatures/tempsignature.diz");
 //			unlink ("signatures/tempsignature.diz.png");
-		}
+			}
 
 //---------------------------------------------------------------------------------------------------------------
 // WRITE EDITED LOGO TO DISK
 //---------------------------------------------------------------------------------------------------------------
 
-		if(isset($_POST['editedsitelogo']))
-		{
-			$logo=$_POST['getsitelogo'];
-			$editedsitelogodata=$_POST['editedsitelogo'];
+			if(isset($_POST['editedsitelogo']))
+			{
+				$logo=$_POST['getsitelogo'];
+				$editedsitelogodata=$_POST['editedsitelogo'];
 
 //			$font=$_POST['font'];
 //			$font=cleanInsert($font);
@@ -790,17 +795,17 @@ include "header.php";
 //		htmlspecialchars_decode($editedsitelogodata, ENT_QUOTES);
 //		$editedsitelogodata=utf8_encode($editedsitelogodata);
 
-			if(empty($editedsitelogodata))
-			{
-				?>
-				<div class="bs-component">
-					<div class="animate__animated animate__shakeX alert alert-dismissible alert-danger">
-						<button type="button" class="close" data-dismiss="alert">x</button>
-						<span>You can not submit an empty logo!<span>
-					</div>
-				</div>
-				<?php
-			}
+				if(empty($editedsitelogodata))
+				{
+					?>
+					<div class="bs-component">
+						<div class="animate__animated animate__shakeX alert alert-dismissible alert-danger">
+							<button type="button" class="close" data-dismiss="alert">x</button>
+							<span>You can not submit an empty logo!<span>
+							</div>
+						</div>
+						<?php
+					}
 
 //		$rgbvalue=$_POST['set_edited_logo_color'];
 //		$rgbvalue=cleanInsert($rgbvalue);
@@ -825,76 +830,76 @@ include "header.php";
 //		unlink ("templogo.diz.png");
 
 		//$editedsitelogodata=cleanInsertPost($editedsitelogodata);
-			$ask_update="update logos set ascii=:editedsitelogodata where logo_id=:logo";
-			doQuery($ask_update,['editedsitelogodata' => $editedsitelogodata, 'logo' => $logo]);	
+					$ask_update="update logos set ascii=:editedsitelogodata where logo_id=:logo";
+					doQuery($ask_update,['editedsitelogodata' => $editedsitelogodata, 'logo' => $logo]);	
 
 //		$ask_update="update logos set base64='1' where filename=:logo";
 //		doQuery($ask_update,['logo' => $logo]);	
-		}
+				}
 
 //----------------------------------------------------------------------------------------------------------------------------
 
-		?>
+				?>
 
-		<div class="row">
-			<div class="col-lg-12">
-				<?php if(is_admin()) { ?>
-					<div class="bs-component">
-						<ul class="nav nav-tabs apt-1 bg-secondary">
-							<li class="nav-item">
-								<a class="nav-link active" data-toggle="tab" href="#colly">Colly</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#crew">Crew</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#artist">Artist</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#edituser">User</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#sitelogo">Site Logo</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#bbs">BBS</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#broken">Broken Collys</a>
-							</li>
-						</ul>
-						<div id="myTabContent" class="tab-content apt-1" style="background-color: #1a1a1a;">
+				<div class="row">
+					<div class="col-lg-12">
+						<?php if(is_admin()) { ?>
+							<div class="bs-component">
+								<ul class="nav nav-tabs apt-1 bg-secondary">
+									<li class="nav-item">
+										<a class="nav-link active" data-toggle="tab" href="#colly">Colly</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" data-toggle="tab" href="#crew">Crew</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" data-toggle="tab" href="#artist">Artist</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" data-toggle="tab" href="#edituser">User</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" data-toggle="tab" href="#sitelogo">Site Logo</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" data-toggle="tab" href="#bbs">BBS</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" data-toggle="tab" href="#broken">Broken Collys</a>
+									</li>
+								</ul>
+								<div id="myTabContent" class="tab-content apt-1" style="background-color: #1a1a1a;">
 
-							<?php
+									<?php
 
-							include ("admin_edit_colly.php");
-							include ("admin_edit_crew.php");
-							include ("admin_edit_artist.php");
-							include ("admin_edit_user.php");
-							include ("admin_edit_site_logo.php");
-							include ("admin_edit_bbs.php");
-							include ("admin_edit_broken_collys.php");
+									include ("admin_edit_colly.php");
+									include ("admin_edit_crew.php");
+									include ("admin_edit_artist.php");
+									include ("admin_edit_user.php");
+									include ("admin_edit_site_logo.php");
+									include ("admin_edit_bbs.php");
+									include ("admin_edit_broken_collys.php");
 
-							?>
-						</div>
+									?>
+								</div>
+							</div>
+						<?php } else { ?>
+							<div class="bs-component">
+								<div class="animate__animated animate__shakeX alert alert-dismissible alert-primary">
+									<button type="button" class="close" data-dismiss="alert">x</button>
+									You need to be <a class="ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">an admin</a>to use this feature.
+								</div>
+							</div>
+						<?php } ?>
 					</div>
-				<?php } else { ?>
-					<div class="bs-component">
-						<div class="animate__animated animate__shakeX alert alert-dismissible alert-primary">
-							<button type="button" class="close" data-dismiss="alert">x</button>
-							You need to be <a class="ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">an admin</a>to use this feature.
-						</div>
-					</div>
-				<?php } ?>
+				</div>
 			</div>
-		</div>
-	</div>
-	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
-		<?php include "sidebar.php"; ?>
-	</div>
+			<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+				<?php include "sidebar.php"; ?>
+			</div>
 
-	<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
-		<?php include "sidebar_right.php"; ?>
-	</div>
+			<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
+				<?php include "sidebar_right.php"; ?>
+			</div>
 
-	<?php include "footer.php";
+			<?php include "footer.php";
