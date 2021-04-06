@@ -12,7 +12,7 @@ switch ($sort_by) {
 	$sort_criteria = "year ASC, month";
 	break;
 	case "releasedate":
-	$sort_criteria = "year ASC, month ASC, day";
+	$sort_criteria = "year DESC, month DESC, day";
 	break;
 	case "nick":
 	$sort_criteria = "artists";
