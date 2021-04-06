@@ -81,12 +81,6 @@ include "header.php";
 				$ask="update users set country=:changecountry where nick=:nick";
 				doQuery($ask,[ 'changecountry' => $changecountry, 'nick' => $nick ]);	
 			}
-			if(isset($_POST['changemessenger']))
-			{
-				$changemessenger=$_POST['changemessenger'];
-				$ask="update users set messenger=:changemessenger where nick=:nick";
-				doQuery($ask,[ 'changemessenger' => $changemessenger, 'nick' => $nick ]);	
-			}
 			if(isset($_POST['changemail']))
 			{
 				$mail=$_POST['changemail'];
@@ -107,12 +101,6 @@ include "header.php";
 				$display_mail=$_POST['display_mail'];
 				$ask="update users set display_mail=:display_mail where nick=:nick";
 				doQuery($ask,[ 'display_mail' => $display_mail, 'nick' => $nick ]);	
-			}
-			if(isset($_POST['display_messenger']))
-			{
-				$display_messenger=$_POST['display_messenger'];
-				$ask="update users set display_messenger=:display_messenger where nick=:nick";
-				doQuery($ask,[ 'display_messenger' => $display_messenger, 'nick' => $nick ]);	
 			}
 			if(isset($_POST['changelistviewmode']))
 			{
@@ -195,19 +183,15 @@ include "header.php";
 					$show_bmonth=$row->bmonth;
 					$show_bday=$row->bday;
 					$show_country=$row->country;
-					$show_avatar=$row->avatar;
 					$show_mail=$row->mail;
 					$show_webpage=$row->webpage;		
 					$show_uploadsignature=$row->upload_signature;
-					$base64=$row->sigbase64;
 					$show_sigdata=$row->sigdata;
 					$show_sigdata=fixOutputEdit($show_sigdata);
 					$show_viewmode=$row->list_view_mode;
 					$def_bg_col=$row->def_bg_col ?? "#000000";
 					$def_fg_col=$row->def_fg_col ?? "255,255,255";
 					$show_display_mail=$row->display_mail;
-					$sigfont=$row->forum_sig_font;
-					$sigcolor=$row->forum_sig_color;
 					$show_def_font=$row->def_font;
 					?>
 
