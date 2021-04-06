@@ -722,20 +722,6 @@ if(isset($_POST['do_change_crew']) && is_admin())
 			$ask="update users set country=:change_country where nick=:change_user_nick";
 			doQuery($ask,['change_country' => $country_list[$change_country], 'change_user_nick' => $change_user_nick ]);	
 		}
-		if(isset($_POST['changeusermessenger']))
-		{
-			$change_user_nick=$_POST['changeusernick'];
-			$change_user_nick=cleanInsert($change_user_nick);
-
-			$changemessenger=$_POST['changeusermessenger'];
-			$changemessenger=cleanInsert($changemessenger);
-
-			$user_nick=$_POST['usernick'];
-			$user_nick=cleanInsert($user_nick);
-
-			$ask="update users set messenger=:changemessenger where nick=:change_user_nick";
-			doQuery($ask,['changemessenger' => $changemessenger, 'change_user_nick' => $change_user_nick]);	
-		}
 		if(isset($_POST['changeusermail']))
 		{
 			$change_user_nick=$_POST['changeusernick'];
@@ -761,78 +747,6 @@ if(isset($_POST['do_change_crew']) && is_admin())
 
 			$ask="update users set mail=:mail where nick=:change_user_nick";
 			doQuery($ask, ['mail' => $mail, 'change_user_nick' => $change_user_nick ]);	
-		}
-
-//---------------------------------------------------------------------------------------------------------------
-// WRITE USER SIGNATURE TO DB
-//---------------------------------------------------------------------------------------------------------------
-
-		if(isset($_POST['setcolor']))
-		{
-			$signature=$_POST['signature'];
-			$signature=cleanInsert($signature);
-
-			$user_signature=$_POST['user_signature'];
-			$user_signature=cleanInsert($user_signature);
-
-			$sigdata=$_POST['signature'];
-			$sigdata=cleanInsert($sigdata);
-
-//			$font=$_POST['font'];
-//			$font=cleanInsert($font);
-
-			$user_nick=$_POST['usernick'];
-			$user_nick=cleanInsert($user_nick);
-
-			$signature=utf8_encode($signature); // convert UTF-8 string to ISO-88591
-
-			if(empty($signature))
-			{
-				?>
-				<div class="bs-component">
-					<div class="animate__animated animate__shakeX alert alert-dismissible alert-danger">
-						<button type="button" class="close" data-dismiss="alert">x</button>
-						<span>You have to make a signature before submitting!</span>
-					</div>
-				</div>				
-				<?php
-			}
-
-//			$rgbvalue=$_POST['setcolor'];
-//			$rgbvalue = explode(",", $rgbvalue);
-//			$delimiter=",";
-
-//			file_put_contents("signatures/tempsignature.diz", $signature);
-//			load_ansi("signatures/tempsignature.diz","signatures/tempsignature.diz","$font","transparent",0);
-
-//			$old_fg_color_r="170";
-//			$old_fg_color_g="170";
-//			$old_fg_color_b="170";
-
-//			$image = imageCreateFromPNG("signatures/tempsignature.diz.png");
-
-//			$fg_color = imageColorExact($image,$old_fg_color_r,$old_fg_color_g,$old_fg_color_b);	//get color to replace
-//			imageColorSet($image,$fg_color,$rgbvalue[0],$rgbvalue[1],$rgbvalue[2]);		//replace color with
-
-//			imagepng($image,"signatures/$user_signature.png");	 											// save image		
-
-			$ask="update users set signature=:user_signature where nick=:edit_user_nick";
-			doQuery($ask, ['user_signature' => $user_signature, 'edit_user_nick' => $edit_user_nick]);
-
-			$sigdata=cleanInsertPost($sigdata);
-			$ask="update users set sigdata=:sigdata where nick=:edit_user_nick";
-			doQuery($ask, ['sigdata' => $sigdata, 'edit_user_nick' => $edit_user_nick]);
-
-//			unlink ("signatures/tempsignature.diz");
-//			unlink ("signatures/tempsignature.diz.png");
-			?>
-			<div class="bs-component">
-				<div class="animate__animated animate__tada alert alert-dismissible alert-success">
-					<button type="button" class="close" data-dismiss="alert">x</button>
-					<span>User signature updated!</span>
-				</div>
-			</div>	
-			<?php
 		}
 
 //---------------------------------------------------------------------------------------------------------------
