@@ -101,13 +101,6 @@ include_once "header.php";
 //-----------------------------------------------------------------------------
 
 			if (isset($_REQUEST[ 'postreply' ])) {
-//				if (isset($_POST[ 'thread' ])) {
-//					$thread = $_POST[ 'thread' ];
-//				}
-
-//				if (isset($_POST[ 'messid' ])) {
-//					$messid = $_POST[ 'messid' ];
-//				}
 
 				if (isset($_GET[ 'thread' ])) {
 					$thread = $_GET[ 'thread' ];
@@ -120,7 +113,7 @@ include_once "header.php";
 				$replymessage = $_GET[ 'replymessage' ] ?? 0;
 				?>
 				<div class="container-fluid bg-secondary ap-1">
-					<form action="message.php?post" method="post">
+					<form action="messages.php?post" method="post">
 						<?php
 
 						foreach (fetchAll("SELECT * FROM messages WHERE id = :id", [
@@ -386,13 +379,13 @@ include_once "header.php";
 								if ($messnew == 1) {
 									?>
 									<div class="col-7">
-										<a class="yellow text-truncate !important;" href="message.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
+										<a class="yellow text-truncate !important;" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
 									</div>
 									<?php
 								} else {
 									?>
 									<div class="col-7">
-										<a class="green text-truncate !important;" href="message.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
+										<a class="green text-truncate !important;" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
 									</div>
 									<?php
 								}
