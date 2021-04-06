@@ -313,32 +313,36 @@ include_once "header.php";
 
 				if (isset($_POST[ 'open_postnewmessage' ])) {
 					?>
-					<div class="headline">
-						New Message
-					</div>
+					<div class="container-fluid bg-secondary amb-1 apb-1">
+						<div class="row apt-1 apb-1 apl-1 apr-1">
+							Receiver: 
+							<select style="margin-left: 8px;" name="posttomember">
+								<?php
+								$ask = $_db->prepare("SELECT nick FROM users ORDER BY nick ASC");
+								$ask->execute();
+								$rows = $ask->fetchAll(PDO::FETCH_OBJ);
+								foreach($rows as $row) {
+									$nick = htmlspecialchars($row->nick);
+									echo "<option>$nick</option>";
+								}
+								?>
+							</select>
+						</div>
 
-					<div class="collys_filename">
-						Receiver:
-						<select name="posttomember">
-							<?php
-							$ask = $_db->prepare("SELECT nick FROM users ORDER BY nick ASC");
-							$ask->execute();
-							$rows = $ask->fetchAll(PDO::FETCH_OBJ);
-							foreach($rows as $row) {
-								$nick = htmlspecialchars($row->nick);
-								echo "<option>$nick</option>";
-							}
-							?>
-						</select>
-					</div>
+						<div class="row apl-1 apr-1">
+							Subject:
+						</div>
 
-					<div style="float: left; width: 370px;">
-						Subject: <input type="text" size="35" name="postsubject">
-					</div>
+						<div class="row apb-1 apl-1 apr-1">
+							<input class="w-100" type="text" name="postsubject">
+						</div>
 
-					<div class="content">
-						<textarea rows="16" cols="82" name="postmessage" id="postmessage"></textarea>
-						<input type="submit" name="postnewmessage" value="Send Message!">
+						<div class="row apb-1 apl-1 apr-1">
+							<textarea clasS="w-100" rows="16" name="postmessage" id="postmessage"></textarea>
+						</div> 
+						<div class="row apl-1 apr-1">
+							<input type="submit" name="postnewmessage" value="Send Message!">
+						</div>
 					</div>
 					<?php
 				}
