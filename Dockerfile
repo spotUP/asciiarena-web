@@ -7,4 +7,5 @@ RUN echo 'PassEnv DBNAME DBHOST DBUSER DBPW' > /etc/apache2/conf-enabled/expose-
 COPY ./ /var/www/html/
 
 RUN a2enmod rewrite
+RUN apt-get install jlha-utils xdms
 
