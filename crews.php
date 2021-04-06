@@ -15,6 +15,7 @@ require_once "header.php";
 				switch ($sort_by) {
 					case "members":
 					case "releases":
+					case "rating":
 					$sort_order = "DESC";
 					break;
 					default:
@@ -54,16 +55,16 @@ require_once "header.php";
 				<a class="white" href="crews.php?sort_by=releases">RELEASES</a>
 			</div>
 			<div class="col-2">
-				<a class="white" href="crews.php?sort_by=releases">SCORE</a>
+				<a class="white" href="crews.php?sort_by=rating">SCORE</a>
 			</div>
 		</div>
 		<?php
 		if (!isset($_POST[ 'search' ])) {
-			$q = "SELECT crews.*, COUNT(member_of.nick) AS members FROM crews LEFT JOIN member_of ON crews.name = member_of.crew GROUP BY crews.name ORDER BY {$sort_by} {$sort_order} {$pagination["limit"]}";
+			$q = "SELECT crews.*, (SELECT COUNT(colly_id) FROM crew_of WHERE crew_id = crews.id) AS releases, (SELECT COUNT(nick) FROM member_of WHERE crew = crews.name) AS members FROM crews ORDER BY {$sort_by} {$sort_order} {$pagination["limit"]}";
 			$p = [];
 		} else {
 			$searchquery = $_POST[ 'search' ];
-			$q = "SELECT crews.*, COUNT(member_of.nick) AS members FROM crews LEFT JOIN member_of ON crews.name = member_of.crew WHERE MATCH(crews.name, crews.acronym) AGAINST (:searchquery IN BOOLEAN MODE) GROUP BY crews.name ORDER BY {$sort_by} {$sort_order} {$pagination["limit"]}";
+			$q = "SELECT crews.*, (SELECT COUNT(colly_id) FROM crew_of WHERE crew_id = crews.id) AS releases, (SELECT COUNT(nick) FROM member_of WHERE crew = crews.name) AS members FROM crews WHERE MATCH(crews.name, crews.acronym) AGAINST (:searchquery IN BOOLEAN MODE) ORDER BY {$sort_by} {$sort_order} {$pagination["limit"]}";
 			$p = [":searchquery" => $searchquery];
 		}
 		$crews = [];
@@ -83,10 +84,10 @@ require_once "header.php";
 					<?=(int)$crew->members?>
 				</div>
 				<div class="magenta col-3 nolink">
-					N/A
+					<?=(int)$crew->releases?>
 				</div>
 				<div class="col-2">
-					N/A
+					<?=(int)$crew->rating !== 0 ? round($crew->rating, 2) : ''?>
 				</div>
 			</div>
 			<?php
