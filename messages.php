@@ -23,6 +23,8 @@ include_once "header.php";
 				$posttomember = $_POST[ 'posttomember' ];
 				$postsubject = $_POST[ 'postsubject' ];
 				$postmessage = $_POST[ 'postmessage' ];
+				$nick=$_user['nick'];
+
 
 				if (empty($posttomember)) {
 					?>
@@ -195,6 +197,7 @@ include_once "header.php";
 						<div class="row">
 							<div class="col-12">
 								<textarea name="postmessage" id="postreply" class="w-100" style="height: 256px;"></textarea>
+								<input type="hidden" name=postername value="<?=$_user['nick']?>">
 								<input type="hidden" name=posttomember value="<?=$messpostername?>">
 								<input type="hidden" name="thread" value="<?=$thread?>">
 								<input type="hidden" name="postsubject" value="<?=$postsubject?>">
@@ -293,6 +296,8 @@ include_once "header.php";
 
 			if (isset($_POST[ 'deletemessage' ])) {
 				$deleteid = ($_POST[ 'thread' ]);
+				$nick=$_user['nick'];
+
 
 				$ask = $_db->prepare("delete from messages where thread=:deleteid and postedto=:nick");
 				$ask->execute(['deleteid' => $deleteid, 'nick' => $nick]);
