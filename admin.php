@@ -463,10 +463,10 @@ if(isset($_POST['do_change_crew']) && is_admin())
 				$ask="update artists   set nick=:edit_artist_nick where nick=:artist";	
 				doQuery($ask,['edit_artist_nick' => $edit_artist_nick, 'artist' => $artist]);	
 
-				$ask="update member_of set nick=:edit_artist_nick' where nick=:artist";	
+				$ask="update member_of set nick=:edit_artist_nick where nick=:artist";	
 				doQuery($ask,['edit_artist_nick' => $edit_artist_nick, 'artist' => $artist]);	
 
-				$ask="update author_of set nick=:edit_artist_nick' where nick=:artist";	
+				$ask="update author_of set nick=:edit_artist_nick where nick=:artist";	
 				doQuery($ask,['edit_artist_nick' => $edit_artist_nick, 'artist' => $artist]);	
 
 			}
