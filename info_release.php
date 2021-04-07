@@ -856,12 +856,12 @@ if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ])))
 	{
 		?>
 		<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: #000;"> 
-			<div id="colly"></div>
+			<div id="ansi-colly"></div>
 		</div>
 		<script type="text/javascript" src="/assets/js/ansilove.js"></script>
 		<script>
 		AnsiLove.render("<?php echo "/collections/{$dirname}/{$filename}"; ?>", function (canvas, sauce) {
-		    document.getElementById("colly").appendChild(canvas);
+		    document.getElementById("ansi-colly").appendChild(canvas);
 		}, {"font": "Amiga mOsOul", "bits": "8", "icecolors": 1, "columns": 80, "thumbnail": 0, "filetype": "ans"});
 		</script>
 <?php
