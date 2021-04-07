@@ -20,12 +20,9 @@ include_once "header.php";
 
 				if (isset($_POST[ 'open_postnewmessage' ])) {
 					?>
-					<div class="headline">
-						New Message
-					</div>
 
-					<div class="collys_filename">
-						Receiver:
+					<div class="row">
+						<span class="white">Receiver:</span>
 						<select name="posttomember">
 							<?php
 							$ask = $_db->prepare("SELECT nick FROM users ORDER BY nick ASC");
