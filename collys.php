@@ -192,10 +192,10 @@ switch ($sort_by) {
 												<span class="yellow"><?=$row->filename?></span>
 											</div>
 											<div class="col-2">
-												<span class="yellow"><?=combinize($row->artists, $row->artist_ids, "/artists/", $row->artists)?></span>
+												<span class="yellow"><?=combinize($row->artists, $row->artist_ids, "/artist/", $row->artists)?></span>
 											</div>
 											<div class="col-2">
-												<span class="yellow"><?=combinize($row->crews, $row->crew_ids, "/crews/", $row->crews)?></span>
+												<span class="yellow"><?=combinize($row->crews, $row->crew_ids, "/crew/", $row->crews)?></span>
 											</div>
 											<div class="col-2">
 												<span class="yellow"><a href="/collys.php?sort_by=releasedate&viewmode=Standard"><?=$year?>-<?=$month?>-<?=$day?></a></span>
