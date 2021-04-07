@@ -856,8 +856,7 @@ if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ])))
 	{
 		?>
 		<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: #000;"> 
-		<br><br><br><br><br>
-			<div id="colly"></div>
+			<div id="colly" style="padding-top: 64px;"></div>
 		</div>
 		<script type="text/javascript" src="/assets/js/ansilove.js"></script>
 		<script>
