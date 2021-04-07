@@ -140,10 +140,10 @@ switch ($sort_by) {
 							<a href="info_release.php?filename=<?=base64_encode($row->filename)?>"><?=$row->name?></a>
 						</div>
 						<div class="col-lg-4 green">
-							<span class="yellow"><?=combinize($row->artists, $row->artist_ids, "/artists/", $row->artists)?></span>
+							<span class="yellow"><?=combinize($row->artists, $row->artist_ids, "/artist/", $row->artists)?></span>
 						</div>
 						<div class="col-lg-4 yellow">
-							<span class="yellow"><?=combinize($row->crews, $row->crew_ids, "/crews/", $row->crews)?></span>
+							<span class="yellow"><?=combinize($row->crews, $row->crew_ids, "/crew/", $row->crews)?></span>
 						</div>
 					</div>
 					<?php
