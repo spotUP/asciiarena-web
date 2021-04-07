@@ -137,7 +137,7 @@ $dirname = $dirname[ 0 ];
 
 						<div class="row d-flex justify-content-between">
 							<span>Added by:</span>
-							<span><a href="members.php?user=<?=$uploader?>"><?=$uploader?></a></span>
+							<span><a href="/member/<?=urlsafe($uploader)?>"><?=$uploader?></a></span>
 						</div>
 						<div class="row d-flex justify-content-between">
 							<span>Viewed:</span>
