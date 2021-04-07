@@ -87,7 +87,7 @@ require_once "header.php";
 					<?=(int)$crew->releases?>
 				</div>
 				<div class="col-2">
-					<?=(int)$crew->rating !== 0 ? round($crew->rating, 2) : ''?>
+					<?=(int)$crew->rating !== 0 ? sprintf("%0.2f", $crew->rating) : ''?>
 				</div>
 			</div>
 			<?php
