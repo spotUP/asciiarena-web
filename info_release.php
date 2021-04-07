@@ -862,7 +862,7 @@ if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ])))
 		<script>
 		AnsiLove.render("<?php echo "/collections/{$dirname}/{$filename}"; ?>", function (canvas, sauce) {
 		    document.getElementById("colly").appendChild(canvas);
-		}, {"font": "Amiga mOsOul", "bits": "8", "icecolors": 1, "columns": 80, "thumbnail": 0, "filetype": "ans"});
+		}, {"font": "mosoul", "bits": "8", "icecolors": 1, "columns": 80, "thumbnail": 0, "filetype": "ans"});
 		</script>
 <?php
 	}
