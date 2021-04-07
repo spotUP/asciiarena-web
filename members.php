@@ -1,10 +1,10 @@
 <?php
 require_once "session.php";
 
-$user_id = $_current[ 0 ] ?? 0;
-$member = fetchOne("SELECT * FROM users WHERE id = :id", [":id" => $user_id], ["password", "pwhash", "temp_pw_hash"]);
+$nickurl = $_GET['member'];
+$member = fetchOne("SELECT * FROM users WHERE nickurl = :nickurl", [":nickurl" => $nickurl], ["password", "pwhash", "temp_pw_hash"]);
 
-if(empty($member->id)) {
+if(!isset($_GET['member']) || empty($member->id)) {
 	header("Location: /");
 	exit();
 }
