@@ -38,7 +38,7 @@ include "header.php";
 			$show_active=$row->active;
 			$show_rating=$row->rating;	
 			$show_acronym=$row->acronym;	
-			$show_rating = round($show_rating, 2);
+			$show_rating = sprintf("%0.2d", $row->rating);
 
 			?>	
 
@@ -95,8 +95,7 @@ include "header.php";
 					$result_crew_rating=fetchAll($ask_crew_rating, [ 'showcrew' => $showcrew ] );
 					foreach($result_crew_rating as $row_crew_rating)
 					{
-						$crewrating=$row_crew_rating->rating;
-						$crewrating = round($crewrating, 2);
+						$crewrating = sprintf("%0.2f", $row_crew_rating->rating);
 					}
 
 					if(empty($show_rating))
@@ -200,8 +199,7 @@ include "header.php";
 				$result_artist_rating=fetchAll($ask_artist_rating, [ 'crewmember' => $crewmember ]);
 				foreach($result_artist_rating as $row_artist_rating)
 				{
-					$artistrating=$row_artist_rating->rating;
-					$artistrating = round($artistrating, 2);
+					$artistrating = sprintf("%0.2f", $row_artist_rating->rating);
 				}
 
 				if(empty($artistrating))
@@ -461,7 +459,7 @@ include "header.php";
 					<div class="row d-flex justify-content-between">
 						<span>Added by:</span>
 
-						<a href="/members.php?user=<?=$uploader?>"><?=$uploader?></a>
+						<a href="/member/<?=urlsafe($uploader)?>"><?=$uploader?></a>
 					</div>
 
 					<div class="row d-flex justify-content-between">

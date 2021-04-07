@@ -192,60 +192,9 @@ include "header.php";
 			doQuery("update users set uploaded = :pumped where nick = :nick", [":nick" => $nick, ":pumped" => $pumped]);
 
 //---------------------------------------------------------------------------------------------------------------
-// RECALCULATE RATINGS FOR ARTISTS
-//---------------------------------------------------------------------------------------------------------------
-
-			$ask="select nick from author_of";
-			$result=fetchAll($ask);
-			foreach ($result as $row)
-			{
-				$artist=$row->nick;
-
-				$ask_avg="select avg(rating) AS avg_rating from comments where artist= :artist and rating > 0";
-				$result_avg=fetchAll($ask_avg, ['artist' => $artist]);
-				foreach ($result_avg as $row_avg)
-				{
-					$avg_artist_rating=$row_avg->avg_rating;
-				}
-				
-				$ask_rate_amount="SELECT COUNT(rating) AS count_rating from comments where artist=:artist and rating>0";
-				$result_rate_amount=fetchAll($ask_rate_amount,[ 'artist' => $artist ]);
-				foreach ($result_rate_amount as $row_rate_amount)
-				{
-					$rate_amount=$row_rate_amount->count_rating;
-				}
-
-				if ($rate_amount >2)
-				{
-					$ask_update="update artists set rating=:avg_artist_rating where nick=:artist";
-					doQuery($ask_update, [ 'artist' => $artist, 'avg_artist_rating' => $avg_artist_rating]);	
-				}
-			}
-
-//---------------------------------------------------------------------------------------------------------------
-// RECALCULATE RATINGS FOR CREWS
-//---------------------------------------------------------------------------------------------------------------
-
-			$ask="select name from crews";
-			$result=fetchAll($ask);
-			foreach ($result as $row)
-			{
-				$crew=$row->name;
-
-			# FIXME: Probably fetchOne ?
-				$ask_rating="select avg(rating) AS avg_rating from comments where crew=:crew and rating>0";
-				$result_rating=fetchAll($ask_rating, ['crew' => $crew ]);
-				foreach ($result_rating as $avg_crew_rating)
-				{
-					$avg_crew_rating=$row_rating->avg_rating;
-				}
-				if(!isset($avg_crew_rating))
-				{
-					$avg_crew_rating=0;
-				}	
-				$ask_update="update crews set rating=:avg_crew_rating where name=:crew ";
-				doQuery($ask_update,['avg_crew_rating' => $avg_crew_rating, 'crew' => $crew]);	
-			}
+// RECALCULATE RATINGS
+//--------------------------------------------------------------------------------------------------------------
+			recalculate_ratings();
 			?>
 			<div class="bs-component">
 				<div class="animate__animated animate__tada alert alert-dismissible alert-success">
@@ -409,25 +358,7 @@ if(isset($_POST['edit_colly_day']) && is_admin())
 // RECALCULATE RATINGS
 //---------------------------------------------------------------------------------------------------------------
 
-
-$ask="update artists a
-inner join (
-select avg(rating) as avgrating, artist from comments
-where rating>0 group by artist
-) as r on a.nick=r.artist
-set a.rating = r.avgrating";
-doQuery($ask);
-
-$ask="update crews c
-inner join (
-select avg(rating) as avgrating, crew from comments
-where rating>0 group by crew
-) as r on c.name=r.crew
-set c.rating = r.avgrating";
-doQuery($ask);
-
-$ask="select crew from crew_of";
-$result=fetchAll($ask);
+recalculate_ratings();
 ?>
 <meta http-equiv="Refresh" content="0"; url="admin.php">
 <?php
