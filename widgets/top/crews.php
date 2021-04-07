@@ -5,7 +5,7 @@
 <?php
 	foreach (fetchAll("SELECT name, rating FROM crews ORDER BY rating DESC LIMIT 5") as $row) {
 		$crew_ratings = $row->rating;
-		$crew_ratings = round($crew_ratings, 2);
+		$crew_ratings = sprintf("%0.2f", $row->rating);
 		$crew = $row->name;
 
 		?>
