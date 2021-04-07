@@ -402,3 +402,28 @@ function urlsafe($string) {
    $string = preg_replace('/-+/', '-', $string);
    return $string;
 }
+
+//-----------------------------------------------------------
+// FUNCTION: recalculate crew & artist ratings
+//-----------------------------------------------------------
+
+function recalculate_ratings() {
+	$ask = 'update artists a set a.rating=0';
+	doQuery($ask);
+	$ask = 'update artists a
+			inner join (
+				select round(avg(rating),2) as avgrating, artist, count(*) as cnt from comments 
+				where rating>0 group by artist having cnt>2
+			) as r on a.nick=r.artist
+		set a.rating = r.avgrating';
+	doQuery($ask);
+	$ask = 'update crews c set c.rating=0';
+	doQuery($ask);
+	$ask = 'update crews c
+			inner join (
+				select round(avg(rating),2) as avgrating, crew, count(*) as cnt from comments
+				where rating>0 group by crew having cnt>1
+			) as r on c.name=r.crew
+		set c.rating = r.avgrating';
+	doQuery($ask);
+}
