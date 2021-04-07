@@ -205,55 +205,11 @@ require_once "header.php"; ?>
 				}
 
 //----------------------------------------------------------------------------------------------
-// CALCULATE RATING FOR CREW
+// CALCULATE RATING
 //----------------------------------------------------------------------------------------------
+//
+				recalculate_ratings();
 
-				$ask_rate_amount = "SELECT COUNT(rating) AS count from comments where crew=:crew and rating>0";
-				$result_rate_amount = fetchOne($ask_rate_amount, [ 'crew' => $crew ]);
-				if ($row_rate_amount = $result_rate_amount) 
-				{
-					$rate_amount = $row_rate_amount->count;
-				}
-				if ($rate_amount > 2) 
-				{
-					$ask = "select avg(rating) AS avg from comments where crew=:crew and rating>0";
-					$result = fetchOne($ask, [ 'crew' => $crew ]);
-					if ($row = $result) 
-					{
-						$avgcrewrating = $row->avg;
-					}
-
-					$ask = "update crews set rating=:avgcrewrating where name=:crew";
-					doQuery($ask, [ 'crew' => $crew, 'avgcrewrating' => $avgcrewrating ]);
-				}
-
-//----------------------------------------------------------------------------------------------
-// CALCULATE RATING FOR ARTISTS
-//----------------------------------------------------------------------------------------------
-
-				$ask = "select nick from author_of where filename=:filename";
-				$result = fetchOne($ask, [ 'filename' => $filename ]);
-				if (isset($result)) 
-				{
-					$artist = $result->nick;
-				}
-				$ask = "select avg(rating) as rating from comments where artist=:artist and rating>0";
-				$result = fetchOne($ask, [ 'artist' => $artist ]);
-				if (isset($result)) 
-				{
-					$avg_artist_rating = $result->rating;
-				}
-				$ask = "SELECT COUNT(rating) as cnt from comments where artist=:artist and rating>0";
-				$result = fetchOne($ask, [ 'artist' => $artist ]);
-				if (isset($result)) 
-				{
-					$rate_amount = $result->cnt;
-				}
-				if ($rate_amount > 2) 
-				{
-					$ask = "update artists set rating=:rating where nick=:nick";
-					doQuery($ask, [ 'rating' => $avg_artist_rating, 'nick' => $artist ]);
-				}
 			}
 
 //----------------------------------------------------------------------------------------------
