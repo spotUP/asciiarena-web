@@ -459,7 +459,7 @@ include "header.php";
 					<div class="row d-flex justify-content-between">
 						<span>Added by:</span>
 
-						<a href="/members.php?user=<?=$uploader?>"><?=$uploader?></a>
+						<a href="/member/<?=urlsafe($uploader)?>"><?=$uploader?></a>
 					</div>
 
 					<div class="row d-flex justify-content-between">

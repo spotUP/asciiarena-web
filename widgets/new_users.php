@@ -7,7 +7,7 @@
 		$join_date = date("y-m-d", $row->joined);
 		?>
 		<div class="col-lg-12 d-flex justify-content-between">
-			<a class="yellow" href="members/<?=$row->id?>"><?=$row->nick?></a>
+			<a class="yellow" href="/member/<?=urlsafe($row->nick)?>"><?=$row->nick?></a>
 			<?=$join_date?>
 		</div>
 		<?php

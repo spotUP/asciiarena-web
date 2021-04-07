@@ -7,7 +7,7 @@
 		$kb = round($row->uploaded / 1000);
 		?>
 		<div class="col-lg-12 d-flex justify-content-between">
-			<a href="/members/<?=$row->id?>"><?=$row->nick?></a>
+			<a href="/member/<?=urlsafe($row->nick)?>"><?=$row->nick?></a>
 			<?=$kb?>kB
 		</div>
 		<?php
