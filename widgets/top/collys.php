@@ -4,13 +4,9 @@
 	</div>
 <?php
 	foreach (fetchAll("SELECT * FROM collys ORDER BY rating DESC LIMIT 5") as $row) {
-		$filename = $row->filename;
-		$filename = str_replace("&#39;", "'", $filename);        // replace ' with &#39
-		$filename = myTruncate($filename, 12);            // truncate
-		$filename = str_replace("'", "&#39;", $filename);        // replace ' with &#39
+		$filename = htmlentities($row->filename);
 		$decodedfilename = base64_encode($row->filename);
-		$colly_rating = $row->rating;
-		$colly_rating = round($colly_rating, 2);
+		$colly_rating = sprintf("%0.2f", $row->rating)
 		?>
 		<div class="col-lg-12 d-flex justify-content-between">
 			<a class="magenta" href="/info_release.php?filename=<?=$decodedfilename?>"><?=$filename?></a>
