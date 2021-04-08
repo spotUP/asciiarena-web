@@ -9,4 +9,4 @@
 //		"arena_stats",
 		"new_users"
 	], false);
-
+?>
