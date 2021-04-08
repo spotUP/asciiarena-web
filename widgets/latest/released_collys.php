@@ -8,14 +8,12 @@
 		foreach (fetchAll("SELECT * FROM collys ORDER BY year DESC, month DESC, day DESC, timestamp DESC limit {$limit}") as $row) 
 		{
 			$latestreleased = $row->filename;
-			$latestreleased = str_replace("&#39;", "'", $latestreleased);        // replace ' with &#39
 			$latestreleased = myTruncate($latestreleased, 12);            // truncate
-			$latestreleased = str_replace("'", "&#39;", $latestreleased);        // replace ' with &#39
 			$release_year = $row->year;
 			$release_year = substr($release_year, 2);
 			$release_month = $row->month;
 			$release_day = $row->day;
-			$filename = base64_encode($row->filename);
+			$filename = $row->filename;
 			if (empty($release_year)) 
 			{
 				$release_year = "xx";
@@ -41,7 +39,7 @@
 
 			?>
 			<div class="col-lg-12 d-flex justify-content-between">
-				<a class="magenta" href="/info_release.php?filename=<?=$filename?>"><?=$latestreleased?></a>
+				<a class="magenta" href="/release/<?=$filename?>"><?=$latestreleased?></a>
 				<?=$release_year?>-<?=$release_month?>-<?=$release_day?>
 			</div>
 			<?php

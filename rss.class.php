@@ -49,10 +49,9 @@ class RSS
 		$items = '';
 		foreach($result as $row)
 		{
-			$encodedfilename = base64_encode($row->filename);
 			$items .= '<item>
 				<title>'. $row->id .' ('. $row->filename .')</title>
-				<link>https://www.asciiarena.se/info_release.php?filename='.$encodedfilename.' </link>
+				<link>https://www.asciiarena.se/release/'.$row->filename.' </link>
 				<description></description>
 			</item>';
 		}

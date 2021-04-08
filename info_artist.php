@@ -260,7 +260,7 @@ foreach (fetchAll($q, $p) as $row) {
         Filename:
       </span>
       <span>
-        <a href="info_release.php?filename=<?=$encoded_filename?>" ><?=$row['filename']?></a>
+        <a href="/release/<?=$filename?>" ><?=$row['filename']?></a>
       </span>
     </div>
 
@@ -436,11 +436,11 @@ foreach (fetchAll($q, $p) as $row) {
  ?>
  <div class="col-lg-12 d-flex justify-content-between pl-0">
   <div class="col-lg-3 pl-0">
-    <a class="magenta" href="info_release.php?filename=<?=$encoded_filename?>" ><?=$filename?></a>
+    <a class="magenta" href="/release/<?=$filename?>" ><?=$filename?></a>
   </div>
 
   <div class="col-lg-3 pl-0">            
-    <a class="magenta" href="info_release.php?filename=<?=$encoded_filename?>" ><?=$name?></a> 
+    <a class="magenta" href="/release/<?=$filename?>" ><?=$name?></a> 
   </div>
   <div class="col-lg-3 pl-0">            
     <a href="/crew/<?=urlsafe($crew)?>/"> <?=$crew?></a>
