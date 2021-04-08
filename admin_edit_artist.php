@@ -119,7 +119,7 @@ if(isset($_POST['getartist']) && is_admin())
 						if (!empty($show_artist_country))
 						{
 							?>
-							<option selected value="$symbol"><?=$show_artist_country?></option>
+							<option selected value="<?=$symbol?>"><?=$show_artist_country?></option>
 							<?php
 						}
 						else
@@ -131,7 +131,7 @@ if(isset($_POST['getartist']) && is_admin())
 						foreach($country_list as $symbol => $country)
 						{
 							?>
-							<option value="<?=$symbol?>">$country</option>
+								<option value="<?=$symbol?>"><?=$country?></option>
 							<?php
 						}
 						?>
