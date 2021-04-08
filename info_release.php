@@ -1,25 +1,24 @@
 <?php
 require_once "session.php";
+
+$filename = $_GET['filename'];
+$_SESSION['filename'] = $filename;
+$nick = $_user['nick'];
+$filename = preg_replace('/\.\.+/', '', $filename);
+
 require_once "header.php"; ?>
 
 <div id="blacker"></div>
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
 		<?php
-		$decoded_filename = $_GET[ 'filename' ] ?? "";
-		$filename = base64_decode($decoded_filename);
-		$_SESSION[ 'filename' ] = $filename;
 
-		$nick = $_user['nick'];
 		$time = time();
 		$comment = $_POST[ 'comment' ] ?? "";
-
 		$user_added_rating = $_POST[ 'user_added_rating' ] ?? "";
 
 		if (isset($_POST[ 'favourite' ]) && is_logged_in()) 
 		{
-			$decoded_filename = $_GET[ 'filename' ] ?? "";
-			$filename = base64_decode($decoded_filename);
 			doQuery("INSERT INTO favourites (user_id, colly_id, nick, filename)
 				VALUES (:user_id, (select id from collys where filename=:filename), :nick, :filename)",
 				[":user_id" => $_user["id"], ":nick" => $nick, ":filename" => $filename]);
@@ -39,11 +38,8 @@ require_once "header.php"; ?>
 
 			if (isset($_POST[ 'broken' ])) 
 			{
-				$filename = $_GET[ 'filename' ] ?? "";
-				$decoded_filename = base64_decode($filename);
-
 				?>
-				<form action="info_release.php?filename=<?=$filename?>" method="post">
+				<form action="/release/<?=$filename?>" method="post">
 					<div class="container-fluid bg-secondary amb-1 apb-1">
 						<div class="row">
 							<div class="col-12 amt-1">
@@ -66,12 +62,10 @@ require_once "header.php"; ?>
 			}
 			if (isset($_POST[ 'do_report_broken' ])) 
 			{
-				$filename = $_GET[ 'filename' ] ?? "";
-				$decoded_filename = base64_decode($filename);
 				$broken_comment = $_POST[ 'broken_comment' ] ?? "";
 				doQuery("UPDATE collys SET broken = 1, broken_comment = :comment WHERE filename = :filename", [
 					":comment" => $broken_comment,
-					":filename" => $decoded_filename
+					":filename" => $filename
 				]);
 				?>
 				<div class="row">
@@ -79,7 +73,7 @@ require_once "header.php"; ?>
 						<div class="bs-component aml-1 amb-1">
 							<div class="alert alert-dismissible alert-success">
 								<button type="button" class="close" data-dismiss="alert">x</button>
-								You reported <?=$decoded_filename?> as broken!
+								You reported <?=$filename?> as broken!
 							</div>
 						</div>
 					</div>
@@ -104,7 +98,7 @@ require_once "header.php"; ?>
 					]);
 				}
 
-				header("Location: {$_SERVER[PHP_SELF]}?filename={$decoded_filename}");
+				header("Location: /release/".$filename);
 				exit;
 			}
 
@@ -132,12 +126,9 @@ require_once "header.php"; ?>
 
 				if (isset($_POST[ 'comment' ]) && (isset($_GET[ 'comment' ]))) 
 				{
-					$comment = cleanInsertPost($comment);
-
 					if (empty($comment))
 					{
 						$comment = "$nick voted $user_added_rating";
-						$comment = cleanInsertPost($comment);
 					}
 
 					$ask = "select nick from author_of where filename=:filename";
@@ -221,7 +212,6 @@ require_once "header.php"; ?>
 				if ($rank = "Admin") 
 				{
 					$commentid = $_POST[ 'commentid' ];
-					$commentid = cleanInsert($commentid);
 					$ask = "DELETE FROM comments where filename=:filename and commentid=:commentid";
 					doQuery($ask, [ 'filename' => $filename, 'commentid' => $commentid ]);
 				}
@@ -330,7 +320,6 @@ require_once "header.php"; ?>
 				if (isset($_POST[ 'old_colly_authors' ]) || (isset($_POST[ 'colly_author' ]) && $nick == "$uploader") || (isset($_POST[ 'colly_author' ]) && $rank == "Admin")) 
 				{
 					$filename = $_POST[ 'filename' ];
-					$filename = cleanInsert($filename);
 
 					$ask = "delete from author_of where filename=:filename";
 					doQuery($ask, [ 'filename' => $filename] );
@@ -416,7 +405,6 @@ require_once "header.php"; ?>
 				{
 					$filename = $_POST[ 'filename' ];
 					$edit_colly_type = $_POST[ 'edit_colly_type' ];
-					$edit_colly_type = cleanInsert($edit_colly_type);
 
 					$ask = "update collys set type=:type where filename=:filename";
               				doQuery($ask, ['type' => $edit_colly_type, 'filename' => $filename]);
@@ -492,7 +480,7 @@ require_once "header.php"; ?>
 					$encoded_filename = base64_encode($row->filename);
 				}
 				?>
-				<form enctype="multipart/form-data" action="info_release.php?filename=<?=$encoded_filename?>" method="post">
+				<form enctype="multipart/form-data" action="/release/<?=$encoded_filename?>" method="post">
 
 					<div class="row">
 						<div class="col-12"><h1 class="ap-1 bg-header">Edit ASCII Collection</h1></div>
@@ -680,7 +668,7 @@ require_once "header.php"; ?>
 					</script>
 
 					<?php
-					echo "<form action='$_SERVER[PHP_SELF]?filename=$decoded_filename' method='post'  id='ctrlForm'>";
+					echo "<form action='/release/".$filename."' method='post'  id='ctrlForm'>";
 
 					echo "<input type='submit' class='btn-big amb-1' name='hide' value='Hide Colly!'" . ((!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) ? " style='display:none'" : "") . "> ";
 					echo "<input type='submit' class='btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s' name='view' value='View Colly'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
@@ -881,7 +869,7 @@ if (!isset($_POST[ 'edit' ]))
 		$commentid = $row->commentid;
 		$commenttime = date("Y-m-d H:i", $row->timestamp);
 
-		echo "<form action='$_SERVER[PHP_SELF]?filename=$decoded_filename&post' method='post'>";
+		echo "<form action='/release/".$filename."&post' method='post'>";
 		if ($userrating > 0) 
 		{
 			if (!is_admin()) 
@@ -1028,7 +1016,7 @@ if (isset($_POST[ 'addcomment' ]))
 		$hasrated = $row->rating;
 		if ($hasrated > 0) 
 		{
-			echo "<form action=\"info_release.php?filename=$decoded_filename&comment\" method=\"post\">";
+			echo "<form action=\"/release/".$filename."&comment\" method=\"post\">";
 			?>
 			<div class="row">
 				<h2>Enter your comment...</h2>
@@ -1047,7 +1035,7 @@ if (isset($_POST[ 'addcomment' ]))
 	}
 	else
 	{
-		echo "<form action=$_SERVER[PHP_SELF]?filename=$decoded_filename&comment method=\"post\">";
+		echo "<form action=\"/release/".$filename."&comment\" method=\"post\">";
 		?>
 		<div class="row apl-1 apr-1">
 			<div class="header bg-header col-12 ap-1">ENTER YOUR COMMENT</div>
@@ -1089,8 +1077,8 @@ if (isset($_POST[ 'addcomment' ]))
 
 if (isset($_POST[ 'edit' ])) 
 {
-	echo "<form action=\"$_SERVER[PHP_SELF]?filename=$decoded_filename&comment\" method=\"post\">";
-	$commentid = cleanInsert($_POST[ 'commentid' ]);
+	echo "<form action=\"/release/".$filename."&comment\" method=\"post\">";
+	$commentid = $_POST[ 'commentid' ];
 
 	$ask = "select comment from comments where commentid=:commentid";
 	$result = fetchAll($ask, [ 'commentid' => $commentid ]);
@@ -1098,7 +1086,7 @@ if (isset($_POST[ 'edit' ]))
 	{
 		$comment = fixOutputEdit($row->comment);
 	}
-	echo "<form action=$_SERVER[PHP_SELF]?filename=$decoded_filename&comment method=\"post\">";
+	echo "<form action=\"/release/".$filename."&comment\" method=\"post\">";
 	?>
 	<div class="headline">
 		Edit Your Comment...

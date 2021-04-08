@@ -11,14 +11,13 @@
 		foreach ($result as $row)
 		{
 			$filename=$row->filename;
-			$encoded_filename=base64_encode($filename);
 			$broken_comment=$row->broken_comment;
 
 			?>
 	<form enctype="multipart/form-data" action="#broken" method="post">
 				<div class="row apb-1">
 					<div class="col-12">
-						<h1 class="ap-1 bg-header"><a href="info_release.php?filename=<?=$encoded_filename?>"><?=$filename?></a></h1>
+						<h1 class="ap-1 bg-header"><a href="/release/<?=$filename?>"><?=$filename?></a></h1>
 					</div>
 				</div>
 
