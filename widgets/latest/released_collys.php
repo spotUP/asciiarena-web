@@ -3,7 +3,7 @@
 	<div class="header col-lg-12 m-0 p-0">
 		<h2 class="ap-1 bg-header"><a href="/collys.php?sort_by=releasedate">NEW COLLYS</a> <a href='/rss.php?id=0'>[RSS]</a></h2>
 	</div>
-	<div class="container bg-green m-0 p-0 apt-1 apb-1 bg-secondary">
+	<div class="container m-0 p-0 apt-1 apb-1 bg-secondary">
 		<?php
 		foreach (fetchAll("SELECT * FROM collys ORDER BY year DESC, month DESC, day DESC, timestamp DESC limit {$limit}") as $row) {
 			$latestreleased = $row->filename;
