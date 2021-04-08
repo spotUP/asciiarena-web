@@ -27,6 +27,7 @@
 				<?=$upload_date?>
 			</div>
 			<?php
-			?>
-		</div>
+		}
+		?>
 	</div>
+</div>
