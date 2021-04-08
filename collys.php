@@ -81,12 +81,10 @@ switch ($sort_by) {
 				<?php
 				foreach ($rows as $row) {
 					$filename = $row->filename;
-					$encoded_filename = base64_encode($filename);
 					$name = $row->name;
 					$type = $row->type;
 					$uploader = $row->uploader;
 					$file_id = $row->file_id;
-					$encoded_filename = base64_encode($row->filename);
 					$upload_date = $row->timestamp;
 					$upload_date = date("d.m.y", $upload_date);
 					$dirname = explode(".", $filename);
@@ -105,7 +103,7 @@ switch ($sort_by) {
 								?>
 							</div>
 							<div class="col-6 apb-1" style="margin-top: -16px;">				
-								<pre style="overflow: hidden;"><a class="magenta ascii" href="info_release.php?filename=<?=$encoded_filename?>"><?=$orig?></a></pre>
+								<pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$filename?>"><?=$orig?></a></pre>
 							</div>
 						</div>
 						<div class="row apb-1">
@@ -137,7 +135,7 @@ switch ($sort_by) {
 					?>
 					<div class="row">
 						<div class="col-4 text-truncate">
-							<a href="info_release.php?filename=<?=base64_encode($row->filename)?>"><?=$row->name?></a>
+							<a href="/release/<?=$row->filename?>"><?=$row->name?></a>
 						</div>
 						<div class="col-lg-4 green">
 							<span class="yellow"><?=combinize($row->artists, $row->artist_ids, "/artist/", $row->artists)?></span>
@@ -186,7 +184,7 @@ switch ($sort_by) {
 											}
 											?>
 											<div class="col-4 text-truncate">
-												<a class="magenta" href="info_release.php?filename=<?=base64_encode($row->filename)?>"><?=$row->name?></a>
+												<a class="magenta" href="/release/<?=$row->filename?>"><?=$row->name?></a>
 											</div>
 											<div class="col-2">
 												<span class="yellow"><?=$row->filename?></span>
@@ -217,12 +215,10 @@ switch ($sort_by) {
 									$ask = "SELECT collys.*, author_of.nick, crew_of.crew FROM collys LEFT JOIN author_of ON collys.id = author_of.colly_id LEFT JOIN crew_of ON collys.id = crew_of.colly_id GROUP BY collys.filename ORDER BY :criteria DESC {$limit}";
 									foreach (fetchAll($ask, [":criteria" => $sort_criteria]) as $row) {
 										$filename = $row->filename;
-										$encoded_filename = base64_encode($filename);
 										$name = $row->name;
 										$type = $row->type;
 										$uploader = $row->uploader;
 										$file_id = $row->file_id;
-										$encoded_filename = base64_encode($row->filename);
 										$upload_date = $row->timestamp;
 										$upload_date = date("d.m.y", $upload_date);
 										$year = $row->year;
@@ -261,7 +257,7 @@ switch ($sort_by) {
 													?>
 												</div>
 												<div class="col-6 apb-1" style="margin-top: -16px;">				
-													<pre style="overflow: hidden;"><a class="magenta ascii" href="info_release.php?filename=<?=$encoded_filename?>"><?=$orig?></a></pre>
+													<pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$filename?>"><?=$orig?></a></pre>
 												</div>
 											</div>
 											<div class="row apb-1">
