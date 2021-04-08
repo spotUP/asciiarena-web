@@ -6,7 +6,8 @@
 	<div class="container bg-green m-0 p-0 apt-1 apb-1 bg-secondary">
 
 		<?php
-		foreach (fetchAll("SELECT id, nick, lastactive FROM users WHERE lastactive > (UNIX_TIMESTAMP()-300) ORDER BY lastactive DESC") as $row) {
+		foreach (fetchAll("SELECT id, nick, lastactive FROM users WHERE lastactive > (UNIX_TIMESTAMP()-300) ORDER BY lastactive DESC") as $row) 
+		{
 			?>
 			<div class="col-lg-12">
 				<a class="yellow" href="/member/<?=urlsafe($row->nick)?>"><?=$row->nick?></a>
@@ -22,4 +23,3 @@
 		</div>
 	</div>
 </div>
-<?php
