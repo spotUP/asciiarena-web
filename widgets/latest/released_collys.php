@@ -1,21 +1,25 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
-	<div class="header col-lg-12">
+<div class="container fluid">
+	<div class="header col-lg-12 m-0 p-0">
 		<h2 class="ap-1 bg-header"><a href="/collys.php?sort_by=releasedate">NEW COLLYS</a> <a href='/rss.php?id=0'>[RSS]</a></h2>
 	</div>
-<?php
-	foreach (fetchAll("SELECT * FROM collys ORDER BY year DESC, month DESC, day DESC, timestamp DESC limit {$limit}") as $row) {
-		$latestreleased = $row->filename;
+	<div class="container bg-green m-0 p-0 apt-1 apb-1 bg-secondary">
+		<?php
+		foreach (fetchAll("SELECT * FROM collys ORDER BY year DESC, month DESC, day DESC, timestamp DESC limit {$limit}") as $row) {
+			$latestreleased = $row->filename;
 
 		$latestreleased = str_replace("&#39;", "'", $latestreleased);        // replace ' with &#39
 		$latestreleased = myTruncate($latestreleased, 12);            // truncate
 		$latestreleased = str_replace("'", "&#39;", $latestreleased);        // replace ' with &#39
 
 		$release_year = $row->year;
+		$release_year = substr($release_year, 2);
+
 		$release_month = $row->month;
 		$release_day = $row->day;
 		$filename = base64_encode($row->filename);
 		if (empty($release_year)) {
-			$release_year = "xxxx";
+			$release_year = "xx";
 		}
 		if (empty($release_month)) {
 			$release_month = "xx";
@@ -39,3 +43,7 @@
 		</div>
 		<?php
 	}
+	?>
+</div>
+</div>
+<?php
