@@ -1,10 +1,13 @@
 <?php defined('VALID') or die('Nuh-uh!');
-	$messages = fetchOne("SELECT COUNT(*) messages FROM messages WHERE postedto = :nick AND new = 1", [":nick" => $_user[ "nick" ]])->messages;
-	if (!$messages) {
-		return;
-	}
+$messages = fetchOne("SELECT COUNT(*) messages FROM messages WHERE postedto = :nick AND new = 1", [":nick" => $_user[ "nick" ]])->messages;
+if (!$messages) {
+	return;
+}
 ?>
-<div class="header col-12"><h2 class="ap-1 bg-header">ALERT!</h2></div>
-<div class="col-12">
-	<a class="lightgreen" href="messages.php">You have <?=$messages?> new message<?=($messages > 1) ? "s" : ""?></a>
+
+<div class="bs-component col-12">
+	<div class="animate__animated animate__bounce animate__delay-2s alert alert-dismissible alert-primary bg-secondary">
+		<button type="button" class="close" data-dismiss="alert">x</button>
+		<a class="cyan" href="messages.php">You have <?=$messages?> new message<?=($messages > 1) ? "s" : ""?></a>
+	</div>
 </div>

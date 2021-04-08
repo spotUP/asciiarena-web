@@ -6,6 +6,7 @@ include "header.php";
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
 		<?php widgets([
+			"message_alerts",
 			["file" => "latest/releases", "header" => "LATEST RELEASES", "columns" => 2],
 			["file" => "wall", "header" => "WALL OF FAME"],
 			["file" => "cedd_sessions", "header" => "ACTIVE CEDD ONLINE SESSIONS"],
