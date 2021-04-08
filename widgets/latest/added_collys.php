@@ -22,9 +22,8 @@
 			<a class="magenta" href="/info_release.php?filename=<?=$encodedfilename?>"><?=$filename?></a>
 			<?=$upload_date?>
 		</div>
-		<?php
-	}
-	?>
-</div>
+		<?php}
+		?>
+	</div>
 </div>
 <?php

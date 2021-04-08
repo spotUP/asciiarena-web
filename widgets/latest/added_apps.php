@@ -22,9 +22,7 @@
 			<a class="magenta" href="/apps.php?sort_by=timestamp DESC"><?=$filename?></a>
 			<?=$upload_date?>
 		</div>
-		<?php
-	}
-	?>
+		<?php}
+		?>
+	</div>
 </div>
-</div>
-<?php
