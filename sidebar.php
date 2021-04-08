@@ -6,5 +6,5 @@
 		"latest/released_collys",
 		"latest/added_collys",
 		"latest/added_mags",
-		"latest/added_apps"
+//		"latest/added_apps"
 	]);
