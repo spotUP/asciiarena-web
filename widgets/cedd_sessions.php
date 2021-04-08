@@ -62,7 +62,6 @@
 			<a class="disabled" href="#">Join</a>
 		</div>
 	</div>
-
 	<div class="row apl-1 apr-1">
 		<div class="col-4 text-truncate">
 			<span class="cyan">aSCIIaRENA Logo Session</span>
@@ -97,6 +96,5 @@
 			<a href="#">Join</a>
 		</div>
 	</div>
-
 </div>
 

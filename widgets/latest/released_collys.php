@@ -5,7 +5,8 @@
 	</div>
 	<div class="container m-0 p-0 apt-1 apb-1 bg-secondary">
 		<?php
-		foreach (fetchAll("SELECT * FROM collys ORDER BY year DESC, month DESC, day DESC, timestamp DESC limit {$limit}") as $row) {
+		foreach (fetchAll("SELECT * FROM collys ORDER BY year DESC, month DESC, day DESC, timestamp DESC limit {$limit}") as $row) 
+		{
 			$latestreleased = $row->filename;
 
 		$latestreleased = str_replace("&#39;", "'", $latestreleased);        // replace ' with &#39
@@ -18,21 +19,26 @@
 		$release_month = $row->month;
 		$release_day = $row->day;
 		$filename = base64_encode($row->filename);
-		if (empty($release_year)) {
+		if (empty($release_year)) 
+		{
 			$release_year = "xx";
 		}
-		if (empty($release_month)) {
+		if (empty($release_month)) 
+		{
 			$release_month = "xx";
 		}
-		if (empty($release_day)) {
+		if (empty($release_day)) 
+		{
 			$release_day = "xx";
 		}
 
-		if (($release_month < 10) && ($release_month !== "xx")) {
+		if (($release_month < 10) && ($release_month !== "xx")) 
+		{
 			$release_month = "0$release_month";
 		}
 
-		if (($release_day < 10) && ($release_day !== "xx")) {
+		if (($release_day < 10) && ($release_day !== "xx")) 
+		{
 			$release_day = "0$release_day";
 		}
 
@@ -46,4 +52,3 @@
 	?>
 </div>
 </div>
-<?php
