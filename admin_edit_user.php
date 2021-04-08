@@ -204,5 +204,6 @@ if(isset($_POST['getuser']) && is_admin())
 			</div>
 			<?php
 		} 
-		?>
+	}
+	?>
 </div>

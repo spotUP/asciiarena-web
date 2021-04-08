@@ -455,28 +455,24 @@ if(isset($_POST['do_change_crew']) && is_admin())
 			if(isset($_POST['edit_artist_nick']) && is_admin())
 			{
 				$artist=$_POST['getartist'];
-				$artist=cleanInsert($artist);
 
 				$edit_artist_nick=$_POST['edit_artist_nick'];
-				$edit_artist_nick = cleanInsert($edit_artist_nick); 
 
 				$ask="update artists   set nick=:edit_artist_nick where nick=:artist";	
 				doQuery($ask,['edit_artist_nick' => $edit_artist_nick, 'artist' => $artist]);	
 
-				$ask="update member_of set nick=:edit_artist_nick' where nick=:artist";	
+				$ask="update member_of set nick=:edit_artist_nick where nick=:artist";	
 				doQuery($ask,['edit_artist_nick' => $edit_artist_nick, 'artist' => $artist]);	
 
-				$ask="update author_of set nick=:edit_artist_nick' where nick=:artist";	
+				$ask="update author_of set nick=:edit_artist_nick where nick=:artist";	
 				doQuery($ask,['edit_artist_nick' => $edit_artist_nick, 'artist' => $artist]);	
 
 			}
 			if(isset($_POST['edit_artist_www']) && is_admin())
 			{
 				$artist=$_POST['getartist'];
-				$artist=cleanInsert($artist);
 
 				$edit_artist_www=$_POST['edit_artist_www'];
-				$edit_artist_www = cleanInsert($edit_artist_www); 
 
 				$ask="update artists set www=:edit_artist_www where nick=:edit_artist_nick";	
 				doQuery($ask,['edit_artist_www' => $edit_artist_www, 'edit_artist_nick' => $edit_artist_nick]);	
@@ -484,10 +480,8 @@ if(isset($_POST['do_change_crew']) && is_admin())
 			if(isset($_POST['edit_artist_status']) && is_admin())
 			{
 				$artist=$_POST['getartist'];
-				$artist=cleanInsert($artist);
 
 				$edit_artist_status=$_POST['edit_artist_status'];
-				$edit_artist_status = cleanInsert($edit_artist_status); 
 
 				$ask="update artists set active=:edit_artist_status where nick=:edit_artist_nick";	
 				doQuery($ask, ['edit_artist_status' => $edit_artist_status, 'edit_artist_nick' => $edit_artist_nick]);	
@@ -495,24 +489,23 @@ if(isset($_POST['do_change_crew']) && is_admin())
 			if(isset($_POST['old_artist_crews']) || (isset($_POST['artist_crew']) && is_admin()))
 			{
 				$artist=$_POST['getartist'];
-				$artist=cleanInsert($artist);
 
 				$ask="delete from member_of where nick=:edit_artist_nick";
 				doQuery($ask, ['edit_artist_nick' => $edit_artist_nick]);
 
-				if (isset($_POST[old_artist_crews]))			
+				if (isset($_POST['old_artist_crews']))			
 				{
-					foreach($_POST[old_artist_crews] as $artist_crew)
+					foreach($_POST['old_artist_crews'] as $artist_crew)
 					{
-						$ask="insert into member_of values (:artist_crew,:edit_artist_nick)";
+						$ask="insert into member_of (crew, nick) values (:artist_crew,:edit_artist_nick)";
 						doQuery($ask,['artist_crew' => $artist_crew, 'edit_artist_nick' => $edit_artist_nick]);
 					}
 				}
-				if (isset($_POST[artist_crew]))
+				if (isset($_POST['artist_crew']))
 				{
-					foreach($_POST[artist_crew] as $new_artist_crew)
+					foreach($_POST['artist_crew'] as $new_artist_crew)
 					{
-						$ask="insert into member_of values (:new_artist_crew,:edit_artist_nick)";
+						$ask="insert into member_of (crew, nick) values (:new_artist_crew,:edit_artist_nick)";
 						doQuery($ask,['new_artist_crew' => $new_artist_crew, 'edit_artist_nick' => $edit_artist_nick]);
 					}
 				}
@@ -523,8 +516,8 @@ if(isset($_POST['do_change_crew']) && is_admin())
 
 			if(isset($_POST['change_artist_country']) && is_admin())
 			{
-				$artist=cleanInsert($_POST['getartist']);
-				$change_artist_country = cleanInsert($_POST['change_artist_country']); 
+				$artist=$_POST['getartist'];
+				$change_artist_country = $_POST['change_artist_country']; 
 
 				if (!empty($change_artist_country))
 				{
@@ -536,10 +529,8 @@ if(isset($_POST['do_change_crew']) && is_admin())
 			if(isset($_POST['edit_artist_acronym']) && is_admin())
 			{
 				$artist=$_POST['getartist'];
-				$artist=cleanInsert($artist);
 
 				$edit_artist_acronym=$_POST['edit_artist_acronym'];
-				$edit_artist_acronym=cleanInsert($edit_artist_acronym); 
 
 				$ask="update artists set acronym=:edit_artist_acronym where nick=:edit_artist_nick";	
 				doQuery($ask,['edit_artist_acronym' => $edit_artist_acronym, 'edit_artist_nick' => $edit_artist_nick]);	
