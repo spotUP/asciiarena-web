@@ -336,7 +336,6 @@ include "header.php";
 			$viewtimes = $row->view_counter;
 			$year = $row->year;
 			$filename = $row->filename;
-			$encoded_filename=base64_encode($filename);
 			$uploader = $row->uploader;
 			$dirname = explode(".", $filename);
 			$dirname = $dirname[0];
@@ -360,7 +359,7 @@ include "header.php";
 				<div class="col-8">
 					<?php
 					?>	
-					<a class="ascii" href="/info_release.php?filename=<?=$encoded_filename?>"><pre><?=$file_id?></pre></a>
+					<a class="ascii" href="/release/<?=$filename?>"><pre><?=$file_id?></pre></a>
 					<?php
 					?>
 				</div>
@@ -380,7 +379,6 @@ include "header.php";
 						<?php
 							$crews = [];
 							foreach(fetchAll("SELECT * FROM crew_of WHERE filename = :filename GROUP BY crew", [ ':filename' => $filename ]) as $crew) {
-								$encoded_crew = base64_encode($crew->crew_id);
 								$crews[] = "<a href=\"/crew/".urlsafe($crew->crew)."/\">{$crew->crew}</a>";
 							}
 							echo pluralize($crews, '<span class="magenta"> & </span>');
@@ -389,7 +387,7 @@ include "header.php";
 					<div class="row d-flex justify-content-between">
 						Filename:
 
-						<a href="/info_release.php?filename=<?=$encoded_filename?>"><?=mb_strimwidth($row->filename, 0, 12);?></a>
+						<a href="/release/<?=$filename?>"><?=mb_strimwidth($row->filename, 0, 12);?></a>
 					</div>
 					<div class="row d-flex justify-content-between">	
 						<span>Size:</span>
@@ -504,7 +502,6 @@ include "header.php";
 		{
 			if(!empty($row_check->filename))
 			{
-				$encoded_crew=base64_encode($showcrew);
 				?>
 				<h2 class="amb-1 amt-1 ap-1 bg-header">All <?=$show_acronym?> Releases</h2>            
 				<div class="row amt-1 amb-1">
@@ -527,16 +524,16 @@ include "header.php";
 				foreach($result as $row)
 				{
 					$author=$row->author;
-					$encoded_filename=base64_encode($row->filename);
+					$filename=$row->filename;
 					$name=$row->name;
 					$year=$row->year;
 					?>
 					<div class="row">
 						<div class="col-3">
-							<a class="magenta" href="/info_release.php?filename=<?=$encoded_filename?>"><?=mb_strimwidth($row->name, 0, 20, "...");?></a>
+							<a class="magenta" href="/release/<?=$filename?>"><?=mb_strimwidth($row->name, 0, 20, "...");?></a>
 						</div>
 						<div class="col-3">
-							<a class="magenta" href="/info_release.php?filename=<?=$encoded_filename?>"><?=mb_strimwidth($row->filename, 0, 12);?></a>
+							<a class="magenta" href="/release/<?=$filename?>"><?=mb_strimwidth($row->filename, 0, 12);?></a>
 						</div>
 
 						<div class="col-3">

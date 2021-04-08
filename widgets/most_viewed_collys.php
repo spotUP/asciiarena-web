@@ -8,14 +8,11 @@
 		foreach (fetchAll("SELECT * FROM collys ORDER BY view_counter DESC LIMIT 5") as $row) 
 		{
 			$filename = $row->filename;
-			$filename = str_replace("&#39;", "'", $filename);        // replace ' with &#39
 			$filename = myTruncate($filename, 12);            // truncate
-			$filename = str_replace("'", "&#39;", $filename);        // replace ' with &#39
-			$decodedfilename = base64_encode($row->filename);
 			$views = $row->view_counter;
 			?>
 			<div class="col-lg-12 d-flex justify-content-between">
-				<a class="magenta" href="/info_release.php?filename=<?=$decodedfilename?>"><?=$filename?></a>
+				<a class="magenta" href="/release/<?=$filename?>"><?=$filename?></a>
 				<?=$views?>
 			</div>
 			<?php

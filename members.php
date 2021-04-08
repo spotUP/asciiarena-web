@@ -107,7 +107,7 @@ include "header.php";
 				<div class="row">
 					<div class="col-2">
 						<a class="lightgreen"
-						href="/info_release.php?filename=<?=base64_encode($row->filename)?>"><?=myTruncate($row->filename, 12)?></a>
+						href="/release/<?=$row->filename?>"><?=myTruncate($row->filename, 12)?></a>
 					</div>
 					<div class="col-10"><?=myTruncate(fixOutputPost($row->comment, ($row->base64)), 80, " ", "...")?></div>
 				</div>
@@ -131,7 +131,7 @@ include "header.php";
 				?>
 				<div class="row">
 					<div class="col-4">
-						<a href="/info_release.php?filename=<?=base64_encode($row->filename)?>"><?=myTruncate($row->name, 24, " ", "...")?></a>
+						<a href="/release/<?=$row->filename?>"><?=myTruncate($row->name, 24, " ", "...")?></a>
 					</div>
 					<div class="col-4">
 						<?=combinize($row->artists, "", "/artist/", $row->artists)?>
@@ -163,7 +163,7 @@ include "header.php";
 					<div class="row" id="colly-row-<?=$row->colly_id?>">
 						<div class="col-4">
 							<a
-							href="/info_release.php?filename=<?=$encoded_filename?>"><?=myTruncate($row->name, 24, " ", "...")?></a>
+							href="/release/<?=$filename?>"><?=myTruncate($row->name, 24, " ", "...")?></a>
 						</div>
 						<div class="col-4">
 							<?=combinize($row->artists, "", "/artist/", $row->artists)?>
