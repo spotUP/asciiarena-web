@@ -1,4 +1,4 @@
-<?php defined('VALID') or die('Nuh-uh!'); ?>
+<?php //defined('VALID') or die('Nuh-uh!'); ?>
 <div class="container fluid">
 	<div class="header col-lg-12 m-0 p-0">
 		<h2 class="ap-1 bg-header"><a class="lightgreen" href="/apps.php?sort_by=timestamp">LATEST ADDED APPS</a> <a class="lightgreen"	href="/rss.php?class=0">[RSS]</a></h2>
@@ -27,7 +27,8 @@
 				<?=$upload_date?>
 			</div>
 			<?php
-//		}
-		?>
-	</div>
+		}
+	}
+	?>
+</div>
 </div>
