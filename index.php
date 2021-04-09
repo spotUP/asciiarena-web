@@ -9,7 +9,7 @@ include "header.php";
 			"message_alerts",
 			["file" => "latest/releases", "header" => "LATEST RELEASES", "columns" => 2],
 			["file" => "wall"],
-			["file" => "cedd_sessions", "header" => "ACTIVE CEDD ONLINE SESSIONS"],
+			["file" => "cedd_sessions"],
 		]); ?>
 	</div>
 	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">

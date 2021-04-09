@@ -152,11 +152,6 @@ EOD;
 			document.getElementById('new_bbs_field').innerHTML =  document.getElementById('new_bbs_field').innerHTML + newselect; document.getElementById('total_bbses').value =  parseInt( document.getElementById('total_bbses').value) + 1;
 		}
 	</script>
-	<style>
-		.widget .header {
-			margin-bottom: 16px;
-		}
-	</style>
 	<script>
 		window.switchers = [];
 
