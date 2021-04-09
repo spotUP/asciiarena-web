@@ -14,13 +14,12 @@ include "header.php";
 		<?php
 		if (is_logged_in())
 		{
-			include ("submit_check_mag.php");
-			include ("submit_check_mag.php");
 			include ("submit_check_colly.php");
 			include ("submit_check_crew.php");
 			include ("submit_check_artist.php");
 			include ("submit_check_bbs.php");
-//			include ("submit_check_news.php");
+			include ("submit_check_app.php");
+			include ("submit_check_mag.php");
 			?>
 			<div class="row">
 				<div class="col-lg-12">
@@ -38,6 +37,12 @@ include "header.php";
 							<li class="nav-item">
 								<a class="nav-link" data-toggle="tab" href="#bbs">BBS</a>
 							</li>
+							<li class="nav-item">
+								<a class="nav-link" data-toggle="tab" href="#app">APP</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" data-toggle="tab" href="#mag">MAG</a>
+							</li>
 						</ul>
 						<div id="myTabContent" class="tab-content">
 							<?php
@@ -45,8 +50,7 @@ include "header.php";
 							include ("submit_crew.php");
 							include ("submit_artist.php");
 							include ("submit_bbs.php");
-//							include ("submit_app.php");
-//							include ("submit_.php");
+							include ("submit_app.php");
 							?>
 						</div>
 					</div>
