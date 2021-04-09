@@ -8,7 +8,7 @@ include "header.php";
 		<?php widgets([
 			"message_alerts",
 			["file" => "latest/releases", "header" => "LATEST RELEASES", "columns" => 2],
-			["file" => "wall", "header" => "WALL OF FAME"],
+			["file" => "wall"],
 			["file" => "cedd_sessions", "header" => "ACTIVE CEDD ONLINE SESSIONS"],
 		]); ?>
 	</div>
