@@ -15,7 +15,7 @@
 		}
 		foreach ($widgets as $widget) {
 			$file = $widget;
-			[$header, $class] = "";
+			[$header, $class] = "apb-0 amb-0";
 			$style = "margin-bottom: 16px;";
 			$limit = 5;
 			$skip_row = false;
