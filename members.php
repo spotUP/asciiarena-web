@@ -20,11 +20,11 @@ include "header.php";
 		<div class="position-relative">
 			<div class="row">
 				<div class="col-4">
-					<span>Nick: </span>
+					<span class="white">Nick: </span>
 					<span class="yellow"><?=$member->nick?></span>
 				</div>
 				<div class="col-8">
-					<span>Status: </span>
+					<span class="white">Status: </span>
 					<span class="yellow"><?=$member->rank?></span>
 				</div>
 			</div>
@@ -32,13 +32,13 @@ include "header.php";
 				<div class="row">
 					<?php if(!empty($member->crew)) { ?>
 						<div class="col-4">
-							<span>Crew: </span>
+							<span class="white">Crew: </span>
 							<span class="yellow"><?=$member->crew?></span>
 						</div>
 					<?php }
 					if(!empty($member->country)) { ?>
 						<div class="col-8">
-							<span>Country: </span>
+							<span class="white">Country: </span>
 							<span class="yellow"><?=$country_list[ $member->country ]?></span>
 						</div>
 					<?php } ?>
@@ -98,9 +98,10 @@ include "header.php";
 		</div>
 		<?php if(!empty($comment_amount)) {
 			?>
-			<div class="row" style="margin-top: 16px; margin-bottom: 16px;">
+			<div class="row">
 				<div class="col-12"><h2 class="ap-1 bg-header">Last 10 comments by <?=$member->nick?></h2></div>
 			</div>
+			<br>
 			<?php
 			foreach(fetchAll("SELECT * FROM comments WHERE user_id = :uid ORDER BY timestamp DESC LIMIT 10", [":uid" => $member->id]) as $row) {
 				?>
@@ -113,18 +114,21 @@ include "header.php";
 				</div>
 				<?php
 			}
+			?>
+			<br>
+			<?php
 		}
 		$upped = fetchOne("SELECT COUNT(*) total FROM collys WHERE uploader_id = :uid", [":uid" => $member->id])->total;
 		if($upped > 0) {
 			?>
-			<div class="row" style="margin-top: 16px;">
+			<div class="row" class="apt-1 apb-1">
 				<div class="col-12"><h2 class="ap-1 bg-header">Last 10 collys added by <?=$member->nick?></h2></div>
 			</div>
 
-			<div class="row" style="margin-top: 16px;">
-				<div class="col-4"><span>NAME</span></div>
-				<div class="col-4"><span>ARTiST</span></div>
-				<div class="col-4"><span>CREW</span></div>
+			<div class="row">
+				<div class="col-4 apt-1 apb-1"><span class="white">NAME</span></div>
+				<div class="col-4 apt-1 apb-1"><span class="white">ARTiST</span></div>
+				<div class="col-4 apt-1 apb-1"><span class="white">CREW</span></div>
 			</div>
 			<?php
 			foreach(fetchAll("SELECT * FROM collys WHERE uploader_id = :uid GROUP BY filename ORDER BY MAX(timestamp) DESC LIMIT 10", [":uid" => $member->id]) as $row) {
@@ -148,10 +152,10 @@ include "header.php";
 			<div class="row" style="margin-top: 16px;">
 				<div class="col-12"><h2 class="ap-1 bg-header"><?=$member->nick?>'s Favourites</h2></div>
 			</div>
-			<div class="row" style="margin-top: 16px;">
-				<div class="col-4"><span>NAME</span></div>
-				<div class="col-4"><span>ARTiST</span></div>
-				<div class="col-4"><span>CREW</span></div>
+			<div class="row" class="apt-1 apb-1">
+				<div class="col-4 apt-1 apb-1"><span class="white">NAME</span></div>
+				<div class="col-4 apt-1 apb-1"><span class="white">ARTiST</span></div>
+				<div class="col-4 apt-1 apb-1"><span class="white">CREW</span></div>
 			</div>
 			<?php
 			foreach($faves

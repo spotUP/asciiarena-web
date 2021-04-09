@@ -1,4 +1,4 @@
-<div class="tab-pane fade" id="mag">
+<div class="tab-pane fade" id="app">
 
 	<!-- -------------------------------------------------------------------------------- -->
 	<!-- UPLOAD MAG FIELD                                                           -->
