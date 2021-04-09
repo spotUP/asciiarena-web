@@ -19,11 +19,11 @@ include "header.php";
 
 		<div class="position-relative">
 			<div class="row">
-				<div class="col-2">
+				<div class="col-4">
 					<span>Nick: </span>
 					<span class="yellow"><?=$member->nick?></span>
 				</div>
-				<div class="col-10">
+				<div class="col-8">
 					<span>Status: </span>
 					<span class="yellow"><?=$member->rank?></span>
 				</div>
@@ -31,13 +31,13 @@ include "header.php";
 			<?php if(!empty($member->crew) && !empty($member->country)) { ?>
 				<div class="row">
 					<?php if(!empty($member->crew)) { ?>
-						<div class="col-2">
+						<div class="col-4">
 							<span>Crew: </span>
 							<span class="yellow"><?=$member->crew?></span>
 						</div>
 					<?php }
 					if(!empty($member->country)) { ?>
-						<div class="col-10">
+						<div class="col-8">
 							<span>Country: </span>
 							<span class="yellow"><?=$country_list[ $member->country ]?></span>
 						</div>
@@ -99,7 +99,7 @@ include "header.php";
 		<?php if(!empty($comment_amount)) {
 			?>
 			<div class="row" style="margin-top: 16px; margin-bottom: 16px;">
-				<div class="col-12"><h1>Last 10 comments by <?=$member->nick?></h1></div>
+				<div class="col-12"><h2 class="ap-1 bg-header">Last 10 comments by <?=$member->nick?></h2></div>
 			</div>
 			<?php
 			foreach(fetchAll("SELECT * FROM comments WHERE user_id = :uid ORDER BY timestamp DESC LIMIT 10", [":uid" => $member->id]) as $row) {
@@ -118,7 +118,7 @@ include "header.php";
 		if($upped > 0) {
 			?>
 			<div class="row" style="margin-top: 16px;">
-				<div class="col-12"><h1>Last 10 collys added by <?=$member->nick?></h1></div>
+				<div class="col-12"><h2 class="ap-1 bg-header">Last 10 collys added by <?=$member->nick?></h2></div>
 			</div>
 
 			<div class="row" style="margin-top: 16px;">
@@ -146,7 +146,7 @@ include "header.php";
 		$faves = fetchAll("SELECT * FROM favourites WHERE user_id = :uid", [":uid" => $member->id]);
 		if(count($faves) > 0) { ?>
 			<div class="row" style="margin-top: 16px;">
-				<div class="col-12"><h1><?=$member->nick?>'s Favourites</h1></div>
+				<div class="col-12"><h2 class="ap-1 bg-header"><?=$member->nick?>'s Favourites</h2></div>
 			</div>
 			<div class="row" style="margin-top: 16px;">
 				<div class="col-4"><span>NAME</span></div>
