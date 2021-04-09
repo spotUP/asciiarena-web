@@ -1,5 +1,5 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
-<div class="container fluid bg-secondary">
+<div class="container fluid">
 
 	<div class="header col-lg-12 m-0 p-0">
 		<h2 class="ap-1 bg-header">LAST CALLERS</h2>
