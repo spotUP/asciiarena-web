@@ -4,8 +4,11 @@
 	$form = "form_{$wall_id}";
 	$tag = "tag_{$wall_id}";
 ?>
+	<div class="header col-lg-12 m-0 p-0 apr-1">
+		<h2 class="ap-1 bg-header">TAG THE WALL</h2>
+	</div>
 <div class="container-fluid">
-	<div class="row m-0 p-0" id="<?=$wall?>"></div>
+	<div class="row m-0 p-0 bg-secondary apt-1 apb-1" id="<?=$wall?>"></div>
 	<?php if (is_logged_in()): ?>
 		<div class="row">
 			<style>
@@ -18,7 +21,7 @@
 					color: transparent;
 				}
 			</style>
-			<div class="col-lg-12" style="padding-top: 16px;">
+			<div class="col-lg-12">
 				<form id="<?=$form?>" action="/cmds.php?cmd=tag" method="post" class="form-inline my-2 my-lg-0">
 					<input class="form-control col-11 tagtext" type="text" name="tagtext"
 					       placeholder="Tag the wall"
