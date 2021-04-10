@@ -704,7 +704,7 @@ require_once "header.php"; ?>
             $row = fetchOne("SELECT view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
             $downloads = $row->downloads+1;
 
-echo $_SERVER['HTTP_HOST'] . $filenameandpath;
+echo $_SERVER['HTTP_HOST']"/" . $filenameandpath;
 
             doQuery("update collys set downloads=:downloads where filename=:filename", [":downloads" => $downloads, ":filename" => $filename]);
             ?><meta content="13"; URL="<?=$_SERVER['PHP_SELF'] . $filenameandpath?>" http-equiv="Refresh"><?php
