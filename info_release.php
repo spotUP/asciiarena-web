@@ -704,10 +704,10 @@ require_once "header.php"; ?>
             $row = fetchOne("SELECT view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
             $downloads = $row->downloads+1;
 
-echo $_SERVER['PHP_SELF'] . $filenameandpath;
+echo $_SERVER['HTTP_HOST'] . $filenameandpath;
 
             doQuery("update collys set downloads=:downloads where filename=:filename", [":downloads" => $downloads, ":filename" => $filename]);
-            ?><meta content="3"; URL="<?=$_SERVER['PHP_SELF'] . $filenameandpath?>" http-equiv="Refresh"><?php
+            ?><meta content="13"; URL="<?=$_SERVER['PHP_SELF'] . $filenameandpath?>" http-equiv="Refresh"><?php
         }
 
         $font = fetchOne("SELECT def_font FROM users WHERE nick = :nick", [":nick" => $nick]);
