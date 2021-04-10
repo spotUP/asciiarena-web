@@ -18,8 +18,8 @@ foreach($res as $row) {
 foreach($collys as $fname => $colly) 
 {
 	?>
-	<div class="col-<?=$breakpoint?><?=(round(12 / $columns))?> overflow-hidden apt-1 apb-1">
-		<div class="row justify-content-md-center animate__animated animate__backInUp">
+	<div class="col-12 d-flex justify-content-center col-<?=$breakpoint?><?=(round(12 / $columns))?> overflow-hidden apt-1 apb-1">
+		<div class="row animate__animated animate__backInUp">
 			<pre><a href="/release/<?=$fname?>" class="ascii lightpink"><?=$colly?></a></pre>
 		</div>
 	</div>
