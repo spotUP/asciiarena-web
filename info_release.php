@@ -705,8 +705,7 @@ require_once "header.php"; ?>
             $downloads = $row->downloads+1;
 
             doQuery("update collys set downloads=:downloads where filename=:filename", [":downloads" => $downloads, ":filename" => $filename]);
-echo "filenameandpath $filenameandpath"collections/r-hl/r-hl.txt
-            ?><meta content="10"; URL="/<?=$filenameandpath?>" http-equiv="Refresh"><?php
+            ?><meta content="10"; URL="$_SERVER['PHP_SELF']<?=$filenameandpath?>" http-equiv="Refresh"><?php
         }
 
         $font = fetchOne("SELECT def_font FROM users WHERE nick = :nick", [":nick" => $nick]);
