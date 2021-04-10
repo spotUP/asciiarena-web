@@ -38,12 +38,12 @@ $dirname = $dirname[ 0 ];
 							<?php if ($colly->file_id == "file_id.diz.png") {
 								$file_id_diz = file_get_contents(__DIR__ . "/collections/file_id.diz.txt");
 								
-								echo "<pre style=\"color: red\">";
+								echo "<pre class=\"magenta apt-1\">";
 								echo $file_id_diz;
 								echo "</pre>";
 							} else {
 								if (file_exists("$file_id")) {
-									echo "<pre class=\"magenta\">";
+									echo "<pre class=\"magenta apt-1\">";
 									echo utf8_encode($file_id_diz);
 									echo "</pre>";
 								}
