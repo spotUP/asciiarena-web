@@ -705,6 +705,7 @@ require_once "header.php"; ?>
             $downloads = $row->downloads+1;
 
             doQuery("update collys set downloads=:downloads where filename=:filename", [":downloads" => $downloads, ":filename" => $filename]);
+echo "filenameandpath $filenameandpath"
             ?><meta content="1"; URL="<?=$filenameandpath?>" http-equiv="Refresh"><?php
         }
 
