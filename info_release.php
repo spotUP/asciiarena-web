@@ -706,7 +706,7 @@ require_once "header.php"; ?>
 
             doQuery("update collys set downloads=:downloads where filename=:filename", [":downloads" => $downloads, ":filename" => $filename]);
 echo "filenameandpath $filenameandpath"
-            ?><meta content="1"; URL="<?=$filenameandpath?>" http-equiv="Refresh"><?php
+            ?><meta content="10"; URL="<?=$filenameandpath?>" http-equiv="Refresh"><?php
         }
 
         $font = fetchOne("SELECT def_font FROM users WHERE nick = :nick", [":nick" => $nick]);
