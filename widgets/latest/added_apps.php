@@ -1,9 +1,9 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
-<div class="container fluid">
+<div class="container fluid col-12 apl-1 apr-1">
 	<div class="header col-lg-12 m-0 p-0">
 		<h2 class="ap-1 bg-header"><a class="lightgreen" href="/apps.php?sort_by=timestamp">LATEST ADDED APPS</a> <a class="lightgreen"	href="/rss.php?class=0">[RSS]</a></h2>
 	</div>
-	<div class="container m-0 p-0 apt-1 apb-1 bg-secondary">
+	<div class="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
 		<?php
 		if (in_array($_user[ "rank" ], ["Elite", "Admin"])) 
 		{

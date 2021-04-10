@@ -1,5 +1,5 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
-<div class="container fluid">
+<div class="container fluid col-12 apl-1 apr-1">
 	<div class="header col-lg-12 p-0 m-0">
 		<h2 class="ap-1 bg-header">MOST VIEWED COLLYS</h2>
 	</div>

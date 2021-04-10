@@ -1,9 +1,9 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
-<div class="container fluid">
+<div class="container fluid col-12 apl-1 apr-1">
 	<div class="header col-12 p-0 m-0">
 		<h2 class="ap-1 bg-header">aSCIIaRENA STATS</h2>
 	</div>
-	<div class="container bg-green m-0 p-0 apt-1 apb-1 bg-secondary">
+	<div class="container col-12 bg-green m-0 p-0 apt-1 apb-1 bg-secondary">
 		<div class="col-12 d-flex justify-content-between">
 			<span class="white">Collys Online:</span>
 			<span><?=fetchOne("SELECT COUNT(*) total FROM collys")->total?></span>
