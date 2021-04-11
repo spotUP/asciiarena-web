@@ -78,7 +78,7 @@ $dirname = $dirname[ 0 ];
 								$crews[] = "<a href=\"/crew/".urlsafe($row->crew)."\">{$row->crew}</a>";
 							}
 							?>
-							<span>
+							<span clas="truncate">
 								<?php
 								echo pluralize($crews);
 								?>
@@ -91,7 +91,7 @@ $dirname = $dirname[ 0 ];
 						</div>
 						<div class="row d-flex justify-content-between">
 							<span>Size:</span>
-							<span><?=$colly->filesize?></span>
+							<span><?=formatBytes($colly->filesize)?></span>
 						</div>
 						<div class="row d-flex justify-content-between">
 							<span>Released:</span>

@@ -6,11 +6,11 @@
 	<div class="container col-12 bg-green m-0 p-0 apt-1 apb-1 bg-secondary">
 		<?php
 		foreach (fetchAll("SELECT id, nick, uploaded FROM users WHERE uploaded > 0 ORDER BY uploaded DESC LIMIT 5") as $row) {
-			$kb = round($row->uploaded / 1000);
+			$kb=formatBytes($row->uploaded);
 			?>
 			<div class="col-lg-12 d-flex justify-content-between">
 				<a href="/member/<?=urlsafe($row->nick)?>"><?=$row->nick?></a>
-				<?=$kb?>kB
+				<?=$kb?>
 			</div>
 			<?php
 		}

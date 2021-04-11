@@ -11,7 +11,7 @@
 			?>
 			<div class="col-lg-12 d-flex justify-content-between">
 				<a class="green" href="/artist/<?=urlsafe($artist)?>"><?=$row->nick?></a>
-				<?=$artist_rating?>
+				<?=$artist_rating?> PTS
 			</div>
 			<?php
 		}

@@ -10,7 +10,7 @@
 		</div>
 		<div class="col-12 d-flex justify-content-between">
 			<span class="white">Pumped Bytes:</span>
-			<span><?=fetchOne("SELECT sum(filesize) bytes FROM collys")->bytes?></span>
+			<span><?=formatBytes(fetchOne("SELECT sum(filesize) bytes FROM collys")->bytes)?></span>
 		</div>
 		<div class="col-12 d-flex justify-content-between">
 			<span class="white">Users:</span>

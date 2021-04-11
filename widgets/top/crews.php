@@ -13,7 +13,7 @@
 			?>
 			<div class="col-lg-12 d-flex justify-content-between">
 				<a href="/crew/<?=urlsafe($crew)?>/"><?=$row->name?></a>
-				<?=$crew_ratings?>
+				<?=$crew_ratings?> PTS
 			</div>
 			<?php
 		}
