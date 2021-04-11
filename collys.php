@@ -140,7 +140,7 @@ switch ($sort_by) {
 						<div class="col-lg-4 green">
 							<span class="yellow"><?=combinize($row->artists, $row->artist_ids, "/artist/", $row->artists)?></span>
 						</div>
-						<div class="col-lg-4 yellow">
+						<div class="col-lg-4 yellow text-truncate">
 							<span class="yellow"><?=combinize($row->crews, $row->crew_ids, "/crew/", $row->crews)?></span>
 						</div>
 					</div>
@@ -189,10 +189,10 @@ switch ($sort_by) {
 											<div class="col-2">
 												<span class="yellow"><?=$row->filename?></span>
 											</div>
-											<div class="col-2">
+											<div class="col-2 text-truncate">
 												<span class="yellow"><?=combinize($row->artists, $row->artist_ids, "/artist/", $row->artists)?></span>
 											</div>
-											<div class="col-2">
+											<div class="col-2 text-truncate">
 												<span class="yellow"><?=combinize($row->crews, $row->crew_ids, "/crew/", $row->crews)?></span>
 											</div>
 											<div class="col-2">
