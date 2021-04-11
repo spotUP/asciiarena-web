@@ -187,7 +187,7 @@ switch ($sort_by) {
 												<a class="magenta" href="/release/<?=$row->filename?>"><?=$row->name?></a>
 											</div>
 											<div class="col-2">
-												<span class="yellow"><?=$row->filename?></span>
+												<a href="/release/<?=$row->filename?>"><?=$row->filename?></a>
 											</div>
 											<div class="col-2 text-truncate">
 												<span class="yellow"><?=combinize($row->artists, $row->artist_ids, "/artist/", $row->artists)?></span>
