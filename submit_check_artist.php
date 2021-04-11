@@ -55,13 +55,14 @@
 			exit;
 		}
 
-		$ask="insert into artists (id, nick, www, active, country, rating, acronym, user_id) values (0, :artistnick, :artistwww, :artiststatus, :artistcountry, 0, :artistacronym)";
+		$ask="insert into artists (nick, www, active, country, rating, acronym, user_id) values (:artistnick, :artistwww, :artiststatus, :artistcountry, 0, :artistacronym)";
 		doQuery($ask, [
 			'artistnick' => $artistnick,
 			'artistwww' => $artistwww,
 			'artiststatus' => $artiststatus,
 			'artistcountry' => $country_list[$artistcountry],
-			'artistacronym' => $artistacronym
+			'artistacronym' => $artistacronym,
+			'user_id' => $_user[ "id" ]
 		]);
 
 		if (isset($_POST[artist_crew]))
