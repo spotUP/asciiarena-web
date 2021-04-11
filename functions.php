@@ -427,3 +427,34 @@ function recalculate_ratings() {
 		set c.rating = r.avgrating';
 	doQuery($ask);
 }
+
+//-----------------------------------------------------------
+//  formatBytes($file_size) mixed file sizes
+//  formatBytes($file_size, 0) KB file sizes
+//  formatBytes($file_size, 1) MB file sizes etc
+//-----------------------------------------------------------
+
+function formatBytes($bytes, $format = 99) {
+$byte_size = 1024;
+    $byte_type = array(" KB", " MB", " GB", " TB", " PB", " EB", " ZB", " YB");
+ 
+    $bytes /= $byte_size;
+    $i = 0;
+ 
+    if ($format == 99 || $format > 7) {
+      while ($bytes > $byte_size) {
+            $bytes /= $byte_size;
+            $i++;
+        }
+    } else {
+      while ($i < $format) {
+            $bytes /= $byte_size;
+            $i++;
+        }
+    }
+ 
+    $bytes = sprintf("%1.2f", $bytes);
+    $bytes .= $byte_type[$i];
+ 
+    return$bytes;
+}

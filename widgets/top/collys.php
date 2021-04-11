@@ -11,7 +11,7 @@
 			?>
 			<div class="col-lg-12 d-flex justify-content-between">
 				<a class="magenta" href="/release/<?=$filename?>"><?=$filename?></a>
-				<?=$colly_rating?>
+				<?=$colly_rating?> PTS
 			</div>
 			<?php
 		}

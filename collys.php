@@ -196,7 +196,7 @@ switch ($sort_by) {
 												<span class="yellow"><?=combinize($row->crews, $row->crew_ids, "/crew/", $row->crews)?></span>
 											</div>
 											<div class="col-2">
-												<span class="yellow"><a href="/collys.php?sort_by=releasedate&viewmode=Standard"><?=$year?>-<?=$month?>-<?=$day?></a></span>
+												<span class="lightgrey"><?=$year?>-<?=$month?>-<?=$day?></span>
 											</div>
 											<?php
 										} ?>
