@@ -3,6 +3,7 @@
 //---------------------------------------------------------------------------------------------------------------
 // CHECK UPLOADED ARTIST
 //---------------------------------------------------------------------------------------------------------------
+//
 
 	if(isset($_POST['artistnick']))
 	{
@@ -55,21 +56,22 @@
 			exit;
 		}
 
-		$ask="insert into artists (nick, www, active, country, rating, acronym, user_id) values (:artistnick, :artistwww, :artiststatus, :artistcountry, 0, :artistacronym)";
+		$ask="insert into artists (nick, www, active, country, rating, acronym, user_id, artisturl) values (:artistnick, :artistwww, :artiststatus, :artistcountry, 0, :artistacronym, :user_id, :artisturl)";
 		doQuery($ask, [
 			'artistnick' => $artistnick,
 			'artistwww' => $artistwww,
 			'artiststatus' => $artiststatus,
 			'artistcountry' => $country_list[$artistcountry],
 			'artistacronym' => $artistacronym,
-			'user_id' => $_user[ "id" ]
+			'user_id' => $_user[ "id" ],
+			'artisturl' => urlsafe($artistnick),
 		]);
 
 		if (isset($_POST[artist_crew]))
 		{
 			foreach($_POST[artist_crew] as $artist_crew)
 			{
-				$ask="insert into member_of values (:artist_crew,:artistnick)";
+				$ask="insert into member_of (crew, nick) values (:artist_crew,:artistnick)";
 				doQuery($ask, ['artist_crew' => $artist_crew, 'artistnick' => $artistnick ]);
 			}
 		}
@@ -82,8 +84,7 @@
 			The artist has been posted!
 		</div>
 
-
-		<meta http-equiv="Refresh" content="2"; url="submit.php">
+		<meta http-equiv="Refresh" content="1"; url="submit.php">
 		<?php	
 		exit;
 	}
