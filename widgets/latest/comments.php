@@ -13,31 +13,25 @@
 				<span class="white text-truncate">Colly</span>
 			</div>
 			<div class="col-2">
-				<span class="white text-truncate">Nick</span>
+				<span class="white text-truncate float-right">Nick</span>
 			</div>
 		</div>
-		<div class="row apl-1 apr-1">
-			<div class="col-7 text-truncate">
-				<span class="cyan text-truncate">Dummy comment...</span>
+		<?php
+		foreach(fetchAll("SELECT * FROM comments ORDER BY timestamp DESC LIMIT 10") as $row) {
+			?>
+			<div class="row apl-1 apr-1">
+				<div class="col-7 cyan text-truncate">
+					<a href="/release/<?=$row->filename?>"><?=fixOutputPost($row->comment)?></a>
+				</div>
+				<div class="col-3">
+					<a class="magenta text-truncate" href="/release/<?=$row->filename?>"><?=$row->filename?></a>
+				</div>
+				<div class="col-2">
+					<a class="yellow text-truncate float-right" href="/member/<?=$row->nick?>"><?=$row->nick?></a>
+				</div>
 			</div>
-			<div class="col-3">
-				<span class="lightpink text-truncate">UP-AMLUV.TXT</span>
-			</div>
-			<div class="col-2">
-				<span class="yellow text-truncate">Spot</span>
-			</div>
-		</div>
-		<div class="row apl-1 apr-1">
-			<div class="col-7 text-truncate">
-				<span class="cyan text-truncate">Good shit!</span>
-			</div>
-			<div class="col-3">
-				<span class="lightpink text-truncate">UP-AMLUV.TXT</span>
-			</div>
-			<div class="col-2">
-				<span class="yellow text-truncate">Major Burps</span>
-			</div>
-		</div>
+			<?php
+		}
+		?>
 	</div>
 </div>
-
