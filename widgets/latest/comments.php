@@ -7,13 +7,13 @@
 	<div class="col-12 bg-secondary apt-1 apb-1">
 		<div class="row apl-1 apr-1 apb-1">
 			<div class="col-7 text-truncate">
-				<span class="white text-truncate">Comment</span>
+				<span class="white text-truncate">COMMENT</span>
 			</div>
 			<div class="col-3">
-				<span class="white text-truncate">Colly</span>
+				<span class="white text-truncate">COLLY</span>
 			</div>
 			<div class="col-2">
-				<span class="white text-truncate float-right">Nick</span>
+				<span class="white text-truncate float-right">NiCK</span>
 			</div>
 		</div>
 		<?php
