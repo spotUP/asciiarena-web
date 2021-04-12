@@ -27,10 +27,10 @@
 				<span>4</span>
 			</div>
 			<div class="col-2">
-				<a href="#">View</a>
+				<a class="float-right" href="#">View</a>
 			</div>
 			<div class="col-2">
-				<a href="#">Join</a>
+				<a class="float-right" href="#">Join</a>
 			</div>
 		</div>
 		<div class="row apl-1 apr-1">
@@ -44,10 +44,10 @@
 				<span>123</span>
 			</div>
 			<div class="col-2">
-				<a href="#">View</a>
+				<a href="#" class="float-right">View</a>
 			</div>
 			<div class="col-2">
-				<a href="#">Join</a>
+				<a href="#" class="float-right">Join</a>
 			</div>
 		</div>
 		<div class="row apl-1 apr-1">
@@ -61,10 +61,10 @@
 				<span>4</span>
 			</div>
 			<div class="col-2">
-				<a class="disabled" href="#">View</a>
+				<a class="disabled float-right" href="#">View</a>
 			</div>
 			<div class="col-2">
-				<a class="disabled" href="#">Join</a>
+				<a class="disabled float-right" href="#">Join</a>
 			</div>
 		</div>
 		<div class="row apl-1 apr-1">
@@ -78,10 +78,10 @@
 				<span>4</span>
 			</div>
 			<div class="col-2">
-				<a href="#">View</a>
+				<a href="#" class="float-right">View</a>
 			</div>
 			<div class="col-2">
-				<a class="disabled" href="#">Join</a>
+				<a class="disabled float-right" href="#">Join</a>
 			</div>
 		</div>
 		<div class="row apl-1 apr-1">
@@ -95,10 +95,10 @@
 				<span>4</span>
 			</div>
 			<div class="col-2">
-				<a href="#">View</a>
+				<a href="#" class="float-right">View</a>
 			</div>
 			<div class="col-2">
-				<a href="#">Join</a>
+				<a href="#" class="float-right">Join</a>
 			</div>
 		</div>
 	</div>

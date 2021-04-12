@@ -10,6 +10,7 @@ include "header.php";
 			["file" => "latest/releases", "header" => "LATEST RELEASES", "columns" => 2],
 			["file" => "wall"],
 			["file" => "cedd_sessions"],
+			["file" => "latest/comments"],
 		]); ?>
 	</div>
 	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
