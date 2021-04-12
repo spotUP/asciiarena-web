@@ -1,7 +1,7 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
 <div class="container fluid col-12 apl-1 apr-1">
 	<div class="header col-lg-12 m-0 p-0">
-		<h2 class="ap-1 bg-header"><a class="lightgreen" href="/mags.php?sort_by=timestamp">LATEST ADDED MAGS</a> <a class="lightgreen"
+		<h2 class="ap-1 bg-header text-truncate lightgreen"><a class="lightgreen" href="/mags.php?sort_by=timestamp">LATEST ADDED MAGS</a> <a class="lightgreen"
 			href="/rss.php?class=0">[RSS]</a>
 		</h2>
 	</div>
@@ -17,8 +17,8 @@
 			$upload_date = date("y-m-d", $upload_date);
 			?>
 			<div class="col-lg-12 d-flex justify-content-between">
-				<a class="magenta" href="/mags.php?sort_by=timestamp"><?=$filename?></a>
-				<?=$upload_date?>
+				<a class="magenta text-truncate" href="/mags.php?sort_by=timestamp"><?=$filename?></a>
+				<span class="text-truncate"><?=$upload_date?></span>
 			</div>
 			<?php 
 		}
