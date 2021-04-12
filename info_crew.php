@@ -351,7 +351,7 @@ include "header.php";
 
 			<div class="row apb-1 apt-1">
 				<div class="col-12">
-					<h2 class="ap-1 bg-header">Latest Release</h2>											
+					<h2 class="ap-1 bg-header">LATEST RELEASE</h2>											
 				</div>
 			</div>
 
@@ -359,7 +359,7 @@ include "header.php";
 				<div class="col-8">
 					<?php
 					?>	
-					<a class="ascii" href="/release/<?=$filename?>"><pre><?=$file_id?></pre></a>
+					<a class="ascii pink" href="/release/<?=$filename?>"><pre><?=$file_id?></pre></a>
 					<?php
 					?>
 				</div>
@@ -503,19 +503,19 @@ include "header.php";
 			if(!empty($row_check->filename))
 			{
 				?>
-				<h2 class="amb-1 amt-1 ap-1 bg-header">All <?=$show_acronym?> Releases</h2>            
+				<h2 class="amb-1 amt-1 ap-1 bg-header">ALL <?=$show_acronym?> RELEASES</h2>            
 				<div class="row amt-1 amb-1">
-					<div class="col-3">
+					<div class="col-6">
 						<a href="/crew/<?=urlsafe($showcrew)?>/?sort_by=a.name">NAME</a>
 					</div>
-					<div class="col-3">
+					<div class="col-2">
 						<a href="/crew/<?=urlsafe($showcrew)?>/?sort_by=a.filename">FiLENAME</a>
 					</div>
-					<div class="col-3">
+					<div class="col-2">
 						<a href="/crew/<?=urlsafe($showcrew)?>/?sort_by=b.nick">ARTiST</a>
 					</div>
-					<div class="col-3">
-						<a href="/crew/<?=urlsafe($showcrew)?>/?sort_by=a.year, a.month">RELEASE DATE</a>
+					<div class="col-2">
+						<a href="/crew/<?=urlsafe($showcrew)?>/?sort_by=a.year, a.month">DATE</a>
 					</div>
 				</div>
 				<?php
@@ -529,20 +529,18 @@ include "header.php";
 					$year=$row->year;
 					?>
 					<div class="row">
-						<div class="col-3">
-							<a class="magenta" href="/release/<?=$filename?>"><?=mb_strimwidth($row->name, 0, 20, "...");?></a>
+						<div class="col-6 text-truncate">
+							<a class="magenta" href="/release/<?=$filename?>"><?=$row->name?></a>
 						</div>
-						<div class="col-3">
-							<a class="magenta" href="/release/<?=$filename?>"><?=mb_strimwidth($row->filename, 0, 12);?></a>
+						<div class="col-2 text-truncate">
+							<a class="magenta" href="/release/<?=urlsafe($filename)?>"><?=$row->filename?></a>
 						</div>
 
-						<div class="col-3">
-
+						<div class="col-2 text-truncate">
 							<a class="green" href="/artist/<?=urlsafe($author)?>"><?=$author?></a>
 						</div>
 
-						<div class="col-3">
-
+						<div class="col-2 text-truncate">
 							<span class="lightgrey" href="/artist/<?=urlsafe($author)?>"><?php if (!empty($year)) { echo $year; }?></span>
 						</div>
 
