@@ -152,7 +152,7 @@ include "header.php";
 		</div>
 		<div class="row apb-1 apt-1">
 			<div class="col-12">
-				<h2 class="ap-1 bg-header">Members</h2>											
+				<h2 class="ap-1 bg-header">MEMBERS</h2>											
 			</div>
 		</div>
 
@@ -506,13 +506,13 @@ include "header.php";
 				<h2 class="amb-1 amt-1 ap-1 bg-header">ALL <?=$show_acronym?> RELEASES</h2>            
 				<div class="row amt-1 amb-1">
 					<div class="col-6">
-						<a href="/crew/<?=urlsafe($showcrew)?>/?sort_by=a.name">NAME</a>
+						<a class="white" href="/crew/<?=urlsafe($showcrew)?>/?sort_by=a.name">NAME</a>
 					</div>
 					<div class="col-2">
-						<a href="/crew/<?=urlsafe($showcrew)?>/?sort_by=a.filename">FiLENAME</a>
+						<a class="white" href="/crew/<?=urlsafe($showcrew)?>/?sort_by=a.filename">FiLENAME</a>
 					</div>
 					<div class="col-2">
-						<a href="/crew/<?=urlsafe($showcrew)?>/?sort_by=b.nick">ARTiST</a>
+						<a class="white" href="/crew/<?=urlsafe($showcrew)?>/?sort_by=b.nick">ARTiST</a>
 					</div>
 					<div class="col-2">
 						<a href="/crew/<?=urlsafe($showcrew)?>/?sort_by=a.year, a.month">DATE</a>
