@@ -453,7 +453,7 @@ $byte_size = 1024;
         }
     }
  
-    $bytes = sprintf("%1.2f", $bytes);
+    $bytes = sprintf("%1.0f", $bytes);
     $bytes .= $byte_type[$i];
  
     return$bytes;
