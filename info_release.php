@@ -477,10 +477,9 @@ require_once "header.php"; ?>
 					$show_colly_month = htmlspecialchars($row->month, ENT_QUOTES);
 					$show_colly_day = htmlspecialchars($row->day, ENT_QUOTES);
 					$show_colly_type = htmlspecialchars($row->type, ENT_QUOTES);
-					$encoded_filename = base64_encode($row->filename);
 				}
 				?>
-				<form enctype="multipart/form-data" action="/release/<?=$encoded_filename?>" method="post">
+				<form enctype="multipart/form-data" action="/release/<?=$filename?>" method="post">
 
 					<div class="row">
 						<div class="col-12"><h1 class="ap-1 bg-header">Edit ASCII Collection</h1></div>
@@ -668,7 +667,7 @@ require_once "header.php"; ?>
 					</script>
 
 					<?php
-					echo "<form action='/release/".$filename."' method='post'  id='ctrlForm'>";
+					echo "<form action=\"/release/".$filename."\" method='post'  id='ctrlForm'>";
 
 					echo "<input type='submit' class='btn-big amb-1' name='hide' value='Hide Colly!'" . ((!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) ? " style='display:none'" : "") . "> ";
 					echo "<input type='submit' class='btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s' name='view' value='View Colly'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
