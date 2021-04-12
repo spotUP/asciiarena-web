@@ -7,13 +7,13 @@
 	<div class="col-12 bg-secondary apt-1 apb-1">
 		<div class="row apl-1 apr-1 apb-1">
 			<div class="col-4 text-truncate">
-				<span class="white">Name</span>
+				<span class="white">NAME</span>
 			</div>
 			<div class="col-2">
-				<span class="white">Status</span>
+				<span class="white">STATUS</span>
 			</div>
 			<div class="col-6">
-				<span class="white">Artists</span>
+				<span class="white">ARTISTS</span>
 			</div>
 		</div>
 		<div class="row apl-1 apr-1">
