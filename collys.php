@@ -65,7 +65,19 @@ switch ($sort_by) {
 
 		if ($is_search) {
 			$searchquery = str_replace(" ", ",", $searchquery);
-			$ask = "SELECT * FROM collys WHERE MATCH(filename, name, artists, crews) against (:searchquery in boolean mode) {$limit}";
+			//$ask = "SELECT * FROM collys WHERE MATCH(filename, name, artists, crews) against (:searchquery in boolean mode) {$limit}";
+			$ask = "SELECT c.id,c.name,c.filename,c.type,c.uploader,c.file_id,c.timestamp,c.year,c.month,c.day,
+  				GROUP_CONCAT(a.nick) as artists,GROUP_CONCAT(cw.name) as crews
+  				FROM collys c
+  				LEFT JOIN artists_collys ac ON c.id=ac.colly_id
+  				LEFT JOIN artists a ON ac.artist_id=a.id
+  				LEFT JOIN collys_crews cc ON c.id=cc.colly_id
+  				LEFT JOIN crews cw ON cc.crew_id=cw.id
+  				WHERE 
+  				  MATCH(c.filename, c.name) against (:searchquery in boolean mode)
+  				  OR MATCH(a.nick) against (:searchquery in boolean mode)
+  				  OR MATCH(cw.name) against (:searchquery in boolean mode)
+  				GROUP BY c.filename {$limit}";
 			$rows = fetchAll($ask, [":searchquery" => $searchquery]);
 
 			if ($viewmode === "BBS") {
@@ -138,10 +150,10 @@ switch ($sort_by) {
 							<a href="/release/<?=$row->filename?>"><?=$row->name?></a>
 						</div>
 						<div class="col-lg-4 green">
-							<span class="yellow"><?=combinize($row->artists, $row->artist_ids, "/artist/", $row->artists)?></span>
+							<span class="yellow"><?=combinize($row->artists, $row->artists, "/artist/", $row->artists)?></span>
 						</div>
 						<div class="col-lg-4 yellow text-truncate">
-							<span class="yellow"><?=combinize($row->crews, $row->crew_ids, "/crew/", $row->crews)?></span>
+							<span class="yellow"><?=combinize($row->crews, $row->crews, "/crew/", $row->crews)?></span>
 						</div>
 					</div>
 					<?php
@@ -162,7 +174,16 @@ switch ($sort_by) {
 									<div class="row">
 										<?php
 										$sort_order = in_array($sort_by, ["timestamp", "releasedate"]) ? "DESC" : "ASC";
-										$result = fetchAll("SELECT * FROM collys ORDER BY {$sort_criteria} {$sort_order} {$pagination["limit"]}");
+										//$result = fetchAll("SELECT * FROM collys ORDER BY {$sort_criteria} {$sort_order} {$pagination["limit"]}");
+										$result = fetchAll("SELECT c.filename,c.name,c.year,c.month,c.day, 
+										  GROUP_CONCAT(a.nick) as artists,GROUP_CONCAT(cw.name) as crews
+										  FROM collys c
+										  LEFT JOIN artists_collys ac ON c.id=ac.colly_id
+										  LEFT JOIN artists a ON ac.artist_id=a.id
+										  LEFT JOIN collys_crews cc ON c.id=cc.colly_id
+										  LEFT JOIN crews cw ON cc.crew_id=cw.id
+										  GROUP BY c.filename
+										  ORDER BY {$sort_criteria} {$sort_order} {$pagination["limit"]}");
 										foreach ($result as $row) {
 											$year = $row->year;
 											$month = $row->month;
