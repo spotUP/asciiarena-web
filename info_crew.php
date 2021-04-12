@@ -359,7 +359,7 @@ include "header.php";
 				<div class="col-8">
 					<?php
 					?>	
-					<a class="ascii pink" href="/release/<?=$filename?>"><pre><?=$file_id?></pre></a>
+					<a class="ascii magenta" href="/release/<?=$filename?>"><pre class="magenta"><?=$file_id?></pre></a>
 					<?php
 					?>
 				</div>
