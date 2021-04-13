@@ -904,7 +904,7 @@ if (!isset($_POST[ 'edit' ]))
 						<span class="white"><?=$userrating?></span>
 					</div>
 					<div class="bg-secondary col-12 ap-1 amb-1">
-						<span class="cyan"><?=$comment?></span>
+						<span class="cyan" style="white-space: pre-wrap;"><?=$comment?></span>
 					</div>
 					<?php
 				}
@@ -921,7 +921,7 @@ if (!isset($_POST[ 'edit' ]))
 					<span class="white"><?=$userrating ?></span>
 				</div>
 				<div class="bg-secondary col-12 ap-1 amb-1">
-					<span class="cyan"><?=$comment?></span>
+					<span class="cyan" style="white-space: pre-wrap;"><?=$comment?></span>
 					<div class="col-12 p-0 m-0 apt-1">
 						<input type="hidden" class="btn-big" name="commentid" value="<?=$commentid?>">
 						<input type="submit" class="btn-big" name="edit" value="Edit">
@@ -946,7 +946,7 @@ if (!isset($_POST[ 'edit' ]))
 						<span class="white"><?=$commenttime ?></span>
 					</div>
 					<div class="col-12 ap-1 amb-1">
-						<span class="cyan"><?=$comment?></span>
+						<span class="cyan" style="white-space: pre-wrap;"><?=$comment?></span>
 						<div class="col-12 p-0 m-0 apt-1">
 							<input type="hidden" class="btn-big" name="commentid" value="<?=$commentid?>">
 							<input type="submit" class="btn-big" name="edit" value="Edit">
@@ -964,7 +964,7 @@ if (!isset($_POST[ 'edit' ]))
 						<span class="white"><?=$commenttime ?></span>
 					</div>
 					<div class="bg-secondary col-12 ap-1 amb-1">
-						<span class="cyan"><?=$comment?></span>
+						<span class="cyan" style="white-space: pre-wrap;"><?=$comment?></span>
 					</div>
 					<?php
 				}
@@ -979,7 +979,7 @@ if (!isset($_POST[ 'edit' ]))
 					<span class="white"><?=$commenttime ?></span>
 				</div>
 				<div class="bg-secondary col-12 ap-1 amb-1">
-					<span class="cyan"><?=$comment?></span>
+					<span class="cyan" style="white-space: pre-wrap;"><?=$comment?></span>
 					<input type="hidden" name="commentid" value="<?=$commentid?>">
 					<div class="col-12 p-0 m-0 apt-1">
 						<input type="submit" class="btn-big" name="edit" value="Edit">
