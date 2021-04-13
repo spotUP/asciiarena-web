@@ -57,7 +57,9 @@ switch ($sort_by) {
 			$p = [];
 		} else {
 			$searchquery = $_POST[ 'search' ];
-			$q = "SELECT * FROM member_of WHERE MATCH(nick, crew) AGAINST (:searchquery IN BOOLEAN MODE) ORDER BY {$sort_by} ASC {$pagination["limit"]}";
+			$q = "SELECT * FROM member_of 
+					WHERE MATCH(nick) AGAINST (:searchquery IN BOOLEAN MODE) 
+						OR MATCH(crew) AGAINST (:searchquery IN BOOLEAN MODE) ORDER BY {$sort_by} ASC {$pagination["limit"]}";
 			$p = [":searchquery" => $searchquery];
 		}
 		$artists = [];
