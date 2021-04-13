@@ -1,25 +1,19 @@
-<div class="tab-pane fade show active" id="colly">
-
-	<!-- -------------------------------------------------------------------------------- -->
-	<!-- UPLOAD COLLY FIELD                                                               -->
-	<!-- -------------------------------------------------------------------------------- -->
-
-
+<div class="tab-pane fade active" id="colly">
 	<form enctype="multipart/form-data" action="submit.php" method="post">
 		<input type="hidden" name="max_file_size" value="10240000">
 		<div class="container-fluid bg-secondary ap-1">
-			<div class="row apl-1 apb-1">
+			<div class="row apl-1 apb-1 apt-1">
 				Upload Amiga ASCII Colly/ANSI (No PC stuff!)
 			</div>
 			<div class="row apl-1">
-				File
+				File (required)
 			</div>
 			<div class="row apl-1 apb-1">
 				<input type="file" name="uploadedfile"><span class="apl-1"><input type="SUBMIT" name="dupecheck" value="Dupe Check"></span>
 			</div>
 
 			<div class="row apl-1">
-				Name
+				Name (required)
 			</div>
 			<div class="row apl-1 apb-1">
 				<input type="text" size="24" name="colly_name">
