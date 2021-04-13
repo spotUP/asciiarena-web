@@ -28,16 +28,19 @@
 			if (strcasecmp($artistnick, $artist_dupe) == 0) 
 			{
 				?>
-				<div class="headline">
-					Error
-				</div>
-
-				<div class="content_with_blenk">
-					The artist already exists!
-				</div>
-
-				<?php
-				exit;
+		?>
+		<div class="content">
+			<br><br>
+		</div>
+		<div class="bs-component">
+			<div class="animate__animated animate__tada alert alert-dismissible alert-danger">
+				<button type="button" class="close" data-dismiss="alert">x</button>
+				<span>The artist already exists!</span>
+			</div>
+		</div>
+		<meta http-equiv="Refresh" content="4"; url="submit.php">
+		<?php
+		exit();
 			}
 		}
 
