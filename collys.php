@@ -105,6 +105,10 @@ switch ($sort_by) {
 					$year = $row->year;
 					$month = $row->month;
 					$day = $row->day;
+					$dirname = explode(".", $filename);
+					$dirname = $dirname[ 0 ];
+					$orig = (file_exists(BASEDIR . "/collections/{$dirname}/{$filename}.diz")) ? file_get_contents(BASEDIR . "/collections/{$dirname}/{$filename}.diz") : "";
+					$orig = utf8_encode($orig);
 					{
 						?>
 						<div class="row">
