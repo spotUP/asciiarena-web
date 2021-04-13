@@ -234,7 +234,7 @@ switch ($sort_by) {
 									</div>
 
 									<?php
-									$ask = "SELECT collys.*, author_of.nick, crew_of.crew FROM collys LEFT JOIN author_of ON collys.id = author_of.colly_id LEFT JOIN crew_of ON collys.id = crew_of.colly_id GROUP BY collys.filename ORDER BY :criteria DESC {$limit}";
+									$ask = "SELECT * FROM collys filename ORDER BY :criteria DESC {$pagination["limit"]}";
 									foreach (fetchAll($ask, [":criteria" => $sort_criteria]) as $row) {
 										$filename = $row->filename;
 										$name = $row->name;
