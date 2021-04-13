@@ -125,16 +125,6 @@ include "header.php";
 				$uploader=$row->uploader;
 			}
 
-			$ask="SELECT * FROM image_of WHERE filename LIKE '$delete_colly%'"; // fetch uploader of deleted colly
-			$result=fetchAll($ask);
-			foreach ($result as $row)
-			{
-				$collyimage=$row->images;
-				$collyimage=addslashes($collyimage);
-				unlink("$collyimage");
-			}
-
-
 			if (file_exists("collys/$delete_colly"))
 			{		
 				$delete_colly=addslashes($delete_colly);
@@ -146,27 +136,17 @@ include "header.php";
 				$delete_colly=addslashes($delete_colly);
 				unlink("collys/$delete_colly.diz");
 			}	
-			if (file_exists("collys/$delete_colly.diz.png"))
-			{
-				$delete_colly=addslashes($delete_colly);
-				unlink("collys/$delete_colly.diz.png");
-			}
+
 			if (file_exists("collys/$delete_colly.diz"))
 			{		
 				$delete_colly=addslashes($delete_colly);
 				unlink("collys/$delete_colly.diz");
-			}
-			if (file_exists("collys/$delete_colly-thumbnail.png"))
-			{		
-				$delete_colly=addslashes($delete_colly);
-				unlink("collys/$delete_colly-thumbnail.png");
 			}
 			
 			if(!empty($delete_colly))
 			{
 				doQuery("delete from collys    WHERE filename    = :delete_colly", [ ":delete_colly" =>  $delete_colly   ]); 
 				doQuery("delete from comments  WHERE filename    = :delete_colly", [ ":delete_colly" =>  $delete_colly   ]); 
-				doQuery("DELETE FROM image_of  WHERE filename LIKE :delete_colly", [ ":delete_colly" => "$delete_colly%" ]); 
 				doQuery("DELETE FROM crew_of   WHERE filename LIKE :delete_colly", [ ":delete_colly" => "$delete_colly%" ]); 
 				doQuery("DELETE FROM author_of WHERE filename LIKE :delete_colly", [ ":delete_colly" => "$delete_colly%" ]); 
 			}
