@@ -152,6 +152,24 @@ EOD;
 			document.getElementById('new_bbs_field').innerHTML =  document.getElementById('new_bbs_field').innerHTML + newselect; document.getElementById('total_bbses').value =  parseInt( document.getElementById('total_bbses').value) + 1;
 		}
 	</script>
+	<script type="text/javascript">
+
+		function add_crew_bbs_field()
+		{
+			var newselect = " <select name=\"add_crew_bbs[]\"" + document.getElementById('total_crew_bbses').value + "><option value=\"Unknown\">Unknown</option><?php
+
+			$ask="select name from bbses";
+			$result=fetchAll($ask);
+			foreach ($result as $row)
+			{
+				$add_bbses=$row->name;
+				echo "<option>$add_bbses</option>";
+			}
+			echo "</select>\"\n";
+			?>
+			document.getElementById('new_crew_bbs_field').innerHTML =  document.getElementById('new_crew_bbs_field').innerHTML + newselect; document.getElementById('total_crew_bbses').value =  parseInt( document.getElementById('total_crew_bbses').value) + 1;
+		}
+	</script>
 	<script>
 		window.switchers = [];
 
