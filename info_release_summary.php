@@ -58,7 +58,8 @@ $dirname = $dirname[ 0 ];
 
 							<?php
 							$authors = [];
-							foreach (fetchAll("SELECT * FROM author_of WHERE filename = :filename", [":filename" => $filename]) as $row) {
+							foreach (fetchAll("SELECT a.nick FROM collys c LEFT JOIN artists_collys ac ON ac.colly_id=c.id LEFT JOIN artists a ON a.id=ac.artist_id 
+								WHERE c.filename=:filename", [":filename" => $filename]) as $row) {
 								$author = $row->nick;
 								$authors[] = "<a class=\"green\" href=\"/artist/".urlsafe($author)."\">{$row->nick}</a>";
 							}
@@ -73,8 +74,8 @@ $dirname = $dirname[ 0 ];
 							<span>Crew(s):</span>
 							<?php
 							$crews = [];
-							foreach (fetchAll("SELECT * FROM crew_of WHERE filename = :filename", [":filename" => $filename]) as $row) {
-								$encoded_crew = base64_encode($row->crew);
+							foreach (fetchAll("SELECT w.name as crew FROM collys c LEFT JOIN collys_crews cc ON cc.colly_id=c.id LEFT JOIN crews w ON w.id=cc.crew_id 
+								WHERE c.filename=:filename", [":filename" => $filename]) as $row) {
 								$crews[] = "<a href=\"/crew/".urlsafe($row->crew)."\">{$row->crew}</a>";
 							}
 							?>
