@@ -234,10 +234,7 @@ EOD;
 <body style="overflow-x: hidden;">
 	<div id="spotclose" class="spotclose" onclick='myFunction()'><div class="noevents">x</div></div>
 	<div class="scanlines"></div>
-	<!-- <div class="overlay"></div> -->
 	<div class="vignette"></div>
-	<!--<div class="noise"></div> -->
-
 	<div class="navbar navbar-expand-lg fixed-top navbar-dark bg-white d-flex justify-content-between"
 	style="height: 22px; margin-bottom: 2px; padding-right: 2px;">
 	<span style="margin-left: 16px;" class="ncommm">NComm 2.0 Copyright 1988-1992 Daniel Bloch & co.</span>
@@ -279,10 +276,12 @@ EOD;
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle ascii" style="padding-right: 8px;" data-toggle="dropdown" href="/admin.php" id="themes">SUBMiT<span class="caret" style="padding-right: 8px;"></span></a>
 						<div class="dropdown-menu ascii" aria-labelledby="themes">
-							<a class="dropdown-item ascii" href="/submit.php#colly">Colly<span style="padding-left: 7px;">       </span></a>
+							<a class="dropdown-item ascii" href="/submit.php">Colly<span style="padding-left: 7px;">       </span></a>
 							<a class="dropdown-item ascii" href="/submit.php#crew">Crew<span style="padding-left: 4px;">    </span></a>
 							<a class="dropdown-item ascii" href="/submit.php#artist">Artist<span style="padding-left: 10px;">     </span></a>
 							<a class="dropdown-item ascii" href="/submit.php#bbs">BBS<span style="font-size: 16px;"> </span></a>
+							<a class="dropdown-item ascii" href="/submit.php#app">APP<span style="font-size: 16px;"> </span></a>
+							<a class="dropdown-item ascii" href="/submit.php#ascii_mag">MAG<span style="font-size: 16px;"> </span></a>
 						</div>
 					</li>
 					<li class="nav-item dropdown">

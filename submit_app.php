@@ -1,39 +1,33 @@
 <div class="tab-pane fade" id="app">
-
-	<!-- -------------------------------------------------------------------------------- -->
-	<!-- UPLOAD MAG FIELD                                                           -->
-	<!-- -------------------------------------------------------------------------------- -->
-
 	<form enctype="multipart/form-data" action="submit.php" method="post">
-		<div class="headline">
-			Upload ASCII Mag
+		<div class="container-fluid bg-secondary ap-1">
+			<div class="row apl-1 apt-1">
+				App Name (required)
+			</div>
+			<div class="row apl-1 apb-1">
+				<input type="text" size="24" name="name">
+			</div>
+
+			<div class="row apl-1">
+				App Author
+			</div>
+
+			<div class="row apl-1 apb-1">
+				<input type="text" name="app_author">
+			</div>
+
+			<div class="row apl-1">
+				File (required)
+			</div>
+
+			<div class="row apl-1 apb-1">
+				<input name="uploaded_app" type="file">
+				<input type="hidden" name="max_file_size" value="10240000">
+				<input type="hidden" name="type" value="APP">
+			</div>
+			<div class="row apl-1">
+				<input type="SUBMIT" value="Upload">
+			</div>
 		</div>
-
-		<div class="content_with_blenk"><br></div>
-
-		<div class="content">
-			Name
-		</div>
-
-		<div class="content">
-			<input type="text" size="24" name="name">
-		</div>
-
-		<div class="content">
-			Author
-		</div>
-
-		<div class="content">
-			<input type="text" name="mag_author">
-		</div>
-
-		<div class="content">
-			File		
-		</div>
-
-		<input name="uploaded_mag" type="file">
-		<input type="hidden" name="max_file_size" value="10240000">
-		<input type="hidden" name="type" value="MAG">
-		<input type="SUBMIT" value="Upload">
 	</form>
 </div>

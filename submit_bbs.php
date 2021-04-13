@@ -1,14 +1,8 @@
-
 <div class="tab-pane fade" id="bbs">
-
-	<!-- -------------------------------------------------------------------------------- -->
-	<!-- ADD BBS FIELD                                                               -->
-	<!-- -------------------------------------------------------------------------------- -->
-
 	<form enctype="multipart/form-data" action="submit.php" method="post">
 		<div class="container-fluid bg-secondary ap-1">
-			<div class="row apl-1 ">
-				Name
+			<div class="row apl-1 apt-1">
+				Name (required)
 			</div>
 
 			<div class="row apl-1 apb-1">
