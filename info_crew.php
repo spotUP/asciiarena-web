@@ -26,6 +26,7 @@ include "header.php";
 
 		$sort_criteria=$_GET['sort_by'] ?? 'a.name';
 		$sort_criteria=preg_replace('[^a-z.]','', $sort_criteria);
+		if ($sort_criteria === 'a.name') $sort_criteria = 'w.name';
 
 		$ask="select * from crews where crewurl=:crewurl";
 		$result=fetchAll($ask, [ 'crewurl' => $crewurl ]);
@@ -135,7 +136,7 @@ include "header.php";
 					foreach($result_members as $row_members)
 						$members=$row_members->count;					
 
-					$ask_rels="SELECT COUNT(filename) AS count FROM crew_of where crew=:showcrew";
+					$ask_rels="SELECT COUNT(colly_id) as count FROM collys_crews WHERE crew_id = (SELECT id FROM crews WHERE name=:showcrew)";
 					$result_rels=fetchAll($ask_rels, [ 'showcrew' => $showcrew ]);
 					foreach($result_rels as $row_rels)
 						$releases=$row_rels->count;				
@@ -234,7 +235,7 @@ include "header.php";
 				}
 				?>
 				<?php
-				$ask_memb_rels="SELECT COUNT(filename) AS count FROM author_of WHERE nick=:crewmember";
+				$ask_memb_rels="SELECT COUNT(colly_id) as count FROM artists_collys WHERE artist_id = (SELECT id FROM artists WHERE nick=:crewmember)";
 				$result_memb_rels=fetchAll($ask_memb_rels, [ 'crewmember' => $crewmember ]);
 				foreach($result_memb_rels as $row_memb_rels)
 				{
@@ -328,7 +329,13 @@ include "header.php";
 // LATEST RELEASE
 //-----------------------------------------------------------------------------
 
-		$ask="SELECT a.*, b.nick AS author, c.crew FROM collys AS a INNER JOIN author_of AS b ON a.filename = b.filename INNER JOIN crew_of AS c ON a.filename = c.filename WHERE c.crew = :showcrew GROUP BY a.filename ORDER BY a.year DESC, a.month DESC, a.day DESC LIMIT 1";
+		$ask="SELECT c.*,a.nick,w.name as crew FROM collys c
+			  LEFT JOIN artists_collys ac ON c.id=ac.colly_id
+			  LEFT JOIN artists a ON ac.artist_id=a.id
+			  LEFT JOIN collys_crews cc ON cc.colly_id=c.id
+			  LEFT JOIN crews w ON cc.crew_id=w.id
+			  WHERE c.id in (SELECT colly_id FROM collys_crews WHERE crew_id IN (SELECT id FROM crews WHERE name=:showcrew))
+			  GROUP BY c.filename ORDER BY c.year DESC, c.month DESC, c.day LIMIT 1";
 		$result=fetchAll($ask, [ 'showcrew' => $showcrew ]);
 		foreach($result as $row)
 		{
@@ -368,7 +375,8 @@ include "header.php";
 						Artist(s):
 						<?php
 						$authors = [];
-						foreach(fetchAll("SELECT * FROM author_of WHERE filename = :filename GROUP BY nick", [ ':filename' => $filename ]) as $author) {
+						foreach(fetchAll("SELECT a.nick FROM collys c LEFT JOIN artists_collys ac ON ac.colly_id=c.id LEFT JOIN artists a ON a.id=ac.artist_id 
+                                                                WHERE c.filename=:filename GROUP BY ac.artist_id", [ ':filename' => $filename ]) as $author) {
 							$authors[] = "<a href=\"/artist/".urlsafe($author->nick)."\">{$author->nick}</a>";
 						}
 						echo pluralize($authors, '<span class="magenta"> & </span>');
@@ -378,7 +386,8 @@ include "header.php";
 						Crew(s):
 						<?php
 							$crews = [];
-							foreach(fetchAll("SELECT * FROM crew_of WHERE filename = :filename GROUP BY crew", [ ':filename' => $filename ]) as $crew) {
+							foreach(fetchAll("SELECT w.name as crew FROM collys c LEFT JOIN collys_crews cc ON cc.colly_id=c.id LEFT JOIN crews w ON w.id=cc.crew_id 
+                                                                WHERE c.filename=:filename GROUP BY cc.crew_id", [ ':filename' => $filename ]) as $crew) {
 								$crews[] = "<a href=\"/crew/".urlsafe($crew->crew)."/\">{$crew->crew}</a>";
 							}
 							echo pluralize($crews, '<span class="magenta"> & </span>');
@@ -495,8 +504,13 @@ include "header.php";
 
 		</div>
 		<?php
-
-		$ask_check="SELECT a.*, b.nick AS author, c.crew FROM collys AS a INNER JOIN author_of AS b ON a.filename = b.filename INNER JOIN crew_of AS c ON a.filename = c.filename WHERE c.crew = :crew GROUP BY a.filename ORDER BY $sort_criteria ASC LIMIT 1";
+		$ask_check="SELECT c.*,a.nick,w.name FROM collys c
+			  LEFT JOIN artists_collys ac ON c.id=ac.colly_id
+			  LEFT JOIN artists a ON ac.artist_id=a.id
+			  LEFT JOIN collys_crews cc ON cc.colly_id=c.id
+			  LEFT JOIN crews w ON cc.crew_id=w.id
+			  WHERE c.id in (SELECT colly_id FROM collys_crews WHERE crew_id IN (SELECT id FROM crews WHERE name=:crew))
+			  GROUP BY c.filename ORDER BY $sort_criteria ASC LIMIT 1";
 		$result_check=fetchAll($ask_check, [ 'crew' => $showcrew ]);
 		foreach($result_check as $row_check)
 		{
@@ -506,21 +520,29 @@ include "header.php";
 				<h2 class="amb-1 amt-1 ap-1 bg-header">ALL <?=$show_acronym?> RELEASES</h2>            
 				<div class="row amt-1 amb-1">
 					<div class="col-6">
-						<a class="white" href="/crew/<?=urlsafe($showcrew)?>/?sort_by=a.name">NAME</a>
+						<a class="white" href="/crew/<?=urlsafe($showcrew)?>/?sort_by=w.name">NAME</a>
 					</div>
 					<div class="col-2">
-						<a class="white" href="/crew/<?=urlsafe($showcrew)?>/?sort_by=a.filename">FiLENAME</a>
+						<a class="white" href="/crew/<?=urlsafe($showcrew)?>/?sort_by=c.filename">FiLENAME</a>
 					</div>
 					<div class="col-2">
-						<a class="white" href="/crew/<?=urlsafe($showcrew)?>/?sort_by=b.nick">ARTiST</a>
+						<a class="white" href="/crew/<?=urlsafe($showcrew)?>/?sort_by=a.nick">ARTiST</a>
 					</div>
 					<div class="col-2">
-						<a href="/crew/<?=urlsafe($showcrew)?>/?sort_by=a.year, a.month">DATE</a>
+						<a href="/crew/<?=urlsafe($showcrew)?>/?sort_by=c.year, c.month">DATE</a>
 					</div>
 				</div>
 				<?php
-				$ask="SELECT a.*, b.nick AS author, c.crew FROM collys AS a INNER JOIN author_of AS b ON a.filename = b.filename INNER JOIN crew_of AS c ON a.filename = c.filename WHERE c.crew = :showcrew GROUP BY a.filename ORDER BY $sort_criteria ASC";
-				$result=fetchAll($ask, [ 'showcrew' => $showcrew ]);
+				$ask = "SELECT c.*,a.nick,w.name, 
+					GROUP_CONCAT(a.nick) as author
+					FROM collys c
+  					LEFT JOIN artists_collys ac ON c.id=ac.colly_id
+  					LEFT JOIN artists a ON ac.artist_id=a.id
+  					LEFT JOIN collys_crews cc ON cc.colly_id=c.id
+  					LEFT JOIN crews w ON cc.crew_id=w.id
+  					WHERE c.id in (SELECT colly_id FROM collys_crews WHERE crew_id IN (SELECT id FROM crews WHERE name=:crew))
+  					GROUP BY c.filename";
+				$result=fetchAll($ask, [ 'crew' => $showcrew ]);
 				foreach($result as $row)
 				{
 					$author=$row->author;

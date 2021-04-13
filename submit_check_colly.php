@@ -265,21 +265,17 @@
 
 		foreach($_POST['artist'] as $artist)
 		{
-			$ask="insert into author_of (nick, filename, colly_id, user_id, artist_id) 
-				values (:artist,:filename,
-                                (select id from collys where filename=:filename),
-                                (select user_id from artists where nick=:artist),
-                                (select id from artists where nick=:artist)
-                        )";
+			$ask = "INSERT INTO artists_collys (artist_id, colly_id) VALUES (
+					(SELECT id FROM artists WHERE nick=:artist),
+					(SELECT id FROM collys WHERE filename=:filename))";
 			doQuery($ask, [ 'artist' => $artist, 'filename' => $filename ]);
 		}
 
 		foreach($_POST['crew'] as $crew)
 		{
-			$ask = "insert into crew_of (crew, filename, crew_id, colly_id)
-					values (:crew, :filename, 
-					(select id from crews where name=:crew),
-					(select id from collys where filename=:filename))";
+			$ask = "INSERT INTO collys_crews (colly_id, crew_id) VALUES (
+					(SELECT id FROM collys WHERE filename=:filename),
+					(SELECT id FROM crews WHERE name=:crew))";
 			doQuery($ask, [ 'crew' => $crew, 'filename' => $filename ]);
 		}
 
