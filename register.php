@@ -1,6 +1,7 @@
 <?php
 require_once "session.php";
 $h1 = ["wELCOME tO aSCIIaRENA", "bY uP rOUGH and diViNE sTYLERS"];
+$now = time();
 include "header.php";
 ?>
 <div class="modal-body row m-0 p-0">
@@ -113,8 +114,8 @@ include "header.php";
 				exit;
 			}
 			$ask = $_db->prepare("INSERT INTO users
-				(nick, crew, password, pwhash, lastactive, current, avatar, mail, uploaded, `rank`, upload_signature, list_view_mode, display_mail,display_messenger)
-				VALUES (:check_nick,'Independent','SECRET',:pwhash, :now, '', 'AvatarDefault.jpg', :mail, 0, 'Inactive', '- -- - aSCIIaRENa - ---- - aSCIIaRENa - -- -','Standard', 'No', 'No')");
+				(nick, crew, password, pwhash, lastactive, current, mail, uploaded, `rank`, upload_signature, list_view_mode, display_mail)
+				VALUES (:check_nick,'Independent','SECRET',:pwhash, :now, '', :mail, 0, 'Inactive', '- -- - aSCIIaRENa - ---- - aSCIIaRENa - -- -','Standard', 'No', 'No')");
 			$ask->execute([
 				'check_nick' => $check_nick,
 				'now' => $now,
@@ -186,22 +187,10 @@ include "header.php";
 			$username = "asciiarena@gmail.com";
 			$password = "4skee4rena";
 
-			$headers = array ('From' => $from,
-				'To' => $to,
-				'Subject' => $subject);
-					// $smtp = Mail::factory('smtp',
-					// array ('host' => $host,
-					// 	'port' => $port,
-					// 	'auth' => true,
-					// 	'username' => $username,
-					// 	'password' => $password));
-					//
-					// $mail = $smtp->send($to, $headers, $body);
-					//
-					// if (PEAR::isError($mail)) 
-					// {
-					// 	echo("<p>" . $mail->getMessage() . "</p>");
-					// } 
+			$headers = 'From: arenamailer @ gmail . com';
+
+			mail($to,$subject,$body,$headers);
+
 				?>
 				<div class="container-fluid bg-secondary amb-1 apb-1">
 					<div class="row">
