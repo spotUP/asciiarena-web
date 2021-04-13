@@ -832,6 +832,7 @@ if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ])))
 		if (file_exists(__DIR__ . "/collections/{$dirname}/{$filename}")) 
 		{
 			$content = file_get_contents(__DIR__ . "/collections/{$dirname}/{$filename}");
+            $content = htmlspecialchars($content)
 			echo "<br><br><br><br>";
 			echo utf8_encode($content);
 			echo "<br><br><br><br>";
