@@ -660,13 +660,6 @@ if(isset($_POST['do_change_crew']) && is_admin())
 			$logo=$_POST['getsitelogo'];
 			$editedsitelogodata=$_POST['editedsitelogo'];
 
-//			$font=$_POST['font'];
-//			$font=cleanInsert($font);
-//		$editedsitelogodata = htmlspecialchars($editedsitelogodata, ENT_QUOTES);
-
-//		htmlspecialchars_decode($editedsitelogodata, ENT_QUOTES);
-//		$editedsitelogodata=utf8_encode($editedsitelogodata);
-
 			if(empty($editedsitelogodata))
 			{
 				?>
@@ -678,51 +671,19 @@ if(isset($_POST['do_change_crew']) && is_admin())
 				</div>
 				<?php
 			}
-
-//		$rgbvalue=$_POST['set_edited_logo_color'];
-//		$rgbvalue=cleanInsert($rgbvalue);
-//		$rgbvalue = explode(",", $rgbvalue);
-//		$delimiter=",";
-
-//		file_put_contents("templogo.diz", $editedsitelogodata);
-//		load_ansi("templogo.diz","templogo.diz","$font","transparent",0);
-
-//		$old_fg_color_r="170";
-//		$old_fg_color_g="170";
-//		$old_fg_color_b="170";
-
-//		$image = imageCreateFromPNG("templogo.diz.png");
-
-//		$fg_color = imageColorExact($image,$old_fg_color_r,$old_fg_color_g,$old_fg_color_b);	//get color to replace
-//		imageColorSet($image,$fg_color,$rgbvalue[0],$rgbvalue[1],$rgbvalue[2]);		//replace color with
-
-//		imagepng($image,"logos/$logo");	 											// save image		
-
-//		unlink ("templogo.diz");
-//		unlink ("templogo.diz.png");
-
-		//$editedsitelogodata=cleanInsertPost($editedsitelogodata);
+		$editedsitelogodata=cleanInsertPost($editedsitelogodata);
 			$ask_update="update logos set ascii=:editedsitelogodata where logo_id=:logo";
-			doQuery($ask_update,['editedsitelogodata' => $editedsitelogodata, 'logo' => $logo]);	
-
-//		$ask_update="update logos set base64='1' where filename=:logo";
-//		doQuery($ask_update,['logo' => $logo]);	
-
+			doQuery($ask_update,['editedsitelogodata' => $editedsitelogodata, 'logo' => $logo]);
 			?>
 			<div class="bs-component">
 				<div class="animate__animated animate__tada alert alert-dismissible alert-success">
 					<button type="button" class="close" data-dismiss="alert">x</button>
 					<span>Logo saved!</span>
 				</div>
-			</div>				
+			</div>
 			<?php
-
 		}
-
-//----------------------------------------------------------------------------------------------------------------------------
-
 		?>
-
 		<div class="row">
 			<div class="col-lg-12">
 				<?php if(is_admin()) { ?>
