@@ -81,6 +81,42 @@ EOD;
 		}
 	</script>
 	<script type="text/javascript">
+		function add_artist_field()
+		{
+			var newselect = " <select name=\"artist[]\"" + document.getElementById('total_artists').value + "><option value=\"Unknown\">Unknown</option><?php
+
+			$ask="select nick from artists";
+			$result=fetchAll($ask);
+			foreach($result as $row)
+			{
+				$artists=$row->nick;
+				echo "<option>$artists</option>";
+			}
+			echo "</select>\"\n";
+			?>
+			document.getElementById('new_artist_field').innerHTML =  document.getElementById('new_artist_field').innerHTML + newselect; document.getElementById('total_artist').value =  parseInt( document.getElementById('total_artists').value) + 1;
+		}
+
+	</script>
+	<script type="text/javascript">
+		function add_crew_field()
+		{
+			var newselect = " <select name=\"crew[]\"" + document.getElementById('total_crews').value + "><option value=\"Unknown\">Unknown</option><?php
+
+			$ask="select name from crews";
+			$result=fetchAll($ask);
+			foreach($result as $row)
+			{
+				$crews=$row->name;
+				echo "<option value='$crews'>$crews</option>";
+			}
+			echo "</select>\"\n";
+			?>
+			document.getElementById('new_crew_field').innerHTML =  document.getElementById('new_crew_field').innerHTML + newselect; document.getElementById('total_crews').value =  parseInt( document.getElementById('total_crews').value) + 1;
+		}
+
+	</script>
+	<script type="text/javascript">
 		function add_artist_crew_field()
 		{
 			var newselect = " <select name=\"artist_crew[]\"" + document.getElementById('total_artist_crews').value + "><option value=\"Unknown\">Unknown</option><?php
@@ -116,7 +152,6 @@ EOD;
 		}
 
 	</script>
-
 	<script type="text/javascript">
 		function add_colly_crew_field()
 		{
