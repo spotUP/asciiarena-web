@@ -82,11 +82,6 @@
 // CHECK UPLOADED COLLY
 //---------------------------------------------------------------------------------------------------------------
 
-	echo "<pre>";
-	print_r($_POST);
-	print_r($_FILES);
-	print_r($_user);
-	echo "</pre>";
 	if(isset($_POST['colly_name']))
 	{
 		$max_file_size=$_POST['max_file_size'];
@@ -122,7 +117,7 @@
 		$filename = $_FILES['uploadedfile']['name']; 							// fetch filename with extension
 		$dirname = explode(".", $filename);
 		$dirname = $dirname[0];
-		$upload_path = "collys/";
+		$upload_path = "collections/";
 
 		if (isset($filename))
 		{
@@ -390,212 +385,27 @@
 		   }
 
 //---------------------------------------------------------------------------------------------------------------
-// CONVERT ASCII COLLY
-//---------------------------------------------------------------------------------------------------------------
-
-		   if ($type == ASCII)
-		   { 
-			$filename = $_FILES['uploadedfile']['name']; 							// fetch filename with extension
-		   	$filen = $upload_path . basename($_FILES['uploadedfile']['name']); 		// fetch filename with path
-
-		   	$dirname = explode(".", $filename);
-		   	$dirname = $dirname[0];
-
-			$filename=str_replace("'", "&#39;",$filename);				// replace ' with &#39
-
-			exec("mkdir collys/$dirname");
-
-			$imagenames=load_ansi("$filen","collys/$dirname/$filename-mosoul","mosoul","$colors",0);
-			if ($imagenames!=-1)
-			{
-				for($i=0;$i<count($imagenames);$i++)
-				{
-					$imagenames[$i]=str_replace("'", "&#39;",$imagenames[$i]);
-					$ask ="insert into image_of values (:filename_mosoul,:imagenames)";
-					doQuery($ask, [
-						'filename_mosoul' => "$filename-mosoul",
-						'imagenames'      => $imagenames[$i],
-					]);
-				}
-			}
-			else
-			{
-				
-				?>
-				<div class="headline">
-					Error
-				</div>
-
-				<div class="content_with_blenk">
-					There was an error during the conversion, please inform an admin!
-				</div>
-				<?php
-                # FIXME: Danger Will Robinson, $filename should be escaped so that one can't say $filename = '%'
-				$ask ="DELETE from image_of WHERE filename LIKE :filename_pattern";
-				doQuery($ask, ['filename_pattern' => "$filename%" ]);
-
-				$ask ="DELETE from collys WHERE filename=:filename";
-				doQuery($ask, [ 'filename' => $filename ]);
-				
-				exit;
-			}
-
-			$imagenames=load_ansi("$filen","collys/$dirname/$filename-microknight","microknight","$colors",0);
-			if ($imagenames!=-1)
-			{
-				for($i=0;$i<count($imagenames);$i++)
-				{
-					$imagenames[$i]=str_replace("'", "&#39;",$imagenames[$i]);
-					$ask ="insert into image_of values (:filename_microknight,:imagenames)";
-					doQuery($ask, [
-						'filename_microknight' => "$filename-microknight",
-						'imagenames'           => $imagenames[$i],
-					]);
-				}
-			}
-			else
-			{
-				?>
-				<div class="headline">
-					Error
-				</div>
-
-				<div class="content_with_blenk">
-					There was an error during the conversion, please inform an admin!
-				</div>
-				<?php
-                # FIXME: Danger Will Robinson, $filename should be escaped so that one can't say $filename = '%'
-				$ask ="DELETE from image_of WHERE filename LIKE :filename_pattern";
-				doQuery($ask, ['filename_pattern' => "$filename%" ]);
-
-				$ask ="DELETE from collys WHERE filename=:filename";
-				doQuery($ask, [ 'filename' => $filename ]);
-
-				exit;
-			}
-			
-			$imagenames=load_ansi("$filen","collys/$dirname/$filename-pot-noodle","pot-noodle","$colors",0);
-			if ($imagenames!=-1)
-			{
-				for($i=0;$i<count($imagenames);$i++)
-				{
-					$imagenames[$i]=str_replace("'", "&#39;",$imagenames[$i]);
-					$ask ="insert into image_of values (:filename_pot_noodle',:imagenames)";
-					doQuery($ask, [
-						'filename_pot_noodle' => "$filename-pot-noodle",
-						'imagenames'          => $imagenames[$i],
-					]);
-				}
-			}
-			else
-			{
-				?>
-				<div class="headline">
-					Error
-				</div>
-
-				<div class="content_with_blenk">
-					There was an error during the conversion, please inform an admin!
-				</div>
-				<?php
-
-                # FIXME: Danger Will Robinson, $filename should be escaped so that one can't say $filename = '%'
-				$ask ="DELETE from image_of WHERE filename LIKE :filename_pattern";
-				doQuery($ask, ['filename_pattern' => "$filename%" ]);
-
-				$ask ="DELETE from collys WHERE filename=:filename";
-				doQuery($ask, [ 'filename' => $filename ]);
-
-				exit;
-			}
-
-			$imagenames=load_ansi("$filen","collys/$dirname/$filename-topaz","topaz","$colors",0);
-			if ($imagenames!=-1)
-			{
-				for($i=0;$i<count($imagenames);$i++)
-				{
-					$imagenames[$i]=str_replace("'", "&#39;",$imagenames[$i]);
-					$ask ="insert into image_of values (:filename_topaz,:imagenames)";
-					doQuery($ask, [
-						'filename_topaz' => "$filename-topaz",
-						'imagenames'      => $imagenames[$i],
-					]);
-				}
-			}
-			else
-			{
-				?>
-				<div class="headline">
-					Error
-				</div>
-
-				<div class="content_with_blenk">
-					There was an error during the conversion, please inform an admin!
-				</div>
-				<?php
-
-                # FIXME: Danger Will Robinson, $filename should be escaped so that one can't say $filename = '%'
-				$ask ="DELETE from image_of WHERE filename LIKE :filename_pattern";
-				doQuery($ask, ['filename_pattern' => "$filename%" ]);
-
-				$ask ="DELETE from collys WHERE filename=:filename";
-				doQuery($ask, [ 'filename' => $filename ]);
-
-				exit;
-			}
-			
-			$imagenames=load_ansi("$filen","collys/$dirname/$filename-topazplus","topazplus","transparent",0);
-			if ($imagenames!=-1)
-			{
-				for($i=0;$i<count($imagenames);$i++)
-				{
-					{
-						$imagenames[$i]=str_replace("'", "&#39;",$imagenames[$i]);
-						$ask ="insert into image_of values (:filename_topazplus,:imagenames)";
-						doQuery($ask, [
-							'filename_topazplus' => "$filename-topazplus",
-							'imagenames'         => $imagenames[$i],
-						]);
-					}
-				}
-			}
-			else
-			{
-				?>
-				<div class="headline">
-					Error
-				</div>
-
-				<div class="content_with_blenk">
-					There was an error during the conversion, please inform an admin!
-				</div>
-				<?php
-
-                # FIXME: Danger Will Robinson, $filename should be escaped so that one can't say $filename = '%'
-				$ask ="DELETE from image_of WHERE filename LIKE :filename_pattern";
-				doQuery($ask, ['filename_pattern' => "$filename%" ]);
-
-				$ask ="DELETE from collys WHERE filename=:filename";
-				doQuery($ask, [ 'filename' => $filename ]);
-
-				exit;
-			}
-		}
-
-//---------------------------------------------------------------------------------------------------------------
 // WRITE TO COLLY
 //---------------------------------------------------------------------------------------------------------------
 
 		foreach($_POST['artist'] as $artist)
 		{
-			$ask="insert into author_of values (:artist,:filename)";
-			doQuery($ask, [ 'artist' => $artist, filename => $filename ]);
+			$ask="insert into author_of (nick, filename, colly_id, user_id, artist_id) 
+				values (:artist,:filename,
+                                (select id from collys where filename=:filename),
+                                (select user_id from artists where nick=:artist),
+                                (select id from artists where nick=:artist)
+                        )";
+			doQuery($ask, [ 'artist' => $artist, 'filename' => $filename ]);
 		}
 
 		foreach($_POST['crew'] as $crew)
 		{
-			$ask="insert into crew_of values (:crew,:filename)";
-			doQuery($ask, [ 'crew' => $crew, filename => $filename ]);
+			$ask = "insert into crew_of (crew, filename, crew_id, colly_id)
+					values (:crew, :filename, 
+					(select id from crews where name=:crew),
+					(select id from collys where filename=:filename))";
+			doQuery($ask, [ 'crew' => $crew, 'filename' => $filename ]);
 		}
 
 		$result = fetchOne("select sum(filesize) AS sum from collys where uploader=:nick", [ 'nick' => $nick ]);
