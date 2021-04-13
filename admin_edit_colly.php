@@ -143,7 +143,7 @@ if($getcollyname && (!isset($_POST['do_edit_colly'])))
 						</div>
 						<div class="col-3">
 							<?php
-							$ask="select nick from author_of where filename=:filename";
+							$ask = "SELECT a.nick FROM collys c LEFT JOIN artists_collys ac ON ac.colly_id=c.id LEFT JOIN artists a ON a.id=ac.artist_id WHERE c.filename=:filename";
 							$result=fetchAll($ask, [ 'filename' => $getcollyname]);
 							foreach ($result as $row)
 							{
@@ -179,7 +179,7 @@ if($getcollyname && (!isset($_POST['do_edit_colly'])))
 						</div>
 						<div class="col-3">				
 							<?php
-							$ask="select crew from crew_of where filename=:getcollyname";
+							$ask = "SELECT w.name as crew FROM collys c LEFT JOIN collys_crews cc ON cc.colly_id=c.id LEFT JOIN crews w ON w.id=cc.crew_id WHERE c.filename=:filename";
 							$result=fetchAll($ask, ['getcollyname' => $getcollyname]);
 							foreach ($result as $row)
 							{
