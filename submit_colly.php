@@ -69,13 +69,13 @@
 				<span class="apl-1">
 					<select name="year">
 						<?php
-						$countyear=1986;
-						$maxyear=date("Y");
+						$endyear=1986;
+						$startyear=date("Y");
 						echo "<option selected='selected' value=0>Unknown</option>";
-						while($countyear<=$maxyear)
+						while($endyear<=$startyear)
 						{
-							echo "<option value=\"$countyear\">$countyear</option>";
-							$countyear++;
+							echo "<option value=\"$countyear\">$startyear</option>";
+							$startyear--;
 						}
 						?>
 					</select>
