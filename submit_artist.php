@@ -1,13 +1,9 @@
 <div class="tab-pane fade" id="artist">
-	<!-- -------------------------------------------------------------------------------- -->
-	<!-- ADD ARTIST FIELD                                                              -->
-	<!-- -------------------------------------------------------------------------------- -->
-
 	<form action="submit.php" method="post">	
 		<div class="container-fluid bg-secondary ap-1">
 
-			<div class="row apl-1">
-				Nick
+			<div class="row apl-1 apt-1">
+				Nick (required)
 			</div>
 
 			<div class="row apl-1 apb-1">

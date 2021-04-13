@@ -31,7 +31,7 @@ include "header.php";
 					<button type="button" class="close" data-dismiss="alert">x</button>
 					<span>Good bwai! Colly marked as fixed!</span>
 				</div>
-			</div>				
+			</div>
 			<?php
 		}	
 
