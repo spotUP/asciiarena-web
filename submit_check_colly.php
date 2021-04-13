@@ -82,6 +82,11 @@
 // CHECK UPLOADED COLLY
 //---------------------------------------------------------------------------------------------------------------
 
+	echo "<pre>";
+	print_r($_POST);
+	print_r($_FILES);
+	print_r($_user);
+	echo "</pre>";
 	if(isset($_POST['colly_name']))
 	{
 		$max_file_size=$_POST['max_file_size'];
@@ -97,20 +102,6 @@
 		$total_artists=$_POST['total_artists'];
 		$artist=$_POST['artist'];
 		$colors=$_POST['colors'];
-		$colors=cleanInsert($colors);
-		$total_artists=cleanInsert($total_artists);
-		$type=cleanInsert($type);
-		$day=cleanInsert($day);
-		$month=cleanInsert($month);
-		$year=cleanInsert($year);
-		$artist=addslashes($artist);
-		$artist=cleanInsert($artist);
-		$crew=addslashes($crew);
-		$crew=cleanInsert($crew);
-		$name=cleanInsert($name);
-		$type=cleanInsert($type);
-		$colors=cleanInsert($colors);
-		$now=cleanInsert($now);
 		?>
 		<div class="headline">
 			Status
@@ -128,13 +119,14 @@
 
 		flush();
 		$allowed_filetypes = array('.txt','.TXT','.asc','.ASC','.ans','.ANS','.diz','.DIZ','.lha','.LHA'); 	// allowed extensions
-		$upload_path = "collys/"; 			
+		$filename = $_FILES['uploadedfile']['name']; 							// fetch filename with extension
+		$dirname = explode(".", $filename);
+		$dirname = $dirname[0];
+		$upload_path = "collys/";
 
 		if (isset($filename))
 		{
 			$filename = $_FILES['uploadedfile']['name']; 							// fetch filename with extension
-			$filename=addslashes($filename);
-			$filename=cleanInsert($filename);
 			$ext = substr($filename, strpos($filename,'.'), strlen($filename)-1); 	// extract extension 
 		 	if(!in_array($ext,$allowed_filetypes))									// filetype allowed?		
 		 	{
@@ -219,61 +211,28 @@
 // CONVERT FILE_ID.DIZ
 //---------------------------------------------------------------------------------------------------------------
 
-		if ($type == ASCII)
+
+		if ($type == 'ASCII')
 		{
 			$filename = $_FILES['uploadedfile']['name']; 							// fetch filename with extension
-		   	$filen = $upload_path . basename($_FILES['uploadedfile']['name']); 		// fetch filename with path
+		   	$filen = $upload_path . $dirname . '/' . basename($_FILES['uploadedfile']['name']); 		// fetch filename with path
+			mkdir($upload_path.$dirname, 0755, TRUE);
 
 		   	if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $filen))
 		   	{ 
-		   		$word1='@BEGIN_FILE_ID.DIZ';
-		   		$word2='@END_FILE_ID.DIZ';
+				$contents = file_get_contents($filen);
+				$file_id = preg_match('/@BEGIN_FILE_ID\.DIZ(.*)@END_FILE_ID\.DIZ/s', $contents, $m) ? $m[1] : '';
+				$file_id_name = (strlen($file_id) > 1) ? $filename.'.diz.png' : null;
+				
+		   		if (strlen ($file_id) > 0) file_put_contents($filen.".diz", $file_id);
 
-		   		$handle = fopen($filen, "r");
-		   		$contents = fread($handle, filesize($filen));
-		   		fclose($handle);
-
-		   		list($junk, $good) = split('@BEGIN_FILE_ID.DIZ', $contents);
-		   		list($good, $junk) = split('@END_FILE_ID.DIZ', $good);
-		   		$file_id = $good;
-
-		   		if (strlen ($file_id) > 0)
-		   		{
-		   			file_put_contents($filen.".diz", $file_id);
-		   			load_ansi($filen.".diz","$filen.diz","mosoul","transparent",0);
-
-		   			$ask="insert into collys values (:name,:year,:type,:filename,:now,(null),:nick,:filesize,:month,:filename_diz_png,0,(null),:day,0,(null))";
-		   			doQuery($ask, [
-		   				'name' => $name,
-		   				'year' => $year,
-		   				'type' => $type,
-		   				'filename' => $filename,
-		   				'now'  => $now,
-		   				'nick' => $nick,
-		   				'filesize' => $filesize,
-		   				'month' => $month,
-		   				'filename_diz_png' => "$filename.diz.png",
-		   				'day' => $day,
-		   			]);
-		   		}
-		   		else
-		   		{
-		   			$ask="insert into collys values (:name,:year,:type,:filename,:now,(null),:nick,:filesize,:month,'file_id_diz.png',0,(null),:day,0,(null))";
-		   			doQuery($ask, [
-		   				'name' => $name,
-		   				'year' => $year,
-		   				'type' => $type,
-		   				'filename' => $filename,
-		   				'now'  => $now,
-		   				'nick' => $nick,
-		   				'filesize' => $filesize,
-		   				'month' => $month,
-		   				'day' => $day,
-		   			]);
-		   		} 
+				$ask = "INSERT INTO collys (name, year, type, filename, timestamp, uploader, uploader_id, filesize, month, file_id, view_counter, downloads, day, broken) 
+					VALUES (:name, :year, :type, :filename, :now, :uploader, :uploader_id, :filesize, :month, :file_id, 0, 0, :day, 0)";
+				doQuery($ask, [ 'name' => $name, 'year' => $year, 'type' => $type, 'filename' => $filename,'now'  => $now, 'uploader' => $_user['nick'], 
+					'uploader_id' => $_user['id'], 'filesize' => $filesize, 'month' => $month, 'file_id' => $file_id_name, 'day' => $day ]);
 		   	}
 		   }
-		   elseif ($type == Archive)	
+		   elseif ($type == 'Archive')	
 		   {
 			$filename = $_FILES['uploadedfile']['name']; 							// fetch filename with extension
 		   	$filen = $upload_path . basename($_FILES['uploadedfile']['name']); 		// fetch filename with path
