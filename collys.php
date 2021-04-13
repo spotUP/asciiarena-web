@@ -5,6 +5,7 @@ include('header.php');
 $is_search = isset($_POST[ "search" ]);
 $searchquery = $_POST[ 'search' ] ?? "";
 if(strlen($searchquery) < 3) unset($is_search);
+$searchquery = str_replace('-', ' ', $searchquery);
 $viewmode = $_GET[ 'viewmode' ] ?? "Standard";
 $crew = $_GET[ 'crew' ] ?? "";
 $sort_by = $_GET[ 'sort_by' ] ?? "";
