@@ -7,7 +7,6 @@
 
 if(isset($_POST['crewname']))
 {
-	var_dump($_POST);
 	$crewname=$_POST['crewname'];
 	$crewacronym=$_POST['crewacronym'];
 	$crewwww=$_POST['crewwww'];
