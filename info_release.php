@@ -828,7 +828,7 @@ if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ])))
 	if ($type == "ASCII") 
 	{
 		?>
-		<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;"><code id="colly" style="font-family: '<?=$font;?>';color: <?=$fgcolor?>;"><?php
+		<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;"><pre id="colly" style="font-family: '<?=$font;?>';color: <?=$fgcolor?>;"><?php
 		if (file_exists(__DIR__ . "/collections/{$dirname}/{$filename}")) 
 		{
 			$content = file_get_contents(__DIR__ . "/collections/{$dirname}/{$filename}");
@@ -836,7 +836,7 @@ if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ])))
 			echo utf8_encode($content);
 			echo "<br><br><br><br>";
 		}
-		?></code>
+		?></pre>
 		</div>
 <?php   }
 	elseif ($type == "ANSI") 
