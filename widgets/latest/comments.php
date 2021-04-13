@@ -21,7 +21,7 @@
 			?>
 			<div class="row apl-1 apr-1">
 				<div class="col-7 cyan text-truncate">
-					<a href="/release/<?=$row->filename?>"><?=fixOutputPost($row->comment)?></a>
+					<a class="cyan" href="/release/<?=$row->filename?>"><?=fixOutputPost($row->comment)?></a>
 				</div>
 				<div class="col-3">
 					<a class="magenta text-truncate" href="/release/<?=$row->filename?>"><?=$row->filename?></a>
