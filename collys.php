@@ -4,6 +4,7 @@ $h1 = "COLLYS";
 include('header.php');
 $is_search = isset($_POST[ "search" ]);
 $searchquery = $_POST[ 'search' ] ?? "";
+if(strlen($searchquery) < 3) unset($is_search);
 $viewmode = $_GET[ 'viewmode' ] ?? "Standard";
 $crew = $_GET[ 'crew' ] ?? "";
 $sort_by = $_GET[ 'sort_by' ] ?? "";
@@ -65,7 +66,19 @@ switch ($sort_by) {
 
 		if ($is_search) {
 			$searchquery = str_replace(" ", ",", $searchquery);
-			$ask = "SELECT * FROM collys WHERE MATCH(filename, name, artists, crews) against (:searchquery in boolean mode) {$limit}";
+			//$ask = "SELECT * FROM collys WHERE MATCH(filename, name, artists, crews) against (:searchquery in boolean mode) {$limit}";
+			$ask = "SELECT c.id,c.name,c.filename,c.type,c.uploader,c.file_id,c.timestamp,c.year,c.month,c.day,
+  				GROUP_CONCAT(a.nick) as artists,GROUP_CONCAT(cw.name) as crews
+  				FROM collys c
+  				LEFT JOIN artists_collys ac ON c.id=ac.colly_id
+  				LEFT JOIN artists a ON ac.artist_id=a.id
+  				LEFT JOIN collys_crews cc ON c.id=cc.colly_id
+  				LEFT JOIN crews cw ON cc.crew_id=cw.id
+  				WHERE 
+  				  MATCH(c.filename, c.name) against (:searchquery in boolean mode)
+  				  OR MATCH(a.nick) against (:searchquery in boolean mode)
+  				  OR MATCH(cw.name) against (:searchquery in boolean mode)
+  				GROUP BY c.filename {$limit}";
 			$rows = fetchAll($ask, [":searchquery" => $searchquery]);
 
 			if ($viewmode === "BBS") {
@@ -92,6 +105,10 @@ switch ($sort_by) {
 					$year = $row->year;
 					$month = $row->month;
 					$day = $row->day;
+					$dirname = explode(".", $filename);
+					$dirname = $dirname[ 0 ];
+					$orig = (file_exists(BASEDIR . "/collections/{$dirname}/{$filename}.diz")) ? file_get_contents(BASEDIR . "/collections/{$dirname}/{$filename}.diz") : "";
+					$orig = utf8_encode($orig);
 					{
 						?>
 						<div class="row">
@@ -138,10 +155,10 @@ switch ($sort_by) {
 							<a href="/release/<?=$row->filename?>"><?=$row->name?></a>
 						</div>
 						<div class="col-lg-4 green">
-							<span class="yellow"><?=combinize($row->artists, $row->artist_ids, "/artist/", $row->artists)?></span>
+							<span class="yellow"><?=combinize($row->artists, $row->artists, "/artist/", $row->artists)?></span>
 						</div>
 						<div class="col-lg-4 yellow text-truncate">
-							<span class="yellow"><?=combinize($row->crews, $row->crew_ids, "/crew/", $row->crews)?></span>
+							<span class="yellow"><?=combinize($row->crews, $row->crews, "/crew/", $row->crews)?></span>
 						</div>
 					</div>
 					<?php
@@ -162,7 +179,16 @@ switch ($sort_by) {
 									<div class="row">
 										<?php
 										$sort_order = in_array($sort_by, ["timestamp", "releasedate"]) ? "DESC" : "ASC";
-										$result = fetchAll("SELECT * FROM collys ORDER BY {$sort_criteria} {$sort_order} {$pagination["limit"]}");
+										//$result = fetchAll("SELECT * FROM collys ORDER BY {$sort_criteria} {$sort_order} {$pagination["limit"]}");
+										$result = fetchAll("SELECT c.filename,c.name,c.year,c.month,c.day, 
+										  GROUP_CONCAT(a.nick) as artists,GROUP_CONCAT(cw.name) as crews
+										  FROM collys c
+										  LEFT JOIN artists_collys ac ON c.id=ac.colly_id
+										  LEFT JOIN artists a ON ac.artist_id=a.id
+										  LEFT JOIN collys_crews cc ON c.id=cc.colly_id
+										  LEFT JOIN crews cw ON cc.crew_id=cw.id
+										  GROUP BY c.filename
+										  ORDER BY {$sort_criteria} {$sort_order} {$pagination["limit"]}");
 										foreach ($result as $row) {
 											$year = $row->year;
 											$month = $row->month;
@@ -207,12 +233,12 @@ switch ($sort_by) {
 									?>
 									<div class="row">
 										<div class="col-lg-12">
-											<span class="green">- --/\-\/- -</span> <span class="cyan">aSCIIaRENA</span> <span class="red">--=*=-- </span><span class="pink"><?=$todaysday?>, the <?=$todaystime?>]</span><span class="red"> --=*=-- </span> <span class="cyan">aSCIIaRENA</span> <span class="green"> - -/\-\/- -- -</span>
+											<span class="green">- --/\-\/- -</span> <span class="cyan">aSCIIaRENA</span> <span class="red">--=*=-- </span><span class="pink"><?=$todaysday?>, the <?=$todaystime?>]</span><span class="red"> --=*=-- </span> <span class="cyan">aSCIIaRENA</span> <span class="green"> - -/\-\/- -- -</span><br/><br/>
 										</div>
 									</div>
 
 									<?php
-									$ask = "SELECT collys.*, author_of.nick, crew_of.crew FROM collys LEFT JOIN author_of ON collys.id = author_of.colly_id LEFT JOIN crew_of ON collys.id = crew_of.colly_id GROUP BY collys.filename ORDER BY :criteria DESC {$limit}";
+									$ask = "SELECT * FROM collys filename ORDER BY :criteria DESC {$pagination["limit"]}";
 									foreach (fetchAll($ask, [":criteria" => $sort_criteria]) as $row) {
 										$filename = $row->filename;
 										$name = $row->name;
@@ -250,7 +276,7 @@ switch ($sort_by) {
 											?>
 											<div class="row">
 												<div class="col-6">
-													<a href=""><span class="cyan" style="margin-right: 8px;"><?=$filename?></span></a> <span class="green" style="margin-right: 16px;">PF--</span> <span class="yellow" style="margin-right: 8px;"><?=$row->filesize?></span> <span class="yellow"><?=$upload_date?></span>
+													<a href="/release/<?=$filename?>"><span class="cyan" style="margin-right: 8px;"><?=$filename?></span></a> <span class="green" style="margin-right: 16px;">PF--</span> <span class="yellow" style="margin-right: 8px;"><?=$row->filesize?></span> <span class="yellow"><?=$upload_date?></span>
 													<?php
 													$ask_sig = "SELECT upload_signature from users where nick = :uploader";
 													$upload_signature = fetchOne($ask_sig, [":uploader" => $uploader])->upload_signature;
