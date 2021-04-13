@@ -97,20 +97,6 @@
 		$total_artists=$_POST['total_artists'];
 		$artist=$_POST['artist'];
 		$colors=$_POST['colors'];
-		$colors=cleanInsert($colors);
-		$total_artists=cleanInsert($total_artists);
-		$type=cleanInsert($type);
-		$day=cleanInsert($day);
-		$month=cleanInsert($month);
-		$year=cleanInsert($year);
-		$artist=addslashes($artist);
-		$artist=cleanInsert($artist);
-		$crew=addslashes($crew);
-		$crew=cleanInsert($crew);
-		$name=cleanInsert($name);
-		$type=cleanInsert($type);
-		$colors=cleanInsert($colors);
-		$now=cleanInsert($now);
 		?>
 		<div class="headline">
 			Status
@@ -128,13 +114,14 @@
 
 		flush();
 		$allowed_filetypes = array('.txt','.TXT','.asc','.ASC','.ans','.ANS','.diz','.DIZ','.lha','.LHA'); 	// allowed extensions
-		$upload_path = "collys/"; 			
+		$filename = $_FILES['uploadedfile']['name']; 							// fetch filename with extension
+		$dirname = explode(".", $filename);
+		$dirname = $dirname[0];
+		$upload_path = "collections/";
 
 		if (isset($filename))
 		{
 			$filename = $_FILES['uploadedfile']['name']; 							// fetch filename with extension
-			$filename=addslashes($filename);
-			$filename=cleanInsert($filename);
 			$ext = substr($filename, strpos($filename,'.'), strlen($filename)-1); 	// extract extension 
 		 	if(!in_array($ext,$allowed_filetypes))									// filetype allowed?		
 		 	{
@@ -219,409 +206,58 @@
 // CONVERT FILE_ID.DIZ
 //---------------------------------------------------------------------------------------------------------------
 
-		if ($type == ASCII)
+
+		if ($type == 'ASCII')
 		{
 			$filename = $_FILES['uploadedfile']['name']; 							// fetch filename with extension
-		   	$filen = $upload_path . basename($_FILES['uploadedfile']['name']); 		// fetch filename with path
+		   	$filen = $upload_path . $dirname . '/' . basename($_FILES['uploadedfile']['name']); 		// fetch filename with path
+			mkdir($upload_path.$dirname, 0755, TRUE);
 
 		   	if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $filen))
 		   	{ 
-		   		$word1='@BEGIN_FILE_ID.DIZ';
-		   		$word2='@END_FILE_ID.DIZ';
+				$contents = file_get_contents($filen);
+				$file_id = preg_match('/@BEGIN_FILE_ID\.DIZ(.*)@END_FILE_ID\.DIZ/s', $contents, $m) ? $m[1] : '';
+				$file_id_name = (strlen($file_id) > 1) ? $filename.'.diz.png' : null;
+				
+		   		if (strlen ($file_id) > 0) file_put_contents($filen.".diz", $file_id);
 
-		   		$handle = fopen($filen, "r");
-		   		$contents = fread($handle, filesize($filen));
-		   		fclose($handle);
-
-		   		list($junk, $good) = split('@BEGIN_FILE_ID.DIZ', $contents);
-		   		list($good, $junk) = split('@END_FILE_ID.DIZ', $good);
-		   		$file_id = $good;
-
-		   		if (strlen ($file_id) > 0)
-		   		{
-		   			file_put_contents($filen.".diz", $file_id);
-		   			load_ansi($filen.".diz","$filen.diz","mosoul","transparent",0);
-
-		   			$ask="insert into collys values (:name,:year,:type,:filename,:now,(null),:nick,:filesize,:month,:filename_diz_png,0,(null),:day,0,(null))";
-		   			doQuery($ask, [
-		   				'name' => $name,
-		   				'year' => $year,
-		   				'type' => $type,
-		   				'filename' => $filename,
-		   				'now'  => $now,
-		   				'nick' => $nick,
-		   				'filesize' => $filesize,
-		   				'month' => $month,
-		   				'filename_diz_png' => "$filename.diz.png",
-		   				'day' => $day,
-		   			]);
-		   		}
-		   		else
-		   		{
-		   			$ask="insert into collys values (:name,:year,:type,:filename,:now,(null),:nick,:filesize,:month,'file_id_diz.png',0,(null),:day,0,(null))";
-		   			doQuery($ask, [
-		   				'name' => $name,
-		   				'year' => $year,
-		   				'type' => $type,
-		   				'filename' => $filename,
-		   				'now'  => $now,
-		   				'nick' => $nick,
-		   				'filesize' => $filesize,
-		   				'month' => $month,
-		   				'day' => $day,
-		   			]);
-		   		} 
+				$ask = "INSERT INTO collys (name, year, type, filename, timestamp, uploader, uploader_id, filesize, month, file_id, view_counter, downloads, day, broken) 
+					VALUES (:name, :year, :type, :filename, :now, :uploader, :uploader_id, :filesize, :month, :file_id, 0, 0, :day, 0)";
+				doQuery($ask, [ 'name' => $name, 'year' => $year, 'type' => $type, 'filename' => $filename,'now'  => $now, 'uploader' => $_user['nick'], 
+					'uploader_id' => $_user['id'], 'filesize' => $filesize, 'month' => $month, 'file_id' => $file_id_name, 'day' => $day ]);
 		   	}
 		   }
-		   elseif ($type == Archive)	
+		   elseif ($type == 'Archive')	
 		   {
 			$filename = $_FILES['uploadedfile']['name']; 							// fetch filename with extension
-		   	$filen = $upload_path . basename($_FILES['uploadedfile']['name']); 		// fetch filename with path
+		   	$filen = $upload_path . $dirname.'/' . basename($_FILES['uploadedfile']['name']); 		// fetch filename with path
+			mkdir($upload_path.$dirname, 0755, TRUE);
+
 		   	if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $filen))
 		   	{ 
-		   		$filename_escaped = addslashes($filename);
-		   		$filen = addslashes($filen);
 
-		   		$contents_check=strlen($contents);
-		   		if ($contents_check <1)
+				$lhal = shell_exec('/usr/bin/lha "'.$filen.'"');
+				$fileids = array();
+				foreach (explode("\n", $lhal) as $l) {
+        				if (preg_match('/%\s+[A-Za-z]+\s+\d+\s+\d{4}\s+(.*file_id\.diz)$/i', $l, $m)) $fileids[] = $m[1];
+				}
+				foreach ($fileids as $fileid) {
+				        shell_exec('/usr/bin/lha pq "'.$filen.'" "'.$fileid.'" > collections/temp.diz');
+				        if (filesize('collections/temp.diz') > 0) {
+                				rename('collections/temp.diz', 'collections/'.$dirname.'/file_id.diz');
+                				break;
+        				}
+				}
+		   		if (!file_exists('collections/'.$dirname.'/file_id.diz'))
 		   		{
-		   			exec("/usr/bin/lha pq ./$filen file_id.diz >collys/temp.diz");
-		   			$size_check = filesize("collys/temp.diz");
-		   			if ($size_check == 0)
-		   			{
-		   				unlink ("collys/temp.diz");
-		   			}
-		   			if (file_exists("collys/temp.diz"))
-		   			{
-		   				$handle = fopen("collys/temp.diz", "r");
-		   				$contents = fread($handle, filesize("collys/temp.diz"));
-		   				fclose($handle);
-		   			}
+		   			file_put_contents('collections/'.$dirname.'/file_id.diz', $name." by ".join(",", $_POST['artists']));
 		   		}
-
-		   		$contents_check=strlen($contents);
-		   		if ($contents_check <1)
-		   		{
-		   			exec("/usr/bin/lha pq ./$filen FILE_ID.DIZ >collys/temp.diz");
-		   			$size_check = filesize("collys/temp.diz");
-		   			if ($size_check == 0)
-		   			{
-		   				unlink ("collys/temp.diz");
-		   			}
-		   			if (file_exists("collys/temp.diz"))
-		   			{
-		   				$handle = fopen("collys/temp.diz", "r");
-		   				$contents = fread($handle, filesize("collys/temp.diz"));
-		   				fclose($handle);
-		   			}
-		   		}				
-		   		$contents_check=strlen($contents);
-		   		if ($contents_check <1)
-		   		{
-		   			exec("/usr/bin/lha pq ./$filen File_Id.Diz >collys/temp.diz");
-		   			$size_check = filesize("collys/temp.diz");
-		   			if ($size_check == 0)
-		   			{
-		   				unlink ("collys/temp.diz");
-		   			}
-		   			if (file_exists("collys/temp.diz"))
-		   			{
-		   				$handle = fopen("collys/temp.diz", "r");
-		   				$contents = fread($handle, filesize("collys/temp.diz"));
-		   				fclose($handle);
-		   			}
-		   		}
-		   		$contents_check=strlen($contents);
-		   		if ($contents_check <1)
-		   		{
-		   			exec("/usr/bin/lha pq ./$filen File_Id.Diz >collys/temp.diz");
-		   			$size_check = filesize("collys/temp.diz");
-		   			if ($size_check == 0)
-		   			{
-		   				unlink ("collys/temp.diz");
-		   			}
-		   			if (file_exists("collys/temp.diz"))
-		   			{
-		   				$handle = fopen("collys/temp.diz", "r");
-		   				$contents = fread($handle, filesize("collys/temp.diz"));
-		   				fclose($handle);
-		   			}
-		   		}				
-		   		$contents_check=strlen($contents);
-		   		if ($contents_check <1)
-		   		{
-		   			exec("/usr/bin/lha pq ./$filen *.DiZ >collys/temp.diz");
-		   			$size_check = filesize("collys/temp.diz");
-		   			if ($size_check == 0)
-		   			{
-		   				unlink ("collys/temp.diz");
-		   			}
-		   			if (file_exists("collys/temp.diz"))
-		   			{
-		   				$handle = fopen("collys/temp.diz", "r");
-		   				$contents = fread($handle, filesize("collys/temp.diz"));
-		   				fclose($handle);
-		   			}
-		   		}				
-		   		$contents_check=strlen($contents);
-		   		if ($contents_check <1)
-		   		{
-		   			exec("/usr/bin/lha pq ./$filen *.dIZ >collys/temp.diz");
-		   			$size_check = filesize("collys/temp.diz");
-		   			if ($size_check == 0)
-		   			{
-		   				unlink ("collys/temp.diz");
-		   			}
-		   			if (file_exists("collys/temp.diz"))
-		   			{
-		   				$handle = fopen("collys/temp.diz", "r");
-		   				$contents = fread($handle, filesize("collys/temp.diz"));
-		   				fclose($handle);
-		   			}
-		   		}
-		   		$contents_check=strlen($contents);
-		   		if ($contents_check <1)
-		   		{
-		   			exec("/usr/bin/lha pq $filen *.diZ >collys/temp.diz");
-		   			$size_check = filesize("collys/temp.diz");
-		   			if ($size_check == 0)
-		   			{
-		   				unlink ("collys/temp.diz");
-		   			}
-		   			if (file_exists("collys/temp.diz"))
-		   			{
-		   				$handle = fopen("collys/temp.diz", "r");
-		   				$contents = fread($handle, filesize("collys/temp.diz"));
-		   				fclose($handle);
-		   			}
-		   		}
-		   		if (file_exists("collys/temp.diz"))
-		   		{
-		   			$size_check = filesize("collys/temp.diz");
-		   			if ($size_check == 0)
-		   			{
-		   				unlink ("collys/temp.diz");
-		   			}
-
-		   			if (file_exists("collys/temp.diz"))
-		   			{
-		   				load_ansi("collys/temp.diz","collys/$filename.diz","mosoul","transparent",0);
-		   			}
-		   		}
-
-		   		if (!file_exists("collys/temp.diz"))
-		   		{
-		   			file_put_contents("./collys/temp.diz", "$name by $mag_author");
-		   			load_ansi("collys/temp.diz","collys/$filename.diz","mosoul","transparent",0);
-		   		}
-		   		$ask="insert into collys values (:name,:year,:type,:filename,:now,(null),:nick,:filesize,:month,:filename_diz_png',0,(null),:day,0,(null))";
-		   		doQuery($ask, [
-		   			'name' => $name,
-		   			'year' => $year,
-		   			'type' => $type,
-		   			'filename' => $filename,
-		   			'now'  => $now,
-		   			'nick' => $nick,
-		   			'filesize' => $filesize,
-		   			'month' => $month,
-		   			'day' => $day,
-		   			'filename_diz_png' => "$filename.diz.png",
-		   		]);
+				$ask = "INSERT INTO collys (name, year, type, filename, timestamp, uploader, uploader_id, filesize, month, file_id, view_counter, downloads, day, broken) 
+					VALUES (:name, :year, :type, :filename, :now, :uploader, :uploader_id, :filesize, :month, :file_id, 0, 0, :day, 0)";
+				doQuery($ask, [ 'name' => $name, 'year' => $year, 'type' => $type, 'filename' => $filename,'now'  => $now, 'uploader' => $_user['nick'], 
+					'uploader_id' => $_user['id'], 'filesize' => $filesize, 'month' => $month, 'file_id' => $file_id_name, 'day' => $day ]);
 		   	}
 		   }
-
-//---------------------------------------------------------------------------------------------------------------
-// CONVERT ASCII COLLY
-//---------------------------------------------------------------------------------------------------------------
-
-		   if ($type == ASCII)
-		   { 
-			$filename = $_FILES['uploadedfile']['name']; 							// fetch filename with extension
-		   	$filen = $upload_path . basename($_FILES['uploadedfile']['name']); 		// fetch filename with path
-
-		   	$dirname = explode(".", $filename);
-		   	$dirname = $dirname[0];
-
-			$filename=str_replace("'", "&#39;",$filename);				// replace ' with &#39
-
-			exec("mkdir collys/$dirname");
-
-			$imagenames=load_ansi("$filen","collys/$dirname/$filename-mosoul","mosoul","$colors",0);
-			if ($imagenames!=-1)
-			{
-				for($i=0;$i<count($imagenames);$i++)
-				{
-					$imagenames[$i]=str_replace("'", "&#39;",$imagenames[$i]);
-					$ask ="insert into image_of values (:filename_mosoul,:imagenames)";
-					doQuery($ask, [
-						'filename_mosoul' => "$filename-mosoul",
-						'imagenames'      => $imagenames[$i],
-					]);
-				}
-			}
-			else
-			{
-				
-				?>
-				<div class="headline">
-					Error
-				</div>
-
-				<div class="content_with_blenk">
-					There was an error during the conversion, please inform an admin!
-				</div>
-				<?php
-                # FIXME: Danger Will Robinson, $filename should be escaped so that one can't say $filename = '%'
-				$ask ="DELETE from image_of WHERE filename LIKE :filename_pattern";
-				doQuery($ask, ['filename_pattern' => "$filename%" ]);
-
-				$ask ="DELETE from collys WHERE filename=:filename";
-				doQuery($ask, [ 'filename' => $filename ]);
-				
-				exit;
-			}
-
-			$imagenames=load_ansi("$filen","collys/$dirname/$filename-microknight","microknight","$colors",0);
-			if ($imagenames!=-1)
-			{
-				for($i=0;$i<count($imagenames);$i++)
-				{
-					$imagenames[$i]=str_replace("'", "&#39;",$imagenames[$i]);
-					$ask ="insert into image_of values (:filename_microknight,:imagenames)";
-					doQuery($ask, [
-						'filename_microknight' => "$filename-microknight",
-						'imagenames'           => $imagenames[$i],
-					]);
-				}
-			}
-			else
-			{
-				?>
-				<div class="headline">
-					Error
-				</div>
-
-				<div class="content_with_blenk">
-					There was an error during the conversion, please inform an admin!
-				</div>
-				<?php
-                # FIXME: Danger Will Robinson, $filename should be escaped so that one can't say $filename = '%'
-				$ask ="DELETE from image_of WHERE filename LIKE :filename_pattern";
-				doQuery($ask, ['filename_pattern' => "$filename%" ]);
-
-				$ask ="DELETE from collys WHERE filename=:filename";
-				doQuery($ask, [ 'filename' => $filename ]);
-
-				exit;
-			}
-			
-			$imagenames=load_ansi("$filen","collys/$dirname/$filename-pot-noodle","pot-noodle","$colors",0);
-			if ($imagenames!=-1)
-			{
-				for($i=0;$i<count($imagenames);$i++)
-				{
-					$imagenames[$i]=str_replace("'", "&#39;",$imagenames[$i]);
-					$ask ="insert into image_of values (:filename_pot_noodle',:imagenames)";
-					doQuery($ask, [
-						'filename_pot_noodle' => "$filename-pot-noodle",
-						'imagenames'          => $imagenames[$i],
-					]);
-				}
-			}
-			else
-			{
-				?>
-				<div class="headline">
-					Error
-				</div>
-
-				<div class="content_with_blenk">
-					There was an error during the conversion, please inform an admin!
-				</div>
-				<?php
-
-                # FIXME: Danger Will Robinson, $filename should be escaped so that one can't say $filename = '%'
-				$ask ="DELETE from image_of WHERE filename LIKE :filename_pattern";
-				doQuery($ask, ['filename_pattern' => "$filename%" ]);
-
-				$ask ="DELETE from collys WHERE filename=:filename";
-				doQuery($ask, [ 'filename' => $filename ]);
-
-				exit;
-			}
-
-			$imagenames=load_ansi("$filen","collys/$dirname/$filename-topaz","topaz","$colors",0);
-			if ($imagenames!=-1)
-			{
-				for($i=0;$i<count($imagenames);$i++)
-				{
-					$imagenames[$i]=str_replace("'", "&#39;",$imagenames[$i]);
-					$ask ="insert into image_of values (:filename_topaz,:imagenames)";
-					doQuery($ask, [
-						'filename_topaz' => "$filename-topaz",
-						'imagenames'      => $imagenames[$i],
-					]);
-				}
-			}
-			else
-			{
-				?>
-				<div class="headline">
-					Error
-				</div>
-
-				<div class="content_with_blenk">
-					There was an error during the conversion, please inform an admin!
-				</div>
-				<?php
-
-                # FIXME: Danger Will Robinson, $filename should be escaped so that one can't say $filename = '%'
-				$ask ="DELETE from image_of WHERE filename LIKE :filename_pattern";
-				doQuery($ask, ['filename_pattern' => "$filename%" ]);
-
-				$ask ="DELETE from collys WHERE filename=:filename";
-				doQuery($ask, [ 'filename' => $filename ]);
-
-				exit;
-			}
-			
-			$imagenames=load_ansi("$filen","collys/$dirname/$filename-topazplus","topazplus","transparent",0);
-			if ($imagenames!=-1)
-			{
-				for($i=0;$i<count($imagenames);$i++)
-				{
-					{
-						$imagenames[$i]=str_replace("'", "&#39;",$imagenames[$i]);
-						$ask ="insert into image_of values (:filename_topazplus,:imagenames)";
-						doQuery($ask, [
-							'filename_topazplus' => "$filename-topazplus",
-							'imagenames'         => $imagenames[$i],
-						]);
-					}
-				}
-			}
-			else
-			{
-				?>
-				<div class="headline">
-					Error
-				</div>
-
-				<div class="content_with_blenk">
-					There was an error during the conversion, please inform an admin!
-				</div>
-				<?php
-
-                # FIXME: Danger Will Robinson, $filename should be escaped so that one can't say $filename = '%'
-				$ask ="DELETE from image_of WHERE filename LIKE :filename_pattern";
-				doQuery($ask, ['filename_pattern' => "$filename%" ]);
-
-				$ask ="DELETE from collys WHERE filename=:filename";
-				doQuery($ask, [ 'filename' => $filename ]);
-
-				exit;
-			}
-		}
 
 //---------------------------------------------------------------------------------------------------------------
 // WRITE TO COLLY
@@ -629,14 +265,22 @@
 
 		foreach($_POST['artist'] as $artist)
 		{
-			$ask="insert into author_of values (:artist,:filename)";
-			doQuery($ask, [ 'artist' => $artist, filename => $filename ]);
+			$ask="insert into author_of (nick, filename, colly_id, user_id, artist_id) 
+				values (:artist,:filename,
+                                (select id from collys where filename=:filename),
+                                (select user_id from artists where nick=:artist),
+                                (select id from artists where nick=:artist)
+                        )";
+			doQuery($ask, [ 'artist' => $artist, 'filename' => $filename ]);
 		}
 
 		foreach($_POST['crew'] as $crew)
 		{
-			$ask="insert into crew_of values (:crew,:filename)";
-			doQuery($ask, [ 'crew' => $crew, filename => $filename ]);
+			$ask = "insert into crew_of (crew, filename, crew_id, colly_id)
+					values (:crew, :filename, 
+					(select id from crews where name=:crew),
+					(select id from collys where filename=:filename))";
+			doQuery($ask, [ 'crew' => $crew, 'filename' => $filename ]);
 		}
 
 		$result = fetchOne("select sum(filesize) AS sum from collys where uploader=:nick", [ 'nick' => $nick ]);

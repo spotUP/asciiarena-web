@@ -7,6 +7,7 @@ include "header.php";
 	$(document).ready(function() {
 		var hash = window.location.hash;
 		hash && $('ul.nav a[href="' + hash + '"]').tab('show');
+		  setTimeout(function() { window.scrollTo(0, 0); }, 1)
 	});
 </script>
 <div class="modal-body row m-0 p-0">
