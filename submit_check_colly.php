@@ -230,157 +230,32 @@
 		   elseif ($type == 'Archive')	
 		   {
 			$filename = $_FILES['uploadedfile']['name']; 							// fetch filename with extension
-		   	$filen = $upload_path . basename($_FILES['uploadedfile']['name']); 		// fetch filename with path
+		   	$filen = $upload_path . $dirname.'/' . basename($_FILES['uploadedfile']['name']); 		// fetch filename with path
+			mkdir($upload_path.$dirname, 0755, TRUE);
+
 		   	if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $filen))
 		   	{ 
-		   		$filename_escaped = addslashes($filename);
-		   		$filen = addslashes($filen);
 
-		   		$contents_check=strlen($contents);
-		   		if ($contents_check <1)
+				$lhal = shell_exec('/usr/bin/lha "'.$filen.'"');
+				$fileids = array();
+				foreach (explode("\n", $lhal) as $l) {
+        				if (preg_match('/%\s+[A-Za-z]+\s+\d+\s+\d{4}\s+(.*file_id\.diz)$/i', $l, $m)) $fileids[] = $m[1];
+				}
+				foreach ($fileids as $fileid) {
+				        shell_exec('/usr/bin/lha pq "'.$filen.'" "'.$fileid.'" > collections/temp.diz');
+				        if (filesize('collections/temp.diz') > 0) {
+                				rename('collections/temp.diz', 'collections/'.$dirname.'/file_id.diz');
+                				break;
+        				}
+				}
+		   		if (!file_exists('collections/'.$dirname.'/file_id.diz'))
 		   		{
-		   			exec("/usr/bin/lha pq ./$filen file_id.diz >collys/temp.diz");
-		   			$size_check = filesize("collys/temp.diz");
-		   			if ($size_check == 0)
-		   			{
-		   				unlink ("collys/temp.diz");
-		   			}
-		   			if (file_exists("collys/temp.diz"))
-		   			{
-		   				$handle = fopen("collys/temp.diz", "r");
-		   				$contents = fread($handle, filesize("collys/temp.diz"));
-		   				fclose($handle);
-		   			}
+		   			file_put_contents('collections/'.$dirname.'/file_id.diz', $name." by ".join(",", $_POST['artists']));
 		   		}
-
-		   		$contents_check=strlen($contents);
-		   		if ($contents_check <1)
-		   		{
-		   			exec("/usr/bin/lha pq ./$filen FILE_ID.DIZ >collys/temp.diz");
-		   			$size_check = filesize("collys/temp.diz");
-		   			if ($size_check == 0)
-		   			{
-		   				unlink ("collys/temp.diz");
-		   			}
-		   			if (file_exists("collys/temp.diz"))
-		   			{
-		   				$handle = fopen("collys/temp.diz", "r");
-		   				$contents = fread($handle, filesize("collys/temp.diz"));
-		   				fclose($handle);
-		   			}
-		   		}				
-		   		$contents_check=strlen($contents);
-		   		if ($contents_check <1)
-		   		{
-		   			exec("/usr/bin/lha pq ./$filen File_Id.Diz >collys/temp.diz");
-		   			$size_check = filesize("collys/temp.diz");
-		   			if ($size_check == 0)
-		   			{
-		   				unlink ("collys/temp.diz");
-		   			}
-		   			if (file_exists("collys/temp.diz"))
-		   			{
-		   				$handle = fopen("collys/temp.diz", "r");
-		   				$contents = fread($handle, filesize("collys/temp.diz"));
-		   				fclose($handle);
-		   			}
-		   		}
-		   		$contents_check=strlen($contents);
-		   		if ($contents_check <1)
-		   		{
-		   			exec("/usr/bin/lha pq ./$filen File_Id.Diz >collys/temp.diz");
-		   			$size_check = filesize("collys/temp.diz");
-		   			if ($size_check == 0)
-		   			{
-		   				unlink ("collys/temp.diz");
-		   			}
-		   			if (file_exists("collys/temp.diz"))
-		   			{
-		   				$handle = fopen("collys/temp.diz", "r");
-		   				$contents = fread($handle, filesize("collys/temp.diz"));
-		   				fclose($handle);
-		   			}
-		   		}				
-		   		$contents_check=strlen($contents);
-		   		if ($contents_check <1)
-		   		{
-		   			exec("/usr/bin/lha pq ./$filen *.DiZ >collys/temp.diz");
-		   			$size_check = filesize("collys/temp.diz");
-		   			if ($size_check == 0)
-		   			{
-		   				unlink ("collys/temp.diz");
-		   			}
-		   			if (file_exists("collys/temp.diz"))
-		   			{
-		   				$handle = fopen("collys/temp.diz", "r");
-		   				$contents = fread($handle, filesize("collys/temp.diz"));
-		   				fclose($handle);
-		   			}
-		   		}				
-		   		$contents_check=strlen($contents);
-		   		if ($contents_check <1)
-		   		{
-		   			exec("/usr/bin/lha pq ./$filen *.dIZ >collys/temp.diz");
-		   			$size_check = filesize("collys/temp.diz");
-		   			if ($size_check == 0)
-		   			{
-		   				unlink ("collys/temp.diz");
-		   			}
-		   			if (file_exists("collys/temp.diz"))
-		   			{
-		   				$handle = fopen("collys/temp.diz", "r");
-		   				$contents = fread($handle, filesize("collys/temp.diz"));
-		   				fclose($handle);
-		   			}
-		   		}
-		   		$contents_check=strlen($contents);
-		   		if ($contents_check <1)
-		   		{
-		   			exec("/usr/bin/lha pq $filen *.diZ >collys/temp.diz");
-		   			$size_check = filesize("collys/temp.diz");
-		   			if ($size_check == 0)
-		   			{
-		   				unlink ("collys/temp.diz");
-		   			}
-		   			if (file_exists("collys/temp.diz"))
-		   			{
-		   				$handle = fopen("collys/temp.diz", "r");
-		   				$contents = fread($handle, filesize("collys/temp.diz"));
-		   				fclose($handle);
-		   			}
-		   		}
-		   		if (file_exists("collys/temp.diz"))
-		   		{
-		   			$size_check = filesize("collys/temp.diz");
-		   			if ($size_check == 0)
-		   			{
-		   				unlink ("collys/temp.diz");
-		   			}
-
-		   			if (file_exists("collys/temp.diz"))
-		   			{
-		   				load_ansi("collys/temp.diz","collys/$filename.diz","mosoul","transparent",0);
-		   			}
-		   		}
-
-		   		if (!file_exists("collys/temp.diz"))
-		   		{
-		   			file_put_contents("./collys/temp.diz", "$name by $mag_author");
-		   			load_ansi("collys/temp.diz","collys/$filename.diz","mosoul","transparent",0);
-		   		}
-		   		$ask="insert into collys values (:name,:year,:type,:filename,:now,(null),:nick,:filesize,:month,:filename_diz_png',0,(null),:day,0,(null))";
-		   		doQuery($ask, [
-		   			'name' => $name,
-		   			'year' => $year,
-		   			'type' => $type,
-		   			'filename' => $filename,
-		   			'now'  => $now,
-		   			'nick' => $nick,
-		   			'filesize' => $filesize,
-		   			'month' => $month,
-		   			'day' => $day,
-		   			'filename_diz_png' => "$filename.diz.png",
-		   		]);
+				$ask = "INSERT INTO collys (name, year, type, filename, timestamp, uploader, uploader_id, filesize, month, file_id, view_counter, downloads, day, broken) 
+					VALUES (:name, :year, :type, :filename, :now, :uploader, :uploader_id, :filesize, :month, :file_id, 0, 0, :day, 0)";
+				doQuery($ask, [ 'name' => $name, 'year' => $year, 'type' => $type, 'filename' => $filename,'now'  => $now, 'uploader' => $_user['nick'], 
+					'uploader_id' => $_user['id'], 'filesize' => $filesize, 'month' => $month, 'file_id' => $file_id_name, 'day' => $day ]);
 		   	}
 		   }
 
