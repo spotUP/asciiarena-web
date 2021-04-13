@@ -233,7 +233,7 @@ switch ($sort_by) {
 									?>
 									<div class="row">
 										<div class="col-lg-12">
-											<span class="green">- --/\-\/- -</span> <span class="cyan">aSCIIaRENA</span> <span class="red">--=*=-- </span><span class="pink"><?=$todaysday?>, the <?=$todaystime?>]</span><span class="red"> --=*=-- </span> <span class="cyan">aSCIIaRENA</span> <span class="green"> - -/\-\/- -- -</span>
+											<span class="green">- --/\-\/- -</span> <span class="cyan">aSCIIaRENA</span> <span class="red">--=*=-- </span><span class="pink"><?=$todaysday?>, the <?=$todaystime?>]</span><span class="red"> --=*=-- </span> <span class="cyan">aSCIIaRENA</span> <span class="green"> - -/\-\/- -- -</span><br/><br/>
 										</div>
 									</div>
 
@@ -276,7 +276,7 @@ switch ($sort_by) {
 											?>
 											<div class="row">
 												<div class="col-6">
-													<a href=""><span class="cyan" style="margin-right: 8px;"><?=$filename?></span></a> <span class="green" style="margin-right: 16px;">PF--</span> <span class="yellow" style="margin-right: 8px;"><?=$row->filesize?></span> <span class="yellow"><?=$upload_date?></span>
+													<a href="/release/<?=$filename?>"><span class="cyan" style="margin-right: 8px;"><?=$filename?></span></a> <span class="green" style="margin-right: 16px;">PF--</span> <span class="yellow" style="margin-right: 8px;"><?=$row->filesize?></span> <span class="yellow"><?=$upload_date?></span>
 													<?php
 													$ask_sig = "SELECT upload_signature from users where nick = :uploader";
 													$upload_signature = fetchOne($ask_sig, [":uploader" => $uploader])->upload_signature;
