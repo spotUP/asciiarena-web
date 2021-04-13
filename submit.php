@@ -42,7 +42,7 @@ include "header.php";
 								<a class="nav-link" data-toggle="tab" href="#app">APP</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#mag">MAG</a>
+								<a class="nav-link" data-toggle="tab" href="#ascii_mag">MAG</a>
 							</li>
 						</ul>
 						<div id="myTabContent" class="tab-content">
@@ -52,6 +52,7 @@ include "header.php";
 							include ("submit_artist.php");
 							include ("submit_bbs.php");
 							include ("submit_app.php");
+							include ("submit_mag.php");
 							?>
 						</div>
 					</div>
