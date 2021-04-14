@@ -88,89 +88,130 @@ if(isset($_POST['colly_name']))
 		{
 			?>
 			<div class="bs-component">
-				<div class="animate__animated animate__tada alert alert-dismissible alert-danger">
+				<div class="animate__animated animate__tada alert alert-dismissible alert-success">
 					<button type="button" class="close" data-dismiss="alert">x</button>
-					<span>This filetype is not allowed here! Inform an Admin if this is a valid colly!</span>
+					<span>This filetype is not supported, please inform an Admin!</span>
 				</div>
 			</div>
 			<meta http-equiv="Refresh" content="4"; url="submit.php">
-			<?php
-			exit;
-		}
-	}
+		</div>
+		<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+			<?php include "sidebar.php"; ?>
+		</div>
+		<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
+			<?php include "sidebar_right.php"; ?>
+		</div>
+	</div>
+	<?php
+	include "footer.php";
+	exit();
+}
+}
 
-	if($filesize > $max_file_size)
+if($filesize > $max_file_size)
+{
+	?>
+	<div class="bs-component">
+		<div class="animate__animated animate__tada alert alert-dismissible alert-success">
+			<button type="button" class="close" data-dismiss="alert">x</button>
+			<span>The colly is <?=$filesize?> bytes! The maximum allowed size is <?=$max_file_size?>. If this really is a (huge!) colly, please inform an Admin!</span>
+		</div>
+	</div>
+	<meta http-equiv="Refresh" content="4"; url="submit.php">
+</div>
+<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+	<?php include "sidebar.php"; ?>
+</div>
+<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
+	<?php include "sidebar_right.php"; ?>
+</div>
+</div>
+<?php
+include "footer.php";
+exit();
+}
+
+if(!is_writable($upload_path))
+{
+	?>
+	<div class="bs-component">
+		<div class="animate__animated animate__tada alert alert-dismissible alert-success">
+			<button type="button" class="close" data-dismiss="alert">x</button>
+			<span>You can not upload to the specified directory, inform an Admin!</span>
+		</div>
+	</div>
+	<meta http-equiv="Refresh" content="4"; url="submit.php">
+</div>
+<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+	<?php include "sidebar.php"; ?>
+</div>
+<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
+	<?php include "sidebar_right.php"; ?>
+</div>
+</div>
+<?php
+include "footer.php";
+exit();
+}	
+$ask_existing="select filename from collys where filename=:filename";
+$result_existing=fetchAll($ask_existing, [ 'filename' => $filename ]);
+foreach ($result_existing as $row_existing)
+{
+	$existing_file=$row_existing->filename;
+	if($existing_file==$filename)
 	{
 		?>
 		<div class="bs-component">
-			<div class="animate__animated animate__tada alert alert-dismissible alert-danger">
+			<div class="animate__animated animate__tada alert alert-dismissible alert-success">
 				<button type="button" class="close" data-dismiss="alert">x</button>
-				<span>The colly is <?=$filesize?> bytes! The maximum allowed size is <?=$max_file_size?>. If this really is a (huge!) colly, please inform an Admin!</span>
+				<span><?=$filename?> already exists! Somebody was faster than you! :(</span>
 			</div>
 		</div>
 		<meta http-equiv="Refresh" content="4"; url="submit.php">
-		<?php
-		exit();
-	}
+	</div>
+	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+		<?php include "sidebar.php"; ?>
+	</div>
+	<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
+		<?php include "sidebar_right.php"; ?>
+	</div>
+</div>
+<?php
+include "footer.php";
+exit();
+}
+}
 
-	if(!is_writable($upload_path))
-	{
-		?>
-		<div class="bs-component">
-			<div class="animate__animated animate__tada alert alert-dismissible alert-danger">
-				<button type="button" class="close" data-dismiss="alert">x</button>
-				<span>You can not upload to the specified directory, inform an Admin!</span>
-			</div>
+if (empty($name))
+{
+	?>
+	<div class="bs-component">
+		<div class="animate__animated animate__tada alert alert-dismissible alert-danger">
+			<button type="button" class="close" data-dismiss="alert">x</button>
+			<span>You must fill the name field</span>
 		</div>
-		<meta http-equiv="Refresh" content="4"; url="submit.php">
-		<?php
-		exit();
-	}	
-	$ask_existing="select filename from collys where filename=:filename";
-	$result_existing=fetchAll($ask_existing, [ 'filename' => $filename ]);
-	foreach ($result_existing as $row_existing)
-	{
-		$existing_file=$row_existing->filename;
-		if($existing_file==$filename)
-		{
-			?>
-			<div class="headline">
-				Error
-			</div>
-
-			<div class="bs-component">
-				<div class="animate__animated animate__tada alert alert-dismissible alert-danger">
-					<button type="button" class="close" data-dismiss="alert">x</button>
-					<span><?=$filename?> already exists! Somebody was faster than you! :(</span>
-				</div>
-			</div>
-			<meta http-equiv="Refresh" content="4"; url="submit.php">
-			<?php
-			exit();
-		}
-	}
-
-	if (empty($name))
-	{
-		?>
-		<div class="bs-component">
-			<div class="animate__animated animate__tada alert alert-dismissible alert-danger">
-				<button type="button" class="close" data-dismiss="alert">x</button>
-				<span>Error, you must fill the name field.</span>
-			</div>
-		</div>
-		<meta http-equiv="Refresh" content="4"; url="submit.php">
-		<?php
-		exit();
-	}
+	</div>
+	<meta http-equiv="Refresh" content="4"; url="submit.php">
+</div>
+<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+	<?php include "sidebar.php"; ?>
+</div>
+<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
+	<?php include "sidebar_right.php"; ?>
+</div>
+</div>
+<?php
+include "footer.php";
+exit();
+}
 
 //---------------------------------------------------------------------------------------------------------------
 // CONVERT FILE_ID.DIZ
 //---------------------------------------------------------------------------------------------------------------
 
 
-	if ($type == 'ASCII')
-	{
+if ($type == 'ASCII')
+{
 		$filename = $_FILES['uploadedfile']['name']; 							// fetch filename with extension
 	   	$filen = $upload_path . $dirname . '/' . basename($_FILES['uploadedfile']['name']); 		// fetch filename with path
 	   	mkdir($upload_path.$dirname, 0755, TRUE);
