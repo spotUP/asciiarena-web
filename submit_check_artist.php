@@ -31,7 +31,7 @@ if(isset($_POST['artistnick']))
 			</div>
 			<meta http-equiv="Refresh" content="4"; url="submit.php">
 			<?php
-			exit();
+//			exit();
 		}
 	}
 
@@ -46,9 +46,9 @@ if(isset($_POST['artistnick']))
 				</div>
 			</div>
 		</div>
-		<meta http-equiv="Refresh" content="4000"; url="submit.php">
+		<meta http-equiv="Refresh" content="4"; url="submit.php">
 		<?php
-		exit();
+//		exit();
 	}
 
 	$ask="insert into artists (nick, www, active, country, rating, acronym, user_id, artisturl) values (:artistnick, :artistwww, :artiststatus, :artistcountry, 0, :artistacronym, :user_id, :artisturl)";
@@ -79,8 +79,8 @@ if(isset($_POST['artistnick']))
 		</div>
 	</div>
 
-	<meta http-equiv="Refresh" content="1"; url="submit.php">
+	<meta http-equiv="Refresh" content="4"; url="submit.php">
 	<?php	
-	exit;
+//	exit;
 }
 ?>
