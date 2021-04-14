@@ -225,58 +225,78 @@ if(isset($_POST['colly_name']))
 // WRITE TO COLLY
 //---------------------------------------------------------------------------------------------------------------
 
-		foreach($_POST['artist'] as $artist)
-		{
-			$ask = "INSERT INTO artists_collys (artist_id, colly_id) VALUES (
-					(SELECT id FROM artists WHERE nick=:artist),
-					(SELECT id FROM collys WHERE filename=:filename))";
-			doQuery($ask, [ 'artist' => $artist, 'filename' => $filename ]);
-		}
+	   foreach($_POST['artist'] as $artist)
+	   {
+	   	$ask = "INSERT INTO artists_collys (artist_id, colly_id) VALUES (
+	   	(SELECT id FROM artists WHERE nick=:artist),
+	   	(SELECT id FROM collys WHERE filename=:filename))";
+	   	doQuery($ask, [ 'artist' => $artist, 'filename' => $filename ]);
+	   }
 
-		foreach($_POST['crew'] as $crew)
-		{
-			$ask = "INSERT INTO collys_crews (colly_id, crew_id) VALUES (
-					(SELECT id FROM collys WHERE filename=:filename),
-					(SELECT id FROM crews WHERE name=:crew))";
-			doQuery($ask, [ 'crew' => $crew, 'filename' => $filename ]);
-		}
+	   foreach($_POST['crew'] as $crew)
+	   {
+	   	$ask = "INSERT INTO collys_crews (colly_id, crew_id) VALUES (
+	   	(SELECT id FROM collys WHERE filename=:filename),
+	   	(SELECT id FROM crews WHERE name=:crew))";
+	   	doQuery($ask, [ 'crew' => $crew, 'filename' => $filename ]);
+	   }
 
-		$result = fetchOne("select sum(filesize) AS sum from collys where uploader=:nick", [ 'nick' => $nick ]);
-		if ($row = $result)
-		{
-			$collysize=$row->sum;
-		}
+	   $result = fetchOne("select sum(filesize) AS sum from collys where uploader=:nick", [ 'nick' => $nick ]);
+	   if ($row = $result)
+	   {
+	   	$collysize=$row->sum;
+	   }
 
-		$result = fetchOne("select sum(filesize) AS sum from mags where uploader=:nick", [ 'nick' => $nick ]);
-		if ($row = $result)
-		{
-			$magsize=$row->sum;
-		}
+	   $result = fetchOne("select sum(filesize) AS sum from mags where uploader=:nick", [ 'nick' => $nick ]);
+	   if ($row = $result)
+	   {
+	   	$magsize=$row->sum;
+	   }
 
-		$result = fetchOne("select sum(filesize) AS sum from apps where uploader=:nick", [ 'nick' => $nick ]);
-		if ($row = $result)
-		{
-			$appsize=$row->sum;
-		}
-		$pumped = $collysize + $appsize + $magsize;
-		doQuery("update users set uploaded=:pumped where nick=:nick", [ 'nick' => $nick, 'pumped' => $pumped ]);
+	   $result = fetchOne("select sum(filesize) AS sum from apps where uploader=:nick", [ 'nick' => $nick ]);
+	   if ($row = $result)
+	   {
+	   	$appsize=$row->sum;
+	   }
+	   $pumped = $collysize + $appsize + $magsize;
+	   doQuery("update users set uploaded=:pumped where nick=:nick", [ 'nick' => $nick, 'pumped' => $pumped ]);
 
 
-	?>
-	<div class="bs-component">
-		<div class="animate__animated animate__tada alert alert-dismissible alert-success">
-			<button type="button" class="close" data-dismiss="alert">x</button>
-			<span><?=$filename?> successfully uploaded!</span>
-		</div>
+	   ?>
+
+	   <?php
+	   $dirname = explode(".", $filename);
+	   $dirname = $dirname[0];
+
+	   exec("mv collys/$filename* collys/$dirname");
+	   ?>
+	   <div class="bs-component">
+	   	<div class="animate__animated animate__tada alert alert-dismissible alert-success">
+	   		<button type="button" class="close" data-dismiss="alert">x</button>
+	   		<span><?=$filename?> successfully uploaded!</span>
+	   	</div>
+	   </div>
+	   <meta http-equiv="Refresh" content="4"; url="submit.php">
 	</div>
-	<?php
-	$dirname = explode(".", $filename);
-	$dirname = $dirname[0];
-
-	exec("mv collys/$filename* collys/$dirname");
-	?>
-	<meta http-equiv="Refresh" content="4"; url="submit.php">
-	<?php
-	exit;
+	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+		<?php include "sidebar.php"; ?>
+	</div>
+	<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
+		<?php include "sidebar_right.php"; ?>
+	</div>
+</div>
+<?php
+include "footer.php";
+exit();
 }
 ?>
+
+
+
+
+
+
+
+
+
+
