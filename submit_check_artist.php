@@ -28,10 +28,6 @@ if(isset($_POST['artistnick']))
 		if (strcasecmp($artistnick, $artist_dupe) == 0) 
 		{
 			?>
-			?>
-			<div class="content">
-				<br><br>
-			</div>
 			<div class="bs-component">
 				<div class="animate__animated animate__tada alert alert-dismissible alert-danger">
 					<button type="button" class="close" data-dismiss="alert">x</button>
@@ -47,16 +43,15 @@ if(isset($_POST['artistnick']))
 	if (empty($artistnick))
 	{
 		?>
-		<div class="headline">
-			Error
-		</div>
-
-		<div class="content_with_blenk">
-			You must fill the artist nick field!
+		<div class="bs-component">
+			<div class="animate__animated animate__tada alert alert-dismissible alert-danger">
+				<button type="button" class="close" data-dismiss="alert">x</button>
+				<span>You must fill the artist nick field!</span>
+			</div>
 		</div>
 		<meta http-equiv="Refresh" content="4"; url="submit.php">
 		<?php
-		exit;
+		exit();
 	}
 
 	$ask="insert into artists (nick, www, active, country, rating, acronym, user_id, artisturl) values (:artistnick, :artistwww, :artiststatus, :artistcountry, 0, :artistacronym, :user_id, :artisturl)";
