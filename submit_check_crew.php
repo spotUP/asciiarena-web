@@ -27,9 +27,9 @@ if(isset($_POST['crewname']))
 		exit;
 	}
 
-	if(!empty($_POST[add_crew_bbs]))
+	if(!empty($_POST['add_crew_bbs']))
 	{		
-		foreach($_POST[add_crew_bbs] as $add_crew_bbs)
+		foreach($_POST['add_crew_bbs'] as $add_crew_bbs)
 		{
 			$ask="insert into bbs_of (id, crew, name) values (0, :add_crew_bbs,:crewname)";
 			doQuery($ask, ['add_crew_bbs' => $add_crew_bbs, 'crewname' => $crewname ]);
@@ -53,7 +53,7 @@ if(isset($_POST['crewname']))
 			<span>Crew submitted successfully!</span>
 		</div>
 	</div>
-	<meta http-equiv="Refresh" content="2"; url="submit.php">
+	<meta http-equiv="Refresh" content="1"; url="submit.php">
 	<?php
 	exit;
 }
