@@ -225,16 +225,41 @@ if(isset($_POST['colly_name']))
 // WRITE TO COLLY
 //---------------------------------------------------------------------------------------------------------------
 
-	   foreach($_POST['artist'] as $artist)
-	   {
-	   	$ask="insert into author_of (nick, filename, colly_id, user_id, artist_id) 
-	   	values (:artist,:filename,
-	   	(select id from collys where filename=:filename),
-	   	(select user_id from artists where nick=:artist),
-	   	(select id from artists where nick=:artist)
-	   )";
-	   doQuery($ask, [ 'artist' => $artist, 'filename' => $filename ]);
-	}
+		foreach($_POST['artist'] as $artist)
+		{
+			$ask = "INSERT INTO artists_collys (artist_id, colly_id) VALUES (
+					(SELECT id FROM artists WHERE nick=:artist),
+					(SELECT id FROM collys WHERE filename=:filename))";
+			doQuery($ask, [ 'artist' => $artist, 'filename' => $filename ]);
+		}
+
+		foreach($_POST['crew'] as $crew)
+		{
+			$ask = "INSERT INTO collys_crews (colly_id, crew_id) VALUES (
+					(SELECT id FROM collys WHERE filename=:filename),
+					(SELECT id FROM crews WHERE name=:crew))";
+			doQuery($ask, [ 'crew' => $crew, 'filename' => $filename ]);
+		}
+
+		$result = fetchOne("select sum(filesize) AS sum from collys where uploader=:nick", [ 'nick' => $nick ]);
+		if ($row = $result)
+		{
+			$collysize=$row->sum;
+		}
+
+		$result = fetchOne("select sum(filesize) AS sum from mags where uploader=:nick", [ 'nick' => $nick ]);
+		if ($row = $result)
+		{
+			$magsize=$row->sum;
+		}
+
+		$result = fetchOne("select sum(filesize) AS sum from apps where uploader=:nick", [ 'nick' => $nick ]);
+		if ($row = $result)
+		{
+			$appsize=$row->sum;
+		}
+		$pumped = $collysize + $appsize + $magsize;
+		doQuery("update users set uploaded=:pumped where nick=:nick", [ 'nick' => $nick, 'pumped' => $pumped ]);
 
 	foreach($_POST['crew'] as $crew)
 	{

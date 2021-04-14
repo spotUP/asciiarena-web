@@ -106,14 +106,14 @@ require_once "header.php"; ?>
 			{
 				$crew = $_POST[ 'crew' ];
 
-				$ask = "SELECT nick from author_of where filename=:filename";
+				$ask = "SELECT a.nick FROM collys c LEFT JOIN artists_collys ac ON ac.colly_id=c.id LEFT JOIN artists a ON a.id=ac.artist_id WHERE c.filename=:filename";
 				$row = fetchOne($ask, [ 'filename' => $filename ]);
 				if (isset($row->nick))
 				{
 					$artist = $row->nick;
 				}
 
-				$ask = "SELECT crew from crew_of where filename=:filename";
+				$ask = "SELECT w.name as crew FROM collys c LEFT JOIN collys_crews cc ON cc.colly_id=c.id LEFT JOIN crews w ON w.id=cc.crew_id WHERE c.filename=:filename";
 				$row = fetchOne($ask, [ 'filename' => $filename ]);
 				if (isset($row->crew))
 				{
@@ -131,14 +131,14 @@ require_once "header.php"; ?>
 						$comment = "$nick voted $user_added_rating";
 					}
 
-					$ask = "select nick from author_of where filename=:filename";
+					$ask = "SELECT a.nick FROM collys c LEFT JOIN artists_collys ac ON ac.colly_id=c.id LEFT JOIN artists a ON a.id=ac.artist_id WHERE c.filename=:filename";
 					$row = fetchOne($ask, [ 'filename' => $filename ]);
 					if (isset($row->nick))
 					{
 						$artist = $row->nick;
 					}
 
-					$ask_crew = "select crew from crew_of where filename=:filename";
+					$ask = "SELECT w.name as crew FROM collys c LEFT JOIN collys_crews cc ON cc.colly_id=c.id LEFT JOIN crews w ON w.id=cc.crew_id WHERE c.filename=:filename";
 					$row_crew = fetchOne($ask_crew, [ 'filename' => $filename ]);
 					if (isset($row_crew->crew))
 					{
@@ -216,7 +216,7 @@ require_once "header.php"; ?>
 					doQuery($ask, [ 'filename' => $filename, 'commentid' => $commentid ]);
 				}
 
-				$ask = "select nick from author_of where filename=:filename";
+				$ask = "SELECT a.nick FROM collys c LEFT JOIN artists_collys ac ON ac.colly_id=c.id LEFT JOIN artists a ON a.id=ac.artist_id WHERE c.filename=:filename";
 				$result = fetchOne($ask, [ 'filename' => $filename ]);
 				if (isset($result)) 
 				{
@@ -252,7 +252,7 @@ require_once "header.php"; ?>
 					$avg_colly_rating = 0;
 				}
 
-				$ask = "select crew from crew_of where filename=:filename";
+				$ask = "SELECT w.name as crew FROM collys c LEFT JOIN collys_crews cc ON cc.colly_id=c.id LEFT JOIN crews w ON w.id=cc.crew_id WHERE c.filename=:filename";
 				$result = fetchOne($ask, [ 'filename' => $filename ]);
 				if (isset($result)) 
 				{
@@ -321,76 +321,60 @@ require_once "header.php"; ?>
 				{
 					$filename = $_POST[ 'filename' ];
 
-					$ask = "delete from author_of where filename=:filename";
+					$ask = "DELETE FROM artists_collys WHERE colly_id in (SELECT id FROM collys WHERE filename=:filename)";
 					doQuery($ask, [ 'filename' => $filename] );
 
-					if (isset($_POST[ old_colly_authors ])) 
+					if (isset($_POST[ 'old_colly_authors' ])) 
 					{
-						foreach ($_POST[ old_colly_authors ] as $colly_author) 
+						foreach ($_POST[ 'old_colly_authors' ] as $colly_author) 
 						{
-                                              		$ask="insert into author_of (nick, filename, colly_id, user_id, artist_id) 
-                                              			values (:colly_author,:filename,
-                                              			(select id from collys where filename=:filename),
-                                              			(select user_id from artists where nick=:colly_author),
-       	                                      			(select id from artists where nick=:colly_author)
-	                                      		)";
-	                                      		doQuery($ask, ['colly_author' => $colly_author, 'filename' => $filename]);
+                        				$ask = "INSERT INTO artists_collys (artist_id, colly_id) VALUES (
+                                        			(SELECT id FROM artists WHERE nick=:artist),
+                                        			(SELECT id FROM collys WHERE filename=:filename))";
+	                                      		doQuery($ask, ['artist' => $colly_author, 'filename' => $filename]);
 						}
-						$ask = "delete from author_of where filename=:filename and nick='Delete'";
-						doQuery($ask, [ 'filename' => $filename] );
 					}
 				}
 
-				if (isset($_POST[ colly_author ])) 
+				if (isset($_POST[ 'colly_author' ])) 
 				{
-					foreach ($_POST[ colly_author ] as $new_colly_author) 
+					foreach ($_POST[ 'colly_author' ] as $new_colly_author) 
 					{
-                                              	$ask="insert into author_of (nick, filename, colly_id, user_id, artist_id) 
-                                              		values (:colly_author,:filename,
-                                              		(select id from collys where filename=:filename),
-                                              		(select user_id from artists where nick=:colly_author),
-       	                                      		(select id from artists where nick=:colly_author)
-	                                      	)";
-	                                      	doQuery($ask, ['colly_author' => $new_colly_author, 'filename' => $filename]);
+                        			$ask = "INSERT INTO artists_collys (artist_id, colly_id) VALUES (
+                                        		(SELECT id FROM artists WHERE nick=:artist),
+                                        		(SELECT id FROM collys WHERE filename=:filename))";
+	                                      	doQuery($ask, ['artist' => $new_colly_author, 'filename' => $filename]);
 					}
-
-					$ask = "delete from author_of where filename=:filename and nick='Delete'";
-					doQuery($ask, [ 'filename' => $filename] );
 				}
 
 				if (isset($_POST[ 'old_colly_crews' ]) || (isset($_POST[ 'colly_crew' ]))) 
 				{
 					$filename = $_POST[ 'filename' ];
 
-					$ask = "delete from crew_of where filename=:filename";
+					$ask = "DELETE FROM collys_crews WHERE colly_id in (SELECT id FROM collys WHERE filename=:filename";
 					doQuery($ask, [ 'filename' => $filename] );
 
-					if (isset($_POST[ old_colly_crews ])) 
+					if (isset($_POST[ 'old_colly_crews' ])) 
 					{
-						foreach ($_POST[ old_colly_crews ] as $colly_crew) 
+						foreach ($_POST[ 'old_colly_crews' ] as $colly_crew) 
 						{
-                      					$ask = "insert into crew_of (crew, filename, crew_id, colly_id)
-                      						values (:crew, :filename,
-                      						(select id from crews where name=:crew),
-                      						(select id from collys where filename=:filename)";
-              						doQuery($ask, ['crew' => $colly_crew, 'filename' => $filename]);
+                        				$ask = "INSERT INTO collys_crews (colly_id, crew_id) VALUES (
+                                        			(SELECT id FROM collys WHERE filename=:filename),
+                                        			(SELECT id FROM crews WHERE name=:crew))";
+                        				doQuery($ask, [ 'crew' => $colly_crew, 'filename' => $filename ]);
 						}
 					}
 
-					if (isset($_POST[ colly_crew ])) 
+					if (isset($_POST[ 'colly_crew' ])) 
 					{
-						foreach ($_POST[ colly_crew ] as $new_colly_crew) 
+						foreach ($_POST[ 'colly_crew' ] as $new_colly_crew) 
 						{
-                      					$ask = "insert into crew_of (crew, filename, crew_id, colly_id)
-                      						values (:crew, :filename,
-                      						(select id from crews where name=:crew),
-                      						(select id from collys where filename=:filename)";
-              						doQuery($ask, ['crew' => $new_colly_crew, 'filename' => $filename]);
-
+                        				$ask = "INSERT INTO collys_crews (colly_id, crew_id) VALUES (
+                                        			(SELECT id FROM collys WHERE filename=:filename),
+                                        			(SELECT id FROM crews WHERE name=:crew))";
+                        				doQuery($ask, [ 'crew' => $new_colly_crew, 'filename' => $filename ]);
 						}
 					}
-					$ask = "delete from crew_of where filename=:filename and crew='Delete'";
-					doQuery($ask, [ 'filename' => $filename] );
 				}
 
 				if (isset($_POST[ 'edit_colly_year' ]) && $nick == "$uploader") 
@@ -569,7 +553,8 @@ require_once "header.php"; ?>
 						</div>
 						<div class="col-4">
 							<?php
-							$ask = "select nick from author_of where filename=:filename";
+							$ask = "SELECT a.nick FROM collys c LEFT JOIN artists_collys ac ON ac.colly_id=c.id LEFT JOIN artists a ON a.id=ac.artist_id 
+									WHERE c.filename=:filename";
 							$result = fetchAll($ask, [ 'filename' => $getcollyname ]);
 							foreach ($result as $row)
 							{
@@ -605,7 +590,8 @@ require_once "header.php"; ?>
 						</div>
 						<div class="col-4">
 							<?php
-							$ask = "select crew from crew_of where filename=:filename";
+							$ask = "SELECT w.name as crew FROM collys c LEFT JOIN collys_crews cc ON cc.colly_id=c.id LEFT JOIN crews w ON w.id=cc.crew_id 
+	                                                                WHERE c.filename=:filename";
 							$result = fetchAll($ask, [ 'filename' => $getcollyname ]);
 							foreach ($result as $row)
 							{
@@ -1000,11 +986,11 @@ if (!isset($_POST[ 'edit' ]))
 
 if (isset($_POST[ 'addcomment' ])) 
 {
-	$ask = "SELECT crew FROM crew_of WHERE filename=:filename";
+	$ask = "SELECT w.name as crew FROM collys c LEFT JOIN collys_crews cc ON cc.colly_id=c.id LEFT JOIN crews w ON w.id=cc.crew_id WHERE c.filename=:filename";
 	$row = fetchOne($ask, ['filename' => $filename ]);
 	$crew = $row->crew;
 
-	$ask = "SELECT nick FROM author_of WHERE filename=:filename";
+	$ask = "SELECT a.nick FROM collys c LEFT JOIN artists_collys ac ON ac.colly_id=c.id LEFT JOIN artists a ON a.id=ac.artist_id WHERE c.filename=:filename";
 	$row = fetchOne($ask, ['filename' => $filename ]);
 	$artist = $row->nick;
 
