@@ -45,18 +45,18 @@ include "header.php";
 								<a class="nav-link" data-toggle="tab" href="#ascii_mag">MAG</a>
 							</li>
 						</ul>
-						<div id="myTabContent" class="tab-content">
-							<?php
-							include ("submit_colly.php");
-							include ("submit_crew.php");
-							include ("submit_artist.php");
-							include ("submit_bbs.php");
-							include ("submit_app.php");
-							include ("submit_mag.php");
-							?>
-						</div>
 					</div>
 				</div>
+			</div>
+			<div id="myTabContent" class="tab-content">
+				<?php
+				include ("submit_colly.php");
+				include ("submit_crew.php");
+				include ("submit_artist.php");
+				include ("submit_bbs.php");
+				include ("submit_app.php");
+				include ("submit_mag.php");
+				?>
 			</div>
 			<?php
 		}
