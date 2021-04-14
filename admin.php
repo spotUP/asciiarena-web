@@ -210,12 +210,12 @@ include "header.php";
 //---------------------------------------------------------------------------------------------------------------
 // WRITE COLLY INFO TO DB
 //---------------------------------------------------------------------------------------------------------------
+		$filename=$_POST['filename'];
 
 		if(isset($_POST['do_edit_colly']) && is_admin())
 		{
 			if(isset($_POST['edit_colly_name']) && is_admin())
 			{
-				$filename=$_POST['filename'];
 
 				$edit_colly_name=$_POST['edit_colly_name'];
 				$ask="update collys set name=:edit_colly_name where filename=:filename";	
@@ -224,7 +224,6 @@ include "header.php";
 
 			if(isset($_POST['old_colly_authors']) || (isset($_POST['colly_author']) && is_admin()))
 			{
-				$filename=$_POST['filename'];
 
 				$ask = "DELETE FROM artists_collys WHERE colly_id in (SELECT id FROM collys WHERE filename=:filename)";
 				doQuery($ask, ['filename' => $filename]);
@@ -254,7 +253,7 @@ include "header.php";
 	if(isset($_POST['old_colly_crews']) || (isset($_POST['colly_crew']) && is_admin()))
 	{
 		$filename=$_POST['filename'];
-		$ask = "DELETE FROM collys_crews WHERE colly_id in (SELECT id FROM collys WHERE filename=:filename";
+		$ask = "DELETE FROM collys_crews WHERE colly_id in (SELECT id FROM collys WHERE filename=:filename)";
 		doQuery($ask,['filename' => $filename]);
 
 		if (isset($_POST['old_colly_crews']))
