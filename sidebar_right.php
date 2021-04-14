@@ -6,7 +6,6 @@
 		"top/crews",
 		"top/uploaders",
 		"top/commenters",
-		"arena_stats",
-		"new_users"
+		"arena_stats"
 	], false);
 ?>
