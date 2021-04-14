@@ -15,8 +15,6 @@ include "header.php";
 
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2">
-
-
 		<div class="position-relative">
 			<div class="row">
 				<div class="col-4">
@@ -99,7 +97,7 @@ include "header.php";
 		<?php if(!empty($comment_amount)) {
 			?>
 			<div class="row">
-				<div class="col-12"><h2 class="ap-1 bg-header">Last 10 comments by <?=$member->nick?></h2></div>
+				<div class="col-12"><h2 class="ap-1 amt-1 bg-header">Last 10 comments by <?=$member->nick?></h2></div>
 			</div>
 			<br>
 			<?php
