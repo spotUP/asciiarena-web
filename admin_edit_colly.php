@@ -180,7 +180,7 @@ if($getcollyname && (!isset($_POST['do_edit_colly'])))
 						<div class="col-3">				
 							<?php
 							$ask = "SELECT w.name as crew FROM collys c LEFT JOIN collys_crews cc ON cc.colly_id=c.id LEFT JOIN crews w ON w.id=cc.crew_id WHERE c.filename=:filename";
-							$result=fetchAll($ask, ['getcollyname' => $getcollyname]);
+							$result=fetchAll($ask, ['filename' => $getcollyname]);
 							foreach ($result as $row)
 							{
 								$colly_crew=$row->crew;
