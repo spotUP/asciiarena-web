@@ -416,12 +416,12 @@ $acronym = $result->acronym;
 <?php
 $sort_criteria = (isset($_GET['sort_by'])) ? $_GET['sort_by'] : 'c.filename';
 $q = "SELECT c.*,a.nick AS author, w.name AS crew FROM collys c
-	LEFT JOIN artists_collys ac ON ac.colly_id = c.id
-	LEFT JOIN artists a ON ac.artist_id = ac.artist_id
-	LEFT JOIN collys_crews cc ON cc.colly_id=c.id
-    	LEFT JOIN crews w ON cc.crew_id=w.id
-	WHERE a.id in (SELECT artist_id FROM artists_collys WHERE artist_id IN (SELECT id FROM artists WHERE nick=:nick))
-	GROUP BY c.filename";
+	  LEFT JOIN artists_collys ac ON ac.colly_id = c.id
+	  LEFT JOIN artists a ON ac.artist_id = ac.artist_id
+	  LEFT JOIN collys_crews cc ON cc.colly_id=c.id
+	  LEFT JOIN crews w ON cc.crew_id=w.id
+	  WHERE ac.artist_id in (SELECT id FROM artists WHERE nick=:nick)
+	  GROUP BY c.filename";
 if ((isset($_GET['sort_by'])) && (array_key_exists($sort_criteria, $validSorts))) {
   $q.= " ORDER BY {$sort_criteria}";
 }
