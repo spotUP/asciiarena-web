@@ -114,13 +114,15 @@ include "header.php";
 				exit;
 			}
 			$ask = $_db->prepare("INSERT INTO users
-				(nick, crew, password, pwhash, lastactive, current, mail, uploaded, `rank`, upload_signature, list_view_mode, display_mail)
-				VALUES (:check_nick,'Independent','SECRET',:pwhash, :now, '', :mail, 0, 'Inactive', '- -- - aSCIIaRENa - ---- - aSCIIaRENa - -- -','Standard', 'No', 'No')");
+				(nick, crew, password, pwhash, lastactive, current, mail, uploaded, `rank`, upload_signature, list_view_mode, display_mail, nickurl)
+				VALUES 
+				(:nick,'Independent','SECRET',:pwhash, :now, '', :mail, 0, 'Inactive', '- -- - aSCIIaRENa - ---- - aSCIIaRENa - -- -','Standard', 'No', :nickurl)");
 			$ask->execute([
-				'check_nick' => $check_nick,
+				'nick' => $check_nick,
 				'now' => $now,
 				'pwhash' => $pwhash,
-				'mail' => $mail
+				'mail' => $mail,
+				'nickurl' => urlsafe($check_nick)
 			]);
 
 			$welcome_msg="WELCOME TO aSCIIaRENA!<br><br>".
