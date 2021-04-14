@@ -7,7 +7,7 @@ include "header.php";
 	$(document).ready(function() {
 		var hash = window.location.hash;
 		hash && $('ul.nav a[href="' + hash + '"]').tab('show');
-		  setTimeout(function() { window.scrollTo(0, 0); }, 1)
+		setTimeout(function() { window.scrollTo(0, 0); }, 1)
 	});
 </script>
 <div class="modal-body row m-0 p-0">
@@ -57,23 +57,23 @@ include "header.php";
 						</div>
 					</div>
 				</div>
-				<?php
-			}
-			else
-			{
-				?>
-				<div class="col-lg-12">
-					<div class="bs-component">
-						<div class="animate__animated animate__shakeX alert alert-dismissible alert-primary">
-							<button type="button" class="close" data-dismiss="alert">x</button>
-							You need to be <a class="ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">logged in</a>to use this feature.
-						</div>
+			</div>
+			<?php
+		}
+		else
+		{
+			?>
+			<div class="col-lg-12">
+				<div class="bs-component">
+					<div class="animate__animated animate__shakeX alert alert-dismissible alert-primary">
+						<button type="button" class="close" data-dismiss="alert">x</button>
+						You need to be <a class="ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">logged in</a>to use this feature.
 					</div>
 				</div>
-				<?php
-			}
-			?>
-		</div>
+			</div>
+			<?php
+		}
+		?>
 	</div>
 	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
 		<?php include "sidebar.php"; ?>
