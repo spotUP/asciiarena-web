@@ -47,20 +47,22 @@ if (empty($artistnick))
 {
 	?>
 </div>
-	<div class="row col-12">
-		<div class="bs-component">
-			<div class="animate__animated animate__tada alert alert-dismissible alert-danger">
-				<button type="button" class="close" data-dismiss="alert">x</button>
-				<span>You must fill the artist nick field!</span>
-			</div>
+
+</div>
+<div class="row col-12">
+	<div class="bs-component">
+		<div class="animate__animated animate__tada alert alert-dismissible alert-danger">
+			<button type="button" class="close" data-dismiss="alert">x</button>
+			<span>You must fill the artist nick field!</span>
 		</div>
 	</div>
-	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
-		<?php include "sidebar.php"; ?>
-	</div>
-	<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
-		<?php include "sidebar_right.php"; ?>
-	</div>
+</div>
+<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+	<?php include "sidebar.php"; ?>
+</div>
+<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
+	<?php include "sidebar_right.php"; ?>
+</div>
 </div>
 <?php include "footer.php"; ?>
 <meta http-equiv="Refresh" content="4"; url="submit.php">
