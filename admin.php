@@ -176,7 +176,7 @@ include "header.php";
 			<div class="bs-component">
 				<div class="animate__animated animate__tada alert alert-dismissible alert-success">
 					<button type="button" class="close" data-dismiss="alert">x</button>
-					<span>Colly successfully deleted.</span>
+					<span>Colly successfully deleted!</span>
 				</div>
 			</div>	
 			<?php
@@ -211,7 +211,7 @@ include "header.php";
 // WRITE COLLY INFO TO DB
 //---------------------------------------------------------------------------------------------------------------
 
-    $filename=$_POST['filename'];
+		$filename=$_POST['filename'];
 
 		if(isset($_POST['do_edit_colly']) && is_admin())
 		{
@@ -234,126 +234,148 @@ include "header.php";
 				{			
 					foreach($_POST['old_colly_authors'] as $colly_author)
 					{
-                                            $ask = "INSERT INTO artists_collys (artist_id, colly_id) VALUES (
-                                                    (SELECT id FROM artists WHERE nick=:artist),
-                                                    (SELECT id FROM collys WHERE filename=:filename))";
-                                            doQuery($ask, ['artist' => $colly_author, 'filename' => $filename]);
+						$ask = "INSERT INTO artists_collys (artist_id, colly_id) VALUES (
+						(SELECT id FROM artists WHERE nick=:artist),
+						(SELECT id FROM collys WHERE filename=:filename))";
+						doQuery($ask, ['artist' => $colly_author, 'filename' => $filename]);
 					}
 				}
 
-			if (isset($_POST['colly_author']))
-			{
-				foreach($_POST['colly_author'] as $new_colly_author)
+				if (isset($_POST['colly_author']))
 				{
-                                        $ask = "INSERT INTO artists_collys (artist_id, colly_id) VALUES (
-                                                  (SELECT id FROM artists WHERE nick=:artist),
-                                                  (SELECT id FROM collys WHERE filename=:filename))";
-                                        doQuery($ask, ['artist' => $new_colly_author, 'filename' => $filename]);
+					foreach($_POST['colly_author'] as $new_colly_author)
+					{
+						$ask = "INSERT INTO artists_collys (artist_id, colly_id) VALUES (
+						(SELECT id FROM artists WHERE nick=:artist),
+						(SELECT id FROM collys WHERE filename=:filename))";
+						doQuery($ask, ['artist' => $new_colly_author, 'filename' => $filename]);
+					}
 				}
+				?>
+				<div class="bs-component">
+					<div class="animate__animated animate__tada alert alert-dismissible alert-success">
+						<button type="button" class="close" data-dismiss="alert">x</button>
+						<span>Colly updated successfully!</span>
+					</div>
+				</div>
+				<?php
 			}
-	}
-	$_POST['old_colly_crews'] = array_filter($_POST['old_colly_crews'], function($x) { return !empty($x); });
-	if(isset($_POST['old_colly_crews']) || (isset($_POST['colly_crew']) && is_admin()))
-	{
-		$filename=$_POST['filename'];
-		$ask = "DELETE FROM collys_crews WHERE colly_id in (SELECT id FROM collys WHERE filename=:filename)";
-		doQuery($ask,['filename' => $filename]);
-
-		if (isset($_POST['old_colly_crews']))
-		{			
-			foreach($_POST['old_colly_crews'] as $colly_crew)
+			$_POST['old_colly_crews'] = array_filter($_POST['old_colly_crews'], function($x) { return !empty($x); });
+			if(isset($_POST['old_colly_crews']) || (isset($_POST['colly_crew']) && is_admin()))
 			{
-                                $ask = "INSERT INTO collys_crews (colly_id, crew_id) VALUES (
-                                          (SELECT id FROM collys WHERE filename=:filename),
-                                          (SELECT id FROM crews WHERE name=:crew))";
-                                doQuery($ask, [ 'crew' => $colly_crew, 'filename' => $filename ]);
+				$filename=$_POST['filename'];
+				$ask = "DELETE FROM collys_crews WHERE colly_id in (SELECT id FROM collys WHERE filename=:filename)";
+				doQuery($ask,['filename' => $filename]);
+
+				if (isset($_POST['old_colly_crews']))
+				{			
+					foreach($_POST['old_colly_crews'] as $colly_crew)
+					{
+						$ask = "INSERT INTO collys_crews (colly_id, crew_id) VALUES (
+						(SELECT id FROM collys WHERE filename=:filename),
+						(SELECT id FROM crews WHERE name=:crew))";
+						doQuery($ask, [ 'crew' => $colly_crew, 'filename' => $filename ]);
+					}
+				}
+
+				if (isset($_POST['colly_crew']))
+				{
+					foreach($_POST[colly_crew] as $new_colly_crew)
+					{
+						$ask = "INSERT INTO collys_crews (colly_id, crew_id) VALUES (
+						(SELECT id FROM collys WHERE filename=:filename),
+						(SELECT id FROM crews WHERE name=:crew))";
+						doQuery($ask, [ 'crew' => $new_colly_crew, 'filename' => $filename ]);
+					}
+				}
+				?>
+				<div class="bs-component">
+					<div class="animate__animated animate__tada alert alert-dismissible alert-success">
+						<button type="button" class="close" data-dismiss="alert">x</button>
+						<span>Colly updated successfully!</span>
+					</div>
+				</div>
+				<?php
 			}
-		}
+			if(isset($_POST['edit_colly_year']) && is_admin())
+			{
+				$filename=$_POST['filename'];
+				$edit_colly_year=$_POST['edit_colly_year'];
+				$ask="update collys set year=:edit_colly_year where filename=:filename";	
+				doQuery($ask,['edit_colly_year' => $edit_colly_year, 'filename' => $filename]);	
+			}
+			if(isset($_POST['edit_colly_type']) && is_admin())
+			{
+				$filename=$_POST['filename'];
 
-	if (isset($_POST['colly_crew']))
-	{
-		foreach($_POST[colly_crew] as $new_colly_crew)
-		{
-                        $ask = "INSERT INTO collys_crews (colly_id, crew_id) VALUES (
-                                  (SELECT id FROM collys WHERE filename=:filename),
-                                  (SELECT id FROM crews WHERE name=:crew))";
-                        doQuery($ask, [ 'crew' => $new_colly_crew, 'filename' => $filename ]);
-		}
-	}
+				$edit_colly_type=$_POST['edit_colly_type'];
 
-}
-if(isset($_POST['edit_colly_year']) && is_admin())
-{
-	$filename=$_POST['filename'];
-	$edit_colly_year=$_POST['edit_colly_year'];
-	$ask="update collys set year=:edit_colly_year where filename=:filename";	
-	doQuery($ask,['edit_colly_year' => $edit_colly_year, 'filename' => $filename]);	
-}
-if(isset($_POST['edit_colly_type']) && is_admin())
-{
-	$filename=$_POST['filename'];
+				$ask="update collys set type=:edit_colly_type where filename=:filename";	
+				doQuery($ask,['edit_colly_type' => $edit_colly_type, 'filename' => $filename]);	
+			}
+			if(isset($_POST['edit_colly_month']) && is_admin())
+			{
+				$filename=$_POST['filename'];
 
-	$edit_colly_type=$_POST['edit_colly_type'];
+				$edit_colly_month=$_POST['edit_colly_month'];
 
-	$ask="update collys set type=:edit_colly_type where filename=:filename";	
-	doQuery($ask,['edit_colly_type' => $edit_colly_type, 'filename' => $filename]);	
-}
-if(isset($_POST['edit_colly_month']) && is_admin())
-{
-	$filename=$_POST['filename'];
+				$ask="update collys set month=:edit_colly_month where filename=:filename";	
+				doQuery($ask,['edit_colly_month' => $edit_colly_month, 'filename' => $filename]);	
+			}
+			if(isset($_POST['edit_colly_day']) && is_admin())
+			{
+				$filename=$_POST['filename'];
 
-	$edit_colly_month=$_POST['edit_colly_month'];
+				$edit_colly_day=$_POST['edit_colly_day'];
 
-	$ask="update collys set month=:edit_colly_month where filename=:filename";	
-	doQuery($ask,['edit_colly_month' => $edit_colly_month, 'filename' => $filename]);	
-}
-if(isset($_POST['edit_colly_day']) && is_admin())
-{
-	$filename=$_POST['filename'];
-
-	$edit_colly_day=$_POST['edit_colly_day'];
-
-	$ask="update collys set day=:edit_colly_day where filename=:filename";	
-	doQuery($ask,['edit_colly_day' => $edit_colly_day, 'filename' => $filename]);	
-}
+				$ask="update collys set day=:edit_colly_day where filename=:filename";	
+				doQuery($ask,['edit_colly_day' => $edit_colly_day, 'filename' => $filename]);	
+			}
 
 //---------------------------------------------------------------------------------------------------------------
 // RECALCULATE RATINGS
 //---------------------------------------------------------------------------------------------------------------
 
-recalculate_ratings();
-?>
-<meta http-equiv="Refresh" content="0"; url="admin.php">
-<?php
-exit;
-}	
+			recalculate_ratings();
+			?>
+
+			<div class="bs-component">
+				<div class="animate__animated animate__tada alert alert-dismissible alert-success">
+					<button type="button" class="close" data-dismiss="alert">x</button>
+					<span>Colly successfully updated!</span>
+				</div>
+			</div>
+			<meta http-equiv="Refresh" content="0"; url="admin.php">
+			<?php
+			exit;
+		}	
 
 //---------------------------------------------------------------------------------------------------------------
 // WRITE CREW INFO TO DB
 //---------------------------------------------------------------------------------------------------------------
 
-if(isset($_POST['do_change_crew']) && is_admin())
-{
-	if(isset($_POST['edit_crew_name']) && is_admin())
-	{
-		$crew=$_POST['getcrew'];
-		$edit_crew_name=$_POST['edit_crew_name'];
+		if(isset($_POST['do_change_crew']) && is_admin())
+		{
+			if(isset($_POST['edit_crew_name']) && is_admin())
+			{
+				$crew=$_POST['getcrew'];
+				$edit_crew_name=$_POST['edit_crew_name'];
 
-		doQuery("update crews     set name=:edit_crew_name where name=:crew", ['edit_crew_name' => $edit_crew_name, 'crew' => $crew]);
-		doQuery("update bbs_of    set crew=:edit_crew_name where crew=:crew", ['edit_crew_name' => $edit_crew_name, 'crew' => $crew]);	
-		doQuery("update member_of set crew=:edit_crew_name where crew=:crew", ['edit_crew_name' => $edit_crew_name, 'crew' => $crew]);	
-	}
-	if(isset($_POST['edit_crew_www']) && is_admin())
-	{
-		$crew=$_POST['getcrew'];
+				doQuery("update crews     set name=:edit_crew_name where name=:crew", ['edit_crew_name' => $edit_crew_name, 'crew' => $crew]);
+				doQuery("update bbs_of    set crew=:edit_crew_name where crew=:crew", ['edit_crew_name' => $edit_crew_name, 'crew' => $crew]);	
+				doQuery("update member_of set crew=:edit_crew_name where crew=:crew", ['edit_crew_name' => $edit_crew_name, 'crew' => $crew]);	
+			}
+			if(isset($_POST['edit_crew_www']) && is_admin())
+			{
+				$crew=$_POST['getcrew'];
 
-		$edit_crew_www=$_POST['edit_crew_www'];
+				$edit_crew_www=$_POST['edit_crew_www'];
 
-		doQuery("update crews set www=:edit_crew_www where name=:edit_crew_name", ['edit_creq_www' => $edit_crew_www, 'edit_crew_name' => $edit_crew_name]);	
-	}
+				doQuery("update crews set www=:edit_crew_www where name=:edit_crew_name", ['edit_creq_www' => $edit_crew_www, 'edit_crew_name' => $edit_crew_name]);	
+			}
 
-	if(isset($_POST['add_bbs']) && is_admin())
-	{
+			if(isset($_POST['add_bbs']) && is_admin())
+			{
 				foreach($_POST[add_bbs] as $add_bbs) // add new bbses
 				{
 					doQuery("insert into bbs_of values (:add_bbs,:crew)", ['add_bbs' => $add_bbs, 'crew' => $crew]);
@@ -484,7 +506,7 @@ if(isset($_POST['do_change_crew']) && is_admin())
 			<div class="bs-component">
 				<div class="animate__animated animate__tada alert alert-dismissible alert-success">
 					<button type="button" class="close" data-dismiss="alert">x</button>
-					<span>Artist updated!</span>
+					<span>Artist successfully updated!</span>
 				</div>
 			</div>	
 			<?php
