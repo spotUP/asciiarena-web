@@ -32,7 +32,9 @@ include "header.php";
 					<span>Good bwai! Colly marked as fixed!</span>
 				</div>
 			</div>
+			<meta http-equiv="Refresh" content="4"; url="admin.php">
 			<?php
+			exit;
 		}	
 
 //---------------------------------------------------------------------------------------------------------------
@@ -54,8 +56,10 @@ include "header.php";
 					<button type="button" class="close" data-dismiss="alert">x</button>
 					<span>User successfully deleted.</span>
 				</div>
-			</div>				
+			</div>
+			<meta http-equiv="Refresh" content="4"; url="admin.php">
 			<?php
+			exit;
 		}	
 
 //---------------------------------------------------------------------------------------------------------------
@@ -81,7 +85,9 @@ include "header.php";
 					<span>Crew successfully deleted.</span>
 				</div>
 			</div>	
+			<meta http-equiv="Refresh" content="4"; url="admin.php">
 			<?php
+			exit;
 		}	
 
 //---------------------------------------------------------------------------------------------------------------
@@ -97,15 +103,17 @@ include "header.php";
 				$ask="delete from logos where logo_id=:delete_sitelogo";
 				doQuery($ask, ['delete_sitelogo' => $delete_sitelogo]);
 			}
-			?><meta http-equiv="Refresh" content="0"; url="admin.php"><?php
 			?>
 			<div class="bs-component">
 				<div class="animate__animated animate__tada alert alert-dismissible alert-success">
 					<button type="button" class="close" data-dismiss="alert">x</button>
 					<span>Logo successfully deleted!</span>
 				</div>
-			</div>				
+			</div>
+			?>
+			<meta http-equiv="Refresh" content="4"; url="admin.php">
 			<?php
+			exit;
 		}	
 
 //---------------------------------------------------------------------------------------------------------------
@@ -168,9 +176,6 @@ include "header.php";
 			$pumped = $collysize + $appsize + $magsize;
 			doQuery("update users set uploaded = :pumped where nick = :nick", [":nick" => $nick, ":pumped" => $pumped]);
 
-//---------------------------------------------------------------------------------------------------------------
-// RECALCULATE RATINGS
-//--------------------------------------------------------------------------------------------------------------
 			recalculate_ratings();
 			?>
 			<div class="bs-component">
@@ -179,7 +184,9 @@ include "header.php";
 					<span>Colly successfully deleted!</span>
 				</div>
 			</div>	
+			<meta http-equiv="Refresh" content="4"; url="admin.php">
 			<?php
+			exit;
 		}	
 
 //---------------------------------------------------------------------------------------------------------------
@@ -204,7 +211,9 @@ include "header.php";
 					<span>Artist successfully deleted!</span>
 				</div>
 			</div>	
+			<meta http-equiv="Refresh" content="4"; url="admin.php">
 			<?php
+			exit;
 		}	
 
 //---------------------------------------------------------------------------------------------------------------
@@ -332,10 +341,6 @@ include "header.php";
 				doQuery($ask,['edit_colly_day' => $edit_colly_day, 'filename' => $filename]);	
 			}
 
-//---------------------------------------------------------------------------------------------------------------
-// RECALCULATE RATINGS
-//---------------------------------------------------------------------------------------------------------------
-
 			recalculate_ratings();
 			?>
 
@@ -345,7 +350,7 @@ include "header.php";
 					<span>Colly successfully updated!</span>
 				</div>
 			</div>
-			<meta http-equiv="Refresh" content="0"; url="admin.php">
+			<meta http-equiv="Refresh" content="4"; url="admin.php">
 			<?php
 			exit;
 		}	
@@ -413,7 +418,9 @@ include "header.php";
 					<span>Crew successfully updated!</span>
 				</div>
 			</div>	
+			<meta http-equiv="Refresh" content="4"; url="admin.php">
 			<?php
+			exit;
 		}
 
 //---------------------------------------------------------------------------------------------------------------
@@ -433,7 +440,6 @@ include "header.php";
 
 				$ask="update member_of set nick=:edit_artist_nick where nick=:artist";	
 				doQuery($ask,['edit_artist_nick' => $edit_artist_nick, 'artist' => $artist]);	
-
 			}
 			if(isset($_POST['edit_artist_www']) && is_admin())
 			{
@@ -509,96 +515,112 @@ include "header.php";
 					<span>Artist successfully updated!</span>
 				</div>
 			</div>	
+			<meta http-equiv="Refresh" content="4"; url="admin.php">
 			<?php
+			exit;
 		}
 
 //---------------------------------------------------------------------------------------------------------------
 // WRITE USER INFO TO DB
 //---------------------------------------------------------------------------------------------------------------
 
-		if(isset($_POST['changeusernick']))
+		if(isset($_POST['do_edit_user']))
 		{
-			$change_user_nick=$_POST['changeusernick'];
-			$user_nick=$_POST['getuser'];
-
-			$ask="update users set nick=:change_user_nick where nick=:user_nick";
-			doQuery($ask, ['change_user_nick' => $change_user_nick, 'user_nick' => $user_nick]);	
-		}
-		if(isset($_POST['changeusercrew']))
-		{
-			$change_user_nick=$_POST['changeusernick'];
-			$changecrew=$_POST['changeusercrew'];
-			$user_nick=$_POST['usernick'];
-
-			$ask="update users set crew=:changecrew where nick=:change_user_nick";
-			doQuery($ask,['changecrew' => $changecrew, 'change_user_nick' => $change_user_nick ]);	
-		}
-		if(isset($_POST['edit_user_rank']))
-		{
-			$change_user_nick=$_POST['changeusernick'];
-			$edit_user_rank=$_POST['edit_user_rank'];
-			$user_nick=$_POST['usernick'];
-
-			$ask="update users set rank=:edit_user_rank where nick=:change_user_nick";
-			doQuery($ask, ['edit_user_rank' => $edit_user_rank, 'change_user_nick' => $change_user_nick]);	
-		}
-		if(isset($_POST['changeuserbyear']))
-		{
-			$change_user_nick=$_POST['changeusernick'];
-			$changebyear=$_POST['changeuserbyear'];
-			$user_nick=$_POST['usernick'];
-
-			$ask="update users set byear=:changebyear where nick=:change_user_nick";
-			doQuery($ask, ['changebyear' => $changebyear, 'change_user_nick' => $change_user_nick]);	
-		}
-		if(isset($_POST['changeuserbmonth']))
-		{
-			$change_user_nick=$_POST['changeusernick'];
-			$changebmonth=$_POST['changeuserbmonth'];
-			$user_nick=$_POST['usernick'];
-
-			$ask="update users set bmonth=:changebmonth where nick=:change_user_nick";
-			doQuery($ask, ['changebmonth' => $changebmonth, 'change_user_nick' => $change_user_nick]);	
-		}
-		if(isset($_POST['changeuserbday']))
-		{
-			$change_user_nick=$_POST['changeusernick'];
-			$changebday=$_POST['changeuserbday'];
-			$user_nick=$_POST['usernick'];
-
-			$ask="update users set bday=:changebday where nick=:change_user_nick";
-			doQuery($ask, ['changebday' => $changebday, 'change_user_nick' => $change_user_nick]);	
-		}
-		if(isset($_POST['changeusercountry']))
-		{
-			$change_user_nick=$_POST['changeusernick'];
-			$change_country=$_POST['changeusercountry'];
-			$user_nick=$_POST['usernick'];
-
-			$ask="update users set country=:change_country where nick=:change_user_nick";
-			doQuery($ask,['change_country' => $country_list[$change_country], 'change_user_nick' => $change_user_nick ]);	
-		}
-		if(isset($_POST['changeusermail']))
-		{
-			$change_user_nick=$_POST['changeusernick'];
-			$mail=$_POST['changeusermail'];
-
-			$mail = trim($_POST['changeusermail']);  
-			if(!checkEmail($mail)) 
+			if(isset($_POST['changeusernick']))
 			{
+				$change_user_nick=$_POST['changeusernick'];
+				$user_nick=$_POST['getuser'];
+
+				$ask="update users set nick=:change_user_nick where nick=:user_nick";
+				doQuery($ask, ['change_user_nick' => $change_user_nick, 'user_nick' => $user_nick]);	
 				?>
 				<div class="bs-component">
-					<div class="animate__animated animate__shakeX alert alert-dismissible alert-danger">
+					<div class="animate__animated animate__shakeX alert alert-dismissible alert-success">
 						<button type="button" class="close" data-dismiss="alert">x</button>
-						<span>You can not submit an empty logo!</span>
+						<span>User name field updated successfully!</span>
 					</div>
 				</div>
 				<?php
 			}
-			$user_nick=$_POST['usernick'];
+			if(isset($_POST['changeusercrew']))
+			{
+				$change_user_nick=$_POST['changeusernick'];
+				$changecrew=$_POST['changeusercrew'];
+				$user_nick=$_POST['usernick'];
 
-			$ask="update users set mail=:mail where nick=:change_user_nick";
-			doQuery($ask, ['mail' => $mail, 'change_user_nick' => $change_user_nick ]);	
+				$ask="update users set crew=:changecrew where nick=:change_user_nick";
+				doQuery($ask,['changecrew' => $changecrew, 'change_user_nick' => $change_user_nick ]);	
+			}
+			if(isset($_POST['edit_user_rank']))
+			{
+				$change_user_nick=$_POST['changeusernick'];
+				$edit_user_rank=$_POST['edit_user_rank'];
+				$user_nick=$_POST['usernick'];
+
+				$ask="update users set rank=:edit_user_rank where nick=:change_user_nick";
+				doQuery($ask, ['edit_user_rank' => $edit_user_rank, 'change_user_nick' => $change_user_nick]);	
+			}
+			if(isset($_POST['changeuserbyear']))
+			{
+				$change_user_nick=$_POST['changeusernick'];
+				$changebyear=$_POST['changeuserbyear'];
+				$user_nick=$_POST['usernick'];
+
+				$ask="update users set byear=:changebyear where nick=:change_user_nick";
+				doQuery($ask, ['changebyear' => $changebyear, 'change_user_nick' => $change_user_nick]);	
+			}
+			if(isset($_POST['changeuserbmonth']))
+			{
+				$change_user_nick=$_POST['changeusernick'];
+				$changebmonth=$_POST['changeuserbmonth'];
+				$user_nick=$_POST['usernick'];
+
+				$ask="update users set bmonth=:changebmonth where nick=:change_user_nick";
+				doQuery($ask, ['changebmonth' => $changebmonth, 'change_user_nick' => $change_user_nick]);	
+			}
+			if(isset($_POST['changeuserbday']))
+			{
+				$change_user_nick=$_POST['changeusernick'];
+				$changebday=$_POST['changeuserbday'];
+				$user_nick=$_POST['usernick'];
+
+				$ask="update users set bday=:changebday where nick=:change_user_nick";
+				doQuery($ask, ['changebday' => $changebday, 'change_user_nick' => $change_user_nick]);	
+			}
+			if(isset($_POST['changeusercountry']))
+			{
+				$change_user_nick=$_POST['changeusernick'];
+				$change_country=$_POST['changeusercountry'];
+				$user_nick=$_POST['usernick'];
+
+				$ask="update users set country=:change_country where nick=:change_user_nick";
+				doQuery($ask,['change_country' => $country_list[$change_country], 'change_user_nick' => $change_user_nick ]);	
+			}
+			if(isset($_POST['changeusermail']))
+			{
+				$change_user_nick=$_POST['changeusernick'];
+				$mail=$_POST['changeusermail'];
+
+				$mail = trim($_POST['changeusermail']);  
+				if(!checkEmail($mail)) 
+				{
+					$user_nick=$_POST['usernick'];
+					$ask="update users set mail=:mail where nick=:change_user_nick";
+					doQuery($ask, ['mail' => $mail, 'change_user_nick' => $change_user_nick ]);	
+				}
+			}
+			?>
+			<div class="bs-component">
+				<div class="animate__animated animate__shakeX alert alert-dismissible alert-success">
+					<button type="button" class="close" data-dismiss="alert">x</button>
+					<span>Mail field updated successfully!</span>
+				</div>
+			</div>
+			<?php
+			?>
+			<meta http-equiv="Refresh" content="4"; url="admin.php">
+			<?php
+			exit;
 		}
 
 //---------------------------------------------------------------------------------------------------------------
