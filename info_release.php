@@ -351,7 +351,7 @@ require_once "header.php"; ?>
 				{
 					$filename = $_POST[ 'filename' ];
 
-					$ask = "DELETE FROM collys_crews WHERE colly_id in (SELECT id FROM collys WHERE filename=:filename";
+					$ask = "DELETE FROM collys_crews WHERE colly_id in (SELECT id FROM collys WHERE filename=:filename)";
 					doQuery($ask, [ 'filename' => $filename] );
 
 					if (isset($_POST[ 'old_colly_crews' ])) 
