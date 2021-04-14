@@ -405,7 +405,7 @@ require_once "header.php"; ?>
 					$filename = $_POST[ 'filename' ];
 					$edit_colly_day = $_POST[ 'edit_colly_day' ];
 					$ask = "update collys set day=:day where filename=:filename";
-              				doQuery($ask, ['date' => $edit_colly_day, 'filename' => $filename]);
+              				doQuery($ask, ['day' => $edit_colly_day, 'filename' => $filename]);
 				}
 
 				//---------------------------------------------------------------------------------------------------------------
