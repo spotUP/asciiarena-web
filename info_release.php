@@ -434,7 +434,7 @@ require_once "header.php"; ?>
 						<div class="bs-component aml-1 amb-1">
 							<div class="alert alert-dismissible alert-success">
 								<button type="button" class="close" data-dismiss="alert">x</button>
-								You added <?=$filename?> as a favourite!
+								<?=$filename?> successfully updated!
 							</div>
 						</div>
 					</div>
@@ -668,12 +668,16 @@ require_once "header.php"; ?>
 						<input type="submit" class="btn-big amb-1" name="addcomment" value="Comment">
 						<input type="submit" class="btn-big amb-1" name="favourite" value="Favourite">
 						<input type="submit" class="btn-big amb-1" name="broken" value="Report Broken">
+						</form>
 						<?php
 						if ($_user[ "nick" ] === $uploader || is_admin()) 
 						{
 							?>
-							<input type="hidden" name="filename" value="<?=$filename?>">
-							<input type="submit" class="btn-big amb-1" name="edit_colly" value="Edit Colly">
+							<form action="/admin.php#colly" method='post' id='edit-colly'>
+								<input type="hidden" name="getcollyname" value="<?=$filename?>">
+								<input type="hidden" name="open_edit_colly_field" value="1">
+								<input type="submit" class="btn-big amb-1" name="edit_colly" value="Edit Colly">
+							</form>
 							<?php
 						}
 					}
