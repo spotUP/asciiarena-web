@@ -46,6 +46,7 @@ if(isset($_POST['artistnick']))
 if (empty($artistnick))
 {
 	?>
+</div>
 	<div class="row col-12">
 		<div class="bs-component">
 			<div class="animate__animated animate__tada alert alert-dismissible alert-danger">
