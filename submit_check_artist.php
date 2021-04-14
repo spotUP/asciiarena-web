@@ -50,6 +50,14 @@ if(isset($_POST['artistnick']))
 			</div>
 		</div>
 		<meta http-equiv="Refresh" content="4"; url="submit.php">
+	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+		<?php include "sidebar.php"; ?>
+	</div>
+	<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
+		<?php include "sidebar_right.php"; ?>
+	</div>
+</div>
+<?php include "footer.php"; ?>
 		<?php
 		exit();
 	}
