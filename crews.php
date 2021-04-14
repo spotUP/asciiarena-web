@@ -60,11 +60,19 @@ require_once "header.php";
 		</div>
 		<?php
 		if (!isset($_POST[ 'search' ])) {
-			$q = "SELECT crews.*, (SELECT COUNT(colly_id) FROM crew_of WHERE crew_id = crews.id) AS releases, (SELECT COUNT(nick) FROM member_of WHERE crew = crews.name) AS members FROM crews ORDER BY {$sort_by} {$sort_order} {$pagination["limit"]}";
+			$q = "SELECT crews.*, 
+				  (SELECT COUNT(colly_id) FROM collys_crews WHERE crew_id = crews.id) AS releases, 
+				   (SELECT COUNT(nick) FROM member_of WHERE crew = crews.name) AS members 
+				   FROM crews ORDER BY {$sort_by} {$sort_order} {$pagination["limit"]}";
 			$p = [];
 		} else {
 			$searchquery = $_POST[ 'search' ];
-			$q = "SELECT crews.*, (SELECT COUNT(colly_id) FROM crew_of WHERE crew_id = crews.id) AS releases, (SELECT COUNT(nick) FROM member_of WHERE crew = crews.name) AS members FROM crews WHERE MATCH(crews.name, crews.acronym) AGAINST (:searchquery IN BOOLEAN MODE) ORDER BY {$sort_by} {$sort_order} {$pagination["limit"]}";
+			$q = "SELECT crews.*, 
+				(SELECT COUNT(colly_id) FROM collys_crews WHERE crew_id = crews.id) AS releases, 
+				(SELECT COUNT(nick) FROM member_of WHERE crew = crews.name) AS members 
+				FROM crews 
+				WHERE MATCH(crews.name, crews.acronym) AGAINST (:searchquery IN BOOLEAN MODE)
+				ORDER BY {$sort_by} {$sort_order} {$pagination["limit"]}";
 			$p = [":searchquery" => $searchquery];
 		}
 		$crews = [];

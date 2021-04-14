@@ -12,10 +12,10 @@ include "header.php";
     <?php
 
     $validSorts = array(
-      'a.filename' => 'Filename',
-      'a.name' => 'Name',
-      'c.crew' => 'Crew',
-      'a.year, a.month' => 'Release Date'
+      'c.filename' => 'Filename',
+      'a.nick' => 'Name',
+      'w.name' => 'Crew',
+      'c.year, c.month' => 'Release Date'
     );
 
     $artisturl = $_GET['artist'];
@@ -147,10 +147,13 @@ include "header.php";
 //-----------------------------------------------------------------------------
 // LATEST FILE_ID
 //-----------------------------------------------------------------------------
-$q = "SELECT a.*, b.nick AS author, c.crew FROM collys AS a " .
-"  INNER JOIN author_of AS b ON a.filename = b.filename " .
-"  INNER JOIN crew_of AS c ON a.filename = c.filename " .
-"WHERE b.nick = :nick GROUP BY a.filename ORDER BY a.year DESC, a.month DESC, a.day DESC LIMIT 1";
+$q = "  SELECT c.*,a.nick,w.name FROM collys c
+	    LEFT JOIN artists_collys ac ON c.id=ac.colly_id
+	    LEFT JOIN artists a ON ac.artist_id=a.id
+	    LEFT JOIN collys_crews cc ON cc.colly_id=c.id
+            LEFT JOIN crews w ON cc.crew_id=w.id
+	    WHERE a.id in (SELECT artist_id FROM artists_collys WHERE artist_id IN (SELECT id FROM artists WHERE nick=:nick))
+            GROUP BY c.filename ORDER BY c.year DESC, c.month DESC, c.day LIMIT 1";
 $p = [":nick" => $show_artist];
 foreach (fetchAll($q, $p) as $row) {
   $row = get_object_vars($row);
@@ -195,7 +198,10 @@ foreach (fetchAll($q, $p) as $row) {
           <span>
             <?php
             $authors = array();
-            $q = "select * from author_of where filename=:filename";
+	    $q = "SELECT c.filename,a.nick FROM collys c
+		    LEFT JOIN artists_collys ac ON ac.colly_id=c.id
+		    LEFT JOIN artists a on a.id=ac.artist_id
+	            WHERE c.filename=:filename";
             $p = [":filename" => $filename];
             foreach (fetchAll($q, $p) as $row_author) {
               $row_author = get_object_vars($row_author);
@@ -228,7 +234,10 @@ foreach (fetchAll($q, $p) as $row) {
           <span>
            <?php
            $crews = array();
-           $q = "select * from crew_of where filename=:filename";
+	    $q = "SELECT c.filename,w.name as crew FROM collys c
+		    LEFT JOIN collys_crews cc ON cc.colly_id=c.id
+		    LEFT JOIN crews w on w.id=cc.crew_id
+		    WHERE c.filename=:filename";
            $p = [":filename" => $filename];
 
            foreach (fetchAll($q, $p) as $row_crew) {
@@ -405,12 +414,14 @@ $acronym = $result->acronym;
 
 </div>
 <?php
-$sort_criteria = (isset($_GET['sort_by'])) ? $_GET['sort_by'] : 'a.filename';
-$q = "SELECT a.*, b.nick AS author, c.crew FROM collys AS a " .
-"  INNER JOIN author_of AS b ON a.filename = b.filename " .
-"  INNER JOIN crew_of AS c ON a.filename = c.filename " .
-"WHERE b.nick = :nick GROUP BY a.filename";
-
+$sort_criteria = (isset($_GET['sort_by'])) ? $_GET['sort_by'] : 'c.filename';
+$q = "SELECT c.*,a.nick AS author, w.name AS crew FROM collys c
+	LEFT JOIN artists_collys ac ON ac.colly_id = c.id
+	LEFT JOIN artists a ON ac.artist_id = ac.artist_id
+	LEFT JOIN collys_crews cc ON cc.colly_id=c.id
+    	LEFT JOIN crews w ON cc.crew_id=w.id
+	WHERE a.id in (SELECT artist_id FROM artists_collys WHERE artist_id IN (SELECT id FROM artists WHERE nick=:nick))
+	GROUP BY c.filename";
 if ((isset($_GET['sort_by'])) && (array_key_exists($sort_criteria, $validSorts))) {
   $q.= " ORDER BY {$sort_criteria}";
 }
