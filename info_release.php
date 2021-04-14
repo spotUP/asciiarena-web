@@ -138,7 +138,7 @@ require_once "header.php"; ?>
 						$artist = $row->nick;
 					}
 
-					$ask = "SELECT w.name as crew FROM collys c LEFT JOIN collys_crews cc ON cc.colly_id=c.id LEFT JOIN crews w ON w.id=cc.crew_id WHERE c.filename=:filename";
+					$ask_crew = "SELECT w.name as crew FROM collys c LEFT JOIN collys_crews cc ON cc.colly_id=c.id LEFT JOIN crews w ON w.id=cc.crew_id WHERE c.filename=:filename";
 					$row_crew = fetchOne($ask_crew, [ 'filename' => $filename ]);
 					if (isset($row_crew->crew))
 					{
