@@ -339,7 +339,7 @@ require_once "header.php"; ?>
 						if ($_user[ "nick" ] === $uploader || is_admin()) 
 						{
 							?>
-							<form action="/admin.php#colly" method='post' id='edit-colly'>
+							<form action="/admin.php#colly" method="post" id="edit-colly">
 								<input type="hidden" name="getcollyname" value="<?=$filename?>">
 								<input type="hidden" name="open_edit_colly_field" value="1">
 								<input type="submit" class="btn-big amb-1" name="edit_colly" value="Edit Colly">
@@ -350,16 +350,25 @@ require_once "header.php"; ?>
 					if (!isset($_POST[ 'download' ])) 
 					{
 						?>
+						<form action="/release/<?=$filename?>" method="post" id="download-colly">
 						<input type="submit" class="btn-big amb-1" name="download" value="Download">
+						</form>
 						<?php
 					} 
 					elseif (isset($_POST[ "download" ])) 
 					{
-            $ask = "select downloads from collys where filename=:filename"; // download counter
-            $row = fetchOne("SELECT view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
-            $downloads = $row->downloads+1;
-
-            doQuery("update collys set downloads=:downloads where filename=:filename", [":downloads" => $downloads, ":filename" => $filename]);
+						echo "downloading...";
+						?>
+						<script>
+    							var link = document.createElement("a");
+    							link.setAttribute('download', '');
+    							link.href = '/collections/<?=$dirname?>/<?=$filename?>';
+    							document.body.appendChild(link);
+    							link.click();
+    							link.remove();
+						</script>
+						<?php
+            					doQuery("update collys set downloads=downloads+1 where filename=:filename", ["filename" => $filename]);
             ?><meta content="1"; URL="<?=$filenameandpath?>" http-equiv="Refresh"><?php
         }
 
