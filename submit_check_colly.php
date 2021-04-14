@@ -261,34 +261,6 @@ if(isset($_POST['colly_name']))
 		$pumped = $collysize + $appsize + $magsize;
 		doQuery("update users set uploaded=:pumped where nick=:nick", [ 'nick' => $nick, 'pumped' => $pumped ]);
 
-	foreach($_POST['crew'] as $crew)
-	{
-		$ask = "insert into crew_of (crew, filename, crew_id, colly_id)
-		values (:crew, :filename, 
-		(select id from crews where name=:crew),
-		(select id from collys where filename=:filename))";
-		doQuery($ask, [ 'crew' => $crew, 'filename' => $filename ]);
-	}
-
-	$result = fetchOne("select sum(filesize) AS sum from collys where uploader=:nick", [ 'nick' => $nick ]);
-	if ($row = $result)
-	{
-		$collysize=$row->sum;
-	}
-
-	$result = fetchOne("select sum(filesize) AS sum from mags where uploader=:nick", [ 'nick' => $nick ]);
-	if ($row = $result)
-	{
-		$magsize=$row->sum;
-	}
-
-	$result = fetchOne("select sum(filesize) AS sum from apps where uploader=:nick", [ 'nick' => $nick ]);
-	if ($row = $result)
-	{
-		$appsize=$row->sum;
-	}
-	$pumped = $collysize + $appsize + $magsize;
-	doQuery("update users set uploaded=:pumped where nick=:nick", [ 'nick' => $nick, 'pumped' => $pumped ]);
 
 	?>
 	<div class="bs-component">
