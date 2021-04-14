@@ -53,25 +53,20 @@ switch ($sort_by) {
 
 		<?php
 		if (!isset($_POST[ 'search' ])) {
-			$q = "SELECT * FROM member_of ORDER BY {$sort_by} ASC {$pagination["limit"]}";
+			$q = "SELECT a.nick,GROUP_CONCAT(m.crew) as crews FROM artists a LEFT JOIN member_of m on a.nick=m.nick GROUP BY a.id ORDER BY {$sort_by} ASC {$pagination["limit"]}";
 			$p = [];
 		} else {
 			$searchquery = $_POST[ 'search' ];
-			$q = "SELECT * FROM member_of 
-					WHERE MATCH(nick) AGAINST (:searchquery IN BOOLEAN MODE) 
-						OR MATCH(crew) AGAINST (:searchquery IN BOOLEAN MODE) ORDER BY {$sort_by} ASC {$pagination["limit"]}";
+			$q = "SELECT a.nick,GROUP_CONCAT(m.crew) as crews FROM artists a LEFT JOIN member_of m on a.nick=m.nick 
+				  WHERE MATCH(a.nick) AGAINST (:searchquery IN BOOLEAN MODE) 
+				    OR MATCH(m.crew) AGAINST (:searchquery IN BOOLEAN MODE)
+				  GROUP BY a.id ORDER BY {$sort_by} ASC {$pagination["limit"]}";
 			$p = [":searchquery" => $searchquery];
 		}
-		$artists = [];
 		foreach (fetchAll($q, $p) as $row) {
-			if (!array_key_exists($row->nick, $artists)) {
-				$artists[ $row->nick ] = [];
-			}
-			if (!in_array($row->crew, $artists[ $row->nick ], true)) {
-				$artists[ $row->nick ][] = "<a href=\"/crew/" . urlsafe($row->crew) . "\">{$row->crew}</a>";
-			}
-		}
-		foreach ($artists as $artist => $crews) {
+			$artist = $row->nick;
+			$crews = explode(',', $row->crews);
+			$crews = array_map(function($crew) { return '<a href="/crew/'.urlsafe($crew).'">'.$crew.'</a>'; }, $crews);
 			?>
 			<div class="row">
 				<div class="forum_nick col-2">
