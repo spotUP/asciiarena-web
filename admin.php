@@ -210,7 +210,8 @@ include "header.php";
 //---------------------------------------------------------------------------------------------------------------
 // WRITE COLLY INFO TO DB
 //---------------------------------------------------------------------------------------------------------------
-		$filename=$_POST['filename'];
+
+    $filename=$_POST['filename'];
 
 		if(isset($_POST['do_edit_colly']) && is_admin())
 		{
@@ -222,7 +223,8 @@ include "header.php";
 				doQuery($ask, ['edit_colly_name' => $edit_colly_name, 'filename' => $filename]);
 			}
 
-			if(isset($_POST['old_colly_authors']) || (isset($_POST['colly_author']) && is_admin()))
+			$_POST['old_colly_authors'] = array_filter($_POST['old_colly_authors'], function($x) { return !empty($x); });
+			if(count($_POST['old_colly_authors']) > 0 || (isset($_POST['colly_author']) && is_admin()))
 			{
 
 				$ask = "DELETE FROM artists_collys WHERE colly_id in (SELECT id FROM collys WHERE filename=:filename)";
@@ -236,8 +238,8 @@ include "header.php";
                                                     (SELECT id FROM artists WHERE nick=:artist),
                                                     (SELECT id FROM collys WHERE filename=:filename))";
                                             doQuery($ask, ['artist' => $colly_author, 'filename' => $filename]);
+					}
 				}
-			}
 
 			if (isset($_POST['colly_author']))
 			{
@@ -250,6 +252,7 @@ include "header.php";
 				}
 			}
 	}
+	$_POST['old_colly_crews'] = array_filter($_POST['old_colly_crews'], function($x) { return !empty($x); });
 	if(isset($_POST['old_colly_crews']) || (isset($_POST['colly_crew']) && is_admin()))
 	{
 		$filename=$_POST['filename'];
