@@ -26,7 +26,7 @@ if(isset($_POST['getuser']) && is_admin())
 	<div class="row apb-1">
 		<div class="col-12">
 			<form enctype="multipart/form-data" action="#edituser" method="post">
-				<select name="getuser">
+				<select name="getuser" onchange="this.form.submit();">
 					<?php
 					if (isset($show_user_nick))
 					{
@@ -197,7 +197,7 @@ if(isset($_POST['getuser']) && is_admin())
 						<div class="col-12">
 							<input type="hidden" name="getuser" value="<?=$getuser?>">
 							<input type="submit" name="delete_user" value="Delete">
-							<input type="submit" size="5" value="Save">
+							<input type="submit" name="do_edit_user" size="5" value="Save">
 						</div>
 					</form>
 				</div>

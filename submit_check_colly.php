@@ -22,7 +22,7 @@ if(isset($_POST['dupecheck']))
 	{
 		?>
 		<div class="bs-component">
-			<div class="animate__animated animate__tada alert alert-dismissible alert-success">
+			<div class="animate__animated animate__tada alert alert-dismissible alert-danger">
 				<button type="button" class="close" data-dismiss="alert">x</button>
 				<span><?=$dupe?> exists! Somebody was faster than you! :(</span>
 			</div>
@@ -177,7 +177,7 @@ foreach ($result_existing as $row_existing)
 	{
 		?>
 		<div class="bs-component">
-			<div class="animate__animated animate__tada alert alert-dismissible alert-success">
+			<div class="animate__animated animate__tada alert alert-dismissible alert-danger">
 				<button type="button" class="close" data-dismiss="alert">x</button>
 				<span><?=$filename?> already exists! Somebody was faster than you! :(</span>
 			</div>
