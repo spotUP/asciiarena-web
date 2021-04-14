@@ -277,19 +277,19 @@ EOD;
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle ascii" style="padding-right: 8px;" data-toggle="dropdown" href="/admin.php" id="themes">SUBMiT<span class="caret" style="padding-right: 8px;"></span></a>
 						<div class="dropdown-menu ascii" aria-labelledby="themes">
-							<a class="dropdown-item ascii" href="/submit.php">COLLY<span style="padding-left: 7px;">       </span></a>
-							<a class="dropdown-item ascii" href="/submit.php#crew">CREW<span style="padding-left: 4px;">    </span></a>
-							<a class="dropdown-item ascii" href="/submit.php#artist">ARTiST<span style="padding-left: 10px;">     </span></a>
+							<a class="dropdown-item ascii" href="/submit.php">Colly<span style="padding-left: 7px;">       </span></a>
+							<a class="dropdown-item ascii" href="/submit.php#crew">Crew<span style="padding-left: 4px;">    </span></a>
+							<a class="dropdown-item ascii" href="/submit.php#artist">Artist<span style="padding-left: 10px;">     </span></a>
 							<a class="dropdown-item ascii" href="/submit.php#bbs">BBS<span style="font-size: 16px;"> </span></a>
-							<a class="dropdown-item ascii" href="/submit.php#app">APP<span style="font-size: 16px;"> </span></a>
-							<a class="dropdown-item ascii" href="/submit.php#ascii_mag">MAG<span style="font-size: 16px;"> </span></a>
+							<a class="dropdown-item ascii" href="/submit.php#app">ASCII App<span style="font-size: 16px;"> </span></a>
+							<a class="dropdown-item ascii" href="/submit.php#ascii_mag">ASCII Mag<span style="font-size: 16px;"> </span></a>
 						</div>
 					</li>
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle ascii" style="padding-right: 8px;" data-toggle="dropdown" href="#">ACCOUNT<span class="caret" style="padding-right: 8px;"></span></a>
 						<div class="dropdown-menu ascii" aria-labelledby="account"><a class="dropdown-item ascii" href="/messages.php">MAiL<span style="padding-left: 4px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;</span></a>
-							<a class="dropdown-item ascii" href="/crib.php">SETTiNGS<span style="padding-left: 4px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;</span></a>
-							<a class="dropdown-item ascii" href="/cmds.php?cmd=logout">LOGOUT<span
+							<a class="dropdown-item ascii" href="/crib.php">Settings<span style="padding-left: 4px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;</span></a>
+							<a class="dropdown-item ascii" href="/cmds.php?cmd=logout">Logout<span
 								style="padding-left: 7px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;</span></a>
 							</div>
 						</li>
