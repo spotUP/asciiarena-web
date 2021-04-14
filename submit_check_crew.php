@@ -46,7 +46,13 @@ if(isset($_POST['crewname']))
 		'crewurl' => urlsafe($crewname)
 	]);
 
-	?>	
+	?>
+	<div class="bs-component">
+		<div class="animate__animated animate__tada alert alert-dismissible alert-success">
+			<button type="button" class="close" data-dismiss="alert">x</button>
+			<span>Crew submitted successfully!</span>
+		</div>
+	</div>
 	<meta http-equiv="Refresh" content="2"; url="submit.php">
 	<?php
 	exit;
