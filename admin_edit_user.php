@@ -150,7 +150,7 @@
           foreach($country_list as $symbol => $country)
 						{
 							?>
-								<option value="<?=$country?>"><?=$country?></option>
+								<option value="<?=$symbol?>"><?=$country?></option>
 							<?php
 						}
 						?>
@@ -183,7 +183,7 @@
         "url": url,
         "data": form.serialize(),
         "success": () => {
-          showAlert("User saved!", "#user");
+          showAlert("User saved!", "#edituser");
           $("#user_id, #user_nick, #user_crew, #user_rank, #user_byear, #user_bmonth, #user_bday, #user_country, #user_mail").val('');
           getUserList();
         }
