@@ -37,8 +37,6 @@ foreach (fetchAll("SELECT * FROM collys WHERE filename = :filename", [":filename
 							echo "</pre>";
 						} else {
 							if (file_exists("$file_id")) {
-								$file_id_diz = iconv("UTF-8","ISO-8859-1//IGNORE",$file_id_diz);
-								$file_id_diz = iconv("ISO-8859-1","UTF-8",$file_id_diz);
 								echo "<pre class=\"magenta apt-1\">";
 								echo utf8_encode($file_id_diz);
 								echo "</pre>";
