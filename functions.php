@@ -409,7 +409,6 @@ function urlsafe($string) {
 
 function cleanStr($value){
     $value = str_replace('Â', '', $value);
-    $value = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
     return $value;
 }
 
