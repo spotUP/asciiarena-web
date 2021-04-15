@@ -224,18 +224,18 @@ exit();
 // CONVERT FILE_ID.DIZ
 //---------------------------------------------------------------------------------------------------------------
 
+$filename = $_FILES['uploadedfile']['name']; 							// fetch filename with extension
+$filen = $upload_path . $dirname . '/' . basename($_FILES['uploadedfile']['name']); 		// fetch filename with path
+mkdir($upload_path.$dirname, 0755, TRUE);
+if (preg_match('/\.lha/i', $filename)) $type = 'Archive';
 
 if ($type == 'ASCII')
 {
-		$filename = $_FILES['uploadedfile']['name']; 							// fetch filename with extension
-	   	$filen = $upload_path . $dirname . '/' . basename($_FILES['uploadedfile']['name']); 		// fetch filename with path
-	   	mkdir($upload_path.$dirname, 0755, TRUE);
-
 	   	if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $filen))
 	   	{ 
 	   		$contents = file_get_contents($filen);
 	   		$file_id = preg_match('/@BEGIN_FILE_ID\.DIZ(.*)@END_FILE_ID\.DIZ/s', $contents, $m) ? $m[1] : '';
-	   		$file_id_name = (strlen($file_id) > 1) ? $filename.'.diz.png' : null;
+	   		$file_id_name = (strlen($file_id) > 1) ? $filename.'.diz' : null;
 
 	   		if (strlen ($file_id) > 0) file_put_contents($filen.".diz", $file_id);
 
@@ -247,10 +247,6 @@ if ($type == 'ASCII')
 	   }
 	   elseif ($type == 'Archive')	
 	   {
-		$filename = $_FILES['uploadedfile']['name']; 							// fetch filename with extension
-	   	$filen = $upload_path . $dirname.'/' . basename($_FILES['uploadedfile']['name']); 		// fetch filename with path
-	   	mkdir($upload_path.$dirname, 0755, TRUE);
-
 	   	if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $filen))
 	   	{ 
 
@@ -262,13 +258,13 @@ if ($type == 'ASCII')
 	   		foreach ($fileids as $fileid) {
 	   			shell_exec('/usr/bin/lha pq "'.$filen.'" "'.$fileid.'" > collections/temp.diz');
 	   			if (filesize('collections/temp.diz') > 0) {
-	   				rename('collections/temp.diz', 'collections/'.$dirname.'/file_id.diz');
+	   				rename('collections/temp.diz', 'collections/'.$dirname.'/'.$filename.'.diz');
 	   				break;
 	   			}
 	   		}
-	   		if (!file_exists('collections/'.$dirname.'/file_id.diz'))
+	   		if (!file_exists('collections/'.$dirname.'/'.$filename.'.diz'))
 	   		{
-	   			file_put_contents('collections/'.$dirname.'/file_id.diz', $name." by ".join(",", $_POST['artists']));
+	   			file_put_contents('collections/'.$dirname.'/'.$filename.'.diz', $name." by ".join(",", $_POST['artists']));
 	   		}
 	   		$ask = "INSERT INTO collys (name, year, type, filename, timestamp, uploader, uploader_id, filesize, month, file_id, view_counter, downloads, day, broken) 
 	   		VALUES (:name, :year, :type, :filename, :now, :uploader, :uploader_id, :filesize, :month, :file_id, 0, 0, :day, 0)";
