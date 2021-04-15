@@ -242,6 +242,7 @@ include "header.php";
 				{			
 					foreach($_POST['old_colly_authors'] as $colly_author)
 					{
+						if ($colly_author === 'Delete') continue;
 						$ask = "INSERT INTO artists_collys (artist_id, colly_id) VALUES (
 						(SELECT id FROM artists WHERE nick=:artist),
 						(SELECT id FROM collys WHERE filename=:filename))";
@@ -253,6 +254,7 @@ include "header.php";
 				{
 					foreach($_POST['colly_author'] as $new_colly_author)
 					{
+						if ($new_colly_author === 'Delete') continue;
 						$ask = "INSERT INTO artists_collys (artist_id, colly_id) VALUES (
 						(SELECT id FROM artists WHERE nick=:artist),
 						(SELECT id FROM collys WHERE filename=:filename))";
@@ -279,6 +281,7 @@ include "header.php";
 				{			
 					foreach($_POST['old_colly_crews'] as $colly_crew)
 					{
+						if ($colly_crew === 'Delete') continue;
 						$ask = "INSERT INTO collys_crews (colly_id, crew_id) VALUES (
 						(SELECT id FROM collys WHERE filename=:filename),
 						(SELECT id FROM crews WHERE name=:crew))";
@@ -288,8 +291,9 @@ include "header.php";
 
 				if (isset($_POST['colly_crew']))
 				{
-					foreach($_POST[colly_crew] as $new_colly_crew)
+					foreach($_POST['colly_crew'] as $new_colly_crew)
 					{
+						if ($new_colly_crew === 'Delete') continue;
 						$ask = "INSERT INTO collys_crews (colly_id, crew_id) VALUES (
 						(SELECT id FROM collys WHERE filename=:filename),
 						(SELECT id FROM crews WHERE name=:crew))";
