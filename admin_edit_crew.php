@@ -6,7 +6,7 @@
 ?>
 <script>
 	function getCrew() {
-		const id = $("#fetch_id").val();
+		const id = $("#crew_fetch_id").val();
 		if (id > 0) {
 			$.get(`/admin_cmds.php?cmd=get_crew&id=${id}`, function (data) {
 				$('#crew_id').val(data[0].id);
@@ -25,7 +25,7 @@
 	}
 
   function getCrewBBSes(id) {
-		let bbslist = $("#bbs_fetch_id");
+		let bbslist = $("#crew_bbs_fetch_id");
 		bbslist.empty();
 		$.get(`/admin_cmds.php?cmd=get_crew_bbs&id=${id}`, function (data) {
 			$.each(data, function (i, bbs) {
@@ -35,9 +35,9 @@
   }
 
 	function getCrewList() {
-		let crewlist = $("#fetch_id");
+		let crewlist = $("#crew_fetch_id");
 		crewlist.empty();
-		crewlist.append($("<option/>").val("0").text("Select Crew"));
+		crewlist.append($("<option/>").val("").text("Select Crew"));
 		$.get("/admin_cmds.php?cmd=get_crew", function (data) {
 			$.each(data, function (i, crew) {
 				crewlist.append($("<option/>").val(crew.id).text(crew.name));
@@ -68,7 +68,7 @@
     const activeName = $("#crew_name").val();
 		if (activeName !== "") {
       $("#add_crew_bbs_crew").val(activeName);
-      $("#add_crew_bbs_bbs").val($("#bbs_add_fetch_id option:selected").text());
+      $("#add_crew_bbs_bbs").val($("#crew_bbs_add_fetch_id option:selected").text());
       const url = form.attr("action");
       $.ajax({
         "type": "POST",
@@ -76,7 +76,7 @@
         "data": form.serialize(),
         "success": () => {
           showAlert("BBS Added!", "#crew");
-          $("#bbs_add_fetch_id").val('0');
+          $("#crew_bbs_add_fetch_id").val('0');
           getCrew();
         }
       });    
@@ -125,8 +125,7 @@
 	<div class="row apb-1">
 		<div class="col-12">
 			<form>
-				<select name="crew_id" id="fetch_id" class="w-100" onchange="getCrew();">
-					<option value="0">Select Crew</option>
+				<select name="crew_id" id="crew_fetch_id" class="w-100" onchange="getCrew();">
 				</select>
 			</form>
 		</div>
@@ -162,7 +161,7 @@
     <div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="crew_rating" class="lightgrey">Rating</label>
-				<input type="text" size="24" id="crew_rating" name="contact">
+				<input type="text" size="24" id="crew_rating" name="rating">
 			</div>
 		</div>
 
@@ -170,17 +169,17 @@
 			<div class="col-6 d-flex justify-content-between">
 				<label for="crew_active" class="lightgrey">Status</label>
         <select name="active" id="crew_active">
-          <option value="No">No</option>
-					<option value="Yes">Yes</option>
+          <option value="Inactive">Inactive</option>
+					<option value="Active">Active</option>
 				</select>
 			</div>
 		</div>
        
     <div class="row apb-1"><div class="col-6 d-flex justify-content-between">BBSes:</div></div>
-    <div id="bbs_fetch_id"></div>
+    <div id="crew_bbs_fetch_id"></div>
     <div class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between">
 
-    <select name="bbs_add_id" id="bbs_add_fetch_id" class="w-100">
+    <select name="bbs_add_id" id="crew_bbs_add_fetch_id" class="w-100">
 					<option value="0">Select BBS</option>
 					<?php
 					$result = fetchAll("SELECT id, name FROM bbses ORDER BY name");
@@ -206,18 +205,18 @@
     getCrewList();
 		$("#crew_form").submit(function (e) {
 			e.preventDefault();
-			const form = $(this);
-			const url = form.attr("action");
-			$.ajax({
-				"type": "POST",
-				"url": url,
-				"data": form.serialize(),
-				"success": () => {
-					showAlert("Crew saved!", "#crew");
+      const form = $(this);
+      const url = form.attr("action");
+      $.ajax({
+        "type": "POST",
+        "url": url,
+        "data": form.serialize(),
+        "success": () => {
+          showAlert("Crew saved!", "#crew");
           $("#crew_id, #crew_name, #crew_acronym, #crew_contact, #crew_url, #crew_rating, #crew_www, #crew_active").val('');
-					getCrewList();
-				}
-			});
+          getCrewList();
+        }
+      });
 		});
 	});
 </script>
