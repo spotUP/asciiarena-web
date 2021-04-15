@@ -407,10 +407,16 @@ function urlsafe($string) {
 // FUNCTION: fix text encoding issues
 //-----------------------------------------------------------
 
-function cleanStr($value){ 
-    $value = str_replace('Â', '', $value);
- //   $value = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
-    return $value;
+function RemoveBS($Str) {  
+  $StrArr = str_split($Str); $NewStr = '';
+  foreach ($StrArr as $Char) {    
+    $CharNo = ord($Char);
+    if ($CharNo == 163) { $NewStr .= $Char; continue; } // keep £ 
+    if ($CharNo > 31 && $CharNo < 127) {
+      $NewStr .= $Char;    
+    }
+  }  
+  return $NewStr;
 }
 
 //-----------------------------------------------------------
