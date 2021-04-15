@@ -56,6 +56,8 @@ if(isset($_POST['getartist']) && is_admin())
 			<div class="row apb-1">
 				<div class="col-6">
 					<span class="white">Nick:</span>
+				</div>
+				<div class="col-6">
 					<input type="text" size="20" name="edit_artist_nick" value="<?=$show_artist_nick?>">
 				</div>
 			</div>
