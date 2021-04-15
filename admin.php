@@ -110,7 +110,6 @@ include "header.php";
 					<span>Logo successfully deleted!</span>
 				</div>
 			</div>
-			?>
 			<meta http-equiv="Refresh" content="4"; url="admin.php">
 			<?php
 			exit;
