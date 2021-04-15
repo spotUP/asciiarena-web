@@ -19,7 +19,7 @@ RewriteBase /
 RewriteRule "^crew/([^/]+)/?$" /info_crew.php?crew=$1 [L,QSA]
 RewriteRule "^artist/([^/]+)/?$" /info_artist.php?artist=$1 [L,QSA]
 RewriteRule "^member/([^/]+)/?$" /members.php?member=$1 [L,QSA]
-RewriteRule "^release/([^/]+)/?$" /info_release.php?filename=$1 [L,QSA]
+RewriteRule "^release/([^/]+)/?$" /info_release.php?filename=$1 [L,QSA,B]
 
 #RewriteCond %{HTTPS} !=on
 #RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
