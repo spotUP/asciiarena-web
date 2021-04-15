@@ -254,7 +254,7 @@ if ($type == 'ASCII')
 	   	if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $filen))
 	   	{ 
 
-	   		$lhal = shell_exec('/usr/bin/lha "'.$filen.'"');
+	   		$lhal = shell_exec('/usr/bin/lha l "'.$filen.'"');
 	   		$fileids = array();
 	   		foreach (explode("\n", $lhal) as $l) {
 	   			if (preg_match('/%\s+[A-Za-z]+\s+\d+\s+\d{4}\s+(.*file_id\.diz)$/i', $l, $m)) $fileids[] = $m[1];
