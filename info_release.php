@@ -500,8 +500,10 @@ require_once "header.php"; ?>
 				if (file_exists(__DIR__ . "/collections/{$dirname}/{$filename}")) 
 				{
 					$content = file_get_contents(__DIR__ . "/collections/{$dirname}/{$filename}");
+					$content = utf8_encode($content);
+					$content = htmlentities($content);
 					echo "<br><br><br><br>";
-					echo utf8_encode($content);
+					echo $content;
 					echo "<br><br><br><br>";
 				}
 				?></pre>
