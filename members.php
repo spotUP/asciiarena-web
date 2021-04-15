@@ -131,7 +131,16 @@ include "header.php";
 				<div class="col-4 apt-1 apb-1"><span class="white">CREW</span></div>
 			</div>
 			<?php
-			foreach(fetchAll("SELECT * FROM collys WHERE uploader_id = :uid GROUP BY filename ORDER BY MAX(timestamp) DESC LIMIT 10", [":uid" => $member->id]) as $row) {
+			foreach(fetchAll("SELECT c.name,c.filename,
+  						GROUP_CONCAT(a.nick) as artists,
+  						GROUP_CONCAT(w.name) as crews 
+  						FROM collys c
+  						LEFT JOIN artists_collys ac ON c.id=ac.colly_id
+  						LEFT JOIN artists a ON ac.artist_id=a.id
+  						LEFT JOIN collys_crews cc ON c.id=cc.colly_id
+  						LEFT JOIN crews w ON w.id=cc.crew_id
+  						WHERE uploader_id = :uid
+  						GROUP BY filename ORDER BY MAX(timestamp) DESC LIMIT 10", [":uid" => $member->id]) as $row) {
 				?>
 				<div class="row">
 					<div class="col-4">
@@ -147,7 +156,17 @@ include "header.php";
 				<?php
 			}
 		}
-		$faves = fetchAll("SELECT * FROM favourites WHERE user_id = :uid", [":uid" => $member->id]);
+		$faves = fetchAll("SELECT c.filename,c.id as colly_id,c.name,
+  					GROUP_CONCAT(DISTINCT a.nick) as artists,
+  					GROUP_CONCAT(DISTINCT w.name) as crews 
+  					FROM favourites f
+  					LEFT JOIN collys c ON f.colly_id=c.id
+  					LEFT JOIN collys_crews cc ON f.colly_id=cc.colly_id
+  					LEFT JOIN crews w ON cc.crew_id=w.id
+  					LEFT JOIN artists_collys ac ON f.colly_id=ac.colly_id
+  					LEFT JOIN artists a ON a.id=ac.artist_id
+  					WHERE f.user_id=:uid
+  					GROUP BY c.filename", [":uid" => $member->id]);
 		if(count($faves) > 0) { ?>
 			<div class="row" style="margin-top: 16px;">
 				<div class="col-12"><h2 class="ap-1 bg-header"><?=$member->nick?>'s Favourites</h2></div>
@@ -158,16 +177,12 @@ include "header.php";
 				<div class="col-4 apt-1 apb-1"><span class="white">CREW</span></div>
 			</div>
 			<?php
-			foreach($faves
-
-				as $fave) {
-				foreach(fetchAll("SELECT * FROM collys WHERE filename = :filename GROUP BY filename ORDER BY filename", [":filename" => $fave->filename]) as $row) {
-					$encoded_filename = base64_encode($row->filename);
+			foreach($faves as $row) {
 					?>
 					<div class="row" id="colly-row-<?=$row->colly_id?>">
 						<div class="col-4">
 							<a
-							href="/release/<?=$filename?>"><?=myTruncate($row->name, 24, " ", "...")?></a>
+							href="/release/<?=$row->filename?>"><?=myTruncate($row->name, 24, " ", "...")?></a>
 						</div>
 						<div class="col-4">
 							<?=combinize($row->artists, "", "/artist/", $row->artists)?>
@@ -180,7 +195,6 @@ include "header.php";
 						</div>
 					</div>
 					<?php
-				}
 			} ?>
 			<script>
 				$(".remove-button").on("click", function () {
