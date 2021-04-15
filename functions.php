@@ -404,6 +404,16 @@ function urlsafe($string) {
 }
 
 //-----------------------------------------------------------
+// FUNCTION: clean string
+//-----------------------------------------------------------
+
+function cleanStr($value){
+    $value = str_replace('Â', '', $value);
+    $value = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
+    return $value;
+}
+
+//-----------------------------------------------------------
 // FUNCTION: recalculate crew & artist ratings
 //-----------------------------------------------------------
 
