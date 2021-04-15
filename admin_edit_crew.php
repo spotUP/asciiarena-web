@@ -3,153 +3,221 @@
 //--------------------------------------------------------------------------------
 // EDIT CREW FIELD
 //--------------------------------------------------------------------------------
-
-
-if(isset($_POST['getcrew']) && is_admin())
-{
-	$getcrew=$_POST['getcrew'];
-	$getcrew=cleanInsert($getcrew);
-	$ask="select * from crews where name=:getcrew";
-	$result=fetchAll($ask, [ 'getcrew' => $getcrew ]);
-	foreach ($result as $row)
-	{
-		$show_crew_name    = $row->name;
-		$show_crew_www     = $row->www;
-		$show_crew_contact = $row->contact;
-		$show_crew_status  = $row->active;
-		$show_crew_acronym = $row->acronym;
-	}
-}
 ?>
+<script>
+	function getCrew() {
+		const id = $("#fetch_id").val();
+		if (id > 0) {
+			$.get(`/admin_cmds.php?cmd=get_crew&id=${id}`, function (data) {
+				$('#crew_id').val(data[0].id);
+				$('#crew_name').val(data[0].name);
+        $('#crew_acronym').val(data[0].acronym);
+				$('#crew_contact').val(data[0].contact);
+				$('#crew_url').val(data[0].url);
+				$('#crew_rating').val(data[0].rating);
+				$('#crew_www').val(data[0].www);
+				$('#crew_active').val(data[0].active);
+			});
+      getCrewBBSes(id)
+		} else {
+			$("#crew_id, #crew_name, #crew_acronym, #crew_contact, #crew_url, #crew_rating, #crew_www, #crew_active").val('');
+		}
+	}
+
+  function getCrewBBSes(id) {
+		let bbslist = $("#bbs_fetch_id");
+		bbslist.empty();
+		$.get(`/admin_cmds.php?cmd=get_crew_bbs&id=${id}`, function (data) {
+			$.each(data, function (i, bbs) {
+        bbslist.append('<div class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between"><span id="bbs_fetch_name_'+bbs.id.toString()+'">'+bbs.name+'</span><input type="button" value="Delete" onclick="deleteCrewBBS('+bbs.id+')"/></div></div>')
+			});
+		});
+  }
+
+	function getCrewList() {
+		let crewlist = $("#fetch_id");
+		crewlist.empty();
+		crewlist.append($("<option/>").val("0").text("Select Crew"));
+		$.get("/admin_cmds.php?cmd=get_crew", function (data) {
+			$.each(data, function (i, crew) {
+				crewlist.append($("<option/>").val(crew.id).text(crew.name));
+			});
+		});
+	}
+
+  function deleteCrewBBS(id) {
+		const activeName = $("#bbs_fetch_name_"+id.toString()).text();
+    if (confirm(`Are you sure you want to delete ${activeName} BBS?`)) {
+      const form = $("#del_crew_bbs_form");
+      $("#del_crew_bbs_id").val(id.toString());
+      const url = form.attr("action");
+      $.ajax({
+        "type": "POST",
+        "url": url,
+        "data": form.serialize(),
+        "success": () => {
+          showAlert("BBS deleted!", "#crew");
+          getCrew();
+        }
+      });
+    }
+  }
+  
+  function addBBS() {
+    const form = $("#add_crew_bbs_form");
+    const activeName = $("#crew_name").val();
+		if (activeName !== "") {
+      $("#add_crew_bbs_crew").val(activeName);
+      $("#add_crew_bbs_bbs").val($("#bbs_add_fetch_id option:selected").text());
+      const url = form.attr("action");
+      $.ajax({
+        "type": "POST",
+        "url": url,
+        "data": form.serialize(),
+        "success": () => {
+          showAlert("BBS Added!", "#crew");
+          $("#bbs_add_fetch_id").val('0');
+          getCrew();
+        }
+      });    
+    }
+  }
+
+	function delCrew() {
+		const activeName = $("#crew_name").val();
+		if (activeName !== "") {
+			if (confirm(`Are you sure you want to delete ${activeName}?`)) {
+				const form = $("#del_crew_form");
+				$("#del_crew_id").val($("#crew_id").val());
+				const url = form.attr("action");
+				$.ajax({
+					"type": "POST",
+					"url": url,
+					"data": form.serialize(),
+					"success": () => {
+						showAlert("Crew deleted!", "#crew");
+            $("#crew_id, #crew_name, #crew_acronym, #crew_contact, #crew_url, #crew_rating, #crew_www, #crew_active").val('');
+						getCrewList();
+					}
+				});
+			}
+		}
+	}
+
+	function showAlert(content, prependTo) {
+		const alertContent = `<div class="bs-component quick-alert amb-1"><div id="#success-alert" class="animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div></div>`;
+		$(prependTo).prepend(alertContent);
+	}
+
+</script>
 
 <div class="tab-pane fade ap-1" id="crew">
-	<form action="#crew" method="post">
-		<div class="row apl-1">
-			<select name="getcrew">
-				<?php
-				if (isset($show_crew_name))
-				{
-					?>
-					<option selected="selected"><?=$show_crew_name?></option>
-					<?php
-				}
-				$ask="select name from crews";
-				$result=fetchAll($ask);
-				foreach ($result as $row)
-				{
-					$show_all_crew_names=$row->name;
-					?>
-					<option><?=$show_all_crew_names?></option>
-					<?php
-				}
-				?>
-			</select>
-			<input type="submit" name="open_edit_crew_field" value=Select>
-		</div>
+  <form id="del_crew_form" action="/admin_cmds.php?cmd=del_crew" method="post">
+		<input type="hidden" name="id" id="del_crew_id">
 	</form>
+  <form id="add_crew_bbs_form" action="/admin_cmds.php?cmd=add_crew_bbs" method="post">
+		<input type="hidden" name="crew" id="add_crew_bbs_crew">
+		<input type="hidden" name="bbs" id="add_crew_bbs_bbs">
+  </form>
+  <form id="del_crew_bbs_form" action="/admin_cmds.php?cmd=del_crew_bbs" method="post">
+		<input type="hidden" name="id" id="del_crew_bbs_id">
+	</form>
+	<div class="row apb-1">
+		<div class="col-12">
+			<form>
+				<select name="crew_id" id="fetch_id" class="w-100" onchange="getCrew();">
+					<option value="0">Select Crew</option>
+				</select>
+			</form>
+		</div>
+	</div>
+  
+  <form id="crew_form" action="/admin_cmds.php?cmd=save_crew" method="post">
+		<input type="hidden" name="id" id="crew_id">
+    <div class="row apb-1">
+			<div class="col-6 d-flex justify-content-between">
+				<label for="crew_name" class="lightgrey">Name</label>
+				<input type="text" size="24" id="crew_name" name="name">
+			</div>
+		</div>
+    <div class="row apb-1">
+			<div class="col-6 d-flex justify-content-between">
+				<label for="crew_acronym" class="lightgrey">Acronym</label>
+				<input type="text" size="24" id="crew_acronym" name="acronym">
+			</div>
+		</div>
+    <div class="row apb-1">
+			<div class="col-6 d-flex justify-content-between">
+				<label for="crew_www" class="lightgrey">Webpage</label>
+				<input type="text" size="24" id="crew_www" name="www">
+			</div>
+		</div>
+    <div class="row apb-1">
+			<div class="col-6 d-flex justify-content-between">
+				<label for="crew_contact" class="lightgrey">Contact</label>
+				<input type="text" size="24" id="crew_contact" name="contact">
+			</div>
+		</div>
 
-	<?php
-	if(isset($_POST['getcrew']) && (isset($_POST['open_edit_crew_field'])))
-	{
-		$getcrew=$_POST['getcrew'];
-		$getcrew=cleanInsert($getcrew);
+    <div class="row apb-1">
+			<div class="col-6 d-flex justify-content-between">
+				<label for="crew_rating" class="lightgrey">Rating</label>
+				<input type="text" size="24" id="crew_rating" name="contact">
+			</div>
+		</div>
 
-		$ask="select * from crews where name=:getcrew";
-		$result=fetchAll($ask, ['getcrew' => $getcrew ]);
-		foreach ($result as $row)
-		{
-			$show_crew_name=$row->name;
-			$show_crew_www=$row->www;
-			$show_crew_contact=$row->contact;
-			$show_crew_status=$row->active;
-			$show_crew_acronym=$row->acronym;
-		}
-
-		?>
-		<form action="admin.php" method="post">
-			<div classP="row">
-				Name
-			</div>
-			<div classP="row apb-1">
-				<input type="text" size="20" name="edit_crew_name" value="<?=$show_crew_name?>">
-			</div>
-			<div classP="row">
-				Acronym
-			</div>
-			<div classP="row apb-1">
-				<input type="text" size="20" name="edit_crew_acronym" value="<?=$show_crew_acronym?>">
-			</div>
-			<div classP="row">
-				Webpage
-			</div>
-			<div classP="row apb-1">
-				<input type="text" size="20" name="edit_crew_www" value="<?=$show_crew_www?>">
-			</div>
-			<div classP="row">
-				BBS(es)
-				<?php
-				$ask="select name from bbs_of where crew = :getcrew ";
-				$result=fetchAll($ask, [ 'getcrew' => $getcrew ]);
-				foreach ($result as $row)
-				{
-					$bbs = $row->name;
-					?>
-					<div class="row apb-1">
-						<select name="edit_bbs[]">
-							<option selected="selected"><?=$bbs?></option>
-							<?php
-							$ask_bbs="select name from bbses";
-							$result_bbs=fetchAll($ask_bbs);
-							foreach ($result_bbs as $row_bbs)
-							{
-								$all_bbses=$row_bbs->name;
-								?>
-								<option><?=$all_bbses?></option>
-								<?php
-							}
-							?>
-						</select>
-					</div>
-					<?php
-				}
-				?>
-			</div>
-			<div classP="row">
-				<span id="new_bbs_field"></span> 
-			</div>
-			<div classP="row">
-				<span onclick="add_bbs_field();" style="cursor: pointer; cursor: hand;">
-					<button type="button">Add BBS!</button>
-				</span>
-			</div>
-			<div classP="row">
-				<input type="hidden" name="total_bbses" id="total_bbses" value="0">
-			</div>
-			<div classP="row">
-				Contact
-			</div>
-			<div classP="row">
-				<input type="text" size="20" name="edit_crew_contact" value="<?=$show_crew_contact?>">
-			</div>
-			<div classP="row">
-				Status:
-			</div>
-			<div classP="row">
-				<select name="edit_crew_status">
-					<option selected="selected"><?=$show_crew_status?></option>
-					<option>Yes</option>
-					<option>No</option>
+    <div class="row apb-1">
+			<div class="col-6 d-flex justify-content-between">
+				<label for="crew_active" class="lightgrey">Status</label>
+        <select name="active" id="crew_active">
+          <option value="No">No</option>
+					<option value="Yes">Yes</option>
 				</select>
 			</div>
-			<div classP="row">
+		</div>
+       
+    <div class="row apb-1"><div class="col-6 d-flex justify-content-between">BBSes:</div></div>
+    <div id="bbs_fetch_id"></div>
+    <div class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between">
 
-				<input type="hidden" name="delete_crew" value="<?=$getcrew?>">
-				<input type="submit" name="do_delete_crew" value="Delete">
-				<input type="hidden" name="getcrew" value="<?=$getcrew?>">
-				<input type="submit" name="do_change_crew" value="Change">
+    <select name="bbs_add_id" id="bbs_add_fetch_id" class="w-100">
+					<option value="0">Select BBS</option>
+					<?php
+					$result = fetchAll("SELECT id, name FROM bbses ORDER BY name");
+					foreach($result as $row) {
+						?>
+						<option value="<?=$row->id?>"><?=$row->name?></option>
+						<?php
+					}
+					?>
+		</select><input type="button" value="Add BBS!" onclick="addBBS()"/>
+    </div></div>
+		<div class="row apt-1">
+			<div class="col-12">
+				<input type="submit" name="do_edit_crew" value="Submit">
+				<input type="button" id="delete_crew" name="delete_crew" value="Delete" onclick="delCrew();">
 			</div>
-		</form>
-		<?php
-	} 
-	?>
+		</div>
+
+  </form>
 </div>
+<script>
+	$(function () {
+    getCrewList();
+		$("#crew_form").submit(function (e) {
+			e.preventDefault();
+			const form = $(this);
+			const url = form.attr("action");
+			$.ajax({
+				"type": "POST",
+				"url": url,
+				"data": form.serialize(),
+				"success": () => {
+					showAlert("Crew saved!", "#crew");
+          $("#crew_id, #crew_name, #crew_acronym, #crew_contact, #crew_url, #crew_rating, #crew_www, #crew_active").val('');
+					getCrewList();
+				}
+			});
+		});
+	});
+</script>
