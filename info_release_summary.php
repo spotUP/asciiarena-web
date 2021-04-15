@@ -38,7 +38,7 @@ foreach (fetchAll("SELECT * FROM collys WHERE filename = :filename", [":filename
 						} else {
 							if (file_exists("$file_id")) {
 								$file_id_diz = htmlspecialchars_decode($file_id_diz, ENT_QUOTES);
-								$file_id_diz = removeBS($file_id_diz);
+								$file_id_diz = preg_replace('/[^(\x20-\x7F)]*/','', $file_id_diz);
 								echo "<pre class=\"magenta apt-1\">";
 								echo utf8_encode($file_id_diz);
 								echo "</pre>";
