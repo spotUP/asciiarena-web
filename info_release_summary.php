@@ -39,7 +39,7 @@ foreach (fetchAll("SELECT * FROM collys WHERE filename = :filename", [":filename
 						} else {
 							if (file_exists("$file_id")) {
 								echo "<pre class=\"magenta apt-1\">";
-								echo utf8_encode($file_id_diz);
+								echo utf8_encode(htmlspecialchars_decode($$file_id_diz, ENT_QUOTES));
 								echo "</pre>";
 							}
 						}
