@@ -320,7 +320,7 @@ require_once "header.php"; ?>
 					echo "<input type='submit' class='btn-big amb-1' name='hide' value='Hide Colly!'" . ((!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) ? " style='display:none'" : "") . "> ";
 					echo "<input type='submit' class='btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s' name='view' value='View Colly'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
 					echo "<input type='button' onclick='myFunction()' class='btn-big amb-1' name='fullscreen' value='Fullscreen'" . ((isset($_POST[ 'change' ]) || (!isset($_POST[ 'view' ]))) ? " style='display:none'" : "") . "> ";
-					
+
 					if (!isset($_POST[ 'download' ])) 
 					{
 						?>
@@ -354,9 +354,11 @@ require_once "header.php"; ?>
 						$result_uploader = fetchOne($ask, [ 'filename' => base64_decode($filename) ]);
 						if (isset($result_uploader->uploader)) $uploader = $result_uploader->uploader;
 						?>
-						<input type="submit" class="btn-big amb-1" name="addcomment" value="Comment">
-						<input type="submit" class="btn-big amb-1" name="favourite" value="Favourite">
-						<input type="submit" class="btn-big amb-1" name="broken" value="Report Broken">
+						<form action="/release/<?=$filename?>" method="post"  id="ctrlForm">
+							<input type="submit" class="btn-big amb-1" name="addcomment" value="Comment">
+							<input type="submit" class="btn-big amb-1" name="favourite" value="Favourite">
+							<input type="submit" class="btn-big amb-1" name="broken" value="Report Broken">
+						</form>
 						<?php
 						if ($_user[ "nick" ] === $uploader || is_admin()) 
 						{
