@@ -32,14 +32,14 @@ foreach (fetchAll("SELECT * FROM collys WHERE filename = :filename", [":filename
 					<span>
 						<?php if ($colly->file_id == "file_id.diz.png") {
 							$file_id_diz = file_get_contents(__DIR__ . "/collections/file_id.diz.txt");
-							
+							$file_id_diz = htmlspecialchars_decode($file_id_diz, ENT_QUOTES);
 							echo "<pre class=\"magenta apt-1\">";
 							echo $file_id_diz;
 							echo "</pre>";
 						} else {
 							if (file_exists("$file_id")) {
 								echo "<pre class=\"magenta apt-1\">";
-								echo utf8_encode(htmlspecialchars_decode($file_id_diz, ENT_QUOTES));
+								echo utf8_encode($file_id_diz);
 								echo "</pre>";
 							}
 						}
