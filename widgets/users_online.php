@@ -19,7 +19,7 @@
 		$registered_online = fetchOne("SELECT COUNT(*) online FROM users WHERE lastactive > (UNIX_TIMESTAMP()-300)")->online;
 		?>
 		<div class="col-lg-12">
-			<br><?=$anonymous_online?> anonymous online
+			<span><br><?=$anonymous_online?> anonymous online</span>
 		</div>
 	</div>
 </div>
