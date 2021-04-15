@@ -303,8 +303,6 @@ require_once "header.php"; ?>
 			if (!isset($_POST[ 'edit_colly' ]) && !isset($_POST[ 'broken' ])) 
 			{
 				$type = fetchOne("SELECT type FROM collys WHERE filename = :filename", [":filename" => $filename])->type ?? "";
-
-
 				?>
 				<div class="container-fluid bg-secondary amb-1 apb-1" style="height: 132px;">
 					<script>
@@ -315,9 +313,7 @@ require_once "header.php"; ?>
 								$("#ctrlForm input[name='view']").click();
 							});
 						});
-
 					</script>
-
 					<?php
 					echo "<form action=\"/release/".$filename."\" method='post'  id='ctrlForm'>";
 
@@ -334,7 +330,6 @@ require_once "header.php"; ?>
 						<input type="submit" class="btn-big amb-1" name="addcomment" value="Comment">
 						<input type="submit" class="btn-big amb-1" name="favourite" value="Favourite">
 						<input type="submit" class="btn-big amb-1" name="broken" value="Report Broken">
-						</form>
 						<?php
 						if ($_user[ "nick" ] === $uploader || is_admin()) 
 						{
@@ -346,262 +341,240 @@ require_once "header.php"; ?>
 							</form>
 							<?php
 						}
-					}
-					if (!isset($_POST[ 'download' ])) 
-					{
 						?>
-						<form action="/release/<?=$filename?>" method="post" id="download-colly">
+					</form>
+					<?php
+				}
+				if (!isset($_POST[ 'download' ])) 
+				{
+					?>
+					<form action="/release/<?=$filename?>" method="post" id="download-colly">
 						<input type="submit" class="btn-big amb-1" name="download" value="Download">
-						</form>
-						<?php
-					} 
-					elseif (isset($_POST[ "download" ])) 
+					</form>
+					<?php
+				} 
+				elseif (isset($_POST[ "download" ])) 
+				{
+					echo "downloading...";
+					?>
+					<script>
+						var link = document.createElement("a");
+						link.setAttribute('download', '');
+						link.href = '/collections/<?=$dirname?>/<?=$filename?>';
+						document.body.appendChild(link);
+						link.click();
+						link.remove();
+					</script>
+					<?php
+					doQuery("update collys set downloads=downloads+1 where filename=:filename", ["filename" => $filename]);
+					?>
+					<meta content="1"; URL="<?=$filenameandpath?>" http-equiv="Refresh">
+					<?php
+				}
+
+				$font = fetchOne("SELECT def_font FROM users WHERE nick = :nick", [":nick" => $nick]);
+				if (($font) && ($font->def_font)) 
+				{
+					$font = $font->def_font;
+				} 
+				else if (isset($_POST['font'])) 
+				{
+					$font = $_POST['font'];
+				} 
+				else
+				{
+					$font = "mOsOul";
+				}
+
+				$fgcolor = (isset($_POST[ 'foreground_color'])) ? $_POST[ 'foreground_color'] : '';
+
+				$def_color = fetchOne("SELECT def_bg_col FROM users WHERE nick = :nick", [":nick" => $nick]);
+				if (($def_color) && ($def_color->def_bg_col)) 
+				{
+					$bgcolor = $def_color->def_bg_col;
+				}
+				else if (isset($_POST['background_color'])) 
+				{
+					$bgcolor = $_POST['background_color'];
+				}
+				else
+				{
+					$bgcolor = "#000000";
+				}
+
+				if ($type != "ANSI") 
+				{
+					if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) 
 					{
-						echo "downloading...";
 						?>
-						<script>
-    							var link = document.createElement("a");
-    							link.setAttribute('download', '');
-    							link.href = '/collections/<?=$dirname?>/<?=$filename?>';
-    							document.body.appendChild(link);
-    							link.click();
-    							link.remove();
-						</script>
+						<div class="apb-0">
+							<select name="font">
+								<option class="dropdown-item" value="MicroKnight"<?php if ($font == 'MicroKnight') echo ' selected'; ?>>MicroKnight</option>
+								<option class="dropdown-item" value="MicroKnightPlus"<?php if ($font == 'MicroKnightPlus') echo ' selected'; ?>>MicroKnight+</option>
+								<option class="dropdown-item" value="mOsOul"<?php if ($font == 'mOsOul') echo ' selected'; ?>>mOsOul</option>
+								<option value="P0T-NOoDLE"<?php if ($font == 'P0T-NOoDLE') echo ' selected'; ?>>P0T-NOoDLE</option>
+								<option value="Topaz_a500"<?php if ($font == 'Topaz_a500') echo ' selected'; ?>>A500 Topaz</option>
+								<option value="TopazPlus_a500"<?php if ($font == 'TopazPlus_a500') echo ' selected'; ?>>A500 Topaz+</option>
+								<option value="Topaz_a1200"<?php if ($font == 'Topaz_a1200') echo ' selected'; ?>>A1200 Topaz</option>
+								<option value="TopazPlus_a1200"<?php if ($font == 'TopazPlus_a1200') echo ' selected'; ?>>A1200 Topaz+</option>
+							</select>
+							<select name="background_color">
+								<option value=""<?php if ($bgcolor == '') echo ' selected'; ?>>BG Color</option>
+								<option value="Black"<?php if ($bgcolor == 'Black') echo ' selected'; ?>>Black</option>
+								<option value="DarkBlue"<?php if ($bgcolor == 'DarkBlue') echo ' selected'; ?>>Dark Blue</option>
+								<option value="DarkGreen"<?php if ($bgcolor == 'DarkGreen') echo ' selected'; ?>>Dark Green</option>
+								<option value="DarkCyan"<?php if ($bgcolor == 'DarkCyan') echo ' selected'; ?>>Dark Cyan</option>
+								<option value="DarkRed"<?php if ($bgcolor == 'DarkRed') echo ' selected'; ?>>Dark Red</option>
+								<option value="Magenta"<?php if ($bgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
+								<option value="Brown"<?php if ($bgcolor == 'Brown') echo ' selected'; ?>>Brown</option>
+								<option value="DarkGrey"<?php if ($bgcolor == 'DarkGrey') echo ' selected'; ?>>Dark Grey</option>
+								<option value="Grey"<?php if ($bgcolor == 'Grey') echo ' selected'; ?>>Grey</option>
+								<option value="Blue"<?php if ($bgcolor == 'Blue') echo ' selected'; ?>>Blue</option>
+								<option value="Green"<?php if ($bgcolor == 'Green') echo ' selected'; ?>>Green</option>
+								<option value="Cyan"<?php if ($bgcolor == 'Cyan') echo ' selected'; ?>>Cyan</option>
+								<option value="Red"<?php if ($bgcolor == 'Red') echo ' selected'; ?>>Red</option>
+								<option value="Magenta"<?php if ($bgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
+								<option value="Yellow"<?php if ($bgcolor == 'Yellow') echo ' selected'; ?>>Yellow</option>
+								<option value="White"<?php if ($bgcolor == 'White') echo ' selected'; ?>>White</option>
+							</select>
+							<select name="foreground_color">
+								<option value=""<?php if ($fgcolor == '') echo ' selected'; ?>>FG Color</option>
+								<option value="Black"<?php if ($fgcolor == 'Black') echo ' selected'; ?>>Black</option>
+								<option value="DarkBlue"<?php if ($fgcolor == 'DarkBlue') echo ' selected'; ?>>Dark Blue</option>
+								<option value="DarkGreen"<?php if ($fgcolor == 'DarkGreen') echo ' selected'; ?>>Dark Green</option>
+								<option value="DarkCyan"<?php if ($fgcolor == 'DarkCyan') echo ' selected'; ?>>Dark Cyan</option>
+								<option value="DarkRed"<?php if ($fgcolor == 'DarkRed') echo ' selected'; ?>>Dark Red</option>
+								<option value="Magenta"<?php if ($fgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
+								<option value="Brown"<?php if ($fgcolor == 'Brown') echo ' selected'; ?>>Brown</option>
+								<option value="DarkGrey"<?php if ($fgcolor == 'DarkGrey') echo ' selected'; ?>>Dark Grey</option>
+								<option value="Grey"<?php if ($fgcolor == 'Grey') echo ' selected'; ?>>Grey</option>
+								<option value="Blue"<?php if ($fgcolor == 'Blue') echo ' selected'; ?>>Blue</option>
+								<option value="Green"<?php if ($fgcolor == 'Green') echo ' selected'; ?>>Green</option>
+								<option value="Cyan"<?php if ($fgcolor == 'Cyan') echo ' selected'; ?>>Cyan</option>
+								<option value="Red"<?php if ($fgcolor == 'Red') echo ' selected'; ?>>Red</option>
+								<option value="Magenta"<?php if ($fgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
+								<option value="Yellow"<?php if ($fgcolor == 'Yellow') echo ' selected'; ?>>Yellow</option>
+								<option value="White"<?php if ($fgcolor == 'White') echo ' selected'; ?>>White</option>
+							</select>
+						</div>
 						<?php
-            					doQuery("update collys set downloads=downloads+1 where filename=:filename", ["filename" => $filename]);
-            ?><meta content="1"; URL="<?=$filenameandpath?>" http-equiv="Refresh"><?php
-        }
-
-        $font = fetchOne("SELECT def_font FROM users WHERE nick = :nick", [":nick" => $nick]);
-        if (($font) && ($font->def_font)) 
-        {
-        	$font = $font->def_font;
-        } 
-        else if (isset($_POST['font'])) 
-        {
-        	$font = $_POST['font'];
-        } 
-        else
-        {
-        	$font = "mOsOul";
-        }
-
-        $fgcolor = (isset($_POST[ 'foreground_color'])) ? $_POST[ 'foreground_color'] : '';
-
-        $def_color = fetchOne("SELECT def_bg_col FROM users WHERE nick = :nick", [":nick" => $nick]);
-        if (($def_color) && ($def_color->def_bg_col)) 
-        {
-        	$bgcolor = $def_color->def_bg_col;
-        }
-        else if (isset($_POST['background_color'])) 
-        {
-        	$bgcolor = $_POST['background_color'];
-        }
-        else
-        {
-        	$bgcolor = "#000000";
-        }
-
-        if ($type != "ANSI") 
-        {
-        	if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) 
-        	{
-        		?>
-        		<div class="apb-0">
-        			<select name="font">
-        				<option class="dropdown-item" value="MicroKnight"<?php if ($font == 'MicroKnight') echo ' selected'; ?>>MicroKnight</option>
-        				<option class="dropdown-item" value="MicroKnightPlus"<?php if ($font == 'MicroKnightPlus') echo ' selected'; ?>>MicroKnight+</option>
-        				<option class="dropdown-item" value="mOsOul"<?php if ($font == 'mOsOul') echo ' selected'; ?>>mOsOul</option>
-        				<option value="P0T-NOoDLE"<?php if ($font == 'P0T-NOoDLE') echo ' selected'; ?>>P0T-NOoDLE</option>
-        				<option value="Topaz_a500"<?php if ($font == 'Topaz_a500') echo ' selected'; ?>>A500 Topaz</option>
-        				<option value="TopazPlus_a500"<?php if ($font == 'TopazPlus_a500') echo ' selected'; ?>>A500 Topaz+</option>
-        				<option value="Topaz_a1200"<?php if ($font == 'Topaz_a1200') echo ' selected'; ?>>A1200 Topaz</option>
-        				<option value="TopazPlus_a1200"<?php if ($font == 'TopazPlus_a1200') echo ' selected'; ?>>A1200 Topaz+</option>
-        			</select>
-        			<select name="background_color">
-        				<option value=""<?php if ($bgcolor == '') echo ' selected'; ?>>BG Color</option>
-        				<option value="Black"<?php if ($bgcolor == 'Black') echo ' selected'; ?>>Black</option>
-        				<option value="DarkBlue"<?php if ($bgcolor == 'DarkBlue') echo ' selected'; ?>>Dark Blue</option>
-        				<option value="DarkGreen"<?php if ($bgcolor == 'DarkGreen') echo ' selected'; ?>>Dark Green</option>
-        				<option value="DarkCyan"<?php if ($bgcolor == 'DarkCyan') echo ' selected'; ?>>Dark Cyan</option>
-        				<option value="DarkRed"<?php if ($bgcolor == 'DarkRed') echo ' selected'; ?>>Dark Red</option>
-        				<option value="Magenta"<?php if ($bgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
-        				<option value="Brown"<?php if ($bgcolor == 'Brown') echo ' selected'; ?>>Brown</option>
-        				<option value="DarkGrey"<?php if ($bgcolor == 'DarkGrey') echo ' selected'; ?>>Dark Grey</option>
-        				<option value="Grey"<?php if ($bgcolor == 'Grey') echo ' selected'; ?>>Grey</option>
-        				<option value="Blue"<?php if ($bgcolor == 'Blue') echo ' selected'; ?>>Blue</option>
-        				<option value="Green"<?php if ($bgcolor == 'Green') echo ' selected'; ?>>Green</option>
-        				<option value="Cyan"<?php if ($bgcolor == 'Cyan') echo ' selected'; ?>>Cyan</option>
-        				<option value="Red"<?php if ($bgcolor == 'Red') echo ' selected'; ?>>Red</option>
-        				<option value="Magenta"<?php if ($bgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
-        				<option value="Yellow"<?php if ($bgcolor == 'Yellow') echo ' selected'; ?>>Yellow</option>
-        				<option value="White"<?php if ($bgcolor == 'White') echo ' selected'; ?>>White</option>
-        			</select>
-        			<select name="foreground_color">
-        				<option value=""<?php if ($fgcolor == '') echo ' selected'; ?>>FG Color</option>
-        				<option value="Black"<?php if ($fgcolor == 'Black') echo ' selected'; ?>>Black</option>
-        				<option value="DarkBlue"<?php if ($fgcolor == 'DarkBlue') echo ' selected'; ?>>Dark Blue</option>
-        				<option value="DarkGreen"<?php if ($fgcolor == 'DarkGreen') echo ' selected'; ?>>Dark Green</option>
-        				<option value="DarkCyan"<?php if ($fgcolor == 'DarkCyan') echo ' selected'; ?>>Dark Cyan</option>
-        				<option value="DarkRed"<?php if ($fgcolor == 'DarkRed') echo ' selected'; ?>>Dark Red</option>
-        				<option value="Magenta"<?php if ($fgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
-        				<option value="Brown"<?php if ($fgcolor == 'Brown') echo ' selected'; ?>>Brown</option>
-        				<option value="DarkGrey"<?php if ($fgcolor == 'DarkGrey') echo ' selected'; ?>>Dark Grey</option>
-        				<option value="Grey"<?php if ($fgcolor == 'Grey') echo ' selected'; ?>>Grey</option>
-        				<option value="Blue"<?php if ($fgcolor == 'Blue') echo ' selected'; ?>>Blue</option>
-        				<option value="Green"<?php if ($fgcolor == 'Green') echo ' selected'; ?>>Green</option>
-        				<option value="Cyan"<?php if ($fgcolor == 'Cyan') echo ' selected'; ?>>Cyan</option>
-        				<option value="Red"<?php if ($fgcolor == 'Red') echo ' selected'; ?>>Red</option>
-        				<option value="Magenta"<?php if ($fgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
-        				<option value="Yellow"<?php if ($fgcolor == 'Yellow') echo ' selected'; ?>>Yellow</option>
-        				<option value="White"<?php if ($fgcolor == 'White') echo ' selected'; ?>>White</option>
-        			</select>
-        		</div>
-        		<?php
-        	}
-        	?>
-        </form>
-    <?php
-} ?>
-    </div>
-<?php
+					}
+					?>
+				</form>
+				<?php
+			} ?>
+		</div>
+		<?php
 
 //----------------------------------------------------------------------------------------------
 // SHOW COLLY?
 //----------------------------------------------------------------------------------------------
 
-if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) 
-{
-
-
-	if (isset($_POST[ 'change' ])) 
-	{
-		$bgcolor = $_POST[ 'background_color' ];
-		$font = $_POST[ 'font' ];
-	}
-	
-	$row = fetchOne("SELECT view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
-	$type = $row->type;
-	$counter = $row->view_counter;
-	$counter++;
-
-	doQuery("UPDATE collys SET view_counter = :counter WHERE filename = :filename", [
-		":counter" => $counter,
-		":filename" => $filename
-	]);
-
-	if ($type == "ASCII") 
-	{
-		?>
-		<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;"><pre id="colly" style="font-family: <?=$font;?>; color: <?=$fgcolor?>; white-space: pre-wrap;"><?php
-		if (file_exists(__DIR__ . "/collections/{$dirname}/{$filename}")) 
+		if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) 
 		{
-			$content = file_get_contents(__DIR__ . "/collections/{$dirname}/{$filename}");
-			echo "<br><br><br><br>";
-			echo utf8_encode($content);
-			echo "<br><br><br><br>";
+
+
+			if (isset($_POST[ 'change' ])) 
+			{
+				$bgcolor = $_POST[ 'background_color' ];
+				$font = $_POST[ 'font' ];
+			}
+
+			$row = fetchOne("SELECT view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
+			$type = $row->type;
+			$counter = $row->view_counter;
+			$counter++;
+
+			doQuery("UPDATE collys SET view_counter = :counter WHERE filename = :filename", [
+				":counter" => $counter,
+				":filename" => $filename
+			]);
+
+			if ($type == "ASCII") 
+			{
+				?>
+				<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;"><pre id="colly" style="font-family: <?=$font;?>; color: <?=$fgcolor?>; white-space: pre-wrap;"><?php
+				if (file_exists(__DIR__ . "/collections/{$dirname}/{$filename}")) 
+				{
+					$content = file_get_contents(__DIR__ . "/collections/{$dirname}/{$filename}");
+					echo "<br><br><br><br>";
+					echo utf8_encode($content);
+					echo "<br><br><br><br>";
+				}
+				?></pre>
+			</div>
+		<?php   }
+		elseif ($type == "ANSI") 
+		{
+			?>
+			<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: #000;"> 
+				<div id="colly" style="padding-top: 64px;"></div>
+			</div>
+			<script type="text/javascript" src="/assets/js/ansilove.js"></script>
+			<script>
+				AnsiLove.render("<?php echo "/collections/{$dirname}/{$filename}"; ?>", function (canvas, sauce) {
+					document.getElementById("colly").appendChild(canvas);
+				}, {"font": "mosoul", "bits": "8", "icecolors": 1, "columns": 80, "thumbnail": 0, "filetype": "ans"});
+			</script>
+			<?php
 		}
-		?></pre>
-		</div>
-<?php   }
-	elseif ($type == "ANSI") 
-	{
-		?>
-		<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: #000;"> 
-			<div id="colly" style="padding-top: 64px;"></div>
-		</div>
-		<script type="text/javascript" src="/assets/js/ansilove.js"></script>
-		<script>
-		AnsiLove.render("<?php echo "/collections/{$dirname}/{$filename}"; ?>", function (canvas, sauce) {
-		    document.getElementById("colly").appendChild(canvas);
-		}, {"font": "mosoul", "bits": "8", "icecolors": 1, "columns": 80, "thumbnail": 0, "filetype": "ans"});
-		</script>
-<?php
 	}
-}
 
 //----------------------------------------------------------------------------------------------
 //SHOW COMMENTS
 //----------------------------------------------------------------------------------------------
-if (!isset($_POST[ 'edit' ])) 
-{
-	foreach (fetchAll("SELECT comment, rating, nick, timestamp, commentid FROM comments WHERE filename = :filename ORDER BY timestamp ASC", [":filename" => $filename]) as $row) 
+	if (!isset($_POST[ 'edit' ])) 
 	{
-		$comment = $row->comment;
-		$userrating = $row->rating;
-		$commentnick = $row->nick;
-		$commentid = $row->commentid;
-		$commenttime = date("Y-m-d H:i", $row->timestamp);
-
-		echo "<form action='/release/".$filename."&post' method='post'>";
-		if ($userrating > 0) 
+		foreach (fetchAll("SELECT comment, rating, nick, timestamp, commentid FROM comments WHERE filename = :filename ORDER BY timestamp ASC", [":filename" => $filename]) as $row) 
 		{
-			if (!is_admin()) 
+			$comment = $row->comment;
+			$userrating = $row->rating;
+			$commentnick = $row->nick;
+			$commentid = $row->commentid;
+			$commenttime = date("Y-m-d H:i", $row->timestamp);
+
+			echo "<form action='/release/".$filename."&post' method='post'>";
+			if ($userrating > 0) 
 			{
-				if ($commentnick === $_user[ "nick" ]) 
+				if (!is_admin()) 
 				{
-					?>
-					<div class="header bg-header col-12 ap-1">
-						<span> BY:</span>
-						<span class="yellow"><?=$commentnick?></span>
-						<span>DATE:</span>
-						<span class="white"><?=$commenttime?></span>
-						<span class="yellow">RATING:</span>
-						<span class="white"><?=$userrating?></span>
-					</div>
-					<div class="bg-secondary col-12 ap-1 amb-1">
-						<span class="cyan"><?=$comment?></span>
-						<div class="col-12 p-0 m-0 apt-1">
-							<input type="hidden" name="commentid" value="<?=$commentid?>"/><input type="submit" class="btn-big" name="edit" value="Edit">
+					if ($commentnick === $_user[ "nick" ]) 
+					{
+						?>
+						<div class="header bg-header col-12 ap-1">
+							<span> BY:</span>
+							<span class="yellow"><?=$commentnick?></span>
+							<span>DATE:</span>
+							<span class="white"><?=$commenttime?></span>
+							<span class="yellow">RATING:</span>
+							<span class="white"><?=$userrating?></span>
 						</div>
-					</div>
-					<?php
+						<div class="bg-secondary col-12 ap-1 amb-1">
+							<span class="cyan"><?=$comment?></span>
+							<div class="col-12 p-0 m-0 apt-1">
+								<input type="hidden" name="commentid" value="<?=$commentid?>"/><input type="submit" class="btn-big" name="edit" value="Edit">
+							</div>
+						</div>
+						<?php
+					}
+					else 
+					{
+						?>
+						<div class="header bg-header col-12 ap-1">
+							<span> BY:</span>
+							<span class="yellow"><?=$commentnick?></span>
+							<span>DATE:</span>
+							<span class="white"><?=$commenttime?></span>
+							<span class="yellow">RATING:</span>
+							<span class="white"><?=$userrating?></span>
+						</div>
+						<div class="bg-secondary col-12 ap-1 amb-1">
+							<span class="cyan" style="white-space: pre-wrap;"><?=$comment?></span>
+						</div>
+						<?php
+					}
 				}
-				else 
-				{
-					?>
-					<div class="header bg-header col-12 ap-1">
-						<span> BY:</span>
-						<span class="yellow"><?=$commentnick?></span>
-						<span>DATE:</span>
-						<span class="white"><?=$commenttime?></span>
-						<span class="yellow">RATING:</span>
-						<span class="white"><?=$userrating?></span>
-					</div>
-					<div class="bg-secondary col-12 ap-1 amb-1">
-						<span class="cyan" style="white-space: pre-wrap;"><?=$comment?></span>
-					</div>
-					<?php
-				}
-			}
-			if (is_admin()) 
-			{
-				?>
-				<div class="header bg-header col-12 ap-1">
-					<span> BY:</span>
-					<span class="yellow"><?=$commentnick ?></span>
-					<span> DATE:</span>
-					<span class="white"><?=$commenttime ?></span>
-					<span class="yellow"> RATING:</span>
-					<span class="white"><?=$userrating ?></span>
-				</div>
-				<div class="bg-secondary col-12 ap-1 amb-1">
-					<span class="cyan" style="white-space: pre-wrap;"><?=$comment?></span>
-					<div class="col-12 p-0 m-0 apt-1">
-						<input type="hidden" class="btn-big" name="commentid" value="<?=$commentid?>">
-						<input type="submit" class="btn-big" name="edit" value="Edit">
-						<input type="submit" class="btn-big" name="Delete" value="Delete">
-					</div>
-				</div>
-
-				<?php
-			}
-		} 
-		else 
-		{
-			if (!is_admin()) 
-			{
-				if ($commentnick === $_user[ "nick" ]) 
+				if (is_admin()) 
 				{
 					?>
 					<div class="header bg-header col-12 ap-1">
@@ -609,20 +582,62 @@ if (!isset($_POST[ 'edit' ]))
 						<span class="yellow"><?=$commentnick ?></span>
 						<span> DATE:</span>
 						<span class="white"><?=$commenttime ?></span>
+						<span class="yellow"> RATING:</span>
+						<span class="white"><?=$userrating ?></span>
 					</div>
-					<div class="col-12 ap-1 amb-1">
+					<div class="bg-secondary col-12 ap-1 amb-1">
 						<span class="cyan" style="white-space: pre-wrap;"><?=$comment?></span>
 						<div class="col-12 p-0 m-0 apt-1">
 							<input type="hidden" class="btn-big" name="commentid" value="<?=$commentid?>">
 							<input type="submit" class="btn-big" name="edit" value="Edit">
+							<input type="submit" class="btn-big" name="Delete" value="Delete">
 						</div>
 					</div>
+
 					<?php
 				}
-				else
+			} 
+			else 
+			{
+				if (!is_admin()) 
+				{
+					if ($commentnick === $_user[ "nick" ]) 
+					{
+						?>
+						<div class="header bg-header col-12 ap-1">
+							<span> BY:</span>
+							<span class="yellow"><?=$commentnick ?></span>
+							<span> DATE:</span>
+							<span class="white"><?=$commenttime ?></span>
+						</div>
+						<div class="col-12 ap-1 amb-1">
+							<span class="cyan" style="white-space: pre-wrap;"><?=$comment?></span>
+							<div class="col-12 p-0 m-0 apt-1">
+								<input type="hidden" class="btn-big" name="commentid" value="<?=$commentid?>">
+								<input type="submit" class="btn-big" name="edit" value="Edit">
+							</div>
+						</div>
+						<?php
+					}
+					else
+					{
+						?>
+						<div class="header bg-header col-12 ap-1">
+							<span> BY:</span>
+							<span class="yellow"><?=$commentnick ?></span>
+							<span> DATE:</span>
+							<span class="white"><?=$commenttime ?></span>
+						</div>
+						<div class="bg-secondary col-12 ap-1 amb-1">
+							<span class="cyan" style="white-space: pre-wrap;"><?=$comment?></span>
+						</div>
+						<?php
+					}
+				}
+				if (is_admin()) 
 				{
 					?>
-					<div class="header bg-header col-12 ap-1">
+					<div class="bg-header header col-12 ap-1">
 						<span> BY:</span>
 						<span class="yellow"><?=$commentnick ?></span>
 						<span> DATE:</span>
@@ -630,33 +645,18 @@ if (!isset($_POST[ 'edit' ]))
 					</div>
 					<div class="bg-secondary col-12 ap-1 amb-1">
 						<span class="cyan" style="white-space: pre-wrap;"><?=$comment?></span>
+						<input type="hidden" name="commentid" value="<?=$commentid?>">
+						<div class="col-12 p-0 m-0 apt-1">
+							<input type="submit" class="btn-big" name="edit" value="Edit">
+							<input type="submit" class="btn-big" name="Delete" value="Delete">
+						</div>
 					</div>
 					<?php
 				}
 			}
-			if (is_admin()) 
-			{
-				?>
-				<div class="bg-header header col-12 ap-1">
-					<span> BY:</span>
-					<span class="yellow"><?=$commentnick ?></span>
-					<span> DATE:</span>
-					<span class="white"><?=$commenttime ?></span>
-				</div>
-				<div class="bg-secondary col-12 ap-1 amb-1">
-					<span class="cyan" style="white-space: pre-wrap;"><?=$comment?></span>
-					<input type="hidden" name="commentid" value="<?=$commentid?>">
-					<div class="col-12 p-0 m-0 apt-1">
-						<input type="submit" class="btn-big" name="edit" value="Edit">
-						<input type="submit" class="btn-big" name="Delete" value="Delete">
-					</div>
-				</div>
-				<?php
-			}
+			echo "</form>";
 		}
-		echo "</form>";
 	}
-}
 }
 
 //----------------------------------------------------------------------------------------------

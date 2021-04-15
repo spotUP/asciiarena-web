@@ -1900,4 +1900,6 @@ div.select-items > div:last-child{
   background: #1a1a1a;
 }
 
-
+form{
+  display: initial !important;
+}
