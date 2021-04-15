@@ -5,7 +5,7 @@
 ?>
 <script>
 	function getBBS() {
-		const id = $("#fetch_id").val();
+		const id = $("#bbs_fetch_id").val();
 		if (id > 0) {
 			$.get(`/admin_cmds.php?cmd=get_bbs&id=${id}`, function (data) {
 				$('#bbs_id').val(data[0].id);
@@ -20,9 +20,9 @@
 	}
 
 	function getBBSList() {
-		let bbslist = $("#fetch_id");
+		let bbslist = $("#bbs_fetch_id");
 		bbslist.empty();
-		bbslist.append($("<option/>").val("0").text("Select BBS"));
+		bbslist.append($("<option/>").val("").text("Select BBS"));
 		$.get("/admin_cmds.php?cmd=get_bbs", function (data) {
 			$.each(data, function (i, bbs) {
 				bbslist.append($("<option/>").val(bbs.id).text(bbs.name));
@@ -64,16 +64,7 @@
 	<div class="row apb-1">
 		<div class="col-12">
 			<form>
-				<select name="bbs_id" id="fetch_id" class="w-100" onchange="getBBS();">
-					<option value="0">Select BBS</option>
-					<?php
-					$result = fetchAll("SELECT id, name FROM bbses ORDER BY name");
-					foreach($result as $row) {
-						?>
-						<option value="<?=$row->id?>"><?=$row->name?></option>
-						<?php
-					}
-					?>
+				<select name="bbs_id" id="bbs_fetch_id" class="w-100" onchange="getBBS();">
 				</select>
 			</form>
 		</div>
@@ -114,20 +105,21 @@
 </div>
 <script>
 	$(function () {
+    getBBSList();
 		$("#bbs_form").submit(function (e) {
 			e.preventDefault();
-			const form = $(this);
-			const url = form.attr("action");
-			$.ajax({
-				"type": "POST",
-				"url": url,
-				"data": form.serialize(),
-				"success": () => {
-					showAlert("BBS saved!", "#bbs");
-					$("#bbs_id, #bbs_name, #bbs_sysop, #bbs_number, #bbs_address").val('');
-					getBBSList();
-				}
-			});
+      const form = $(this);
+      const url = form.attr("action");
+      $.ajax({
+        "type": "POST",
+        "url": url,
+        "data": form.serialize(),
+        "success": () => {
+          showAlert("BBS saved!", "#bbs");
+          $("#bbs_id, #bbs_name, #bbs_sysop, #bbs_number, #bbs_address").val('');
+          getBBSList();
+        }
+      });
 		});
 	});
 </script>
