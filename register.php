@@ -27,7 +27,7 @@ include "header.php";
 			{
 				?>
 				FAILURE! Wrong Password! Try again.
-				<meta http-equiv="Refresh" content="2; url=register.php">
+				<meta http-equiv="Refresh" content="2" url="register.php">
 				<?php
 				exit;
 			}
@@ -40,7 +40,7 @@ include "header.php";
 				$_SESSION['password'] = $confirm_password;
 				$_SESSION['password'] = $confirm_nick;
 
-				?><meta http-equiv="Refresh" content="0"; url="login.php?activated"><?php
+				?><meta http-equiv="Refresh" content="0" url="login.php?activated"><?php
 				exit();
 			}
 		}	
@@ -56,28 +56,28 @@ include "header.php";
 			if ($check_password == $check_nick)
 			{
 				?>FAILURE! The nick and password must be unique!<?php
-				?><meta http-equiv="Refresh" content="2; url=register.php"><?php
+				?><meta http-equiv="Refresh" content="2" url="register.php"><?php
 				exit;
 			}
 
 			if ($check_password!=$repeat_password)
 			{
 				?>FAILURE! The passwords doesn't match!<?php
-				?><meta http-equiv="Refresh" content="2; url=register.php"><?php
+				?><meta http-equiv="Refresh" content="2" url="register.php"><?php
 				exit;
 			}
 
 			if ($spam!='iamnotarobot')
 			{
 				?>FAILURE! Enter iamnotarobot to prove that you are human!<?php
-				?><meta http-equiv="Refresh" content="2; url=register.php"><?php
+				?><meta http-equiv="Refresh" content="2" url="register.php"><?php
 				exit;
 			}
 
 			if (empty($check_nick))
 			{
 				?>FAILURE! Error! You must fill the name field!<?php
-				?><meta http-equiv="Refresh" content="2; url=register.php"><?php
+				?><meta http-equiv="Refresh" content="2" url="register.php"><?php
 				exit;
 			}
 
@@ -85,14 +85,14 @@ include "header.php";
 			if(!checkEmail($mail)) 
 			{
 				?>FAILURE! Error! You must enter a valid E-Mail adress!<?php
-				?><meta http-equiv="Refresh" content="200; url=register.php"><?php
+				?><meta http-equiv="Refresh" content="2" url="register.php"><?php
 				exit;
 			}
 
 			if (empty($check_password))
 			{
 				?>FAILURE! Error! You must fill the password field!<?php
-				?><meta http-equiv="Refresh" content="2; url=register.php"><?php
+				?><meta http-equiv="Refresh" content="2" url="register.php"><?php
 				exit;
 			}
 
@@ -100,7 +100,7 @@ include "header.php";
 			if ($pwlenght < 6)
 			{
 				?>FAILURE! Error! The password must contain 6 characters!<?php	
-				?><meta http-equiv="Refresh" content="2; url=register.php"><?php
+				?><meta http-equiv="Refresh" content="2" url="register.php"><?php
 				exit;
 			}
 
@@ -110,7 +110,7 @@ include "header.php";
 			if(count($rows) > 0)
 			{
 				?>This nick is already in use!<?php		
-				?><meta http-equiv="Refresh" content="2; url=register.php"><?php
+				?><meta http-equiv="Refresh" content="2" url="register.php"><?php
 				exit;
 			}
 			$ask = $_db->prepare("INSERT INTO users
@@ -193,105 +193,17 @@ include "header.php";
 
 			mail($to,$subject,$body,$headers);
 
-				?>
-				<div class="container-fluid bg-secondary amb-1 apb-1">
-					<div class="row">
-						<div class="col-12 d-flex justify-content-md-center">
-							<img src="assets/data/register.png">
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-12">
-							Your account has been created, a mail with instructions has been sent to your e-mail adress.
-						</div>
-					</div>
-				</div>
-				<?php
-			}
 			?>
-			<form action="register.php" method="post">
-				<div class="container-fluid bg-secondary amb-1 apb-1">
-					<div class="row apb-1">
-						<div class="col-12 d-flex justify-content-md-center">
-							<img src="assets/data/register.png">
-						</div>
-					</div>
-					<?php if (!isset($_GET['confirm']))
-					{
-						?>
-						<div class="row">
-							<div class="col-6">
-								<span class="white">Nick</span>
-							</div>
-							<div class="col-6">
-								<span class="white">Password</span> 
-							</div>
-						</div> 
-
-						<div class="row apb-1">
-							<div class="col-6">
-								<input type="text" name="nick" class="w-100"> 
-							</div>
-							<div class="col-6">
-								<input type="password" name="password" class="w-100">
-							</div>
-						</div>
-
-
-						<div class="row">
-							<div class="col-6">
-								E-Mail 
-							</div>
-							<div class="col-6">
-								Repeat Password 
-							</div>
-						</div>
-
-						<div class="row apb-1">
-							<div class="col-6">
-								<input type="text" name="mail" class="w-100">
-							</div>
-							<div class="col-6">
-								<input type="password" name="repeat_password" class="w-100">
-							</div>
-						</div>
-
-						<div class="row">
-							<div class="col-6">
-								Enter iamnotarobot here: 
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-6 apb-1">
-								<input type="text" name="spam" class="w-100"> 
-							</div>
-						</div>
-						<div clas="row">
-							<input type="submit" value="Join!">
-						</div>
-					</div>
-					<?php
-				}
-				if (isset($_GET['confirm']))
-				{
-					$confirm_pw_hash=$_GET['confirm'];
-
-					$ask="SELECT * FROM users WHERE pwhash='$confirm_pw_hash'";
-					$row=fetchOne($ask, ['confirm_pw_hash' => $confirm_pw_hash ]);
-					$nick=$row->nick;
-					$pw_hash=$row->pwhash;
-					?>
-					wELCOME <?=$nick?>, pLEASE cONFiRM yOUR pASSWORD!
-					Password: <input type="hidden" name="confirm_nick" value="<?=$nick?>"><input type="password" name="confirm_password" size="14"> <input type="submit" value="Confirm!">
-					<?php
-				}		
-				?>
-			</form>
-
-
-
-
-
+			<div class="row">
+				<div class="col-12 d-flex justify-content-md-center">
+					<img src="assets/data/register.png">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12 text-center apt-1">
+					<span>Your account has been created, a mail with instructions has been sent to your e-mail adress.</span>
+				</div>
+			</div>
 		</div>
 		<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
 			<?php include "sidebar.php"; ?>
@@ -300,5 +212,100 @@ include "header.php";
 			<?php include "sidebar_right.php"; ?>
 		</div>
 	</div>
+	<?php 
+	echo "hey!!!!!";
+	?>
 	<?php include "footer.php"; ?>
+	<meta http-equiv="Refresh" content="4" url="index.php">
+	<?php
+	exit();
+}
+?>
+<form action="register.php" method="post">
+	<div class="container-fluid bg-secondary amb-1 apb-1">
+		<div class="row apb-1">
+			<div class="col-12 d-flex justify-content-md-center">
+				<img src="assets/data/register.png">
+			</div>
+		</div>
+		<?php if (!isset($_GET['confirm']))
+		{
+			?>
+			<div class="row">
+				<div class="col-6">
+					<span class="white">Nick</span>
+				</div>
+				<div class="col-6">
+					<span class="white">Password</span> 
+				</div>
+			</div> 
+
+			<div class="row apb-1">
+				<div class="col-6">
+					<input type="text" name="nick" class="w-100"> 
+				</div>
+				<div class="col-6">
+					<input type="password" name="password" class="w-100">
+				</div>
+			</div>
+
+
+			<div class="row">
+				<div class="col-6">
+					E-Mail 
+				</div>
+				<div class="col-6">
+					Repeat Password 
+				</div>
+			</div>
+
+			<div class="row apb-1">
+				<div class="col-6">
+					<input type="text" name="mail" class="w-100">
+				</div>
+				<div class="col-6">
+					<input type="password" name="repeat_password" class="w-100">
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-6">
+					Enter iamnotarobot here: 
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-6 apb-1">
+					<input type="text" name="spam" class="w-100"> 
+				</div>
+			</div>
+			<div clas="row">
+				<input type="submit" value="Join!">
+			</div>
+		</div>
+		<?php
+	}
+	if (isset($_GET['confirm']))
+	{
+		$confirm_pw_hash=$_GET['confirm'];
+
+		$ask="SELECT * FROM users WHERE pwhash='$confirm_pw_hash'";
+		$row=fetchOne($ask, ['confirm_pw_hash' => $confirm_pw_hash ]);
+		$nick=$row->nick;
+		$pw_hash=$row->pwhash;
+		?>
+		wELCOME <?=$nick?>, pLEASE cONFiRM yOUR pASSWORD!
+		Password: <input type="hidden" name="confirm_nick" value="<?=$nick?>"><input type="password" name="confirm_password" size="14"> <input type="submit" value="Confirm!">
+		<?php
+	}		
+	?>
+</form>
+</div>
+<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+	<?php include "sidebar.php"; ?>
+</div>
+<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
+	<?php include "sidebar_right.php"; ?>
+</div>
+</div>
+<?php include "footer.php"; ?>
 
