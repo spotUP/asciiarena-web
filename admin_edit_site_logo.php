@@ -41,44 +41,46 @@ if(isset($_POST['getsitelogo']) && is_admin())
 			?>
 		</select>
 	</form>
-		<?php
-		if (isset($_POST['getsitelogo']))
+	<?php
+	if (isset($_POST['getsitelogo']))
+	{
+		$editsitelogo=$_POST['getsitelogo'];
+		$ask="select * from logos where logo_id=:editsitelogo";
+		$row=fetchOne($ask, [ 'editsitelogo' => $editsitelogo]);
+		if (isset($row))
 		{
-			$editsitelogo=$_POST['getsitelogo'];
-			$ask="select * from logos where logo_id=:editsitelogo";
-			$row=fetchOne($ask, [ 'editsitelogo' => $editsitelogo]);
-			if (isset($row))
-			{
-				$logo_id = $row->logo_id;
-				$author = $row->author;
-				$ascii = htmlspecialchars($row->ascii, ENT_QUOTES);
-			}
-			?>
-			<form enctype="multipart/form-data" action="#" method="post">
-				<div class="row apb-1 apt-1">
-					<div class="col-12">
-						<textarea name="editedsitelogo" wrap="physical" cols="80" rows="8"><?=$ascii?></textarea>
-					</div>
+			$logo_id = $row->logo_id;
+			$author = $row->author;
+			$ascii = htmlspecialchars($row->ascii, ENT_QUOTES);
+		}
+		?>
+		<form enctype="multipart/form-data" action="#" method="post">
+			<div class="row apb-1 apt-1">
+				<div class="col-12">
+					<textarea name="editedsitelogo" wrap="physical" cols="80" rows="8"><?=$ascii?></textarea>
 				</div>
-				<div class="row">
-					<div class="col-12">
-						<input type="hidden" name="getsitelogo" value="<?=$editsitelogo?>">
-						<input type="submit" value="Save">
-					</div>
+			</div>
+			<div class="row">
+				<div class="col-12">
+					<input type="hidden" name="getsitelogo" value="<?=$editsitelogo?>">
+					<input type="submit" value="Save">
+					<?php
+					if (isset($_POST['getsitelogo']) && (!isset($_POST['edit_sitelogo'])))
+					{
+						?>
+
+						<input type="hidden" name="getsitelogo" value="<?=$_POST['getsitelogo']?>">
+						<input type="submit" name="delete_sitelogo" value="Delete">
+						
+						<?php
+					} 
+					?>
 				</div>
-			</form>
-			<form enctype="multipart/form-data" action="#" method="post">
-				<?php
-			} 
-
-			if (isset($_POST['getsitelogo']) && (!isset($_POST['edit_sitelogo'])))
-			{
-				?>
-				<input type="hidden" name="getsitelogo" value="<?=$_POST['getsitelogo']?>">
-				<input type="submit" name="delete_sitelogo" value="Delete">
-
-				<?php
-			} 
-			?>
-			</form>
-	</div>
+			</div>
+		</form>
+		<form enctype="multipart/form-data" action="#" method="post">
+			<?php
+		} 
+		?>
+	</form>
+</div>

@@ -79,7 +79,7 @@ if(isset($_POST['getartist']) && is_admin())
 			</div>
 			<div class="row apb-1">
 				<div class="col-6">
-					<span class="white">Crew</span>
+					<span class="white">Crew(s)</span>
 				</div>
 				<?php
 				$ask="select crew from member_of where nick='$getartist'";
