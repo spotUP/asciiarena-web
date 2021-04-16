@@ -8,33 +8,33 @@ $stars1 = <<<EOD
 __/\__
 \    / __/\__
 /_  _\ \    /
-  \/   /_  _\
-  __/\__ \/
-  \    /
-  /_  _\
-    \/
+\/   /_  _\
+__/\__ \/
+\    /
+/_  _\
+\/
 EOD;
 $stars2 = <<<EOD
-        __/\__
+__/\__
 __/\__  \    /
 \    /  /_  _\
 /_  _\    \/
-  \/ __/\__
-     \    /
-     /_  _\
-       \/
+\/ __/\__
+\    /
+/_  _\
+\/
 EOD;
 $mobilelogo = <<<EOD
-                                 .
-      ______________    _______  ____________
+.
+______________    _______  ____________
 o   ._\___    /  __/___/   ___/_/_____/_____/  o
-  . |   L/   /___     /   /    /     /     / .
-  __|_______/________/________/_____/_____/_____
+. |   L/   /___     /   /    /     /     / .
+__|_______/________/________/_____/_____/_____
 ._\____   /\___  /_.   _   /____ |   |_\___    /
 |   L/   /    |    |   ___/_    \|   |   L/   / 
 |_______/ ____|    |_______/___\_____|_______/ .
-              |____|spot               .
-        o
+|____|spot               .
+o
 EOD;
 ?>
 <!DOCTYPE html>
@@ -42,7 +42,7 @@ EOD;
 <head>
 	<title>aSCIIaRENA</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
- 	<meta charset="utf-8">
+	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<link rel="icon" href="/favicon.ico" type="image/x-icon">
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
@@ -364,11 +364,19 @@ EOD;
 			<?php }
 		}
 		?>
-		<div class="col-12 p-0 m-0 apb-1">
-			<div class="bs-component">
-				<div class="animate__animated animate__tada alert alert-dismissible alert-danger hide-on-landscape">
-					<button type="button" class="close" data-dismiss="alert">x</button>
-					Rotate your phone for a better viewing experience.
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="bs-component aml-1 amb-1 apl-1 apr-1 apt-1">
+					<div class="animate__animated animate__tada alert alert-dismissible alert-danger hide-on-landscape">
+						<button type="button" class="close" data-dismiss="alert">x</button>
+						Rotate your phone for a better viewing experience.
+					</div>
 				</div>
 			</div>
 		</div>
+
+
+
+
+
+
