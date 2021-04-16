@@ -9,11 +9,11 @@
 			<div class="col-7 text-truncate">
 				<span class="white text-truncate">COMMENT</span>
 			</div>
-			<div class="col-3">
-				<span class="white text-truncate">COLLY</span>
+			<div class="col-3 text-truncate">
+				<span class="white">COLLY</span>
 			</div>
-			<div class="col-2">
-				<span class="white text-truncate float-right">NiCK</span>
+			<div class="col-2 text-truncate">
+				<span class="white float-right">NiCK</span>
 			</div>
 		</div>
 		<?php
@@ -23,10 +23,10 @@
 				<div class="col-7 cyan text-truncate">
 					<a class="cyan" href="/release/<?=$row->filename?>"><?=fixOutputPost($row->comment)?></a>
 				</div>
-				<div class="col-3">
+				<div class="col-3 text-truncate">
 					<a class="magenta text-truncate" href="/release/<?=$row->filename?>"><?=$row->filename?></a>
 				</div>
-				<div class="col-2">
+				<div class="col-2 text-truncate">
 					<a class="yellow text-truncate float-right" href="/member/<?=$row->nick?>"><?=$row->nick?></a>
 				</div>
 			</div>
