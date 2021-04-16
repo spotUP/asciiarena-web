@@ -1,15 +1,27 @@
 <?php
 require_once "session.php";
 $h1 = "aRTIST iNFO";
+
+$artist_available = true;
+$artisturl = $_GET['artist'];
+$result = fetchOne("select nick from artists where artisturl=:artisturl", [ 'artisturl' => $artisturl ]);
+if (isset($result->nick)) {
+	$showartist = $result->nick;
+} else {
+	header("HTTP/1.0 404 Not Found");
+	$artist_available = false;
+}
+
+
 include "header.php";
 //-----------------------------------------------------------------------------
 // ARTIST INFO
 //-----------------------------------------------------------------------------
-
 ?>
 <div class="modal-body row m-0 p-0">
   <div class="col-lg-8 order-md-1 order-lg-2 order-xl-2">
     <?php
+if ($artist_available) {
 
     $validSorts = array(
       'c.filename' => 'Filename',
@@ -17,16 +29,6 @@ include "header.php";
       'w.name' => 'Crew',
       'c.year, c.month' => 'Release Date'
     );
-
-    $artisturl = $_GET['artist'];
-    $result = fetchOne("select nick from artists where artisturl=:artisturl", [ 'artisturl' => $artisturl ]);
-    if (isset($result->nick)) 
-    {
-    	$showartist = $result->nick;
-    } else {
-    	echo "artist not found";
-    	exit;
-    }
 
     $q = "select * from artists where nick=:nick";
     $p = [":nick" => $showartist];
@@ -462,6 +464,19 @@ foreach (fetchAll($q, $p) as $row) {
 </div>
 
 <?php
+}
+} else {
+	                        ?>
+                                <div class="row">
+                                        <div class="col-lg-12">
+                                                <div class="bs-component aml-1 amb-1">
+                                                        <div class="alert alert-danger">
+                                                                 artist not found
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+                                <?php
 }
 ?>
 </div>
