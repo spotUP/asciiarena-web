@@ -3,18 +3,19 @@ require_once "session.php";
 
 $nickurl = $_GET['member'];
 $member = fetchOne("SELECT * FROM users WHERE nickurl = :nickurl", [":nickurl" => $nickurl], ["password", "pwhash", "temp_pw_hash"]);
-
+$member_available = true;
 if(!isset($_GET['member']) || empty($member->id)) {
-	header("Location: /");
-	exit();
+	header("HTTP/1.0 404 Not Found");
+	$member_available = false;
 }
 
-$h1 = "MEMBER INFO";
+$h1 = "mEMBER iNFO";
 include "header.php";
 ?>
 
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2">
+		<?php if ($member_available) { ?>
 		<div class="position-relative">
 			<div class="row">
 				<div class="col-4">
@@ -209,6 +210,20 @@ include "header.php";
 					});
 				</script>
 			<?php }
+
+		} else {
+                                ?>
+                                <div class="row">
+                                        <div class="col-lg-12">
+                                                <div class="bs-component aml-1 amb-1">
+                                                        <div class="alert alert-danger">
+                                                                member not found
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+                                <?php
+		}
 			?>
 		</div>
 		<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">

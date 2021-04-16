@@ -1,8 +1,18 @@
 <?php
 require_once "session.php";
 $h1 = "cREW dETAiLS";
-include "header.php";
 
+$crewurl=$_GET['crew'] ?? '';
+$crew_available = true;
+$result = fetchOne("select name from crews where crewurl=:crewurl", [ 'crewurl' => $crewurl ]);
+if (isset($result->name)) {
+	$showcrew = $result->name;
+} else {
+	header("HTTP/1.0 404 Not Found");
+	$crew_available = false;
+}
+
+include "header.php";
 ?>
 
 <div class="modal-body row m-0 p-0">
@@ -14,15 +24,7 @@ include "header.php";
 // CREW INFO
 //-----------------------------------------------------------------------------
 
-		$crewurl=$_GET['crew'] ?? '';
-		$result = fetchOne("select name from crews where crewurl=:crewurl", [ 'crewurl' => $crewurl ]);
-		if (isset($result->name)) 
-		{
-			$showcrew = $result->name;
-		} else {
-			echo "crew not found";
-			exit;
-		}
+	if ($crew_available) {
 
 		$sort_criteria=$_GET['sort_by'] ?? 'a.name';
 		$sort_criteria=preg_replace('[^a-z.]','', $sort_criteria);
@@ -572,6 +574,20 @@ include "header.php";
 				}
 			}
 		}
+
+	} else {
+			        ?>
+                                <div class="row">
+                                        <div class="col-lg-12">
+                                                <div class="bs-component aml-1 amb-1">
+                                                        <div class="alert alert-danger">
+                                                                crew not found
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+                                <?php
+	}
 		?>
 
 	</div>

@@ -1,10 +1,16 @@
 <?php
 require_once "session.php";
+$h1 = "rELEAsE iNFO";
 
 $filename = $_GET['filename'];
 $_SESSION['filename'] = $filename;
 $nick = $_user['nick'];
 $filename = preg_replace('/\.\.+/', '', $filename);
+$colly_available = true;
+if (!fetchOne("SELECT 1 FROM collys WHERE filename = :filename", [":filename" => $filename])) {
+		header("HTTP/1.0 404 Not Found");
+		$colly_available = false;
+}
 
 require_once "header.php"; ?>
 
@@ -300,7 +306,7 @@ require_once "header.php"; ?>
 // TOP CONTROL TABLE
 //----------------------------------------------------------------------------------------------
 
-			if (!isset($_POST[ 'edit_colly' ]) && !isset($_POST[ 'broken' ])) 
+			if (!isset($_POST[ 'edit_colly' ]) && !isset($_POST[ 'broken' ]) && $colly_available) 
 			{
 				$type = fetchOne("SELECT type FROM collys WHERE filename = :filename", [":filename" => $filename])->type ?? "";
 				?>
@@ -664,7 +670,20 @@ require_once "header.php"; ?>
 			echo "</form>";
 		}
 	}
+} else {
+				?>
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="bs-component aml-1 amb-1">
+							<div class="alert alert-danger">
+								colly not found
+							</div>
+						</div>
+					</div>
+				</div>
+				<?php
 }
+
 
 //----------------------------------------------------------------------------------------------
 // ADD COMMENT FIELD
