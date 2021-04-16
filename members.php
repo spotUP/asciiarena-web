@@ -212,17 +212,17 @@ include "header.php";
 			<?php }
 
 		} else {
-                                ?>
-                                <div class="row">
-                                        <div class="col-lg-12">
-                                                <div class="bs-component aml-1 amb-1">
-                                                        <div class="alert alert-danger">
-                                                                member not found
-                                                        </div>
-                                                </div>
-                                        </div>
+        ?>
+        <div class="row">
+                <div class="col-lg-12">
+                        <div class="bs-component aml-1 amb-1">
+                                <div class="alert alert-danger">
+                                        member not found
                                 </div>
-                                <?php
+                        </div>
+                </div>
+        </div>
+        <?php
 		}
 			?>
 		</div>
