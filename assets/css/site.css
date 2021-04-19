@@ -1686,6 +1686,10 @@ a.disabled{
   .dropdown-divider {
     display: none;
   }
+
+}
+
+@media only screen and (max-width: 960px) {
   .mobile-bg{
     background-color: #1a1a1a !important;
   }
@@ -1834,11 +1838,11 @@ body > div.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-white > span
 }
 
 .select-selected {
-    background-color: #444444;
-    padding-top: 16px !important;
-    padding-bottom: 16px !important;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
+  background-color: #444444;
+  padding-top: 16px !important;
+  padding-bottom: 16px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
 }
 
 /*style the arrow inside the select element:*/
