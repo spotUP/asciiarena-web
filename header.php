@@ -8,33 +8,33 @@ $stars1 = <<<EOD
 __/\__
 \    / __/\__
 /_  _\ \    /
-\/   /_  _\
-__/\__ \/
-\    /
-/_  _\
-\/
+  \/   /_  _\
+  __/\__ \/
+  \    /
+  /_  _\
+    \/
 EOD;
 $stars2 = <<<EOD
-__/\__
+        __/\__
 __/\__  \    /
 \    /  /_  _\
 /_  _\    \/
-\/ __/\__
-\    /
-/_  _\
-\/
+  \/ __/\__
+     \    /
+     /_  _\
+       \/
 EOD;
 $mobilelogo = <<<EOD
-.
-______________    _______  ____________
+                       .
+      ______________    _______  ____________
 o   ._\___    /  __/___/   ___/_/_____/_____/  o
-. |   L/   /___     /   /    /     /     / .
-__|_______/________/________/_____/_____/_____
+  . |   L/   /___     /   /    /     /     / .
+  __|_______/________/________/_____/_____/_____
 ._\____   /\___  /_.   _   /____ |   |_\___    /
 |   L/   /    |    |   ___/_    \|   |   L/   / 
 |_______/ ____|    |_______/___\_____|_______/ .
-|____|spot               .
-o
+              |____|spot               .
+       o
 EOD;
 ?>
 <!DOCTYPE html>
@@ -244,7 +244,7 @@ EOD;
 	</div>
 </div>
 <div class="navbar navbar-expand-lg fixed-top bg-blue" style="top: 22px; height: 21px">
-	<div class="container-fluid m-0 p-0">
+	<div class="container-fluid m-md-0 p-md-0">
 		<a href="/" style="color: #fff" class="navbar-brand ascii">aSCIIaRENA</a>
 		<a class="navbar-toggler ascii" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">mENU</a>
 		<div class="collapse navbar-collapse" id="navbarResponsive">
