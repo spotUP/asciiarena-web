@@ -1824,26 +1824,6 @@ body > div.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-white > span
   width: 100%;
 }
 
-/* custom select */
-
-/*the container must be positioned relative:*/
-.custom-select {
-  position: relative;
-  height: initial !important;
-  margin-bottom: 16px;
-}
-
-.custom-select select {
-  display: none; /*hide original SELECT element:*/
-}
-
-.select-selected {
-  background-color: #444444;
-  padding-top: 16px !important;
-  padding-bottom: 16px !important;
-  padding-left: 16px !important;
-  padding-right: 16px !important;
-}
 
 /*style the arrow inside the select element:*/
 .select-selected:after {
@@ -1909,3 +1889,14 @@ div.select-items > div:last-child{
 form{
   display: initial !important;
 }
+
+textarea,
+input.text,
+input[type="text"],
+input[type="button"],
+input[type="submit"],
+.input-checkbox {
+-webkit-appearance: none;
+border-radius: 0;
+}
+
