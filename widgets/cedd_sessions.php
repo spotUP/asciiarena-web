@@ -3,7 +3,7 @@
 	<h2 class="ap-1 bg-header">OPEN CEDD ONLINE DOCUMENTS</h2>
 </div>
 
-<div class="container-fluid">
+<div class="container-fluid apt-1 p-0 p-lg-2">
 	<div class="col-12 bg-secondary apt-1 apb-1">
 		<div class="row apb-1">
 			<div class="col-4 text-truncate">
@@ -16,7 +16,7 @@
 				<span class="white">ARTISTS</span>
 			</div>
 		</div>
-		<div class="row apl-1 apr-1">
+		<div class="row">
 			<div class="col-4 text-truncate">
 				<span class="cyan">Spots mega co-op mayhem</span>
 			</div>
@@ -33,7 +33,7 @@
 				<a class="float-right" href="#">Join</a>
 			</div>
 		</div>
-		<div class="row apl-1 apr-1">
+		<div class="row">
 			<div class="col-4 text-truncate">
 				<span class="cyan">Friday brawl!</span>
 			</div>
@@ -50,7 +50,7 @@
 				<a href="#" class="float-right">Join</a>
 			</div>
 		</div>
-		<div class="row apl-1 apr-1">
+		<div class="row">
 			<div class="col-4 text-truncate">
 				<span class="cyan">Divine Stylers Internal Bash!</span>
 			</div>
@@ -67,7 +67,7 @@
 				<a class="disabled float-right" href="#">Join</a>
 			</div>
 		</div>
-		<div class="row apl-1 apr-1">
+		<div class="row">
 			<div class="col-4 text-truncate">
 				<span class="cyan">aSCIIaRENA Logo Session</span>
 			</div>
@@ -84,7 +84,7 @@
 				<a class="disabled float-right" href="#">Join</a>
 			</div>
 		</div>
-		<div class="row apl-1 apr-1">
+		<div class="row">
 			<div class="col-4 text-truncate">
 				<span class="cyan">Monday Bluez...</span>
 			</div>

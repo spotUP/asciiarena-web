@@ -7,7 +7,7 @@
 <div class="header col-lg-12">
 	<h2 class="apt-1 apb-1 bg-header">TAG THE WALL</h2>
 </div>
-<div class="container-fluid">
+<div class="container-fluid p-0 p-lg-2">
 	<div class="row m-0 p-0 bg-secondary apt-1 apb-1" id="<?=$wall?>"></div>
 	<?php if (is_logged_in()): ?>
 		<div class="row">

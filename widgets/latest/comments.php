@@ -1,11 +1,11 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
 <div class="header col-lg-12">
-	<h2 class="ap-1 bg-header">LATEST COMMENTS</h2>
+	<h2 class="ap-1 am-0 bg-header">LATEST COMMENTS</h2>
 </div>
 
-<div class="container-fluid">
+<div class="container-fluid apt-1 p-0 p-lg-2">
 	<div class="col-12 bg-secondary apt-1 apb-1">
-		<div class="row apl-1 apr-1 apb-1">
+		<div class="row apb-1">
 			<div class="col-7 text-truncate">
 				<span class="white text-truncate">COMMENT</span>
 			</div>
@@ -19,7 +19,7 @@
 		<?php
 		foreach(fetchAll("SELECT * FROM comments ORDER BY timestamp DESC LIMIT 10") as $row) {
 			?>
-			<div class="row apl-1 apr-1">
+			<div class="row">
 				<div class="col-7 cyan text-truncate">
 					<a class="cyan" href="/release/<?=$row->filename?>"><?=fixOutputPost($row->comment)?></a>
 				</div>
