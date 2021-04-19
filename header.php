@@ -294,7 +294,7 @@ include "header_ascii.php";
 
 		<div class="container-fluid mobile-bg">
 			<div class="row" style="padding-top: 58px; padding-bottom: 16px;">
-				<div class="col-12 d-flex justify-content-center m-0 p-0">
+				<div class="col-12 d-flex justify-content-center m-0 p-0 m-md-0 p-md-0 m-sm-1 p-sm-1">
 					<pre class="overflow-hidden d-none d-lg-block" style="position: relative; left: 32px;"><span class="magenta"><?=$stars1?></span></pre>
 					<div class="overflow-hidden d-none d-lg-block mx-auto">
 						<div id="logoswitcher">
