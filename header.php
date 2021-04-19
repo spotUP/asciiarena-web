@@ -203,8 +203,8 @@ include "header_ascii.php";
 
 <body>
 	<div id="spotclose" class="spotclose" onclick='myFunction()'><div class="noevents">x</div></div>
-<!--	<div class="scanlines"></div>
-	<div class="vignette"></div> -->
+	<div class="scanlines"></div>
+	<div class="vignette"></div>
 	<div class="navbar navbar-expand-lg fixed-top navbar-dark bg-white d-flex justify-content-between m-0 p-0" style="height: 22px; margin-bottom: 2px; padding-right: 2px;">
 		<span style="margin-left: 16px;" class="ncommm">NComm 2.0 Copyright 1988-1992 Daniel Bloch & co.</span>
 		<span><a href="/accounting.php"><img src="/assets/data/multitask.png" alt=""></a></span>
@@ -292,7 +292,7 @@ include "header_ascii.php";
 			</div>
 		</div>
 
-		<div class="container-fluid">
+		<div class="container-fluid mobile-bg">
 			<div class="row" style="padding-top: 58px; padding-bottom: 16px;">
 				<div class="col-12 d-flex justify-content-center m-0 p-0">
 					<pre class="overflow-hidden d-none d-lg-block" style="position: relative; left: 32px;"><span class="magenta"><?=$stars1?></span></pre>
