@@ -1,7 +1,7 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
-<div class="container fluid col-12 apl-1 apr-1" style="min-height: 160px;">
+<div class="container fluid col-12" style="min-height: 160px;">
 	<div class="header col-lg-12 m-0 p-0">
-		<h2 class="ap-1 bg-header">USERS ONLINE</h2>
+		<h2 class="ap-1 bg-header m-0 p-0">USERS ONLINE</h2>
 	</div>
 	<div class="container col-12 bg-green m-0 p-0 apt-1 apb-1 bg-secondary">
 

@@ -1418,7 +1418,6 @@ input[type=text]{
 .alert {
   padding: 0 8px 16px;
   font-size: 16px !important;
-  z-index: 999999;
 }
 
 .alert-dismissible .close {

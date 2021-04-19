@@ -4,8 +4,8 @@
 	$form = "form_{$wall_id}";
 	$tag = "tag_{$wall_id}";
 ?>
-<div class="header col-lg-12 m-0 p-0 apr-1 apl-1">
-	<h2 class="ap-1 bg-header">TAG THE WALL</h2>
+<div class="header col-lg-12">
+	<h2 class="apt-1 apb-1 bg-header">TAG THE WALL</h2>
 </div>
 <div class="container-fluid">
 	<div class="row m-0 p-0 bg-secondary apt-1 apb-1" id="<?=$wall?>"></div>

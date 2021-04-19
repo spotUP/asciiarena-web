@@ -343,7 +343,7 @@ EOD;
 				$switcher = (is_array($h1)) ? "switcher" : ""; ?>
 				<div class="page-header">
 					<div class="row ml-0 pl-0 mr-0 pr-0">
-						<div class="col-12 m-0 p-0">
+						<div class="col-12">
 							<h1 class="bg-header ap-1 <?=$switcher?>" style="min-height: 16px;">
 								<span><?php if(!empty($switcher)) {
 									echo implode("</span><span style='display: none;'>", $h1);

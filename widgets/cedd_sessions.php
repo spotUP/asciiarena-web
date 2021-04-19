@@ -1,11 +1,11 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
-<div class="header col-lg-12 m-0 p-0 apl-1 apr-1">
+<div class="header col-lg-12">
 	<h2 class="ap-1 bg-header">OPEN CEDD ONLINE DOCUMENTS</h2>
 </div>
 
 <div class="container-fluid">
 	<div class="col-12 bg-secondary apt-1 apb-1">
-		<div class="row apl-1 apr-1 apb-1">
+		<div class="row apb-1">
 			<div class="col-4 text-truncate">
 				<span class="white">NAME</span>
 			</div>
