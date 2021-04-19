@@ -1900,3 +1900,16 @@ input[type="submit"],
 border-radius: 0;
 }
 
+input, button, select, optgroup {
+-webkit-appearance: none;
+border-radius: 0;
+}
+input, button, select, optgroup, textarea {
+-webkit-appearance: none;
+border-radius: 0;
+}
+select {
+-webkit-appearance: none;
+border-radius: 0;
+}
+
