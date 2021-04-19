@@ -1918,3 +1918,7 @@ input[type=text] {
 border-radius: 0 !important;
 }
 
+select{
+-webkit-appearance: none !important;
+border-radius: 0 !important;
+}
