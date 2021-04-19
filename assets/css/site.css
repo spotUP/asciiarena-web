@@ -205,6 +205,15 @@ h5, .h5 {
   padding: 0px 0px;
 }
 
+textarea,
+input.text,
+input[type="text"],
+input[type="button"],
+input[type="submit"],
+.input-checkbox {
+-webkit-appearance: none;
+} 
+
 .lead {
   font-size: 16px;
   line-height: 20px;
@@ -1890,35 +1899,5 @@ form{
   display: initial !important;
 }
 
-textarea,
-input.text,
-input[type="text"],
-input[type="button"],
-input[type="submit"],
-.input-checkbox {
--webkit-appearance: none !important;
-border-radius: 0 !important;
-}
 
-input, button, select, optgroup {
--webkit-appearance: none !important;
-border-radius: 0 !important; 
-}
-input, button, select, optgroup, textarea {
--webkit-appearance: none !important;
-border-radius: 0 !important;
-}
-select {
--webkit-appearance: none !important;
-border-radius: 0 !important;
-}
 
-input[type=text] {
--webkit-appearance: none !important;
-border-radius: 0 !important;
-}
-
-select{
--webkit-appearance: none !important;
-border-radius: 0 !important;
-}
