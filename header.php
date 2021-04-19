@@ -4,38 +4,7 @@ $logos = [];
 foreach(fetchAll("SELECT ascii FROM logos ORDER BY RAND() limit 10") as $logo) {
 	$logos[] = '<a href="/" class="logo ascii"><pre style="overflow: hidden;"><span class="magenta">' . $logo->ascii . '</span></pre></a>';
 }
-$stars1 = <<<EOD
-__/\__
-\    / __/\__
-/_  _\ \    /
-\/   /_  _\
-__/\__ \/
-\    /
-/_  _\
-\/
-EOD;
-$stars2 = <<<EOD
-__/\__
-__/\__  \    /
-\    /  /_  _\
-/_  _\    \/
-\/ __/\__
-\    /
-/_  _\
-\/
-EOD;
-$mobilelogo = <<<EOD
-.
-______________    _______  ____________
-o   ._\___    /  __/___/   ___/_/_____/_____/  o
-. |   L/   /___     /   /    /     /     / .
-__|_______/________/________/_____/_____/_____
-._\____   /\___  /_.   _   /____ |   |_\___    /
-|   L/   /    |    |   ___/_    \|   |   L/   / 
-|_______/ ____|    |_______/___\_____|_______/ .
-|____|spot               .
-o
-EOD;
+include "header_ascii.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -232,7 +201,7 @@ EOD;
 	</script>
 </head>
 
-<body style="overflow-x: hidden;">
+<body>
 	<div id="spotclose" class="spotclose" onclick='myFunction()'><div class="noevents">x</div></div>
 <!--	<div class="scanlines"></div>
 	<div class="vignette"></div> -->
