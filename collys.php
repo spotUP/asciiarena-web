@@ -210,19 +210,19 @@ switch ($sort_by) {
 												$day = "0$day";
 											}
 											?>
-											<div class="col-4 text-truncate">
+											<div class="col-4 col-sm-4 text-truncate">
 												<a class="magenta" href="/release/<?=$row->filename?>"><?=$row->name?></a>
 											</div>
-											<div class="col-2">
+											<div class="col-sm-2 d-none d-sm-block">
 												<a href="/release/<?=$row->filename?>"><?=$row->filename?></a>
 											</div>
-											<div class="col-2 text-truncate">
+											<div class="col-4 col-sm-2 text-truncate">
 												<span class="yellow"><?=combinize($row->artists, $row->artist_ids, "/artist/", $row->artists)?></span>
 											</div>
-											<div class="col-2 text-truncate">
+											<div class="col-4 col-sm-2 text-truncate">
 												<span class="yellow"><?=combinize($row->crews, $row->crew_ids, "/crew/", $row->crews)?></span>
 											</div>
-											<div class="col-2">
+											<div class="col-sm-2 d-none d-sm-block">
 												<span class="lightgrey"><?=$year?>-<?=$month?>-<?=$day?></span>
 											</div>
 											<?php
