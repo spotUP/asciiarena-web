@@ -301,7 +301,7 @@ switch ($sort_by) {
 								$upload_signature = fetchOne($ask_sig, [":uploader" => $uploader])->upload_signature;
 								?>
 							</div>
-							<div class="col-12 col-sm-6 apb-1 text-center text-md-left">
+							<div class="col-12 col-sm-6 apb-1 d-flex align-items-center">
 								<pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$filename?>"><?=$orig?></a></pre>
 							</div>
 						</div>
