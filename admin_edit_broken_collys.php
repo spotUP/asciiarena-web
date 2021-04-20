@@ -23,7 +23,7 @@
 
 				<div class="row apl-1 apr-1 apb-1">
 					<div class="col-10">
-						Comment: <?=$broken_comment?>
+						<span class="cyan">Comment: <?=$broken_comment?></span>
 					</div>
 				</div>
 
