@@ -4,6 +4,10 @@
 //--------------------------------------------------------------------------------
 ?>
 <script>
+  function userclear() {
+    $("#user_id, #user_nick, #user_crew, #user_rank, #user_byear, #user_bmonth, #user_bday, #user_country, #user_mail").val('');
+  }
+  
 	function getUser() {
 		const id = $("#user_fetch_id").val();
 		if (id > 0) {
@@ -19,7 +23,7 @@
 				$('#user_mail').val(data[0].mail);
 			});
 		} else {
-			$("#user_id, #user_nick, #user_crew, #user_rank, #user_byear, #user_bmonth, #user_bday, #user_country, #user_mail").val('');
+			userclear();
 		}
 	}
 
@@ -47,7 +51,7 @@
 					"data": form.serialize(),
 					"success": () => {
 						showAlert("User deleted!", "#user");
-            $("#user_id, #user_nick, #user_crew, #user_rank, #user_byear, #user_bmonth, #user_bday, #user_country, #user_mail").val('');
+            userclear();
 						getUserList();
 					}
 				});
@@ -165,7 +169,7 @@
 		</div>    
     <div class="row apt-1">
 			<div class="col-12">
-				<input type="submit" name="do_edit_user" value="Submit">
+				<input type="submit" name="do_edit_user" value="Save">
 				<input type="button" id="delete_user" name="delete_user" value="Delete" onclick="delUser();">
 			</div>
 		</div>
@@ -184,7 +188,7 @@
         "data": form.serialize(),
         "success": () => {
           showAlert("User saved!", "#edituser");
-          $("#user_id, #user_nick, #user_crew, #user_rank, #user_byear, #user_bmonth, #user_bday, #user_country, #user_mail").val('');
+          userclear();
           getUserList();
         }
       });
