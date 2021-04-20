@@ -4,6 +4,10 @@
 	// --------------------------------------------------------------------------------
 ?>
 <script>
+  function bbsclear() {
+    $("#bbs_id, #bbs_name, #bbs_sysop, #bbs_number, #bbs_address").val('');
+  }
+  
 	function getBBS() {
 		const id = $("#bbs_fetch_id").val();
 		if (id > 0) {
@@ -15,7 +19,7 @@
 				$('#bbs_number').val(data[0].number);
 			});
 		} else {
-			$("#bbs_id, #bbs_name, #bbs_sysop, #bbs_number, #bbs_address").val('');
+			bbsclear();
 		}
 	}
 
@@ -43,7 +47,7 @@
 					"data": form.serialize(),
 					"success": () => {
 						showAlert("BBS deleted!", "#bbs");
-						$("#bbs_id, #bbs_name, #bbs_sysop, #bbs_number, #bbs_address").val('');
+						bbsclear();
 						getBBSList();
 					}
 				});
@@ -97,7 +101,7 @@
 		</div>
 		<div class="row apt-1">
 			<div class="col-12">
-				<input type="submit" name="do_edit_bbs" value="Submit">
+				<input type="submit" name="do_edit_bbs" value="Save">
 				<input type="button" id="delete_bbs" name="delete_bbs" value="Delete" onclick="delBBS();">
 			</div>
 		</div>
@@ -116,7 +120,7 @@
         "data": form.serialize(),
         "success": () => {
           showAlert("BBS saved!", "#bbs");
-          $("#bbs_id, #bbs_name, #bbs_sysop, #bbs_number, #bbs_address").val('');
+          bbsclear();
           getBBSList();
         }
       });

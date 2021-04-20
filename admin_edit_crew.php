@@ -5,6 +5,12 @@
 //--------------------------------------------------------------------------------
 ?>
 <script>
+  function crewclear() {
+	$("#crew_id, #crew_name, #crew_acronym, #crew_contact, #crew_url, #crew_rating, #crew_www, #crew_active").val('');
+    let bbslist = $("#crew_bbs_fetch_id");
+    bbslist.empty();
+  }
+  
 	function getCrew() {
 		const id = $("#crew_fetch_id").val();
 		if (id > 0) {
@@ -20,7 +26,7 @@
 			});
       getCrewBBSes(id)
 		} else {
-			$("#crew_id, #crew_name, #crew_acronym, #crew_contact, #crew_url, #crew_rating, #crew_www, #crew_active").val('');
+        crewclear();
 		}
 	}
 
@@ -96,7 +102,7 @@
 					"data": form.serialize(),
 					"success": () => {
 						showAlert("Crew deleted!", "#crew");
-            $("#crew_id, #crew_name, #crew_acronym, #crew_contact, #crew_url, #crew_rating, #crew_www, #crew_active").val('');
+            crewclear();
 						getCrewList();
 					}
 				});
@@ -193,7 +199,7 @@
     </div></div>
 		<div class="row apt-1">
 			<div class="col-12">
-				<input type="submit" name="do_edit_crew" value="Submit">
+				<input type="submit" name="do_edit_crew" value="Save">
 				<input type="button" id="delete_crew" name="delete_crew" value="Delete" onclick="delCrew();">
 			</div>
 		</div>
@@ -213,7 +219,7 @@
         "data": form.serialize(),
         "success": () => {
           showAlert("Crew saved!", "#crew");
-          $("#crew_id, #crew_name, #crew_acronym, #crew_contact, #crew_url, #crew_rating, #crew_www, #crew_active").val('');
+          crewclear();
           getCrewList();
         }
       });

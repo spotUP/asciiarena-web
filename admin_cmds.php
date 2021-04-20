@@ -9,6 +9,170 @@
 
 	if(is_admin()) {
 		switch($cmd) {
+      case "get_colly":
+				$id = $_GET[ "id" ] ?? 0;
+				$data = [];
+				if($id) {
+					$collys = fetchAll("SELECT * FROM collys WHERE id = :id", [":id" => $id]);
+				} else {
+					$collys = fetchAll("SELECT * FROM collys ORDER BY name");
+				}
+				foreach($collys as $colly) {
+					$data[] = [
+						"id" => (int)$colly->id,
+						"name" => $colly->name,
+						"year" => $colly->year,
+						"month" => $colly->month,
+						"day" => $colly->day,
+						"type" => $colly->type,
+						"diz" => $colly->file_id,
+					];
+				}
+				if(!empty($data)) {
+					exit(json_out($data));
+				}
+				exit(json_out(["status" => false], 404));
+      case "save_colly":
+				$response = 200;
+				$data = [
+					":name" => $_POST[ "name" ] ?? "",
+					":year" => $_POST[ "year" ] ?? "",
+					":month" => $_POST[ "month" ] ?? "",
+					":day" => $_POST[ "day" ] ?? "",
+					":type" => $_POST[ "type" ] ?? "",
+					":file_id" => $_POST[ "diz" ] ?? "",
+				];
+				if(!empty($_POST[ "id" ])) {
+					$q = "UPDATE collys SET name = :name, year = :year, month = :month, day = :day, type = :type, file_id = :file_id WHERE id = :id";
+					$data[ ":id" ] = $_POST[ "id" ];
+				} else {
+					$q = "INSERT INTO collys (name, year, month, day, type, file_id) VALUES (:name, :year, :month, :day, :type, :file_id)";
+					$response = 201;
+				}
+				if(doQuery($q, $data)) {
+					exit(json_out(["status" => true], $response));
+				}
+				exit(json_out(["status" => true], 400));          
+      case "del_colly":
+				if(!empty($_POST[ 'id' ])) {
+					$id = (int)$_POST[ 'id' ];
+					if($id && doQuery("DELETE FROM collys WHERE id = :id", [":id" => $id])) {
+						exit(json_out(["status" => true]));
+					}
+				}
+				exit(json_out(["status" => false], 404)); 
+      case "get_colly_artist":
+        $id = $_GET[ "id" ] ?? 0;
+				$data = [];
+        $artists = fetchAll("SELECT artists_collys.id,artists.nick FROM artists_collys, artists where artists_collys.artist_id=artists.id and artists_collys.colly_id=:id",[":id" => $id]);
+				foreach($artists as $artist) {
+					$data[] = [
+						"id" => (int)$artist->id,
+						"nick" => $artist->nick,
+					];
+				}
+				if(!empty($data)) {
+					exit(json_out($data));
+				}
+        exit(json_out(["status" => false], 404));
+      case "del_colly_artist":
+				if(!empty($_POST[ 'id' ])) {
+					$id = (int)$_POST[ 'id' ];
+					if($id && doQuery("DELETE FROM artists_collys WHERE id = :id", [":id" => $id])) {
+						exit(json_out(["status" => true]));
+					}
+				}
+				exit(json_out(["status" => false], 404));  
+      case "add_colly_artist":        
+        $response = 200;
+				$data = [
+					":artist_id" => $_POST[ "artist_id" ] ?? "",
+					":colly_id" => $_POST[ "colly_id" ] ?? "",
+				];
+        $q = "INSERT INTO artists_collys (artist_id, colly_id) VALUES (:artist_id, :colly_id)";
+				$response = 201;
+				if(doQuery($q, $data)) {
+					exit(json_out(["status" => true], $response));
+				}
+				exit(json_out(["status" => true], 400));                    
+      case "get_colly_crew":
+        $id = $_GET[ "id" ] ?? 0;
+				$data = [];
+        $crews = fetchAll("SELECT collys_crews.id,crews.name FROM collys_crews, crews where collys_crews.crew_id=crews.id and collys_crews.colly_id=:id",[":id" => $id]);
+				foreach($crews as $crew) {
+					$data[] = [
+						"id" => (int)$crew->id,
+						"name" => $crew->name,
+					];
+				}
+				if(!empty($data)) {
+					exit(json_out($data));
+				}
+        exit(json_out(["status" => false], 404));
+      case "del_colly_crew":
+				if(!empty($_POST[ 'id' ])) {
+					$id = (int)$_POST[ 'id' ];
+					if($id && doQuery("DELETE FROM collys_crews WHERE id = :id", [":id" => $id])) {
+						exit(json_out(["status" => true]));
+					}
+				}
+				exit(json_out(["status" => false], 404));  
+      case "add_colly_crew":        
+        $response = 200;
+				$data = [
+					":crew_id" => $_POST[ "crew_id" ] ?? "",
+					":colly_id" => $_POST[ "colly_id" ] ?? "",
+				];
+        $q = "INSERT INTO collys_crews (crew_id, colly_id) VALUES (:crew_id, :colly_id)";
+				$response = 201;
+				if(doQuery($q, $data)) {
+					exit(json_out(["status" => true], $response));
+				}
+				exit(json_out(["status" => true], 400));             
+      case "get_logo":
+				$id = $_GET[ "id" ] ?? 0;
+				$data = [];
+				if($id) {
+					$logos = fetchAll("SELECT * FROM logos WHERE logo_id = :id", [":id" => $id]);
+				} else {
+					$logos = fetchAll("SELECT * FROM logos ORDER BY logo_id");
+				}
+				foreach($logos as $logo) {
+					$data[] = [
+						"id" => (int)$logo->logo_id,
+						"author" => $logo->author,
+						"ascii" => $logo->ascii,
+					];
+				}
+				if(!empty($data)) {
+					exit(json_out($data));
+				}
+				exit(json_out(["status" => false], 404));
+      case "del_logo":
+				if(!empty($_POST[ 'id' ])) {
+					$id = (int)$_POST[ 'id' ];
+					if($id && doQuery("DELETE FROM logos WHERE logo_id = :id", [":id" => $id])) {
+						exit(json_out(["status" => true]));
+					}
+				}
+				exit(json_out(["status" => false], 404));   
+      case "save_logo":
+				$response = 200;
+				$data = [
+					":author" => $_POST[ "author" ] ?? "",
+					":ascii" => $_POST[ "ascii" ] ?? "",
+				];
+				if(!empty($_POST[ "id" ])) {
+					$q = "UPDATE logos SET author = :author, ascii = :ascii WHERE logo_id = :id";
+					$data[ ":id" ] = $_POST[ "id" ];
+				} else {
+					$q = "INSERT INTO logos (author, ascii) VALUES (:author, :ascii)";
+					$response = 201;
+				}
+				if(doQuery($q, $data)) {
+					exit(json_out(["status" => true], $response));
+				}
+				exit(json_out(["status" => true], 400));           
       case "get_user":
 				$id = $_GET[ "id" ] ?? 0;
 				$data = [];

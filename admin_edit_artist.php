@@ -4,6 +4,12 @@
 //--------------------------------------------------------------------------------
 ?>
 <script>
+  function artistclear() {
+    $("#artist_id, #artist_nick, #artist_acronym, #artist_www, #artist_country, #artist_status").val('');
+		let crewslist = $("#artist_crew_fetch_id");
+		crewslist.empty();
+  }
+  
 	function getArtist() {
 		const id = $("#artist_fetch_id").val();
 		if (id > 0) {
@@ -17,7 +23,7 @@
 			});
       getArtistCrews(id)
 		} else {
-			$("#artist_id, #artist_nick, #artist_acronym, #artist_www, #artist_country, #artist_status").val('');
+      artistclear();
 		}
 	}
 
@@ -45,7 +51,7 @@
 					"data": form.serialize(),
 					"success": () => {
 						showAlert("Artist deleted!", "#artist");
-       			$("#artist_id, #artist_nick, #artist_acronym, #artist_www, #artist_country, #artist_status").val('');
+       			artistclear();
 						getArtistList();
 					}
 				});
@@ -197,7 +203,7 @@
 
     <div class="row apt-1">
 			<div class="col-12">
-				<input type="submit" name="do_edit_artist" value="Submit">
+				<input type="submit" name="do_edit_artist" value="Save">
 				<input type="button" id="delete_artist" name="delete_artist" value="Delete" onclick="delArtist();">
 			</div>
 		</div>
@@ -217,7 +223,7 @@
         "data": form.serialize(),
         "success": () => {
           showAlert("Artist saved!", "#artist");
-          $("#artist_id, #artist_nick, #artist_acronym, #artist_www, #artist_country, #artist_status").val('');
+          artistclear();
           getArtistList();
         }
       });
