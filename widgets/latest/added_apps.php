@@ -1,7 +1,7 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
 <div class="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
 	<div class="header col-lg-12 p-0">
-		<h2 class="ap-1 bg-header text-truncate lightgreen"><a class="lightgreen" href="/apps.php?sort_by=timestamp">LATEST ADDED APPS</a> <a class="lightgreen"	href="/rss.php?class=0">[RSS]</a></h2>
+		<h2 class="ap-1 bg-header text-truncate lightgreen"><a class="lightgreen" href="/application/">LATEST ADDED APPS</a> <a class="lightgreen" href="/rss.php?class=0">[RSS]</a></h2>
 	</div>
 	<div class="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
 		<?php
@@ -23,7 +23,7 @@
 			$upload_date = date("y-m-d", $upload_date);
 			?>
 			<div class="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
-				<a class="magenta text-truncate" href="/apps.php?sort_by=timestamp DESC"><?=$filename?></a>
+				<a class="magenta text-truncate" href="/application/<?=$filename?>"><?=$filename?></a>
 				<span class="text-truncate"><?=$upload_date?></span>
 			</div>
 			<?php
