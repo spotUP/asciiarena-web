@@ -245,7 +245,7 @@ switch ($sort_by) {
 				$todaystime = date("d-m-y");
 				?>
 				<div class="row">
-					<div class="col-lg-12">
+					<div class="col-lg-12 text-truncate">
 						<span class="green">- --/\-\/- -</span> <span class="cyan">aSCIIaRENA</span> <span class="red">--=*=-- </span><span class="pink"><?=$todaysday?>, the <?=$todaystime?>]</span><span class="red"> --=*=-- </span> <span class="cyan">aSCIIaRENA</span> <span class="green"> - -/\-\/- -- -</span><br/><br/>
 					</div>
 				</div>
@@ -288,28 +288,28 @@ switch ($sort_by) {
 					{
 						?>
 						<div class="row">
-							<div class="col-6">
+							<div class="col-12 col-sm-6">
 								<a href="/release/<?=$filename?>"><span class="cyan" style="margin-right: 8px;"><?=$filename?></span></a> <span class="green" style="margin-right: 16px;">PF--</span> <span class="yellow" style="margin-right: 8px;"><?=$row->filesize?></span> <span class="yellow"><?=$upload_date?></span>
 								<?php
 								$ask_sig = "SELECT upload_signature from users where nick = :uploader";
 								$upload_signature = fetchOne($ask_sig, [":uploader" => $uploader])->upload_signature;
 								?>
 							</div>
-							<div class="col-6 apb-1" style="margin-top: -16px;">				
+							<div class="col-12 col-sm-6 apb-1">
 								<pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$filename?>"><?=$orig?></a></pre>
 							</div>
 						</div>
 						<div class="row apb-1">
-							<div class="col-6">
+							<div class="col-12 col-sm-6">
 							</div>
-							<div class="col-6">
+							<div class="col-12 col-sm-6">
 								<span class="pink text-right"><?=$upload_signature?></span>
 							</div>
 						</div>
 						<div class="row apb-2">
-							<div class="col-6">
+							<div class="col-12 col-sm-6">
 							</div>
-							<div class="col-6">
+							<div class="col-12 col-sm-6">
 								<span class="green text-right">[ aSCIIaRENa ] [ FREE LEECH ] [ aSCIIaRENa ]</span>
 							</div>
 						</div>
@@ -317,7 +317,7 @@ switch ($sort_by) {
 					}
 				}
 			}
-		}				
+		}
 		?>
 		<div class="row apl-1 apt-1">
 			<div class="col-12">
