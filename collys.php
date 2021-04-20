@@ -31,7 +31,7 @@ switch ($sort_by) {
 }
 ?>
 <div class="modal-body row m-0 p-0">
-	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
+	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2">
 		<div class="row apl-1 apb-1">
 			<div class="col-12 d-flex justify-content-between">
 				<?php
@@ -45,17 +45,26 @@ switch ($sort_by) {
 					echo $pagination[ "pager" ];
 				}
 				?>
-				<div class="btn-group" role="group" aria-label="Button group with nested dropdown">
-					<div class="btn-group" role="group">
-						<button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">View Mode:</button>
-						<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-							<a class="dropdown-item" href="collys.php?sort_by=releasemonth&viewmode=Standard">Standard</a>
-							<a class="dropdown-item" href="collys.php?sort_by=releasemonth&viewmode=BBS">BBS</a>
+				<div class="row">
+					<div class="col-12">
+						<div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+							<div class="btn-group" role="group">
+								<button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">View Mode:</button>
+								<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+									<a class="dropdown-item" href="collys.php?sort_by=releasemonth&viewmode=Standard">Standard</a>
+									<a class="dropdown-item" href="collys.php?sort_by=releasemonth&viewmode=BBS">BBS</a>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-12">
 				<form action="?sort_by=<?=$sort_criteria?>&viewmode=<?=$viewmode?>" method="post">
-					<span style="margin-right: 16px;">Search: <input type="text" name="search" style="background-color: #555 !important;" value="<?=$searchquery?>"></span>
+					<span class="amr-1">Search: <input type="text" name="search" style="background-color: #555 !important;" value="<?=$searchquery?>"></span>
 				</form>
 			</div>
 		</div>
