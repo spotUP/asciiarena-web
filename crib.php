@@ -390,7 +390,7 @@ include "header.php";
 									<option class='white' value="#ffffff">White</option>
 								</select> -->
 								<select id="colorselector_1" name="set_def_bg_col">
-									<option selected="selected" value="<?=$def_fg_col?>" /><?=$fg_color_list["$def_fg_col"]?></option>
+									<option style="display: none;" id="selcol-1" selected="selected" value="<?=$def_bg_col?>" data-color="<?=$def_bg_col?>">Test</option>
 									<option value='#555555' data-color="#555555">Bright Black</option>
 									<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
 									<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
@@ -416,7 +416,7 @@ include "header.php";
 							</div>
 							<div class="col-3">	
 								<select id="colorselector_2" name="set_def_fg_col">
-									<option selected="selected" value="<?=$def_fg_col?>" /><?=$fg_color_list["$def_fg_col"]?></option>
+									<option id="selcol-2" selected="selected" value="<?=$def_fg_col?>" data-color="<?=$def_fg_col?>">Test</option>
 									<option value='#555555' data-color="#555555">Bright Black</option>
 									<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
 									<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
