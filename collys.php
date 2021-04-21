@@ -156,21 +156,21 @@ switch ($sort_by) {
 			} else {
 				?>
 				<div class="row apb-1">
-					<div class="col-4"><span class="white">NAME</span></div>
-					<div class="col-4"><span class="white">ARTiST</span></div>
-					<div class="col-4"><span class="white">CREW</span></div>
+					<div class="col-8 col-sm-4"><span class="white">NAME</span></div>
+					<div class="col-4 col-sm-4"><span class="white">ARTiST</span></div>
+					<div class="col-4 d-none d-sm-block"><span class="white">CREW</span></div>
 				</div>
 				<?php
 				foreach ($rows as $row) {
 					?>
 					<div class="row">
-						<div class="col-4 col-sm-4 text-truncate">
+						<div class="col-8 col-sm-4 text-truncate">
 							<a class="magenta" href="/release/<?=$row->filename?>"><?=$row->name?></a>
 						</div>
 						<div class="col-4 col-sm-4 green">
 							<span class="yellow"><?=combinize($row->artists, $row->artists, "/artist/", $row->artists)?></span>
 						</div>
-						<div class="col-4 col-sm-4 yellow text-truncate">
+						<div class="col-4 col-sm-4 yellow text-truncate d-none d-sm-block">
 							<span class="yellow"><?=combinize($row->crews, $row->crews, "/crew/", $row->crews)?></span>
 						</div>
 					</div>
@@ -182,10 +182,10 @@ switch ($sort_by) {
 			{
 				?>
 				<div class="row amb-1">
-					<div class="col-4 col-sm-4"><span class="white"><a class="white" href="collys.php?sort_by=name&viewmode=Standard">NAME</a></span></div>
+					<div class="col-8 col-sm-4"><span class="white"><a class="white" href="collys.php?sort_by=name&viewmode=Standard">NAME</a></span></div>
 					<div class="col-2 d-none d-sm-block"><span class="white"><a class="white" href="collys.php?sort_by=filename&viewmode=Standard">FiLENAME</a></span></div>
 					<div class="col-4 col-sm-2"><span class="white"><a class="white" href="collys.php?sort_by=nick&viewmode=Standard">ARTIST</a></span></div>
-					<div class="col-4 col-sm-2"><span class="white"><a class="white" href="collys.php?sort_by=crew&viewmode=Standard">CREW</a></span></div>
+					<div class="col-sm-2 d-none d-sm-block"><span class="white"><a class="white" href="collys.php?sort_by=crew&viewmode=Standard">CREW</a></span></div>
 					<div class="col-2 d-none d-sm-block"><span class="white"><a class="white" href="collys.php?sort_by=releasedate&viewmode=Standard">DATE</a></span></div>
 				</div>
 
@@ -222,7 +222,7 @@ switch ($sort_by) {
 							$day = "0$day";
 						}
 						?>
-						<div class="col-4 col-sm-4 text-truncate">
+						<div class="col-8 col-sm-4 text-truncate">
 							<a class="magenta" href="/release/<?=$row->filename?>"><?=$row->name?></a>
 						</div>
 						<div class="col-sm-2 d-none d-sm-block">
@@ -231,7 +231,7 @@ switch ($sort_by) {
 						<div class="col-4 col-sm-2 text-truncate">
 							<span class="yellow"><?=combinize($row->artists, $row->artist_ids, "/artist/", $row->artists)?></span>
 						</div>
-						<div class="col-4 col-sm-2 text-truncate">
+						<div class="col-4 col-sm-2 d-none d-sm-block text-truncate">
 							<span class="yellow"><?=combinize($row->crews, $row->crew_ids, "/crew/", $row->crews)?></span>
 						</div>
 						<div class="col-sm-2 d-none d-sm-block">
