@@ -166,7 +166,7 @@
 	}
   
 </script>
-<div class="tab-pane fade ap-1" id="colly">
+<div class="tab-pane fade show active ap-1" id="colly">
   <form id="del_colly_form" action="/admin_cmds.php?cmd=del_colly" method="post">
 		<input type="hidden" name="id" id="del_colly_id">
 	</form>

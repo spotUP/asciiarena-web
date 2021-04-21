@@ -676,13 +676,13 @@ include "header.php";
 								<a class="nav-link" data-toggle="tab" href="#edituser">User</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#sitelogo">Site Logo</a>
+								<a class="nav-link" data-toggle="tab" href="#sitelogo">Logo</a>
 							</li>
 							<li class="nav-item">
 								<a class="nav-link" data-toggle="tab" href="#bbs">BBS</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#broken">Broken Collys</a>
+								<a class="nav-link" data-toggle="tab" href="#broken">Broken</a>
 							</li>
 						</ul>
 						<div id="myTabContent" class="tab-content apt-1" style="background-color: #1a1a1a;">
