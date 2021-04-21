@@ -21,7 +21,7 @@
 			?>
 			<div class="row">
 				<div class="col-sm-7 cyan">
-					<a class="cyan" href="/release/<?=$row->filename?>"><?=fixOutputPost($row->comment)?></a>
+					<a class="cyan" style="white-space: pre-wrap;" href="/release/<?=$row->filename?>"><?=($row->comment)?></a>
 				</div>
 				<div class="col-6 col-sm-3 mb-4 mb-sm-0 text-truncate">
 					<a class="magenta text-truncate" href="/release/<?=$row->filename?>"><?=$row->filename?></a>
