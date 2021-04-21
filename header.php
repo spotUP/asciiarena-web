@@ -257,7 +257,7 @@ include "header_ascii.php";
 							<a class="dropdown-item ascii" href="/submit.php#ascii_mag">ASCII Mag<span style="font-size: 16px;"> </span></a>
 						</div>
 					</li>
-					<ul class="nav navbar-nav" style="position: absolute; right: 0px;">
+					<ul class="nav navbar-nav menu-right">
 						<?php
 						if(!is_logged_in()) 
 						{
