@@ -730,25 +730,21 @@ option {
 }
 
 a.nav-link{
-  padding-top: 0px !important;
   margin-top: 0px !important;
   color: #aaa !important;
 }
 
 a.nav-link:hover{
-  padding-top: 0px !important;
   margin-top: 0px !important;
   color: #aaa !important;
 }
 
 a.nav-link:active{
-  padding-top: 0px !important;
   margin-top: 0px !important;
   color: #aaa !important;
 }
 
 a.nav-link:focus{
-  padding-top: 0px !important;
   margin-top: 0px !important;
   color: #aaa !important;
 }
