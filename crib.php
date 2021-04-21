@@ -370,7 +370,7 @@ include "header.php";
 								Default Colly BG:
 							</div>
 							<div class="col-3">	
-								<select name="set_def_bg_col">
+<!--								<select name="set_def_bg_col">
 									<option selected="selected" value="<?=$def_bg_col?>" /><?=$bg_color_list["$def_bg_col"]?></option>
 									<option class='black' value="#000000">Black</option>
 									<option class='darkblue' value="#0000aa">Dark Blue</option>
@@ -388,6 +388,25 @@ include "header.php";
 									<option class='magenta' value="#ff55ff">Magenta</option>
 									<option class='yellow' value="#ffff55">Yellow</option>
 									<option class='white' value="#ffffff">White</option>
+								</select> -->
+								<select id="colorselector_1" name="set_def_bg_col">
+									<option selected="selected" value="<?=$def_fg_col?>" /><?=$fg_color_list["$def_fg_col"]?></option>
+									<option value='#555555' data-color="#555555">Bright Black</option>
+									<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
+									<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
+									<option value='#ff5555' data-color="#ff5555">Bright Red</option>
+									<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
+									<option value='#55ff55' data-color="#55ff55">Bright Green</option>
+									<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
+									<option value='#ffffff' data-color="#ffffff">White</option>
+									<option value='#000000' data-color="#000000">Black</option>
+									<option value='#0000aa' data-color="#0000aa">Blue</option>
+									<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
+									<option value='#aa0000' data-color="#aa0000">Red</option>
+									<option value='#aa5500' data-color="#aa5500">Yellow</option>
+									<option value='#00aa00' data-color="#00aa00">Green</option>
+									<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
+									<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
 								</select>
 							</div>
 						</div>
@@ -396,27 +415,51 @@ include "header.php";
 								Default Colly FG:
 							</div>
 							<div class="col-3">	
-								<select name="set_def_fg_col">
+								<select id="colorselector_2" name="set_def_fg_col">
 									<option selected="selected" value="<?=$def_fg_col?>" /><?=$fg_color_list["$def_fg_col"]?></option>
-									<option class='black' value="0,0,0">Black</option>
-									<option class='darkblue' value="0,0,170">Dark Blue</option>
-									<option class='darkgreen' value="0,170,0">Dark Green</option>
-									<option class='darkcyan' value="0,170,170">Dark Cyan</option>
-									<option class='darkred' value="170,0,0">Dark Red</option>
-									<option class='magenta' value="170,0,170">Magenta</option>
-									<option class='brown' value="170,85,0">Brown</option>
-									<option class='darkgrey' value="85,85,85">Dark Grey</option>
-									<option class='grey' value="170,170,170">Grey</option>
-									<option class='blue' value="85,85,255">Blue</option>
-									<option class='green' value="85,255,85">Green</option>
-									<option class='cyan' value="85,85,255">Cyan</option>
-									<option class='red' value="255,85,85">Red</option>
-									<option class='magenta' value="255,85,255">Magenta</option>
-									<option class='yellow' value="255,255,85">Yellow</option>
-									<option class='white' value="255,255,255">White</option>
+									<option value='#555555' data-color="#555555">Bright Black</option>
+									<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
+									<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
+									<option value='#ff5555' data-color="#ff5555">Bright Red</option>
+									<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
+									<option value='#55ff55' data-color="#55ff55">Bright Green</option>
+									<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
+									<option value='#ffffff' data-color="#ffffff">White</option>
+									<option value='#000000' data-color="#000000">Black</option>
+									<option value='#0000aa' data-color="#0000aa">Blue</option>
+									<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
+									<option value='#aa0000' data-color="#aa0000">Red</option>
+									<option value='#aa5500' data-color="#aa5500">Yellow</option>
+									<option value='#00aa00' data-color="#00aa00">Green</option>
+									<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
+									<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
 								</select>
 							</div>
 						</div>
+						<script>
+							$(function() {
+
+								window.prettyPrint && prettyPrint();
+
+								$('#colorselector_1').colorselector();
+								$('#colorselector_2').colorselector({
+									callback : function(value, color, title) {
+										$("#colorValue").val(value);
+										$("#colorColor").val(color);
+										$("#colorTitle").val(title);
+									}
+								});
+
+								$("#setColor").click(function(e) {
+									$("#colorselector_2").colorselector("setColor", "#008B8B");
+								})
+
+								$("#setValue").click(function(e) {
+									$("#colorselector_2").colorselector("setValue", 18);
+								})
+
+							});
+						</script>
 						<div class="row amb-1">
 							<div class="col-3">	
 								Default Colly Font:
