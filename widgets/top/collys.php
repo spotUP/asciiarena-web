@@ -10,8 +10,8 @@
 			$colly_rating = sprintf("%0.2f", $row->rating)
 			?>
 			<div class="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
-				<a class="magenta" href="/release/<?=$filename?>"><?=$filename?></a>
-				<?=$colly_rating?> PTS
+				<a class="magenta text-truncate" href="/release/<?=$filename?>"><?=$filename?></a>
+				<span class="text-truncate"><?=$colly_rating?> PTS</span>
 			</div>
 			<?php
 		}

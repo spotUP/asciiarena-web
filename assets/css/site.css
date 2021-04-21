@@ -635,6 +635,10 @@ option {
   text-shadow: 1px 1px 10px rgba(0, 187, 187, 0.40) !important;
 }
 
+a.cyan:hover{
+  color: white !important;
+}
+
 .red
 {   
   color: #aa0000 !important;

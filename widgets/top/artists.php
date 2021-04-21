@@ -10,8 +10,8 @@
 			$artist_rating = sprintf("%0.2f", $row->rating);
 			?>
 			<div class="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
-				<a class="green" href="/artist/<?=urlsafe($artist)?>"><?=$row->nick?></a>
-				<?=$artist_rating?> PTS
+				<a class="green text-truncate" href="/artist/<?=urlsafe($artist)?>"><?=$row->nick?></a>
+				<span class="text-truncate"><?=$artist_rating?> PTS</span>
 			</div>
 			<?php
 		}

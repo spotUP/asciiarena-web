@@ -12,8 +12,8 @@
 			$views = $row->view_counter;
 			?>
 			<div class="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
-				<a class="magenta" href="/release/<?=$filename?>"><?=$filename?></a>
-				<?=$views?>
+				<a class="magenta text-truncate" href="/release/<?=$filename?>"><?=$filename?></a>
+				<span class="text-truncate"><?=$views?></span>
 			</div>
 			<?php
 		}
