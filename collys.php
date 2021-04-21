@@ -164,8 +164,8 @@ switch ($sort_by) {
 				foreach ($rows as $row) {
 					?>
 					<div class="row">
-						<div class="col-4 text-truncate">
-							<a href="/release/<?=$row->filename?>"><?=$row->name?></a>
+						<div class="col-4 col-sm-4 text-truncate">
+							<a class="magenta" href="/release/<?=$row->filename?>"><?=$row->name?></a>
 						</div>
 						<div class="col-lg-4 green">
 							<span class="yellow"><?=combinize($row->artists, $row->artists, "/artist/", $row->artists)?></span>
