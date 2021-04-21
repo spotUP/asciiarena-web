@@ -771,16 +771,8 @@ a:hover{
   /*  margin-left: 8px; */
 }
 
-a:hover::before{
+a.arena:hover::before{
   content: ">";
-}
-
-a.ascii:hover{
-  content: initial !important;
-}
-
-a.ascii:hover::before{
-  content: initial !important;
 }
 
 a.grey
@@ -1675,7 +1667,7 @@ a.disabled{
   .nav-link .dropdown-toggle:hover{
   }
   .nav-link .dropdown-toggle:focus{
-      color: white !important;
+    color: white !important;
   }
   .nav-link .dropdown-toggle:focus-within{
     color: green;
