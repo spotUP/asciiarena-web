@@ -3,7 +3,7 @@
   padding: 0px;
   min-width: 128px;
   max-width: 128px;
-  background-color: #1a1a1a;
+  background-color: black;
   margin-top: 3px;
   margin-left: 0px;
   border: none;
@@ -49,3 +49,7 @@
   border-radius: 0;
   margin-top: -4px;
 }
+.dropdown.dropdown-colorselector > ul > li:nth-child(1){
+  display: none !important;
+}
+

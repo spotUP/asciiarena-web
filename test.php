@@ -7,7 +7,6 @@ include "header.php";
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
 		<?php //phpinfo()?>
 		<select id="colorselector_1" name="set_def_bg_col">
-			<option selected="selected" value="<?=$def_fg_col?>" /><?=$fg_color_list["$def_fg_col"]?></option>
 			<option value='#555555' data-color="#555555">Bright Black</option>
 			<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
 			<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
