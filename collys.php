@@ -67,7 +67,7 @@ switch ($sort_by) {
 		<div class="row">
 			<div class="col-12 apb-1 block d-sm-none">
 				<form action="?sort_by=<?=$sort_criteria?>&viewmode=<?=$viewmode?>" method="post">
-					<span class="amr-1 ">Search: <input type="text" name="search" style="background-color: #555 !important;" value="<?=$searchquery?>"></span>
+					<span class="amr-1">Search: <input type="text" name="search" value="<?=$searchquery?>"></span>
 				</form>
 			</div>
 		</div>

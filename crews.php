@@ -2,6 +2,7 @@
 require_once "session.php";
 $h1 = "CREWS";
 require_once "header.php";
+$searchquery = $_POST[ 'search' ] ?? "";
 
 ?>
 <div class="modal-body row m-0 p-0">
@@ -31,9 +32,18 @@ require_once "header.php";
 					echo $pagination[ "pager" ];
 				}
 				?>
-				<form action="?sort_by=<?=$sort_by?>" method="post">
-					<label>Search for: <input type="text" name="search"></label>
-				</form>
+				<div class="col-6 d-none d-sm-block">
+					<form action="?sort_by=<?=$sort_by?>" method="post">
+							<span class="amr-1 ">Search: <input type="text" name="search" value="<?=$searchquery?>"></span>
+					</form>
+				</div>
+				<div class="row">
+					<div class="col-12 block d-sm-none">
+						<form action="?sort_by=<?=$sort_by?>" method="post">
+							<span class="amr-1 ">Search: <input type="text" name="search" value="<?=$searchquery?>"></span>
+						</form>
+					</div>
+				</div>
 			</div>
 		</div>
 		<?php
@@ -61,18 +71,18 @@ require_once "header.php";
 		<?php
 		if (!isset($_POST[ 'search' ])) {
 			$q = "SELECT crews.*, 
-				  (SELECT COUNT(colly_id) FROM collys_crews WHERE crew_id = crews.id) AS releases, 
-				   (SELECT COUNT(nick) FROM member_of WHERE crew = crews.name) AS members 
-				   FROM crews ORDER BY {$sort_by} {$sort_order} {$pagination["limit"]}";
+			(SELECT COUNT(colly_id) FROM collys_crews WHERE crew_id = crews.id) AS releases, 
+			(SELECT COUNT(nick) FROM member_of WHERE crew = crews.name) AS members 
+			FROM crews ORDER BY {$sort_by} {$sort_order} {$pagination["limit"]}";
 			$p = [];
 		} else {
 			$searchquery = $_POST[ 'search' ];
 			$q = "SELECT crews.*, 
-				(SELECT COUNT(colly_id) FROM collys_crews WHERE crew_id = crews.id) AS releases, 
-				(SELECT COUNT(nick) FROM member_of WHERE crew = crews.name) AS members 
-				FROM crews 
-				WHERE MATCH(crews.name, crews.acronym) AGAINST (:searchquery IN BOOLEAN MODE)
-				ORDER BY {$sort_by} {$sort_order} {$pagination["limit"]}";
+			(SELECT COUNT(colly_id) FROM collys_crews WHERE crew_id = crews.id) AS releases, 
+			(SELECT COUNT(nick) FROM member_of WHERE crew = crews.name) AS members 
+			FROM crews 
+			WHERE MATCH(crews.name, crews.acronym) AGAINST (:searchquery IN BOOLEAN MODE)
+			ORDER BY {$sort_by} {$sort_order} {$pagination["limit"]}";
 			$p = [":searchquery" => $searchquery];
 		}
 		$crews = [];
