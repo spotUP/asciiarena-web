@@ -1,4 +1,4 @@
-<div class="tab-pane fade active" id="colly">
+<div class="tab-pane fade show active" id="colly">
 	<form enctype="multipart/form-data" action="submit.php" method="post">
 		<input type="hidden" name="max_file_size" value="10240000">
 		<div class="container-fluid bg-secondary ap-1">
