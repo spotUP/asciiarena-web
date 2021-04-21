@@ -39,10 +39,10 @@ include "header.php";
 								<a class="nav-link" data-toggle="tab" href="#bbs">BBS</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#app">APP</a>
+								<a class="nav-link" data-toggle="tab" href="#app">App</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#ascii_mag">MAG</a>
+								<a class="nav-link" data-toggle="tab" href="#ascii_mag">Mag</a>
 							</li>
 						</ul>
 					</div>
