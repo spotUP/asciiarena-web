@@ -12,8 +12,8 @@
 
 			?>
 			<div class="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
-				<a href="/crew/<?=urlsafe($crew)?>/"><?=$row->name?></a>
-				<?=$crew_ratings?> PTS
+				<a class="text-truncate" href="/crew/<?=urlsafe($crew)?>/"><?=$row->name?></a>
+				<span class="text-truncate"><?=$crew_ratings?> PTS</span>
 			</div>
 			<?php
 		}
