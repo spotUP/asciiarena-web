@@ -1667,19 +1667,14 @@ a.disabled{
   .nav-link {
     color: black;
   }
-  .nav-link:hover {
-    color: white;
-    background: black;
-  }
+  
   .nav-link .dropdown-toggle{
     color: black;
   }
   .nav-link .dropdown-toggle:hover{
-    color: white;
-    background: black;
   }
   .nav-link .dropdown-toggle:focus{
-    color: black;
+      color: white !important;
   }
   .nav-link .dropdown-toggle:focus-within{
     color: green;
@@ -1899,5 +1894,8 @@ form{
   .menu-right{
     position: absolute; 
     right: 0px;
+  }
+  a.nav-link:hover {
+    color: white !important;
   }
 }
