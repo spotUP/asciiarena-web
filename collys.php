@@ -124,7 +124,7 @@ switch ($sort_by) {
 					$orig = utf8_encode($orig);
 					{
 						?>
-						<div class="row">
+						<div class="row apt-1">
 							<div class="col-6">
 								<a href=""><span class="cyan" style="margin-right: 8px;"><?=$filename?></span></a> <span class="green" style="margin-right: 16px;">PF--</span> <span class="yellow" style="margin-right: 8px;"><?=$row->filesize?></span> <span class="yellow"><?=$upload_date?></span>
 								<?php
@@ -132,7 +132,7 @@ switch ($sort_by) {
 								$upload_signature = fetchOne($ask_sig, [":uploader" => $uploader])->upload_signature;
 								?>
 							</div>
-							<div class="col-6 apb-1" style="margin-top: -16px;">				
+							<div class="col-6 apb-1">				
 								<pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$filename?>"><?=$orig?></a></pre>
 							</div>
 						</div>
