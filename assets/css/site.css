@@ -1636,7 +1636,7 @@ a.disabled{
 .navbar-nav {
   background: none;
 }
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 959px) {
   .show{
     border: 0;
   }
@@ -1686,6 +1686,11 @@ a.disabled{
   }
   .dropdown-divider {
     display: none;
+  }
+  .navbar-expand-lg .navbar-nav .nav-link {
+    padding-right: 0px;
+    padding-left: 8px;
+    color: black !important;
   }
 }
 
@@ -1890,7 +1895,7 @@ form{
   display: initial !important;
 }
 
-@media only screen and (min-width:769px){
+@media only screen and (min-width:959px){
   .menu-right{
     position: absolute; 
     right: 0px;
