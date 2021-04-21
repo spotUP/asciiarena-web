@@ -213,8 +213,8 @@ include "header_ascii.php";
 		<div class="container-fluid m-md-0 p-md-0">
 			<a href="/" style="color: #fff" class="navbar-brand ascii">aSCIIaRENA</a>
 			<a class="navbar-toggler ascii" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">mENU</a>
-			<div class="collapse navbar-collapse" id="navbarResponsive">
-				<ul class="navbar-nav w-100">
+			<div class="collapse navbar-collapse justify-content-center" id="navbarResponsive">
+				<ul class="navbar-nav">
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle ascii apr-1" data-toggle="dropdown" href="/collys.php?sort_by=releasedate" id="themes">COLLYS<span class="caret" style="padding-right: 8px;"></span></a>
 						<div class="dropdown-menu ascii" aria-labelledby="themes">
@@ -257,9 +257,7 @@ include "header_ascii.php";
 							<a class="dropdown-item ascii" href="/submit.php#ascii_mag">ASCII Mag<span style="font-size: 16px;"> </span></a>
 						</div>
 					</li>
-
-
-					<ul class="nav navbar-nav ml-sm-auto">
+					<ul class="nav navbar-nav" style="position: absolute; right: 0px;">
 						<?php
 						if(!is_logged_in()) 
 						{
@@ -304,7 +302,15 @@ include "header_ascii.php";
 							?>
 						</ul>
 					</div>
+
 				</div>
+
+
+
+
+
+
+
 			</div>
 
 
