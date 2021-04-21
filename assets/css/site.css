@@ -1631,6 +1631,7 @@ a.disabled{
 }
 .navbar-nav {
   background: none;
+  margin-left: -112px;
 }
 @media only screen and (max-width: 959px) {
   .show{
