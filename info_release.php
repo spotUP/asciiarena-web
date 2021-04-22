@@ -450,6 +450,7 @@ require_once "header.php"; ?>
                                                                 $('#colorselector_1').colorselector({
                                                                         callback : function(value, color, title) {
 										$("#colly").css('background-color', color);
+										$("#colly-div").css('background-color', color);
 									}
                                                                 });
                                                                 $('#colorselector_2').colorselector({
@@ -514,7 +515,7 @@ require_once "header.php"; ?>
 			if ($type == "ASCII") 
 			{
 				?>
-				<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;"><pre id="colly" style="font-family: <?=$font;?>; color: <?=$fgcolor?>; white-space: pre;"><?php
+				<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;" id="colly-div"><pre id="colly" style="font-family: <?=$font;?>; color: <?=$fgcolor?>; white-space: pre;"><?php
 				if (file_exists(__DIR__ . "/collections/{$dirname}/{$filename}")) 
 				{
 					$content = file_get_contents(__DIR__ . "/collections/{$dirname}/{$filename}");
