@@ -119,8 +119,6 @@
         showAlert("Author Added!", "#colly");   
       }
     }
-    $("#colly_artist_add_fetch_id").val('0');
-    showAlert("Author Added!", "#colly");   
   }
  
  function deleteCollyCrew(id) {
