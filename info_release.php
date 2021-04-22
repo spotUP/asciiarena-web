@@ -383,43 +383,85 @@ require_once "header.php"; ?>
 					<?php
 				}
 
-				$font = fetchOne("SELECT def_font FROM users WHERE nick = :nick", [":nick" => $nick]);
-				if (($font) && ($font->def_font)) 
-				{
-					$font = $font->def_font;
-				} 
-				else if (isset($_POST['font'])) 
-				{
-					$font = $_POST['font'];
-				} 
-				else
-				{
-					$font = "mOsOul";
-				}
-
-				$fgcolor = (isset($_POST[ 'foreground_color'])) ? $_POST[ 'foreground_color'] : '';
-
-				$def_color = fetchOne("SELECT def_bg_col FROM users WHERE nick = :nick", [":nick" => $nick]);
-				if (($def_color) && ($def_color->def_bg_col)) 
-				{
-					$bgcolor = $def_color->def_bg_col;
-				}
-				else if (isset($_POST['background_color'])) 
-				{
-					$bgcolor = $_POST['background_color'];
-				}
-				else
-				{
-					$bgcolor = "#000000";
-				}
+				$row = fetchOne("SELECT def_font,def_fg_col,def_bg_col FROM users WHERE nick = :nick", [":nick" => $nick]);
+				$font = (strlen($row->font) > 1) ? $row->font : 'mOsOul';
+				$fgcolor = (strlen($row->def_fg_col) > 1) ? $row->def_fg_col : '#ffffff';
+				$bgcolor = (strlen($row->def_bg_col) > 1) ? $row->def_bg_col : '#000000';
 
 				if ($type != "ANSI") 
 				{
 					if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) 
 					{
 						?>
+                                                <div class="row apb-0">
+                                                        <div class="col-3">
+                                                                Colly BG:
+                                                        </div>
+                                                        <div class="col-3">
+                                                                <select id="colorselector_1" name="set_def_bg_col">
+                                                                        <option style="display: none;" id="selcol-1" selected="selected" value="<?=$bgcolor?>" data-color="<?=$bgcolor?>"></option>
+                                                                        <option value='#555555' data-color="#555555">Bright Black</option>
+                                                                        <option value='#5555ff' data-color="#5555ff">Bright Blue</option>
+                                                                        <option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
+                                                                        <option value='#ff5555' data-color="#ff5555">Bright Red</option>
+                                                                        <option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
+                                                                        <option value='#55ff55' data-color="#55ff55">Bright Green</option>
+                                                                        <option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
+                                                                        <option value='#ffffff' data-color="#ffffff">White</option>
+                                                                        <option value='#000000' data-color="#000000">Black</option>
+                                                                        <option value='#0000aa' data-color="#0000aa">Blue</option>
+                                                                        <option value='#aa00aa' data-color="#aa00aa">Magenta</option>
+                                                                        <option value='#aa0000' data-color="#aa0000">Red</option>
+                                                                        <option value='#aa5500' data-color="#aa5500">Yellow</option>
+                                                                        <option value='#00aa00' data-color="#00aa00">Green</option>
+                                                                        <option value='#00aaaa' data-color="#00aaaa">Cyan</option>
+                                                                        <option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
+                                                                </select>
+                                                        </div>
+                                                </div>
+                                                <div class="row amb-1">
+                                                        <div class="col-3">
+                                                                Colly FG:
+                                                        </div>
+                                                        <div class="col-3">
+                                                                <select id="colorselector_2" name="set_def_fg_col">
+                                                                        <option id="selcol-2" selected="selected" value="<?=$fgcolor?>" data-color="<?=$fgcolor?>"></option>
+                                                                        <option value='#555555' data-color="#555555">Bright Black</option>
+                                                                        <option value='#5555ff' data-color="#5555ff">Bright Blue</option>
+                                                                        <option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
+                                                                        <option value='#ff5555' data-color="#ff5555">Bright Red</option>
+                                                                        <option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
+                                                                        <option value='#55ff55' data-color="#55ff55">Bright Green</option>
+                                                                        <option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
+                                                                        <option value='#ffffff' data-color="#ffffff">White</option>
+                                                                        <option value='#000000' data-color="#000000">Black</option>
+                                                                        <option value='#0000aa' data-color="#0000aa">Blue</option>
+                                                                        <option value='#aa00aa' data-color="#aa00aa">Magenta</option>
+                                                                        <option value='#aa0000' data-color="#aa0000">Red</option>
+                                                                        <option value='#aa5500' data-color="#aa5500">Yellow</option>
+                                                                        <option value='#00aa00' data-color="#00aa00">Green</option>
+                                                                        <option value='#00aaaa' data-color="#00aaaa">Cyan</option>
+                                                                        <option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
+                                                                </select>
+                                                        </div>
+                                                </div>
+                                                <script>
+                                                        $(function() {
+                                                                $('#colorselector_1').colorselector({
+                                                                        callback : function(value, color, title) {
+										$("#colly").css('background-color', color);
+									}
+                                                                });
+                                                                $('#colorselector_2').colorselector({
+                                                                        callback : function(value, color, title) {
+										$("#colly").css('color', color);
+                                                                        }
+                                                                });
+
+                                                        });
+                                                </script>
 						<div class="apb-0">
-							<select name="font">
+							<select name="font" id="colly-font">
 								<option class="dropdown-item" value="MicroKnight"<?php if ($font == 'MicroKnight') echo ' selected'; ?>>MicroKnight</option>
 								<option class="dropdown-item" value="MicroKnightPlus"<?php if ($font == 'MicroKnightPlus') echo ' selected'; ?>>MicroKnight+</option>
 								<option class="dropdown-item" value="mOsOul"<?php if ($font == 'mOsOul') echo ' selected'; ?>>mOsOul</option>
@@ -429,45 +471,13 @@ require_once "header.php"; ?>
 								<option value="Topaz_a1200"<?php if ($font == 'Topaz_a1200') echo ' selected'; ?>>A1200 Topaz</option>
 								<option value="TopazPlus_a1200"<?php if ($font == 'TopazPlus_a1200') echo ' selected'; ?>>A1200 Topaz+</option>
 							</select>
-							<select name="background_color">
-								<option value=""<?php if ($bgcolor == '') echo ' selected'; ?>>BG Color</option>
-								<option value="Black"<?php if ($bgcolor == 'Black') echo ' selected'; ?>>Black</option>
-								<option value="DarkBlue"<?php if ($bgcolor == 'DarkBlue') echo ' selected'; ?>>Dark Blue</option>
-								<option value="DarkGreen"<?php if ($bgcolor == 'DarkGreen') echo ' selected'; ?>>Dark Green</option>
-								<option value="DarkCyan"<?php if ($bgcolor == 'DarkCyan') echo ' selected'; ?>>Dark Cyan</option>
-								<option value="DarkRed"<?php if ($bgcolor == 'DarkRed') echo ' selected'; ?>>Dark Red</option>
-								<option value="Magenta"<?php if ($bgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
-								<option value="Brown"<?php if ($bgcolor == 'Brown') echo ' selected'; ?>>Brown</option>
-								<option value="DarkGrey"<?php if ($bgcolor == 'DarkGrey') echo ' selected'; ?>>Dark Grey</option>
-								<option value="Grey"<?php if ($bgcolor == 'Grey') echo ' selected'; ?>>Grey</option>
-								<option value="Blue"<?php if ($bgcolor == 'Blue') echo ' selected'; ?>>Blue</option>
-								<option value="Green"<?php if ($bgcolor == 'Green') echo ' selected'; ?>>Green</option>
-								<option value="Cyan"<?php if ($bgcolor == 'Cyan') echo ' selected'; ?>>Cyan</option>
-								<option value="Red"<?php if ($bgcolor == 'Red') echo ' selected'; ?>>Red</option>
-								<option value="Magenta"<?php if ($bgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
-								<option value="Yellow"<?php if ($bgcolor == 'Yellow') echo ' selected'; ?>>Yellow</option>
-								<option value="White"<?php if ($bgcolor == 'White') echo ' selected'; ?>>White</option>
-							</select>
-							<select name="foreground_color">
-								<option value=""<?php if ($fgcolor == '') echo ' selected'; ?>>FG Color</option>
-								<option value="Black"<?php if ($fgcolor == 'Black') echo ' selected'; ?>>Black</option>
-								<option value="DarkBlue"<?php if ($fgcolor == 'DarkBlue') echo ' selected'; ?>>Dark Blue</option>
-								<option value="DarkGreen"<?php if ($fgcolor == 'DarkGreen') echo ' selected'; ?>>Dark Green</option>
-								<option value="DarkCyan"<?php if ($fgcolor == 'DarkCyan') echo ' selected'; ?>>Dark Cyan</option>
-								<option value="DarkRed"<?php if ($fgcolor == 'DarkRed') echo ' selected'; ?>>Dark Red</option>
-								<option value="Magenta"<?php if ($fgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
-								<option value="Brown"<?php if ($fgcolor == 'Brown') echo ' selected'; ?>>Brown</option>
-								<option value="DarkGrey"<?php if ($fgcolor == 'DarkGrey') echo ' selected'; ?>>Dark Grey</option>
-								<option value="Grey"<?php if ($fgcolor == 'Grey') echo ' selected'; ?>>Grey</option>
-								<option value="Blue"<?php if ($fgcolor == 'Blue') echo ' selected'; ?>>Blue</option>
-								<option value="Green"<?php if ($fgcolor == 'Green') echo ' selected'; ?>>Green</option>
-								<option value="Cyan"<?php if ($fgcolor == 'Cyan') echo ' selected'; ?>>Cyan</option>
-								<option value="Red"<?php if ($fgcolor == 'Red') echo ' selected'; ?>>Red</option>
-								<option value="Magenta"<?php if ($fgcolor == 'Magenta') echo ' selected'; ?>>Magenta</option>
-								<option value="Yellow"<?php if ($fgcolor == 'Yellow') echo ' selected'; ?>>Yellow</option>
-								<option value="White"<?php if ($fgcolor == 'White') echo ' selected'; ?>>White</option>
-							</select>
 						</div>
+                                                <script>
+							$("#colly-font").change(function() {
+								font = $(this).val();
+								$("#colly").css('font-family', font);
+							});
+						</script>
 						<?php
 					}
 					?>
