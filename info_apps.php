@@ -36,6 +36,10 @@ require_once "header.php"; ?>
 						$file_id = preg_replace('/\\.[^.\\s]{3,4}$/', '', $filename).'.diz';
 						if (file_exists('apps/'.$file_id)) {
 							echo file_get_contents('apps/'.$file_id);
+						} elseif (file_exists('apps/'.$filename.'.diz.png')) {
+							?>
+							<img src="/apps/<?=$filename?>.diz.png" class="app-diz">
+							<?php
 						}
 						echo '</pre>';
 						?>
