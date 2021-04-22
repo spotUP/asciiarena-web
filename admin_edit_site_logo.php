@@ -97,7 +97,7 @@
 
 		<div class="row apb-1 apt-1">
 			<div class="col-12">
-				<textarea id="logo_ascii" wrap="physical" cols="80" name="ascii" rows="8"/></textarea>
+				<textarea id="logo_ascii" class="w-100" wrap="physical" name="ascii" rows="8"/></textarea>
 			</div>
 		</div>
 		<div class="row">
