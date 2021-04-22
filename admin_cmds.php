@@ -18,14 +18,37 @@
 					$collys = fetchAll("SELECT * FROM collys ORDER BY name");
 				}
 				foreach($collys as $colly) {
+          $crewdata = [];
+          $artistdata = [];
+					if($id) {
+						$crews = fetchAll("SELECT collys_crews.id,crews.name FROM collys_crews, crews where crews.id = collys_crews.crew_id and collys_crews.colly_id=:id",[":id" => $colly->id]);
+						foreach($crews as $crew) {
+							$crewdata[] = [
+								"id" => (int)$crew->id,
+								"name" => $crew->name,
+							];
+						}
+            
+            $artists = fetchAll("SELECT artists_collys.id,artists.nick FROM artists_collys, artists where artists.id = artists_collys.artist_id and artists_collys.colly_id=:id",[":id" => $colly->id]);
+						foreach($artists as $artist) {
+							$artistdata[] = [
+								"id" => (int)$artist->id,
+								"nick" => $artist->nick,
+							];
+						}
+					}
+          
 					$data[] = [
 						"id" => (int)$colly->id,
 						"name" => $colly->name,
+            "filename" => $colly->filename,
 						"year" => $colly->year,
 						"month" => $colly->month,
 						"day" => $colly->day,
 						"type" => $colly->type,
 						"diz" => $colly->file_id,
+            "crews" => $crewdata,
+            "artists" => $artistdata,
 					];
 				}
 				if(!empty($data)) {
@@ -35,7 +58,8 @@
 			case "save_colly":
 				$response = 200;
 				$data = [
-					":name" => $_POST[ "name" ] ?? "",
+          ":name" => $_POST[ "name" ] ?? "",
+					":filename" => $_POST[ "filename" ] ?? "",
 					":year" => $_POST[ "year" ] ?? "",
 					":month" => $_POST[ "month" ] ?? "",
 					":day" => $_POST[ "day" ] ?? "",
@@ -43,93 +67,113 @@
 					":file_id" => $_POST[ "diz" ] ?? "",
 				];
 				if(!empty($_POST[ "id" ])) {
-					$q = "UPDATE collys SET name = :name, year = :year, month = :month, day = :day, type = :type, file_id = :file_id WHERE id = :id";
+					$q = "UPDATE collys SET name = :name, filename = :filename, year = :year, month = :month, day = :day, type = :type, file_id = :file_id WHERE id = :id";
 					$data[ ":id" ] = $_POST[ "id" ];
+          $id = $_POST[ "id" ];
+          $collyid = $id;
 				} else {
-					$q = "INSERT INTO collys (name, year, month, day, type, file_id) VALUES (:name, :year, :month, :day, :type, :file_id)";
+					$q = "INSERT INTO collys (name, filename, year, month, day, type, file_id) VALUES (:name, :filename, :year, :month, :day, :type, :file_id)";
+          $id = "";
 					$response = 201;
 				}
-				if(doQuery($q, $data)) {
-					exit(json_out(["status" => true], $response));
+        
+        if(!doQuery($q, $data)) {
+					exit(json_out(["status" => true], 400));     
 				}
-				exit(json_out(["status" => true], 400));          
-			case "del_colly":
-				if(!empty($_POST[ 'id' ])) {
-					$id = (int)$_POST[ 'id' ];
-					if($id && doQuery("DELETE FROM collys WHERE id = :id", [":id" => $id])) {
-						exit(json_out(["status" => true]));
-					}
-				}
-				exit(json_out(["status" => false], 404)); 
-			case "get_colly_artist":
-				$id = $_GET[ "id" ] ?? 0;
-				$data = [];
-				$artists = fetchAll("SELECT artists_collys.id,artists.nick FROM artists_collys, artists where artists_collys.artist_id=artists.id and artists_collys.colly_id=:id",[":id" => $id]);
-				foreach($artists as $artist) {
-					$data[] = [
-						"id" => (int)$artist->id,
-						"nick" => $artist->nick,
-					];
-				}
-				if(!empty($data)) {
-					exit(json_out($data));
-				}
-				exit(json_out(["status" => false], 404));
-			case "del_colly_artist":
-				if(!empty($_POST[ 'id' ])) {
-					$id = (int)$_POST[ 'id' ];
-					if($id && doQuery("DELETE FROM artists_collys WHERE id = :id", [":id" => $id])) {
-						exit(json_out(["status" => true]));
-					}
-				}
-				exit(json_out(["status" => false], 404));  
-			case "add_colly_artist":        
-				$response = 200;
-				$data = [
-					":artist_id" => $_POST[ "artist_id" ] ?? "",
-					":colly_id" => $_POST[ "colly_id" ] ?? "",
-				];
-				$q = "INSERT INTO artists_collys (artist_id, colly_id) VALUES (:artist_id, :colly_id)";
-				$response = 201;
-				if(doQuery($q, $data)) {
-					exit(json_out(["status" => true], $response));
-				}
-				exit(json_out(["status" => true], 400));                    
-			case "get_colly_crew":
-				$id = $_GET[ "id" ] ?? 0;
-				$data = [];
-				$crews = fetchAll("SELECT collys_crews.id,crews.name FROM collys_crews, crews where collys_crews.crew_id=crews.id and collys_crews.colly_id=:id",[":id" => $id]);
-				foreach($crews as $crew) {
-					$data[] = [
-						"id" => (int)$crew->id,
-						"name" => $crew->name,
-					];
-				}
-				if(!empty($data)) {
-					exit(json_out($data));
-				}
-				exit(json_out(["status" => false], 404));
-			case "del_colly_crew":
-				if(!empty($_POST[ 'id' ])) {
-					$id = (int)$_POST[ 'id' ];
-					if($id && doQuery("DELETE FROM collys_crews WHERE id = :id", [":id" => $id])) {
-						exit(json_out(["status" => true]));
-					}
-				}
-				exit(json_out(["status" => false], 404));  
-			case "add_colly_crew":        
-				$response = 200;
-				$data = [
-					":crew_id" => $_POST[ "crew_id" ] ?? "",
-					":colly_id" => $_POST[ "colly_id" ] ?? "",
-				];
 
-				$q = "INSERT INTO collys_crews (crew_id, colly_id) VALUES (:crew_id, :colly_id)";
-				$response = 201;
-				if(doQuery($q, $data)) {
-					exit(json_out(["status" => true], $response));
+        if (empty($id)) {
+          $rowInserted = fetchOne("SELECT LAST_INSERT_ID() rowid");
+          $collyid = $rowInserted->rowid;
+        }
+  
+        if (!empty($id)) {
+					if(!doQuery("UPDATE collys_crews SET updating='Y' WHERE colly_id = :id", [":id" => $id]))
+					{
+						exit(json_out(["status" => true], 400));     
+					}
+        }
+        
+				$crewnames = $_POST[ "crewname" ] ?? "";     
+				
+				if(!empty($crewnames)) {
+					foreach($crewnames as $crewname) {
+						$q = "INSERT INTO collys_crews (colly_id,crew_id) select :colly_id, id from crews where name = :name and (select count(*) from collys_crews where colly_id = :colly_id and crew_id = crews.id)=0";
+						$data = [
+							":colly_id" => $collyid,
+							":name" => $crewname
+							
+						];
+						if(!doQuery($q, $data)) {
+							exit(json_out(["status" => true], 400));     
+						}
+
+						$q = "UPDATE collys_crews SET updating = null where colly_id = :colly_id and crew_id = (select id from crews where name = :name)";
+						if(!doQuery($q, $data)) {
+							exit(json_out(["status" => true], 400));     
+						}
+					}
 				}
-				exit(json_out(["status" => true], 400));             
+				
+				if (!empty($id)) {
+					if(!doQuery("DELETE FROM collys_crews WHERE updating='Y' AND colly_id = :id", [":id" => $id])) {
+						exit(json_out(["status" => true], 400));     
+					}
+				}
+					
+        if (!empty($id)) {
+					if(!doQuery("UPDATE artists_collys SET updating='Y' WHERE colly_id = :id", [":id" => $id]))
+					{
+						exit(json_out(["status" => true], 400));     
+					}
+				}
+        
+				$artistnames = $_POST[ "artistname" ] ?? "";     
+				
+				if(!empty($artistnames)) {
+					foreach($artistnames as $artistname) {
+						$q = "INSERT INTO artists_collys (colly_id,artist_id) select :colly_id, id from artists where nick = :nick and (select count(*) from artists_collys where colly_id = :colly_id and artist_id = artists.id)=0";
+						$data = [
+							":colly_id" => $collyid,
+							":nick" => $artistname
+							
+						];
+						if(!doQuery($q, $data)) {
+							exit(json_out(["status" => true], 400));     
+						}
+
+						$q = "UPDATE artists_collys SET updating = null where colly_id = :colly_id and artist_id = (select id from artists where nick = :nick)";
+						if(!doQuery($q, $data)) {
+							exit(json_out(["status" => true], 400));     
+						}
+					}
+				}
+				
+				if (!empty($id)) {
+					if(!doQuery("DELETE FROM artists_collys WHERE updating='Y' AND colly_id = :id", [":id" => $id])) {
+						exit(json_out(["status" => true], 400));     
+					}
+				}
+					
+				exit(json_out(["status" => true], $response));
+        
+			case "del_colly":
+        if(!empty($_POST[ 'id' ])) {
+					$id = (int)$_POST[ 'id' ];
+					if($id) {
+						if (!doQuery("DELETE FROM artists_collys WHERE colly_id = :id", [":id" => $id])) {
+							exit(json_out(["status" => false], 400));
+						}
+							
+						if (!doQuery("DELETE FROM collys_crews WHERE colly_id = :id", [":id" => $id])) {
+							exit(json_out(["status" => false], 400));
+						}
+
+						if (!doQuery("DELETE FROM collys WHERE id = :id", [":id" => $id])) {
+							exit(json_out(["status" => false], 404));
+						}
+					}
+				}
+				exit(json_out(["status" => true]));  
 			case "get_logo":
 				$id = $_GET[ "id" ] ?? 0;
 				$data = [];
@@ -239,6 +283,16 @@
 					$artists = fetchAll("SELECT * FROM artists ORDER BY nick");
 				}
 				foreach($artists as $artist) {
+					$crewdata = [];
+					if($id) {
+						$crews = fetchAll("SELECT member_of.id,member_of.crew FROM member_of, artists where member_of.nick=artists.nick and artists.id=:id",[":id" => $artist->id]);
+						foreach($crews as $crew) {
+							$crewdata[] = [
+								"id" => (int)$crew->id,
+								"name" => $crew->crew,
+							];
+						}
+					}
 					$data[] = [
 						"id" => (int)$artist->id,
 						"nick" => $artist->nick,
@@ -246,6 +300,7 @@
 						"www" => $artist->www,
 						"country" => $artist->country,
 						"active" => $artist->active,
+						"crews" => $crewdata
 					];
 				}
 				if(!empty($data)) {
@@ -255,11 +310,17 @@
 			case "del_artist":
 				if(!empty($_POST[ 'id' ])) {
 					$id = (int)$_POST[ 'id' ];
-					if($id && doQuery("DELETE FROM artists WHERE id = :id", [":id" => $id])) {
-						exit(json_out(["status" => true]));
+					if($id) {
+						if (!doQuery("DELETE FROM member_of WHERE nick = (select nick from artists where id = :id)", [":id" => $id])) {
+							exit(json_out(["status" => false], 400));
+						}
+							
+						if (!doQuery("DELETE FROM artists WHERE id = :id", [":id" => $id])) {
+							exit(json_out(["status" => false], 404));
+						}
 					}
 				}
-				exit(json_out(["status" => false], 404));
+				exit(json_out(["status" => true]));      
 			case "save_artist":
 				$response = 200;
 				$data = [
@@ -272,48 +333,51 @@
 				if(!empty($_POST[ "id" ])) {
 					$q = "UPDATE artists SET nick = :nick, acronym = :acronym, www = :www, active = :active, country = :country WHERE id = :id";
 					$data[ ":id" ] = $_POST[ "id" ];
+					$id = $_POST[ "id" ];
 				} else {
 					$q = "INSERT INTO artists (nick, acronym, www, active, country) VALUES (:nick, :acronym, :www, :active, :country)";
 					$response = 201;
+					$id = "";
 				}
-				if(doQuery($q, $data)) {
-					exit(json_out(["status" => true], $response));
+				if(!doQuery($q, $data)) {
+					exit(json_out(["status" => true], 400));  
 				}
-				exit(json_out(["status" => true], 400));   
-			case "get_artist_crews":
-				$id = $_GET[ "id" ] ?? 0;
-				$data = [];
-				$crews = fetchAll("SELECT member_of.id,member_of.crew FROM member_of, artists where member_of.nick=artists.nick and artists.id=:id",[":id" => $id]);
-				foreach($crews as $crew) {
-					$data[] = [
-						"id" => (int)$crew->id,
-						"crew" => $crew->crew,
-					];
-				}
-				if(!empty($data)) {
-					exit(json_out($data));
-				}
-				exit(json_out(["status" => false], 404));
-			case "del_artist_crew":
-				if(!empty($_POST[ 'id' ])) {
-					$id = (int)$_POST[ 'id' ];
-					if($id && doQuery("DELETE FROM member_of WHERE id = :id", [":id" => $id])) {
-						exit(json_out(["status" => true]));
+				
+				if (!empty($id)) {
+					if(!doQuery("UPDATE member_of SET updating='Y' WHERE nick = (select nick from artists where id = :id)", [":id" => $id]))
+					{
+						exit(json_out(["status" => true], 400));     
 					}
 				}
-				exit(json_out(["status" => false], 404));  
-			case "add_artist_crew":        
-				$response = 200;
-				$data = [
-					":nick" => $_POST[ "nick" ] ?? "",
-					":crew" => $_POST[ "crew" ] ?? "",
-				];
-				$q = "INSERT INTO member_of (nick, crew) VALUES (:nick, :crew)";
-				$response = 201;
-				if(doQuery($q, $data)) {
-					exit(json_out(["status" => true], $response));
+				
+				$crewnames = $_POST[ "crewname" ] ?? "";     
+				
+				if(!empty($crewnames)) {
+					foreach($crewnames as $crewname) {
+						$q = "INSERT INTO member_of (crew,nick) select :crew, :nick where (select count(*) from member_of where crew = :crew and nick = :nick)=0";
+						$data = [
+							":crew" => $crewname ?? "",
+							":nick" => $_POST[ "nick" ] ?? ""
+							
+						];
+						if(!doQuery($q, $data)) {
+							exit(json_out(["status" => true], 400));     
+						}
+
+						$q = "UPDATE member_of SET updating = null where crew = :crew and nick = :nick";
+						if(!doQuery($q, $data)) {
+							exit(json_out(["status" => true], 400));     
+						}
+					}
 				}
-				exit(json_out(["status" => true], 400));                    
+				
+				if (!empty($id)) {
+					if(!doQuery("DELETE FROM member_of WHERE updating='Y' AND nick = (select nick from artists where id = :id)", [":id" => $id])) {
+						exit(json_out(["status" => true], 400));     
+					}
+				}
+					
+				exit(json_out(["status" => true], $response));
 			case "get_crew":
 				$id = $_GET[ "id" ] ?? 0;
 				$data = [];
@@ -355,8 +419,7 @@
 					if($id) {
 						if (!doQuery("DELETE FROM bbs_of WHERE crew = (select crew from crews where id = :id)", [":id" => $id])) {
 							exit(json_out(["status" => false], 400));
-            }
-							
+						}
 						if (!doQuery("DELETE FROM crews WHERE id = :id", [":id" => $id])) {
 							exit(json_out(["status" => false], 404));
 						}

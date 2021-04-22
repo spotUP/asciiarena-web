@@ -12,6 +12,7 @@
 		const id = $("#bbs_fetch_id").val();
 		if (id > 0) {
 			$.get(`/admin_cmds.php?cmd=get_bbs&id=${id}`, function (data) {
+        bbsclear();
 				$('#bbs_id').val(data[0].id);
 				$('#bbs_name').val(data[0].name);
 				$('#bbs_sysop').val(data[0].sysop);
@@ -34,6 +35,21 @@
 		});
 	}
 
+  function saveBBS() {
+    const form = $("#bbs_form");
+    const url = form.attr("action");
+    $.ajax({
+      "type": "POST",
+      "url": url,
+      "data": form.serialize(),
+      "success": () => {
+        showAlert("BBS Saved!", "#bbs");
+        bbsclear();
+        getBBSList();
+      }
+    });
+  }
+
 	function delBBS() {
 		const activeName = $("#bbs_name").val();
 		if (activeName !== "") {
@@ -46,7 +62,7 @@
 					"url": url,
 					"data": form.serialize(),
 					"success": () => {
-						showAlert("BBS deleted!", "#bbs");
+						showAlert("BBS Deleted!", "#bbs");
 						bbsclear();
 						getBBSList();
 					}
@@ -101,8 +117,8 @@
 		</div>
 		<div class="row apt-1">
 			<div class="col-12">
-				<input type="submit" name="do_edit_bbs" value="Save">
-				<input type="button" id="delete_bbs" name="delete_bbs" value="Delete" onclick="delBBS();">
+				<input type="button" value="Save" onclick="saveBBS()">
+				<input type="button" value="Delete" onclick="delBBS()">
 			</div>
 		</div>
 	</form>
@@ -110,20 +126,5 @@
 <script>
 	$(function () {
     getBBSList();
-		$("#bbs_form").submit(function (e) {
-			e.preventDefault();
-      const form = $(this);
-      const url = form.attr("action");
-      $.ajax({
-        "type": "POST",
-        "url": url,
-        "data": form.serialize(),
-        "success": () => {
-          showAlert("BBS saved!", "#bbs");
-          bbsclear();
-          getBBSList();
-        }
-      });
-		});
 	});
 </script>
