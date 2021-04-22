@@ -30,48 +30,48 @@
 
 <script type="text/javascript">
 	$(document).ready(function () {
-    $(document).keydown(function(e){
-       
-        if(e.keyCode == 27) {
-            if ($('#colly').hasClass('fullscreen')) 
-            {
-                $('#colly').removeClass('fullscreen');
-            } 
-            else 
-            {
-                $('#colly').addClass('fullscreen');
-            }
-            if ($('#blacker').hasClass('show')) 
-            {
-                $('#blacker').removeClass('show');
-            } 
-            else 
-            {
-                $('#blacker').addClass('show');
-            }
-            if ($('#spotclose').hasClass('show')) 
-            {
-                $('#spotclose').removeClass('show');
-            } 
-            else 
-            {
-                $('#spotclose').addClass('show');
-            }
-        }
-    });
-})
+		$(document).keydown(function(e){
+			
+			if(e.keyCode == 27) {
+				if ($('#colly').hasClass('fullscreen')) 
+				{
+					$('#colly').removeClass('fullscreen');
+				} 
+				else 
+				{
+					$('#colly').addClass('fullscreen');
+				}
+				if ($('#blacker').hasClass('show')) 
+				{
+					$('#blacker').removeClass('show');
+				} 
+				else 
+				{
+					$('#blacker').addClass('show');
+				}
+				if ($('#spotclose').hasClass('show')) 
+				{
+					$('#spotclose').removeClass('show');
+				} 
+				else 
+				{
+					$('#spotclose').addClass('show');
+				}
+			}
+		});
+	})
 </script>
 
 <?php
-	if (DEBUG) {
-		echo "<pre>";
-		print_r($_user);
-		$stats = fetchAll("SHOW profiles");
-		print_r($stats);
-		print_r($_queries);
-		print_r($_SERVER);
-		echo "</pre>";
-	}
+if (DEBUG) {
+	echo "<pre>";
+	print_r($_user);
+	$stats = fetchAll("SHOW profiles");
+	print_r($stats);
+	print_r($_queries);
+	print_r($_SERVER);
+	echo "</pre>";
+}
 ?>
 
 <!-- Modal -->
@@ -87,11 +87,11 @@
 			</div>
 			<div class="modal-body bg-primary">
 				<?php
-					if (!is_logged_in())
-					{
-				?>
-				<form action="/cmds.php?cmd=login" method="post">
-					<?php
+				if (!is_logged_in())
+				{
+					?>
+					<form action="/cmds.php?cmd=login" method="post">
+						<?php
 						if (isset($_GET[ 'inactive' ])) {
 							?>
 							yOUR aCCOUNT iS nOT aCTiVE!
@@ -120,49 +120,45 @@
 							?>
 							<div class="container-fluid">
 								<div class="row">
-
 									<div class="col-12 col-sm-6">
 										<div class="form-group">
 											<input type="text" class="form-control" name="nick" id="nick" autocomplete="username" placeholder="Enter your handle"
-											       aria-describedby="nickHelp">
+											aria-describedby="nickHelp">
 										</div>
-										<div class="form-group"><input type="password" name="password" class="form-control"
-										                               autocomplete="current-password"
-										                               placeholder="Proove it"></div>
+										<div class="form-group"><input type="password" name="password" class="form-control" autocomplete="current-password" placeholder="Proove it"></div>
 									</div>
-
 									<div class="col-12 col-sm-6">
 										<div class="form-group">
 											<div class="custom-control custom-switch">
 												<input type="checkbox" class="custom-control-input" id="customSwitch1" name="rememberme"
-												       value="1" checked>
+												value="1" checked>
 												<label class="custom-control-label" for="customSwitch1"><span style="margin-left: -8px !important;">Remember me<span></label>
+												</div>
 											</div>
+											<a href=register.php>Register</a> <span style="color: #999999;">new account!</span><br><br>
+											<a href="reminder.php">Help!</a> <span style="color: #999999;">I forgot my password!</span><br><br>
 										</div>
-										<a href=register.php>Register</a> <span style="color: #999999;">new account!</span><br><br>
-										<a href="reminder.php">Help!</a> <span style="color: #999999;">I forgot my password!</span><br><br>
 									</div>
 								</div>
-							</div>
+								<?php
+							}
+							?>
+							<script type="text/javascript">
+								$('#login').on('shown.bs.modal', function () {
+									$('#nick').focus();
+								})
+							</script>
 							<?php
 						}
-					?>
-					<script type="text/javascript">
-						$('#login').on('shown.bs.modal', function () {
-							$('#nick').focus();
-						})
-					</script>
-					<?php
-						}
-					?>
+						?>
+					</div>
+					<div class="modal-footer bg-primary">
+						<button type="button" class="btn-secondary bg-grey" data-dismiss="modal">CLOSE</button>
+						<button type="submit" class="btn-primary bg-lightgrey">LOG IN</button>
+					</div>
+				</form>
 			</div>
-			<div class="modal-footer bg-primary">
-				<button type="button" class="btn-secondary bg-grey" data-dismiss="modal">CLOSE</button>
-				<button type="submit" class="btn-primary bg-lightgrey">LOG IN</button>
-			</div>
-			</form>
 		</div>
 	</div>
-</div>
 </body>
 </html>
