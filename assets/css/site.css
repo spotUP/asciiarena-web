@@ -1534,12 +1534,12 @@ a.disabled{
 }
 
 .modal-content {
-  min-width: 500px;
+/*  min-width: 500px; */
 }
 
 .modal-dialog {
   position: relative;
-  width: 500px;
+/*  width: 500px; */
   pointer-events: none;
   margin: auto;
   height: 100%;
@@ -1547,7 +1547,7 @@ a.disabled{
   align-items: center;
   padding: 10px;
 }
-
+/*
 .modal {
   position: absolute;
   top: 0;
@@ -1562,19 +1562,23 @@ a.disabled{
   filter: drop-shadow(7px 8px 0 black);
   margin: auto;
 }
+*/
 
+/*
 .modal.fade{
   opacity:1
 }
 .modal.fade .modal-dialog{
   -webkit-transform:translate(0);-moz-transform:translate(0);transform:translate(0)
 }
-
+*/
+/*
 .modal .modal-dialog {
  -webkit-transform: translate(0);
  -moz-transform: translate(0);
  transform: translate(0);
 }
+*/
 .navbar-toggler-icon {
   display: block;
   width: 16px !important;
