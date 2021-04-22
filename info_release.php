@@ -8,8 +8,8 @@ $nick = $_user['nick'];
 $filename = preg_replace('/\.\.+/', '', $filename);
 $colly_available = true;
 if (!fetchOne("SELECT 1 FROM collys WHERE filename = :filename", [":filename" => $filename])) {
-		header("HTTP/1.0 404 Not Found");
-		$colly_available = false;
+	header("HTTP/1.0 404 Not Found");
+	$colly_available = false;
 }
 
 $row = fetchOne("SELECT def_font,def_fg_col,def_bg_col FROM users WHERE nick = :nick", [":nick" => $nick]);
@@ -330,7 +330,7 @@ require_once "header.php"; ?>
 
 					echo "<input type='submit' class='btn-big amb-1' name='hide' value='Hide Colly!'" . ((!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) ? " style='display:none'" : "") . "> ";
 					if (!preg_match('/\.lha/i', $filename)) {
-					echo "<input type='submit' class='btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s' name='view' value='View Colly'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
+						echo "<input type='submit' class='btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s' name='view' value='View Colly'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
 					}
 					echo "<input type='button' onclick='myFunction()' class='btn-big amb-1' name='fullscreen' value='Fullscreen'" . ((isset($_POST[ 'change' ]) || (!isset($_POST[ 'view' ]))) ? " style='display:none'" : "") . "> ";
 
@@ -393,75 +393,75 @@ require_once "header.php"; ?>
 					if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) 
 					{
 						?>
-                                                <div class="row apb-0">
-                                                        <div class="col-3">
-                                                                Colly BG:
-                                                        </div>
-                                                        <div class="col-3">
-                                                                <select class="custom-select" class="custom-select" id="colorselector_1" name="set_def_bg_col">
-                                                                        <option style="display: none;" id="selcol-1" selected="selected" value="<?=$bgcolor?>" data-color="<?=$bgcolor?>"></option>
-                                                                        <option value='#555555' data-color="#555555">Bright Black</option>
-                                                                        <option value='#5555ff' data-color="#5555ff">Bright Blue</option>
-                                                                        <option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
-                                                                        <option value='#ff5555' data-color="#ff5555">Bright Red</option>
-                                                                        <option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
-                                                                        <option value='#55ff55' data-color="#55ff55">Bright Green</option>
-                                                                        <option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
-                                                                        <option value='#ffffff' data-color="#ffffff">White</option>
-                                                                        <option value='#000000' data-color="#000000">Black</option>
-                                                                        <option value='#0000aa' data-color="#0000aa">Blue</option>
-                                                                        <option value='#aa00aa' data-color="#aa00aa">Magenta</option>
-                                                                        <option value='#aa0000' data-color="#aa0000">Red</option>
-                                                                        <option value='#aa5500' data-color="#aa5500">Yellow</option>
-                                                                        <option value='#00aa00' data-color="#00aa00">Green</option>
-                                                                        <option value='#00aaaa' data-color="#00aaaa">Cyan</option>
-                                                                        <option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
-                                                                </select>
-                                                        </div>
-                                                </div>
-                                                <div class="row amb-1">
-                                                        <div class="col-3">
-                                                                Colly FG:
-                                                        </div>
-                                                        <div class="col-3">
-                                                                <select class="custom-select" class="custom-select" id="colorselector_2" name="set_def_fg_col">
-                                                                        <option id="selcol-2" selected="selected" value="<?=$fgcolor?>" data-color="<?=$fgcolor?>"></option>
-                                                                        <option value='#555555' data-color="#555555">Bright Black</option>
-                                                                        <option value='#5555ff' data-color="#5555ff">Bright Blue</option>
-                                                                        <option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
-                                                                        <option value='#ff5555' data-color="#ff5555">Bright Red</option>
-                                                                        <option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
-                                                                        <option value='#55ff55' data-color="#55ff55">Bright Green</option>
-                                                                        <option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
-                                                                        <option value='#ffffff' data-color="#ffffff">White</option>
-                                                                        <option value='#000000' data-color="#000000">Black</option>
-                                                                        <option value='#0000aa' data-color="#0000aa">Blue</option>
-                                                                        <option value='#aa00aa' data-color="#aa00aa">Magenta</option>
-                                                                        <option value='#aa0000' data-color="#aa0000">Red</option>
-                                                                        <option value='#aa5500' data-color="#aa5500">Yellow</option>
-                                                                        <option value='#00aa00' data-color="#00aa00">Green</option>
-                                                                        <option value='#00aaaa' data-color="#00aaaa">Cyan</option>
-                                                                        <option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
-                                                                </select>
-                                                        </div>
-                                                </div>
-                                                <script>
-                                                        $(function() {
-                                                                $('#colorselector_1').colorselector({
-                                                                        callback : function(value, color, title) {
+						<div class="row apb-0">
+							<div class="col-3">
+								Colly BG:
+							</div>
+							<div class="col-3">
+								<select class="custom-select" class="custom-select" id="colorselector_1" name="set_def_bg_col">
+									<option style="display: none;" id="selcol-1" selected="selected" value="<?=$bgcolor?>" data-color="<?=$bgcolor?>"></option>
+									<option value='#555555' data-color="#555555">Bright Black</option>
+									<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
+									<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
+									<option value='#ff5555' data-color="#ff5555">Bright Red</option>
+									<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
+									<option value='#55ff55' data-color="#55ff55">Bright Green</option>
+									<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
+									<option value='#ffffff' data-color="#ffffff">White</option>
+									<option value='#000000' data-color="#000000">Black</option>
+									<option value='#0000aa' data-color="#0000aa">Blue</option>
+									<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
+									<option value='#aa0000' data-color="#aa0000">Red</option>
+									<option value='#aa5500' data-color="#aa5500">Yellow</option>
+									<option value='#00aa00' data-color="#00aa00">Green</option>
+									<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
+									<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
+								</select>
+							</div>
+						</div>
+						<div class="row amb-1">
+							<div class="col-3">
+								Colly FG:
+							</div>
+							<div class="col-3">
+								<select class="custom-select" class="custom-select" id="colorselector_2" name="set_def_fg_col">
+									<option id="selcol-2" selected="selected" value="<?=$fgcolor?>" data-color="<?=$fgcolor?>"></option>
+									<option value='#555555' data-color="#555555">Bright Black</option>
+									<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
+									<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
+									<option value='#ff5555' data-color="#ff5555">Bright Red</option>
+									<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
+									<option value='#55ff55' data-color="#55ff55">Bright Green</option>
+									<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
+									<option value='#ffffff' data-color="#ffffff">White</option>
+									<option value='#000000' data-color="#000000">Black</option>
+									<option value='#0000aa' data-color="#0000aa">Blue</option>
+									<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
+									<option value='#aa0000' data-color="#aa0000">Red</option>
+									<option value='#aa5500' data-color="#aa5500">Yellow</option>
+									<option value='#00aa00' data-color="#00aa00">Green</option>
+									<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
+									<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
+								</select>
+							</div>
+						</div>
+						<script>
+							$(function() {
+								$('#colorselector_1').colorselector({
+									callback : function(value, color, title) {
 										$("#colly").css('background-color', color);
 										$("#colly-div").css('background-color', color);
 										$("#blacker").css('background-color', color);
 									}
-                                                                });
-                                                                $('#colorselector_2').colorselector({
-                                                                        callback : function(value, color, title) {
+								});
+								$('#colorselector_2').colorselector({
+									callback : function(value, color, title) {
 										$("#colly").css('color', color);
-                                                                        }
-                                                                });
+									}
+								});
 
-                                                        });
-                                                </script>
+							});
+						</script>
 						<div class="apb-0">
 							<select class="custom-select" name="font" id="colly-font">
 								<option class="dropdown-item" value="MicroKnight"<?php if ($font == 'MicroKnight') echo ' selected'; ?>>MicroKnight</option>
@@ -474,7 +474,7 @@ require_once "header.php"; ?>
 								<option value="TopazPlus_a1200"<?php if ($font == 'TopazPlus_a1200') echo ' selected'; ?>>A1200 Topaz+</option>
 							</select>
 						</div>
-                                                <script>
+						<script>
 							$("#colly-font").change(function() {
 								font = $(this).val();
 								$("#colly").css('font-family', font);
@@ -683,17 +683,17 @@ require_once "header.php"; ?>
 		}
 	}
 } else {
-				?>
-				<div class="row">
-					<div class="col-lg-12">
-						<div class="bs-component aml-1 amb-1">
-							<div class="alert alert-danger">
-								colly not found
-							</div>
-						</div>
-					</div>
+	?>
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="bs-component aml-1 amb-1">
+				<div class="alert alert-danger">
+					colly not found
 				</div>
-				<?php
+			</div>
+		</div>
+	</div>
+	<?php
 }
 
 
@@ -790,15 +790,20 @@ if (isset($_POST[ 'edit' ]))
 	}
 	echo "<form action=\"/release/".$filename."&comment\" method=\"post\">";
 	?>
-	<div class="headline">
-		Edit Your Comment...
-	</div>
-
 	<div class="row">
-		<textarea rows="5" cols="82" name="edit_message"><?=$comment?></textarea>
-		<input type="hidden" name="commentid" value="<?=$commentid?>"/>
-		<input type="submit" class="btn-big" name="writeedit" align="right" value="Submit">
-	</form>
+		<div class="col-12 apb-1">
+			<span class="white">Edit Your Comment...</span>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-12">
+			<textarea rows="5" class="w-100" name="edit_message"><?=$comment?></textarea>
+			<input type="hidden" name="commentid" value="<?=$commentid?>"/>
+		</div>
+		<div class="col-12 apt-1">
+			<input type="submit" class="btn-big" name="writeedit" align="right" value="Submit">
+		</form>
+	</div>
 </div>
 <?php
 }
