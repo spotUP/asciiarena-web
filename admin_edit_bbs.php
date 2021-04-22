@@ -84,7 +84,7 @@
 	<div class="row apb-1">
 		<div class="col-12">
 			<form>
-				<select name="bbs_id" id="bbs_fetch_id" class="w-100" onchange="getBBS();">
+				<select class="custom-select" name="bbs_id" id="bbs_fetch_id" class="w-100" onchange="getBBS();">
 				</select>
 			</form>
 		</div>
