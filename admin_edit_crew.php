@@ -13,7 +13,7 @@
 	}
 	
 	function addCrewBBSItem(bbslist,id,name) {
-		bbslist.append('<div id="crew_bbs_entry'+id+'" class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between"><span id="bbs_fetch_name_'+id+'">'+name+'</span><input type="hidden" name="bbsname[]" value="'+name+'"><input type="button" value="Delete" onclick="deleteCrewBBS('+id+')"/></div></div>')
+    bbslist.append('<div id="crew_bbs_entry'+id+'" class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between"><span id="bbs_fetch_name_'+id+'">'+name+'</span><input type="hidden" name="bbsname[]" value="'+name+'"><input type="button" value="Delete" onclick="deleteCrewBBS('+id+')"/></div></div>')
 	}
 	
 	function getCrew() {
@@ -100,12 +100,14 @@
     let bbsid = $("#crew_bbs_add_fetch_id").val()
     let bbsname = $("#crew_bbs_add_fetch_id option:selected").text()
     
-    if (!($("#crew_bbs_entry"+bbsid).length)) {
-      let bbslist = $("#crew_bbs_fetch_id");
-      addCrewBBSItem(bbslist,bbsid,bbsname)
+    if (bbsid>0) {
+      if (!($("#crew_bbs_entry"+bbsid).length)) {
+        let bbslist = $("#crew_bbs_fetch_id");
+        addCrewBBSItem(bbslist,bbsid,bbsname)
+      }
+      $("#crew_bbs_add_fetch_id").val("0")
+      showAlert("BBS Added!", "#crew");
     }
-    $("#crew_bbs_add_fetch_id").val("0")
-    showAlert("BBS Added!", "#crew");
 	}
 
 	function showAlert(content, prependTo) {
