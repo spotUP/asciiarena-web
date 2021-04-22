@@ -6,26 +6,45 @@
 
 <script>
   function collyclear() {
-    $("#colly_id, #colly_name, #colly_year, #colly_month, #colly_day, #colly_type, #colly_diz").val('');
-    let crewslist = $("#colly_crews_fetch_id");
+    $("#colly_id, #colly_name, #colly_filename, #colly_year, #colly_month, #colly_day, #colly_type, #colly_diz").val('');
+    let crewslist = $("#colly_crew_fetch_id");
     crewslist.empty();
-    let artistslist = $("#colly_artists_fetch_id");
+    let artistslist = $("#colly_artist_fetch_id");
     artistslist.empty();
+    $("#colly_crew_add_fetch_id").val("0")
+    $("#colly_artist_add_fetch_id").val("0")
   }
   
+  function addCollyCrewItem(crewslist,id,name) {
+		crewslist.append('<div id="colly_crew_entry'+id+'" class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between"><span id="crew_fetch_name_'+id+'">'+name+'</span><input type="hidden" name="crewname[]" value="'+name+'"><input type="button" value="Delete" onclick="deleteCollyCrew('+id+')"/></div></div>')
+	}
+  
+ 	function addCollyArtistItem(artistslist,id,name) {
+		artistslist.append('<div id="colly_artist_entry'+id+'" class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between"><span id="artist_fetch_name_'+id+'">'+name+'</span><input type="hidden" name="artistname[]" value="'+name+'"><input type="button" value="Delete" onclick="deleteCollyArtist('+id+')"/></div></div>')
+	}
+
 	function getColly() {
 		const id = $("#colly_fetch_id").val();
 		if (id > 0) {
 			$.get(`/admin_cmds.php?cmd=get_colly&id=${id}`, function (data) {      
 				$('#colly_id').val(data[0].id);
         $('#colly_name').val(data[0].name);
+        $('#colly_filename').val(data[0].filename);
 				$('#colly_year').val(data[0].year);
 				$('#colly_month').val(data[0].month);
 				$('#colly_day').val(data[0].day);
 				$('#colly_type').val(data[0].type);
 				$('#colly_diz').val(data[0].diz);
-        getCollyArtists(id)
-        getCollyCrews(id)
+        let crewslist = $("#colly_crew_fetch_id");
+					crewslist.empty();
+					$.each(data[0].crews, function (i, crew) {
+						addCollyCrewItem(crewslist,crew.id,crew.name)
+				});
+        let artistslist = $("#colly_artist_fetch_id");
+					artistslist.empty();
+					$.each(data[0].artists, function (i, artist) {
+						addCollyArtistItem(artistslist,artist.id,artist.nick)
+				});
 			});
 		} else {
 			collyclear();
@@ -43,6 +62,21 @@
 		});
 	}
   
+  function saveColly() {
+    const form = $("#colly_form");
+    const url = form.attr("action");
+    $.ajax({
+      "type": "POST",
+      "url": url,
+      "data": form.serialize(),
+      "success": () => {
+        showAlert("Colly Saved!", "#colly");
+        collyclear();
+        getCollyList();
+      }
+    });
+  }
+  
 	function delColly() {
 		const activeName = $("#colly_name").val();
 		if (activeName !== "") {
@@ -55,7 +89,7 @@
 					"url": url,
 					"data": form.serialize(),
 					"success": () => {
-						showAlert("Colly deleted!", "#colly");
+						showAlert("Colly Deleted!", "#colly");
             collyclear();
 						getCollyList();
 					}
@@ -63,103 +97,49 @@
 			}
 		}
 	}
-
-  function getCollyArtists(id) {
-		let artistslist = $("#colly_artists_fetch_id");
-		artistslist.empty();
-		$.get(`/admin_cmds.php?cmd=get_colly_artist&id=${id}`, function (data) {
-			$.each(data, function (i, artist) {
-        artistslist.append('<div class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between"><span id="artist_fetch_name_'+artist.id.toString()+'">'+artist.nick+'</span><input type="button" value="Delete" onclick="deleteCollyArtist('+artist.id+')"/></div></div>')
-			});
-		});
-  }
-  
-  function addCollyArtist() {
-    const form = $("#add_colly_artist_form");
-    const activeName = $("#colly_name").val();
-		if (activeName !== "") {
-      $("#add_colly_artist_colly_id").val($("#colly_id").val());
-      $("#add_colly_artist_artist_id").val($("#colly_artist_add_fetch_id").val());
-      const url = form.attr("action");
-      $.ajax({
-        "type": "POST",
-        "url": url,
-        "data": form.serialize(),
-        "success": () => {
-          showAlert("Author Added!", "#colly");
-          $("#colly_artist_add_fetch_id").val('0');
-          getCollyArtists($("#colly_id").val());
-        }
-      });    
-    }
-  }
-  
+ 
   function deleteCollyArtist(id) {
 		const activeName = $("#artist_fetch_name_"+id.toString()).text();
     if (confirm(`Are you sure you want to delete ${activeName} Artist?`)) {
-      const form = $("#del_colly_artist_form");
-      $("#del_colly_artist_id").val(id.toString());
-      const url = form.attr("action");
-      $.ajax({
-        "type": "POST",
-        "url": url,
-        "data": form.serialize(),
-        "success": () => {
-          showAlert("Artist deleted!", "#colly");
-          getCollyArtists($("#colly_id").val());
-        }
-      });
+			let artistitem = $("#colly_artist_entry"+id.toString());
+			artistitem.remove();
+			showAlert("Author Deleted!", "#colly");     
     }
   }
 
-  function getCollyCrews(id) {
-		let crewslist = $("#colly_crews_fetch_id");
-		crewslist.empty();
-		$.get(`/admin_cmds.php?cmd=get_colly_crew&id=${id}`, function (data) {
-			$.each(data, function (i, crew) {
-        crewslist.append('<div class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between"><span id="crew_fetch_name_'+crew.id.toString()+'">'+crew.name+'</span><input type="button" value="Delete" onclick="deleteCollyCrew('+crew.id+')"/></div></div>')
-			});
-		});
-  }
-  
-  function addCollyCrew() {
-    const form = $("#add_colly_crew_form");
-    const activeName = $("#colly_name").val();
-		if (activeName !== "") {
-      $("#add_colly_crew_colly_id").val($("#colly_id").val());
-      $("#add_colly_crew_crew_id").val($("#colly_crew_add_fetch_id").val());
-      const url = form.attr("action");
-      $.ajax({
-        "type": "POST",
-        "url": url,
-        "data": form.serialize(),
-        "success": () => {
-          showAlert("Crew Added!", "#colly");
-          $("#colly_crew_add_fetch_id").val('0');
-          getCollyCrews($("#colly_id").val());
-        }
-      });    
+  function addCollyArtist() {
+    let artistid = $("#colly_artist_add_fetch_id").val()
+    let artistnick = $("#colly_artist_add_fetch_id option:selected").text()
+    
+    if (!($("#colly_artist_entry"+artistid).length)) {
+      let artistlist = $("#colly_artist_fetch_id");
+      addCollyArtistItem(artistlist,artistid,artistnick)
     }
+    $("#colly_artist_add_fetch_id").val('0');
+    showAlert("Author Added!", "#colly");   
   }
-  
-  function deleteCollyCrew(id) {
+ 
+ function deleteCollyCrew(id) {
 		const activeName = $("#crew_fetch_name_"+id.toString()).text();
     if (confirm(`Are you sure you want to delete ${activeName} Crew?`)) {
-      const form = $("#del_colly_crew_form");
-      $("#del_colly_crew_id").val(id.toString());
-      const url = form.attr("action");
-      $.ajax({
-        "type": "POST",
-        "url": url,
-        "data": form.serialize(),
-        "success": () => {
-          showAlert("Crew deleted!", "#colly");
-          getCollyCrews($("#colly_id").val());
-        }
-      });
+      let crewitem = $("#colly_crew_entry"+id.toString());
+			crewitem.remove();      
+      showAlert("Crew Deleted!", "#colly");
     }
   }
 
+  function addCollyCrew() {
+    let crewid = $("#colly_crew_add_fetch_id").val()
+    let crewname = $("#colly_crew_add_fetch_id option:selected").text()
+    
+    if (!($("#colly_crew_entry"+crewid).length)) {
+      let crewlist = $("#colly_crew_fetch_id");
+      addCollyCrewItem(crewlist,crewid,crewname)
+    }
+    $("#colly_crew_add_fetch_id").val('0');
+    showAlert("Crew Added!", "#colly");
+  }
+ 
 	function showAlert(content, prependTo) {
 		const alertContent = `<div class="bs-component quick-alert amb-1"><div id="#success-alert" class="animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div></div>`;
 		$(prependTo).prepend(alertContent);
@@ -169,20 +149,6 @@
 <div class="tab-pane fade show active ap-1" id="colly">
   <form id="del_colly_form" action="/admin_cmds.php?cmd=del_colly" method="post">
 		<input type="hidden" name="id" id="del_colly_id">
-	</form>
-  <form id="add_colly_artist_form" action="/admin_cmds.php?cmd=add_colly_artist" method="post">
-		<input type="hidden" name="colly_id" id="add_colly_artist_colly_id">
-		<input type="hidden" name="artist_id" id="add_colly_artist_artist_id">
-  </form>
-  <form id="del_colly_artist_form" action="/admin_cmds.php?cmd=del_colly_artist" method="post">
-		<input type="hidden" name="id" id="del_colly_artist_id">
-	</form>
-  <form id="add_colly_crew_form" action="/admin_cmds.php?cmd=add_colly_crew" method="post">
-		<input type="hidden" name="colly_id" id="add_colly_crew_colly_id">
-		<input type="hidden" name="crew_id" id="add_colly_crew_crew_id">
-  </form>
-  <form id="del_colly_crew_form" action="/admin_cmds.php?cmd=del_colly_crew" method="post">
-		<input type="hidden" name="id" id="del_colly_crew_id">
 	</form>
   <div class="row apb-1">
 		<div class="col-12">
@@ -206,6 +172,13 @@
 			<div class="col-6 d-flex justify-content-between">
 				<label for="colly_name" class="lightgrey">Name</label>
 				<input type="text" size="24" id="colly_name" name="name">
+			</div>
+		</div>
+
+    <div class="row apb-1">
+			<div class="col-6 d-flex justify-content-between">
+				<label for="colly_name" class="lightgrey">Filename</label>
+				<input type="text" size="24" id="colly_filename" name="filename">
 			</div>
 		</div>
 
@@ -266,7 +239,7 @@
 
 	     
     <div class="row apb-1"><div class="col-6 d-flex justify-content-between">Artists:</div></div>
-    <div id="colly_artists_fetch_id"></div>
+    <div id="colly_artist_fetch_id"></div>
     <div class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between">
 
 
@@ -284,7 +257,7 @@
     </div></div>
 
     <div class="row apb-1"><div class="col-6 d-flex justify-content-between">Crews:</div></div>
-    <div id="colly_crews_fetch_id"></div>
+    <div id="colly_crew_fetch_id"></div>
     <div class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between">
 
 
@@ -303,8 +276,8 @@
 
     <div class="row">
       <div class="col-12">
-				<input type="submit" name="do_edit_colly" value="Save">
-				<input type="button" id="delete_colly" name="delete_colly" value="Delete" onclick="delColly();">
+				<input type="button" value="Save"" onclick="saveColly();">
+				<input type="button" value="Delete" onclick="delColly()">
       </div>
     </div>
   </form>  
@@ -312,20 +285,5 @@
 <script>
 	$(function () {
     getCollyList();
-		$("#colly_form").submit(function (e) {
-			e.preventDefault();
-      const form = $(this);
-      const url = form.attr("action");
-      $.ajax({
-        "type": "POST",
-        "url": url,
-        "data": form.serialize(),
-        "success": () => {
-          showAlert("Colly saved!", "#colly");
-          collyclear();
-          getCollyList();
-        }
-      });
-		});
 	});
 </script>
