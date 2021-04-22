@@ -43,7 +43,7 @@ include "header_ascii.php";
 
 	<script type="text/javascript">
 		function add_colly_crew_field() {
-			var newselect = " <select name=\"colly_crew[]\"" + document.getElementById('total_colly_crews').value + "><option>Independent</option><?php
+			var newselect = " <select class=\"custom-select\" name=\"colly_crew[]\"" + document.getElementById('total_colly_crews').value + "><option>Independent</option><?php
 			foreach (fetchAll("SELECT name FROM crews") as $row) {
 				echo "<option>{$row->name}</option>";
 			}
@@ -55,7 +55,7 @@ include "header_ascii.php";
 	<script type="text/javascript">
 		function add_artist_field()
 		{
-			var newselect = " <select name=\"artist[]\"" + document.getElementById('total_artists').value + "><option value=\"Unknown\">Unknown</option><?php
+			var newselect = " <select class=\"custom-select\" name=\"artist[]\"" + document.getElementById('total_artists').value + "><option value=\"Unknown\">Unknown</option><?php
 
 			$ask="select nick from artists";
 			$result=fetchAll($ask);
@@ -73,7 +73,7 @@ include "header_ascii.php";
 	<script type="text/javascript">
 		function add_crew_field()
 		{
-			var newselect = " <select name=\"crew[]\"" + document.getElementById('total_crews').value + "><option value=\"Unknown\">Unknown</option><?php
+			var newselect = " <select class=\"custom-select\" name=\"crew[]\"" + document.getElementById('total_crews').value + "><option value=\"Unknown\">Unknown</option><?php
 
 			$ask="select name from crews";
 			$result=fetchAll($ask);
@@ -91,7 +91,7 @@ include "header_ascii.php";
 	<script type="text/javascript">
 		function add_artist_crew_field()
 		{
-			var newselect = " <select name=\"artist_crew[]\"" + document.getElementById('total_artist_crews').value + "><option value=\"Unknown\">Unknown</option><?php
+			var newselect = " <select class=\"custom-select\" name=\"artist_crew[]\"" + document.getElementById('total_artist_crews').value + "><option value=\"Unknown\">Unknown</option><?php
 
 			$ask="select name from crews";
 			$result=fetchAll($ask);
@@ -109,7 +109,7 @@ include "header_ascii.php";
 	<script type="text/javascript">
 		function add_colly_author_field()
 		{
-			var newselect = " <select name=\"colly_author[]\"" + document.getElementById('total_colly_authors').value + "><option value=\"Unknown\">Unknown</option><?php
+			var newselect = " <select class=\"custom-select\" name=\"colly_author[]\"" + document.getElementById('total_colly_authors').value + "><option value=\"Unknown\">Unknown</option><?php
 
 			$ask="select nick from artists";
 			$result=fetchAll($ask);
@@ -127,7 +127,7 @@ include "header_ascii.php";
 	<script type="text/javascript">
 		function add_colly_crew_field()
 		{
-			var newselect = " <select name=\"colly_crew[]\"" + document.getElementById('total_colly_crews').value + "><option>Independent</option><?php
+			var newselect = " <select class=\"custom-select\" name=\"colly_crew[]\"" + document.getElementById('total_colly_crews').value + "><option>Independent</option><?php
 
 			$ask="select name from crews";
 			$result=fetchAll($ask);
@@ -145,7 +145,7 @@ include "header_ascii.php";
 
 		function add_bbs_field()
 		{
-			var newselect = " <select name=\"add_bbs[]\"" + document.getElementById('total_bbses').value + "><option value=\"Unknown\">Unknown</option><?php
+			var newselect = " <select class=\"custom-select\" name=\"add_bbs[]\"" + document.getElementById('total_bbses').value + "><option value=\"Unknown\">Unknown</option><?php
 
 			$ask="select name from bbses";
 			$result=fetchAll($ask);
@@ -163,7 +163,7 @@ include "header_ascii.php";
 
 		function add_crew_bbs_field()
 		{
-			var newselect = " <select name=\"add_crew_bbs[]\"" + document.getElementById('total_crew_bbses').value + "><option value=\"Unknown\">Unknown</option><?php
+			var newselect = " <select class=\"custom-select\" name=\"add_crew_bbs[]\"" + document.getElementById('total_crew_bbses').value + "><option value=\"Unknown\">Unknown</option><?php
 
 			$ask="select name from bbses";
 			$result=fetchAll($ask);

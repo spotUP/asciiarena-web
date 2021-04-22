@@ -398,7 +398,7 @@ require_once "header.php"; ?>
                                                                 Colly BG:
                                                         </div>
                                                         <div class="col-3">
-                                                                <select id="colorselector_1" name="set_def_bg_col">
+                                                                <select class="custom-select" class="custom-select" id="colorselector_1" name="set_def_bg_col">
                                                                         <option style="display: none;" id="selcol-1" selected="selected" value="<?=$bgcolor?>" data-color="<?=$bgcolor?>"></option>
                                                                         <option value='#555555' data-color="#555555">Bright Black</option>
                                                                         <option value='#5555ff' data-color="#5555ff">Bright Blue</option>
@@ -424,7 +424,7 @@ require_once "header.php"; ?>
                                                                 Colly FG:
                                                         </div>
                                                         <div class="col-3">
-                                                                <select id="colorselector_2" name="set_def_fg_col">
+                                                                <select class="custom-select" class="custom-select" id="colorselector_2" name="set_def_fg_col">
                                                                         <option id="selcol-2" selected="selected" value="<?=$fgcolor?>" data-color="<?=$fgcolor?>"></option>
                                                                         <option value='#555555' data-color="#555555">Bright Black</option>
                                                                         <option value='#5555ff' data-color="#5555ff">Bright Blue</option>
@@ -462,7 +462,7 @@ require_once "header.php"; ?>
                                                         });
                                                 </script>
 						<div class="apb-0">
-							<select name="font" id="colly-font">
+							<select class="custom-select" name="font" id="colly-font">
 								<option class="dropdown-item" value="MicroKnight"<?php if ($font == 'MicroKnight') echo ' selected'; ?>>MicroKnight</option>
 								<option class="dropdown-item" value="MicroKnightPlus"<?php if ($font == 'MicroKnightPlus') echo ' selected'; ?>>MicroKnight+</option>
 								<option class="dropdown-item" value="mOsOul"<?php if ($font == 'mOsOul') echo ' selected'; ?>>mOsOul</option>
@@ -752,7 +752,7 @@ if (isset($_POST[ 'addcomment' ]))
 			<div class="col-12 apl-1 apr-1 apb-1 apt-1 bg-secondary">
 
 				RATING
-				<select name="user_added_rating">
+				<select class="custom-select" name="user_added_rating">
 					<option value="0" selected="selected">Blank</option><?php
 					for ($i = 1; $i < 11; $i++) 
 					{
