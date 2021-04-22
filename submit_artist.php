@@ -31,7 +31,7 @@
 			</div>
 
 			<div class="row apl-1 apb-1">
-				<select name="artistcountry"> 
+				<select class="custom-select" name="artistcountry"> 
 					<option value="Unknown">Unknown</option>
 					<?php
 					foreach($country_list as $symbol => $country)
@@ -56,7 +56,7 @@
 			</div>
 
 			<div class="row apl-1 apb-1">
-				<select name="artiststatus">
+				<select class="custom-select" name="artiststatus">
 					<option>Active</option>
 					<option>Inactive</option>
 				</select>
