@@ -12,9 +12,14 @@ if (!fetchOne("SELECT 1 FROM collys WHERE filename = :filename", [":filename" =>
 		$colly_available = false;
 }
 
+$row = fetchOne("SELECT def_font,def_fg_col,def_bg_col FROM users WHERE nick = :nick", [":nick" => $nick]);
+$font = (strlen($row->font) > 1) ? $row->font : 'mOsOul';
+$fgcolor = (strlen($row->def_fg_col) > 1) ? $row->def_fg_col : '#ffffff';
+$bgcolor = (strlen($row->def_bg_col) > 1) ? $row->def_bg_col : '#000000';
+
 require_once "header.php"; ?>
 
-<div id="blacker"></div>
+<div id="blacker" style="background-color: <?=$bgcolor?>;"></div>
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
 		<?php
@@ -383,11 +388,6 @@ require_once "header.php"; ?>
 					<?php
 				}
 
-				$row = fetchOne("SELECT def_font,def_fg_col,def_bg_col FROM users WHERE nick = :nick", [":nick" => $nick]);
-				$font = (strlen($row->font) > 1) ? $row->font : 'mOsOul';
-				$fgcolor = (strlen($row->def_fg_col) > 1) ? $row->def_fg_col : '#ffffff';
-				$bgcolor = (strlen($row->def_bg_col) > 1) ? $row->def_bg_col : '#000000';
-
 				if ($type != "ANSI") 
 				{
 					if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) 
@@ -451,6 +451,7 @@ require_once "header.php"; ?>
                                                                         callback : function(value, color, title) {
 										$("#colly").css('background-color', color);
 										$("#colly-div").css('background-color', color);
+										$("#blacker").css('background-color', color);
 									}
                                                                 });
                                                                 $('#colorselector_2').colorselector({
