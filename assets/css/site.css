@@ -771,16 +771,8 @@ a:hover{
   /*  margin-left: 8px; */
 }
 
-a:hover::before{
+a.arena:hover::before{
   content: ">";
-}
-
-a.ascii:hover{
-  content: initial !important;
-}
-
-a.ascii:hover::before{
-  content: initial !important;
 }
 
 a.grey
@@ -1436,7 +1428,7 @@ input[type=text]{
 
 #blacker{
   position: fixed !important;
-  background-color: #000000 !important;
+  background-color: #000000;
   width: 100vw !important;
   height: 100vh !important;
   top:0 !important;
@@ -1675,7 +1667,7 @@ a.disabled{
   .nav-link .dropdown-toggle:hover{
   }
   .nav-link .dropdown-toggle:focus{
-      color: white !important;
+    color: white !important;
   }
   .nav-link .dropdown-toggle:focus-within{
     color: green;
