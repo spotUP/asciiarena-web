@@ -2,10 +2,10 @@
 require_once "session.php";
 $h1 = "aPPLiCATiONS";
 
-$is_search = isset($_POST['search']);
-$searchquery = $_POST[ 'search' ] ?? "";
-if(strlen($searchquery) < 3) unset($is_search);
-$viewmode = $_GET[ 'viewmode' ] ?? "Standard";
+$is_search = (isset($_POST['search'])) ? true : false;
+$searchquery = $_POST['search'] ?? "";
+if(strlen($searchquery) < 3) $is_search = false;
+$viewmode = $_GET['viewmode'] ?? "Standard";
 
 $sort_order = strtolower($_GET['sort_order']) ?? "";
 switch ($sort_order) {
@@ -17,7 +17,7 @@ switch ($sort_by) {
         case "name": $sort_criteria = "name"; break;
         case "filename": $sort_criteria = "filename"; break;
         case "release": $sort_criteria = "filedate"; break;
-        case "author": $sort_criteria = "author"; break;
+        case "author": $sort_criteria = "a.author"; break;
         case "uploader": $sort_criteria = "uploader"; break;
         default:
                 $sort_criteria = "name";
@@ -36,7 +36,7 @@ require_once "header.php"; ?>
 			<?php
 			require_once "pagination.php";
 			$limit = "LIMIT 30";
-        		$pageno = $_GET[ 'pageno' ] ?? 1;
+        		$pageno = $_GET['pageno'] ?? 1;
         		$rows_per_page = ($viewmode === "BBS") ? 6 : 30;
         		$pagination = pagination("apps", $pageno, $rows_per_page, "viewmode={$viewmode}&sort_by={$sort_by}&sort_order={$sort_order}");
     
@@ -44,7 +44,7 @@ require_once "header.php"; ?>
         			echo $pagination[ "pager" ];
         		}
         		?>
-                                <div class="row">
+                                <div class="row apb-1">
                                         <div class="col-12">
                                                 <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
                                                         <div class="btn-group" role="group">
@@ -63,50 +63,98 @@ require_once "header.php"; ?>
         		</div>
 
         		<div class="row">
-        			<div class="col-12">
-                			<span class="green">- --/\-\/- -</span><span class="cyan">aSCIIaRENA</span> <span class="red">--=*=-- </span><span class="pink"><?=date("D")?>, the <?=date("d-m-y")?>]</span><span class="red"> --=*=-- </span> <span class="cyan">aSCIIaRENA</span> <span class="green"> - -/\-\/- -- -</span>
-                		</div>
+				<div class="col-lg-12 d-none d-sm-block">
+					<span class="green">- --/\-\/- -</span> <span class="cyan">aSCIIaRENA</span> <span class="red">--=*=-- </span><span class="pink">[<?=date("D")?>, the <?=date("d-m-y")?>]</span><span class="red"> --=*=-- </span> <span class="cyan">aSCIIaRENA</span> <span class="green"> - -/\-\/- -- -</span><br><br>
+				</div>
 			</div>
 			
 			<?php
 			if ($is_search) {
-				$ask = "SELECT * FROM apps 
-					WHERE name LIKE '%:searchquery%'
-						OR filename LIKE '%:searchquery%'
-					{$limit}";
-				$rows = fetchAll($ask, [":searchquery" => $searchquery]);
+				$ask = "SELECT a.*,u.upload_signature FROM apps a
+					LEFT JOIN users u ON a.uploader=u.nick
+					WHERE name LIKE :searchquery
+						OR filename LIKE :searchquery
+						OR author LIKE :searchquery
+					{$pagination['limit']}";
+				$rows = fetchAll($ask, [":searchquery" => '%'.$searchquery.'%']);
 			} else {
-				$ask = "SELECT * FROM apps {$limit}";
+				$ask = "SELECT a.*,u.upload_signature FROM apps a 
+					LEFT JOIN users u ON a.uploader=u.nick 
+					ORDER BY {$sort_criteria}
+					{$pagination['limit']}";
 				$rows = fetchAll($ask);
 			}
 
 			if ($viewmode === "BBS") {
+			?>
+			<div class="container">
+				<?php
+				foreach ($rows as $row) {
+					?>
+                                        <div class="row apt-1">
+                                        	<div class="col-6">
+							<a href="/application/<?=$row->filename?>"><span class="cyan" style="margin-right: 8px;"><?=$row->filename?></span></a> <span class="green" style="margin-right: 16px;">PF--</span> <span class="yellow" style="margin-right: 8px;"><?=$row->filesize?></span> <span class="yellow"><?=date("d.m.y", $row->timestamp);?></span>
+                                        	</div>
+                                                <div class="col-6 apb-1">
+							<?php
+                                        		$file_id = preg_replace('/\\.[^.\\s]{3,4}$/', '', $row->filename).'.diz';
+                                        		if (file_exists('apps/'.$file_id)) {
+								?>
+                                                		<pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$row->filename?>"><?=file_get_contents('apps/'.$file_id)?>/</a></pre>
+								<?php
+                                        		} elseif (file_exists('apps/'.$row->filename.'.diz.png')) {
+                                        			?>
+                                                		<img src="/apps/<?=$row->filename?>.diz.png" class="app-diz">
+                                                		<?php
+                                        		}
+							?>
+                                                	<pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$filename?>"><?=$orig?></a></pre>
 
+                                                </div>
+                                        </div>
+                                        <div class="row apb-1">
+                                        	<div class="col-6"></div>
+                                                <div class="col-6">
+                                                	<span class="pink text-right"><?=$row->upload_signature?></span>
+                                                </div>
+                                        </div>
+                                        <div class="row apb-2">
+                                        	<div class="col-6"></div>
+                                                <div class="col-6">
+                                                	<span class="green text-right">[ aSCIIaRENa ] [ FREE LEECH ] [ aSCIIaRENa ]</span>
+                                                </div>
+                                        </div>
+					<?php
+				}
+				?>
+			</div>
+			<?php
 			} else {
 				?>
-                                <div class="row amb-1" style="width: 100%">
-                                        <div class="col-2 col-sm-4"><span class="white">FILENAME</span></div>
-                                        <div class="col-2 col-sm-4"><span class="white">NAME</span></div>
-                                        <div class="col-2 col-sm-4"><span class="white">AUTHOR</span></div>
+			<div class="container">
+                                <div class="row amb-1">
+                                        <div class="col-2 col-sm-4"><span class="white"><a href="?sort_by=filename&sort_order=<?=$osort_order?>">FILENAME</a></span></div>
+                                        <div class="col-2 col-sm-4"><span class="white"><a href="?sort_by=name&sort_order=<?=$osort_order?>">NAME</a></span></div>
+                                        <div class="col-2 col-sm-4"><span class="white"><a href="?sort_by=author&sort_order=<?=$osort_order?>">AUTHOR</a></span></div>
                                 </div>
 				<?php
 				foreach ($rows as $row) {
 					?>
-                                        <!--div class="row">
-                                                <div class="col-8 col-sm-4 text-truncate">
+                                        <div class="row">
+                                                <div class="col-4 col-sm-4 text-truncate">
                                                         <a class="magenta" href="/application/<?=$row->filename?>"><?=$row->filename?></a>
                                                 </div>
-                                                <div class="col-8 col-sm-4 text-truncate">
+                                                <div class="col-4 col-sm-4 text-truncate">
                                                         <a class="magenta" href="/application/<?=$row->filename?>"><?=$row->name?></a>
+						</div>
                                                 <div class="col-4 col-sm-4 green">
-                                                        <span class="yellow"><?=combinize($row->artists, $row->artists, "/artist/", $row->artists)?></span>
+							<span class="yellow"><?=$row->author?></span>
                                                 </div>
-                                                <div class="col-4 col-sm-4 yellow text-truncate d-none d-sm-block">
-                                                        <span class="yellow"><?=combinize($row->crews, $row->crews, "/crew/", $row->crews)?></span>
-                                                </div>
-                                        </div-->
+                                        </div>
                                         <?php
-				}
+				} ?>
+                        </div>
+			<?php
 			}
 			?>
 		</div>
