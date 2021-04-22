@@ -121,7 +121,7 @@
 							<div class="container-fluid">
 								<div class="row">
 
-									<div class="col-6">
+									<div class="col-12 col-sm-6">
 										<div class="form-group">
 											<input type="text" class="form-control" name="nick" id="nick" autocomplete="username" placeholder="Enter your handle"
 											       aria-describedby="nickHelp">
@@ -131,7 +131,7 @@
 										                               placeholder="Proove it"></div>
 									</div>
 
-									<div class="col-6">
+									<div class="col-12 col-sm-6">
 										<div class="form-group">
 											<div class="custom-control custom-switch">
 												<input type="checkbox" class="custom-control-input" id="customSwitch1" name="rememberme"
