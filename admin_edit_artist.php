@@ -97,12 +97,14 @@
     let crewid = $("#artist_crew_add_fetch_id").val()
     let crewname = $("#artist_crew_add_fetch_id option:selected").text()
     
-    if (!($("#artist_crew_entry"+crewid).length)) {
-      let crewlist = $("#artist_crew_fetch_id");
-      addArtistCrewItem(crewlist,crewid,crewname)
+    if (crewid>0) {
+      if (!($("#artist_crew_entry"+crewid).length)) {
+        let crewlist = $("#artist_crew_fetch_id");
+        addArtistCrewItem(crewlist,crewid,crewname)
+      }
+      $("#artist_crew_add_fetch_id").val('0');
+      showAlert("Crew Added!", "#artist");
     }
-    $("#artist_crew_add_fetch_id").val('0');
-    showAlert("Crew Added!", "#artist");
 	}  
 	
 	function showAlert(content, prependTo) {
