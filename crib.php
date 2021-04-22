@@ -190,7 +190,7 @@ include "header.php";
 					$show_sigdata=fixOutputEdit($show_sigdata);
 					$show_viewmode=$row->list_view_mode;
 					$def_bg_col=$row->def_bg_col ?? "#000000";
-					$def_fg_col=$row->def_fg_col ?? "255,255,255";
+					$def_fg_col=$row->def_fg_col ?? "#ffffff";
 					$show_display_mail=$row->display_mail;
 					$show_def_font=$row->def_font;
 					?>
