@@ -427,6 +427,8 @@ input, optgroup, textarea {
   font-family: 'TopazPlus_a1200' !important;
   font-size: 16px;
   background: #444444 !important;
+  border: 0px;
+  resize: none;
 }
 
 input:hover, optgroup:hover {
