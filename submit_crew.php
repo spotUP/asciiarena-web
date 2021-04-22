@@ -47,7 +47,7 @@
 			</div>
 
 			<div class="row apb-1 apl-1">
-				<select name="crewstatus">
+				<select class="custom-select" name="crewstatus">
 					<option>Active</option>
 					<option selected="selected">Inactive</option>
 				</select>

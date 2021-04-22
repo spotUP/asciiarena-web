@@ -23,7 +23,7 @@ include_once "header.php";
 
 					<div class="row">
 						<span class="white">Receiver:</span>
-						<select name="posttomember">
+						<select class="custom-select" name="posttomember">
 							<?php
 							$ask = $_db->prepare("SELECT nick FROM users ORDER BY nick ASC");
 							$ask->execute();

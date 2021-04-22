@@ -190,7 +190,7 @@ include "header.php";
 					$show_sigdata=fixOutputEdit($show_sigdata);
 					$show_viewmode=$row->list_view_mode;
 					$def_bg_col=$row->def_bg_col ?? "#000000";
-					$def_fg_col=$row->def_fg_col ?? "255,255,255";
+					$def_fg_col=$row->def_fg_col ?? "#ffffff";
 					$show_display_mail=$row->display_mail;
 					$show_def_font=$row->def_font;
 					?>
@@ -222,7 +222,7 @@ include "header.php";
 							Birth:
 						</div>
 						<div class="col-3">
-							<select name='changebyear'>
+							<select class="custom-select" name='changebyear'>
 								<?php
 								echo "<option>$show_byear</option>";
 								$countyear=1900;
@@ -233,7 +233,7 @@ include "header.php";
 									$countyear++;
 								}
 								echo "</select>";	
-								echo "<select name='changebmonth'>";
+								echo "<select class='custom-select' name='changebmonth'>";
 								if ($show_bmonth<10)
 									echo "<option selected='selected'>0$show_bmonth</option>"; 
 								if ($show_bmonth>9)	
@@ -251,7 +251,7 @@ include "header.php";
 								}
 								echo "</select>";
 
-								echo "<select name='changebday'>";
+								echo "<select class='custom-select' name='changebday'>";
 								if ($show_bday<10)	
 									echo "<option selected='selected'>0$show_bday</option>"; 
 								if ($show_bday>9)	
@@ -273,7 +273,7 @@ include "header.php";
 							Country:
 						</div>
 						<div class="col-4">
-							<select name="changecountry"> 
+							<select class="custom-select" name="changecountry"> 
 								<?php
 								if (!empty($show_country))
 								{
@@ -304,7 +304,7 @@ include "header.php";
 								Show E-Mail:
 							</div>
 							<div class="col-4">	
-								<select name="display_mail">
+								<select class="custom-select" name="display_mail">
 									<option selected="selected"><?=$show_display_mail?></option>
 									<?php
 									if($show_display_mail!="Yes")
@@ -355,7 +355,7 @@ include "header.php";
 								File list mode:
 							</div>
 							<div class="col-3">	
-								<select name="changelistviewmode">
+								<select class="custom-select" name="changelistviewmode">
 									<option selected="selected"><?=$show_viewmode?></option>
 									<?php
 									if($show_viewmode!="BBS")
@@ -370,7 +370,7 @@ include "header.php";
 								Default Colly BG:
 							</div>
 							<div class="col-3">	
-								<select name="set_def_bg_col">
+<!--								<select name="set_def_bg_col">
 									<option selected="selected" value="<?=$def_bg_col?>" /><?=$bg_color_list["$def_bg_col"]?></option>
 									<option class='black' value="#000000">Black</option>
 									<option class='darkblue' value="#0000aa">Dark Blue</option>
@@ -388,6 +388,25 @@ include "header.php";
 									<option class='magenta' value="#ff55ff">Magenta</option>
 									<option class='yellow' value="#ffff55">Yellow</option>
 									<option class='white' value="#ffffff">White</option>
+								</select> -->
+								<select class="custom-select" id="colorselector_1" name="set_def_bg_col">
+									<option style="display: none;" id="selcol-1" selected="selected" value="<?=$def_bg_col?>" data-color="<?=$def_bg_col?>">Test</option>
+									<option value='#555555' data-color="#555555">Bright Black</option>
+									<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
+									<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
+									<option value='#ff5555' data-color="#ff5555">Bright Red</option>
+									<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
+									<option value='#55ff55' data-color="#55ff55">Bright Green</option>
+									<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
+									<option value='#ffffff' data-color="#ffffff">White</option>
+									<option value='#000000' data-color="#000000">Black</option>
+									<option value='#0000aa' data-color="#0000aa">Blue</option>
+									<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
+									<option value='#aa0000' data-color="#aa0000">Red</option>
+									<option value='#aa5500' data-color="#aa5500">Yellow</option>
+									<option value='#00aa00' data-color="#00aa00">Green</option>
+									<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
+									<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
 								</select>
 							</div>
 						</div>
@@ -396,33 +415,57 @@ include "header.php";
 								Default Colly FG:
 							</div>
 							<div class="col-3">	
-								<select name="set_def_fg_col">
-									<option selected="selected" value="<?=$def_fg_col?>" /><?=$fg_color_list["$def_fg_col"]?></option>
-									<option class='black' value="0,0,0">Black</option>
-									<option class='darkblue' value="0,0,170">Dark Blue</option>
-									<option class='darkgreen' value="0,170,0">Dark Green</option>
-									<option class='darkcyan' value="0,170,170">Dark Cyan</option>
-									<option class='darkred' value="170,0,0">Dark Red</option>
-									<option class='magenta' value="170,0,170">Magenta</option>
-									<option class='brown' value="170,85,0">Brown</option>
-									<option class='darkgrey' value="85,85,85">Dark Grey</option>
-									<option class='grey' value="170,170,170">Grey</option>
-									<option class='blue' value="85,85,255">Blue</option>
-									<option class='green' value="85,255,85">Green</option>
-									<option class='cyan' value="85,85,255">Cyan</option>
-									<option class='red' value="255,85,85">Red</option>
-									<option class='magenta' value="255,85,255">Magenta</option>
-									<option class='yellow' value="255,255,85">Yellow</option>
-									<option class='white' value="255,255,255">White</option>
+								<select class="custom-select" id="colorselector_2" name="set_def_fg_col">
+									<option id="selcol-2" selected="selected" value="<?=$def_fg_col?>" data-color="<?=$def_fg_col?>">Test</option>
+									<option value='#555555' data-color="#555555">Bright Black</option>
+									<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
+									<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
+									<option value='#ff5555' data-color="#ff5555">Bright Red</option>
+									<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
+									<option value='#55ff55' data-color="#55ff55">Bright Green</option>
+									<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
+									<option value='#ffffff' data-color="#ffffff">White</option>
+									<option value='#000000' data-color="#000000">Black</option>
+									<option value='#0000aa' data-color="#0000aa">Blue</option>
+									<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
+									<option value='#aa0000' data-color="#aa0000">Red</option>
+									<option value='#aa5500' data-color="#aa5500">Yellow</option>
+									<option value='#00aa00' data-color="#00aa00">Green</option>
+									<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
+									<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
 								</select>
 							</div>
 						</div>
+						<script>
+							$(function() {
+
+								window.prettyPrint && prettyPrint();
+
+								$('#colorselector_1').colorselector();
+								$('#colorselector_2').colorselector({
+									callback : function(value, color, title) {
+										$("#colorValue").val(value);
+										$("#colorColor").val(color);
+										$("#colorTitle").val(title);
+									}
+								});
+
+								$("#setColor").click(function(e) {
+									$("#colorselector_2").colorselector("setColor", "#008B8B");
+								})
+
+								$("#setValue").click(function(e) {
+									$("#colorselector_2").colorselector("setValue", 18);
+								})
+
+							});
+						</script>
 						<div class="row amb-1">
 							<div class="col-3">	
 								Default Colly Font:
 							</div>
 							<div class="col-3">	
-								<select name='def_font'>
+								<select class="custom-select" name='def_font'>
 									<?php
 									echo "<option selected='selected'>$show_def_font</option>";
 									if ($show_def_font != "topaz")			

@@ -18,13 +18,13 @@ include "header.php";
         <div class="col-lg-12" style="margin-top: 16px;">
           <span>
             <label for="fontList">Font:</label>
-            <select id="fontList">
+            <select class="custom-select" id="fontList">
               <option value="Graffiti.flf" selected>Graffiti</option>
             </select>
           </span>
           <span>
             <label for="taagCharWidth">Character Width:</label>
-            <select id="taagCharWidth">
+            <select class="custom-select" id="taagCharWidth">
               <option value="full">Full</option>
               <option value="fitted">Fitted</option>
               <option value="controlled smushing">Smush (R)</option>
@@ -34,7 +34,7 @@ include "header.php";
           </span>
           <span>
             <label for="taagCharHeight">Character Height: </label>
-            <select id="taagCharHeight">
+            <select class="custom-select" id="taagCharHeight">
               <option value="full">Full</option>
               <option value="fitted">Fitted</option>
               <option value="controlled smushing">Smush (R)</option>
