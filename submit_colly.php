@@ -37,7 +37,7 @@
 				Date
 			</div>
 			<div class="row apl-1 apb-1">
-				<select name="day">
+				<select class="custom-select" name="day">
 					<?php
 					$min_day=1;
 					$max_day=31;
@@ -50,7 +50,7 @@
 					?>
 				</select>
 				<span class="apl-1">
-					<select name="month">
+					<select class="custom-select" name="month">
 						<option value="0">Unknown</option>
 						<option value="1">January</option>
 						<option value="2">February</option>
@@ -67,7 +67,7 @@
 					</select>
 				</span>
 				<span class="apl-1">
-					<select name="year">
+					<select class="custom-select" name="year">
 						<?php
 						$countyear=1986;
 						$maxyear=date("Y");
@@ -85,7 +85,7 @@
 				Type
 			</div>
 			<div class="row apl-1 apb-1">
-				<select name="type">
+				<select class="custom-select" name="type">
 					<option value="ASCII">ASCII/Ansi</option>
 					<option>Archive</option>
 				</select>
@@ -96,7 +96,7 @@
 			</div>
 
 			<div class="row apl-1 apb-1">
-				<select name="colors">
+				<select class="custom-select" name="colors">
 					<option value="transparent">ANSI</option>
 					<option>Workbench</option>
 				</select>
