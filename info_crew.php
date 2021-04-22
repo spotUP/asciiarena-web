@@ -12,6 +12,24 @@ if (isset($result->name)) {
 	$crew_available = false;
 }
 
+$sort_order = (isset($_GET['sort_order'])) ? strtolower($_GET['sort_order']) : "";
+switch ($sort_order) {
+        case "desc": $sort_order = 'DESC'; $osort_order = 'asc'; break;
+        default: $sort_order = 'ASC'; $osort_order = 'desc'; break;
+}
+$sort_by = $_GET['sort_by'] ?? "";
+switch ($sort_by) {
+        case "name": $sort_criteria = "w.name"; break;
+        case "filename": $sort_criteria = "c.filename"; break;
+        case "artist": $sort_criteria = "a.nick"; break;
+        case "date": $sort_criteria = "c.year, c.month"; break;
+        default:
+                $sort_criteria = "w.name";
+                $sort_by = "name";
+                break;
+}
+$sort_criteria .= ' '.$sort_order;
+
 include "header.php";
 ?>
 
@@ -26,9 +44,9 @@ include "header.php";
 
 	if ($crew_available) {
 
-		$sort_criteria=$_GET['sort_by'] ?? 'a.name';
-		$sort_criteria=preg_replace('[^a-z.]','', $sort_criteria);
-		if ($sort_criteria === 'a.name') $sort_criteria = 'w.name';
+		//$sort_criteria=$_GET['sort_by'] ?? 'a.name';
+		//$sort_criteria=preg_replace('[^a-z.]','', $sort_criteria);
+		//if ($sort_criteria === 'a.name') $sort_criteria = 'w.name';
 
 		$ask="select * from crews where crewurl=:crewurl";
 		$result=fetchAll($ask, [ 'crewurl' => $crewurl ]);
@@ -506,75 +524,65 @@ include "header.php";
 
 		</div>
 		<?php
-		$ask_check="SELECT c.*,a.nick,w.name FROM collys c
-			  LEFT JOIN artists_collys ac ON c.id=ac.colly_id
-			  LEFT JOIN artists a ON ac.artist_id=a.id
-			  LEFT JOIN collys_crews cc ON cc.colly_id=c.id
-			  LEFT JOIN crews w ON cc.crew_id=w.id
-			  WHERE c.id in (SELECT colly_id FROM collys_crews WHERE crew_id IN (SELECT id FROM crews WHERE name=:crew))
-			  GROUP BY c.filename ORDER BY $sort_criteria ASC LIMIT 1";
-		$result_check=fetchAll($ask_check, [ 'crew' => $showcrew ]);
-		foreach($result_check as $row_check)
+		$ask_check = "SELECT count(c.filename) as files FROM collys c 
+			WHERE c.id in (SELECT colly_id FROM collys_crews WHERE crew_id IN (SELECT id FROM crews WHERE name=:crew))";
+		$result_check = fetchOne($ask_check, [ 'crew' => $showcrew ]);
+		if($result_check->files > 0)
 		{
-			if(!empty($row_check->filename))
-			{
+			?>
+			<h2 class="amb-1 amt-1 ap-1 bg-header">ALL <?=$show_acronym?> RELEASES</h2>
+			<div class="row amt-1 amb-1">
+				<div class="col-6">
+					<a class="white" href="/crew/<?=urlsafe($showcrew)?>/?sort_by=name&sort_order=<?=$osort_order?>">NAME</a>
+				</div>
+				<div class="col-2">
+					<a class="white" href="/crew/<?=urlsafe($showcrew)?>/?sort_by=filename&sort_order=<?=$osort_order?>">FiLENAME</a>
+				</div>
+				<div class="col-2">
+					<a class="white" href="/crew/<?=urlsafe($showcrew)?>/?sort_by=artist&sort_order=<?=$osort_order?>">ARTiST</a>
+				</div>
+				<div class="col-2">
+					<a href="/crew/<?=urlsafe($showcrew)?>/?sort_by=date&sort_order=<?=$osort_order?>">DATE</a>
+				</div>
+			</div>
+			<?php
+			$ask = "SELECT c.*,a.nick,w.name, 
+				GROUP_CONCAT(a.nick) as author
+				FROM collys c
+  				LEFT JOIN artists_collys ac ON c.id=ac.colly_id
+  				LEFT JOIN artists a ON ac.artist_id=a.id
+  				LEFT JOIN collys_crews cc ON cc.colly_id=c.id
+  				LEFT JOIN crews w ON cc.crew_id=w.id
+  				WHERE c.id in (SELECT colly_id FROM collys_crews WHERE crew_id IN (SELECT id FROM crews WHERE name=:crew))
+  				GROUP BY c.filename ORDER BY $sort_criteria";
+			$result=fetchAll($ask, [ 'crew' => $showcrew ]);
+			foreach($result as $row)
+				{
+				$author=$row->author;
+				$filename=$row->filename;
+				$name=$row->name;
+				$year=$row->year;
 				?>
-				<h2 class="amb-1 amt-1 ap-1 bg-header">ALL <?=$show_acronym?> RELEASES</h2>            
-				<div class="row amt-1 amb-1">
-					<div class="col-6">
-						<a class="white" href="/crew/<?=urlsafe($showcrew)?>/?sort_by=w.name">NAME</a>
+				<div class="row">
+					<div class="col-6 text-truncate">
+						<a class="magenta" href="/release/<?=$filename?>"><?=$row->name?></a>
 					</div>
-					<div class="col-2">
-						<a class="white" href="/crew/<?=urlsafe($showcrew)?>/?sort_by=c.filename">FiLENAME</a>
+					<div class="col-2 text-truncate">
+						<a class="magenta" href="/release/<?=$filename?>"><?=$row->filename?></a>
 					</div>
-					<div class="col-2">
-						<a class="white" href="/crew/<?=urlsafe($showcrew)?>/?sort_by=a.nick">ARTiST</a>
+
+					<div class="col-2 text-truncate">
+						<a class="green" href="/artist/<?=urlsafe($author)?>"><?=$author?></a>
 					</div>
-					<div class="col-2">
-						<a href="/crew/<?=urlsafe($showcrew)?>/?sort_by=c.year, c.month">DATE</a>
+
+					<div class="col-2 text-truncate">
+						<span class="lightgrey" href="/artist/<?=urlsafe($author)?>"><?php if (!empty($year)) { echo $year; }?></span>
 					</div>
+
 				</div>
 				<?php
-				$ask = "SELECT c.*,a.nick,w.name, 
-					GROUP_CONCAT(a.nick) as author
-					FROM collys c
-  					LEFT JOIN artists_collys ac ON c.id=ac.colly_id
-  					LEFT JOIN artists a ON ac.artist_id=a.id
-  					LEFT JOIN collys_crews cc ON cc.colly_id=c.id
-  					LEFT JOIN crews w ON cc.crew_id=w.id
-  					WHERE c.id in (SELECT colly_id FROM collys_crews WHERE crew_id IN (SELECT id FROM crews WHERE name=:crew))
-  					GROUP BY c.filename";
-				$result=fetchAll($ask, [ 'crew' => $showcrew ]);
-				foreach($result as $row)
-				{
-					$author=$row->author;
-					$filename=$row->filename;
-					$name=$row->name;
-					$year=$row->year;
-					?>
-					<div class="row">
-						<div class="col-6 text-truncate">
-							<a class="magenta" href="/release/<?=$filename?>"><?=$row->name?></a>
-						</div>
-						<div class="col-2 text-truncate">
-							<a class="magenta" href="/release/<?=urlsafe($filename)?>"><?=$row->filename?></a>
-						</div>
-
-						<div class="col-2 text-truncate">
-							<a class="green" href="/artist/<?=urlsafe($author)?>"><?=$author?></a>
-						</div>
-
-						<div class="col-2 text-truncate">
-							<span class="lightgrey" href="/artist/<?=urlsafe($author)?>"><?php if (!empty($year)) { echo $year; }?></span>
-						</div>
-
-					</div>
-
-					<?php
-				}
 			}
 		}
-
 	} else {
 			        ?>
                                 <div class="row">
