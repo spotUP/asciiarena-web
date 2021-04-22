@@ -120,7 +120,7 @@
 	<div class="row apb-1">
 		<div class="col-12">
 			<form>
-				<select name="artist_id" id="artist_fetch_id" class="w-100" onchange="getArtist();">
+				<select class="custom-select" name="artist_id" id="artist_fetch_id" class="w-100" onchange="getArtist();">
 				</select>
 			</form>
 		</div>
@@ -153,7 +153,7 @@
 		<div class="row apb-1"><div class="col-6 d-flex justify-content-between">Crews:</div></div>
 		<div id="artist_crew_fetch_id"></div>
 		<div class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between">
-		<select id="artist_crew_add_fetch_id" class="w-100">
+		<select class="custom-select" id="artist_crew_add_fetch_id" class="w-100">
 					<option value="0">Select Crew</option>
 					<?php
 					$result = fetchAll("SELECT id, name FROM crews ORDER BY name");
@@ -168,7 +168,7 @@
 		<div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="artist_country" class="lightgrey">Country</label>
-				<select name="country" id="artist_country">
+				<select class="custom-select" name="country" id="artist_country">
 					<?php
 					foreach($country_list as $symbol => $country)
 						{
@@ -184,7 +184,7 @@
 		<div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="artist_active" class="lightgrey">Status</label>
-				<select name="active" id="artist_active">
+				<select class="custom-select" name="active" id="artist_active">
 					<option value="Active">Active</option>
 					<option value="Inactive">Inactive</option>
 				</select>
