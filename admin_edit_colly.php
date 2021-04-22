@@ -115,9 +115,9 @@
       if (!($("#colly_artist_entry"+artistid).length)) {
         let artistlist = $("#colly_artist_fetch_id");
         addCollyArtistItem(artistlist,artistid,artistnick)
+        $("#colly_artist_add_fetch_id").val('0');
+        showAlert("Author Added!", "#colly");   
       }
-      $("#colly_artist_add_fetch_id").val('0');
-      showAlert("Author Added!", "#colly");   
     }
     $("#colly_artist_add_fetch_id").val('0');
     showAlert("Author Added!", "#colly");   
@@ -140,9 +140,9 @@
       if (!($("#colly_crew_entry"+crewid).length)) {
         let crewlist = $("#colly_crew_fetch_id");
         addCollyCrewItem(crewlist,crewid,crewname)
+        $("#colly_crew_add_fetch_id").val('0');
+        showAlert("Crew Added!", "#colly");
       }
-      $("#colly_crew_add_fetch_id").val('0');
-      showAlert("Crew Added!", "#colly");
     }
   }
  
