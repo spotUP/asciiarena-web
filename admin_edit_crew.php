@@ -124,7 +124,7 @@
 	<div class="row apb-1">
 		<div class="col-12">
 			<form>
-				<select name="crew_id" id="crew_fetch_id" class="w-100" onchange="getCrew();">
+				<select class="custom-select" name="crew_id" id="crew_fetch_id" class="w-100" onchange="getCrew();">
 				</select>
 			</form>
 		</div>
@@ -167,7 +167,7 @@
 		<div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="crew_active" class="lightgrey">Status</label>
-				<select name="active" id="crew_active">
+				<select class="custom-select" name="active" id="crew_active">
 					<option value="Active">Active</option>
 					<option value="Inactive">Inactive</option>
 				</select>
@@ -177,7 +177,7 @@
 		<div class="row apb-1"><div class="col-6 d-flex justify-content-between">BBSes:</div></div>
 		<div id="crew_bbs_fetch_id"></div>
 		<div class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between">
-		<select id="crew_bbs_add_fetch_id" class="w-100">
+		<select class="custom-select" id="crew_bbs_add_fetch_id" class="w-100">
 					<option value="0">Select BBS</option>
 					<?php
 					$result = fetchAll("SELECT id, name FROM bbses ORDER BY name");
