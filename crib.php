@@ -222,7 +222,7 @@ include "header.php";
 							Birth:
 						</div>
 						<div class="col-3">
-							<select name='changebyear'>
+							<select class="custom-select" name='changebyear'>
 								<?php
 								echo "<option>$show_byear</option>";
 								$countyear=1900;
@@ -233,7 +233,7 @@ include "header.php";
 									$countyear++;
 								}
 								echo "</select>";	
-								echo "<select name='changebmonth'>";
+								echo "<select class='custom-select' name='changebmonth'>";
 								if ($show_bmonth<10)
 									echo "<option selected='selected'>0$show_bmonth</option>"; 
 								if ($show_bmonth>9)	
@@ -251,7 +251,7 @@ include "header.php";
 								}
 								echo "</select>";
 
-								echo "<select name='changebday'>";
+								echo "<select class='custom-select' name='changebday'>";
 								if ($show_bday<10)	
 									echo "<option selected='selected'>0$show_bday</option>"; 
 								if ($show_bday>9)	
@@ -273,7 +273,7 @@ include "header.php";
 							Country:
 						</div>
 						<div class="col-4">
-							<select name="changecountry"> 
+							<select class="custom-select" name="changecountry"> 
 								<?php
 								if (!empty($show_country))
 								{
@@ -304,7 +304,7 @@ include "header.php";
 								Show E-Mail:
 							</div>
 							<div class="col-4">	
-								<select name="display_mail">
+								<select class="custom-select" name="display_mail">
 									<option selected="selected"><?=$show_display_mail?></option>
 									<?php
 									if($show_display_mail!="Yes")
@@ -355,7 +355,7 @@ include "header.php";
 								File list mode:
 							</div>
 							<div class="col-3">	
-								<select name="changelistviewmode">
+								<select class="custom-select" name="changelistviewmode">
 									<option selected="selected"><?=$show_viewmode?></option>
 									<?php
 									if($show_viewmode!="BBS")
@@ -389,7 +389,7 @@ include "header.php";
 									<option class='yellow' value="#ffff55">Yellow</option>
 									<option class='white' value="#ffffff">White</option>
 								</select> -->
-								<select id="colorselector_1" name="set_def_bg_col">
+								<select class="custom-select" id="colorselector_1" name="set_def_bg_col">
 									<option style="display: none;" id="selcol-1" selected="selected" value="<?=$def_bg_col?>" data-color="<?=$def_bg_col?>">Test</option>
 									<option value='#555555' data-color="#555555">Bright Black</option>
 									<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
@@ -415,7 +415,7 @@ include "header.php";
 								Default Colly FG:
 							</div>
 							<div class="col-3">	
-								<select id="colorselector_2" name="set_def_fg_col">
+								<select class="custom-select" id="colorselector_2" name="set_def_fg_col">
 									<option id="selcol-2" selected="selected" value="<?=$def_fg_col?>" data-color="<?=$def_fg_col?>">Test</option>
 									<option value='#555555' data-color="#555555">Bright Black</option>
 									<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
@@ -465,7 +465,7 @@ include "header.php";
 								Default Colly Font:
 							</div>
 							<div class="col-3">	
-								<select name='def_font'>
+								<select class="custom-select" name='def_font'>
 									<?php
 									echo "<option selected='selected'>$show_def_font</option>";
 									if ($show_def_font != "topaz")			
