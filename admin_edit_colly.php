@@ -58,6 +58,10 @@
 		$.get("/admin_cmds.php?cmd=get_colly", function (data) {
 			$.each(data, function (i, colly) {
 				collylist.append($("<option/>").val(colly.id).text(colly.name));
+				if (($("#edit_colly_id").val().length) && (colly.filename == $("#edit_colly_id").val())) {         
+					$("#colly_fetch_id").val(colly.id).trigger("change");
+					$("#edit_colly_id").val("")
+				}			
 			});
 		});
 	}
@@ -280,11 +284,12 @@
 
     <div class="row">
       <div class="col-12">
-				<input type="button" value="Save"" onclick="saveColly();">
+				<input type="button" value="Save" onclick="saveColly();">
 				<input type="button" value="Delete" onclick="delColly()">
       </div>
     </div>
   </form>  
+	<input type="hidden" id="edit_colly_id" value="<?php if(isset($_POST['getcollyname']) && (isset($_POST['open_edit_colly_field']))) echo $_POST['getcollyname']; ?>">
 </div>
 <script>
 	$(function () {
