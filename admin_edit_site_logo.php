@@ -84,7 +84,7 @@
 	<div class="row apb-1">
 		<div class="col-12">
 			<form>
-				<select class="custom-select" name="logo_id" id="logo_fetch_id" class="w-100" onchange="getLogo();">
+				<select class="select2" name="logo_id" id="logo_fetch_id" class="w-100" onchange="getLogo();">
 				</select>
 			</form>
 		</div>
