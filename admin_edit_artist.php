@@ -212,7 +212,7 @@
 
 		<div class="row">
 			<div class="col-6 d-flex justify-content-between">
-				<select class="custom-select" name="active" id="artist_active">
+				<select class="select2" name="active" id="artist_active">
 					<option value="Active">Active</option>
 					<option value="Inactive">Inactive</option>
 				</select>
