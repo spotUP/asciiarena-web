@@ -1899,6 +1899,10 @@ form{
   }
 }
 
+.select2{
+  width: 100% !important;
+}
+
 span.select2-selection__arrow > b::before{
  display: none;
 }
@@ -1962,3 +1966,6 @@ select2-dropdown {
     padding: 0px !important;
 }
 
+b::before, b::after, strong::before, strong::after {
+    content: '';
+}

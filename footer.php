@@ -62,6 +62,10 @@
 	})
 </script>
 
+<script>
+	$('.select2').select2();
+</script>
+
 <?php
 if (DEBUG) {
 	echo "<pre>";
