@@ -89,7 +89,7 @@
 	<div class="row apb-1">
 		<div class="col-12">
 			<form>
-				<select class="custom-select" name="user_id" id="user_fetch_id" class="w-100" onchange="getUser();">
+				<select class="select2" name="user_id" id="user_fetch_id" class="w-100" onchange="getUser();">
 				</select>
 			</form>
 		</div>
@@ -111,7 +111,7 @@
 		<div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="uesr_rank" class="lightgrey">Rank</label>
-				<select class="custom-select" name="rank" id="user_rank">
+				<select class="select2" name="rank" id="user_rank">
 					<option value="User">User</option>
 					<option value="Elite">Elite</option>
 					<option value="Admin">Admin</option>
@@ -121,7 +121,7 @@
 		<div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="user_birth_year" class="lightgrey">Birth</label>
-				<select class="custom-select" name="byear" id="user_byear">
+				<select class="select2" name="byear" id="user_byear">
 					<?php
 						$countyear=1900;
 						$maxyear=date("Y")-5;
@@ -134,7 +134,7 @@
 						}
 					?>
 				</select>
-				<select class="custom-select" name="bmonth" id="user_bmonth">
+				<select class="select2" name="bmonth" id="user_bmonth">
 					<?php
 					$countmonth=1;
 					$maxmonth=12;
@@ -147,7 +147,7 @@
 					}
 					?>
 				</select>
-				<select class="custom-select" name="bday" id="user_bday">
+				<select class="select2" name="bday" id="user_bday">
 					<?php
 					$countday=1;
 					$maxday=31;
@@ -165,7 +165,7 @@
 		<div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="user_country" class="lightgrey">Country</label>
-				<select class="custom-select" name="country" id="user_country">
+				<select class="select2" name="country" id="user_country">
 					<?php
 					foreach($country_list as $symbol => $country)
 						{

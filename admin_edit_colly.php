@@ -161,7 +161,7 @@
   <div class="row apb-1">
 		<div class="col-12">
 			<form>
-				<select class="custom-select" name="colly_id" id="colly_fetch_id" class="w-100" onchange="getColly();">
+				<select class="select2" name="colly_id" id="colly_fetch_id" class="w-100" onchange="getColly();">
 				</select>
 			</form>
 		</div>
@@ -193,7 +193,7 @@
     <div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="colly_type" class="lightgrey">Type</label>
-        <select class="custom-select" name="type" id="colly_type">
+        <select class="select2" name="type" id="colly_type">
           <option value="ASCII">ASCII</option>
 					<option value="ANSI">ANSI</option>
 				</select>
@@ -203,7 +203,7 @@
     <div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="colly_year" class="lightgrey">Release Date</label>
-        <select class="custom-select" name="year" id="colly_year">
+        <select class="select2" name="year" id="colly_year">
           <?php
 						$countyear=1900;
 						$maxyear=date("Y");
@@ -216,7 +216,7 @@
 						}
           ?>
         </select>
-        <select class="custom-select" name="month" id="colly_month">
+        <select class="select2" name="month" id="colly_month">
           <?php
           $countmonth=1;
           $maxmonth=12;
@@ -229,7 +229,7 @@
           }
           ?>
 				</select>
-        <select class="custom-select" name="day" id="colly_day">
+        <select class="select2" name="day" id="colly_day">
           <?php
           $countday=1;
           $maxday=31;
@@ -251,7 +251,7 @@
     <div class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between">
 
 
-    <select class="custom-select" name="colly_artist_add_id" id="colly_artist_add_fetch_id" class="w-100">
+    <select class="select2" name="colly_artist_add_id" id="colly_artist_add_fetch_id" class="w-100">
 					<option value="0">Select Artist</option>
 					<?php
 					$result = fetchAll("SELECT id, nick FROM artists ORDER BY nick");
@@ -269,7 +269,7 @@
     <div class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between">
 
 
-    <select class="custom-select" name="colly_crew_add_id" id="colly_crew_add_fetch_id" class="w-100">
+    <select class="select2" name="colly_crew_add_id" id="colly_crew_add_fetch_id" class="w-100">
 					<option value="0">Select Crew</option>
 					<?php
 					$result = fetchAll("SELECT id, name FROM crews ORDER BY name");
