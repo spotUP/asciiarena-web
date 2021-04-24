@@ -19,19 +19,19 @@
 		const id = $("#artist_fetch_id").val();
 		if (id > 0) {
 			$.get(`/admin_cmds.php?cmd=get_artist&id=${id}`, function (data) {
-					artistclear();
-					$('#artist_id').val(data[0].id);
-					$('#artist_nick').val(data[0].nick);
-					$('#artist_acronym').val(data[0].acronym);
-					$('#artist_www').val(data[0].www);
-					$('#artist_country').val(data[0].country);
-					$('#artist_status').val(data[0].active);
-					let crewslist = $("#artist_crew_fetch_id");
-					crewslist.empty();
-					$.each(data[0].crews, function (i, crew) {
-						addArtistCrewItem(crewslist,crew.id,crew.name)
-					});
+				artistclear();
+				$('#artist_id').val(data[0].id);
+				$('#artist_nick').val(data[0].nick);
+				$('#artist_acronym').val(data[0].acronym);
+				$('#artist_www').val(data[0].www);
+				$('#artist_country').val(data[0].country);
+				$('#artist_status').val(data[0].active);
+				let crewslist = $("#artist_crew_fetch_id");
+				crewslist.empty();
+				$.each(data[0].crews, function (i, crew) {
+					addArtistCrewItem(crewslist,crew.id,crew.name)
 				});
+			});
 		} else {
 			artistclear();
 		}
@@ -94,17 +94,17 @@
 	}
 	
 	function addArtistCrew() {
-    let crewid = $("#artist_crew_add_fetch_id").val()
-    let crewname = $("#artist_crew_add_fetch_id option:selected").text()
-    
-    if (crewid>0) {
-      if (!($("#artist_crew_entry"+crewid).length)) {
-        let crewlist = $("#artist_crew_fetch_id");
-        addArtistCrewItem(crewlist,crewid,crewname)
-      }
-      $("#artist_crew_add_fetch_id").val('0');
-      showAlert("Crew Added!", "#artist");
-    }
+		let crewid = $("#artist_crew_add_fetch_id").val()
+		let crewname = $("#artist_crew_add_fetch_id option:selected").text()
+		
+		if (crewid>0) {
+			if (!($("#artist_crew_entry"+crewid).length)) {
+				let crewlist = $("#artist_crew_fetch_id");
+				addArtistCrewItem(crewlist,crewid,crewname)
+			}
+			$("#artist_crew_add_fetch_id").val('0');
+			showAlert("Crew Added!", "#artist");
+		}
 	}  
 	
 	function showAlert(content, prependTo) {
@@ -120,8 +120,11 @@
 	<div class="row apb-1">
 		<div class="col-12">
 			<form>
-				<select class="custom-select" name="artist_id" id="artist_fetch_id" class="w-100" onchange="getArtist();">
+				<select class="select2" name="artist_id" id="artist_fetch_id" class="w-100" onchange="getArtist();">
 				</select>
+				<script>
+					$('.select2').select2();
+				</script>
 			</form>
 		</div>
 	</div>
@@ -153,17 +156,17 @@
 		<div class="row apb-1"><div class="col-6 d-flex justify-content-between">Crews:</div></div>
 		<div id="artist_crew_fetch_id"></div>
 		<div class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between">
-		<select class="custom-select" id="artist_crew_add_fetch_id" class="w-100">
-					<option value="0">Select Crew</option>
-					<?php
-					$result = fetchAll("SELECT id, name FROM crews ORDER BY name");
-					foreach($result as $row) {
-						?>
-						<option value="<?=$row->id?>"><?=$row->name?></option>
-						<?php
-					}
+			<select class="custom-select" id="artist_crew_add_fetch_id" class="w-100">
+				<option value="0">Select Crew</option>
+				<?php
+				$result = fetchAll("SELECT id, name FROM crews ORDER BY name");
+				foreach($result as $row) {
 					?>
-		</select><input type="button" value="Add Crew!" onclick="addArtistCrew()"/>
+					<option value="<?=$row->id?>"><?=$row->name?></option>
+					<?php
+				}
+				?>
+			</select><input type="button" value="Add Crew!" onclick="addArtistCrew()"/>
 		</div></div>
 		<div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
@@ -171,12 +174,12 @@
 				<select class="custom-select" name="country" id="artist_country">
 					<?php
 					foreach($country_list as $symbol => $country)
-						{
-							?>
-								<option value="<?=$country?>"><?=$country?></option>
-							<?php
-						}
+					{
 						?>
+						<option value="<?=$country?>"><?=$country?></option>
+						<?php
+					}
+					?>
 				</select>
 			</div>
 		</div>

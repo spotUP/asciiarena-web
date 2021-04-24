@@ -316,7 +316,7 @@ include_once "header.php";
 					<div class="container-fluid bg-secondary amb-1 apb-1">
 						<div class="row apt-1 apb-1 apl-1 apr-1">
 							Receiver: 
-							<select style="margin-left: 8px;" name="posttomember">
+							<select class="select2" style="margin-left: 8px;" name="posttomember">
 								<?php
 								$ask = $_db->prepare("SELECT nick FROM users ORDER BY nick ASC");
 								$ask->execute();
@@ -327,6 +327,9 @@ include_once "header.php";
 								}
 								?>
 							</select>
+							<script>
+								$('.select2').select2();
+							</script>
 						</div>
 
 						<div class="row apl-1 apr-1">

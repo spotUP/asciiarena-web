@@ -23,7 +23,7 @@ include_once "header.php";
 
 					<div class="row">
 						<span class="white">Receiver:</span>
-						<select class="custom-select" name="posttomember">
+						<select class="form-control select2 custom-select" name="posttomember">
 							<?php
 							$ask = $_db->prepare("SELECT nick FROM users ORDER BY nick ASC");
 							$ask->execute();
@@ -34,6 +34,9 @@ include_once "header.php";
 							}
 							?>
 						</select>
+						<script>
+							$('.select2').select2();
+						</script>
 					</div>
 					<div style="float: left; width: 370px;">
 						Subject: <input type="text" size="35" name="postsubject">
