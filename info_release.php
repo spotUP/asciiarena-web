@@ -366,10 +366,29 @@ require_once "header.php"; ?>
 						$ask = "select uploader from collys where filename=:filename";
 						$result_uploader = fetchOne($ask, [ 'filename' => base64_decode($filename) ]);
 						if (isset($result_uploader->uploader)) $uploader = $result_uploader->uploader;
+						$favourite = (fetchOne("SELECT 1 FROM favourites WHERE user_id = :user AND colly_id = :colly", [ "user" => $_user['id'], "colly" => $colly_id])) ? true : false;
 						?>
 						<form action="/release/<?=$filename?>" method="post"  id="ctrlForm">
 							<input type="submit" class="btn-big amb-1" name="addcomment" value="Comment">
+							<?php if ($favourite) { ?>
+							<input type="submit" class="btn-big amb-1" id="unfave" name="unfave" data-id="<?=$colly_id?>" value="Remove favourite">
+                                                	<script>
+                                                        $("#unfave").on("click", function () {
+                                                                const url = `/cmds.php/unfave/${$(this).data("id")}`;
+                                                                $.ajax(
+                                                                        url
+                                                                        ).done(data => {
+                                                                                if (data.status === true) {
+                                                                                        $(`#colly-row-${data.id}`).fadeOut(300, function () {
+                                                                                                $(this).remove();
+                                                                                        });
+                                                                                }
+                                                                        });
+                                                                });
+                                                        </script>
+							<?php } else { ?>
 							<input type="submit" class="btn-big amb-1" name="favourite" value="Favourite">
+							<?php } ?>
 							<input type="submit" class="btn-big amb-1" name="broken" value="Report Broken">
 						</form>
 						<?php

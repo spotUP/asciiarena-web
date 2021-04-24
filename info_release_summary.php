@@ -13,6 +13,7 @@ foreach (fetchAll("SELECT * FROM collys WHERE filename = :filename", [":filename
 	$dirname = explode(".", $filename);
 	$dirname = $dirname[ 0 ];
 	$file_id = "$filenameandpath.diz";
+	$colly_id = $colly->id;
 	$show_colly_name = preg_replace('/[^(\x20-\x7F)]*/','', $colly->name);
 	htmlspecialchars($show_colly_name, ENT_QUOTES);
 	if (file_exists($file_id)) {
