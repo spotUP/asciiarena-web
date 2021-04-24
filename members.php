@@ -211,7 +211,7 @@ include "header.php";
 						?>
 						<script>
 							$(".remove-button").on("click", function () {
-								const url = `/cmds/unfave/${$(this).data("id")}`;
+								const url = `/cmds.php/unfave/${$(this).data("id")}`;
 								$.ajax(
 									url
 									).done(data => {
