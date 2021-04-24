@@ -118,13 +118,9 @@
 		<input type="hidden" name="id" id="del_artist_id">
 	</form>
 	<div class="row apb-1">
-		<div class="col-12">
+		<div class="col-6">
 			<form>
-				<select class="select2" name="artist_id" id="artist_fetch_id" class="w-100" onchange="getArtist();">
-				</select>
-				<script>
-					$('.select2').select2();
-				</script>
+				<select class="select2" name="artist_id" id="artist_fetch_id" onchange="getArtist();"></select>
 			</form>
 		</div>
 	</div>
@@ -132,46 +128,70 @@
 	<form id="artist_form" action="/admin_cmds.php?cmd=save_artist" method="post">
 		<input type="hidden" name="id" id="artist_id">
 
-		<div class="row apb-1">
-			<div class="col-6 d-flex justify-content-between">
-				<label for="artist_nick" class="lightgrey">Nick</label>
-				<input type="text" size="24" id="artist_nick" name="nick">
+		<div class="row">
+			<div class="col-6 d-flex">
+				<label for="artist_nick" class="lightgrey apr-1">Nick</label>
 			</div>
 		</div>
 
 		<div class="row apb-1">
+			<div class="col-6 d-flex">
+				<input class="w-100" type="text" id="artist_nick" name="nick">
+			</div>
+		</div>
+
+		<div class="row">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="artist_acronym" class="lightgrey">Acronym</label>
-				<input type="text" size="24" id="artist_acronym" name="acronym">
 			</div>
 		</div>
 
 		<div class="row apb-1">
+			<div class="col-6 d-flex justify-content-between">
+				<input class="w-100" type="text" id="artist_acronym" name="acronym">
+			</div>
+		</div>
+
+		<div class="row">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="artist_www" class="lightgrey">Webpage</label>
-				<input type="text" size="24" id="artist_www" name="www">
 			</div>
 		</div>
 
-		<div class="row apb-1"><div class="col-6 d-flex justify-content-between">Crews:</div></div>
-		<div id="artist_crew_fetch_id"></div>
-		<div class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between">
-			<select class="custom-select" id="artist_crew_add_fetch_id" class="w-100">
-				<option value="0">Select Crew</option>
-				<?php
-				$result = fetchAll("SELECT id, name FROM crews ORDER BY name");
-				foreach($result as $row) {
-					?>
-					<option value="<?=$row->id?>"><?=$row->name?></option>
-					<?php
-				}
-				?>
-			</select><input type="button" value="Add Crew!" onclick="addArtistCrew()"/>
-		</div></div>
 		<div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
+				<input class="w-100" type="text" size="24" id="artist_www" name="www">
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-6 d-flex justify-content-between">Crews:</div>
+		</div>
+		<div id="artist_crew_fetch_id"></div>
+		<div class="row apb-1">
+			<div class="col-6 d-flex">
+				<select class="select2" id="artist_crew_add_fetch_id" class="w-100">
+					<option value="0">Select Crew</option>
+					<?php
+					$result = fetchAll("SELECT id, name FROM crews ORDER BY name");
+					foreach($result as $row) {
+						?>
+						<option value="<?=$row->id?>"><?=$row->name?></option>
+						<?php
+					}
+					?>
+				</select>
+				<span class="apl-1"><input type="button" value="Add Crew!" onclick="addArtistCrew()"/></span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-6 d-flex justify-content-between">
 				<label for="artist_country" class="lightgrey">Country</label>
-				<select class="custom-select" name="country" id="artist_country">
+			</div>
+		</div>
+		<div class="row apb-1">
+			<div class="col-6 d-flex justify-content-between">
+				<select class="select2" name="country" id="artist_country">
 					<?php
 					foreach($country_list as $symbol => $country)
 					{
@@ -183,10 +203,15 @@
 				</select>
 			</div>
 		</div>
-		
-		<div class="row apb-1">
+
+		<div class="row">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="artist_active" class="lightgrey">Status</label>
+			</div>
+		</div>  
+
+		<div class="row">
+			<div class="col-6 d-flex justify-content-between">
 				<select class="custom-select" name="active" id="artist_active">
 					<option value="Active">Active</option>
 					<option value="Inactive">Inactive</option>
