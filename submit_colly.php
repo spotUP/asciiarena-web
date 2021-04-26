@@ -37,20 +37,22 @@
 				Date
 			</div>
 			<div class="row apl-1 apb-1">
-				<select class="custom-select" name="day">
-					<?php
-					$min_day=1;
-					$max_day=31;
-					echo "<option selected='selected' value=0>Unknown</option>";
-					while($min_day<=$max_day)
-					{
-						echo "<option>$min_day</option>";
-						$min_day++;
-					}
-					?>
-				</select>
+				<span>
+					<select class="select2" name="day">
+						<?php
+						$min_day=1;
+						$max_day=31;
+						echo "<option selected='selected' value=0>Unknown</option>";
+						while($min_day<=$max_day)
+						{
+							echo "<option>$min_day</option>";
+							$min_day++;
+						}
+						?>
+					</select>
+				</span>
 				<span class="apl-1">
-					<select class="custom-select" name="month">
+					<select class="select2" name="month">
 						<option value="0">Unknown</option>
 						<option value="1">January</option>
 						<option value="2">February</option>
@@ -67,7 +69,7 @@
 					</select>
 				</span>
 				<span class="apl-1">
-					<select class="custom-select" name="year">
+					<select class="select2" name="year">
 						<?php
 						$countyear=1986;
 						$maxyear=date("Y");
@@ -85,10 +87,12 @@
 				Type
 			</div>
 			<div class="row apl-1 apb-1">
-				<select class="custom-select" name="type">
-					<option value="ASCII">ASCII/Ansi</option>
-					<option>Archive</option>
-				</select>
+				<span>
+					<select class="select2" name="type">
+						<option value="ASCII">ASCII/Ansi</option>
+						<option>Archive</option>
+					</select>
+				</span>
 			</div>
 
 			<div class="row apl-1">
@@ -96,10 +100,12 @@
 			</div>
 
 			<div class="row apl-1 apb-1">
-				<select class="custom-select" name="colors">
-					<option value="transparent">ANSI</option>
-					<option>Workbench</option>
-				</select>
+				<span>
+					<select class="select2" name="colors">
+						<option value="transparent">ANSI</option>
+						<option>Workbench</option>
+					</select>
+				</span>
 			</div>
 
 			<div class="row apl-1 apb-1">
