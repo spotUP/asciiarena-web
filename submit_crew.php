@@ -47,10 +47,12 @@
 			</div>
 
 			<div class="row apb-1 apl-1">
-				<select class="custom-select" name="crewstatus">
-					<option>Active</option>
-					<option selected="selected">Inactive</option>
-				</select>
+				<span>
+					<select class="select2" name="crewstatus">
+						<option>Active</option>
+						<option selected="selected">Inactive</option>
+					</select>
+				</span>
 			</div>
 
 			<div class="row apl-1">
