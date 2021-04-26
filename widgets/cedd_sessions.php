@@ -6,27 +6,27 @@
 <div class="container-fluid apt-1 p-0 p-lg-2">
 	<div class="col-12 bg-secondary apt-1 apb-1">
 		<div class="row apb-1">
-			<div class="col-sm-7 text-truncate">
+			<div class="col-7 col-sm-7 text-truncate">
 				<span class="white">NAME</span>
 			</div>
-			<div class="col-2">
+			<div class="col-2 col-sm-2">
 				<span class="white">STATUS</span>
 			</div>
-			<div class="col-1">
+			<div class="col-1 col-sm-1 d-none d-sm-block">
 				<span class="white">ARTISTS</span>
 			</div>
-			<div class="col-2">
+			<div class="col-3 col-sm-2">
 				<span class="white float-right">ACTiON</span>
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-6 col-sm-7 text-truncate">
+			<div class="col-7 col-sm-7 text-truncate">
 				<span class="cyan">Spots mega co-op mayhem</span>
 			</div>
-			<div class="col-2">
+			<div class="col-2 col-sm-2">
 				<span class="green">Open</span>
 			</div>
-			<div class="col-1">
+			<div class="col-1 col-sm-1 d-none d-sm-block">
 				<span>4</span>
 			</div>
 			<div class="col-3 col-sm-2">
@@ -35,13 +35,13 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-6 col-sm-7 text-truncate">
+			<div class="col-7 col-sm-7 text-truncate">
 				<span class="cyan">Friday brawl!</span>
 			</div>
 			<div class="col-2">
 				<span class="green">Open</span>
 			</div>
-			<div class="col-1">
+			<div class="col-1 col-sm-1 d-none d-sm-block">
 				<span>123</span>
 			</div>
 			<div class="col-3 col-sm-2">
@@ -50,13 +50,13 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-6 col-sm-7 text-truncate">
+			<div class="col-7 col-sm-7 text-truncate">
 				<span class="cyan">Divine Stylers Internal Bash!</span>
 			</div>
-			<div class="col-2">
+			<div class="col-2 col-sm-2">
 				<span class="lightred">Private</span>
 			</div>
-			<div class="col-1">
+			<div class="col-1 col-sm-1 d-none d-sm-block">
 				<span>4</span>
 			</div>
 			<div class="col-3 col-sm-2">
@@ -65,13 +65,13 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-6 col-sm-7 text-truncate">
+			<div class="col-7 col-sm-7 text-truncate">
 				<span class="cyan">aSCIIaRENA Logo Session</span>
 			</div>
-			<div class="col-2">
+			<div class="col-2 col-sm-2">
 				<span class="green">View</span>
 			</div>
-			<div class="col-1">
+			<div class="col-1 col-sm-1 d-none d-sm-block">
 				<span>4</span>
 			</div>
 			<div class="col-3 col-sm-2">
@@ -80,13 +80,13 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-6 col-sm-7 text-truncate">
+			<div class="col-7 col-sm-7 text-truncate">
 				<span class="cyan">Monday Bluez...</span>
 			</div>
-			<div class="col-2">
+			<div class="col-2 col-sm-2">
 				<span class="green">Open</span>
 			</div>
-			<div class="col-1">
+			<div class="col-1 col-sm-1 d-none d-sm-block">
 				<span>4</span>
 			</div>
 			<div class="col-3 col-sm-2">
