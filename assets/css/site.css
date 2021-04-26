@@ -1001,6 +1001,11 @@ pointer-events: none;
   }
 }
 
+@keyframes blink{
+  50% { opacity: 0; }
+  90% { opacity: 1; color #fff; }
+}
+
 .noise {
   position: fixed;
   top: -50%;
