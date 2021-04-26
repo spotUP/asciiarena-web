@@ -23,7 +23,6 @@ foreach (fetchAll("SELECT * FROM collys WHERE filename = :filename", [":filename
 		?>
 		<div class="row">
 			<div class="header col-lg-12">
-
 				<h1 class="ap-1 bg-header"><?=$show_colly_name?></h1>
 			</div>
 		</div>

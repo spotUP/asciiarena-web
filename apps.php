@@ -92,10 +92,10 @@ require_once "header.php"; ?>
 				foreach ($rows as $row) {
 					?>
                                         <div class="row apt-1">
-                                        	<div class="col-6">
+                                        	<div class="col-12 col-am-6 text-center text-md-left">
 							<a href="/application/<?=$row->filename?>"><span class="cyan" style="margin-right: 8px;"><?=$row->filename?></span></a> <span class="green" style="margin-right: 16px;">PF--</span> <span class="yellow" style="margin-right: 8px;"><?=$row->filesize?></span> <span class="yellow"><?=date("d.m.y", $row->timestamp);?></span>
                                         	</div>
-                                                <div class="col-6 apb-1">
+                                                <div class="col-12 col-sm-6 apb-1 text-center text-md-left">
 							<?php
                                         		$file_id = preg_replace('/\\.[^.\\s]{3,4}$/', '', $row->filename).'.diz';
                                         		if (file_exists('apps/'.$file_id)) {
@@ -113,15 +113,18 @@ require_once "header.php"; ?>
                                                 </div>
                                         </div>
                                         <div class="row apb-1">
-                                        	<div class="col-6"></div>
-                                                <div class="col-6">
+                                        	<div class="col-12 col-sm-6"></div>
+                                                <div class="col-12 col-sm-6 text-center text-md-left">
                                                 	<span class="pink text-right"><?=$row->upload_signature?></span>
                                                 </div>
                                         </div>
                                         <div class="row apb-2">
-                                        	<div class="col-6"></div>
-                                                <div class="col-6">
+                                        	<div class="col-12 col-sm-6"></div>
+                                                <div class="col-12 col-sm-6 text-center text-md-left d-none d-sm-block">
                                                 	<span class="green text-right">[ aSCIIaRENa ] [ FREE LEECH ] [ aSCIIaRENa ]</span>
+                                                </div>
+                                                <div class="col-12 col-sm-6 text-center text-md-left">
+                                                        <span class="green text-right block d-sm-none">[ aSCIIaRENa ] [ FREE LEECH ]</span>
                                                 </div>
                                         </div>
 					<?php
@@ -135,7 +138,7 @@ require_once "header.php"; ?>
                                 <div class="row amb-1">
                                         <div class="col-4 col-sm-4"><span class="white"><a href="?sort_by=filename&sort_order=<?=$osort_order?>">FILENAME</a></span></div>
                                         <div class="col-4 col-sm-4"><span class="white"><a href="?sort_by=name&sort_order=<?=$osort_order?>">NAME</a></span></div>
-                                        <div class="col-4 col-sm-4"><span class="white"><a href="?sort_by=author&sort_order=<?=$osort_order?>">AUTHOR</a></span></div>
+                                        <div class="col-4 col-sm-4 text-truncate"><span class="white"><a href="?sort_by=author&sort_order=<?=$osort_order?>">AUTHOR</a></span></div>
                                 </div>
 				<?php
 				foreach ($rows as $row) {
@@ -147,7 +150,7 @@ require_once "header.php"; ?>
                                                 <div class="col-4 col-sm-4 text-truncate">
                                                         <a class="magenta" href="/application/<?=$row->filename?>"><?=$row->name?></a>
 						</div>
-                                                <div class="col-4 col-sm-4 green">
+                                                <div class="col-4 col-sm-4 green text-truncate">
 							<span class="yellow"><?=$row->author?></span>
                                                 </div>
                                         </div>
