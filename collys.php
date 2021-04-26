@@ -125,7 +125,7 @@ switch ($sort_by) {
 					{
 						?>
 						<div class="row apt-1">
-							<div class="col-6">
+							<div class="col-6 text-center text-md-left">
 								<a href=""><span class="cyan" style="margin-right: 8px;"><?=$filename?></span></a> <span class="green" style="margin-right: 16px;">PF--</span> <span class="yellow" style="margin-right: 8px;"><?=$row->filesize?></span> <span class="yellow"><?=$upload_date?></span>
 								<?php
 								$ask_sig = "SELECT upload_signature from users where nick = :uploader";
