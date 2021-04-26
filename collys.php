@@ -54,10 +54,10 @@ switch ($sort_by) {
 									<a class="dropdown-item" href="collys.php?sort_by=releasemonth&viewmode=Standard">Standard</a>
 									<a class="dropdown-item" href="collys.php?sort_by=releasemonth&viewmode=BBS">BBS</a>
 								</div>
-								<form action="?sort_by=<?=$sort_criteria?>&viewmode=<?=$viewmode?>" method="post">
-									<span class="amr-1 d-none d-sm-block">Search: <input type="text" name="search" style="background-color: #555 !important;" value="<?=$searchquery?>"></span>
-								</form>
 							</div>
+							<form action="?sort_by=<?=$sort_criteria?>&viewmode=<?=$viewmode?>" method="post">
+								<span class="amr-1 d-none d-sm-block">Search: <input type="text" name="search" style="background-color: #555 !important;" value="<?=$searchquery?>"></span>
+							</form>
 						</div>
 					</div>
 				</div>
