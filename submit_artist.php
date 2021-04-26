@@ -31,15 +31,17 @@
 			</div>
 
 			<div class="row apl-1 apb-1">
-				<select class="custom-select" name="artistcountry"> 
-					<option value="Unknown">Unknown</option>
-					<?php
-					foreach($country_list as $symbol => $country)
-					{
-						echo "<option value=\"$symbol\">$country</option>\n";
-					}
-					?>
-				</select>	
+				<span>
+					<select class="select2" name="artistcountry"> 
+						<option value="Unknown">Unknown</option>
+						<?php
+						foreach($country_list as $symbol => $country)
+						{
+							echo "<option value=\"$symbol\">$country</option>\n";
+						}
+						?>
+					</select>
+				</span>
 			</div>
 
 			<div class="row apl-1">
@@ -56,10 +58,12 @@
 			</div>
 
 			<div class="row apl-1 apb-1">
-				<select class="custom-select" name="artiststatus">
-					<option>Active</option>
-					<option>Inactive</option>
-				</select>
+				<span>
+					<select class="select2" name="artiststatus">
+						<option>Active</option>
+						<option>Inactive</option>
+					</select>
+				</span>
 			</div>
 
 			<div class="row apl-1">
