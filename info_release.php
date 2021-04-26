@@ -552,13 +552,20 @@ require_once "header.php"; ?>
 		{
 			?>
 			<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: #000;"> 
+				<span id="loading" style="animation: blink 2s linear infinite">.LOADiNG.</span>
 				<div id="colly" style="padding-top: 64px;"></div>
 			</div>
 			<script type="text/javascript" src="/assets/js/ansilove.js"></script>
 			<script>
-				AnsiLove.render("<?php echo "/collections/{$dirname}/{$filename}"; ?>", function (canvas, sauce) {
-					document.getElementById("colly").appendChild(canvas);
-				}, {"font": "mosoul", "bits": "8", "icecolors": 1, "columns": 80, "thumbnail": 0, "filetype": "ans"});
+				AnsiLove.splitRender("<?php echo "/collections/{$dirname}/{$filename}"; ?>", function (canvases, sauce) {
+				    	canvases.forEach(function (canvas) {
+				    		canvas.style.verticalAlign = "bottom";
+				    		canvas.style.margin = "0 auto";
+				    		canvas.style.display = "block";
+						document.getElementById("colly").appendChild(canvas);
+				       	});
+					document.getElementById("loading").style.display = "none";
+				}, 100, {"bits": "8"});
 			</script>
 			<?php
 		}
