@@ -429,13 +429,37 @@ input, optgroup, textarea {
   background: #444444 !important;
   border: 0px;
   resize: none;
+  color: #bbbbbb;
 }
 
 input:hover, optgroup:hover {
-  color: #000000 !important;
   font-family: 'TopazPlus_a1200' !important;
   font-size: 16px;
-  background: #2a2a2a !important;
+  background: #444444 !important;
+  color: #bbbbbb !important;
+}
+
+input:active, button:active, select:active, optgroup:active {
+    border: 0;
+    max-height: 16px;
+    min-height: 16px;
+    color: #bbbbbb !important;
+}
+
+input, button, select, optgroup {
+  border: 0;
+  max-height: 16px;
+  min-height: 16px;
+  border: 0 !important;
+  white-space: pre;
+  color: #bbbbbb !important;
+}
+
+input:active, button:active, select:active, optgroup:active {
+  border: 0;
+  max-height: 16px;
+  min-height: 16px;
+  color: #bbbbbb !important;
 }
 
 select {
@@ -1048,20 +1072,6 @@ textarea.fig-txt{
   resize: none !important;
   padding: 16px !important;
   background: #2a2a2a !important;
-}
-
-input, button, select, optgroup {
-  border: 0;
-  max-height: 16px;
-  min-height: 16px;
-  border: 0 !important;
-  white-space: pre;
-}
-
-input:active, button:active, select:active, optgroup:active {
-  border: 0;
-  max-height: 16px;
-  min-height: 16px;
 }
 
 .fig-opt-entry {
