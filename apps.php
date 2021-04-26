@@ -133,9 +133,9 @@ require_once "header.php"; ?>
 				?>
 			<div class="container">
                                 <div class="row amb-1">
-                                        <div class="col-2 col-sm-4"><span class="white"><a href="?sort_by=filename&sort_order=<?=$osort_order?>">FILENAME</a></span></div>
-                                        <div class="col-2 col-sm-4"><span class="white"><a href="?sort_by=name&sort_order=<?=$osort_order?>">NAME</a></span></div>
-                                        <div class="col-2 col-sm-4"><span class="white"><a href="?sort_by=author&sort_order=<?=$osort_order?>">AUTHOR</a></span></div>
+                                        <div class="col-4 col-sm-4"><span class="white"><a href="?sort_by=filename&sort_order=<?=$osort_order?>">FILENAME</a></span></div>
+                                        <div class="col-4 col-sm-4"><span class="white"><a href="?sort_by=name&sort_order=<?=$osort_order?>">NAME</a></span></div>
+                                        <div class="col-4 col-sm-4"><span class="white"><a href="?sort_by=author&sort_order=<?=$osort_order?>">AUTHOR</a></span></div>
                                 </div>
 				<?php
 				foreach ($rows as $row) {
