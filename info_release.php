@@ -522,10 +522,11 @@ require_once "header.php"; ?>
 				$font = $_POST[ 'font' ];
 			}
 
-			$row = fetchOne("SELECT view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
+			$row = fetchOne("SELECT filename,view_counter, type FROM collys WHERE filename = :filename", [":filename" => $filename]);
 			$type = $row->type;
 			$counter = $row->view_counter;
 			$counter++;
+			$filename = $row->filename;
 
 			doQuery("UPDATE collys SET view_counter = :counter WHERE filename = :filename", [
 				":counter" => $counter,
@@ -536,9 +537,9 @@ require_once "header.php"; ?>
 			{
 				?>
 				<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;" id="colly-div"><pre id="colly" style="font-family: <?=$font;?>; color: <?=$fgcolor?>; white-space: pre;"><?php
-				if (file_exists(__DIR__ . "/collections/{$dirname}/{$filename}")) 
+				if (file_exists("collections/{$dirname}/{$filename}")) 
 				{
-					$content = file_get_contents(__DIR__ . "/collections/{$dirname}/{$filename}");
+					$content = file_get_contents("collections/{$dirname}/{$filename}");
 					$content = utf8_encode($content);
 					$content = htmlentities($content);
 					echo "<br><br><br><br>";
