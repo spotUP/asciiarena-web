@@ -520,7 +520,7 @@ require_once "header.php"; ?>
 			$commentid = $row->commentid;
 			$commenttime = date("Y-m-d H:i", $row->timestamp);
 
-			echo "<form action='/release/".$filename."&post' method='post'>";
+			echo "<form action='/release/".$filename."' method='post'>";
 			if ($userrating > 0) 
 			{
 				if (!is_admin()) 
