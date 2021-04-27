@@ -328,7 +328,7 @@ require_once "header.php"; ?>
 					<?php
 					echo "<form action=\"/release/".$filename."\" method='post'  id='ctrlForm'>";
 
-					echo "<input type='submit' class='btn-big amb-1' name='hide' value='Hide Colly!'" . ((!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type != "Archive"))) ? " style='display:none'" : "") . "> ";
+					echo "<input type='submit' class='btn-big amb-1' name='hide' value='Hide Colly!'" . ((!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type === "Archive"))) ? " style='display:none'" : "") . "> ";
 					if (!preg_match('/\.lha/i', $filename)) {
 						echo "<input type='submit' class='btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s' name='view' value='View Colly'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
 					}
