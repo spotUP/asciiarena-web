@@ -30,17 +30,20 @@ foreach (fetchAll("SELECT * FROM collys WHERE filename = :filename", [":filename
 			<div class="row ap-1 bg-secondary overflow-hidden">
 				<div class="animate__animated animate__backInLeft col-lg-8 d-flex justify-content-center justify-content-lg-start" style="position: relative; top: -16px;">
 					<span>
-						<?php if ($colly->file_id == "file_id.diz.png") {
+						<?php 
+						if (file_exists("$file_id")) 
+						{
+							$file_id_diz = file_get_contents(__DIR__ . "file_id");
+							echo "<pre class=\"magenta apt-1\">";
+							echo utf8_encode($file_id_diz);
+							echo "</pre>";
+						}
+						else 
+						{
 							$file_id_diz = file_get_contents(__DIR__ . "/collections/file_id.diz.txt");
 							echo "<pre class=\"magenta apt-1\">";
-							echo $file_id_diz;
+							echo utf8_encode($file_id_diz);
 							echo "</pre>";
-						} else {
-							if (file_exists("$file_id")) {
-								echo "<pre class=\"magenta apt-1\">";
-								echo utf8_encode($file_id_diz);
-								echo "</pre>";
-							}
 						}
 						?>
 					</span>
