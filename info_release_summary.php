@@ -1,9 +1,10 @@
 <?php defined('VALID') or die('Nuh-uh!');
-$dirname = explode(".", $filename);
-$dirname = $dirname[ 0 ];
-$filenameandpath = "collections/$dirname/$filename"; // fetch path + filename to get filesize.
-foreach (fetchAll("SELECT * FROM collys WHERE filename = :filename", [":filename" => $filename]) as $colly) 
-{
+
+$colly = fetchOne("SELECT * FROM collys WHERE filename = :filename", [":filename" => $filename]);
+
+	$dirname = explode(".", $colly->filename);
+	$dirname = $dirname[0];
+	$filenameandpath = "collections/".$dirname."/".$colly->filename; // fetch path + filename to get filesize.
 	$viewtimes = $colly->view_counter;
 	$year = $colly->year;
 	$prodmonth = $colly->month;
@@ -31,16 +32,16 @@ foreach (fetchAll("SELECT * FROM collys WHERE filename = :filename", [":filename
 				<div class="animate__animated animate__backInLeft col-lg-8 d-flex justify-content-center justify-content-lg-start" style="position: relative; top: -16px;">
 					<span>
 						<?php
-						if (file_exists("/"."$file_id")) 
+						if (file_exists($file_id))
 						{
-							$file_id_diz = file_get_contents("/"."$file_id");
+							$file_id_diz = file_get_contents($file_id);
 							echo "<pre class=\"magenta apt-1\">";
 							echo utf8_encode($file_id_diz);
 							echo "</pre>";
 						}
 						else 
 						{
-							$file_id_diz = file_get_contents(__DIR__ . "/collections/file_id.diz.txt");
+							$file_id_diz = file_get_contents("collections/file_id.diz.txt");
 							echo "<pre class=\"magenta apt-1\">";
 							echo utf8_encode($file_id_diz);
 							echo "</pre>";
@@ -161,5 +162,4 @@ foreach (fetchAll("SELECT * FROM collys WHERE filename = :filename", [":filename
 		</div>
 	</div>
 	<?php
-}
 ?>
