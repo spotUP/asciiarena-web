@@ -82,8 +82,9 @@ $searchquery = $_POST[ 'search' ] ?? "";
 			(SELECT COUNT(nick) FROM member_of WHERE crew = crews.name) AS members 
 			FROM crews 
 			WHERE MATCH(crews.name, crews.acronym) AGAINST (:searchquery IN BOOLEAN MODE)
+				OR crews.name LIKE :wcquery OR crews.acronym LIKE :wcquery
 			ORDER BY {$sort_by} {$sort_order} {$pagination["limit"]}";
-			$p = [":searchquery" => $searchquery];
+			$p = [":searchquery" => $searchquery, ":wcquery" => '%'.$searchquery.'%'];
 		}
 		$crews = [];
 		foreach (fetchAll($q, $p) as $row) {
