@@ -34,7 +34,7 @@ foreach (fetchAll("SELECT * FROM collys WHERE filename = :filename", [":filename
 						echo "fileid: $file_id";
 						if (file_exists("$file_id")) 
 						{
-							$file_id_diz = file_get_contents(__DIR__ . "file_id");
+							$file_id_diz = file_get_contents(."/".__DIR__ . "file_id");
 							echo "<pre class=\"magenta apt-1\">";
 							echo utf8_encode($file_id_diz);
 							echo "</pre>";
