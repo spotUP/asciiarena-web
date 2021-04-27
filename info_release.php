@@ -225,71 +225,7 @@ require_once "header.php"; ?>
 					$commentid = $_POST[ 'commentid' ];
 					$ask = "DELETE FROM comments where filename=:filename and commentid=:commentid";
 					doQuery($ask, [ 'filename' => $filename, 'commentid' => $commentid ]);
-				}
-
-				$ask = "SELECT a.nick FROM collys c LEFT JOIN artists_collys ac ON ac.colly_id=c.id LEFT JOIN artists a ON a.id=ac.artist_id WHERE c.filename=:filename";
-				$result = fetchOne($ask, [ 'filename' => $filename ]);
-				if (isset($result)) 
-				{
-					$artist = $result->nick;
-				}
-
-				$ask = "select avg(rating) as rating from comments where artist=:artist and rating>0";
-				$result = fetchOne($ask, [ 'artist' => $artist]);
-				if (isset($result)) 
-				{
-					$avg_artist_rating = $result->rating;
-				} else { 
-					$avg_artist_rating = 0;
-				}
-
-				$ask = "SELECT COUNT(rating) as rating from comments where artist=:artist and rating>0";
-				$result = fetchOne($ask, [ 'artist' => $artist]);
-				if (isset($result)) 
-				{
-					$rate_amount = $result->rating;
-				}
-				if ($rate_amount > 2) 
-				{
-					$ask = "update artists set rating=:rating where nick=:nick";
-					doQuery($ask, [ 'rating' => $avg_artist_rating, 'nick' => $artist ]);
-				}
-				$ask = "select avg(rating) as rating from comments where filename=:filename and rating>0";
-				$result = fetchOne($ask, [ 'filename' => $filename ]);
-				if (isset($result)) 
-				{
-					$avg_colly_rating = $result->rating;
-				} else {
-					$avg_colly_rating = 0;
-				}
-
-				$ask = "SELECT w.name as crew FROM collys c LEFT JOIN collys_crews cc ON cc.colly_id=c.id LEFT JOIN crews w ON w.id=cc.crew_id WHERE c.filename=:filename";
-				$result = fetchOne($ask, [ 'filename' => $filename ]);
-				if (isset($result)) 
-				{
-					$crew = $result->crew;
-				}
-
-				$ask = "select avg(rating) as rating from comments where crew=:crew and rating>0";
-				$result = fetchOne($ask, [ 'crew' => $crew ]);
-				if (isset($result)) 
-				{
-					$avg_crew_rating = $result->rating;
-				} else { 
-					$avg_crew_rating = 0;
-				}
-
-				$ask_rate_amount = "SELECT COUNT(rating) as rating from comments where crew=:crew and rating>0";
-				$result = fetchOne($ask, [ 'crew' => $crew ]);
-				if (isset($result)) 
-				{
-					$rate_amount = $result->rating;
-				}
-
-				if ($rate_amount > 2) 
-				{
-					$ask = "update crews set rating=:rating where name=:crew";
-					doQuery($ask, [ 'rating' => $avg_artist_rating, 'crew' => $crew ]);
+					recalculate_ratings();
 				}
 				?>
 				<div class="row">
@@ -584,7 +520,7 @@ require_once "header.php"; ?>
 			$commentid = $row->commentid;
 			$commenttime = date("Y-m-d H:i", $row->timestamp);
 
-			echo "<form action='/release/".$filename."&post' method='post'>";
+			echo "<form action='/release/".$filename."' method='post'>";
 			if ($userrating > 0) 
 			{
 				if (!is_admin()) 
