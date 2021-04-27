@@ -533,7 +533,6 @@ require_once "header.php"; ?>
 				":filename" => $filename
 			]);
 
-			echo "type:$type";
 			if ($type == "ASCII") 
 			{
 				?>
@@ -552,7 +551,6 @@ require_once "header.php"; ?>
 		<?php   }
 		elseif ($type == "ANSI") 
 		{
-			echo "ansilove";    
 			?>
 			<div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: #000;"> 
 				<span id="loading" style="animation: blink 2s linear infinite">.LOADiNG.</span>
