@@ -316,33 +316,32 @@ require_once "header.php"; ?>
 				$type = fetchOne("SELECT type FROM collys WHERE filename = :filename", [":filename" => $filename])->type ?? "";
 				?>
 				<div class="container-fluid bg-secondary amb-1 apb-1" style="height: 132px;">
-					<script>
-						$(document).ready(function() 
-						{
-							$("#ctrlForm select").change(function() 
-							{
-								$("#ctrlForm input[name='view']").click();
-							});
-						});
-					</script>
+					<form action="/release/<?=$filename?>" method="post"  id="ctrlForm">
 					<?php
-					echo "<form action=\"/release/".$filename."\" method='post'  id='ctrlForm'>";
-
-					echo "<input type='submit' class='btn-big amb-1' name='hide' value='Hide Colly!'" . ((!isset($_POST[ 'change' ]) && (!isset($_POST[ 'view' ]) && ($type === "Archive"))) ? " style='display:none'" : "") . "> ";
-					if (!preg_match('/\.lha/i', $filename)) {
-						echo "<input type='submit' class='btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s' name='view' value='View Colly'" . ((isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) ? " style='display:none'" : "") . "> ";
+					if ($type !== 'Archive' && isset($_POST['view'])) {
+						?>
+						<input type="submit" class="btn-big amb-1" name="hide" value="Hide Colly!">
+						<?php
 					}
-					echo "<input type='button' onclick='myFunction()' class='btn-big amb-1' name='fullscreen' value='Fullscreen'" . ((isset($_POST[ 'change' ]) || (!isset($_POST[ 'view' ]))) ? " style='display:none'" : "") . "> ";
 
-					if (!isset($_POST[ 'download' ])) 
+					if ($type !== 'Archive' && !isset($_POST['view'])) {
+						?>
+						<input type="submit" class="btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s" name="view" value="View Colly">
+						<?php
+					}
+					if (isset($_POST['view'])) {
+						?>
+						<input type='button' onclick="showFullscreen(); return false;" class="btn-big amb-1" name="fullscreen" value="Fullscreen">
+						<?php
+					}
+
+					if (!isset($_POST['download'])) 
 					{
 						?>
-						<form action="/release/<?=$filename?>" method="post" id="download-colly">
-							<input type="submit" class="btn-big amb-1" name="download" value="Download">
-						</form>
+						<input type="submit" class="btn-big amb-1" name="download" value="Download">
 						<?php
 					} 
-					elseif (isset($_POST[ "download" ])) 
+					elseif (isset($_POST['download'])) 
 					{
 						echo "downloading...";
 						?>
