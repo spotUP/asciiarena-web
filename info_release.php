@@ -305,7 +305,7 @@ require_once "header.php"; ?>
 				<?php
 			}
 
-			include('info_release_summary.php');
+			if ($colly_available) include('info_release_summary.php');
 
 //----------------------------------------------------------------------------------------------
 // TOP CONTROL TABLE
@@ -744,7 +744,7 @@ if (isset($_POST[ 'addcomment' ]))
 		$hasrated = $row->rating;
 		if ($hasrated > 0) 
 		{
-			echo "<form action=\"/release/".$filename."&comment\" method=\"post\">";
+			echo "<form action=\"/release/".$filename."?comment\" method=\"post\">";
 			?>
 			<div class="row">
 				<h2>Enter your comment...</h2>
@@ -763,7 +763,7 @@ if (isset($_POST[ 'addcomment' ]))
 	}
 	else
 	{
-		echo "<form action=\"/release/".$filename."&comment\" method=\"post\">";
+		echo "<form action=\"/release/".$filename."?comment\" method=\"post\">";
 		?>
 		<div class="row apl-1 apr-1">
 			<div class="header bg-header col-12 ap-1">ENTER YOUR COMMENT</div>
@@ -805,7 +805,7 @@ if (isset($_POST[ 'addcomment' ]))
 
 if (isset($_POST[ 'edit' ])) 
 {
-	echo "<form action=\"/release/".$filename."&comment\" method=\"post\">";
+	echo "<form action=\"/release/".$filename."?comment\" method=\"post\">";
 	$commentid = $_POST[ 'commentid' ];
 
 	$ask = "select comment from comments where commentid=:commentid";
@@ -814,7 +814,7 @@ if (isset($_POST[ 'edit' ]))
 	{
 		$comment = fixOutputEdit($row->comment);
 	}
-	echo "<form action=\"/release/".$filename."&comment\" method=\"post\">";
+	echo "<form action=\"/release/".$filename."?comment\" method=\"post\">";
 	?>
 	<div class="row">
 		<div class="col-12 apb-1">
