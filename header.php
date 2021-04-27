@@ -33,7 +33,7 @@ include "header_ascii.php";
 		});
 	</script>
 	<script type="text/javascript">
-		function myFunction() {
+		function showFullscreen() {
 			var element = document.getElementById("colly");
 			element.classList.toggle("fullscreen");
 			var element = document.getElementById("blacker");
@@ -206,7 +206,7 @@ include "header_ascii.php";
 </head>
 
 <body>
-	<div id="spotclose" class="spotclose" onclick='myFunction()'><div class="noevents">x</div></div>
+	<div id="spotclose" class="spotclose" onclick='showFullscreen()'><div class="noevents">x</div></div>
 	<div class="scanlines"></div>
 	<div class="vignette"></div>
 	<div class="navbar navbar-expand-lg fixed-top navbar-dark bg-white d-flex justify-content-between m-0 p-0" style="height: 22px; margin-bottom: 2px; padding-right: 2px;">
