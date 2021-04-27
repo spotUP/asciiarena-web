@@ -31,10 +31,9 @@ foreach (fetchAll("SELECT * FROM collys WHERE filename = :filename", [":filename
 				<div class="animate__animated animate__backInLeft col-lg-8 d-flex justify-content-center justify-content-lg-start" style="position: relative; top: -16px;">
 					<span>
 						<?php
-						echo "fileid: $file_id";
-						if (file_exists("$file_id")) 
+						if (file_exists("/"."$file_id")) 
 						{
-							$file_id_diz = file_get_contents(."/".__DIR__ . "file_id");
+							$file_id_diz = file_get_contents(__DIR__ . "/" . "$file_id");
 							echo "<pre class=\"magenta apt-1\">";
 							echo utf8_encode($file_id_diz);
 							echo "</pre>";
