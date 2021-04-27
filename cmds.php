@@ -31,6 +31,7 @@
 			}
 			break;
 		case "logout":
+			doQuery("UPDATE users SET lastactive = UNIX_TIMESTAMP()-300 WHERE id = {$_user['id']}");
 			$_SESSION = [];
 			if (ini_get("session.use_cookies")) {
 				$params = session_get_cookie_params();
