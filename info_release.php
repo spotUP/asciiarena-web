@@ -566,7 +566,7 @@ require_once "header.php"; ?>
 						document.getElementById("colly").appendChild(canvas);
 				       	});
 					document.getElementById("loading").style.display = "none";
-				}, 100, {"bits": "8"});
+				}, 100, {"font": "mosoul", "bits": "8", "icecolors": 1, "columns": 80, "thumbnail": 0, "filetype": "ans"});
 			</script>
 			<?php
 		}
