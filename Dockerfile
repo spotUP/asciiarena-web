@@ -12,6 +12,8 @@ COPY ./ /var/www/html/
 
 RUN a2enmod rewrite
 
+ARG MAILROOT 
+ENV MAILROOT ${MAILROOT}
 RUN echo "root=${MAILROOT}" > /etc/ssmtp/ssmtp.conf
 RUN echo "mailhub=${MAILHOST}" >> /etc/ssmtp/ssmtp.conf
 RUN echo "AuthUser=${MAILUSER}" >> /etc/ssmtp/ssmtp.conf
