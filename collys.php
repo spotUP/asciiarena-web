@@ -91,8 +91,9 @@ switch ($sort_by) {
 			MATCH(c.filename, c.name) against (:searchquery in boolean mode)
 			OR MATCH(a.nick) against (:searchquery in boolean mode)
 			OR MATCH(cw.name) against (:searchquery in boolean mode)
+			OR c.filename LIKE :wcquery OR c.name LIKE :wcquery OR a.nick LIKE :wcquery OR cw.name LIKE :wcquery
 			GROUP BY c.filename {$limit}";
-			$rows = fetchAll($ask, [":searchquery" => $searchquery]);
+			$rows = fetchAll($ask, [":searchquery" => $searchquery, ":wcquery" => '%'.$searchquery.'%']);
 
 			if ($viewmode === "BBS") {
 				$todaysday = date("D");
