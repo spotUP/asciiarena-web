@@ -60,8 +60,9 @@ switch ($sort_by) {
 			$q = "SELECT a.nick,GROUP_CONCAT(m.crew) as crews FROM artists a LEFT JOIN member_of m on a.nick=m.nick 
 				  WHERE MATCH(a.nick) AGAINST (:searchquery IN BOOLEAN MODE) 
 				    OR MATCH(m.crew) AGAINST (:searchquery IN BOOLEAN MODE)
+				    OR a.nick LIKE :wcquery
 				  GROUP BY a.id ORDER BY {$sort_by} ASC {$pagination["limit"]}";
-			$p = [":searchquery" => $searchquery];
+			$p = [":searchquery" => $searchquery, ":wcquery" => '%'.$searchquery.'%'];
 		}
 		foreach (fetchAll($q, $p) as $row) {
 			$artist = $row->nick;
