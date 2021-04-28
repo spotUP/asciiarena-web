@@ -16,17 +16,14 @@ ARG MAILROOT
 ARG MAILHOST
 ARG MAILUSER
 ARG MAILPASS
-ARG MAILDOMAIN
 ENV MAILROOT ${MAILROOT}
 ARG MAILHOST ${MAILHOST}
 ARG MAILUSER ${MAILUSER}
 ARG MAILPASS ${MAILPASS}
-ARG MAILDOMAIN ${MAILDOMAIN}
 RUN echo "root=${MAILROOT}" > /etc/ssmtp/ssmtp.conf
 RUN echo "mailhub=${MAILHOST}" >> /etc/ssmtp/ssmtp.conf
 RUN echo "AuthUser=${MAILUSER}" >> /etc/ssmtp/ssmtp.conf
 RUN echo "AuthPass=${MAILPASS}" >> /etc/ssmtp/ssmtp.conf
-RUN echo "rewriteDomain=${MAILDOMAIN}" >> /etc/ssmtp/ssmtp.conf
 RUN echo "UseTLS=YES" >> /etc/ssmtp/ssmtp.conf
 RUN echo "UseSTARTTLS=YES" >> /etc/ssmtp/ssmtp.conf
 RUN echo "sendmail_path=sendmail -i -t" >> /usr/local/etc/php/conf.d/php-sendmail.ini
