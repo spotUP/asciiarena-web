@@ -18,8 +18,8 @@
 					$collys = fetchAll("SELECT * FROM collys ORDER BY name");
 				}
 				foreach($collys as $colly) {
-          $crewdata = [];
-          $artistdata = [];
+          				$crewdata = [];
+          				$artistdata = [];
 					if($id) {
 						$crews = fetchAll("SELECT collys_crews.id,crews.name FROM collys_crews, crews where crews.id = collys_crews.crew_id and collys_crews.colly_id=:id",[":id" => $colly->id]);
 						foreach($crews as $crew) {
@@ -29,7 +29,7 @@
 							];
 						}
             
-            $artists = fetchAll("SELECT artists_collys.id,artists.nick FROM artists_collys, artists where artists.id = artists_collys.artist_id and artists_collys.colly_id=:id",[":id" => $colly->id]);
+            					$artists = fetchAll("SELECT artists_collys.id,artists.nick FROM artists_collys, artists where artists.id = artists_collys.artist_id and artists_collys.colly_id=:id",[":id" => $colly->id]);
 						foreach($artists as $artist) {
 							$artistdata[] = [
 								"id" => (int)$artist->id,
@@ -41,14 +41,14 @@
 					$data[] = [
 						"id" => (int)$colly->id,
 						"name" => $colly->name,
-            "filename" => $colly->filename,
+            					"filename" => $colly->filename,
 						"year" => $colly->year,
 						"month" => $colly->month,
 						"day" => $colly->day,
 						"type" => $colly->type,
 						"diz" => $colly->file_id,
-            "crews" => $crewdata,
-            "artists" => $artistdata,
+            					"crews" => $crewdata,
+            					"artists" => $artistdata,
 					];
 				}
 				if(!empty($data)) {
@@ -58,11 +58,11 @@
 			case "save_colly":
 				$response = 200;
 				$data = [
-          ":name" => $_POST[ "name" ] ?? "",
+          				":name" => $_POST[ "name" ] ?? "",
 					":filename" => $_POST[ "filename" ] ?? "",
-					":year" => $_POST[ "year" ] ?? "",
-					":month" => $_POST[ "month" ] ?? "",
-					":day" => $_POST[ "day" ] ?? "",
+					":year" => $_POST[ "year" ] ?? 1900,
+					":month" => $_POST[ "month" ] ?? 1,
+					":day" => $_POST[ "day" ] ?? 1,
 					":type" => $_POST[ "type" ] ?? "",
 					":file_id" => $_POST[ "diz" ] ?? "",
 				];
@@ -87,7 +87,7 @@
         }
   
         if (!empty($id)) {
-					if(!doQuery("UPDATE collys_crews SET updating='Y' WHERE colly_id = :id", [":id" => $id]))
+					if(!doQuery("UPDATE collys_crews SET updated='Y' WHERE colly_id = :id", [":id" => $id]))
 					{
 						exit(json_out(["status" => true], 400));     
 					}
@@ -107,7 +107,7 @@
 							exit(json_out(["status" => true], 400));     
 						}
 
-						$q = "UPDATE collys_crews SET updating = null where colly_id = :colly_id and crew_id = (select id from crews where name = :name)";
+						$q = "UPDATE collys_crews SET updated = null where colly_id = :colly_id and crew_id = (select id from crews where name = :name)";
 						if(!doQuery($q, $data)) {
 							exit(json_out(["status" => true], 400));     
 						}
@@ -115,13 +115,13 @@
 				}
 				
 				if (!empty($id)) {
-					if(!doQuery("DELETE FROM collys_crews WHERE updating='Y' AND colly_id = :id", [":id" => $id])) {
+					if(!doQuery("DELETE FROM collys_crews WHERE updated='Y' AND colly_id = :id", [":id" => $id])) {
 						exit(json_out(["status" => true], 400));     
 					}
 				}
 					
         if (!empty($id)) {
-					if(!doQuery("UPDATE artists_collys SET updating='Y' WHERE colly_id = :id", [":id" => $id]))
+					if(!doQuery("UPDATE artists_collys SET updated='Y' WHERE colly_id = :id", [":id" => $id]))
 					{
 						exit(json_out(["status" => true], 400));     
 					}
@@ -141,7 +141,7 @@
 							exit(json_out(["status" => true], 400));     
 						}
 
-						$q = "UPDATE artists_collys SET updating = null where colly_id = :colly_id and artist_id = (select id from artists where nick = :nick)";
+						$q = "UPDATE artists_collys SET updated = null where colly_id = :colly_id and artist_id = (select id from artists where nick = :nick)";
 						if(!doQuery($q, $data)) {
 							exit(json_out(["status" => true], 400));     
 						}
@@ -149,7 +149,7 @@
 				}
 				
 				if (!empty($id)) {
-					if(!doQuery("DELETE FROM artists_collys WHERE updating='Y' AND colly_id = :id", [":id" => $id])) {
+					if(!doQuery("DELETE FROM artists_collys WHERE updated='Y' AND colly_id = :id", [":id" => $id])) {
 						exit(json_out(["status" => true], 400));     
 					}
 				}
@@ -344,7 +344,7 @@
 				}
 				
 				if (!empty($id)) {
-					if(!doQuery("UPDATE member_of SET updating='Y' WHERE nick = (select nick from artists where id = :id)", [":id" => $id]))
+					if(!doQuery("UPDATE member_of SET updated='Y' WHERE nick = (select nick from artists where id = :id)", [":id" => $id]))
 					{
 						exit(json_out(["status" => true], 400));     
 					}
@@ -364,7 +364,7 @@
 							exit(json_out(["status" => true], 400));     
 						}
 
-						$q = "UPDATE member_of SET updating = null where crew = :crew and nick = :nick";
+						$q = "UPDATE member_of SET updated = null where crew = :crew and nick = :nick";
 						if(!doQuery($q, $data)) {
 							exit(json_out(["status" => true], 400));     
 						}
@@ -372,7 +372,7 @@
 				}
 				
 				if (!empty($id)) {
-					if(!doQuery("DELETE FROM member_of WHERE updating='Y' AND nick = (select nick from artists where id = :id)", [":id" => $id])) {
+					if(!doQuery("DELETE FROM member_of WHERE updated='Y' AND nick = (select nick from artists where id = :id)", [":id" => $id])) {
 						exit(json_out(["status" => true], 400));     
 					}
 				}
@@ -451,7 +451,7 @@
 				}
 
 				if (!empty($id)) {
-					if(!doQuery("UPDATE bbs_of SET updating='Y' WHERE crew = (select name from crews where id = :id)", [":id" => $id]))
+					if(!doQuery("UPDATE bbs_of SET updated='Y' WHERE crew = (select name from crews where id = :id)", [":id" => $id]))
 					{
 						exit(json_out(["status" => true], 400));     
 					}
@@ -470,7 +470,7 @@
 							exit(json_out(["status" => true], 400));     
 						}
 
-						$q = "UPDATE bbs_of SET updating = null where name = :name and crew = :crew";
+						$q = "UPDATE bbs_of SET updated = null where name = :name and crew = :crew";
 						if(!doQuery($q, $data)) {
 							exit(json_out(["status" => true], 400));     
 						}
@@ -478,7 +478,7 @@
 				}
 
 				if (!empty($id)) {
-					if(!doQuery("DELETE FROM bbs_of WHERE updating='Y' AND crew = (select name from crews where id = :id)", [":id" => $id])) {
+					if(!doQuery("DELETE FROM bbs_of WHERE updated='Y' AND crew = (select name from crews where id = :id)", [":id" => $id])) {
 						exit(json_out(["status" => true], 400));     
 					}
 				}
