@@ -37,4 +37,5 @@ RUN echo "user ${MAILUSER}" >> /etc/msmtprc
 RUN echo "password ${MAILPASS}" >> /etc/msmtprc
 RUN echo "account default : email" >> /etc/msmtprc
 RUN echo "sendmail_path=/usr/bin/msmtp -t" >> /usr/local/etc/php/conf.d/php-sendmail.ini
+RUN usermod -a -G tty www-data
 
