@@ -28,7 +28,7 @@ ARG MAILPASS ${MAILPASS}
 RUN echo "defaults" > /etc/msmtprc
 RUN echo "tls on" >> /etc/msmtprc
 RUN echo "tls_trust_file /etc/ssl/certs/ca-certificates.crt" >> /etc/msmtprc
-RUN echo "logfile -" >> /etc/msmtprc
+RUN echo "logfile /dev/stdout" >> /etc/msmtprc
 RUN echo "account email" >> /etc/msmtprc
 RUN echo "host ${MAILHOST}" >> /etc/msmtprc
 RUN echo "from ${MAILROOT}" >> /etc/msmtprc
