@@ -1,4 +1,4 @@
-FROM library/php:7.2-apache
+FROM library/php:7.4-apache
 
 RUN apt-get -y update
 
@@ -14,21 +14,27 @@ COPY ./ /var/www/html/
 
 RUN a2enmod rewrite
 
-RUN apt-get -y install ssmtp mailutils
+RUN apt-get -y install msmtp mailutils
 
-ARG MAILROOT 
+ARG MAILROOT
 ARG MAILHOST
 ARG MAILUSER
 ARG MAILPASS
-ENV MAILROOT ${MAILROOT}
+ARG MAILROOT ${MAILROOT}
 ARG MAILHOST ${MAILHOST}
 ARG MAILUSER ${MAILUSER}
 ARG MAILPASS ${MAILPASS}
-RUN echo "root=${MAILROOT}" > /etc/ssmtp/ssmtp.conf
-RUN echo "mailhub=${MAILHOST}" >> /etc/ssmtp/ssmtp.conf
-RUN echo "AuthUser=${MAILUSER}" >> /etc/ssmtp/ssmtp.conf
-RUN echo "AuthPass=${MAILPASS}" >> /etc/ssmtp/ssmtp.conf
-RUN echo "UseTLS=YES" >> /etc/ssmtp/ssmtp.conf
-RUN echo "UseSTARTTLS=YES" >> /etc/ssmtp/ssmtp.conf
-RUN echo "sendmail_path=sendmail -i -t" >> /usr/local/etc/php/conf.d/php-sendmail.ini
+
+RUN echo "defaults" > /etc/msmtprc
+RUN echo "tls on" >> /etc/msmtprc
+RUN echo "tls_trust_file /etc/ssl/certs/ca-certificates.crt" >> /etc/msmtprc
+RUN echo "logfile -" >> /etc/msmtprc
+RUN echo "account email" >> /etc/msmtprc
+RUN echo "host ${MAILHOST}" >> /etc/msmtprc
+RUN echo "from ${MAILROOT}" >> /etc/msmtprc
+RUN echo "auth on" >> /etc/ssmtp/msmtprc
+RUN echo "user ${MAILUSER}" >> /etc/msmtprc
+RUN echo "password ${MAILPASS}" >> /etc/msmtprc
+RUN echo "account default : email" >> /etcmsmtprc
+RUN echo "sendmail_path=/usr/bin/msmtp -t" >> /usr/local/etc/php/conf.d/php-sendmail.ini
 
