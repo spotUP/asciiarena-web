@@ -2,6 +2,8 @@ FROM library/php:7.2-apache
 
 RUN apt-get -y update
 
+RUN mkdir -p /usr/share/man/man1
+
 RUN apt-get -y install jlha-utils xdms
 
 RUN docker-php-ext-install mbstring pdo pdo_mysql
