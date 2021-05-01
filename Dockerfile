@@ -28,7 +28,7 @@ ARG MAILPASS ${MAILPASS}
 RUN echo "defaults" > /etc/msmtprc
 RUN echo "tls on" >> /etc/msmtprc
 RUN echo "tls_trust_file /etc/ssl/certs/ca-certificates.crt" >> /etc/msmtprc
-RUN echo "logfile /dev/stdout" >> /etc/msmtprc
+RUN echo "logfile -" >> /etc/msmtprc
 RUN echo "account email" >> /etc/msmtprc
 RUN echo "host ${MAILHOST}" >> /etc/msmtprc
 RUN echo "from ${MAILROOT}" >> /etc/msmtprc
@@ -37,5 +37,4 @@ RUN echo "user ${MAILUSER}" >> /etc/msmtprc
 RUN echo "password ${MAILPASS}" >> /etc/msmtprc
 RUN echo "account default : email" >> /etc/msmtprc
 RUN echo "sendmail_path=/usr/bin/msmtp -t" >> /usr/local/etc/php/conf.d/php-sendmail.ini
-RUN chmod 666 /dev/pts/0
 
