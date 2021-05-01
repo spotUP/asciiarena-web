@@ -1,4 +1,4 @@
-FROM library/php:7.2-apache
+FROM library/php:7.4-apache
 
 RUN apt-get -y update
 
