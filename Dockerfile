@@ -1,4 +1,4 @@
-FROM library/php:7.1.10-apache
+FROM library/php:7.4.18-apache
 
 RUN apt-get -y update
 
