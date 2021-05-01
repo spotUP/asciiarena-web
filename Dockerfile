@@ -35,6 +35,6 @@ RUN echo "from ${MAILROOT}" >> /etc/msmtprc
 RUN echo "auth on" >> /etc/msmtprc
 RUN echo "user ${MAILUSER}" >> /etc/msmtprc
 RUN echo "password ${MAILPASS}" >> /etc/msmtprc
-RUN echo "account default : email" >> /etcmsmtprc
+RUN echo "account default : email" >> /etc/msmtprc
 RUN echo "sendmail_path=/usr/bin/msmtp -t" >> /usr/local/etc/php/conf.d/php-sendmail.ini
 
