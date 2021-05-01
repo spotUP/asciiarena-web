@@ -118,7 +118,7 @@
 		http_response_code($code);
 		header("Content-Type: application/json");
 		try {
-			return json_encode($data);
+			return json_encode($data, JSON_INVALID_UTF8_IGNORE);
 		} catch (Exception $e) {
 			return "[]";
 		}
