@@ -2,7 +2,7 @@ FROM library/php:7.2-apache
 
 RUN apt-get -y update
 
-RUN apt-get -y install jlha-utils xdms ssmtp mailutils
+RUN apt-get -y install jlha-utils xdms
 
 RUN docker-php-ext-install mbstring pdo pdo_mysql
 
@@ -11,6 +11,8 @@ RUN echo 'PassEnv DBNAME DBHOST DBUSER DBPW' > /etc/apache2/conf-enabled/expose-
 COPY ./ /var/www/html/
 
 RUN a2enmod rewrite
+
+RUN apt-get -y install ssmtp mailutils
 
 ARG MAILROOT 
 ARG MAILHOST
