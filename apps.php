@@ -93,18 +93,16 @@ require_once "header.php"; ?>
             foreach ($rows as $row) {
              ?>
              <div class="row apt-1">
-                 <div class="col-12 col-am-6 text-center text-md-left">
+                 <div class="col-6 col-am-6 text-center text-md-left">
                        <a href="/application/<?=$row->filename?>"><span class="cyan" style="margin-right: 8px;"><?=$row->filename?></span></a> <span class="green" style="margin-right: 16px;">PF--</span> <span class="yellow" style="margin-right: 8px;"><?=$row->filesize?></span> <span class="yellow"><?=date("d.m.y", $row->timestamp);?></span>
                </div>
-               <div class="col-12 col-sm-6 apb-1 text-center text-md-left">
+               <div class="col-6 col-sm-6 apb-1 text-center text-md-left">
                        <?php
-                       $file_id = preg_replace('/\\.[^.\\s]{3,4}$/', '', $row->filename).'.diz';
-                       if (file_exists('apps/'.$file_id)) {
-                        ?>
-                        <pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$row->filename?>"><?=file_get_contents('apps/'.$file_id)?>/</a></pre>
-                        <?php
-                } 
-                ?>
+                       $file_id = $row->filename.'.diz';
+		       $dirname = @array_shift(explode(".", $row->filename));
+                       if (file_exists('apps/'.$dirname.'/'.$file_id)) { ?>
+                       <pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$row->filename?>"><?=file_get_contents('apps/'.$dirname.'/'.$file_id)?></a></pre>
+                       <?php } ?>
         </div>
 </div>
 <div class="row apb-1">
