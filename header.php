@@ -207,7 +207,9 @@ include "header_ascii.php";
 
 <body>
 	<div id="spotclose" class="spotclose" onclick='showFullscreen()'><div class="noevents">x</div></div>
+	<?php if (!isset($_user['settings']['crt_effect']) || $_user['settings']['crt_effect'] === 'Y') { ?>
 	<div class="scanlines"></div>
+	<?php } ?>
 	<div class="vignette"></div>
 	<div class="navbar navbar-expand-lg fixed-top navbar-dark bg-white d-flex justify-content-between m-0 p-0" style="height: 22px; margin-bottom: 2px; padding-right: 2px;">
 		<span style="margin-left: 16px;" class="ncommm">NComm 2.0 Copyright 1988-1992 Daniel Bloch & co.</span>
