@@ -135,17 +135,17 @@ include "header.php";
 				Birth:
 			</div>
 			<div class="col-3">
-				<select class="custom-select" name="byear">
+				<select class="select2" name="byear">
 					<?php for ($i=1920; $i<(date('Y')-5); $i++) { ?>
 						<option <?=($byear == $i) ? 'selected' : ''?>><?=$i?></option>
 					<?php } ?>
 				</select>
-				<select class="custom-select" name="bmonth">
+				<select class="select2" name="bmonth">
 					<?php for ($i=1; $i<=12; $i++) { ?>
 						<option <?=($bmonth == $i) ? 'selected' : ''?>><?=$i?></option>
 					<?php } ?>
 				</select>
-				<select class="custom-select" name="bday">
+				<select class="select2" name="bday">
 					<?php for ($i=1; $i<=31; $i++) { ?>
 						<option <?=($bday == $i) ? 'selected' : ''?>><?=$i?></option>
 					<?php } ?>
@@ -155,7 +155,7 @@ include "header.php";
 				Country:
 			</div>
 			<div class="col-4">
-				<select class="custom-select" name="country"> 
+				<select class="select2" name="country"> 
 					<?php foreach($country_list as $symbol => $scountry) { ?>
 					<option value="<?=$symbol?>" <?=($country == $symbol) ? 'selected' : ''?>><?=$country_list[$symbol]?></option>
 					<?php } ?>
@@ -173,7 +173,7 @@ include "header.php";
 				Show E-Mail:
 			</div>
 			<div class="col-4">	
-				<select class="custom-select" name="display_mail">
+				<select class="select2" name="display_mail">
 					<option <?=($display_mail === 'Yes') ? 'selected' : ''?>>Yes</option>
 					<option <?=($display_mail === 'No') ? 'selected' : ''?>>No</option>
 				</select>
@@ -219,7 +219,7 @@ include "header.php";
 				File list mode:
 			</div>
 			<div class="col-3">	
-				<select class="custom-select" name="viewmode">
+				<select class="select2" name="viewmode">
 					<option <?=($viewmode === 'Standard') ? 'selected' : ''?>>Standard</option>
 					<option <?=($viewmode === 'BBS') ? 'selected' : ''?>>BBS</option>
 				</select>
@@ -301,7 +301,7 @@ include "header.php";
 				Default Colly Font:
 			</div>
 			<div class="col-3">	
-				<select class="custom-select" name='def_font'>
+				<select class="select2" name='def_font'>
 					<option <?=($def_font === 'mosoul') ? 'selected' : ''?>>mosoul</option>
 					<option <?=($def_font === 'topaz') ? 'selected' : ''?>>topaz</option>
 					<option <?=($def_font === 'microknight') ? 'selected' : ''?>>microknight</option>
