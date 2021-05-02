@@ -102,7 +102,7 @@ require_once "header.php"; ?>
          $dirname = @array_shift(explode(".", $row->filename));
          if (file_exists('apps/'.$dirname.'/'.$file_id)) { 
          $display_file_id = file_get_contents('apps/'.$dirname.'/'.$file_id); ?>
-           <pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$row->filename?>"><?$display_file_id)?></a></pre>
+           <pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$row->filename?>"><?$display_file_id?></a></pre>
          <?php } ?>
        </div>
      </div>
