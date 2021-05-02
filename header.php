@@ -229,7 +229,7 @@ include "header_ascii.php";
 							<a class="dropdown-item ascii" href="/collys.php?sort_by=nick">By Artist<span style="padding-left: 10px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
 							<a class="dropdown-item ascii" href="/collys.php?sort_by=crew">By Crew<span style="padding-left: 10px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
 							<a class="dropdown-item ascii" href="/collys.php?sort_by=date">By Release Date<span style="font-size: 16px; font-family:Monaco, monospace;">&nbsp;</span></a>
-							<a class="dropdown-item ascii" href="/collys.php?sort_by=timestamp">By Upload Date<span style="padding-left: 8px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;</span></a>
+							<a class="dropdown-item ascii" href="/collys.php?sort_by=uploaddate">By Upload Date<span style="padding-left: 8px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;</span></a>
 							<a class="dropdown-item ascii" href="/collys.php?sort_by=uploader">By Uploader<span style="padding-left: 13px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;</span></a>
 						</div>
 					</li>

@@ -20,6 +20,8 @@ switch ($sort_by) {
         case "artist": $sort_criteria = "artists"; break;
         case "crew": $sort_criteria = "crews"; break;
         case "date": $sort_criteria = "c.year ".$sort_order.", c.month ".$sort_order.", c.day"; break;
+        case "uploaddate": $sort_criteria = "c.timestamp"; $sort_order = 'desc'; break;
+        case "uploader": $sort_criteria = "c.uploader"; break;
         default:
         	$sort_criteria = "c.name";
         	$sort_by = "name";
@@ -137,7 +139,7 @@ require_once "header.php"; ?>
 		<div class="row amb-1">
 			<div class="col"><span class="white"><a href="?sort_by=name&sort_order=<?=$osort_order?>">NAME</a></span></div>
 			<div class="col"><span class="white"><a href="?sort_by=filename&sort_order=<?=$osort_order?>">FILENAME</a></span></div>
-			<div class="col text-truncate"><span class="white"><a href="?sort_by=author&sort_order=<?=$osort_order?>">ARTiST</a></span></div>
+			<div class="col text-truncate"><span class="white"><a href="?sort_by=artist&sort_order=<?=$osort_order?>">ARTiST</a></span></div>
 			<div class="col text-truncate"><span class="white"><a href="?sort_by=crew&sort_order=<?=$osort_order?>">CREW</a></span></div>
 			<div class="col text-truncate"><span class="white"><a href="?sort_by=date&sort_order=<?=$osort_order?>">DATE</a></span></div>
 		</div>
