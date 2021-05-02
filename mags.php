@@ -102,7 +102,7 @@ require_once "header.php"; ?>
                          $file_id = $row->filename.'.diz';
                          if (file_exists('mags/'.$dirname.'/'.$file_id)) {
                             $display_file_id=file_get_contents('mags/'.$dirname.'/'.$file_id);
-                            $display_file_id=utf8_encode($display_file_id_diz);
+                            $display_file_id=utf8_encode($display_file_id);
                                 ?>
                                 <pre style="overflow: hidden;"><a class="magenta ascii" href="/magazine/<?=$row->filename?>"><?=$display_file_id?></a></pre>
                                 <?php
