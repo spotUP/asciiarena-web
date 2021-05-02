@@ -21,7 +21,9 @@
 					"nick" => $login->nick,
 					"crew" => $login->crew,
 					"rank" => $login->rank,
-					"settings" => []
+					"settings" => [
+						"crt_effect" => $login->crt_effect,
+					]
 				];
 				doQuery("INSERT INTO lastusers (nick, crew, user_id, timestamp) VALUES (:nick, :crew, {$login->id}, UNIX_TIMESTAMP())", [
 					":nick" => $_user[ "nick" ],
