@@ -1286,7 +1286,28 @@ input[type="password" i]:hover {
   font-family: 'TopazPlus_a1200' !important;
 }
 
+input[type="password" i]:active {
+  padding: 0px;
+  margin: 0px;
+  font-size: 16px !important;
+  font-family: 'TopazPlus_a1200' !important;
+}
+
 input[type="password"] {
+  padding: 0px;
+  margin: 0px;
+  font-size: 16px !important;
+  font-family: 'TopazPlus_a1200' !important;
+}
+
+input[type="password"]:hover {
+  padding: 0px;
+  margin: 0px;
+  font-size: 16px !important;
+  font-family: 'TopazPlus_a1200' !important;
+}
+
+input[type="password"]:active {
   padding: 0px;
   margin: 0px;
   font-size: 16px !important;
