@@ -100,9 +100,8 @@ require_once "header.php"; ?>
                        <?php
                        $file_id = preg_replace('/\\.[^.\\s]{3,4}$/', '', $row->filename).'.diz';
                        if (file_exists('apps/'.$file_id)) {
-                        $display_file_id=file_get_contents('apps/'.$file_id);
                         ?>
-                        <pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$row->filename?>"><?=$display_file_id?>/</a></pre>
+                        <pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$row->filename?>"><?=file_get_contents('apps/'.$file_id)?>/</a></pre>
                         <?php
                 } 
                 ?>
