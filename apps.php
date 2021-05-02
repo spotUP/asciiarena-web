@@ -98,7 +98,7 @@ require_once "header.php"; ?>
                </div>
                <div class="col-6 col-sm-6 apb-1 text-center text-md-left">
                        <?php
-                       $file_id = $row->filename.'.diz';
+                       $file_id = utf8_encode($row->filename.'.diz');
 		       $dirname = @array_shift(explode(".", $row->filename));
                        if (file_exists('apps/'.$dirname.'/'.$file_id)) { ?>
                        <pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$row->filename?>"><?=file_get_contents('apps/'.$dirname.'/'.$file_id)?></a></pre>
