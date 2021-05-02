@@ -159,15 +159,16 @@ body {
   padding-bottom: 32px;
 }
 
-input:-webkit-autofill {
-  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
-  font-size: 16px !important;
-  font-weight: normal !important;
-  line-height: 16px !important;
-  margin:0 !important;
-  padding:0 !important;
-}
-input:autofill {
+/* Change Autocomplete styles in Chrome*/
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
   font-size: 16px !important;
   font-weight: normal !important;
