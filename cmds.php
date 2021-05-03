@@ -18,7 +18,7 @@
 					":nick" => $ni
 				]);
 				if ($login) {
-					$pwhash = password_hash($pw, PASSWORD_BCRYPT, array('cost' => 14));
+					$pwhash = password_hash($pw, PASSWORD_BCRYPT, array('cost' => 13));
 					doQuery("UPDATE users SET pwhash=:pwhash WHERE id=:id", [ ":pwhash" => $pwhash, ":id" => $login->id ]);
 				}
 			} else {
