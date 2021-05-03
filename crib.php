@@ -53,17 +53,16 @@ if (!is_logged_in()) {
 			$spw = fetchOne("SELECT pwhash FROM users WHERE (id = :id)", [ ":id" => $_user['id'] ])->pwhash;
 			if (preg_match('/^[a-f0-9]{32}$/i', $spw)) {
 				if (md5($_POST['old_password']) !== $spw) $errors[] = 'old password is incorrect';
-				$pwhash = password_hash($pw, PASSWORD_BCRYPT, array('cost' => 13));
+				$pwhash = password_hash($_POST['new_password'], PASSWORD_BCRYPT, array('cost' => 13));
 			} else {
-				if (password_verify($pw, $spw)) {
-					$pwhash = password_hash($pw, PASSWORD_BCRYPT, array('cost' => 13));
+				if (password_verify($_POST['old_password'], $spw)) {
+					$pwhash = password_hash($_POST['new_password'], PASSWORD_BCRYPT, array('cost' => 13));
 				} else {
 					$errors[] = 'old password is incorrect';
 				}
 			}
 			if (count($errors) == 0) {
-				$ask="update users set pwhash=:pwhash where id=:id";
-				$q = doQuery($ask,[ 'pwhash' => $pwhash, 'id' => $_user['id'] ]);
+				$q = doQuery("UPDATE users SET pwhash=:pwhash WHERE id=:id",[ 'pwhash' => $pwhash, 'id' => $_user['id'] ]);
 				if ($q) $messages[] = 'password successuflly updated';
 			}
 		}
