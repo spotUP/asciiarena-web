@@ -11,10 +11,21 @@
 		case "login":
 			$pw = $_POST[ "password" ] ?? "";
 			$ni = $_POST[ "nick" ] ?? "";
-			$login = fetchOne("SELECT * FROM users WHERE pwhash = :pwhash AND (nick = :nick OR mail = :nick)", [
-				":pwhash" => md5($pw),
-				":nick" => $ni
-			]);
+			$spw = fetchOne("SELECT pwhash FROM users WHERE (nick = :nick OR mail = :nick)", [ ":nick" => $ni ])->pwhash;
+			if (preg_match('/^[a-f0-9]{32}$/i', $spw)) {
+				$login = fetchOne("SELECT * FROM users WHERE pwhash = :pwhash AND (nick = :nick OR mail = :nick)", [
+					":pwhash" => md5($pw),
+					":nick" => $ni
+				]);
+				if ($login) {
+					$pwhash = password_hash($pw, PASSWORD_BCRYPT, array('cost' => 14));
+					doQuery("UPDATE users SET pwhash=:pwhash WHERE id=:id", [ ":pwhash" => $pwhash, ":id" => $login->id ]);
+				}
+			} else {
+				if (password_verify($pw, $spw)) {
+					$login = fetchOne("SELECT * FROM users WHERE (nick = :nick OR mail = :nick)", [ ":nick" => $ni ]);
+				}
+			}
 			if ($login) {
 				$_user = $_SESSION[ "_user" ] = [
 					"id" => $login->id,
