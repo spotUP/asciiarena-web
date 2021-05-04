@@ -43,13 +43,15 @@ if (!is_logged_in()) {
 		 	&& isset($_POST['repeat_password']) && strlen($_POST['repeat_password']) > 0
 			) {
 
-			if (strlen($_POST['new_password']) < 6) {
-				$errors[] = 'new password is too short';
-			}
+			if (strlen($_POST['new_password']) < 6) $errors[] = 'new password is too short';
+			if ($_POST['password'] !== $_POST['repeat_password']) $errors[] = "passwords don't match";
+        		if (!preg_match('/[A-Z]/', $_POST['password'])
+        		        || !preg_match('/[a-z]/', $_POST['password'])
+        		        || !preg_match('/[0-9]/', $_POST['password']) 
+        		        || !preg_match('/[^\w]/', $_POST['password'])) {
+        		        $errors[] = 'password should include at least one upper case letter, one lower caser letter, one number and one special character';
+        		}
 
-			if (md5($_POST['new_password']) !== md5($_POST['repeat_password'])) {
-				$errors[] = 'new passwords do not match';
-			}
 			$spw = fetchOne("SELECT pwhash FROM users WHERE (id = :id)", [ ":id" => $_user['id'] ])->pwhash;
 			if (preg_match('/^[a-f0-9]{32}$/i', $spw)) {
 				if (md5($_POST['old_password']) !== $spw) $errors[] = 'old password is incorrect';
