@@ -10,9 +10,15 @@ if(isset($_POST['join'])) {
 	if ($_POST['nick'] === $_POST['password']) $errors[] = "username and password may not be identical"; 
 	if ($_POST['password'] !== $_POST['repeat_password']) $errors[] = "passwords don't match"; 
         if (!checkEmail($_POST['mail'])) $errors[] = 'invalid e-mail address';
-	if (strlen($_POST['password']) < 5) $errors[] = "password is too short";
+	if (strlen($_POST['password']) < 6) $errors[] = "password is too short";
 	if ($_POST['spam'] !== 'iamnotarobot') $errors[] = "spam check not completed";
 	if (is_logged_in()) $errors[] = "you're already logged in";
+	if (!preg_match('/[A-Z]/', $_POST['password'])
+		|| !preg_match('/[a-z]/', $_POST['password'])
+		|| !preg_match('/[0-9]/', $_POST['password'])
+		|| !preg_match('/[^\w]/', $_POST['password'])) {
+		$errors[] = 'password should include at least one upper case letter, one lower caser letter, one number and one special character';
+	}
 
 	$chk = fetchOne("SELECT 1 FROM users WHERE nick=:nick", [ ":nick" => $_POST['nick'] ] );
 	if ($chk) $errors[] = "nickname already in use";
@@ -28,24 +34,24 @@ if(isset($_POST['join'])) {
 			[ ":nick" => $_POST['nick'], ":pwhash" => $pwhash, ":now" => time(), ":mail" => $_POST['mail'], ":nickurl" => urlsafe($_POST['nick']) ]
 			);
 
-		$message = "WELCOME TO aSCIIaRENA!<br><br>".
+		$message = "WELCOME TO aSCIIaRENA!\n\n".
 
-			"To fully enjoy aSCIIaRENA, you should head over to your \"crib\" and personalize<br>".
-			"the viewing settings. You can change things such as the default colors of ASCII<br>".
-			"collys and the default viewing mode when listing collys/files.<br>". 
-			"Do check out the BBS listing mode! =)<br><br>".
+			"To fully enjoy aSCIIaRENA, you should head over to your \"crib\" and personalize\n".
+			"the viewing settings. You can change things such as the default colors of ASCII\n".
+			"collys and the default viewing mode when listing collys/files.\n".
+			"Do check out the BBS listing mode! =)\n\n".
 
-			"You can also edit your upload signature etc.<br><br>".
+			"You can also edit your upload signature etc.\n\n".
 
-			"After that you are ready for axxion! You can not only submitASCII collys, you<br>".
+			"After that you are ready for axxion! You can not only submitASCII collys, you\n".
 			"can comment and vote on collys.<br><br>".
 
-			"When you vote on a colly, the artist that made the colly and the crew that<br>".
-			"released it will get scores too, meaning that the artist top and the crew top<br>".
-			"are all based on the votes that you cast on collys. So go vote to prop your<br>". 
-			"favourite collys/artists/crews!<br><br>".
+			"When you vote on a colly, the artist that made the colly and the crew that\n".
+			"released it will get scores too, meaning that the artist top and the crew top\n".
+			"are all based on the votes that you cast on collys. So go vote to prop your\n".
+			"favourite collys/artists/crews!\n\n".
 
-			"/ sPOT^uP rOUGH [aSCIIaRENA sYSOP]<br>";	
+			"/ sPOT^uP rOUGH [aSCIIaRENA sYSOP]\n";
 
 		$user_id = fetchOne("SELECT id FROM users WHERE nick=:nick AND mail=:mail", [ ":nick" => $_POST['nick'], ":mail" => $_POST['mail'] ])->id;
 		$from_id = 2;
@@ -131,7 +137,7 @@ include "header.php";
 <?php } elseif (isset($_GET['confirm'])) { ?>
 <!-- account (not) activated -->
 <?php } else { ?>
-<form action="register.php" method="post">
+<form action="/register.php" method="post">
 	<div class="container-fluid bg-secondary amb-1 apb-1">
 		<div class="row">
 			<div class="col-6">
