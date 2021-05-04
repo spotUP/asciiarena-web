@@ -40,7 +40,7 @@ $searchquery = $_POST[ 'search' ] ?? "";
 				<div class="row">
 					<div class="col-12 block d-sm-none">
 						<form action="?sort_by=<?=$sort_by?>" method="post">
-							<span class="amr-1 ">Search: <input type="text" name="search" value="<?=$searchquery?>"></span>
+							<span class="amr-1 ">Search: <input type="text" name="search" autocomplete="off" value="<?=$searchquery?>"></span>
 						</form>
 					</div>
 				</div>

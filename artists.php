@@ -31,7 +31,7 @@ switch ($sort_by) {
 				?>				
 				<div>
 					<form action="?sort_by=<?=$sort_by?>" method="post">
-					<span class="amr-1">Search: <input type="text" name="search" value="<?=$searchquery?>"></span>
+					<span class="amr-1">Search: <input type="text" name="search" autocomplete="off" value="<?=$searchquery?>"></span>
 					</form>
 				</div>
 			</div>
