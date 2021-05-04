@@ -555,8 +555,6 @@ input:active, optgroup:active {
   color: #bbbbbb !important;
 }
 
-
-
 select {
   color: #ffffff !important;
   font-family: 'TopazPlus_a1200' !important;
@@ -571,7 +569,6 @@ select:hover {
   background: #999999 !important;
 }
 
-
 button, select{
   margin: 0;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
@@ -584,6 +581,13 @@ input, optgroup, textarea {
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
   line-height: 16px;
   font-size: 16px;
+}
+
+input[type=button], input[type=submit], input[type=reset] {
+  padding-left: 8px;
+  padding-right: 8px;
+  margin-left: 8px;
+  padding-top: 0px;
 }
 
 .btn-primary {
@@ -2139,4 +2143,10 @@ select2-dropdown {
 
 b::before, b::after, strong::before, strong::after {
   content: '';
+}
+
+.custom-file-input:lang(en) ~ .custom-file-label::after {
+    content: "Browse" !important;
+    padding-left: 8px;
+    padding-right: 8px;
 }
