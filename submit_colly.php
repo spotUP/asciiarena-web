@@ -16,7 +16,7 @@
 				Name (required)
 			</div>
 			<div class="row apl-1 apb-1">
-				<input type="text" size="24" name="colly_name">
+				<input type="text" size="24" name="colly_name" autocomplete="off">
 			</div>
 
 			<div class="row apl-1">

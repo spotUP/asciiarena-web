@@ -6,7 +6,7 @@
 			</div>
 
 			<div class="row apl-1 apb-1">
-				<input type="text" size="24" name="name">
+				<input type="text" size="24" name="name" autocomplete="off">
 			</div>
 
 			<div class="row apl-1">
@@ -14,7 +14,7 @@
 			</div>
 
 			<div class="row apl-1 apb-1">
-				<input type="text" size="24" name="sysop">
+				<input type="text" size="24" name="sysop" autocomplete="off">
 			</div>
 
 			<div class="row apl-1">
@@ -22,7 +22,7 @@
 			</div>
 
 			<div class="row apl-1 apb-1">
-				<input type="text" size="24" name="address">
+				<input type="text" size="24" name="address" autocomplete="off">
 			</div>
 
 			<div class="row apl-1">
@@ -30,7 +30,7 @@
 			</div>
 
 			<div class="row apl-1 apb-1">			
-				<input type="text" size="24" name="number">
+				<input type="text" size="24" name="number" autocomplete="off">
 			</div>
 
 			<div class="row apl-1 apb-1">

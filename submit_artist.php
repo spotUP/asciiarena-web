@@ -7,7 +7,7 @@
 			</div>
 
 			<div class="row apl-1 apb-1">
-				<input type="text" size="20" name="artistnick">
+				<input type="text" size="20" name="artistnick" autocomplete="off">
 			</div>
 
 			<div class="row apl-1">
@@ -15,7 +15,7 @@
 			</div>
 
 			<div class="row apl-1 apb-1">
-				<input type="text" size="20" name="artistacronym">
+				<input type="text" size="20" name="artistacronym" autocomplete="off">
 			</div>
 
 			<div class="row apl-1">
@@ -23,7 +23,7 @@
 			</div>
 
 			<div class="row apl-1 apb-1">
-				<input type="text" size="20" name="artistwww">
+				<input type="text" size="20" name="artistwww" autocomplete="off">
 			</div>
 
 			<div class="row apl-1">
