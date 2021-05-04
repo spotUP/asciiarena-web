@@ -357,76 +357,76 @@ require_once "header.php"; ?>
 							if (isset($_POST[ 'view' ]) || (isset($_POST[ 'change' ]))) 
 							{
 								?>
-								<div class="row apb-0">
-									<div class="col-3">
-										Colly BG:
-									</div>
-									<div class="col-3">
-										<select class="custom-select" class="custom-select" id="colorselector_1" name="set_def_bg_col">
-											<option style="display: none;" id="selcol-1" selected="selected" value="<?=$bgcolor?>" data-color="<?=$bgcolor?>"></option>
-											<option value='#555555' data-color="#555555">Bright Black</option>
-											<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
-											<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
-											<option value='#ff5555' data-color="#ff5555">Bright Red</option>
-											<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
-											<option value='#55ff55' data-color="#55ff55">Bright Green</option>
-											<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
-											<option value='#ffffff' data-color="#ffffff">White</option>
-											<option value='#000000' data-color="#000000">Black</option>
-											<option value='#0000aa' data-color="#0000aa">Blue</option>
-											<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
-											<option value='#aa0000' data-color="#aa0000">Red</option>
-											<option value='#aa5500' data-color="#aa5500">Yellow</option>
-											<option value='#00aa00' data-color="#00aa00">Green</option>
-											<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
-											<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
-										</select>
-									</div>
-								</div>
-								<div class="row amb-1">
-									<div class="col-3">
-										Colly FG:
-									</div>
-									<div class="col-3">
-										<select class="custom-select" class="custom-select" id="colorselector_2" name="set_def_fg_col">
-											<option id="selcol-2" selected="selected" value="<?=$fgcolor?>" data-color="<?=$fgcolor?>"></option>
-											<option value='#555555' data-color="#555555">Bright Black</option>
-											<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
-											<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
-											<option value='#ff5555' data-color="#ff5555">Bright Red</option>
-											<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
-											<option value='#55ff55' data-color="#55ff55">Bright Green</option>
-											<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
-											<option value='#ffffff' data-color="#ffffff">White</option>
-											<option value='#000000' data-color="#000000">Black</option>
-											<option value='#0000aa' data-color="#0000aa">Blue</option>
-											<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
-											<option value='#aa0000' data-color="#aa0000">Red</option>
-											<option value='#aa5500' data-color="#aa5500">Yellow</option>
-											<option value='#00aa00' data-color="#00aa00">Green</option>
-											<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
-											<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
-										</select>
-									</div>
-								</div>
-								<script>
-									$(function() {
-										$('#colorselector_1').colorselector({
-											callback : function(value, color, title) {
-												$("#colly").css('background-color', color);
-												$("#colly-div").css('background-color', color);
-												$("#blacker").css('background-color', color);
-											}
-										});
-										$('#colorselector_2').colorselector({
-											callback : function(value, color, title) {
-												$("#colly").css('color', color);
-											}
-										});
-
-									});
-								</script>
 								<div class="container-fluid">
+									<div class="row apb-0">
+										<div class="col-3">
+											Colly BG:
+										</div>
+										<div class="col-3">
+											<select class="custom-select" class="custom-select" id="colorselector_1" name="set_def_bg_col">
+												<option style="display: none;" id="selcol-1" selected="selected" value="<?=$bgcolor?>" data-color="<?=$bgcolor?>"></option>
+												<option value='#555555' data-color="#555555">Bright Black</option>
+												<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
+												<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
+												<option value='#ff5555' data-color="#ff5555">Bright Red</option>
+												<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
+												<option value='#55ff55' data-color="#55ff55">Bright Green</option>
+												<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
+												<option value='#ffffff' data-color="#ffffff">White</option>
+												<option value='#000000' data-color="#000000">Black</option>
+												<option value='#0000aa' data-color="#0000aa">Blue</option>
+												<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
+												<option value='#aa0000' data-color="#aa0000">Red</option>
+												<option value='#aa5500' data-color="#aa5500">Yellow</option>
+												<option value='#00aa00' data-color="#00aa00">Green</option>
+												<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
+												<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
+											</select>
+										</div>
+									</div>
+									<div class="row amb-1">
+										<div class="col-3">
+											Colly FG:
+										</div>
+										<div class="col-3">
+											<select class="custom-select" class="custom-select" id="colorselector_2" name="set_def_fg_col">
+												<option id="selcol-2" selected="selected" value="<?=$fgcolor?>" data-color="<?=$fgcolor?>"></option>
+												<option value='#555555' data-color="#555555">Bright Black</option>
+												<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
+												<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
+												<option value='#ff5555' data-color="#ff5555">Bright Red</option>
+												<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
+												<option value='#55ff55' data-color="#55ff55">Bright Green</option>
+												<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
+												<option value='#ffffff' data-color="#ffffff">White</option>
+												<option value='#000000' data-color="#000000">Black</option>
+												<option value='#0000aa' data-color="#0000aa">Blue</option>
+												<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
+												<option value='#aa0000' data-color="#aa0000">Red</option>
+												<option value='#aa5500' data-color="#aa5500">Yellow</option>
+												<option value='#00aa00' data-color="#00aa00">Green</option>
+												<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
+												<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
+											</select>
+										</div>
+									</div>
+									<script>
+										$(function() {
+											$('#colorselector_1').colorselector({
+												callback : function(value, color, title) {
+													$("#colly").css('background-color', color);
+													$("#colly-div").css('background-color', color);
+													$("#blacker").css('background-color', color);
+												}
+											});
+											$('#colorselector_2').colorselector({
+												callback : function(value, color, title) {
+													$("#colly").css('color', color);
+												}
+											});
+
+										});
+									</script>
 									<div class="row aml-1">
 										<div class="col-3">
 											Font:
