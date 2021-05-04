@@ -56,7 +56,7 @@ require_once "header.php"; ?>
                                                 </div>
 
                                                 <form action="?sort_by=<?=$sort_criteria?>&sort_order=<?=$sort_order?>&viewmode=<?=$viewmode?>" method="post">
-                                                        <span class="amr-1 d-none d-sm-block">Search: <input type="text" name="search" style="background-color: #555 !important;" value="<?=$searchquery?>"></span>
+                                                        <span class="amr-1 d-none d-sm-block">Search: <input type="text" name="search" autocomplete="off" style="background-color: #555 !important;" value="<?=$searchquery?>"></span>
                                                 </form>
                                         </div>
                                 </div>
