@@ -101,13 +101,14 @@ require_once "header.php"; ?>
                          $dirname = preg_replace('/\\.[^.\\s]{3,4}$/', '', $row->filename);
                          $file_id = $row->filename.'.diz';
                          if (file_exists('mags/'.$dirname.'/'.$file_id)) {
+                            $display_file_id=file_get_contents('mags/'.$dirname.'/'.$file_id);
+                            $display_file_id=utf8_encode($display_file_id);
                                 ?>
-                                <pre style="overflow: hidden;"><a class="magenta ascii" href="/magazine/<?=$row->filename?>"><?=file_get_contents('mags/'.$dirname.'/'.$file_id)?>/</a></pre>
+                                <pre style="overflow: hidden;"><a class="magenta ascii" href="/magazine/<?=$row->filename?>"><?=$display_file_id?></a></pre>
                                 <?php
                         }
-                        ?>
-                        <pre style="overflow: hidden;"><a class="magenta ascii" href="/magazine/<?=$filename?>"><?=$orig?></a></pre>
 
+                        ?>
                 </div>
         </div>
         <div class="row apb-1">

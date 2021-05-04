@@ -9,26 +9,58 @@
 
 	switch ($cmd) {
 		case "login":
+			$login = false;
 			$pw = $_POST[ "password" ] ?? "";
 			$ni = $_POST[ "nick" ] ?? "";
-			$login = fetchOne("SELECT * FROM users WHERE pwhash = :pwhash AND (nick = :nick OR mail = :nick)", [
-				":pwhash" => md5($pw),
-				":nick" => $ni
-			]);
+			$spw = fetchOne("SELECT pwhash FROM users WHERE (nick = :nick OR mail = :nick)", [ ":nick" => $ni ])->pwhash;
+			if (preg_match('/^[a-f0-9]{32}$/i', $spw)) {
+				$login = fetchOne("SELECT * FROM users WHERE pwhash = :pwhash AND (nick = :nick OR mail = :nick)", [
+					":pwhash" => md5($pw),
+					":nick" => $ni
+				]);
+				if ($login) {
+					$pwhash = password_hash($pw, PASSWORD_BCRYPT, array('cost' => 13));
+					doQuery("UPDATE users SET pwhash=:pwhash WHERE id=:id", [ ":pwhash" => $pwhash, ":id" => $login->id ]);
+				}
+			} else {
+				if (password_verify($pw, $spw)) {
+					$login = fetchOne("SELECT * FROM users WHERE (nick = :nick OR mail = :nick)", [ ":nick" => $ni ]);
+				}
+			}
 			if ($login) {
 				$_user = $_SESSION[ "_user" ] = [
 					"id" => $login->id,
 					"nick" => $login->nick,
 					"crew" => $login->crew,
 					"rank" => $login->rank,
-					"settings" => []
+					"settings" => [
+						"crt_effect" => $login->crt_effect,
+					]
 				];
 				doQuery("INSERT INTO lastusers (nick, crew, user_id, timestamp) VALUES (:nick, :crew, {$login->id}, UNIX_TIMESTAMP())", [
 					":nick" => $_user[ "nick" ],
 					":crew" => $_user[ "crew" ]
 				]);
 				doQuery("UPDATE users SET lastactive = UNIX_TIMESTAMP() WHERE id = {$login->id}");
+				if ($is_ajax) { ?>
+					<div class="bs-component quick-alert amb-1" id="login-success" style="display: none;">
+						<div id="#succes-alert" class="animate__animated animate__shakeX alert alert-success">authentication successful</div>
+					</div>
+					<script>$('#login-success').fadeIn('fast').delay(500, function(){ window.location.reload(); });</script>
+					<?php 
+					exit;
+				}
+			} else {
+				if ($is_ajax) { ?>
+					<div class="bs-component quick-alert amb-1" id="login-failure" style="display: none;">
+						<div id="#danger-alert" class="animate__animated animate__shakeX alert alert-danger">authentication failed</div>
+					</div>
+					<script>$('#login-failure').fadeIn('slow').delay(2000).fadeOut('slow');</script>
+					<?php 
+					exit;
+				}
 			}
+			exit;
 			break;
 		case "logout":
 			doQuery("UPDATE users SET lastactive = UNIX_TIMESTAMP()-300 WHERE id = {$_user['id']}");

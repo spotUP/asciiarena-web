@@ -135,6 +135,11 @@
 
 * {
   cursor:url(../data/mousepointer.png), auto !important;
+  font-smooth: never !important;
+  -webkit-font-smooth : none !important;
+  -webkit-font-smoothing: none !important;
+  -moz-osx-font-smoothing: none !important;
+  font-smoothing: none !important;
 }
 
 
@@ -152,6 +157,70 @@ body {
   -moz-osx-font-smoothing: none !important;
   font-smoothing: none !important;
   padding-bottom: 32px;
+}
+
+/* Change Autocomplete styles in Chrome*/
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
+  font-size: 16px !important;
+  font-weight: normal !important;
+  line-height: 16px !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+
+
+
+
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-animation: autofill 0s forwards;
+  animation: autofill 0s forwards;
+}
+
+@keyframes autofill {
+  100% {
+    background: transparent;
+    color: inherit;
+    font-size: inherit;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
+  font-size: 16px !important;
+  font-weight: normal !important;
+  line-height: 16px !important;
+  margin:0 !important;
+  padding:0 !important;
+  }
+}
+
+@-webkit-keyframes autofill {
+  100% {
+    background: transparent;
+    color: inherit;
+    font-size: inherit;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
+  font-size: 16px !important;
+  font-weight: normal !important;
+  line-height: 16px !important;
+  }
+}
+
+
+input:-webkit-autofill::first-line {
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
+  font-size: 16px !important;
+  font-weight: normal !important;
+  line-height: 16px !important;
 }
 
 
@@ -419,6 +488,7 @@ html {
   line-height: 16px;
   line-height-step: 16px;
   color: #fff;
+  overflow-y: scroll;
 }
 
 
@@ -433,10 +503,10 @@ input, optgroup, textarea {
 }
 
 button:active, select:active{
-    border: 0;
-    max-height: 16px;
-    min-height: 16px;
-    color: #999999 !important;
+  border: 0;
+  max-height: 16px;
+  min-height: 16px;
+  color: #999999 !important;
 }
 
 button:active, select:active{
@@ -479,10 +549,10 @@ input:hover, optgroup:hover {
 }
 
 input:active, optgroup:active {
-    border: 0;
-    max-height: 16px;
-    min-height: 16px;
-    color: #bbbbbb !important;
+  border: 0;
+  max-height: 16px;
+  min-height: 16px;
+  color: #bbbbbb !important;
 }
 
 
@@ -1250,6 +1320,47 @@ input[type=text]{
   color: #999999;
 }
 
+input[type="password" i] {
+  padding: 0px;
+  margin: 0px;
+  font-size: 16px !important;
+  font-family: 'TopazPlus_a1200' !important;
+}
+
+input[type="password" i]:hover {
+  padding: 0px;
+  margin: 0px;
+  font-size: 16px !important;
+  font-family: 'TopazPlus_a1200' !important;
+}
+
+input[type="password" i]:active {
+  padding: 0px;
+  margin: 0px;
+  font-size: 16px !important;
+  font-family: 'TopazPlus_a1200' !important;
+}
+
+input[type="password"] {
+  padding: 0px;
+  margin: 0px;
+  font-size: 16px !important;
+  font-family: 'TopazPlus_a1200' !important;
+}
+
+input[type="password"]:hover {
+  padding: 0px;
+  margin: 0px;
+  font-size: 16px !important;
+  font-family: 'TopazPlus_a1200' !important;
+}
+
+input[type="password"]:active {
+  padding: 0px;
+  margin: 0px;
+  font-size: 16px !important;
+  font-family: 'TopazPlus_a1200' !important;
+}
 
 .ap-1 { 
   padding-left: 8px !important;
