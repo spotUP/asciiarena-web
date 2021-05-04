@@ -22,9 +22,9 @@ if(isset($_POST['join'])) {
 	if (count($errors) == 0) {
 		$pwhash = password_hash($_POST['password'], PASSWORD_BCRYPT, array('cost' => 13));
 		$create = doQuery("INSERT INTO users
-			(nick, crew, password, pwhash, lastactive, current, mail, uploaded, `rank`, upload_signature, list_view_mode, display_mail, nickurl)
+			(nick, crew, pwhash, lastactive, current, mail, uploaded, `rank`, upload_signature, list_view_mode, display_mail, nickurl)
 			VALUES 
-			(:nick,'Independent','SECRET',:pwhash, :now, '', :mail, 0, 'Inactive', '- -- - aSCIIaRENa - ---- - aSCIIaRENa - -- -','Standard', 'No', :nickurl)",
+			(:nick,'Independent', :pwhash, :now, '', :mail, 0, 'Inactive', '- -- - aSCIIaRENa - ---- - aSCIIaRENa - -- -','Standard', 'No', :nickurl)",
 			[ ":nick" => $_POST['nick'], ":pwhash" => $pwhash, ":now" => time(), ":mail" => $_POST['mail'], ":nickurl" => urlsafe($_POST['nick']) ]
 			);
 

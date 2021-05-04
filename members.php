@@ -2,7 +2,7 @@
 require_once "session.php";
 
 $nickurl = $_GET['member'];
-$member = fetchOne("SELECT * FROM users WHERE nickurl = :nickurl", [":nickurl" => $nickurl], ["password", "pwhash", "temp_pw_hash"]);
+$member = fetchOne("SELECT * FROM users WHERE nickurl = :nickurl", [":nickurl" => $nickurl], ["pwhash"]);
 $member_available = true;
 if(!isset($_GET['member']) || empty($member->id)) {
 	header("HTTP/1.0 404 Not Found");
