@@ -261,7 +261,7 @@ require_once "header.php"; ?>
 			{
 				$type = fetchOne("SELECT type FROM collys WHERE filename = :filename", [":filename" => $filename])->type ?? "";
 				?>
-				<div class="container-fluid bg-secondary amb-1 apb-1" style="height: 132px;">
+				<div class="container-fluid bg-secondary amb-1 apb-1">
 					<form action="/release/<?=$filename?>" method="post"  id="ctrlForm">
 						<?php
 						if ($type !== 'Archive' && isset($_POST['view'])) {
