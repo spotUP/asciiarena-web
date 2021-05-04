@@ -207,7 +207,9 @@ include "header_ascii.php";
 
 <body>
 	<div id="spotclose" class="spotclose" onclick='showFullscreen()'><div class="noevents">x</div></div>
+	<?php if (!isset($_user['settings']['crt_effect']) || $_user['settings']['crt_effect'] === 'Y') { ?>
 	<div class="scanlines"></div>
+	<?php } ?>
 	<div class="vignette"></div>
 	<div class="navbar navbar-expand-lg fixed-top navbar-dark bg-white d-flex justify-content-between m-0 p-0" style="height: 22px; margin-bottom: 2px; padding-right: 2px;">
 		<span style="margin-left: 16px;" class="ncommm">NComm 2.0 Copyright 1988-1992 Daniel Bloch & co.</span>
@@ -220,14 +222,14 @@ include "header_ascii.php";
 			<div class="collapse navbar-collapse justify-content-center" id="navbarResponsive">
 				<ul class="navbar-nav">
 					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle ascii apr-1" data-toggle="dropdown" href="/collys.php?sort_by=releasedate" id="themes">COLLYS<span class="caret" style="padding-right: 8px;"></span></a>
+						<a class="nav-link dropdown-toggle ascii apr-1" data-toggle="dropdown" href="/collys.php?sort_by=date" id="themes">COLLYS<span class="caret" style="padding-right: 8px;"></span></a>
 						<div class="dropdown-menu ascii" aria-labelledby="themes">
 							<a class="dropdown-item ascii" href="/collys.php?sort_by=name">By Name<span style="padding-left: 7px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
 							<a class="dropdown-item ascii" href="/collys.php?sort_by=filename">By Filename<span style="padding-left: 4px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
 							<a class="dropdown-item ascii" href="/collys.php?sort_by=nick">By Artist<span style="padding-left: 10px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
 							<a class="dropdown-item ascii" href="/collys.php?sort_by=crew">By Crew<span style="padding-left: 10px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
-							<a class="dropdown-item ascii" href="/collys.php?sort_by=releasedate">By Release Date<span style="font-size: 16px; font-family:Monaco, monospace;">&nbsp;</span></a>
-							<a class="dropdown-item ascii" href="/collys.php?sort_by=timestamp">By Upload Date<span style="padding-left: 8px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;</span></a>
+							<a class="dropdown-item ascii" href="/collys.php?sort_by=date">By Release Date<span style="font-size: 16px; font-family:Monaco, monospace;">&nbsp;</span></a>
+							<a class="dropdown-item ascii" href="/collys.php?sort_by=uploaddate">By Upload Date<span style="padding-left: 8px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;</span></a>
 							<a class="dropdown-item ascii" href="/collys.php?sort_by=uploader">By Uploader<span style="padding-left: 13px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;</span></a>
 						</div>
 					</li>
