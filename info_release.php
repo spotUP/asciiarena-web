@@ -426,11 +426,11 @@ require_once "header.php"; ?>
 
 									});
 								</script>
-								<div class="row">
-									<div class="col-3 apb-0">
+								<div class="row apb-1">
+									<div class="col-3">
 										Font:
 									</div>
-									<div class="col-2 apb-1">
+									<div class="col-2">
 										<select class="custom-select" name="font" id="colly-font">
 											<option class="dropdown-item" value="MicroKnight"<?php if ($font == 'MicroKnight') echo ' selected'; ?>>MicroKnight</option>
 											<option class="dropdown-item" value="MicroKnightPlus"<?php if ($font == 'MicroKnightPlus') echo ' selected'; ?>>MicroKnight+</option>
