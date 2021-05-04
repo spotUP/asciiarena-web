@@ -426,7 +426,7 @@ require_once "header.php"; ?>
 
 									});
 								</script>
-								<div class="row apb-1">
+								<div class="row aml-1">
 									<div class="col-3">
 										Font:
 									</div>
