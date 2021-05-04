@@ -10,6 +10,66 @@ include "header.php";
 		setTimeout(function() { window.scrollTo(0, 0); }, 1)
 	});
 </script>
+<script type="text/javascript">
+	function add_artist_field()
+	{
+		var newselect = " <select class=\"select2\" name=\"artist[]\"" + document.getElementById('total_artists').value + "><option value=\"Unknown\">Unknown</option><?php
+
+		$ask="select nick from artists";
+		$result=fetchAll($ask);
+		foreach($result as $row)
+		{
+			$artists=$row->nick;
+			echo "<option>$artists</option>";
+		}
+		echo "</select>\"\n";
+		?>
+		document.getElementById('new_artist_field').innerHTML =  document.getElementById('new_artist_field').innerHTML + newselect; document.getElementById('total_artist').value =  parseInt( document.getElementById('total_artists').value) + 1;
+	}
+	function add_crew_field()
+	{
+		var newselect = " <select class=\"select2\" name=\"crew[]\"" + document.getElementById('total_crews').value + "><option value=\"Unknown\">Unknown</option><?php
+
+		$ask="select name from crews";
+		$result=fetchAll($ask);
+		foreach($result as $row)
+		{
+			$crews=$row->name;
+			echo "<option value='$crews'>$crews</option>";
+		}
+		echo "</select>\"\n";
+		?>
+		document.getElementById('new_crew_field').innerHTML =  document.getElementById('new_crew_field').innerHTML + newselect; document.getElementById('total_crews').value =  parseInt( document.getElementById('total_crews').value) + 1;
+	}
+	function add_artist_crew_field()
+	{
+		var newselect = " <select class=\"select2\" name=\"artist_crew[]\"" + document.getElementById('total_artist_crews').value + "><option value=\"Unknown\">Unknown</option><?php
+		$ask="select name from crews";
+		$result=fetchAll($ask);
+		foreach($result as $row)
+		{
+			$crews=$row->name;
+			echo "<option value='$crews'>$crews</option>";
+		}
+		echo "</select>\"\n";
+		?>
+		document.getElementById('new_artist_crew_field').innerHTML =  document.getElementById('new_artist_crew_field').innerHTML + newselect; document.getElementById('total_artist_crews').value =  parseInt( document.getElementById('total_artist_crews').value) + 1;
+	}
+	function add_crew_bbs_field()
+	{
+		var newselect = " <select class=\"select2\" name=\"add_crew_bbs[]\"" + document.getElementById('total_crew_bbses').value + "><option value=\"Unknown\">Unknown</option><?php
+		$ask="select name from bbses";
+		$result=fetchAll($ask);
+		foreach ($result as $row)
+		{
+			$add_bbses=$row->name;
+			echo "<option>$add_bbses</option>";
+		}
+		echo "</select>\"\n";
+		?>
+		document.getElementById('new_crew_bbs_field').innerHTML =  document.getElementById('new_crew_bbs_field').innerHTML + newselect; document.getElementById('total_crew_bbses').value =  parseInt( document.getElementById('total_crew_bbses').value) + 1;
+	}
+</script>
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
 		<?php
