@@ -19,6 +19,16 @@ $bgcolor = (strlen($row->def_bg_col) > 1) ? $row->def_bg_col : '#000000';
 
 require_once "header.php"; ?>
 
+<script type="text/javascript">
+	function showFullscreen() {
+		var element = document.getElementById("colly");
+		element.classList.toggle("fullscreen");
+		var element = document.getElementById("blacker");
+		element.classList.toggle("show");
+		var element = document.getElementById("spotclose");
+		element.classList.toggle("show");
+	}
+</script>
 <div id="blacker" style="background-color: <?=$bgcolor?>;"></div>
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
