@@ -9,6 +9,7 @@
 
 	switch ($cmd) {
 		case "login":
+			$login = false;
 			$pw = $_POST[ "password" ] ?? "";
 			$ni = $_POST[ "nick" ] ?? "";
 			$spw = fetchOne("SELECT pwhash FROM users WHERE (nick = :nick OR mail = :nick)", [ ":nick" => $ni ])->pwhash;
@@ -41,7 +42,25 @@
 					":crew" => $_user[ "crew" ]
 				]);
 				doQuery("UPDATE users SET lastactive = UNIX_TIMESTAMP() WHERE id = {$login->id}");
+				if ($is_ajax) { ?>
+					<div class="bs-component quick-alert amb-1" id="login-success" style="display: none;">
+						<div id="#succes-alert" class="animate__animated animate__shakeX alert alert-success">authentication successful</div>
+					</div>
+					<script>$('#login-success').fadeIn('slow').delay(500, function(){ window.location.reload(); });</script>
+					<?php 
+					exit;
+				}
+			} else {
+				if ($is_ajax) { ?>
+					<div class="bs-component quick-alert amb-1" id="login-failure" style="display: none;">
+						<div id="#danger-alert" class="animate__animated animate__shakeX alert alert-danger">authentication failed</div>
+					</div>
+					<script>$('#login-failure').fadeIn('slow').delay(2000).fadeOut('slow');</script>
+					<?php 
+					exit;
+				}
 			}
+			exit;
 			break;
 		case "logout":
 			doQuery("UPDATE users SET lastactive = UNIX_TIMESTAMP()-300 WHERE id = {$_user['id']}");
