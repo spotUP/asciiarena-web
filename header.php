@@ -58,7 +58,7 @@ include "header_ascii.php";
 	<div class="vignette"></div>
 	<div class="navbar navbar-expand-lg fixed-top navbar-dark bg-white d-flex justify-content-between m-0 p-0" style="height: 22px; margin-bottom: 2px; padding-right: 2px;">
 		<span style="margin-left: 16px;" class="ncommm">NComm 2.0 Copyright 1988-1992 Daniel Bloch & co.</span>
-		<span><a href="/accounting.php"><img src="/assets/data/multitask.png" alt=""></a></span>
+		<span><a href="/accounting.php"><img src="/assets/data/multitask.png" alt="" width="23" height="22"></a></span>
 	</div>
 	<div class="navbar navbar-expand-lg fixed-top bg-blue m-0 p-0" style="top: 22px; height: 21px">
 		<div class="container-fluid m-md-0 p-md-0">
