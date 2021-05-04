@@ -1,169 +1,168 @@
 <?php
-	require_once ('functions.php');
+require_once "session.php";
+
+$errors = array();
+$messages = array();
+
+if(isset($_POST['reminder'])) {
+        if (!checkEmail($_POST['mail'])) $errors[] = 'invalid e-mail address';
+	if ($_POST['spam'] !== 'iamnotarobot') $errors[] = "spam check not completed";
+	if (is_logged_in()) $errors[] = "you're already logged in";
+
+	$user_id = fetchOne("SELECT id FROM users WHERE mail=:mail", [ ":mail" => $_POST['mail'] ])->id;
+	if (!$user_id) $errors[] = "unknown e-mail address";
+
+	if (count($errors) == 0) {
+		$mail_qs = qsencrypt(array($user_id, $_POST['mail'], time()));
+		$mail_from = 'asciiarenamailer@gmail.com';
+		$mail_to = $_POST['mail'];
+		$mail_subject = "aSCIIaRENA Password Reminder";
+		$mail_body = "Hi!\n\n" .
+			"Someone requested that your aSCIIaRENA password should be reset.\n".
+			"Hopefully it was you. Click this link to reset your password.\n".
+			"https://www.asciiarena.se/reminder.php?reset=$mail_qs\n";
+		$mail_headers = 'From: <'.$mail_from.'>';
+		mail($mail_to, $mail_subject, $mail_body, $mail_headers);
+		$reminder_mail = true;
+	}
+
+} // $_POST['reminder']
+
+if (isset($_GET['reset'])) {
+	if (!preg_match('/^[a-z0-9-]+$/i', $_GET['reset'])) $errors[] = "invalid URL (0)"; 
+	list ($user_id, $mail, $e) = qsdecrypt($_GET['reset']);
+	if (isset($e) && $e < (time()-14400)) $errors[] = "reset link has expired";
+
+	if (count($errors) == 0) {
+		$nick = fetchOne("SELECT nick FROM users WHERE mail=:mail", [ ":mail" => $mail ])->nick;
+		$password_modify = true;
+	}
+} // $_GET['reset']
+
+if (isset($_POST['save'])) {
+	if (strlen($_POST['password']) < 5) $errors[] = "password is too short";
+	if ($_POST['password'] !== $_POST['repeat_password']) $errors[] = "passwords don't match"; 
+	$nick = fetchOne("SELECT nick FROM users WHERE mail=:mail", [ ":mail" => $mail ])->nick;
+	if ($nick === $_POST['password']) $errors[] = "username and password may not be identical";
+
+	if (count($errors) == 0) {
+		$pwhash = password_hash($_POST['password'], PASSWORD_BCRYPT, array('cost' => 13));
+		$q = doQuery("UPDATE users SET pwhash=:pwhash WHERE id=:id",[ 'pwhash' => $pwhash, 'id' => $userid ]);
+		$password_changed = true;
+		$messages[] = "password saved";
+	}
+} // $_POST['save']
+
+$h1 = ["pASSWORD rECOVERY"];
+
+include "header.php";
 ?>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "https://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-	<title>ASCIIARENA brought to you by UP ROUGH SOUNDSYSTEM</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
-	<meta name="viewport" content="width=device-width">
-	<link rel='stylesheet' href='style.css' type='text/css'>
-</head>
-	<body>
-		<?php
-
-
-$path = '/var/packages/PEAR/target/';
-set_include_path(get_include_path() . PATH_SEPARATOR . $path);
-
-
-		echo "<div id='maincontainer'>";
-			echo "<div id='maincontent'>";
-
-			require_once "Mail.php";
-			if(isset($_POST['email']))
-			{
-
-				function createRandomPassword() 
-				{
-					$chars = "abcdefghijkmnopqrstuvwxyz023456789";
-					srand((double)microtime()*1000000);
-					$i = 0;
-					$pass = '' ;
-					while ($i <= 7) 
-					{
-						$num = rand() % 33;
-						$tmp = substr($chars, $num, 1);
-						$pass = $pass . $tmp;
-						$i++;
-
-		    		}
-					return $pass;
-				}
-
-				$password = createRandomPassword();
-				$pwhash=md5($password);
-
-				$recipient = $_POST['email'];
-
-				$ask="SELECT mail, nick FROM users WHERE mail=:recipient";
-				$result=fetchOne($ask, [ 'recipient' => $recipient ]);
-				foreach ($result as $row)
-				{
-					$mail=$row->mail;
-					$nick=$row->nick;					
-				}
-				if (isset($_POST['email']) && (isset($mail)))
-				{
-					$ask_update="update users set temp_pw_hash=:pwhash where mail=:recipient";
-					doQuery($ask_update, ['pwhash' => $ppwhash, 'recipient' => $recipient ]);
-
-					$from = "aSCIIaRENA <spotUP@gmail.com>";
-					$to = "$nick <$recipient>";
-					$subject = "aSCIIaRENA Password Reminder";
-					$body = "Hi!\n\n" .
-					"Someone requested that your aSCIIaRENA password should be reset.\n".
-					"Hopefully it was you. Click this link to reset your password.\n".
-					"https://www.asciiarena.se/reminder.php?newpassword=$pwhash\n";
-	
-					$host = "ssl://smtp.gmail.com";
-					$port = "465";
-					$username = "asciiarenamailer@gmail.com";
-					$password = "ascii4life";
-	
-					$headers = array ('From' => $from,
-					  'To' => $to,
-					  'Subject' => $subject);
-					$smtp = Mail::factory('smtp',
-					  array ('host' => $host,
-					    'port' => $port,
-					    'auth' => true,
-					    'username' => $username,
-					    'password' => $password));
-	
-					$mail = $smtp->send($to, $headers, $body);
-
-					if (PEAR::isError($mail)) 
-					{
-						echo("<p>" . $mail->getMessage() . "</p>");
-					} 
-					else
-					{
-						$recipient = $_POST['email'];
-						?><meta http-equiv="Refresh" content="0"; url="reminder.php?sent=sent&recipient=<?=$recipient?>"><?php
-					}
-				}
-			}
-			if (isset($_POST['new_user_password']))
-			{
-				$nick=$_POST['nick'];
-				$new_password=$_POST['new_user_password'];
-				$new_password=cleanInsert($new_password); 
-				$pwhash=md5($new_password);
-
-				$ask_update="update users set pwhash=:pwhash where nick=:nick";
-				doQuery($ask_update, ['pwhash' => $pwhash, 'nick' => $nick ]);
-
-				$ask_update="update users set temp_pw_hash=(null) where nick=:nick";
-				doQuery($ask_update, ['nick' => $nick ]);
-				?><meta http-equiv="Refresh" content="0"; url="login.php"><?php
-			}
-			
-			echo "<form action='$_SERVER[PHP_SELF]' method='post'>";
-			echo "<table width=\"913px\">";
-				echo "<tr><td colspan='3'><img class='centered' border='0' src='data/login.png'></td></tr>";
-				echo "<tr><td colspan='3'></td></tr>";
-				if (isset($_POST['email']) && (!isset($mail))) 
-				{
-					echo "<tr><td align='center' width='165'>tHiS eMAiL aDDY dOESN'T eXiST iN tHE dATABASE!</td></td></tr>";
-					?><meta http-equiv="Refresh" content="3; url=reminder.php"><?php
-				}
-				if (!isset($_POST['email']) && (!isset($_GET['newpassword']) && (!isset($_GET['sent']))))
-				{
-					echo "<tr><td width='260'></td><td align='left' width='165'>mAIL aDDY:</td></td></tr>";
-					echo "<tr><td width='260'></td><td align='left'><input type=\"text\" name=\"email\" id=\"email\" size=\"30\"></td><td align='left'><input type=\"submit\" value=\"Send Password!\"></td></tr>";
-				}
-
-				if (isset($_GET['sent']))
-				{
-					$recipient = $_GET['recipient'];
-				
-					echo "<tr><td width='560'align='center'>a mAiL hAS bEEN sENT tO $recipient,</td></tr>";
-					echo "<tr><td width='560'align='center'>rEAD tHE mAiL fOR fURTHER iNSTRUCTiONS!</td></tr>";
-					exit();
-				}
-					
-				if (isset($_GET['newpassword']))
-				{				
-					$new_password=$_GET['newpassword'];
-					$ask="SELECT * FROM users WHERE temp_pw_hash=:new_password";
-					$result=fetchAll($ask, ['new_password' => $new_password ]);
-					foreach ($result as $row)
-					{
-						$nick=$row->nick;
-						$mail=$row->mail;
-						$temp_pw_hash=$row->temp_pw_hash;
-					}
-
-					if ($new_password == $temp_pw_hash)
-					{
-						echo "<tr><td width='460'align='center'>wELCOME bACK $nick, yOUR pASSWORD hAS bEEN rESET.</td></tr>";
-						echo "<tr><td width='260'></td><td align='left' width='165'>eNTER nEW pASSWORD:</td></tr>";
-						echo "<tr><td width='260'></td><td align='left'><input type=\"hidden\" name=\"nick\" value=\"$nick\"><input type=\"password\" name=\"new_user_password\" id=\"new_user_password\" size=\"30\"></td><td align='left'><input type=\"submit\" value=\"Send Password!\"></td></tr>";
-					}
-					else
-					{
-						echo "<tr><td align='center'>hACK aTTEMPT dETECTED! yOUR iP hAS bEEN rEPORTED tO tHE pOLiCE!</td></tr>";
-					}
-				}
-			echo "</table></form>";
-			?>
-			<script type="text/javascript">
-			document.getElementById('email').focus();
-			</script>
+<div class="modal-body row m-0 p-0">
+<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
+<?php if (is_array($errors) && count($errors) > 0) { ?>
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="bs-component aml-1 amb-1">
+				<div class="alert alert-danger"><ul><?php foreach ($errors as $error) { ?> <li><?=$error?></li> <?php } ?></ul></div>
 			</div>
 		</div>
-	</body>
-</html>
+	</div>
+<?php } elseif (is_array($messages) && count($messages) > 0) { ?>
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="bs-component aml-1 amb-1">
+				<div class="alert alert-success"><ul><?php foreach ($messages as $message) { ?> <li><?=$message?></li> <?php } ?></ul></div>
+			</div>
+		</div>
+	</div>
+<?php } ?>
+<?php if (isset($reminder_mail) && $reminder_mail) { ?>
+<div class="row">
+	<div class="col-12 text-center apt-1">
+		<span>A mail with instructions has been sent to your e-mail adress.</span>
+	</div>
+</div>
+<?php } elseif (isset($password_changed) && $password_changed) { ?>
+	<p>Your password has been changed, you can now  <a class="ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">logon</a></p>
+<?php } elseif (isset($password_modify) && $password_modify) { ?>
+<form action="" method="post">
+	<div class="container-fluid bg-secondary amb-1 apb-1">
+		<div class="row">
+			<div class="col-6">
+				<span class="white">Nick</span>
+			</div>
+			<div class="col-6">
+				<span class="white">Password</span>
+			</div>
+		</div>
+		<div class="row apb-1">
+			<div class="col-6">
+				<?=$nick?>
+			</div>
+			<div class="col-6">
+				<input type="password" name="password" class="w-100" value="">
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-6">
+				<span class="white">E-Mail</span>
+			</div>
+			<div class="col-6">
+				<span class="white">Repeat password</span>
+			</div>
+		</div>
+		<div class="row apb-1">
+			<div class="col-6">
+				<?=$mail?>
+			</div>
+			<div class="col-6">
+				<input type="password" name="repeat_password" class="w-100">
+			</div>
+		</div>
+		<div clas="row">
+			<input type="submit" value="Save!" name="save">
+		</div>
+	</div>
+</form>
+<?php } else { ?>
+<form action="reminder.php" method="post">
+	<div class="container-fluid bg-secondary amb-1 apb-1">
 
+		<div class="row">
+			<div class="col-6">
+				E-Mail 
+			</div>
+		</div>
+
+		<div class="row apb-1">
+			<div class="col-6">
+				<input type="text" name="mail" class="w-100" value="<?=$_POST['mail']?>">
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-6">
+				Enter iamnotarobot here: 
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-6 apb-1">
+				<input type="text" name="spam" class="w-100" value="<?=$_POST['spam']?>"> 
+			</div>
+		</div>
+		<div clas="row">
+			<input type="submit" value="Reset!" name="reminder">
+		</div>
+	</div>
+</form>
+<?php } // else ($reminder) ?>
+
+</div>
+<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+	<?php include "sidebar.php"; ?>
+</div>
+<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
+	<?php include "sidebar_right.php"; ?>
+</div>
+</div>
+<?php include "footer.php"; ?>
