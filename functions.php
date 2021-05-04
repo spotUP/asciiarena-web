@@ -459,3 +459,24 @@ $byte_size = 1024;
  
     return$bytes;
 }
+
+$qskey = '4Cke@Hn?rWCQPDRxi0oIs9.BYOYskXqq';
+
+// encrypts querystring (accepts array)
+function qsencrypt($qs) {
+  if (!is_array($qs)) return false;
+  global $qskey;
+  $iv = openssl_random_pseudo_bytes(16);
+  $data = implode('|', $qs);
+  $enc = bin2hex(openssl_encrypt($data, 'aes-256-cbc', $qskey, OPENSSL_RAW_DATA, $iv));
+  return $enc."-".bin2hex($iv);
+}
+
+// decrypts querystring (returns array)
+function qsdecrypt($qs) {
+  global $qskey;
+  list($data, $iv) = preg_split("/\-/", $qs);
+  $dec = openssl_decrypt(hex2bin($data), 'aes-256-cbc', $qskey, OPENSSL_RAW_DATA, hex2bin($iv));
+  return explode('|', $dec);
+}
+
