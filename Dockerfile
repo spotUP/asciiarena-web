@@ -18,10 +18,12 @@ RUN apt-get -y install msmtp mailutils
 
 ARG MAILROOT
 ARG MAILHOST
+ARG MAILPORT
 ARG MAILUSER
 ARG MAILPASS
 ARG MAILROOT ${MAILROOT}
 ARG MAILHOST ${MAILHOST}
+ARG MAILPORT ${MAILPORT}
 ARG MAILUSER ${MAILUSER}
 ARG MAILPASS ${MAILPASS}
 
@@ -31,6 +33,7 @@ RUN echo "tls_trust_file /etc/ssl/certs/ca-certificates.crt" >> /etc/msmtprc
 RUN echo "logfile -" >> /etc/msmtprc
 RUN echo "account email" >> /etc/msmtprc
 RUN echo "host ${MAILHOST}" >> /etc/msmtprc
+RUN echo "port ${MAILPORT}" >> /etc/msmtprc
 RUN echo "from ${MAILROOT}" >> /etc/msmtprc
 RUN echo "auth on" >> /etc/msmtprc
 RUN echo "user ${MAILUSER}" >> /etc/msmtprc
