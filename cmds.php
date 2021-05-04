@@ -12,6 +12,7 @@
 			$login = false;
 			$pw = $_POST[ "password" ] ?? "";
 			$ni = $_POST[ "nick" ] ?? "";
+			$loc = $_POST[ "location" ] ?? "/";
 			$spw = fetchOne("SELECT pwhash FROM users WHERE (nick = :nick OR mail = :nick)", [ ":nick" => $ni ])->pwhash;
 			if (preg_match('/^[a-f0-9]{32}$/i', $spw)) {
 				$login = fetchOne("SELECT * FROM users WHERE pwhash = :pwhash AND (nick = :nick OR mail = :nick)", [
@@ -46,7 +47,7 @@
 					<div class="bs-component quick-alert amb-1" id="login-success" style="display: none;">
 						<div id="#succes-alert" class="animate__animated animate__shakeX alert alert-success">authentication successful</div>
 					</div>
-					<script>$('#login-success').fadeIn('fast').delay(500, function(){ window.location.reload(); });</script>
+					<script>$('#login-success').fadeIn('fast').delay(500, function(){ window.location.replace('<?=addslashes($loc)?>'); });</script>
 					<?php 
 					exit;
 				}
