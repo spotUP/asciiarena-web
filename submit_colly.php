@@ -9,7 +9,7 @@
 				File (required)
 			</div>
 			<div class="row apl-1 apb-1">
-				<div class="custom-file col-6">
+				<div class="custom-file col-3">
 					<input type="file" class="custom-file-input" name="uploadedfile" id="inputGroupFile01">
 					<label class="custom-file-label" for="inputGroupFile01">Choose file</label>
 				</div>
