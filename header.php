@@ -44,17 +44,6 @@ include "header_ascii.php";
 	</script>
 
 	<script type="text/javascript">
-		function add_colly_crew_field() {
-			var newselect = " <select class=\"select2\" name=\"colly_crew[]\"" + document.getElementById('total_colly_crews').value + "><option>Independent</option><?php
-			foreach (fetchAll("SELECT name FROM crews") as $row) {
-				echo "<option>{$row->name}</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_colly_crew_field').innerHTML = document.getElementById('new_colly_crew_field').innerHTML + newselect; document.getElementById('total_colly_crews').value = parseInt(document.getElementById('total_colly_crews').value) + 1;
-		}
-	</script>
-	<script type="text/javascript">
 		function add_artist_field()
 		{
 			var newselect = " <select class=\"select2\" name=\"artist[]\"" + document.getElementById('total_artists').value + "><option value=\"Unknown\">Unknown</option><?php
@@ -109,60 +98,6 @@ include "header_ascii.php";
 
 	</script>
 	<script type="text/javascript">
-		function add_colly_author_field()
-		{
-			var newselect = " <select class=\"select2\" name=\"colly_author[]\"" + document.getElementById('total_colly_authors').value + "><option value=\"Unknown\">Unknown</option><?php
-
-			$ask="select nick from artists";
-			$result=fetchAll($ask);
-			foreach($result as $row)
-			{
-				$artists=$row->nick;
-				echo "<option>$artists</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_colly_author_field').innerHTML =  document.getElementById('new_colly_author_field').innerHTML + newselect; document.getElementById('total_colly_authors').value =  parseInt( document.getElementById('total_colly_authors').value) + 1;
-		}
-
-	</script>
-	<script type="text/javascript">
-		function add_colly_crew_field()
-		{
-			var newselect = " <select class=\"select2\" name=\"colly_crew[]\"" + document.getElementById('total_colly_crews').value + "><option>Independent</option><?php
-
-			$ask="select name from crews";
-			$result=fetchAll($ask);
-			foreach ($result as $row)
-			{
-				$crews=$row->name;
-				echo "<option value='$crews'>$crews</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_colly_crew_field').innerHTML =  document.getElementById('new_colly_crew_field').innerHTML + newselect; document.getElementById('total_colly_crews').value =  parseInt( document.getElementById('total_colly_crews').value) + 1;
-		}
-	</script>
-	<script type="text/javascript">
-
-		function add_bbs_field()
-		{
-			var newselect = " <select class=\"select2\" name=\"add_bbs[]\"" + document.getElementById('total_bbses').value + "><option value=\"Unknown\">Unknown</option><?php
-
-			$ask="select name from bbses";
-			$result=fetchAll($ask);
-			foreach ($result as $row)
-			{
-				$add_bbses=$row->name;
-				echo "<option>$add_bbses</option>";
-			}
-			echo "</select>\"\n";
-			?>
-			document.getElementById('new_bbs_field').innerHTML =  document.getElementById('new_bbs_field').innerHTML + newselect; document.getElementById('total_bbses').value =  parseInt( document.getElementById('total_bbses').value) + 1;
-		}
-	</script>
-	<script type="text/javascript">
-
 		function add_crew_bbs_field()
 		{
 			var newselect = " <select class=\"select2\" name=\"add_crew_bbs[]\"" + document.getElementById('total_crew_bbses').value + "><option value=\"Unknown\">Unknown</option><?php
@@ -204,7 +139,6 @@ include "header_ascii.php";
 		}
 	</script>
 </head>
-
 <body>
 	<div id="spotclose" class="spotclose" onclick='showFullscreen()'><div class="noevents">x</div></div>
 	<?php if (!isset($_user['settings']['crt_effect']) || $_user['settings']['crt_effect'] === 'Y') { ?>
@@ -358,9 +292,4 @@ include "header_ascii.php";
 						</div>
 					</div>
 				</div>
-
-
-
-
-
 
