@@ -7,7 +7,7 @@
 			</div>
 
 			<div class="row apb-1 apl-1">
-				<input type="text" size="20" name="crewname">
+				<input type="text" size="20" name="crewname" autocomplete="off">
 			</div>
 
 			<div class="row apl-1">
@@ -15,7 +15,7 @@
 			</div>
 
 			<div class="row apb-1 apl-1">
-				<input type="text" size="20" name="crewacronym">
+				<input type="text" size="20" name="crewacronym" autocomplete="off">
 			</div>
 
 			<div class="row apl-1">
@@ -23,7 +23,7 @@
 			</div>
 
 			<div class="row apb-1 apl-1">
-				<input type="text" size="20" name="crewwww">
+				<input type="text" size="20" name="crewwww" autocomplete="off">
 			</div>
 
 			<div class="row apl-1">
@@ -39,7 +39,7 @@
 			</div>
 
 			<div class="row apb-1 apl-1">
-				<input type="text" size="20" name="crewcontact">
+				<input type="text" size="20" name="crewcontact" autocomplete="off">
 			</div>
 
 			<div class="row apl-1">
