@@ -1,131 +1,34 @@
 <?php
 require_once "session.php";
-$h1 = ["wELCOME tO aSCIIaRENA", "bY uP rOUGH and diViNE sTYLERS"];
-$now = time();
-include "header.php";
-?>
-<div class="modal-body row m-0 p-0">
-	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
 
+$errors = array();
+$messages = array();
 
+if(isset($_POST['join'])) {
 
-		<?php
-//--------------------------------------------------------------------------
-// MATCH PASSWORD AND UPDATE USER STATUS
-//--------------------------------------------------------------------------
-		if (isset($_POST['confirm_password']))
-		{
-			$confirm_nick=$_POST['confirm_nick'];
-			$confirm_password=$_POST['confirm_password'];
-			$confirm_password_md5=md5($confirm_password);
+	if (!preg_match('/^[A-Za-z0-9-\.#_\!\^]{2,60}$/', $_POST['nick'])) $errors[] = "invalid nickname";
+	if ($_POST['nick'] === $_POST['password']) $errors[] = "username and password may not be identical"; 
+	if ($_POST['password'] !== $_POST['repeat_password']) $errors[] = "passwords don't match"; 
+        if (!checkEmail($_POST['mail'])) $errors[] = 'invalid e-mail address';
+	if (strlen($_POST['password']) < 5) $errors[] = "password is too short";
+	if ($_POST['spam'] !== 'iamnotarobot') $errors[] = "spam check not completed";
+	if (is_logged_in()) $errors[] = "you're already logged in";
 
-			$ask="SELECT * FROM users WHERE nick=:confirm_nick";
-			$row=fetchOne($ask, ['confirm_nick' => $confirm_nick ]);
-			$pw_hash=$row->pwhash;
+	$chk = fetchOne("SELECT 1 FROM users WHERE nick=:nick", [ ":nick" => $_POST['nick'] ] );
+	if ($chk) $errors[] = "nickname already in use";
+	$chk = fetchOne("SELECT 1 FROM users WHERE mail=:mail", [ ":mail" => $_POST['mail'] ] );
+	if ($chk) $errors[] = "e-mail address already in use";
 
-			if ($confirm_password_md5 != $pw_hash)
-			{
-				?>
-				FAILURE! Wrong Password! Try again.
-				<meta http-equiv="Refresh" content="2" url="register.php">
-				<?php
-				exit;
-			}
+	if (count($errors) == 0) {
+		$pwhash = password_hash($_POST['password'], PASSWORD_BCRYPT, array('cost' => 13));
+		$create = doQuery("INSERT INTO users
+			(nick, crew, pwhash, lastactive, current, mail, uploaded, `rank`, upload_signature, list_view_mode, display_mail, nickurl)
+			VALUES 
+			(:nick,'Independent', :pwhash, :now, '', :mail, 0, 'Inactive', '- -- - aSCIIaRENa - ---- - aSCIIaRENa - -- -','Standard', 'No', :nickurl)",
+			[ ":nick" => $_POST['nick'], ":pwhash" => $pwhash, ":now" => time(), ":mail" => $_POST['mail'], ":nickurl" => urlsafe($_POST['nick']) ]
+			);
 
-			if ($confirm_password_md5 == $pw_hash)
-			{
-				$ask_update="update users set rank='User', joined=:now where nick=:confirm_nick";
-				doQuery($ask_update,['confirm_nick' => $confirm_nick, 'now' => $now ]);
-
-				$_SESSION['password'] = $confirm_password;
-				$_SESSION['password'] = $confirm_nick;
-
-				?><meta http-equiv="Refresh" content="0" url="login.php?activated"><?php
-				exit();
-			}
-		}	
-		if(isset($_POST['nick']))
-		{
-			$check_nick=$_POST['nick'];
-			$check_password=$_POST['password'];
-			$repeat_password=$_POST['repeat_password'];
-			$spam=$_POST['spam'];
-			$mail=$_POST['mail'];
-			$pwhash=md5($check_password);
-
-			if ($check_password == $check_nick)
-			{
-				?>FAILURE! The nick and password must be unique!<?php
-				?><meta http-equiv="Refresh" content="2" url="register.php"><?php
-				exit;
-			}
-
-			if ($check_password!=$repeat_password)
-			{
-				?>FAILURE! The passwords doesn't match!<?php
-				?><meta http-equiv="Refresh" content="2" url="register.php"><?php
-				exit;
-			}
-
-			if ($spam!='iamnotarobot')
-			{
-				?>FAILURE! Enter iamnotarobot to prove that you are human!<?php
-				?><meta http-equiv="Refresh" content="2" url="register.php"><?php
-				exit;
-			}
-
-			if (empty($check_nick))
-			{
-				?>FAILURE! Error! You must fill the name field!<?php
-				?><meta http-equiv="Refresh" content="2" url="register.php"><?php
-				exit;
-			}
-
-			$mail = trim($_POST['mail']);  
-			if(!checkEmail($mail)) 
-			{
-				?>FAILURE! Error! You must enter a valid E-Mail adress!<?php
-				?><meta http-equiv="Refresh" content="2" url="register.php"><?php
-				exit;
-			}
-
-			if (empty($check_password))
-			{
-				?>FAILURE! Error! You must fill the password field!<?php
-				?><meta http-equiv="Refresh" content="2" url="register.php"><?php
-				exit;
-			}
-
-			$pwlenght=(strlen($check_password));
-			if ($pwlenght < 6)
-			{
-				?>FAILURE! Error! The password must contain 6 characters!<?php	
-				?><meta http-equiv="Refresh" content="2" url="register.php"><?php
-				exit;
-			}
-
-			$ask_check = $_db->prepare("SELECT nick FROM users WHERE nick = :check_nick");
-			$ask_check->execute(['check_nick' => $check_nick]);
-			$rows = $ask_check->fetchAll();
-			if(count($rows) > 0)
-			{
-				?>This nick is already in use!<?php		
-				?><meta http-equiv="Refresh" content="2" url="register.php"><?php
-				exit;
-			}
-			$ask = $_db->prepare("INSERT INTO users
-				(nick, crew, password, pwhash, lastactive, current, mail, uploaded, `rank`, upload_signature, list_view_mode, display_mail, nickurl)
-				VALUES 
-				(:nick,'Independent','SECRET',:pwhash, :now, '', :mail, 0, 'Inactive', '- -- - aSCIIaRENa - ---- - aSCIIaRENa - -- -','Standard', 'No', :nickurl)");
-			$ask->execute([
-				'nick' => $check_nick,
-				'now' => $now,
-				'pwhash' => $pwhash,
-				'mail' => $mail,
-				'nickurl' => urlsafe($check_nick)
-			]);
-
-			$welcome_msg="WELCOME TO aSCIIaRENA!<br><br>".
+		$message = "WELCOME TO aSCIIaRENA!<br><br>".
 
 			"To fully enjoy aSCIIaRENA, you should head over to your \"crib\" and personalize<br>".
 			"the viewing settings. You can change things such as the default colors of ASCII<br>".
@@ -144,161 +47,146 @@ include "header.php";
 
 			"/ sPOT^uP rOUGH [aSCIIaRENA sYSOP]<br>";	
 
-			$ask = $_db->prepare("SELECT thread FROM messages ORDER BY thread DESC LIMIT 1");
-			$ask->execute();
-			$rows = $ask->fetch(PDO::FETCH_OBJ);
-			if($rows === false) 
-			{
-					    # FIXME: $row is probably wrong? 
-				$thread=$row[0];
-			}
-			if (empty($thread))
-			{
-				$thread=0;
-			}
-			$thread++;
+		$user_id = fetchOne("SELECT id FROM users WHERE nick=:nick AND mail=:mail", [ ":nick" => $_POST['nick'], ":mail" => $_POST['mail'] ])->id;
+		$from_id = 2;
+		$postername = 'Spot';
+		$subject = 'Welcome!';
 
-			$ask = $_db->prepare("INSERT INTO messages
-				(thread, postedto, postername, timestamp, subject, message, unread)
-				VALUES (:thread, :check_nick,'Spot',:now,'Welcome!',:welcome_msg,1)
-				");
-			$ask->execute([
-				'thread' => $thread,
-				'check_nick' => $check_nick,
-				'now' => $now,
-				'welcome_msg' => $welcome_msg
-			]);
+		$msg = doQuery("INSERT INTO messages 
+			(thread, from_id, to_id, postedto, postername, timestamp, subject, message)
+			VALUES
+			((select max(thread)+1 from messages m), :from_id, :to_id, :postedto, :postername, :timestamp, :subject, :message)", 
+			[ ":from_id" => $from_id, ":to_id" => $user_id, ":postedto" => $_POST['nick'], ":postername" => $postername, 
+				":timestamp" => time(), ":subject" => $subject, ":message" => $message ]);
 
 
-//-------------------------------------------------------------------------
-// SEND WELCOME MAIL					
-//-------------------------------------------------------------------------
-
-					// require_once "Mail.php";
-
-			$from = "aSCIIaRENa <asciiarena@gmail.com>";
-			$to = "$check_nick <$mail>";
-			$subject = "aSCIIaRENa Account Activation";
-			$body = "Hi $check_nick! \n\n" .
+		$mail_qs = qsencrypt(array($user_id, $_POST['nick'], time()));
+		$mail_from = 'asciiarenamailer@gmail.com';
+		$mail_to = $_POST['nick'].' <'.$_POST['mail'].'>';
+		$mail_subject = "aSCIIaRENa Account Activation";
+		$mail_body = "Hi ".$_POST['nick']."! \n\n".
 			"Your aSCIIaRENA account is ready for use,\n".
 			"click the link to activate it.\n".
-			"https://www.asciiarena.se/register.php?confirm=$pwhash\n";
+			"https://www.asciiarena.se/register.php?confirm=".$mail_qs."\n";
+		$mail_headers = 'From: <'.$mail_from.'>';
+		mail($mail_to, $mail_subject, $mail_body, $mail_headers);
+	}
+} // $_POST['join']
 
-			$host = "ssl://smtp.gmail.com";
-			$port = "465";
-			$username = "asciiarena@gmail.com";
-			$password = "4skee4rena";
+if (isset($_GET['confirm'])) {
+	if (preg_match('/^[a-z0-9-]+$/i', $_POST['confirm'])) $errors[] = "invalid URL (0)"; 
+	list ($user_id, $nick, $e) = qsdecrypt($_GET['confirm']);
+	if (isset($e) && $e < (time()-604800)) $errors[] = "activation link has expired";
+	if (!preg_match('/^\d+$/', $user_id)) $errors[] = "invalid URL (1)";
+	$chk_user = fetchOne("SELECT 1 FROM users WHERE nick=:nick AND id=:id", [ ":id" => $user_id, "nick" => $nick ] );
+	if (!$chk_user) $errors[] = "invalid user account";
+	$chk_joined = fetchOne("SELECT 1 FROM users WHERE joined IS NOT NULL AND nick=:nick AND id=:id", [ ":id" => $user_id, "nick" => $nick ] );
+	if ($chk_joined) $errors[] = "account is already activated";
+	if (is_logged_in()) $errors[] = "you're already logged in";
 
-			$headers = 'From: arenamailer @ gmail . com';
+	if (count($errors) == 0) {
+		$ask = "UPDATE users SET rank='User', joined=:now WHERE nick=:nick AND id=:id";
+		doQuery($ask, [ ":now" => time(), ":nick" => $nick, ":id" => $user_id] );
+		$messages[] = 'Your account has been activated, you can now  <a class="ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">logon</a>';
+	} else {
+		$errors[] = 'account activation has failed';
+	}
+}
 
-			mail($to,$subject,$body,$headers);
-
-			?>
-			<div class="row">
-				<div class="col-12 d-flex justify-content-md-center">
-					<img src="assets/data/register.png">
-				</div>
+$h1 = ["wELCOME tO aSCIIaRENA", "bY uP rOUGH and diViNE sTYLERS"];
+$now = time();
+include "header.php";
+?>
+<div class="modal-body row m-0 p-0">
+<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
+<div class="row">
+	<div class="col-12 d-flex justify-content-md-center">
+		<img src="assets/data/register.png">
+	</div>
+</div>
+<br/>
+<?php if (is_array($errors) && count($errors) > 0) { ?>
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="bs-component aml-1 amb-1">
+				<div class="alert alert-danger"><ul><?php foreach ($errors as $error) { ?> <li><?=$error?></li> <?php } ?></ul></div>
 			</div>
-			<div class="row">
-				<div class="col-12 text-center apt-1">
-					<span>Your account has been created, a mail with instructions has been sent to your e-mail adress.</span>
-				</div>
-			</div>
-		</div>
-		<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
-			<?php include "sidebar.php"; ?>
-		</div>
-		<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
-			<?php include "sidebar_right.php"; ?>
 		</div>
 	</div>
-	<?php 
-	echo "hey!!!!!";
-	?>
-	<?php include "footer.php"; ?>
-	<meta http-equiv="Refresh" content="4" url="index.php">
-	<?php
-	exit();
-}
-?>
+<?php } elseif (is_array($messages) && count($messages) > 0) { ?>
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="bs-component aml-1 amb-1">
+				<div class="alert alert-success"><ul><?php foreach ($messages as $message) { ?> <li><?=$message?></li> <?php } ?></ul></div>
+			</div>
+		</div>
+	</div>
+<?php } ?>
+<?php if (isset($_POST['join']) && $create) { ?>
+<div class="row">
+	<div class="col-12 text-center apt-1">
+		<span>Your account has been created, a mail with instructions has been sent to your e-mail adress.</span>
+	</div>
+</div>
+<?php } elseif (isset($_GET['confirm'])) { ?>
+<!-- account (not) activated -->
+<?php } else { ?>
 <form action="register.php" method="post">
 	<div class="container-fluid bg-secondary amb-1 apb-1">
+		<div class="row">
+			<div class="col-6">
+				<span class="white">Nick</span>
+			</div>
+			<div class="col-6">
+				<span class="white">Password</span> 
+			</div>
+		</div> 
+
 		<div class="row apb-1">
-			<div class="col-12 d-flex justify-content-md-center">
-				<img src="assets/data/register.png">
+			<div class="col-6">
+				<input type="text" name="nick" class="w-100" value="<?=$_POST['nick']?>"> 
+			</div>
+			<div class="col-6">
+				<input type="password" name="password" class="w-100" value="">
 			</div>
 		</div>
-		<?php if (!isset($_GET['confirm']))
-		{
-			?>
-			<div class="row">
-				<div class="col-6">
-					<span class="white">Nick</span>
-				</div>
-				<div class="col-6">
-					<span class="white">Password</span> 
-				</div>
-			</div> 
-
-			<div class="row apb-1">
-				<div class="col-6">
-					<input type="text" name="nick" class="w-100"> 
-				</div>
-				<div class="col-6">
-					<input type="password" name="password" class="w-100">
-				</div>
-			</div>
 
 
-			<div class="row">
-				<div class="col-6">
-					E-Mail 
-				</div>
-				<div class="col-6">
-					Repeat Password 
-				</div>
+		<div class="row">
+			<div class="col-6">
+				E-Mail 
 			</div>
-
-			<div class="row apb-1">
-				<div class="col-6">
-					<input type="text" name="mail" class="w-100">
-				</div>
-				<div class="col-6">
-					<input type="password" name="repeat_password" class="w-100">
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col-6">
-					Enter iamnotarobot here: 
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-6 apb-1">
-					<input type="text" name="spam" class="w-100"> 
-				</div>
-			</div>
-			<div clas="row">
-				<input type="submit" value="Join!">
+			<div class="col-6">
+				Repeat Password 
 			</div>
 		</div>
-		<?php
-	}
-	if (isset($_GET['confirm']))
-	{
-		$confirm_pw_hash=$_GET['confirm'];
 
-		$ask="SELECT * FROM users WHERE pwhash='$confirm_pw_hash'";
-		$row=fetchOne($ask, ['confirm_pw_hash' => $confirm_pw_hash ]);
-		$nick=$row->nick;
-		$pw_hash=$row->pwhash;
-		?>
-		wELCOME <?=$nick?>, pLEASE cONFiRM yOUR pASSWORD!
-		Password: <input type="hidden" name="confirm_nick" value="<?=$nick?>"><input type="password" name="confirm_password" size="14"> <input type="submit" value="Confirm!">
-		<?php
-	}		
-	?>
+		<div class="row apb-1">
+			<div class="col-6">
+				<input type="text" name="mail" class="w-100" value="<?=$_POST['mail']?>">
+			</div>
+			<div class="col-6">
+				<input type="password" name="repeat_password" class="w-100">
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-6">
+				Enter iamnotarobot here: 
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-6 apb-1">
+				<input type="text" name="spam" class="w-100" value="<?=$_POST['spam']?>"> 
+			</div>
+		</div>
+		<div clas="row">
+			<input type="submit" value="Join!" name="join">
+		</div>
+	</div>
 </form>
+<?php } // else ($create) ?>
+
 </div>
 <div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
 	<?php include "sidebar.php"; ?>
@@ -308,4 +196,3 @@ include "header.php";
 </div>
 </div>
 <?php include "footer.php"; ?>
-

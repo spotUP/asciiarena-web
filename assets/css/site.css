@@ -488,6 +488,7 @@ html {
   line-height: 16px;
   line-height-step: 16px;
   color: #fff;
+  overflow-y: scroll;
 }
 
 
