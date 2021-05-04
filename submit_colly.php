@@ -9,21 +9,18 @@
 				File (required)
 			</div>
 			<div class="row apl-1 apb-1">
-				<input type="file" ><span class="apl-1"></span>
-			</div>
-
-			<div class="form-group">
-				<div class="input-group mb-3">
-					<div class="custom-file col-4">
-						<input type="file" class="custom-file-input" name="uploadedfile" id="inputGroupFile01">
-						<label class="custom-file-label" for="inputGroupFile01">Choose file</label>
-					</div>
-					<div class="input-group-append">
-						<input type="SUBMIT" name="dupecheck" value="Dupe Check">
+				<div class="form-group">
+					<div class="input-group mb-3">
+						<div class="custom-file col-4">
+							<input type="file" class="custom-file-input" name="uploadedfile" id="inputGroupFile01">
+							<label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+						</div>
+						<div class="input-group-append">
+							<input type="SUBMIT" name="dupecheck" value="Dupe Check">
+						</div>
 					</div>
 				</div>
 			</div>
-
 			<div class="row apl-1">
 				Name (required)
 			</div>
