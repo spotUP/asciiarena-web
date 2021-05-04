@@ -46,7 +46,7 @@
 					<div class="bs-component quick-alert amb-1" id="login-success" style="display: none;">
 						<div id="#succes-alert" class="animate__animated animate__shakeX alert alert-success">authentication successful</div>
 					</div>
-					<script>$('#login-success').fadeIn('slow').delay(500, function(){ window.location.reload(); });</script>
+					<script>$('#login-success').fadeIn('fast').delay(500, function(){ window.location.reload(); });</script>
 					<?php 
 					exit;
 				}
