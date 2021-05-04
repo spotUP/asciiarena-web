@@ -137,7 +137,7 @@ include "header.php";
 <?php } elseif (isset($_GET['confirm'])) { ?>
 <!-- account (not) activated -->
 <?php } else { ?>
-<form action="register.php" method="post">
+<form action="/register.php" method="post">
 	<div class="container-fluid bg-secondary amb-1 apb-1">
 		<div class="row">
 			<div class="col-6">

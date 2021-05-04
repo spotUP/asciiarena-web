@@ -105,8 +105,8 @@ if (DEBUG) {
 										<label class="custom-control-label" for="customSwitch1"><span style="margin-left: -8px !important;">Remember me<span></label>
 									</div>
 								</div>
-								<a href=register.php>Register</a> <span style="color: #999999;">new account!</span><br><br>
-								<a href="reminder.php">Help!</a> <span style="color: #999999;">forgot your password?</span><br><br>
+								<a href="/register.php">Register</a> <span style="color: #999999;">new account!</span><br><br>
+								<a href="/reminder.php">Help!</a> <span style="color: #999999;">forgot your password?</span><br><br>
 							</div>
 						</div>
 					</div>
@@ -134,6 +134,7 @@ if (DEBUG) {
 							});
 						}
 					</script>
+					<input type="hidden" name="location" value="<?=($_SERVER['SCRIPT_NAME'] === '/register.php' ||$_SERVER['SCRIPT_NAME'] === '/reminder.php') ? '/' : $_SERVER['REQUEST_URI']?>">
 				</form>
 				<div id="login-results"></div>
 			<?php } else { ?>
@@ -147,6 +148,5 @@ if (DEBUG) {
 		</div>
 	</div>
 </div> <!-- login modal -->
-
 </body>
 </html>
