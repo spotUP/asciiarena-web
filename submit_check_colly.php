@@ -331,13 +331,6 @@ if ($type == 'ASCII')
 
 
 	   ?>
-
-	   <?php
-	   $dirname = explode(".", $filename);
-	   $dirname = $dirname[0];
-
-	   exec("mv collys/$filename* collys/$dirname");
-	   ?>
 	   <div class="bs-component">
 	   	<div class="animate__animated animate__tada alert alert-dismissible alert-success">
 	   		<button type="button" class="close" data-dismiss="alert">x</button>
