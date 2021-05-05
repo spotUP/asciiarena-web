@@ -8,7 +8,7 @@ if(strlen($searchquery) < 3) $is_search = false;
 $searchquery = preg_replace('/[^A-Za-z0-9\s\.-]/', '', $searchquery);
 $viewmode = $_GET['viewmode'] ?? "Standard";
 
-$sort_order = strtolower($_GET['sort_order']) ?? "";
+$sort_order = (isset($_GET['sort_order'])) ? strtolower($_GET['sort_order']) : "";
 switch ($sort_order) {
 	case "desc": $sort_order = 'DESC'; $osort_order = 'asc'; break;
 	default: $sort_order = 'ASC'; $osort_order = 'desc'; break;
