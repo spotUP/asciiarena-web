@@ -44,10 +44,7 @@
 				]);
 				doQuery("UPDATE users SET lastactive = UNIX_TIMESTAMP() WHERE id = {$login->id}");
 				if ($is_ajax) { ?>
-					<div class="bs-component quick-alert amb-1" id="login-success" style="display: none;">
-						<div id="#succes-alert" class="animate__animated animate__shakeX alert alert-success">authentication successful</div>
-					</div>
-					<script>$('#login-success').fadeIn('fast').delay(500, function(){ window.location.replace('<?=addslashes($loc)?>'); });</script>
+					<script>window.location.replace('<?=addslashes($loc)?>');</script>
 					<?php 
 					exit;
 				}
