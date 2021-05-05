@@ -219,7 +219,7 @@ include "header.php";
 // WRITE COLLY INFO TO DB
 //---------------------------------------------------------------------------------------------------------------
 
-		$filename=$_POST['filename'];
+		$filename = (isset($_POST['filename'])) ? $_POST['filename'] : "";
 
 		if(isset($_POST['do_edit_colly']) && is_admin())
 		{
