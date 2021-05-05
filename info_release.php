@@ -28,10 +28,14 @@ require_once "header.php"; ?>
 		var element = document.getElementById("spotclose");
 		element.classList.toggle("show");
 	}
+        function showAlert(content, prependTo) {
+		const alertContent = `<div class="bs-component quick-alert amb-1"><div id="#success-alert" class="animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div></div>`;
+                $(prependTo).prepend(alertContent);
+       }
 </script>
 <div id="blacker" style="background-color: <?=$bgcolor?>;"></div>
 <div class="modal-body row m-0 p-0">
-	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
+	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1" id="release">
 		<?php
 
 		$time = time();
@@ -319,14 +323,14 @@ require_once "header.php"; ?>
 									<input type="submit" class="btn-big amb-1" id="unfave" name="unfave" data-id="<?=$colly_id?>" value="Remove favourite">
 									<script>
 										$("#unfave").on("click", function () {
+											event.preventDefault();
 											const url = `/cmds.php/unfave/${$(this).data("id")}`;
 											$.ajax(
 												url
 												).done(data => {
 													if (data.status === true) {
-														$(`#colly-row-${data.id}`).fadeOut(300, function () {
-															$(this).remove();
-														});
+														$("#unfave").remove();
+														showAlert('You removed <?=addslashes($filename)?> as a favorite.', '#release');
 													}
 												});
 											});
