@@ -101,8 +101,8 @@ if(isset($_POST['colly_name']))
 		if(!in_array($ext,$allowed_filetypes))
 		{
 			$type = 'ASCII';
-			if (in_array(strtolower($ext), array('ans') $type = 'ANSI';
-			if (in_array(strtolower($ext), array('lha', 'zip') $type = 'Archive';
+			if (in_array(strtolower($ext), array('ans'))) $type = 'ANSI';
+			if (in_array(strtolower($ext), array('lha', 'zip'))) $type = 'Archive';
 			?>
 			<div class="bs-component">
 				<div class="animate__animated animate__tada alert alert-dismissible alert-success">
