@@ -46,8 +46,9 @@ if (isset($_POST['save'])) {
 	if ($nick === $_POST['password']) $errors[] = "username and password may not be identical";
 
 	if (count($errors) == 0) {
+		list ($user_id, $mail, $e) = qsdecrypt($_POST['reset']);
 		$pwhash = password_hash($_POST['password'], PASSWORD_BCRYPT, array('cost' => 13));
-		$q = doQuery("UPDATE users SET pwhash=:pwhash WHERE id=:id",[ 'pwhash' => $pwhash, 'id' => $userid ]);
+		$q = doQuery("UPDATE users SET pwhash=:pwhash WHERE id=:id",[ 'pwhash' => $pwhash, 'id' => $user_id ]);
 		$password_changed = true;
 		$messages[] = "password saved";
 	}
@@ -120,6 +121,7 @@ include "header.php";
 			</div>
 		</div>
 		<div clas="row">
+			<input type="hidden" value="<?=$_GET['reset']?>" name="reset">
 			<input type="submit" value="Save!" name="save">
 		</div>
 	</div>
