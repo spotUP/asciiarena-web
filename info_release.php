@@ -123,8 +123,6 @@ require_once "header.php"; ?>
 					]);
 				}
 
-				header("Location: /release/".$filename);
-				exit;
 			}
 
 			if (isset($_POST[ 'add_comment' ]) || (isset($_POST[ 'Delete' ]))) 
