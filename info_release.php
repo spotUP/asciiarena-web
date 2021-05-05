@@ -13,9 +13,9 @@ if (!fetchOne("SELECT 1 FROM collys WHERE filename = :filename", [":filename" =>
 }
 
 $row = fetchOne("SELECT def_font,def_fg_col,def_bg_col FROM users WHERE nick = :nick", [":nick" => $nick]);
-$font = (strlen($row->font) > 1) ? $row->font : 'mOsOul';
-$fgcolor = (strlen($row->def_fg_col) > 1) ? $row->def_fg_col : '#ffffff';
-$bgcolor = (strlen($row->def_bg_col) > 1) ? $row->def_bg_col : '#000000';
+$font = (isset($row->font) && strlen($row->font) > 1) ? $row->font : 'mOsOul';
+$fgcolor = (isset($row->def_fg_col) && strlen($row->def_fg_col) > 1) ? $row->def_fg_col : '#ffffff';
+$bgcolor = (isset($row->def_bg_col) && strlen($row->def_bg_col) > 1) ? $row->def_bg_col : '#000000';
 
 require_once "header.php"; ?>
 
