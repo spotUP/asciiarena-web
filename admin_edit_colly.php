@@ -203,19 +203,12 @@
 		<div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="colly_year" class="lightgrey">Release Date</label>
-				<select class="select2" name="year" id="colly_year">
-					<?php
-					$countyear=1900;
-					$maxyear=date("Y");
-					while($countyear<=$maxyear)
-					{
-						?>
-						<option><?=$countyear?></option>
-						<?php
-						$countyear++;
-					}
-					?>
-				</select>
+		                <select class="select2" name="year" id="colly_year">
+					<option value="0">Unknown</option>
+                                        <?php for ($i=date('Y'); $i>=1986; $i--) { ?>
+					<option value="<?=$i?>"><?=$i?></option>
+                                        <?php } ?>
+                                </select>
 				<select class="select2" name="month" id="colly_month">
 					<?php
 					$countmonth=1;
