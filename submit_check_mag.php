@@ -130,7 +130,7 @@ if(isset($_POST['mag_author']))
 // CONVERT MAG FILE_ID.DIZ
 //---------------------------------------------------------------------------------------------------------------
 
-		if ($type == MAG)
+		if ($type == 'MAG')
 		{
 		$filename = $_FILES['uploaded_mag']['name']; 							// fetch filename with extension
 	   	$filen = $upload_path . basename($_FILES['uploaded_mag']['name']); 		// fetch filename with path
