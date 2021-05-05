@@ -77,7 +77,6 @@ if(isset($_POST['colly_name']))
 	$year=$_POST['year'];
 	$month=$_POST['month'];
 	$day=$_POST['day'];
-	$type=$_POST['type'];
 	$now=time();
 	$total_artists=$_POST['total_artists'];
 	$artist=$_POST['artist'];
@@ -101,6 +100,9 @@ if(isset($_POST['colly_name']))
 		$ext = substr($filename, strpos($filename,'.'), strlen($filename)-1);
 		if(!in_array($ext,$allowed_filetypes))
 		{
+			$type = 'ASCII';
+			if (in_array(strtolower($ext), array('ans'))) $type = 'ANSI';
+			if (in_array(strtolower($ext), array('lha', 'zip'))) $type = 'Archive';
 			?>
 			<div class="bs-component">
 				<div class="animate__animated animate__tada alert alert-dismissible alert-success">
@@ -220,11 +222,25 @@ include "footer.php";
 exit();
 }
 
+
+$filename = $_FILES['uploadedfile']['name']; 							// fetch filename with extension
+$dupecheck = fetchOne("select filename from collys where filename=:filename", [ 'filename' => $filename ]);
+
+if ($dupecheck) {
+?>
+	   <div class="bs-component">
+	   	<div class="animate__animated animate__tada alert alert-dismissible alert-warning">
+	   		<button type="button" class="close" data-dismiss="alert">x</button>
+	   		<span><?=$filename?> is a duplicate, upload skipped!</span>
+	   	</div>
+	   </div>
+<?php
+} else {
+
 //---------------------------------------------------------------------------------------------------------------
 // CONVERT FILE_ID.DIZ
 //---------------------------------------------------------------------------------------------------------------
 
-$filename = $_FILES['uploadedfile']['name']; 							// fetch filename with extension
 $filen = $upload_path . $dirname . '/' . basename($_FILES['uploadedfile']['name']); 		// fetch filename with path
 mkdir($upload_path.$dirname, 0755, TRUE);
 if (preg_match('/\.lha/i', $filename)) $type = 'Archive';
@@ -256,7 +272,7 @@ if ($type == 'ASCII')
 	   			if (preg_match('/%\s+[A-Za-z]+\s+\d+\s+\d{4}\s+(.*file_id\.diz)$/i', $l, $m)) $fileids[] = $m[1];
 	   		}
 	   		foreach ($fileids as $fileid) {
-	   			shell_exec('/usr/bin/lha pq "'.$filen.'" "'.$fileid.'" > collections/temp.diz');
+	   			shell_exec('/usr/bin/lha pq "'.$filen.'" "'.$fileid.'" | sed 1,3d > collections/temp.diz');
 	   			if (filesize('collections/temp.diz') > 0) {
 	   				rename('collections/temp.diz', 'collections/'.$dirname.'/'.$filename.'.diz');
 	   				break;
@@ -315,19 +331,13 @@ if ($type == 'ASCII')
 
 
 	   ?>
-
-	   <?php
-	   $dirname = explode(".", $filename);
-	   $dirname = $dirname[0];
-
-	   exec("mv collys/$filename* collys/$dirname");
-	   ?>
 	   <div class="bs-component">
 	   	<div class="animate__animated animate__tada alert alert-dismissible alert-success">
 	   		<button type="button" class="close" data-dismiss="alert">x</button>
 	   		<span><?=$filename?> successfully uploaded!</span>
 	   	</div>
 	   </div>
+<?php } // ($dupecheck) ?>
 	   <meta http-equiv="Refresh" content="4"; url="submit.php">
 	</div>
 	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
