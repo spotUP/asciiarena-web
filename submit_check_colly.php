@@ -77,7 +77,6 @@ if(isset($_POST['colly_name']))
 	$year=$_POST['year'];
 	$month=$_POST['month'];
 	$day=$_POST['day'];
-	$type=$_POST['type'];
 	$now=time();
 	$total_artists=$_POST['total_artists'];
 	$artist=$_POST['artist'];
@@ -101,6 +100,9 @@ if(isset($_POST['colly_name']))
 		$ext = substr($filename, strpos($filename,'.'), strlen($filename)-1);
 		if(!in_array($ext,$allowed_filetypes))
 		{
+			$type = 'ASCII';
+			if (in_array(strtolower($ext), array('ans') $type = 'ANSI';
+			if (in_array(strtolower($ext), array('lha', 'zip') $type = 'Archive';
 			?>
 			<div class="bs-component">
 				<div class="animate__animated animate__tada alert alert-dismissible alert-success">

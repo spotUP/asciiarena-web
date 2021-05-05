@@ -80,14 +80,6 @@
 			<div class="row apl-1">
 				Type
 			</div>
-			<div class="row apl-1 apb-1">
-				<span>
-					<select class="select2" name="type">
-						<option value="ASCII">ASCII/Ansi</option>
-						<option>Archive</option>
-					</select>
-				</span>
-			</div>
 
 			<div class="row apl-1">
 				ANSI Colors
