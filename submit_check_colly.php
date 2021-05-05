@@ -272,7 +272,7 @@ if ($type == 'ASCII')
 	   			if (preg_match('/%\s+[A-Za-z]+\s+\d+\s+\d{4}\s+(.*file_id\.diz)$/i', $l, $m)) $fileids[] = $m[1];
 	   		}
 	   		foreach ($fileids as $fileid) {
-	   			shell_exec('/usr/bin/lha pq "'.$filen.'" "'.$fileid.'" > collections/temp.diz');
+	   			shell_exec('/usr/bin/lha pq "'.$filen.'" "'.$fileid.'" | sed 1,3d > collections/temp.diz');
 	   			if (filesize('collections/temp.diz') > 0) {
 	   				rename('collections/temp.diz', 'collections/'.$dirname.'/'.$filename.'.diz');
 	   				break;
