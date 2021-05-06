@@ -12,9 +12,15 @@ if(!isset($_GET['member']) || empty($member->id)) {
 $h1 = "mEMBER iNFO";
 include "header.php";
 ?>
-
+<script>
+       function showAlert(content, prependTo) {
+                const alertContent = `<div class="bs-component quick-alert amb-1"><div id="#success-alert" class="animate__animated animate__shakeX alert alert-dismissible alert-success"
+><button type="button" class="close" data-dismiss="alert">x</button>${content}</div></div>`;
+                $(prependTo).prepend(alertContent);
+       }
+</script>
 <div class="modal-body row m-0 p-0">
-	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2">
+	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2" id="member">
 		<?php if ($member_available) { ?>
 			<div class="position-relative">
 				<div class="row">
@@ -126,8 +132,8 @@ include "header.php";
 				</div>
 				<?php
 				foreach(fetchAll("SELECT c.name,c.filename,
-					GROUP_CONCAT(a.nick) as artists,
-					GROUP_CONCAT(w.name) as crews 
+					GROUP_CONCAT(DISTINCT a.nick) as artists,
+					GROUP_CONCAT(DISTINCT w.name) as crews 
 					FROM collys c
 					LEFT JOIN artists_collys ac ON c.id=ac.colly_id
 					LEFT JOIN artists a ON ac.artist_id=a.id
@@ -218,6 +224,7 @@ include "header.php";
 										if (data.status === true) {
 											$(`#colly-row-${data.id}`).fadeOut(300, function () {
 												$(this).remove();
+												showAlert('You removed <?=addslashes($row->filename)?> as a favorite.', '#member');
 											});
 										}
 									});

@@ -40,7 +40,7 @@ require_once "header.php"; ?>
 
 		$time = time();
 		$comment = $_POST[ 'comment' ] ?? "";
-		$user_added_rating = $_POST[ 'user_added_rating' ] ?? "";
+		$user_added_rating = $_POST[ 'user_added_rating' ] ?? null;
 
 		if (isset($_POST[ 'favourite' ]) && is_logged_in()) 
 		{
@@ -718,6 +718,8 @@ require_once "header.php"; ?>
 			}
 			else
 			{
+
+				$chk_rating = fetchOne("SELECT 1 FROM comments WHERE filename=:filename AND user_id=:user_id AND rating > 0", [ "filename" => $filename, "user_id" => $_user["id"] ] );
 				echo "<form action=\"/release/".$filename."?comment\" method=\"post\">";
 				?>
 				<div class="row apl-1 apr-1">
@@ -733,6 +735,7 @@ require_once "header.php"; ?>
 				<div class="row aml-1 apl-1 apr-1">
 					<div class="col-12 apl-1 apr-1 apb-1 apt-1 bg-secondary">
 
+						<?php if (!$chk_rating) { ?>
 						RATING
 						<select class="custom-select" name="user_added_rating">
 							<option value="0" selected="selected">Blank</option><?php
@@ -741,6 +744,7 @@ require_once "header.php"; ?>
 								echo "<option value=$i>$i</option>";
 							} ?>
 						</select>
+						<?php } ?>
 						<input type="hidden" name="crew" align="right" value="<?=$crew?>"><input type="hidden" name="artist"
 						align="right" value="<?=$artist?>">
 						<input type="submit" class="btn-big" name="add_comment" align="right" value="Comment">
