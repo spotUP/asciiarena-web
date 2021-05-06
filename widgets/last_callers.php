@@ -22,7 +22,7 @@ $(function() {
 	$(".lastcall-time").each(function(){
 		var utc = $(this).data("utc");
 		var localdate = new Date(utc);
-		var localtime = ("0" + localdate.getHours()).slice(-2) + ':' + localdate.getMinutes();
+		var localtime = ("0" + localdate.getHours()).slice(-2) + ':' + ("0" + localdate.getMinutes()).slice(-2);
 		$(this).text(localtime);
 	});
 });
