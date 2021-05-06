@@ -23,7 +23,7 @@ if(isset($_POST['artistnick']))
 	$result=fetchAll($ask, [ 'artistnick' => $artistnick ]);
 	foreach ($result as $row)
 	{
-		$artist_dupe=$row[0];				
+		$artist_dupe=$row->nick;
 
 		if (strcasecmp($artistnick, $artist_dupe) == 0) 
 		{
@@ -74,9 +74,9 @@ doQuery($ask, [
 	'artisturl' => urlsafe($artistnick),
 ]);
 
-if (isset($_POST[artist_crew]))
+if (isset($_POST['artist_crew']) && is_array($_POST['artist_crew']))
 {
-	foreach($_POST[artist_crew] as $artist_crew)
+	foreach($_POST['artist_crew'] as $artist_crew)
 	{
 		$ask="insert into member_of (crew, nick) values (:artist_crew,:artistnick)";
 		doQuery($ask, ['artist_crew' => $artist_crew, 'artistnick' => $artistnick ]);
