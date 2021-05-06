@@ -243,9 +243,11 @@ if ($dupecheck) {
 
 $filen = $upload_path . $dirname . '/' . basename($_FILES['uploadedfile']['name']); 		// fetch filename with path
 mkdir($upload_path.$dirname, 0755, TRUE);
-if (preg_match('/\.lha/i', $filename)) $type = 'Archive';
+$type = 'ASCII';
+if (in_array(strtolower($ext), array('ans'))) $type = 'ANSI';
+if (in_array(strtolower($ext), array('lha', 'zip'))) $type = 'Archive';
 
-if ($type == 'ASCII')
+if ($type === 'ASCII' || $type === 'ANSI')
 {
 	   	if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $filen))
 	   	{ 
