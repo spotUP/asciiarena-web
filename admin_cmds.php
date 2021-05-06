@@ -257,9 +257,9 @@
 					":nick" => $_POST[ "nick" ] ?? "",
 					":rank" => $_POST[ "rank" ] ?? "",
 					":crew" => $_POST[ "crew" ] ?? "",
-					":byear" => $_POST[ "byear" ] ?? "",
-					":bmonth" => $_POST[ "bmonth" ] ?? "",
-					":bday" => $_POST[ "bday" ] ?? "",
+					":byear" => $_POST[ "byear" ] ?? null,
+					":bmonth" => $_POST[ "bmonth" ] ?? null,
+					":bday" => $_POST[ "bday" ] ?? null,
 					":country" => $_POST[ "country" ] ?? "",
 					":mail" => $_POST[ "mail" ] ?? "",
 				];
