@@ -147,7 +147,7 @@ require_once "header.php"; ?>
 // WRITE COMMENT TO DATABASE
 //----------------------------------------------------------------------------------------------
 
-				if (isset($_POST[ 'comment' ]) && (isset($_GET[ 'comment' ]))) 
+				if (isset($_POST[ 'comment' ]) && (isset($_GET[ 'comment' ])) && is_logged_in()) 
 				{
 					if (empty($comment))
 					{
