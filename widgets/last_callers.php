@@ -10,10 +10,20 @@
 			?>
 			<div class="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
 				<a class="yellow text-truncate" href="/member/<?=urlsafe($row->nick)?>"><?=$row->nick?></a>
-				<?=Date("H:i", $row->timestamp)?>
+				<span class="lastcall-time" data-utc="<?=date("c", $row->timestamp)?>"><?=Date("H:i", $row->timestamp)?></span>
 			</div>
 			<?php
 		}
 		?>
 	</div>
 </div>
+<script>
+$(function() {
+	$(".lastcall-time").each(function(){
+		var utc = $(this).data("utc");
+		var localdate = new Date(utc);
+		var localtime = ("0" + localdate.getHours()).slice(-2) + ':' + localdate.getMinutes();
+		$(this).text(localtime);
+	});
+});
+</script>
