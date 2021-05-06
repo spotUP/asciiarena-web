@@ -4,7 +4,7 @@ $wall = "wall_{$wall_id}";
 $form = "form_{$wall_id}";
 $tag = "tag_{$wall_id}";
 ?>
-<div class="header col-lg-12">
+<div class="header col-12 col-lg-12">
 	<h2 class="apt-1 apb-1 bg-header">TAG THE WALL</h2>
 </div>
 <div class="container-fluid p-0 p-lg-2">
@@ -21,18 +21,16 @@ $tag = "tag_{$wall_id}";
 					color: transparent;
 				}
 			</style>
-			<div class="col-lg-12">
-				<form id="<?=$form?>" action="/cmds.php?cmd=tag" method="post" class="form-inline">
-					<div class="row apl-1">
-						<div class="col-11">
-							<input class="form-control tagtext w-100" type="text" name="tagtext" placeholder="Tag the wall" id="<?=$tag?>" required autocomplete="off">
-						</div>
-						<div class="col-1">
-							<button class="btn-primary" style="width: 48px; margin-top: 2px;" type="submit">Tag</button>
-						</div>
+			<form id="<?=$form?>" action="/cmds.php?cmd=tag" method="post" class="w-100">
+				<div class="row col-12 col-lg-12 m-0">
+					<div class="col-10 col-lg-11">
+						<input class="form-control tagtext w-100" type="text" name="tagtext" placeholder="Tag the wall" id="<?=$tag?>" required autocomplete="off">
 					</div>
-				</form>
-			</div>
+					<div class="col-2 col-lg-1">
+						<button class="button w-100" type="submit">Tag</button>
+					</div>
+				</div>
+			</form>
 			<script>
 				$(function () {
 					$("#<?=$form?>").submit(function (e) {
