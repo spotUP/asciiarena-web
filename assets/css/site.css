@@ -2158,3 +2158,7 @@ b::before, b::after, strong::before, strong::after {
     padding-left: 8px;
     padding-right: 8px;
 }
+
+.p-lg-2 {
+    padding: 16px 8px !important;
+  }
