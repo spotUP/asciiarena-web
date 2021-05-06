@@ -1,14 +1,14 @@
 <?php defined('VALID') or die('Nuh-uh!');
-	$wall_id = random_int(0, 65536);
-	$wall = "wall_{$wall_id}";
-	$form = "form_{$wall_id}";
-	$tag = "tag_{$wall_id}";
+$wall_id = random_int(0, 65536);
+$wall = "wall_{$wall_id}";
+$form = "form_{$wall_id}";
+$tag = "tag_{$wall_id}";
 ?>
 <div class="header col-lg-12">
 	<h2 class="apt-1 apb-1 bg-header">TAG THE WALL</h2>
 </div>
 <div class="container-fluid p-0 p-lg-2">
-	<div class="row m-0 p-0 bg-secondary apt-1 apb-1" id="<?=$wall?>"></div>
+	<div class="row m-0 p-0 bg-secondary apb-1" id="<?=$wall?>"></div>
 	<?php if (is_logged_in()): ?>
 		<div class="row">
 			<style>
@@ -22,11 +22,15 @@
 				}
 			</style>
 			<div class="col-lg-12">
-				<form id="<?=$form?>" action="/cmds.php?cmd=tag" method="post" class="form-inline my-2 my-lg-0">
-					<input class="form-control col-11 tagtext" type="text" name="tagtext"
-					       placeholder="Tag the wall"
-					       id="<?=$tag?>" required autocomplete="off">
-					<button class="btn-primary col-1" style="margin: 0 !important; padding: 0 !important" type="submit">Tag</button>
+				<form id="<?=$form?>" action="/cmds.php?cmd=tag" method="post" class="form-inline">
+					<div class="row apl-1">
+						<div class="col-11">
+							<input class="form-control tagtext w-100" type="text" name="tagtext" placeholder="Tag the wall" id="<?=$tag?>" required autocomplete="off">
+						</div>
+						<div class="col-1">
+							<button class="btn-primary" style="width: 48px; margin-top: 2px;" type="submit">Tag</button>
+						</div>
+					</div>
 				</form>
 			</div>
 			<script>
