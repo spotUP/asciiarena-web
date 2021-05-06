@@ -4,7 +4,7 @@
 </div>
 
 <div class="container-fluid apt-1 p-0 p-lg-2">
-	<div class="col-12 bg-secondary apt-1 apb-1">
+	<div class="col-12 bg-secondary">
 		<div class="row apb-1">
 			<div class="col-6 col-sm-7 text-truncate">
 				<span class="white text-truncate">COMMENT</span>
