@@ -205,7 +205,7 @@ include "header.php";
 				New password
 			</div>
 			<div class="col-3">						
-				<input type="password"  class="w-100" name="new_password">
+				<input type="password"  class="w-100" name="password">
 			</div>
 		</div>
 		<div class="row amb-1">
