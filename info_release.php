@@ -491,7 +491,7 @@ require_once "header.php";?>
         <?php if (is_admin())  {         
         ?>
           buttons = `<input type="button" class="btn-big" onclick="editComment(${comment.id})" value="Edit"><input type="button" onclick="deleteComment(${comment.id})" class="btn-big" value="Delete">`
-        <?php } else {
+        <?php } elseif (is_logged_in()){
         ?>
         if (comment.nick == "<?=$_user[ "nick" ]?>") {
           buttons = `<input type="button" class="btn-big" onclick="editComment(${comment.id})" value="Edit">`
