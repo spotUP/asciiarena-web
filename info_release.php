@@ -54,11 +54,11 @@ require_once "header.php";?>
 		<input type="button" id="fsbutton" style="display:none" onclick="showFullscreen()" class="btn-big amb-1" value="Fullscreen">
     <?php } ?>
 		<input type="button" onclick="downloadfile()" class="btn-big amb-1" value="Download">
+		<input id="collyid" type="hidden" data-id="<?=$colly_id?>" >
     <?php if (is_logged_in()) {
       $favourite = (fetchOne("SELECT 1 FROM favourites WHERE user_id = :user AND colly_id = :colly", [ "user" => $_user['id'], "colly" => $colly_id])) ? "Remove favourite" : "Favourite";
     ?>
     
-		<input id="collyid" type="hidden" data-id="<?=$colly_id?>" >
     
 		<input type="button" class="btn-big amb-1" onclick="addComment()" value="Comment">
 		<input type="button" id="favbutton" onclick="favourite()" class="btn-big amb-1" value="<?=$favourite?>">
