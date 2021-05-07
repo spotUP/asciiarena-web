@@ -4,9 +4,11 @@ RUN apt-get -y update
 
 RUN mkdir -p /usr/share/man/man1
 
-RUN apt-get -y install jlha-utils xdms libonig-dev
+RUN apt-get -y install jlha-utils xdms libonig-dev libmcrypt-dev
 
 RUN docker-php-ext-install mbstring pdo pdo_mysql
+RUN pecl install mcrypt-1.0.4
+RUN docker-php-ext-enable mcrypt
 
 RUN echo 'PassEnv DBNAME DBHOST DBUSER DBPW' > /etc/apache2/conf-enabled/expose-env.conf 
 
