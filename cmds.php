@@ -15,7 +15,7 @@
 			$loc = $_POST[ "location" ] ?? "/";
 			$spw = fetchOne("SELECT pwhash FROM users WHERE (nick = :nick OR mail = :nick)", [ ":nick" => $ni ])->pwhash;
 			if (preg_match('/^[a-f0-9]{32}$/i', $spw)) {
-				$login = fetchOne("SELECT * FROM users WHERE pwhash = :pwhash AND (nick = :nick OR mail = :nick)", [
+				$login = fetchOne("SELECT id,nick,crew,rank,crt_effect FROM users WHERE pwhash = :pwhash AND (nick = :nick OR mail = :nick)", [
 					":pwhash" => md5($pw),
 					":nick" => $ni
 				]);
@@ -25,7 +25,7 @@
 				}
 			} else {
 				if (password_verify($pw, $spw)) {
-					$login = fetchOne("SELECT * FROM users WHERE (nick = :nick OR mail = :nick)", [ ":nick" => $ni ]);
+					$login = fetchOne("SELECT id,nick,crew,rank,crt_effect FROM users WHERE (nick = :nick OR mail = :nick)", [ ":nick" => $ni ]);
 				}
 			}
 			if ($login) {
@@ -38,6 +38,7 @@
 						"crt_effect" => $login->crt_effect,
 					]
 				];
+				if (isset($_POST["rememberme"]) && $_POST["rememberme"] == 1) setremember();
 				doQuery("INSERT INTO lastusers (nick, crew, user_id, timestamp) VALUES (:nick, :crew, {$login->id}, UNIX_TIMESTAMP())", [
 					":nick" => $_user[ "nick" ],
 					":crew" => $_user[ "crew" ]
@@ -68,6 +69,7 @@
 				setcookie(session_name(), '', time() - 42000, $params[ "path" ], $params[ "domain" ], $params[ "secure" ], $params[ "httponly" ]);
 			}
 			session_destroy();
+			if (isset($_COOKIE['aarm'])) setcookie('aarm', '', (time()-86400), '/', 'asciiarena.se', true, true);
 			break;
 		/*			case "register":
 						break;*/

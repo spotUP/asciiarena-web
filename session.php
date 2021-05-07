@@ -22,6 +22,32 @@
 	if (!empty($_path)) {
 		$_current = array_filter(explode("/", trim($_path, "/")));
 	}
+
+	if (!is_logged_in() && isset($_COOKIE['aarm']) && preg_match('/^(\w+):(\w+)$/', $_COOKIE['aarm'], $m)) {
+		list(, $selector, $token) = $m;
+		$v = fetchOne("SELECT user_id,hash FROM auth WHERE selector=:selector AND expiration > NOW()", [ 'selector' => $selector ] );
+		if ($v) {
+			if (hash_equals($v->hash, hash('sha256', $token.$remember_salt))) {
+				$login = fetchOne("SELECT id,nick,crew,rank,crt_effect FROM users WHERE id=:id", [ ":id" => $v->user_id ] );
+                                $_user = $_SESSION[ "_user" ] = [
+                                        "id" => $login->id,
+                                        "nick" => $login->nick,
+                                        "crew" => $login->crew,
+                                        "rank" => $login->rank,
+                                        "settings" => [
+                                                "crt_effect" => $login->crt_effect,
+                                        ]
+                                ];
+                                doQuery("INSERT INTO lastusers (nick, crew, user_id, timestamp) VALUES (:nick, :crew, {$login->id}, UNIX_TIMESTAMP())", [
+                                        ":nick" => $_user[ "nick" ],
+                                        ":crew" => $_user[ "crew" ]
+                                ]);
+				doQuery("UPDATE users SET lastactive = UNIX_TIMESTAMP() WHERE id = {$login->id}");
+			}
+		}
+
+	}
+
 	if (!defined("NO_PING") && valid_current()) {
 		if (is_logged_in()) {
 			doQuery("UPDATE users SET lastactive = UNIX_TIMESTAMP(), current = :current WHERE id = :id", [
