@@ -69,12 +69,12 @@ include_once "header.php";
 					exit;
 				}
 
-				$postsubject = cleanInsert($postsubject);
-				$postmessage = cleanInsertPost($postmessage);
 				$now = time();
-				$ask = "INSERT INTO messages (thread, postedto, postername, timestamp, subject, message, new, unread) VALUES (:thread,:posttomember,:nick,:now,:postsubject,:postmessage,1,1)";
+				$ask = "INSERT INTO messages (thread, from_id, to_id, postedto, postername, timestamp, subject, message, new, unread) VALUES (:thread,:from_id,(select id from users where nick=:posttomember),:posttomember,:nick,:now,:postsubject,:postmessage,1,1)";
 				doQuery($ask, [
 					'thread'       => $thread,
+					'from_id'      => $_user['id'],
+					'to_id'        => $thread,
 					'posttomember' => $posttomember,
 					'nick'         => $nick,
 					'now'          => $now,
@@ -94,8 +94,8 @@ include_once "header.php";
 			if (isset($_POST[ 'deletemessage' ])) {
 				$deleteid = ($_POST[ 'thread' ]);
 				$deletemsgid = ($_POST[ 'messid' ]);
-				$ask = $_db->prepare("delete from messages where thread=:deleteid and id=:messid");
-				$ask->execute(['deleteid' => $deleteid, 'messid' => $deletemsgid ]);
+				$ask = $_db->prepare("delete from messages where thread=:deleteid and id=:messid and (from_id=:user_id or to_id=:user_id)");
+				$ask->execute(['deleteid' => $deleteid, 'messid' => $deletemsgid, "user_id" => $_user['id'] ]);
 			}
 
 //-----------------------------------------------------------------------------
@@ -118,8 +118,8 @@ include_once "header.php";
 					<form action="messages.php?post" method="post">
 						<?php
 
-						foreach (fetchAll("SELECT * FROM messages WHERE id = :id", [
-							":id" => $messid
+						foreach (fetchAll("SELECT * FROM messages WHERE id = :id and to_id=:user_id", [
+							":id" => $messid, ":user_id" => $_user['id']
 						]) as $row) {
 							$messid = $row->id;
 							$thread = $row->thread;
@@ -274,11 +274,12 @@ include_once "header.php";
 				$thread++;
 
 				$now = time();
-				$ask = $_db->prepare("INSERT INTO messages (thread, postedto, postername, timestamp, subject, message, new, unread)
-					VALUES (:thread,:posttomember,:postername,:now,:postsubject,:postmessage,1,1)
+				$ask = $_db->prepare("INSERT INTO messages (thread, from_id, to_id, postedto, postername, timestamp, subject, message, new, unread)
+					VALUES (:thread,:from_id,(select id from users where nick=:posttomember),:posttomember,:postername,:now,:postsubject,:postmessage,1,1)
 					");
 				$ask->execute([
 					'thread' => $thread,
+					'from_id' => $_user['id'],
 					'posttomember' => $posttomember,
 					'postername' => $postername,
 					'now' => $now,
@@ -390,20 +391,23 @@ include_once "header.php";
 								$messnew = $row_new->new;
 								if ($messnew == 1) {
 									?>
-									<div class="col-7">
+									<div class="col-5">
 										<a class="yellow text-truncate !important;" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
 									</div>
 									<?php
 								} else {
 									?>
-									<div class="col-7">
+									<div class="col-5">
 										<a class="green text-truncate !important;" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
 									</div>
 									<?php
 								}
 								?>
-								<div class="col-3">
+								<div class="col-2">
 									<span class="cyan">From:</span> <span class="white"><?=$messpostername?></span>
+								</div>
+								<div class="col-3">
+									<span class="cyan">Date:</span> <span class="white message-time" data-utc="<?=date("c", $row->timestamp)?>"><?=date("d/m H:i", $row->timestamp)?></span>
 								</div>
 								<div class="col-2">
 									<input type="hidden" name="thread" value="<?=$thread?>">
@@ -442,10 +446,14 @@ include_once "header.php";
 		<?php include "sidebar_right.php"; ?>
 	</div>
 </div>
+<script>
+$(function() {
+        $(".message-time").each(function(){
+                var utc = $(this).data("utc");
+                var localdate = new Date(utc);
+                var localtime = ("0" + localdate.getDate()).slice(-2) + "/" + ("0" + localdate.getMonth()).slice(-2) + " " + ("0" + localdate.getHours()).slice(-2) + ':' + ("0" + localdate.getMinutes()).slice(-2);
+                $(this).text(localtime);
+        });
+});
+</script>
 <?php include "footer.php"; ?>
-
-
-
-
-
-
