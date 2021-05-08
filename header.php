@@ -1,4 +1,6 @@
 <?php defined('VALID') or die('Nuh-uh!');
+require_once "lib/Mobile_Detect.php";
+$detect = new Mobile_Detect;
 header('Content-Type: text/html; charset=UTF-8');
 $logos = [];
 foreach(fetchAll("SELECT ascii FROM logos ORDER BY RAND() limit 10") as $logo) {
@@ -197,11 +199,12 @@ include "header_ascii.php";
 				<div class="row">
 					<div class="col-lg-12">
 						<div class="bs-component aml-1 amb-1 apl-1 apr-1 apt-1">
+							<?php if ($detect->isMobile()) { ?>
 							<div class="animate__animated animate__tada alert alert-dismissible alert-danger hide-on-landscape">
 								<button type="button" class="close" data-dismiss="alert">x</button>
 								Rotate your phone for a better viewing experience.
 							</div>
+							<?php } ?>
 						</div>
 					</div>
 				</div>
-
