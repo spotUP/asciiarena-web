@@ -12,25 +12,29 @@ include "header.php";
 		<span class="cyan">Thanks to TZ and Hamlet for their contributions</span>
 		<br><br><br>
 
-		<span class="white">CYGNUS EDiTOR ONLiNE</span><br><br>
+<!--		<span class="white">CYGNUS EDiTOR ONLiNE</span><br><br>
 		<span class="cyan">Code by Fred, Origo, Phiwer</span><br>
-		<span class="cyan">Concept/UI/HTML/CSS by Spot</span><br><br><br>
+		<span class="cyan">Concept/UI/HTML/CSS by Spot</span><br><br><br> -->
 
-		<span class="white">HiPPOPLAYER ONLiNE</span><br><br>
+<!--		<span class="white">HiPPOPLAYER ONLiNE</span><br><br>
 		<span class="cyan">Code by Stalvik</span><br>
 		<span class="cyan">Concept/UI/HTML/CSS by Spot</span><br>
-		<span class="yellow">Add refs to player libs here</span><br><br><br>
+		<span class="yellow">Add refs to player libs here</span><br><br><br> -->
 
-        <span class="white">ASCII FONT EDITOR</span><br><br>
+<!--        <span class="white">ASCII FONT EDITOR</span><br><br>
 		<span class="cyan">Code by ....</span><br>        
 		<span class="cyan">Concept/UI/HTML/CSS by Spot</span><br>
-		<span class="cyan">Based on a web adaption of FIGLET by PatorJK</span><br><br><br>
+		<span class="cyan">Based on a web adaption of FIGLET by PatorJK</span><br><br><br> -->
 
 		<span class="white">ADMiNS</span><br><br>
-		<span class="cyan">Dino, Dipswitch, h7, Ne7, Skope, Spot, Yonx, Zito</span><br><br><br>
+		<span class="cyan">Dino, Dipswitch, dMG, h7, Ne7, Skope, Spot, Yonx, Zito</span><br><br><br>
 
 		<span class="white">FOLLOW</span><br><br><br>
 		<span class="white bg-blue ap-1"><a href="https://www.facebook.com/asciiarena">Facebook</a></span><br><br><br>
+
+		<span class="white">CHAT</span><br><br><br>
+		<span class="white bg-lightblue ap-1"><a href="https://discord.gg/KzVPpZrR">Discord</a></span><br><br><br>
+
 	</div>
 	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
 		<?php include "sidebar.php"; ?>
