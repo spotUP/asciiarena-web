@@ -221,7 +221,7 @@
         if (empty($rating)) $rating = null;
 				if ($colly > 0) {
 					$status = doQuery("insert into comments (colly_id, filename, crew, artist, comment, rating, nick, timestamp,user_id) 
-            values (:colly_id,:filename,(select w.name from collys_crews cc LEFT JOIN crews w ON w.id=cc.crew_id where cc.colly_id=:colly_id),(select a.nick from artists_collys ac LEFT JOIN artists a ON a.id=ac.artist_id where ac.colly_id=:colly_id),:comment, :rating, :nick, :time, :user_id)",[
+            values (:colly_id,:filename,(select w.name from collys_crews cc LEFT JOIN crews w ON w.id=cc.crew_id where cc.colly_id=:colly_id),(select group_concat(a.nick) from artists_collys ac LEFT JOIN artists a ON a.id=ac.artist_id where ac.colly_id=:colly_id GROUP BY ac.colly_id),:comment, :rating, :nick, :time, :user_id)",[
             ":colly_id" => (int)$colly,
             ":filename" => $_SESSION['filename'],
             ":comment" => $comment,
