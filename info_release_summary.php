@@ -35,7 +35,7 @@ $dirname = $dirname[0];
 						if (file_exists($file_id))
 						{
 							$file_id_diz = file_get_contents($file_id);
-							$file_id_diz = htmlentities($file_id_diz, ENT_SUBSTITUTE)
+							$file_id_diz = htmlentities($file_id_diz, ENT_SUBSTITUTE);
 							echo "<pre class=\"magenta apt-1\">";
 							echo utf8_encode($file_id_diz);
 							echo "</pre>";
