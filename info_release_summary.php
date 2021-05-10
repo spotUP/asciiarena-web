@@ -2,8 +2,8 @@
 
 $colly = fetchOne("SELECT * FROM collys WHERE filename = :filename", [":filename" => $filename]);
 
-	$dirname = explode(".", $colly->filename);
-	$dirname = $dirname[0];
+$dirname = explode(".", $colly->filename);
+$dirname = $dirname[0];
 	$filenameandpath = "collections/".$dirname."/".$colly->filename; // fetch path + filename to get filesize.
 	$viewtimes = $colly->view_counter;
 	$year = $colly->year;
@@ -35,6 +35,8 @@ $colly = fetchOne("SELECT * FROM collys WHERE filename = :filename", [":filename
 						if (file_exists($file_id))
 						{
 							$file_id_diz = file_get_contents($file_id);
+							$file_id_diz = htmlentities($file_id_diz);
+
 							echo "<pre class=\"magenta apt-1\">";
 							echo utf8_encode($file_id_diz);
 							echo "</pre>";
@@ -162,4 +164,4 @@ $colly = fetchOne("SELECT * FROM collys WHERE filename = :filename", [":filename
 		</div>
 	</div>
 	<?php
-?>
+	?>
