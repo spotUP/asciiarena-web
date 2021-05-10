@@ -35,6 +35,7 @@ include "header.php";
 		<span class="white">CHAT</span><br><br><br>
 		<span class="white bg-lightblue ap-1"><a href="https://discord.gg/KzVPpZrR">Discord</a></span><br><br><br>
 
+		<span class="cyan">You can also reach us on IRCNet in #asciiarena</span><br><br><br>
 	</div>
 	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
 		<?php include "sidebar.php"; ?>
