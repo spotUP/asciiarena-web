@@ -360,68 +360,167 @@ include_once "header.php";
 //-----------------------------------------------------------------------------
 // MESSAGE LIST 
 //-----------------------------------------------------------------------------
+			?>
 
-			if (!isset($_POST[ 'open_postnewmessage' ])) 
-			{
 
-				?>
-				<form enctype="multipart/form-data" action="messages.php" method="post">
-					<div class="row apb-1 apl-1">
-						<input type="submit" colspan="4" name="open_postnewmessage" value="New Message!">
-					</div>
-				</form>
-				<?php
-				foreach (fetchAll("SELECT * FROM messages WHERE postedto = :nick GROUP BY thread ORDER BY timestamp DESC", [":nick" => $_user[ "nick" ]]) as $row) {
-					$messid = $row->id;
-					$thread = $row->thread;
-					$messpostedto = $row->postedto;
-					$messpostername = $row->postername;
-					$messtimestamp = $row->timestamp;
-					$messtime = date("D M j o", $messtimestamp);
-					$postsubject = $row->subject;
-					$postmessage = $row->message;
-					$postsubject = fixOutputPost($postsubject);
-					$postmessage = fixOutputPost($postmessage);
 
-					?>
-					<form action="messages.php" method="post">
-						<div class="row">
-							<?php
-							foreach (fetchAll("SELECT new FROM messages WHERE thread = :thread ORDER BY new DESC LIMIT 1", [":thread" => $thread]) as $row_new) {
-								$messnew = $row_new->new;
-								if ($messnew == 1) {
-									?>
-									<div class="col-5">
-										<a class="yellow text-truncate !important;" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
-									</div>
-									<?php
-								} else {
-									?>
-									<div class="col-5">
-										<a class="green text-truncate !important;" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
-									</div>
-									<?php
-								}
-								?>
-								<div class="col-2">
-									<span class="cyan">From:</span> <span class="white"><?=$messpostername?></span>
-								</div>
-								<div class="col-3">
-									<span class="cyan">Date:</span> <span class="white message-time" data-utc="<?=date("c", $row->timestamp)?>"><?=date("d/m H:i", $row->timestamp)?></span>
-								</div>
-								<div class="col-2">
-									<input type="hidden" name="thread" value="<?=$thread?>">
-									<input type="hidden" name="messid" value="<?=$messid?>">
-									<div class="float-right apr-1"><input type="submit" name="deletemessage" value="Delete"></div>
-								</div>
+			<ul class="nav nav-tabs" id="myTab" role="tablist">
+				<li class="nav-item">
+					<a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Inbox</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Outbox</a>
+				</li>
+			</ul>
+
+
+
+
+
+			<div class="tab-content" id="myTabContent">
+				<div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+					<?php
+					if (!isset($_POST[ 'open_postnewmessage' ])) 
+					{
+
+						?>
+						<form enctype="multipart/form-data" action="messages.php" method="post">
+							<div class="row apb-1 apl-1">
+								<input type="submit" colspan="4" name="open_postnewmessage" value="New Message!">
 							</div>
 						</form>
 						<?php
+						foreach (fetchAll("SELECT * FROM messages WHERE postedto = :nick GROUP BY thread ORDER BY timestamp DESC", [":nick" => $_user[ "nick" ]]) as $row) 
+						{
+							$messid = $row->id;
+							$thread = $row->thread;
+							$messpostedto = $row->postedto;
+							$messpostername = $row->postername;
+							$messtimestamp = $row->timestamp;
+							$messtime = date("D M j o", $messtimestamp);
+							$postsubject = $row->subject;
+							$postmessage = $row->message;
+							$postsubject = fixOutputPost($postsubject);
+							$postmessage = fixOutputPost($postmessage);
+
+							?>
+							<form action="messages.php" method="post">
+								<div class="row">
+									<?php
+									foreach (fetchAll("SELECT new FROM messages WHERE thread = :thread ORDER BY new DESC LIMIT 1", [":thread" => $thread]) as $row_new) 
+									{
+										$messnew = $row_new->new;
+										if ($messnew == 1) 
+										{
+											?>
+											<div class="col-5">
+												<a class="yellow text-truncate !important;" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
+											</div>
+											<?php
+										} 
+										else 
+										{
+											?>
+											<div class="col-5">
+												<a class="green text-truncate !important;" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
+											</div>
+											<?php
+										}
+										?>
+										<div class="col-2">
+											<span class="cyan">From:</span> <span class="white"><?=$messpostername?></span>
+										</div>
+										<div class="col-3">
+											<span class="cyan">Date:</span> <span class="white message-time" data-utc="<?=date("c", $row->timestamp)?>"><?=date("d/m H:i", $row->timestamp)?></span>
+										</div>
+										<div class="col-2">
+											<input type="hidden" name="thread" value="<?=$thread?>">
+											<input type="hidden" name="messid" value="<?=$messid?>">
+											<div class="float-right apr-1"><input type="submit" name="deletemessage" value="Delete"></div>
+										</div>
+									</div>
+								</form>
+								<?php
+							}
+						}
 					}
-				}
+					?>
+				</div>
+				<div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+					<?php
+					if (!isset($_POST[ 'open_postnewmessage' ])) 
+					{
+
+						?>
+						<form enctype="multipart/form-data" action="messages.php" method="post">
+							<div class="row apb-1 apl-1">
+								<input type="submit" colspan="4" name="open_postnewmessage" value="New Message!">
+							</div>
+						</form>
+						<?php
+						foreach (fetchAll("SELECT * FROM messages WHERE postername = :nick GROUP BY thread ORDER BY timestamp DESC", [":nick" => $_user[ "nick" ]]) as $row) 
+						{
+							$messid = $row->id;
+							$thread = $row->thread;
+							$messpostedto = $row->postedto;
+							$messpostername = $row->postername;
+							$messtimestamp = $row->timestamp;
+							$messtime = date("D M j o", $messtimestamp);
+							$postsubject = $row->subject;
+							$postmessage = $row->message;
+							$postsubject = fixOutputPost($postsubject);
+							$postmessage = fixOutputPost($postmessage);
+
+							?>
+							<form action="messages.php" method="post">
+								<div class="row">
+									<?php
+									foreach (fetchAll("SELECT new FROM messages WHERE thread = :thread ORDER BY new DESC LIMIT 1", [":thread" => $thread]) as $row_new) 
+									{
+										$messnew = $row_new->new;
+										if ($messnew == 1) 
+										{
+											?>
+											<div class="col-5">
+												<a class="yellow text-truncate !important;" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
+											</div>
+											<?php
+										} 
+										else 
+										{
+											?>
+											<div class="col-5">
+												<a class="green text-truncate !important;" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
+											</div>
+											<?php
+										}
+										?>
+										<div class="col-2">
+											<span class="cyan">From:</span> <span class="white"><?=$messpostername?></span>
+										</div>
+										<div class="col-3">
+											<span class="cyan">Date:</span> <span class="white message-time" data-utc="<?=date("c", $row->timestamp)?>"><?=date("d/m H:i", $row->timestamp)?></span>
+										</div>
+										<div class="col-2">
+											<input type="hidden" name="thread" value="<?=$thread?>">
+											<input type="hidden" name="messid" value="<?=$messid?>">
+											<div class="float-right apr-1"><input type="submit" name="deletemessage" value="Delete"></div>
+										</div>
+									</div>
+								</form>
+								<?php
+							}
+						}
+					}
+					?>
 
 
-			}
+
+
+
+				</div>
+			</div>
+			<?php
 		} 
 		else
 		{
@@ -437,7 +536,6 @@ include_once "header.php";
 			<?php
 		}
 		?>
-
 	</div>
 	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
 		<?php include "sidebar.php"; ?>
@@ -447,13 +545,13 @@ include_once "header.php";
 	</div>
 </div>
 <script>
-$(function() {
-        $(".message-time").each(function(){
-                var utc = $(this).data("utc");
-                var localdate = new Date(utc);
-                var localtime = ("0" + localdate.getDate()).slice(-2) + "/" + ("0" + localdate.getMonth()).slice(-2) + " " + ("0" + localdate.getHours()).slice(-2) + ':' + ("0" + localdate.getMinutes()).slice(-2);
-                $(this).text(localtime);
-        });
-});
+	$(function() {
+		$(".message-time").each(function(){
+			var utc = $(this).data("utc");
+			var localdate = new Date(utc);
+			var localtime = ("0" + localdate.getDate()).slice(-2) + "/" + ("0" + localdate.getMonth()).slice(-2) + " " + ("0" + localdate.getHours()).slice(-2) + ':' + ("0" + localdate.getMinutes()).slice(-2);
+			$(this).text(localtime);
+		});
+	});
 </script>
 <?php include "footer.php"; ?>
