@@ -145,9 +145,9 @@
 		</div>
 		<div class="row apt-1">
 			<div class="col-12">
-				<input type="button" value="Save" onclick="saveBBS()">
+				<input type="button" class="btn-big" value="Save" onclick="saveBBS()">
         <?php if ($admin_edit && is_admin()) { ?>
-				<input type="button" value="Delete" onclick="delBBS()">
+				<input type="button" class="btn-big bg-red" value="Delete" onclick="delBBS()">
         <?php } ?>
 			</div>
 		</div>

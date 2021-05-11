@@ -18,7 +18,7 @@
 	}
 	
 	function addCrewBBSItem(bbslist,id,name) {
-    bbslist.append('<div id="crew_bbs_entry'+id+'" class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between"><span id="bbs_fetch_name_'+id+'">'+name+'</span><input type="hidden" name="bbsname[]" value="'+name+'"><input type="button" value="Delete" onclick="deleteCrewBBS('+id+')"/></div></div>')
+    bbslist.append('<div id="crew_bbs_entry'+id+'" class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between"><span id="bbs_fetch_name_'+id+'">'+name+'</span><input type="hidden" name="bbsname[]" value="'+name+'"><input type="button" class="btn-big" value="Delete" onclick="deleteCrewBBS('+id+')"/></div></div>')
 	}
 	
   <?php if ($admin_edit && is_admin()) { ?>
@@ -222,9 +222,9 @@
 		</div></div>
 		<div class="row apt-1">
 			<div class="col-12">
-				<input type="button" value="Save" onclick="saveCrew()">
+				<input type="button" class="btn-big" value="Save" onclick="saveCrew()">
         <?php if ($admin_edit && is_admin()) { ?>
-				<input type="button" value="Delete" onclick="delCrew()">
+				<input type="button" class="btn-big bg-red" value="Delete" onclick="delCrew()">
         <?php } ?>
 			</div>
 		</div>

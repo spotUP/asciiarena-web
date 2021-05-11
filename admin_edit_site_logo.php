@@ -110,8 +110,8 @@
 		</div>
 		<div class="row">
 			<div class="col-12">
-				<input type="button" value="Save" onclick="saveLogo()">
-				<input type="button" value="Delete" onclick="delLogo()">
+				<input type="button" class="btn-big" value="Save" onclick="saveLogo()">
+				<input type="button" class="btn-big bg-red" value="Delete" onclick="delLogo()">
 			</div>
 		</div>
 	</form>  

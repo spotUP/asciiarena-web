@@ -30,7 +30,7 @@
 				<div class="row apl-1 apr-1 apb-1">
 					<div class="col-2">
 						<input type="hidden" name="filename" value="<?=$filename?>">
-						<input type="submit" name="colly_fixed" value="Fixed">
+						<input type="submit" class="btn-big" name="colly_fixed" value="Fixed">
 					</div>
 				</div>
 				<div class="row" style="background-color: #111111;">
