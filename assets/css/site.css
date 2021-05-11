@@ -1,8 +1,8 @@
 @font-face {
   font-family: 'MicroKnight';
   src: url('/assets/fonts/MicroKnight.woff2') format('woff2'),
-       url('/assets/fonts/MicroKnight.woff') format('woff'),
-       url('/assets/fonts/MicroKnight.ttf') format('truetype');
+  url('/assets/fonts/MicroKnight.woff') format('woff'),
+  url('/assets/fonts/MicroKnight.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   -webkit-font-kerning: none;
@@ -18,8 +18,8 @@
 @font-face {
   font-family: 'MicroKnightPlus';
   src: url('/assets/fonts/MicroKnightPlus.woff2') format('woff2'),
-       url('/assets/fonts/MicroKnightPlus.woff') format('woff'),
-       url('/assets/fonts/MicroKnightPlus.ttf') format('truetype');
+  url('/assets/fonts/MicroKnightPlus.woff') format('woff'),
+  url('/assets/fonts/MicroKnightPlus.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   -webkit-font-kerning: none;
@@ -35,8 +35,8 @@
 @font-face {
   font-family: 'mOsOul';
   src: url('/assets/fonts/mOsOul.woff2') format('woff2'),
-       url('/assets/fonts/mOsOul.woff') format('woff'),
-       url('/assets/fonts/mOsOul.ttf') format('truetype');
+  url('/assets/fonts/mOsOul.woff') format('woff'),
+  url('/assets/fonts/mOsOul.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   -webkit-font-kerning: none;
@@ -52,8 +52,8 @@
 @font-face {
   font-family: 'P0T-NOoDLE';
   src: url('/assets/fonts/P0T-NOoDLE.woff2') format('woff2'),
-       url('/assets/fonts/P0T-NOoDLE.woff') format('woff'),
-       url('/assets/fonts/P0T-NOoDLE.ttf') format('truetype');
+  url('/assets/fonts/P0T-NOoDLE.woff') format('woff'),
+  url('/assets/fonts/P0T-NOoDLE.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   -webkit-font-kerning: none;
@@ -69,8 +69,8 @@
 @font-face {
   font-family: 'Topaz_a500';
   src: url('/assets/fonts/Topaz_a500.woff2') format('woff2'),
-       url('/assets/fonts/Topaz_a500.woff') format('woff'),
-       url('/assets/fonts/Topaz_a500.ttf') format('truetype');
+  url('/assets/fonts/Topaz_a500.woff') format('woff'),
+  url('/assets/fonts/Topaz_a500.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   -webkit-font-kerning: none;
@@ -86,8 +86,8 @@
 @font-face {
   font-family: 'Topaz_a1200';
   src: url('/assets/fonts/Topaz_a1200.woff2') format('woff2'),
-       url('/assets/fonts/Topaz_a1200.woff') format('woff'),
-       url('/assets/fonts/Topaz_a1200.ttf') format('truetype');
+  url('/assets/fonts/Topaz_a1200.woff') format('woff'),
+  url('/assets/fonts/Topaz_a1200.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   -webkit-font-kerning: none;
@@ -103,8 +103,8 @@
 @font-face {
   font-family: 'TopazPlus_a500';
   src: url('/assets/fonts/TopazPlus_a500.woff2') format('woff2'),
-       url('/assets/fonts/TopazPlus_a500.woff') format('woff'),
-       url('/assets/fonts/TopazPlus_a500.ttf') format('truetype');
+  url('/assets/fonts/TopazPlus_a500.woff') format('woff'),
+  url('/assets/fonts/TopazPlus_a500.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   -webkit-font-kerning: none;
@@ -120,8 +120,8 @@
 @font-face {
   font-family: 'TopazPlus_a1200';
   src: url('/assets/fonts/TopazPlus_a1200.woff2') format('woff2'),
-       url('/assets/fonts/TopazPlus_a1200.woff') format('woff'),
-       url('/assets/fonts/TopazPlus_a1200.ttf') format('truetype');
+  url('/assets/fonts/TopazPlus_a1200.woff') format('woff'),
+  url('/assets/fonts/TopazPlus_a1200.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   -webkit-font-kerning: none;
@@ -202,12 +202,12 @@ input:-webkit-autofill:active {
     background: transparent;
     color: inherit;
     font-size: inherit;
-  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
-  font-size: 16px !important;
-  font-weight: normal !important;
-  line-height: 16px !important;
-  margin:0 !important;
-  padding:0 !important;
+    font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
+    font-size: 16px !important;
+    font-weight: normal !important;
+    line-height: 16px !important;
+    margin:0 !important;
+    padding:0 !important;
   }
 }
 
@@ -216,10 +216,10 @@ input:-webkit-autofill:active {
     background: transparent;
     color: inherit;
     font-size: inherit;
-  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
-  font-size: 16px !important;
-  font-weight: normal !important;
-  line-height: 16px !important;
+    font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
+    font-size: 16px !important;
+    font-weight: normal !important;
+    line-height: 16px !important;
   }
 }
 
@@ -592,9 +592,9 @@ input, optgroup, textarea {
 }
 
 input[type=button], input[type=submit], input[type=reset] {
-/*  padding-left: 8px; */
+  /*  padding-left: 8px; */
   padding-right: 8px;
-/*  margin-left: 8px; */
+  /*  margin-left: 8px; */
   padding-top: 0px;
 }
 
@@ -2164,14 +2164,14 @@ b::before, b::after, strong::before, strong::after {
 }
 
 .custom-file-input:lang(en) ~ .custom-file-label::after {
-    content: "Browse" !important;
-    padding-left: 8px;
-    padding-right: 8px;
+  content: "Browse" !important;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 .p-lg-2 {
-    padding: 16px 8px !important;
-  }
+  padding: 16px 8px !important;
+}
 
 textarea,
 input.text,
@@ -2182,11 +2182,15 @@ input[type="email"],
 input[type="tel"],
 input[type="number"],
 .input-checkbox {
--webkit-appearance: none !important;
-border-radius: 0 !important;
+  -webkit-appearance: none !important;
+  border-radius: 0 !important;
 }
 
 .btn-big{
--webkit-appearance: none !important;
-border-radius: 0 !important;
+  -webkit-appearance: none !important;
+  border-radius: 0 !important;
+}
+
+input:focus, textarea:focus, select:focus{
+  outline: none;
 }
