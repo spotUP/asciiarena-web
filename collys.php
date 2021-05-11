@@ -116,7 +116,7 @@ require_once "header.php"; ?>
 									$file_id = utf8_encode($file_id);
 									$file_id = htmlentities($file_id, ENT_SUBSTITUTE);
 									?>
-									<pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$row->filename?>"><?=$file_id?>/</a></pre>
+									<pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$row->filename?>"><?=$file_id?></a></pre>
 								<?php } ?>
 							</div>
 						</div>
