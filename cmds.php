@@ -306,9 +306,9 @@
     }
   }
     
-	function countDownload() {
+	function countDownload($collyid) {
     if (is_ajax() && is_logged_in()) {
-      $colly = $_POST[ "colly_id" ] ?? $_current[ 1 ] ?? 0;
+      $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
       if ($colly > 0) {
         $status = doQuery("update collys set downloads=downloads+1 where id = :colly_id",[
           ":colly_id" => (int)$colly,
@@ -323,9 +323,9 @@
     }
   }
   
-  function countView() {
+  function countView($collyid) {
     if (is_ajax() && is_logged_in()) {
-      $colly = $_POST[ "colly_id" ] ?? $_current[ 1 ] ?? 0;
+      $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
       if ($colly > 0) {
         $status = doQuery("update collys set view_counter=view_counter+1 where id = :colly_id",[
           ":colly_id" => (int)$colly,
@@ -340,9 +340,9 @@
     }
   }
 
-  function brokenColly() {
+  function brokenColly($collyid) {
     if (is_ajax() && is_logged_in()) {
-      $colly = $_POST[ "colly_id" ] ?? $_current[ 1 ] ?? 0;
+      $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
       $comment = $_POST[ 'comment' ] ?? "";
       if ($colly > 0) {
         $status = doQuery("update collys set broken=1, broken_comment=:comment where id = :colly_id",[
@@ -359,9 +359,9 @@
     }
   }
   
-  function getComments() {
+  function getComments($collyid) {
     if (is_ajax()) {
-      $colly = $_POST[ "colly_id" ] ?? $_current[ 1 ] ?? 0;
+      $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
       if ($colly > 0) {
         $data = [];
         $comments = fetchAll("SELECT commentid,timestamp,nick,ifnull(rating,'') as rating,comment FROM comments WHERE colly_id = :id", [":id" => $colly]);
@@ -382,9 +382,9 @@
     }  
   }
   
-  function deleteComment() {
+  function deleteComment($collyid) {
     if (is_ajax() && is_logged_in() &&is_admin()) {
-      $id = $_POST[ "comment_id" ] ?? $_current[ 1 ] ?? 0;
+      $id = $_POST[ "comment_id" ] ?? $collyid ?? 0;
       $colly = $_POST[ "colly_id" ] ?? 0;
       if ($id > 0) {
         $status = doQuery("delete from comments where commentid = :commentid",[
@@ -404,10 +404,10 @@
     }
   }
     
-  function editComment() {
+  function editComment($collyid) {
     $_user = $_SESSION[ "_user" ];
     if (is_ajax() && is_logged_in()) {
-      $id = $_POST[ "comment_id" ] ?? $_current[ 1 ] ?? 0;
+      $id = $_POST[ "comment_id" ] ?? $collyid ?? 0;
       $comment = $_POST[ 'comment' ] ?? "";
       if ($id > 0) {
         if (is_admin()) {
@@ -431,10 +431,10 @@
     }
   }
   
-  function addComment() {
+  function addComment($collyid) {
     $_user = $_SESSION[ "_user" ];
     if (is_ajax() && is_logged_in()) {
-      $colly = $_POST[ "colly_id" ] ?? $_current[ 1 ] ?? 0;
+      $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
       $comment = $_POST[ 'comment' ] ?? "";
       $rating = $_POST[ 'rating' ] ?? "";
       if (empty($rating)) $rating = null;
@@ -464,10 +464,10 @@
     }
   }
   
-  function faveColly() {
+  function faveColly($collyid) {
     $_user = $_SESSION[ "_user" ];
     if (is_ajax() && is_logged_in()) {
-      $colly = $_POST[ "colly_id" ] ?? $_current[ 1 ] ?? 0;
+      $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
       if ($colly > 0) {
         $status = doQuery("INSERT INTO favourites (user_id, colly_id, nick, filename)
         VALUES (:user_id, :colly_id, :nick, :filename)", [
@@ -486,10 +486,10 @@
     }  
   }
 
-  function unfaveColly() {
+  function unfaveColly($collyid) {
     $_user = $_SESSION[ "_user" ];
     if (is_ajax() && is_logged_in()) {
-      $colly = $_POST[ "colly_id" ] ?? $_current[ 1 ] ?? 0;
+      $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
       if ($colly > 0) {
         $status = doQuery("DELETE FROM favourites WHERE user_id = :user AND colly_id = :colly", [
           ":user" => $_user[ "id" ],
@@ -924,31 +924,31 @@
       tag();
 			break;
     case "countdl":
-      countDownload();
+      countDownload($_current[1]);
 			break;
     case "countview":
-      countView();
+      countView($_current[1]);
 			break;      
     case "broken":
-      brokenColly();
+      brokenColly($_current[1]);
 			break;  
     case "getcomments":      
-      getComments();
+      getComments($_current[1]);
 			break;  
     case "delcomment":
-      deleteComment();
+      deleteComment($_current[1]);
 			break;         
     case "editcomment":
-      editComment();
+      editComment($_current[1]);
 			break;         
     case "addcomment":
-      addComment();
+      addComment($_current[1]);
 			break;         
 		case "fave":
-      faveColly();
+      faveColly($_current[1]);
 			break;
 		case "unfave":
-      unfaveColly();
+      unfaveColly($_current[1]);
 			break;
     case "save_artist":
       saveArtist();

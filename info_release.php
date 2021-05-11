@@ -499,22 +499,39 @@ require_once "header.php";?>
         <?php }
         ?>
 
-        commentlist.append(`
-        <div class="header bg-header col-12 ap-1">
-          <span> BY:</span>
-          <span class="yellow">${comment.nick}</span>
-          <span>DATE:</span>
-          <span class="white">${comment.time}</span>
-          <span class="yellow">RATING:</span>
-          <span class="white">${comment.rating}</span>
-        </div>
-        <div class="bg-secondary col-12 ap-1 amb-1">
-          <span id="comment${comment.id}"class="cyan">${comment.comment}</span>
-          <div class="col-12 p-0 m-0 apt-1">
-          ${buttons}
+        if (comment.rating.length>0) {
+          commentlist.append(`
+          <div class="header bg-header col-12 ap-1">
+            <span> BY:</span>
+            <span class="yellow">${comment.nick}</span>
+            <span>DATE:</span>
+            <span class="white">${comment.time}</span>
+            <span class="yellow">RATING:</span>
+            <span class="white">${comment.rating}</span>
           </div>
-        </div>`); 
-        });
+          <div class="bg-secondary col-12 ap-1 amb-1">
+            <span id="comment${comment.id}"class="cyan">${comment.comment}</span>
+            <div class="col-12 p-0 m-0 apt-1">
+            ${buttons}
+            </div>
+          </div>`); 
+        }
+        else {
+          commentlist.append(`
+          <div class="header bg-header col-12 ap-1">
+            <span> BY:</span>
+            <span class="yellow">${comment.nick}</span>
+            <span>DATE:</span>
+            <span class="white">${comment.time}</span>
+          </div>
+          <div class="bg-secondary col-12 ap-1 amb-1">
+            <span id="comment${comment.id}"class="cyan">${comment.comment}</span>
+            <div class="col-12 p-0 m-0 apt-1">
+            ${buttons}
+            </div>
+          </div>`); 
+        }
+      });
     });   
   }
   
