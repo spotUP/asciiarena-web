@@ -43,7 +43,7 @@
 			"url": url,
 			"data": form.serialize(),
 			"success": () => {
-				showAlert("Logo Saved!", "#sitelogo");
+				showSiteLogoAlert("Logo Saved!", true);
 				logoclear();
 				getLogoList();
 			}
@@ -61,8 +61,12 @@
 					"type": "POST",
 					"url": url,
 					"data": form.serialize(),
+          "error": (r) => {
+            showSiteLogoAlert("There was an error during saving!",false);
+          },      
+          
 					"success": () => {
-						showAlert("Logo Deleted!", "#sitelogo");
+						showSiteLogoAlert("Logo Deleted!", true);
 						logoclear();
 						getLogoList();
 					}
@@ -71,9 +75,13 @@
 		}
 	}
 
-	function showAlert(content, prependTo) {
-		const alertContent = `<div class="bs-component quick-alert amb-1"><div id="#success-alert" class="animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div></div>`;
-		$(prependTo).prepend(alertContent);
+	function showSiteLogoAlert(content, success) {
+    if (success) {
+		alertContent = `<div id="#success-alert" class="bs-component quick-alert amb-1 animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
+    } else {
+		alertContent = `<div id="#failure-alert" class="bs-component quick-alert amb-1 animate__animated animate__shakeX alert alert-dismissible alert-warning"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
+    }
+		$("#sitelogo").prepend(alertContent);
 	}
 	
 </script>

@@ -15,6 +15,7 @@
 		crewslist.append('<div id="artist_crew_entry'+id+'" class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between"><span id="crew_fetch_name_'+id+'">'+name+'</span><input type="hidden" name="crewname[]" value="'+name+'"><input type="button" value="Delete" onclick="deleteArtistCrew('+id+')"/></div></div>')
 	}
 
+  <?php if ($admin_edit && is_admin()) { ?>
 	function getArtist() {
 		const id = $("#artist_fetch_id").val();
 		if (id > 0) {
@@ -48,21 +49,6 @@
 		});
 	}
 
-	function saveArtist() {
-		const form = $("#artist_form");
-		const url = form.attr("action");
-		$.ajax({
-			"type": "POST",
-			"url": url,
-			"data": form.serialize(),
-			"success": () => {
-				showAlert("Artist Saved!", "#artist");
-				artistclear();
-				getArtistList();
-			}
-		});
-	}
-
 	function delArtist() {
 		const activeName = $("#artist_nick").val();
 		if (activeName !== "") {
@@ -75,7 +61,7 @@
 					"url": url,
 					"data": form.serialize(),
 					"success": () => {
-						showAlert("Artist Deleted!", "#artist");
+						showArtistAlert("Artist Deleted!",true);
 						artistclear();
 						getArtistList();
 					}
@@ -83,13 +69,42 @@
 			}
 		}
 	}
+  <?php } ?>
+	function saveArtist() {
+    if ($("#artist_nick").val().trim().length==0) {
+      showArtistAlert("You must fill the artist nick field!",false);
+      return;
+    }
+
+		const form = $("#artist_form");
+		const url = form.attr("action");
+		$.ajax({
+			"type": "POST",
+			"url": url,
+			"data": form.serialize(),
+      "error": (r) => {
+        if (r.status==409) {
+          showArtistAlert("The artist already exists!",false);
+        } else {
+          showArtistAlert("There was an error during saving!",false);
+        }
+      },
+			"success": () => {
+				showArtistAlert("Artist Saved!",true);
+				artistclear();
+        <?php if ($admin_edit && is_admin()) { ?>
+				getArtistList();
+        <?php } ?>
+			}
+		});
+	}
 
 	function deleteArtistCrew(id) {
 		const activeName = $("#crew_fetch_name_"+id.toString()).text();
 		if (confirm(`Are you sure you want to delete ${activeName} Crew?`)) {
 			let crewitem = $("#artist_crew_entry"+id.toString());
 			crewitem.remove();
-			showAlert("Crew Deleted!", "#artist");
+			showArtistAlert("Crew Deleted!",true);
 		}
 	}
 	
@@ -103,17 +118,22 @@
 				addArtistCrewItem(crewlist,crewid,crewname)
 			}
 			$("#artist_crew_add_fetch_id").val('0');
-			showAlert("Crew Added!", "#artist");
+			showArtistAlert("Crew Added!",true);
 		}
 	}  
 	
-	function showAlert(content, prependTo) {
-		const alertContent = `<div class="bs-component quick-alert amb-1"><div id="#success-alert" class="animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div></div>`;
-		$(prependTo).prepend(alertContent);
+	function showArtistAlert(content, success) {
+    if (success) {
+		alertContent = `<div id="#success-alert" class="bs-component quick-alert amb-1 animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
+    } else {
+		alertContent = `<div id="#failure-alert" class="bs-component quick-alert amb-1 animate__animated animate__shakeX alert alert-dismissible alert-warning"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
+    }
+		$("#artist").prepend(alertContent);
 	}
 
 </script>
 <div class="tab-pane fade ap-1" id="artist">
+  <?php if ($admin_edit && is_admin()) { ?>
 	<form id="del_artist_form" action="/admin_cmds.php?cmd=del_artist" method="post">
 		<input type="hidden" name="id" id="del_artist_id">
 	</form>
@@ -124,13 +144,16 @@
 			</form>
 		</div>
 	</div>
-
 	<form id="artist_form" action="/admin_cmds.php?cmd=save_artist" method="post">
+  <?php } else { ?>
+	<form id="artist_form" action="/cmds.php?cmd=save_artist" method="post">
+  <?php } ?>
+
 		<input type="hidden" name="id" id="artist_id">
 
 		<div class="row">
 			<div class="col-6 d-flex">
-				<label for="artist_nick" class="lightgrey apr-1">Nick</label>
+				<label for="artist_nick" class="lightgrey apr-1">Nick (required)</label>
 			</div>
 		</div>
 
@@ -184,13 +207,10 @@
 				<span class="apl-1"><input type="button" value="Add Crew!" onclick="addArtistCrew()"/></span>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-6 d-flex justify-content-between">
-				<label for="artist_country" class="lightgrey">Country</label>
-			</div>
-		</div>
 		<div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
+				<label for="artist_country" class="lightgrey">Country</label>
+        <div style="min-width:40%">
 				<select class="select2" name="country" id="artist_country">
 					<?php
 					foreach($country_list as $symbol => $country)
@@ -201,21 +221,19 @@
 					}
 					?>
 				</select>
-			</div>
+        </div>
+      </div>
 		</div>
 
 		<div class="row">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="artist_active" class="lightgrey">Status</label>
-			</div>
-		</div>  
-
-		<div class="row">
-			<div class="col-6 d-flex justify-content-between">
+        <div>
 				<select class="select2" name="active" id="artist_active">
 					<option value="Active">Active</option>
 					<option value="Inactive">Inactive</option>
 				</select>
+        </div>
 			</div>
 		</div>  
 
@@ -228,8 +246,10 @@
 
 	</form>
 </div>
+<?php if ($admin_edit && is_admin()) { ?>
 <script>
 	$(function () {
 		getArtistList();
 	});
 </script>
+<?php } ?>

@@ -40,14 +40,26 @@
 	}
 
 	function saveUser() {
+    if ($("#user_nick").val().trim().length==0) {
+      showUserAlert("You must fill the user nick field!", false);
+      return;
+    }
+
 		const form = $("#user_form");
 		const url = form.attr("action");
 		$.ajax({
 			"type": "POST",
 			"url": url,
 			"data": form.serialize(),
+      "error": (r) => {
+        if (r.status==409) {
+          showUserAlert("The user already exists!",false);
+        } else {
+          showUserAlert("There was an error during saving!",false);
+        }
+      },      
 			"success": () => {
-				showAlert("User Saved!", "#edituser");
+				showUserAlert("User Saved!", true);
 				userclear();
 				getUserList();
 			}
@@ -66,7 +78,7 @@
 					"url": url,
 					"data": form.serialize(),
 					"success": () => {
-						showAlert("User Deleted!", "#edituser");
+						showUserAlert("User Deleted!", true);
 						userclear();
 						getUserList();
 					}
@@ -75,11 +87,14 @@
 		}
 	}
 
-	function showAlert(content, prependTo) {
-		const alertContent = `<div class="bs-component quick-alert amb-1"><div id="#success-alert" class="animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div></div>`;
-		$(prependTo).prepend(alertContent);
-	}
-
+function showUserAlert(content, success) {
+    if (success) {
+		alertContent = `<div id="#success-alert" class="bs-component quick-alert amb-1 animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
+    } else {
+		alertContent = `<div id="#failure-alert" class="bs-component quick-alert amb-1 animate__animated animate__shakeX alert alert-dismissible alert-warning"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
+    }
+		$("#edituser").prepend(alertContent);
+}
 </script>
 
 <div class="tab-pane fade ap-1" id="edituser">
@@ -98,7 +113,7 @@
 		<input type="hidden" name="id" id="user_id">
 		<div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
-				<label for="user_nick" class="lightgrey">Nick</label>
+				<label for="user_nick" class="lightgrey">Nick (required)</label>
 				<input type="text" size="24" id="user_nick" name="nick">
 			</div>
 		</div>
@@ -111,16 +126,20 @@
 		<div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="uesr_rank" class="lightgrey">Rank</label>
+        <div>
 				<select class="select2" name="rank" id="user_rank">
 					<option value="User">User</option>
 					<option value="Elite">Elite</option>
 					<option value="Admin">Admin</option>
 				</select>
+        </div>
 			</div>
 		</div>
 		<div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="user_birth_year" class="lightgrey">Birth</label>
+        <div class="d-flex">
+        <div>
 				<select class="select2" name="byear" id="user_byear">
 					<?php
 						$countyear=1900;
@@ -134,7 +153,8 @@
 						}
 					?>
 				</select>
-				<select class="select2" name="bmonth" id="user_bmonth">
+        </div><div>
+        <select class="select2" name="bmonth" id="user_bmonth">
 					<?php
 					$countmonth=1;
 					$maxmonth=12;
@@ -147,7 +167,8 @@
 					}
 					?>
 				</select>
-				<select class="select2" name="bday" id="user_bday">
+        </div><div>
+        <select class="select2" name="bday" id="user_bday">
 					<?php
 					$countday=1;
 					$maxday=31;
@@ -160,11 +181,14 @@
 					}
 					?>
 				</select>
+        </div>
+        </div>
 			</div>
 		</div>
 		<div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="user_country" class="lightgrey">Country</label>
+        <div style="min-width:40%">
 				<select class="select2" name="country" id="user_country">
 					<?php
 					foreach($country_list as $symbol => $country)
@@ -175,6 +199,7 @@
 						}
 						?>
 				</select>
+        </div>
 			</div>
 		</div>
 		<div class="row apb-1">

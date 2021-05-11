@@ -75,12 +75,6 @@ include "header.php";
 		<?php
 		if (is_logged_in())
 		{
-			include ("submit_check_colly.php");
-			include ("submit_check_crew.php");
-			include ("submit_check_artist.php");
-			include ("submit_check_bbs.php");
-			include ("submit_check_app.php");
-			include ("submit_check_mag.php");
 			?>
 			<div class="row">
 				<div class="col-lg-12">
@@ -108,14 +102,15 @@ include "header.php";
 					</div>
 				</div>
 			</div>
-			<div id="myTabContent" class="tab-content">
+			<div id="myTabContent" class="tab-content apt-1" style="background-color: #1a1a1a;">
 				<?php
-				include ("submit_colly.php");
-				include ("submit_crew.php");
-				include ("submit_artist.php");
-				include ("submit_bbs.php");
-				include ("submit_app.php");
-				include ("submit_mag.php");
+        		$admin_edit=false;
+				include ("edit_colly.php");
+				include ("edit_crew.php");
+				include ("edit_artist.php");
+				include ("edit_bbs.php");
+				include ("edit_app.php");
+				include ("edit_mag.php");
 				?>
 			</div>
 			<?php

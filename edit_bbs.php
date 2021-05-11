@@ -7,7 +7,8 @@
   function bbsclear() {
     $("#bbs_id, #bbs_name, #bbs_sysop, #bbs_number, #bbs_address").val('');
   }
-  
+
+  <?php if ($admin_edit && is_admin()) { ?> 
 	function getBBS() {
 		const id = $("#bbs_fetch_id").val();
 		if (id > 0) {
@@ -35,21 +36,6 @@
 		});
 	}
 
-  function saveBBS() {
-    const form = $("#bbs_form");
-    const url = form.attr("action");
-    $.ajax({
-      "type": "POST",
-      "url": url,
-      "data": form.serialize(),
-      "success": () => {
-        showAlert("BBS Saved!", "#bbs");
-        bbsclear();
-        getBBSList();
-      }
-    });
-  }
-
 	function delBBS() {
 		const activeName = $("#bbs_name").val();
 		if (activeName !== "") {
@@ -61,8 +47,11 @@
 					"type": "POST",
 					"url": url,
 					"data": form.serialize(),
+          "error": (r) => {
+            showBBSAlert("There was an error during saving!",false);
+          },      
 					"success": () => {
-						showAlert("BBS Deleted!", "#bbs");
+						showBBSAlert("BBS Deleted!", true);
 						bbsclear();
 						getBBSList();
 					}
@@ -70,18 +59,53 @@
 			}
 		}
 	}
+  <?php } ?>
 
-	function showAlert(content, prependTo) {
-		const alertContent = `<div class="bs-component quick-alert amb-1"><div id="#success-alert" class="animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div></div>`;
-		$(prependTo).prepend(alertContent);
+  function saveBBS() {
+    if ($("#bbs_name").val().trim().length==0) {
+      showBBSAlert("You must fill the name field!", false);
+      return
+    }
+    
+    const form = $("#bbs_form");
+    const url = form.attr("action");
+    $.ajax({
+      "type": "POST",
+      "url": url,
+      "data": form.serialize(),
+      "error": (r) => {
+        if (r.status==409) {
+          showBBSAlert("The bbs already exists!",false);
+        } else {
+          showBBSAlert("There was an error during saving!",false);
+        }
+      },            
+      "success": () => {
+        showBBSAlert("BBS Saved!", true);
+        bbsclear();
+        <?php if ($admin_edit && is_admin()) { ?>
+        getBBSList();
+        <?php } ?>
+        
+      }
+    });
+  }
+
+	function showBBSAlert(content, success) {
+    if (success) {
+		alertContent = `<div id="#success-alert" class="bs-component quick-alert amb-1 animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
+    } else {
+		alertContent = `<div id="#failure-alert" class="bs-component quick-alert amb-1 animate__animated animate__shakeX alert alert-dismissible alert-warning"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
+    }
+		$("#bbs").prepend(alertContent);
 	}
-
 </script>
 <div class="tab-pane fade ap-1" id="bbs">
+  <?php if ($admin_edit && is_admin()) { ?>
 	<form id="del_bbs_form" action="/admin_cmds.php?cmd=del_bbs" method="post">
 		<input type="hidden" name="id" id="del_bbs_id">
 	</form>
-	<div class="row apb-1">
+	<div class="row  apb-1">
 		<div class="col-12">
 			<form>
 				<select class="select2" name="bbs_id" id="bbs_fetch_id" class="w-100" onchange="getBBS();">
@@ -90,10 +114,14 @@
 		</div>
 	</div>
 	<form id="bbs_form" action="/admin_cmds.php?cmd=save_bbs" method="post">
+  <?php } else { ?>
+	<form id="bbs_form" action="/cmds.php?cmd=save_bbs" method="post">
+  <?php } ?>
+  
 		<input type="hidden" name="id" id="bbs_id">
 		<div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
-				<label for="bbs_name" class="lightgrey">Name</label>
+				<label for="bbs_name" class="lightgrey">Name (required)</label>
 				<input type="text" size="24" id="bbs_name" name="name">
 			</div>
 		</div>
@@ -118,13 +146,17 @@
 		<div class="row apt-1">
 			<div class="col-12">
 				<input type="button" value="Save" onclick="saveBBS()">
+        <?php if ($admin_edit && is_admin()) { ?>
 				<input type="button" value="Delete" onclick="delBBS()">
+        <?php } ?>
 			</div>
 		</div>
 	</form>
 </div>
+<?php if ($admin_edit && is_admin()) { ?>
 <script>
 	$(function () {
     getBBSList();
 	});
 </script>
+<?php } ?>

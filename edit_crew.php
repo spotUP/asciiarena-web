@@ -6,7 +6,12 @@
 ?>
 <script>
 	function crewclear() {
+  <?php if ($admin_edit && is_admin()) { ?>
 	$("#crew_id, #crew_name, #crew_acronym, #crew_contact, #crew_url, #crew_rating, #crew_www, #crew_active").val('');
+  <?php } else { ?>
+	$("#crew_id, #crew_name, #crew_acronym, #crew_contact, #crew_url, #crew_www, #crew_active").val('');
+  <?php } ?>
+
 		let bbslist = $("#crew_bbs_fetch_id");
 		bbslist.empty();
 		$("#crew_bbs_add_fetch_id").val("0")
@@ -16,6 +21,7 @@
     bbslist.append('<div id="crew_bbs_entry'+id+'" class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between"><span id="bbs_fetch_name_'+id+'">'+name+'</span><input type="hidden" name="bbsname[]" value="'+name+'"><input type="button" value="Delete" onclick="deleteCrewBBS('+id+')"/></div></div>')
 	}
 	
+  <?php if ($admin_edit && is_admin()) { ?>
 	function getCrew() {
 		const id = $("#crew_fetch_id").val();
 		if (id > 0) {
@@ -51,21 +57,6 @@
 		});
 	}
 
-	function saveCrew() {
-		const form = $("#crew_form");
-		const url = form.attr("action");
-		$.ajax({
-			"type": "POST",
-			"url": url,
-			"data": form.serialize(),
-			"success": () => {
-				showAlert("Crew Saved!", "#crew");
-				crewclear();
-				getCrewList();
-			}
-		});
-	}
-
 	function delCrew() {
 		const activeName = $("#crew_name").val();
 		if (activeName !== "") {
@@ -78,7 +69,7 @@
 					"url": url,
 					"data": form.serialize(),
 					"success": () => {
-						showAlert("Crew Deleted!", "#crew");
+						showCrewAlert("Crew Deleted!", true);
 						crewclear();
 						getCrewList();
 					}
@@ -86,13 +77,43 @@
 			}
 		}
 	}
+  <?php } ?>
+
+	function saveCrew() {
+    if ($("#crew_name").val().trim().length==0) {
+      showCrewAlert("You must fill the crew name field!", false);
+      return;
+    }
+
+		const form = $("#crew_form");
+		const url = form.attr("action");
+		$.ajax({
+			"type": "POST",
+			"url": url,
+			"data": form.serialize(),
+      "error": (r) => {
+        if (r.status==409) {
+          showCrewAlert("The crew already exists!",false);
+        } else {
+          showCrewAlert("There was an error during saving!",false);
+        }
+      },      
+			"success": () => {
+				showCrewAlert("Crew Saved!", true);
+				crewclear();
+        <?php if ($admin_edit && is_admin()) { ?>
+				getCrewList();
+        <?php } ?>
+			}
+		});
+	}
 
 	function deleteCrewBBS(id) {
 		const activeName = $("#bbs_fetch_name_"+id.toString()).text();
 		if (confirm(`Are you sure you want to delete ${activeName} BBS?`)) {
 			let bbsitem = $("#crew_bbs_entry"+id.toString());
 			bbsitem.remove();
-			showAlert("BBS Deleted!", "#crew");
+			showCrewAlert("BBS Deleted!", true);
 		}
 	}
 	
@@ -106,35 +127,41 @@
         addCrewBBSItem(bbslist,bbsid,bbsname)
       }
       $("#crew_bbs_add_fetch_id").val("0")
-      showAlert("BBS Added!", "#crew");
+      showCrewAlert("BBS Added!", true);
     }
 	}
 
-	function showAlert(content, prependTo) {
-		const alertContent = `<div class="bs-component quick-alert amb-1"><div id="#success-alert" class="animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div></div>`;
-		$(prependTo).prepend(alertContent);
+	function showCrewAlert(content, success) {
+    if (success) {
+		alertContent = `<div id="#success-alert" class="bs-component quick-alert amb-1 animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
+    } else {
+		alertContent = `<div id="#failure-alert" class="bs-component quick-alert amb-1 animate__animated animate__shakeX alert alert-dismissible alert-warning"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
+    }
+		$("#crew").prepend(alertContent);
 	}
 
 </script>
 
 <div class="tab-pane fade ap-1" id="crew">
+  <?php if ($admin_edit && is_admin()) { ?>
 	<form id="del_crew_form" action="/admin_cmds.php?cmd=del_crew" method="post">
 		<input type="hidden" name="id" id="del_crew_id">
 	</form>
 	<div class="row apb-1">
 		<div class="col-12">
-			<form>
-				<select class="select2" name="crew_id" id="crew_fetch_id" class="w-100" onchange="getCrew();">
-				</select>
-			</form>
+      <select class="select2" name="crew_id" id="crew_fetch_id" class="w-100" onchange="getCrew();">
+      </select>
 		</div>
 	</div>
-	
 	<form id="crew_form" action="/admin_cmds.php?cmd=save_crew" method="post">
+  <?php } else { ?>
+	<form id="crew_form" action="/cmds.php?cmd=save_crew" method="post">
+  <?php } ?>
+
 		<input type="hidden" name="id" id="crew_id">
 		<div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
-				<label for="crew_name" class="lightgrey">Name</label>
+				<label for="crew_name" class="lightgrey">Name (required)</label>
 				<input type="text" size="24" id="crew_name" name="name">
 			</div>
 		</div>
@@ -157,20 +184,24 @@
 			</div>
 		</div>
 
-		<div class="row apb-1">
+		<?php if ($admin_edit && is_admin()) { ?>
+    <div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="crew_rating" class="lightgrey">Rating</label>
 				<input type="text" size="24" id="crew_rating" name="rating">
 			</div>
 		</div>
+    <?php } ?>
 
 		<div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="crew_active" class="lightgrey">Status</label>
+        <div>
 				<select class="select2" name="active" id="crew_active">
 					<option value="Active">Active</option>
 					<option value="Inactive">Inactive</option>
 				</select>
+        </div>
 			</div>
 		</div>
 			 
@@ -192,14 +223,18 @@
 		<div class="row apt-1">
 			<div class="col-12">
 				<input type="button" value="Save" onclick="saveCrew()">
+        <?php if ($admin_edit && is_admin()) { ?>
 				<input type="button" value="Delete" onclick="delCrew()">
+        <?php } ?>
 			</div>
 		</div>
 
 	</form>
 </div>
+<?php if ($admin_edit && is_admin()) { ?>
 <script>
 	$(function () {
 		getCrewList();
 	});
 </script>
+<?php } ?>

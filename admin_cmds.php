@@ -329,13 +329,14 @@
 					":www" => $_POST[ "www" ] ?? "",
 					":country" => $_POST[ "country" ] ?? "",
 					":active" => $_POST[ "active" ] ?? "",
+          ":artisturl" => urlsafe($_POST[ "nick" ] ?? ""),
 				];
 				if(!empty($_POST[ "id" ])) {
-					$q = "UPDATE artists SET nick = :nick, acronym = :acronym, www = :www, active = :active, country = :country WHERE id = :id";
+					$q = "UPDATE artists SET nick = :nick, acronym = :acronym, www = :www, active = :active, country = :country, artisturl = :artisturl WHERE id = :id";
 					$data[ ":id" ] = $_POST[ "id" ];
 					$id = $_POST[ "id" ];
 				} else {
-					$q = "INSERT INTO artists (nick, acronym, www, active, country) VALUES (:nick, :acronym, :www, :active, :country)";
+					$q = "INSERT INTO artists (nick, acronym, www, active, country, artisturl) VALUES (:nick, :acronym, :www, :active, :country, :artisturl)";
 					$response = 201;
 					$id = "";
 				}
@@ -432,7 +433,7 @@
 					":name" => $_POST[ "name" ] ?? "",
 					":acronym" => $_POST[ "acronym" ] ?? "",
 					":contact" => $_POST[ "contact" ] ?? "",
-					":crewurl" => $_POST[ "crewurl" ] ?? "",
+					":crewurl" => urlsafe($_POST[ "name" ] ?? ""),
 					":rating" => $_POST[ "rating" ] ?? "",
 					":www" => $_POST[ "www" ] ?? "",
 					":active" => $_POST[ "active" ] ?? "",

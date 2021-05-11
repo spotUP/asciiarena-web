@@ -67,7 +67,7 @@ if ($artist_available) {
             $artists[$row_crew['nick']][] = $row_crew['crew'];
           }
         }
-        foreach($artists as $artist=>$crews) {
+        foreach($artists as $showartist=>$crews) {
           $c = 0;
           foreach($crews as $crew) {
            $encoded_crew=base64_encode($crew);
@@ -395,7 +395,7 @@ foreach (fetchAll($q, $p) as $row) {
 <?php
 }
 $q = "SELECT acronym FROM artists where nick=:nick";
-$p = [":nick" => $artist];
+$p = [":nick" => $showartist];
 $result = fetchOne($q, $p);
 $acronym = $result->acronym;
 ?>
@@ -410,7 +410,7 @@ $acronym = $result->acronym;
 <div class="col-lg-12 d-flex justify-content-between pl-0">
   <?php
   foreach ($validSorts as $key => $val) {
-    echo "<div class=\"col-lg-3 pl-0 amb-1\"><a class=\"lightgreen\" href=\"/artist/".urlsafe($artist)."?&sort_by={$key}\">{$val}</a></div>";
+    echo "<div class=\"col-lg-3 pl-0 amb-1\"><a class=\"lightgreen\" href=\"/artist/".urlsafe($showartist)."?&sort_by={$key}\">{$val}</a></div>";
   }
   ?>
 
