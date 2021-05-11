@@ -353,9 +353,9 @@
 	</div>
 	<div class="row">
 		<div class="col-12">
-			<input type="button" value="Save" onclick="saveColly();">
+			<input type="button" class="btn-big" value="Save" onclick="saveColly();">
         <?php if ($admin_edit && is_admin()) { ?>
-			<input type="button" value="Delete" onclick="delColly()">
+			<input type="button" class="btn-big bg-red" value="Delete" onclick="delColly()">
         <?php } ?>
       
 		</div>

@@ -239,8 +239,8 @@
 
 		<div class="row apt-1">
 			<div class="col-12">
-				<input type="button" value="Save" onclick="saveArtist()">
-				<input type="button" value="Delete" onclick="delArtist()">
+				<input type="button" class="btn-big" value="Save" onclick="saveArtist()">
+				<input type="button" class="btn-big bg-red" value="Delete" onclick="delArtist()">
 			</div>
 		</div>
 

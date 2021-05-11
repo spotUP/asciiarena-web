@@ -76,7 +76,7 @@
 		</div>
 		<div class="row apt-1">
 			<div class="col-12">
-				<input type="button" value="Save" onclick="saveapp()">
+				<input type="button" class="btn-big" value="Save" onclick="saveapp()">
 			</div>
 		</div>
 	</form>

@@ -210,8 +210,8 @@ function showUserAlert(content, success) {
 		</div>    
 		<div class="row apt-1">
 			<div class="col-12">
-				<input type="button" value="Save" onclick="saveUser()">
-				<input type="button" value="Delete" onclick="delUser()">
+				<input type="button" class="btn-big" value="Save" onclick="saveUser()">
+				<input type="button" class="btn-big bg-red" value="Delete" onclick="delUser()">
 			</div>
 		</div>
 	</form>
