@@ -688,13 +688,13 @@ include "header.php";
 						<div id="myTabContent" class="tab-content apt-1" style="background-color: #1a1a1a;">
 
 							<?php
-
-							include ("admin_edit_colly.php");
-							include ("admin_edit_crew.php");
-							include ("admin_edit_artist.php");
+           					$admin_edit=true;
+							include ("edit_colly.php");
+							include ("edit_crew.php");
+							include ("edit_artist.php");
 							include ("admin_edit_user.php");
 							include ("admin_edit_site_logo.php");
-							include ("admin_edit_bbs.php");
+							include ("edit_bbs.php");
 							include ("admin_edit_broken_collys.php");
 
 							?>
