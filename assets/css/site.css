@@ -1754,6 +1754,15 @@ a.disabled{
  transform: translate(0);
 }
 */
+
+/*
+.fade {
+opacity: 0 !important;
+-webkit-transition: opacity .3s linear !important;
+transition: opacity .3s linear !important;
+}
+*/
+
 .navbar-toggler-icon {
   display: block;
   width: 16px !important;
@@ -2162,3 +2171,16 @@ b::before, b::after, strong::before, strong::after {
 .p-lg-2 {
     padding: 16px 8px !important;
   }
+
+textarea,
+input.text,
+input[type="text"],
+input[type="button"],
+input[type="submit"],
+input[type="email"],
+input[type="tel"],
+input[type="number"]
+.input-checkbox {
+-webkit-appearance: none !important;
+border-radius: 0 !important;
+}
