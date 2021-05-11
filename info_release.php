@@ -20,8 +20,8 @@ $font = (strlen($row->font) > 1) ? $row->font : 'mOsOul';
 $fgcolor = (strlen($row->def_fg_col) > 1) ? $row->def_fg_col : '#ffffff';
 $bgcolor = (strlen($row->def_bg_col) > 1) ? $row->def_bg_col : '#000000';
 } else {
-  $fgcolor = '#ffffff';
-  $bgcolor = '#000000';
+  $fgcolor = '#1a1a1a';
+  $bgcolor = '#bb00bb';
 }
 
 require_once "header.php";?>
@@ -510,7 +510,7 @@ require_once "header.php";?>
             <span class="white">${comment.rating}</span>
           </div>
           <div class="bg-secondary col-12 ap-1 amb-1">
-            <span id="comment${comment.id}"class="cyan">${comment.comment}</span>
+            <span id="comment${comment.id}"class="cyan" style="white-space: pre-wrap;">${comment.comment}</span>
             <div class="col-12 p-0 m-0 apt-1">
             ${buttons}
             </div>
@@ -525,7 +525,7 @@ require_once "header.php";?>
             <span class="white">${comment.time}</span>
           </div>
           <div class="bg-secondary col-12 ap-1 amb-1">
-            <span id="comment${comment.id}"class="cyan">${comment.comment}</span>
+            <span id="comment${comment.id}"class="cyan" style="white-space: pre-wrap;">${comment.comment}</span>
             <div class="col-12 p-0 m-0 apt-1">
             ${buttons}
             </div>
