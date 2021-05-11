@@ -27,7 +27,7 @@ $tag = "tag_{$wall_id}";
 						<input class="form-control tagtext w-100" type="text" name="tagtext" placeholder="Tag the wall" id="<?=$tag?>" required autocomplete="off">
 					</div>
 					<div class="col-2 col-lg-1">
-						<button class="button w-100" type="submit">Tag</button>
+						<button class="button w-100 btn-primary black bg-lightgrey" type="submit">Tag</button>
 					</div>
 				</div>
 			</form>
