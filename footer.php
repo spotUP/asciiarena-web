@@ -142,8 +142,8 @@ if (DEBUG) {
 			<?php } ?>
 			</div> <!-- modal-body -->
 			<div class="modal-footer bg-primary">
-				<button type="button" class="btn-secondary bg-grey" data-dismiss="modal">CLOSE</button>
-				<button type="button" class="btn-primary white bg-lightgrey" onclick="loginUser()">LOG IN</button>
+				<button type="button" class="btn-secondary bg-transparent amr-1 apr-1" data-dismiss="modal">CLOSE</button>
+				<button type="button" class="btn-primary black bg-lightgrey" onclick="loginUser()">LOG IN</button>
 			</div>
 		</div>
 	</div>

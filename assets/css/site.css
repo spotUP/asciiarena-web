@@ -2191,6 +2191,11 @@ input[type="number"],
   border-radius: 0 !important;
 }
 
-input:focus, textarea:focus, select:focus, button:focus, btn-primary:focus{
+input:focus, textarea:focus, select:focus, button:focus, .btn-primary.focus, .btn-primary:focus{
   outline: none !important;
 }
+
+
+
+
+
