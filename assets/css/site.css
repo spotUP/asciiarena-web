@@ -2179,8 +2179,13 @@ input[type="button"],
 input[type="submit"],
 input[type="email"],
 input[type="tel"],
-input[type="number"]
+input[type="number"],
 .input-checkbox {
+-webkit-appearance: none !important;
+border-radius: 0 !important;
+}
+
+.btn-big{
 -webkit-appearance: none !important;
 border-radius: 0 !important;
 }
