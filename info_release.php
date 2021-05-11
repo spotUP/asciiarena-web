@@ -20,8 +20,8 @@ $font = (strlen($row->font) > 1) ? $row->font : 'mOsOul';
 $fgcolor = (strlen($row->def_fg_col) > 1) ? $row->def_fg_col : '#ffffff';
 $bgcolor = (strlen($row->def_bg_col) > 1) ? $row->def_bg_col : '#000000';
 } else {
-  $fgcolor = '#bb00bb';
-  $bgcolor = '#1a1a1a';
+  $fgcolor = '#FF55FF';
+  $bgcolor = '#111111';
 }
 
 require_once "header.php";?>
