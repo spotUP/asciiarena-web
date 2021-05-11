@@ -2203,5 +2203,19 @@ input#password-form.control{
   line-height: 16px;
 }
 
+input:-internal-autofill-selected {
+  font-size: 16px !important;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-size: 16px;
+  font-weight: normal;
+  line-height: 16px;
+}
 
+input:-internal-autofill {
+  font-size: 16px !important;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-size: 16px;
+  font-weight: normal;
+  line-height: 16px;
+}
 
