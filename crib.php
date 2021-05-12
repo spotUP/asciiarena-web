@@ -131,10 +131,12 @@ include "header.php";
 					<div class="col-3">
 						<input type="text" class="w-100" maxlength="14" name="nick" value="<?=$nick?>">
 					</div>
-					<div class="col-2">
+				</div>
+				<div class="row amb-1">
+					<div class="col-3">
 						Crew: 
 					</div>
-					<div class="col-4">
+					<div class="col-3">
 						<input type="text" class="w-100" name="crew" value="<?=$crew?>"> 
 					</div>
 				</div>
@@ -159,10 +161,12 @@ include "header.php";
 							<?php } ?>
 						</select>
 					</div>
-					<div class="col-2">
+				</div>
+				<div class="row amb-1">
+					<div class="col-3">
 						Country:
 					</div>
-					<div class="col-4">
+					<div class="col-3">
 						<select class="select2" name="country"> 
 							<?php foreach($country_list as $symbol => $scountry) { ?>
 								<option value="<?=$symbol?>" <?=($country == $symbol) ? 'selected' : ''?>><?=$country_list[$symbol]?></option>
@@ -177,10 +181,12 @@ include "header.php";
 					<div class="col-3">		
 						<input type="text" class="w-100" name="mail" value="<?=$mail?>">
 					</div>
-					<div class="col-2">		
+				</div>
+				<div class="row amb-1">
+					<div class="col-3">		
 						Show E-Mail:
 					</div>
-					<div class="col-4">	
+					<div class="col-3">	
 						<select class="select2" name="display_mail">
 							<option <?=($display_mail === 'Yes') ? 'selected' : ''?>>Yes</option>
 							<option <?=($display_mail === 'No') ? 'selected' : ''?>>No</option>
