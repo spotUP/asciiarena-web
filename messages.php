@@ -446,7 +446,7 @@ include_once "header.php";
 					}
 					?>
 				</div>
-				<div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+				<div class="tab-pane fade show" id="profile" role="tabpanel" aria-labelledby="profile-tab">
 					<?php
 					if (!isset($_POST[ 'open_postnewmessage' ])) 
 					{
@@ -477,16 +477,6 @@ include_once "header.php";
 									<?php
 									foreach (fetchAll("SELECT new FROM messages WHERE thread = :thread ORDER BY new DESC LIMIT 1", [":thread" => $thread]) as $row_new) 
 									{
-										$messnew = $row_new->new;
-										if ($messnew == 1) 
-										{
-											?>
-											<div class="col-5">
-												<a class="yellow text-truncate !important;" href="messages.php?messid=<?=$messid?>&thread=<?=$thread?>&postreply"><?=$postsubject?></a>
-											</div>
-											<?php
-										} 
-										else 
 										{
 											?>
 											<div class="col-5">
@@ -496,7 +486,7 @@ include_once "header.php";
 										}
 										?>
 										<div class="col-2">
-											<span class="cyan">From:</span> <span class="white"><?=$messpostername?></span>
+											<span class="cyan">To:</span> <span class="white"><?=$messpostedto?></span>
 										</div>
 										<div class="col-3">
 											<span class="cyan">Date:</span> <span class="white message-time" data-utc="<?=date("c", $row->timestamp)?>"><?=date("d/m H:i", $row->timestamp)?></span>
