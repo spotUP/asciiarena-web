@@ -21,7 +21,6 @@ foreach($collys as $fname => $colly)
 	<div class="col-12 d-flex justify-content-center col-<?=$breakpoint?><?=(round(12 / $columns))?> overflow-hidden apt-1 apb-1">
 		<div class="row animate__animated animate__backInUp">
 			<pre><a href="/release/<?=$fname?>" class="ascii magenta"><?=$colly?></a></pre>
-			<pre><a href="/release/<?=$fname?>" class="ascii magenta"><?=$colly?></a></pre>
 		</div>
 	</div>
 	<?php 
