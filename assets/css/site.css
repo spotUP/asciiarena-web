@@ -2193,12 +2193,22 @@ input[type="number"],
 
 input:focus, textarea:focus, select:focus, button:focus, .btn-primary.focus, .btn-primary:focus{
   outline: none !important;
+  font-size: 16px !important;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-weight: normal;
+  line-height: 16px;
 }
 
 input#password-form.control{
   font-size: 16px !important;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
-  font-size: 16px;
+  font-weight: normal;
+  line-height: 16px;
+}
+
+#password-form.control{
+  font-size: 16px !important;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
   font-weight: normal;
   line-height: 16px;
 }
@@ -2232,6 +2242,14 @@ button, input, optgroup, select, textarea {
       &:-webkit-autofill:hover,
       &:-webkit-autofill:focus,
       &:-webkit-autofill:active {
+  font-size: 16px !important;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
+  font-size: 16px !important;
+  font-weight: normal !important;
+  line-height: 16px !important;
+}
+
+input:-webkit-autofill, input:-webkit-autofill:hover, and input:-webkit-autofill:first-line{
   font-size: 16px !important;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
   font-size: 16px !important;
