@@ -20,6 +20,10 @@ foreach($collys as $fname => $colly)
 	?>
 	<div class="col-12 d-flex justify-content-center col-<?=$breakpoint?><?=(round(12 / $columns))?> overflow-hidden apt-1 apb-1">
 		<div class="row animate__animated animate__backInUp">
+			<pre style="opacity: 1.0; position: absolute; top: 0px;"><a href="/release/<?=$fname?>" class="ascii magenta"><?=$colly?></a></pre>
+			<pre style="opacity: 0.15; position: absolute; top: 10px;"><a href="/release/<?=$fname?>" class="ascii magenta"><?=$colly?></a></pre>
+			<pre style="opacity: 0.05; position: absolute; top: 20px;"><a href="/release/<?=$fname?>" class="ascii magenta"><?=$colly?></a></pre>
+			<pre style="opacity: 0.02; position: absolute; top: 30px;"><a href="/release/<?=$fname?>" class="ascii magenta"><?=$colly?></a></pre>
 			<pre><a href="/release/<?=$fname?>" class="ascii magenta"><?=$colly?></a></pre>
 		</div>
 	</div>
