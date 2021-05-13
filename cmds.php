@@ -217,6 +217,7 @@
   
  
   function login() {
+    global $_user;
     $login = false;
     $pw = $_POST[ "password" ] ?? "";
     $ni = $_POST[ "nick" ] ?? "";
@@ -271,6 +272,7 @@
   }
 
   function logout() {
+    global $_user;
     $_user = $_SESSION[ "_user" ];
     doQuery("UPDATE users SET lastactive = UNIX_TIMESTAMP()-300 WHERE id = {$_user['id']}");
     $_SESSION = [];
@@ -283,6 +285,7 @@
   }
   
   function tag() {
+    global $_user;
     $_user = $_SESSION[ "_user" ];
     $text = $_POST[ 'tagtext' ] ?? "";
     $text = strip_tags($text);
@@ -315,8 +318,7 @@
         ]);
         $code = ($status) ? 200 : 400;
         exit(json_out([
-          "status" => $status,
-          "id" => (int)$colly
+          "status" => $status
         ], $code));
       }
       exit(json_out(["status" => false], 400));
@@ -332,8 +334,7 @@
         ]);
         $code = ($status) ? 200 : 400;
         exit(json_out([
-          "status" => $status,
-          "id" => (int)$colly
+          "status" => $status
         ], $code));
       }
       exit(json_out(["status" => false], 400));
@@ -351,8 +352,7 @@
         ]);
         $code = ($status) ? 200 : 400;
         exit(json_out([
-          "status" => $status,
-          "id" => (int)$colly
+          "status" => $status
         ], $code));
       }
       exit(json_out(["status" => false], 400));
@@ -396,8 +396,7 @@
         ]);
         recalculate_ratings();
         exit(json_out([
-          "status" => $status,
-          "id" => (int)$id
+          "status" => $status
         ], $code));
       }
       exit(json_out(["status" => false], 400));
@@ -405,7 +404,7 @@
   }
     
   function editComment($collyid) {
-    $_user = $_SESSION[ "_user" ];
+    global $_user;
     if (is_ajax() && is_logged_in()) {
       $id = $_POST[ "comment_id" ] ?? $collyid ?? 0;
       $comment = $_POST[ 'comment' ] ?? "";
@@ -423,8 +422,7 @@
         ]);
         $code = ($status) ? 200 : 400;
         exit(json_out([
-          "status" => $status,
-          "id" => (int)$id
+          "status" => $status
         ], $code));
       }
       exit(json_out(["status" => false], 400));
@@ -432,7 +430,7 @@
   }
   
   function addComment($collyid) {
-    $_user = $_SESSION[ "_user" ];
+    global $_user;
     if (is_ajax() && is_logged_in()) {
       $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
       $comment = $_POST[ 'comment' ] ?? "";
@@ -456,8 +454,7 @@
         recalculate_ratings();
 
         exit(json_out([
-          "status" => $status,
-          "id" => (int)$colly
+          "status" => $status
         ], $code));
       }
       exit(json_out(["status" => false], 400));
@@ -465,7 +462,7 @@
   }
   
   function faveColly($collyid) {
-    $_user = $_SESSION[ "_user" ];
+    global $_user;
     if (is_ajax() && is_logged_in()) {
       $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
       if ($colly > 0) {
@@ -478,8 +475,7 @@
         ]);
         $code = ($status) ? 200 : 400;
         exit(json_out([
-          "status" => $status,
-          "id" => (int)$colly
+          "status" => $status
         ], $code));
       }
       exit(json_out(["status" => false], 400));
@@ -487,7 +483,7 @@
   }
 
   function unfaveColly($collyid) {
-    $_user = $_SESSION[ "_user" ];
+    global $_user;
     if (is_ajax() && is_logged_in()) {
       $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
       if ($colly > 0) {
@@ -497,8 +493,7 @@
         ]);
         $code = ($status) ? 200 : 400;
         exit(json_out([
-          "status" => $status,
-          "id" => (int)$colly
+          "status" => $status
         ], $code));
       }
       exit(json_out(["status" => false], 400));
@@ -645,7 +640,7 @@
   }
   
   function saveColly() {
-    $_user = $_SESSION[ "_user" ];
+    global $_user;
     if (is_ajax() && is_logged_in()) {
 
       $filename = $_FILES['filename']['name'];
@@ -765,7 +760,7 @@
   }
     
   function saveapp() {
-    $_user = $_SESSION[ "_user" ];
+    global $_user;
     if (is_ajax() && is_logged_in()) {
     
       $filename = $_FILES['file']['name'];
@@ -832,7 +827,7 @@
   }
   
   function saveMag() {
-    $_user = $_SESSION[ "_user" ];
+    global $_user;
     if (is_ajax() && is_logged_in()) {
       $filename = $_FILES['file']['name'];
       $q = "select count(*) as cnt from mags where name=:name or filename=:filename";
@@ -905,6 +900,156 @@
 
     }
   }
+  
+  function getMessage($msgId) {
+    global $_user;
+    if (is_ajax() && is_logged_in()) {
+      
+      $msg = fetchOne("SELECT * FROM messages WHERE id = :msgid", [":msgid" => $msgId]);
+      
+      $data = [
+          "id" => (int)$msg->id,
+          "thread" =>(int)$msg->thread,
+          "postedto" =>$msg->postedto,
+          "postername" =>$msg->postername,
+          "subject" =>$msg->subject,
+          "message" =>$msg->message,
+          "replyid" =>$msg->to_id==$_user['id'] ? $msg->from_id : $msg->to_id,          
+          "timestamp" =>$msg->timestamp,
+        ];
+
+      if(!empty($data)) {
+        exit(json_out($data));
+      }
+      exit(json_out(["status" => false], 404));
+    }  
+  }
+
+  function deleteMessage($threadId) {
+    global $_user;
+    if (is_ajax() && is_logged_in()) {
+      
+      $status = doQuery("delete FROM messages WHERE thread = :threadid and (to_id=:user_id)", [
+        ":threadid" => $threadId,
+        ":user_id" => $_user['id']
+      ]);
+      $code = ($status) ? 200 : 400;
+      exit(json_out([
+        "status" => $status
+      ], $code));
+
+      exit(json_out(["status" => false], 400));
+    }  
+  }
+
+  function getMessages($msgboxId) {
+    global $_user;
+    if (is_ajax() && is_logged_in()) {
+      $data = [];
+      
+      $messages = [];
+      if ((int)$msgboxId==1) {
+        $messages = fetchAll("SELECT * FROM messages WHERE to_id = :user_id GROUP BY thread ORDER BY timestamp DESC", [":user_id" => $_user['id']]);
+      } else if ((int)$msgboxId == 2) {
+        $messages = fetchAll("SELECT * FROM messages WHERE from_id = :user_id GROUP BY thread ORDER BY timestamp DESC", [":user_id" => $_user['id']]);
+      }
+      
+      foreach($messages as $msg) {
+        $data[] = [
+          "id" => (int)$msg->id,
+          "thread" =>(int)$msg->thread,
+          "postedto" =>$msg->postedto,
+          "postername" =>$msg->postername,
+          "subject" =>$msg->subject,         
+          "message" =>$msg->message,
+          "new" =>$msg->new,
+          "timestamp" =>$msg->timestamp,
+        ];
+      }
+      if(!empty($data)) {
+        exit(json_out($data));
+      }
+      exit(json_out(["status" => false], 404));
+    }  
+  }
+
+  function getMessageThread($msgId, $threadId) {
+    global $_user;
+    if (is_ajax() && is_logged_in()) {
+      $data = [];
+      
+      doQuery("update messages set new=0 where thread=:thread and to_id=:user_id",[ 'thread' => $threadId,":user_id" => $_user['id']]);      
+      $messages = fetchAll("select * from messages where thread = :thread", [ 'thread' => $threadId ]);
+      
+      foreach($messages as $msg) {
+        $data[] = [
+          "id" => (int)$msg->id,
+          "thread" =>(int)$msg->thread,
+          "postedto" =>$msg->postedto,
+          "postername" =>$msg->postername,
+          "subject" =>$msg->subject,
+          "message" =>$msg->message,
+          "timestamp" =>$msg->timestamp,
+        ];
+      }
+      if(!empty($data)) {
+        exit(json_out($data));
+      }
+      exit(json_out(["status" => false], 404));
+    }  
+  }
+
+  function newMessage() {
+    global $_user;
+
+    if (is_ajax() && is_logged_in()) {
+      $msgtext = $_POST[ 'msgtext' ] ?? "";
+      $subject = $_POST[ 'subject' ] ?? "";
+      $touserid = $_POST[ 'receiver' ] ?? "";
+      
+      $status = doQuery("insert into messages (thread,from_id,to_id,postedto,postername,timestamp,subject,message,new,unread) 
+        select ifnull(max(thread)+1,1),:user_id,:touserid,(select nick from users where id=:touserid),(select nick from users where id=:user_id),UNIX_TIMESTAMP(),:subject,:msgtext,1,1 from messages",[
+        ":user_id" => $_user[ "id" ],
+        ":subject" => $subject,
+        ":touserid" => $touserid,
+        ":msgtext" => $msgtext
+      ]);
+      $code = ($status) ? 200 : 400;
+
+      exit(json_out([
+        "status" => $status
+      ], $code));
+    }
+    
+  }
+
+  function replyMessage() {
+    global $_user;
+
+    if (is_ajax() && is_logged_in()) {
+      $thread = (int)$_POST[ "thread" ] ?? 0;
+      $msgtext = $_POST[ 'msgtext' ] ?? "";
+      $subject = $_POST[ 'subject' ] ?? "";
+      $touserid = $_POST[ 'receiver' ] ?? "";
+      
+      if ($thread > 0) {
+        $status = doQuery("insert into messages (thread,from_id,to_id,postedto,postername,timestamp,subject,message,new,unread) 
+          values (:thread_id,:user_id,:touserid,(select nick from users where id=:touserid),(select nick from users where id=:user_id),UNIX_TIMESTAMP(),:subject,:msgtext,1,1)",[
+          ":thread_id" => $thread,
+          ":user_id" => $_user[ "id" ],
+          ":subject" => $subject,
+          ":touserid" => $touserid,
+          ":msgtext" => $msgtext
+        ]);
+        $code = ($status) ? 200 : 400;
+
+        exit(json_out([
+          "status" => $status
+        ], $code));
+      }
+      exit(json_out(["status" => false], 400));
+    }
+  }
 
 	$cmd = $_GET[ "cmd" ] ?? $_current[ 0 ] ?? "";
 	$reDir = "/";
@@ -971,8 +1116,24 @@
     case "save_mag":
       saveMag();
       break;
+    case "get_message":
+      getMessage($_current[1]);
+      break;      
+    case "delete_message":
+      deleteMessage($_current[1]);
+      break;      
+    case "get_messages":
+      getMessages($_current[1]);
+      break;      
+    case "get_thread":
+      getMessageThread($_current[1],$_current[2]);
+      break;      
+    case "new_message":
+      newMessage();
+    case "reply_thread":
+      replyMessage();
 		default:
-			if ($is_ajax) {
+			if (is_ajax()) {
 				exit(json_out(["status" => false], 400));
 			}
       else {
