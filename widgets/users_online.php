@@ -6,7 +6,7 @@
 		foreach (fetchAll("SELECT id, nick, lastactive FROM users WHERE lastactive > (UNIX_TIMESTAMP()-300) ORDER BY lastactive DESC") as $row) 
 		{
 			?>
-			<div class="col-lg-12 p-0">
+			<div class="col-lg-12 p-0 apl-1">
 				<a class="yellow" href="/member/<?=urlsafe($row->nick)?>"><?=$row->nick?></a>
 			</div>
 			<?php
@@ -16,7 +16,7 @@
 		$registered_online = fetchOne("SELECT COUNT(*) online FROM users WHERE lastactive > (UNIX_TIMESTAMP()-300)")->online;
 		?>
 		<div class="col-lg-12 apt-1 p-0 p-lg-2">
-			<span><br><?=$anonymous_online?> anonymous online</span>
+			<span><?=$anonymous_online?> anonymous online</span>
 		</div>
 	</div>
 </div>
