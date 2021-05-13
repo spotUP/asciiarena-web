@@ -161,14 +161,14 @@ include "header_ascii.php";
 			<div class="container-fluid mobile-bg">
 				<div class="row" style="padding-top: 58px; padding-bottom: 16px;">
 					<div class="col-12 d-flex align-items-center justify-content-center m-0 p-0 m-md-0 p-md-0 m-sm-1 p-sm-1">
-						<pre class="overflow-hidden d-flex align-items-center d-none d-lg-block" style="position: relative; left: 32px;"><span class="magenta"><?=$stars1?></span></pre>
+						<pre class="overflow-hidden d-none d-lg-block" style="position: relative; left: 32px;"><span class="magenta"><?=$stars1?></span></pre>
 						<div class="overflow-hidden d-flex align-items-center d-none d-lg-block mx-auto">
 							<div id="logoswitcher">
-								<div class="logo nolink overflow-hidden"><?=implode('</div><div class="logo nolink" style="display: none;">', $logos)?></div>
+								<div class="logo d-none d-lg-block nolink overflow-hidden"><?=implode('</div><div class="logo nolink" style="display: none;">', $logos)?></div>
 							</div>
 						</div>
-						<pre class="overflow-hidden d-lg-none"><span class="magenta nolink"><a href="www.asciiarena.se"><?=$mobilelogo?></a></span></pre>
-						<pre class="overflow-hidden d-none d-lg-block aml-1" style="position: relative; left: -32px;"><span class="magenta"><?=$stars2?></span></pre>
+						<pre class="overflow-hidden d-lg-none"><a class="magenta nolink" href="www.asciiarena.se"><?=$mobilelogo?></a></pre>
+						<pre class="overflow-hidden d-none d-lg-block" style="position: relative; left: -32px;"><span class="magenta"><?=$stars2?></span></pre>
 					</div>
 				</div>
 				<script>
