@@ -75,12 +75,14 @@ include "header.php";
 					<div class="col-3">		
 						Show E-Mail:
 					</div>
-					<div class="col-3">	
-						<select id="display_mail" class="select2">
-							<option value="Yes">Yes</option>
-							<option value="No">No</option>
-						</select>
-					</div>
+          			<div class="col-3">
+						<div class="form-group">
+							<div class="custom-control custom-switch">
+								<input type="checkbox" class="custom-control-input" id="display_mail"value="1">
+								<label class="custom-control-label" for="display_mail"></label>
+							</div>
+						</div>
+					</div>          
 				</div>
 				<div class="row amb-1">
 					<div class="col-12 apt-1">
@@ -276,7 +278,7 @@ include "header.php";
           "viewmode": $("#viewmode").val(),
           "def_bg_col": $("#def_bg_col").val(),
           "def_fg_col": $("#def_fg_col").val(),
-          "display_mail": $("#display_mail").val(),
+          "display_mail": $("#display_mail").is(':checked') ? "Yes": "No",
           "def_font": $("#def_font").val(),
           "crt_effect": $("#crt_effect").is(':checked') ? "Y": "N",
           "oldpass": oldpass,
@@ -316,7 +318,7 @@ include "header.php";
         $("#def_bg_col").colorselector("setColor", settings.def_bg_col);
         $("#def_fg_col").colorselector("setColor", settings.def_fg_col);
         
-        $("#display_mail").val(settings.display_mail).trigger('change');
+        $("#display_mail").prop('checked', settings.display_mail=="Yes");
         $("#def_font").val(settings.def_font).trigger('change');
         $("#crt_effect").prop('checked', settings.crt_effect=="Y");
         $("#btnSave").removeAttr("disabled");
