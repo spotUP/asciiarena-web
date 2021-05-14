@@ -315,6 +315,7 @@ require_once "header.php";?>
     $("#addcomment").show(500);
     $("#editcomment").hide(500);
     $('#user_comment').focus();
+    $('#user_comment')[0].scrollIntoView(false);
   }
 
   function reportAsBroken() {
