@@ -112,6 +112,7 @@ include_once "header.php";
       </div>
 
 		</div>
+
     <div role="tabpanel" aria-labelledby="inboxTab, outboxTab" id="msgList" class="row">
     </div>
 			<?php
@@ -185,6 +186,7 @@ include_once "header.php";
     $("#newMessage").show();
     $("#msgList").hide();
     $("#msgDetails").hide();
+    
     $("#posttomember").val("");
     $("#postnewmessage").val("");
     $("#postnewsubject").val("");
@@ -224,6 +226,7 @@ include_once "header.php";
     $("#msgDetails").show();
     $("#newMessage").hide();
     $("#msgList").hide();
+   
     let threadBody = $("#msgThreadBody");
     let count=0;
 		threadBody.empty();   
@@ -276,6 +279,7 @@ include_once "header.php";
     $("#msgList").show();
     $("#newMessage").hide();
     $("#msgDetails").hide();
+    
     $("#inboxId").val(mailbox);
     let msglist = $("#msgList");
 		msglist.empty();
@@ -333,8 +337,24 @@ include_once "header.php";
 		$("#alerts").prepend(alertContent);
 	}
   
+  function getQueryParam(param, defaultValue = undefined) {
+    location.search.substr(1)
+        .split("&")
+        .some(function(item) { // returns first occurence and stops
+            return item.split("=")[0] == param && (defaultValue = item.split("=")[1], true)
+        })
+    return defaultValue
+}
+
 	$(function() {
-    getMessages(1);    
+    let msguser = getQueryParam('sendmsg','');
+    
+    if (msguser.length==0) {
+      getMessages(1);    
+    } else {
+      newMessage();
+      $('#posttomember').val(msguser).trigger('change');
+    }
 	});
     
 </script>

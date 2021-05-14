@@ -58,7 +58,7 @@ include "header.php";
 					<div class="col-3">
 						<select class="select2" id="country"> 
 							<?php foreach($country_list as $symbol => $scountry) { ?>
-								<option value="<?=$country_list[$symbol]?>"><?=$country_list[$symbol]?></option>
+								<option value="<?=$symbol?>"><?=$country_list[$symbol]?></option>
 							<?php } ?>
 						</select>
 					</div>

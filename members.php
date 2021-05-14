@@ -77,6 +77,11 @@ include "header.php";
 					<img class="position-absolute" style="right: 100px; top: -30px; z-index: 11;" src="/assets/data/sticker_supporter.png" alt="Commenter">
 					<?php
 				}
+        ?>
+				
+        <div class="row apt-1"><a class="button btn-big" href="/messages.php?sendmsg=<?=$member->id?>" ><input type="button" id="btnMsg" class="btn-big" value="Send Message" ></a></div>
+        <?php
+				
 				$colly_amount = fetchOne("SELECT COUNT(*) total from collys where uploader_id = :uid", [":uid" => $member->id])->total;
 				if(!empty($comment_amount) && !empty($colly_amount)) {
 					if(empty($comment_amount)) {
