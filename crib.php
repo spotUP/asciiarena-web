@@ -1,123 +1,12 @@
 <?php
 require_once "session.php";
-
-$errors = array();
-$messages = array();
-
-if (!is_logged_in()) {
-	$errors[]  = 'You need to be <a class="ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">logged in</a>to use this feature.';
-} else {
-
-	if(isset($_POST['Save'])) {
-		if (preg_match('/^[A-Za-z0-9-\.#_\!\^]{2,60}$/', $_POST['nick'])) {
-			$_SESSION['_user']['nick'] = $_POST['nick'];
-		} else {
-			$errors[] = 'invalid nickname';
-		}
-		if(!checkEmail($_POST['mail'])) {
-			$errors[] = 'invalid e-mail address';
-		}
-
-		if(!preg_match('/^#[A-Fa-f0-9]+$/', $_POST['def_bg_col'])) $errors[] = 'invalid background color';
-		if(!preg_match('/^#[A-Fa-f0-9]+$/', $_POST['def_fg_col'])) $errors[] = 'invalid foreground color';
-
-		$_POST['display_mail'] = ($_POST['display_mail'] === 'Yes') ? 'Yes' : 'No';
-		$_POST['viewmode'] = ($_POST['viewmode'] === 'BBS') ? 'BBS' : 'Standard';
-
-		$crt_effect = (isset($_POST['crt_effect']) && $_POST['crt_effect'] == 1) ? 'Y' : 'N';
-		$_SESSION['_user']['settings']['crt_effect'] = $crt_effect;
-
-		if (count($errors) == 0) {
-			$ask="update users set nick=:nick, crew=:crew, byear=:byear, bmonth=:bmonth, bday=:bday, country=:country,
-			mail=:mail, display_mail=:display_mail,
-			def_font=:def_font, def_bg_col=:def_bg_col, def_fg_col=:def_fg_col, upload_signature=:upload_signature, crt_effect=:crt_effect where id=:id";
-			$q = doQuery($ask,[ 'nick' => $_POST['nick'], 'crew' => $_POST['crew'], 'byear' => $_POST['byear'], 'bmonth' => $_POST['bmonth'], 'bday' => $_POST['bday'], 'country' => $_POST['country'],
-				'mail' => $_POST['mail'], 'display_mail' => $_POST['display_mail'],
-				'def_font' => $_POST['def_font'], 'def_bg_col' => $_POST['def_bg_col'], 'def_fg_col' => $_POST['def_fg_col'], 'upload_signature' => $_POST['upload_signature'], 'crt_effect' => $crt_effect, 
-				'id' => $_user['id'] ]);
-			if ($q) $messages[] = 'settings successuflly saved';
-		}
-
-		if (isset($_POST['old_password']) && strlen($_POST['old_password']) > 0
-			&& isset($_POST['new_password']) && strlen($_POST['old_password']) > 0
-			&& isset($_POST['repeat_password']) && strlen($_POST['repeat_password']) > 0
-		) {
-
-			if (strlen($_POST['new_password']) < 6) $errors[] = 'new password is too short';
-		if ($_POST['password'] !== $_POST['repeat_password']) $errors[] = "passwords don't match";
-		if (!preg_match('/[A-Z]/', $_POST['password'])
-			|| !preg_match('/[a-z]/', $_POST['password'])
-			|| !preg_match('/[0-9]/', $_POST['password']) 
-			|| !preg_match('/[^\w]/', $_POST['password'])) {
-			$errors[] = 'password should include at least one upper case letter, one lower caser letter, one number and one special character';
-	}
-
-	$spw = fetchOne("SELECT pwhash FROM users WHERE (id = :id)", [ ":id" => $_user['id'] ])->pwhash;
-	if (preg_match('/^[a-f0-9]{32}$/i', $spw)) {
-		if (md5($_POST['old_password']) !== $spw) $errors[] = 'old password is incorrect';
-		$pwhash = password_hash($_POST['new_password'], PASSWORD_BCRYPT, array('cost' => 13));
-	} else {
-		if (password_verify($_POST['old_password'], $spw)) {
-			$pwhash = password_hash($_POST['new_password'], PASSWORD_BCRYPT, array('cost' => 13));
-		} else {
-			$errors[] = 'old password is incorrect';
-		}
-	}
-	if (count($errors) == 0) {
-		$q = doQuery("UPDATE users SET pwhash=:pwhash WHERE id=:id",[ 'pwhash' => $pwhash, 'id' => $_user['id'] ]);
-		if ($q) $messages[] = 'password successuflly updated';
-	}
-}
-$_user = $_SESSION['_user'];
-}
-
-$ask="select * from users where nick=:nick";
-$row=fetchOne($ask, [ 'nick' => $_user['nick'] ]);
-if ($row) {
-	$nick = $row->nick;
-	$crew = $row->crew;
-	$byear = $row->byear;
-	$bmonth = $row->bmonth;
-	$bday = $row->bday;
-	$country = $row->country;
-	$mail = $row->mail;
-	$webpage = $row->webpage;            
-	$upload_signature = $row->upload_signature;
-	$viewmode = $row->list_view_mode;
-	$def_bg_col = $row->def_bg_col ?? "#000000";
-	$def_fg_col = $row->def_fg_col ?? "#ffffff";
-	$display_mail = $row->display_mail;
-	$def_font = $row->def_font;
-	$crt_effect = $row->crt_effect;
-} elseif (is_logged_in()) {
-	$errors[] = 'unable to retrieve user data';
-}
-}
-
 $h1 = ["wELCOME tO aSCIIaRENA", "bY uP rOUGH and diViNE sTYLERS"];
 include "header.php";
 ?>
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
-		<?php if (is_array($errors) && count($errors) > 0) { ?>
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="bs-component aml-1 amb-1">
-						<div class="alert alert-danger"><ul><?php foreach ($errors as $error) { ?> <li><?=$error?></li> <?php } ?></ul></div>
-					</div>
-				</div>
-			</div>
-		<?php } elseif (is_array($messages) && count($messages) > 0) { ?>
-
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="bs-component aml-1 amb-1">
-						<div class="alert alert-success"><ul><?php foreach ($messages as $message) { ?> <li><?=$message?></li> <?php } ?></ul></div>
-					</div>
-				</div>
-			</div>
-		<?php } ?>
 		<?php if (is_logged_in()) { ?>
+    <div id="alerts"></div>
 			<form enctype="multipart/form-data" action="/crib.php" method="post">
 				<div class="row amb-1">
 					<div class="col-12">
@@ -129,7 +18,7 @@ include "header.php";
 						Nick: 
 					</div>
 					<div class="col-3">
-						<input type="text" class="w-100" maxlength="14" name="nick" value="<?=$nick?>">
+						<input type="text" class="w-100" maxlength="14" id="nick" value="">
 					</div>
 				</div>
 				<div class="row amb-1">
@@ -137,7 +26,7 @@ include "header.php";
 						Crew: 
 					</div>
 					<div class="col-3">
-						<input type="text" class="w-100" name="crew" value="<?=$crew?>"> 
+						<input type="text" class="w-100" id="crew" value=""> 
 					</div>
 				</div>
 				<div class="row amb-1">
@@ -145,19 +34,19 @@ include "header.php";
 						Birth:
 					</div>
 					<div class="col-3">
-						<select class="select2" name="byear">
+						<select id="byear" class="select2">
 							<?php for ($i=1920; $i<(date('Y')-5); $i++) { ?>
-								<option <?=($byear == $i) ? 'selected' : ''?>><?=$i?></option>
+								<option value="<?=$i?>"><?=$i?></option>
 							<?php } ?>
 						</select>
-						<select class="select2" name="bmonth">
+						<select id="bmonth" class="select2">
 							<?php for ($i=1; $i<=12; $i++) { ?>
-								<option <?=($bmonth == $i) ? 'selected' : ''?>><?=$i?></option>
+								<option value="<?=$i?>"><?=$i?></option>
 							<?php } ?>
 						</select>
-						<select class="select2" name="bday">
+						<select id="bday" class="select2">
 							<?php for ($i=1; $i<=31; $i++) { ?>
-								<option <?=($bday == $i) ? 'selected' : ''?>><?=$i?></option>
+								<option value="<?=$i?>"><?=$i?></option>
 							<?php } ?>
 						</select>
 					</div>
@@ -167,9 +56,9 @@ include "header.php";
 						Country:
 					</div>
 					<div class="col-3">
-						<select class="select2" name="country"> 
+						<select class="select2" id="country"> 
 							<?php foreach($country_list as $symbol => $scountry) { ?>
-								<option value="<?=$symbol?>" <?=($country == $symbol) ? 'selected' : ''?>><?=$country_list[$symbol]?></option>
+								<option value="<?=$country_list[$symbol]?>"><?=$country_list[$symbol]?></option>
 							<?php } ?>
 						</select>
 					</div>
@@ -179,7 +68,7 @@ include "header.php";
 						Mail:
 					</div>
 					<div class="col-3">		
-						<input type="text" class="w-100" name="mail" value="<?=$mail?>">
+						<input id="mail" type="text" class="w-100" value="">
 					</div>
 				</div>
 				<div class="row amb-1">
@@ -187,9 +76,9 @@ include "header.php";
 						Show E-Mail:
 					</div>
 					<div class="col-3">	
-						<select class="select2" name="display_mail">
-							<option <?=($display_mail === 'Yes') ? 'selected' : ''?>>Yes</option>
-							<option <?=($display_mail === 'No') ? 'selected' : ''?>>No</option>
+						<select id="display_mail" class="select2">
+							<option value="Yes">Yes</option>
+							<option value="No">No</option>
 						</select>
 					</div>
 				</div>
@@ -203,7 +92,7 @@ include "header.php";
 						Old password
 					</div>
 					<div class="col-3">	
-						<input type="password" class="w-100" name="old_password">
+						<input type="password" class="w-100" id="old_password">
 					</div>
 				</div>
 				<div class="row amb-1">
@@ -211,7 +100,7 @@ include "header.php";
 						New password
 					</div>
 					<div class="col-3">						
-						<input type="password"  class="w-100" name="password">
+						<input type="password"  class="w-100" id="password">
 					</div>
 				</div>
 				<div class="row amb-1">
@@ -219,7 +108,7 @@ include "header.php";
 						New password again
 					</div>
 					<div class="col-3">						
-						<input type="password" class="w-100" name="repeat_password">
+						<input type="password" class="w-100" id="repeat_password">
 					</div>
 				</div>
 				<div class="row amb-1">
@@ -233,9 +122,9 @@ include "header.php";
 						File list mode:
 					</div>
 					<div class="col-3">	
-						<select class="select2" name="viewmode">
-							<option <?=($viewmode === 'Standard') ? 'selected' : ''?>>Standard</option>
-							<option <?=($viewmode === 'BBS') ? 'selected' : ''?>>BBS</option>
+						<select class="select2" id="viewmode">
+							<option value="Standard">Standard</option>
+							<option value="BBS" >BBS</option>
 						</select>
 					</div>
 				</div>
@@ -244,8 +133,8 @@ include "header.php";
 						Default Colly BG:
 					</div>
 					<div class="col-3">	
-						<select class="custom-select" id="colorselector_1" name="def_bg_col">
-							<option style="display: none;" id="selcol-1" selected="selected" value="<?=$def_bg_col?>" data-color="<?=$def_bg_col?>"></option>
+						<select class="custom-select" id="def_bg_col">
+              <option id="sel_bg_col" value="" data-color="">Custom</option>
 							<option value='#555555' data-color="#555555">Bright Black</option>
 							<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
 							<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
@@ -270,8 +159,8 @@ include "header.php";
 						Default Colly FG:
 					</div>
 					<div class="col-3">	
-						<select class="custom-select" id="colorselector_2" name="def_fg_col">
-							<option id="selcol-2" selected="selected" value="<?=$def_fg_col?>" data-color="<?=$def_fg_col?>"></option>
+						<select class="custom-select" id="def_fg_col">
+              <option id="sel_bg_col" value="" data-color="">Custom</option>
 							<option value='#555555' data-color="#555555">Bright Black</option>
 							<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
 							<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
@@ -291,35 +180,16 @@ include "header.php";
 						</select>
 					</div>
 				</div>
-				<script>
-					$(function() {
-						window.prettyPrint && prettyPrint();
-						$('#colorselector_1').colorselector();
-						$('#colorselector_2').colorselector({
-							callback : function(value, color, title) {
-								$("#colorValue").val(value);
-								$("#colorColor").val(color);
-								$("#colorTitle").val(title);
-							}
-						});
-						$("#setColor").click(function(e) {
-							$("#colorselector_2").colorselector("setColor", "#008B8B");
-						})
-						$("#setValue").click(function(e) {
-							$("#colorselector_2").colorselector("setValue", 18);
-						})
-					});
-				</script>
 				<div class="row amb-1">
 					<div class="col-3">	
 						Default Colly Font:
 					</div>
 					<div class="col-3">	
-						<select class="select2" name='def_font'>
-							<option <?=($def_font === 'mosoul') ? 'selected' : ''?>>mosoul</option>
-							<option <?=($def_font === 'topaz') ? 'selected' : ''?>>topaz</option>
-							<option <?=($def_font === 'microknight') ? 'selected' : ''?>>microknight</option>
-							<option <?=($def_font === 'pot-noodle') ? 'selected' : ''?>>pot-noodle</option>
+						<select class="select2" id='def_font'>
+							<option value="mosoul">mosoul</option>
+							<option value="topaz" >topaz</option>
+							<option value="microknight" >microknight</option>
+							<option value="pot-noodle" >pot-noodle</option>
 						</select>
 					</div>
 				</div>
@@ -330,8 +200,8 @@ include "header.php";
 					<div class="col-3">
 						<div class="form-group">
 							<div class="custom-control custom-switch">
-								<input type="checkbox" class="custom-control-input" id="customSwitch1" name="crt_effect" value="1" <?=($crt_effect === 'Y') ? 'checked' : '';?>>
-								<label class="custom-control-label" for="customSwitch1"></label>
+								<input type="checkbox" class="custom-control-input" id="crt_effect" name="crt_effect" value="1">
+								<label class="custom-control-label" for="crt_effect"></label>
 							</div>
 						</div>
 					</div>
@@ -343,12 +213,12 @@ include "header.php";
 				</div>
 				<div class="row amb-1">
 					<div class="col-6">		
-						<input type="text" class="w-100" size="44" maxlength="44" name="upload_signature" value="<?=$upload_signature?>">
+						<input type="text" class="w-100" size="44" maxlength="44" id="upload_signature" value="">
 					</div>							
 				</div>
 				<div class="row amb-1">
 					<div class="col-12 apt-1">	
-						<input type="submit" class="btn-big" value="Save" name="Save">
+						<input type="button" class="btn-big" onclick="saveSettings()" value="Save" name="Save">
 					</div>
 				</div>
 			</form>	
@@ -362,4 +232,110 @@ include "header.php";
 		<?php include "sidebar_right.php"; ?>
 	</div>
 </div>
+
+  <script>
+    function saveSettings() {
+      let oldpass = $("#old_password").val();
+      let newpass1 = $("#password").val();
+      let newpass2 = $("#repeat_password").val();
+      
+      if ((oldpass.length>0) && (newpass1.length==0)) {
+        showAlert("You have not specified a new password!", false);
+        return;
+      }
+      
+      if (((newpass1.length+newpass2.length)>0) && newpass1!=newpass2) {
+        showAlert("New passwords do not match!", false);
+        return;
+      }
+
+      if ((oldpass.length==0) && ((newpass1.length+newpass2.length)>0)) {
+        showAlert("You must enter your old password if you wish to change it!", false);
+        return;
+      }
+
+      if (newpass1.length>0) {
+        if (!newpass1.match(/[A-Z]/) || !newpass1.match(/[a-z]/) || !newpass1.match(/[0-9]/) || !newpass1.match(/[^\w]/)) {
+          showAlert('password should include at least one upper case letter, one lower caser letter, one number and one special character', false);
+          return;
+        }
+      }
+      
+      $.ajax({
+        "type": "POST",
+        "url": "/cmds.php/save_settings",
+        "data": {
+          "nick": $("#nick").val(),
+          "crew": $("#crew").val(),
+          "byear": $("#byear").val(),
+          "bmonth": $("#bmonth").val(),
+          "bday": $("#bday").val(),
+          "country": $("#country").val(),
+          "mail": $("#mail").val(),
+          "upload_signature": $("#upload_signature").val(),
+          "viewmode": $("#viewmode").val(),
+          "def_bg_col": $("#def_bg_col").val(),
+          "def_fg_col": $("#def_fg_col").val(),
+          "display_mail": $("#display_mail").val(),
+          "def_font": $("#def_font").val(),
+          "crt_effect": $("#crt_effect").is(':checked') ? "Y": "N",
+          "oldpass": oldpass,
+          "newpass": newpass1
+        },
+        "success": () => {
+          showAlert("Settings saved sucessfully!", true);
+        },
+        "error": (r) => {
+          if (r && r.responseJSON && r.responseJSON.error) {
+            showAlert(r.responseJSON.error+', settings not saved', false);
+          } else {
+          showAlert("An error occured saving the settings!", false);
+          }
+        }
+      });
+            
+    }
+    function getSettings() {
+      $.get("/cmds.php/get_settings", function (settings) {
+       
+        $("#nick").val(settings.nick);
+        $("#crew").val(settings.crew);
+        $("#byear").val(settings.byear).trigger('change');
+        $("#bmonth").val(settings.bmonth).trigger('change');
+        $("#bday").val(settings.bday).trigger('change');
+        $("#country").val(settings.country).trigger('change');
+        $("#mail").val(settings.mail);
+        $("#upload_signature").val(settings.upload_signature);
+        $("#viewmode").val(settings.viewmode).trigger('change');
+        $("#sel_bg_col").val(settings.def_bg_col);
+        $("#sel_bg_col").attr("data-color",settings.def_bg_col);
+        $("#sel_fg_col").val(settings.def_fg_col);
+        $("#sel_fg_col").attr("data-color",settings.def_fg_col);       
+        $('#def_fg_col').colorselector();
+        $('#def_bg_col').colorselector();
+        $("#def_bg_col").colorselector("setColor", settings.def_bg_col);
+        $("#def_fg_col").colorselector("setColor", settings.def_fg_col);
+        
+        $("#display_mail").val(settings.display_mail).trigger('change');
+        $("#def_font").val(settings.def_font).trigger('change');
+        $("#crt_effect").prop('checked', settings.crt_effect=="Y");
+      });
+    }
+  
+    function showAlert(content,success) {
+      if (success) {
+        alertContent = `<div id="#success-alert" class="bs-component quick-alert amb-1 animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
+      } else {
+        alertContent = `<div id="#failure-alert" class="bs-component quick-alert amb-1 animate__animated animate__shakeX alert alert-dismissible alert-warning"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
+      }
+      $("#alerts").prepend(alertContent);
+       $(window).scrollTop(0);
+    }
+
+    $(function() {
+      window.prettyPrint && prettyPrint();
+      getSettings();
+    });
+  </script>
+
 <?php include "footer.php"; ?>

@@ -5,7 +5,7 @@
 ?>
 <script>
 	function artistclear() {
-		$("#artist_id, #artist_nick, #artist_acronym, #artist_www, #artist_country, #artist_status").val('');
+		$("#artist_id, #artist_nick, #artist_acronym, #artist_www, #artist_country, #artist_status").val('').trigger('change');
 		let crewslist = $("#artist_crew_fetch_id");
 		crewslist.empty();
 		$("#artist_crew_add_fetch_id").val("0")
@@ -25,8 +25,8 @@
 				$('#artist_nick').val(data[0].nick);
 				$('#artist_acronym').val(data[0].acronym);
 				$('#artist_www').val(data[0].www);
-				$('#artist_country').val(data[0].country);
-				$('#artist_status').val(data[0].active);
+				$('#artist_country').val(data[0].country).trigger('change');
+				$('#artist_status').val(data[0].active).trigger('change');
 				let crewslist = $("#artist_crew_fetch_id");
 				crewslist.empty();
 				$.each(data[0].crews, function (i, crew) {
@@ -227,9 +227,9 @@
 
 		<div class="row">
 			<div class="col-6 d-flex justify-content-between">
-				<label for="artist_active" class="lightgrey">Status</label>
+				<label for="artist_status" class="lightgrey">Status</label>
         <div>
-				<select class="select2" name="active" id="artist_active">
+				<select class="select2" name="active" id="artist_status">
 					<option value="Active">Active</option>
 					<option value="Inactive">Inactive</option>
 				</select>

@@ -1051,6 +1051,131 @@
     }
   }
 
+  function getSettings() {
+    global $_user;
+    if (is_ajax() && is_logged_in()) {
+      
+      $row = fetchOne("select * from users where id=:userid", ['userid' => $_user['id'] ]);
+      
+      if ($row) {
+        $data = [
+          "nick" => $row->nick,
+          "crew" => $row->crew,
+          "byear" => $row->byear,
+          "bmonth" => $row->bmonth,
+          "bday" => $row->bday,
+          "country" => $row->country,
+          "mail" => $row->mail,
+          "webpage" => $row->webpage,            
+          "upload_signature" => $row->upload_signature,
+          "viewmode" => $row->list_view_mode,
+          "def_bg_col" => $row->def_bg_col ?? "#000000",
+          "def_fg_col" => $row->def_fg_col ?? "#ffffff",
+          "display_mail" => $row->display_mail,
+          "def_font" => $row->def_font,
+          "crt_effect" => $row->crt_effect,
+          ];
+        exit(json_out($data));
+      } else {
+        exit(json_out(["status" => false], 404));
+      }
+    }
+  }
+  
+  function saveSettings() {
+    global $_user;
+    if (is_ajax() && is_logged_in()) {
+      
+      $user_id = $_user[ "id" ];
+      
+      $oldpass = $_POST[ 'oldpass' ] ?? "";
+      $newpass = $_POST[ 'newpass' ] ?? "";
+      $errors = '';
+      
+      if (strlen($newpass)>0) {
+        $spw = fetchOne("SELECT pwhash FROM users WHERE (id = :id)", [ ":id" => $_user['id'] ])->pwhash;
+        if (preg_match('/^[a-f0-9]{32}$/i', $spw)) {
+          if (md5($oldpass) !== $spw) $error = 'old password is incorrect';
+        } else {
+          if (!password_verify($oldpass, $spw)) {
+            $errors = 'old password is incorrect';
+          }
+        }
+        
+        if (strlen($errors)<1) {
+          if (!preg_match('/[A-Z]/',$newpass) || !preg_match('/[a-z]/',$newpass) || !preg_match('/[0-9]/',$newpass) || !preg_match('/[^\w]/',$newpass)) {
+            $errors = 'password should include at least one upper case letter, one lower caser letter, one number and one special character';
+          }
+        }
+          
+        if (strlen($errors)>0) {
+          exit(json_out([
+                  "status" => false,
+                  "error" => $errors
+                ], 400));
+        }
+          
+        $pwhash = password_hash($newpass, PASSWORD_BCRYPT, array('cost' => 13));
+                    
+        $status = doQuery("update users set pwhash = :pwhash where id = :user_id",[   
+          ":pwhash" => $pwhash,
+          ":user_id" => $user_id
+        ]);
+        
+        if (!$status) {
+          exit(json_out([
+            "status" => $status
+            ], 400));
+        }
+                    
+      }
+      
+      $nick = $_POST[ 'nick' ] ?? "";
+      $crew = $_POST[ 'crew' ] ?? "";
+      $byear = $_POST[ 'byear' ] ?? "";
+      $bmonth = $_POST[ 'bmonth' ] ?? "";
+      $bday = $_POST[ 'bday' ] ?? "";
+      $country = $_POST[ 'country' ] ?? "";
+      $mail = $_POST[ 'mail' ] ?? "";
+      $uploadsig = $_POST[ 'upload_signature' ] ?? "";
+      $viewmode = $_POST[ 'viewmode' ] ?? "";
+      $def_bg_col = $_POST[ 'def_bg_col' ] ?? "";
+      $def_fg_col = $_POST[ 'def_fg_col' ] ?? "";
+      $display_mail = $_POST[ 'display_mail' ] ?? "";
+      $def_font = $_POST[ 'def_font' ] ?? "";
+      $crt_effect= $_POST[ 'crt_effect' ] ?? "";   
+      
+      
+      $status = doQuery("update users set nick=:nick, crew=:crew, byear=:byear, bmonth=:bmonth, bday=:bday, country=:country,
+        mail=:mail, upload_signature=:uploadsig, list_view_mode=:viewmode, def_fg_col=:def_fg_col, def_bg_col=:def_bg_col, display_mail=:display_mail,
+        def_font=:def_font, crt_effect=:crt_effect where id = :user_id",[
+        ":user_id" => $user_id,
+        ":nick" => $nick,
+        ":crew" => $crew,
+        ":byear" => $byear,
+        ":bmonth" => $bmonth,
+        ":bday" => $bday,
+        ":country" => $country,
+        ":mail" => $mail,
+        ":uploadsig" => $uploadsig,
+        ":viewmode" => $viewmode,
+        ":def_bg_col" => $def_bg_col,
+        ":def_fg_col" => $def_fg_col,
+        ":display_mail" => $display_mail,
+        ":def_font" => $def_font,
+        ":crt_effect" => $crt_effect
+      ]);
+      $code = ($status) ? 200 : 400;
+
+      $_user['nick'] = $nick;
+
+      exit(json_out([
+        "status" => $status
+      ], $code));
+    }
+   
+  }
+
 	$cmd = $_GET[ "cmd" ] ?? $_current[ 0 ] ?? "";
 	$reDir = "/";
 
@@ -1132,6 +1257,10 @@
       newMessage();
     case "reply_thread":
       replyMessage();
+    case "get_settings":
+      getSettings();
+    case "save_settings":
+      saveSettings();
 		default:
 			if (is_ajax()) {
 				exit(json_out(["status" => false], 400));

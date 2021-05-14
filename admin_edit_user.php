@@ -5,7 +5,7 @@
 ?>
 <script>
 	function userclear() {
-		$("#user_id, #user_nick, #user_crew, #user_rank, #user_byear, #user_bmonth, #user_bday, #user_country, #user_mail").val('');
+		$("#user_id, #user_nick, #user_crew, #user_rank, #user_byear, #user_bmonth, #user_bday, #user_country, #user_mail").val('').trigger('change');
 	}
 	
 	function getUser() {
@@ -16,11 +16,11 @@
 				$('#user_id').val(data[0].id);
 				$('#user_nick').val(data[0].nick);
 				$('#user_crew').val(data[0].crew);
-				$('#user_rank').val(data[0].rank);
-				$('#user_byear').val(data[0].byear);
-				$('#user_bmonth').val(data[0].bmonth);
-				$('#user_bday').val(data[0].bday);
-				$('#user_country').val(data[0].country);
+				$('#user_rank').val(data[0].rank).trigger('change');
+				$('#user_byear').val(data[0].byear).trigger('change');
+				$('#user_bmonth').val(data[0].bmonth).trigger('change');
+				$('#user_bday').val(data[0].bday).trigger('change');
+				$('#user_country').val(data[0].country).trigger('change');
 				$('#user_mail').val(data[0].mail);
 			});
 		} else {

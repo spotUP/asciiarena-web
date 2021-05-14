@@ -6,7 +6,7 @@
 
 <script>
 	function collyclear() {
-		$("#colly_id, #colly_name, #colly_filename, #colly_year, #colly_month, #colly_day, #colly_type, #colly_diz").val('');
+		$("#colly_id, #colly_name, #colly_filename, #colly_year, #colly_month, #colly_day, #colly_type, #colly_diz").val('').trigger('change');
 		let crewslist = $("#colly_crew_fetch_id");
 		crewslist.empty();
 		let artistslist = $("#colly_artist_fetch_id");
@@ -31,10 +31,10 @@
 				$('#colly_id').val(data[0].id);
 				$('#colly_name').val(data[0].name);
 				$('#colly_filename').val(data[0].filename);
-				$('#colly_year').val(data[0].year);
-				$('#colly_month').val(data[0].month);
-				$('#colly_day').val(data[0].day);
-				$('#colly_type').val(data[0].type);
+				$('#colly_year').val(data[0].year).trigger('change');
+				$('#colly_month').val(data[0].month).trigger('change');
+				$('#colly_day').val(data[0].day).trigger('change');
+				$('#colly_type').val(data[0].type).trigger('change');
 				$('#colly_diz').val(data[0].diz);
 				let crewslist = $("#colly_crew_fetch_id");
 				crewslist.empty();

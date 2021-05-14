@@ -7,9 +7,9 @@
 <script>
 	function crewclear() {
   <?php if ($admin_edit && is_admin()) { ?>
-	$("#crew_id, #crew_name, #crew_acronym, #crew_contact, #crew_url, #crew_rating, #crew_www, #crew_active").val('');
+	$("#crew_id, #crew_name, #crew_acronym, #crew_contact, #crew_url, #crew_rating, #crew_www, #crew_active").val('').trigger('change');
   <?php } else { ?>
-	$("#crew_id, #crew_name, #crew_acronym, #crew_contact, #crew_url, #crew_www, #crew_active").val('');
+	$("#crew_id, #crew_name, #crew_acronym, #crew_contact, #crew_url, #crew_www, #crew_active").val('').trigger('change');
   <?php } ?>
 
 		let bbslist = $("#crew_bbs_fetch_id");
@@ -34,7 +34,7 @@
 				$('#crew_url').val(data[0].url);
 				$('#crew_rating').val(data[0].rating);
 				$('#crew_www').val(data[0].www);
-				$('#crew_active').val(data[0].active);
+				$('#crew_active').val(data[0].active).trigger('change');
 				let bbslist = $("#crew_bbs_fetch_id");
 				bbslist.empty();
 				$.each(data[0].bbses, function (i, bbs) {
