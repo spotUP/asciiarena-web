@@ -218,7 +218,7 @@ include "header.php";
 				</div>
 				<div class="row amb-1">
 					<div class="col-12 apt-1">	
-						<input type="button" class="btn-big" onclick="saveSettings()" value="Save" name="Save">
+						<input type="button" id="btnSave" class="btn-big" onclick="saveSettings()" value="Save" name="Save">
 					</div>
 				</div>
 			</form>	
@@ -319,6 +319,10 @@ include "header.php";
         $("#display_mail").val(settings.display_mail).trigger('change');
         $("#def_font").val(settings.def_font).trigger('change');
         $("#crt_effect").prop('checked', settings.crt_effect=="Y");
+        $("#btnSave").removeAttr("disabled");
+      }).fail(function() {
+        showAlert('An error occured loading your settings!');
+        $("#btnSave").attr("disabled", true);
       });
     }
   
@@ -334,6 +338,7 @@ include "header.php";
 
     $(function() {
       window.prettyPrint && prettyPrint();
+      $("#btnSave").attr("disabled", true);
       getSettings();
     });
   </script>
