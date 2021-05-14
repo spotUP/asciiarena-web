@@ -9,8 +9,25 @@ include_once "header.php";
     <?php
 		if (is_logged_in()) {
     ?>
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" id="inboxTab" data-toggle="tab" onclick="getMessages(1)" href="#msgList" role="tab" aria-controls="msgList" aria-selected="true">Inbox</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" id="outboxTab" onclick="getMessages(2)" href="#msgList" role="tab" aria-controls="msgList" aria-selected="false">Outbox</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" id="newMsgTab" onclick="newMessage()" href="#newMessage "role="tab" aria-controls="newMessage" aria-selected="false">New message</a>
+      </li>
+
+      
+    </ul>
+    <div class="row apb-1 apl-1">
+      <input type="hidden" id="inboxId" value="1">
+    </div>
     <div id="alerts"></div>
-    <div id="newMessage" style="display:none"  class="container-fluid bg-secondary amb-1 apb-1">
+    <div role="tabpanel" aria-labelledby="newMsgTab" id="newMessage" style="display:none"  class="container-fluid bg-secondary amb-1 apb-1">
       <div class="row apt-1 apb-1 apl-1 apr-1">
         Receiver: 
         <select class="select2" style="margin-left: 8px;" id="posttomember">
@@ -49,7 +66,6 @@ include_once "header.php";
     <div id="msgDetails" style="display:none" class="container-fluid bg-secondary ap-1">
       <div class="row">
         <input type="hidden" id="replyid" value="">
-        <input type="hidden" id="currentthreadid" value="">
         <div class="col-6">
           <span class="cyan">Date:</span>
           <span id="threadDate" class="white">thread date</span>
@@ -96,21 +112,7 @@ include_once "header.php";
       </div>
 
 		</div>
-    
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
-      <li class="nav-item">
-        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" onclick="getMessages(1)" role="tab" aria-controls="home" aria-selected="true">Inbox</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" onclick="getMessages(2)" role="tab" aria-controls="profile" aria-selected="false">Outbox</a>
-      </li>
-    </ul>
-    <div class="row apb-1 apl-1">
-      <input type="hidden" id="inboxId" value="1">
-      <input type="button" colspan="4" onclick="newMessage()" value="New Message!">
-    </div>
-
-    <div id="msgList" class="row">
+    <div role="tabpanel" aria-labelledby="inboxTab, outboxTab" id="msgList" class="row">
     </div>
 			<?php
 		} 
@@ -166,12 +168,11 @@ include_once "header.php";
           msgtext: msgtext
         },
         "success": () => {
-          $("#newMessage").hide();
           $("#posttomember").val("");
           $("#postnewmessage").val("");
           $("#postnewsubject").val("");
           showAlert("Message sent succesfully!", true);
-          getMessages($("#inboxId").val());
+          getMessages(1);
         },
         "error": () => {
           showAlert("An error occured sending the message!", false);
@@ -182,12 +183,12 @@ include_once "header.php";
 
   function newMessage() {
     $("#newMessage").show();
+    $("#msgList").hide();
+    $("#msgDetails").hide();
     $("#posttomember").val("");
     $("#postnewmessage").val("");
     $("#postnewsubject").val("");
     $('#postnewmessage').focus();  
-    $("#msgDetails").hide();
-    $("#currentthreadid").val("");
   }
   
   function sendReply(msgid,threadid) {
@@ -222,8 +223,7 @@ include_once "header.php";
 
     $("#msgDetails").show();
     $("#newMessage").hide();
-    $("#currentthreadid").val(threadid);
-    
+    $("#msgList").hide();
     let threadBody = $("#msgThreadBody");
     let count=0;
 		threadBody.empty();   
@@ -273,6 +273,9 @@ include_once "header.php";
   }
   
   function getMessages(mailbox) {
+    $("#msgList").show();
+    $("#newMessage").hide();
+    $("#msgDetails").hide();
     $("#inboxId").val(mailbox);
     let msglist = $("#msgList");
 		msglist.empty();
@@ -313,11 +316,6 @@ include_once "header.php";
 					"type": "POST",
 					"url": "/cmds.php/delete_message/"+threadid,
 					"success": () => {
-            if ($("#currentthreadid").val()==threadid) {
-              $("#msgDetails").hide();
-              $("#currentthreadid").val("");
-            }
-
             getMessages($("#inboxId").val());
 					},
           "error": () => {
