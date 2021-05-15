@@ -28,10 +28,10 @@ include "header_ascii.php";
   <script type="module">
     import init386 from "/assets/js/386-animation/index.js";
     init386({
-      fastLoad: true,
+      fastLoad: false,
       speedFactor: 1,
       background: '#000000',
-      cursorColor: '#FAFAFA', // The colour of the terminal cursor/bar.
+      cursorColor: 'transparent', // The colour of the terminal cursor/bar.
     });
 
   </script>
