@@ -20,17 +20,28 @@ include "header_ascii.php";
 	<link rel="stylesheet" href="/assets/css/bootstrap.min.css" media="screen">
 	<link rel="stylesheet" href="/assets/css/bootstrap-colorselector.css" media="screen">
 	<link rel="stylesheet" href="/assets/css/site.css" media="screen">
+  <link rel="stylesheet" href="/assets/css/386.css" media="screen">
         <link rel="preload" href="/assets/fonts/TopazPlus_a1200.woff2" as="font" type="font/woff2" crossorigin>
 	<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 	<script src="/assets/js/bootstrap.bundle.min.js"></script>
 	<script src="/assets/js/bootstrap-colorselector.js"></script>
+  <script type="module">
+    import init386 from "/assets/js/386-animation/index.js";
+    init386({
+      fastLoad: true,
+      speedFactor: 1,
+      background: '#000000',
+      cursorColor: '#FAFAFA', // The colour of the terminal cursor/bar.
+    });
+
+  </script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
-	<script>
-		window.switchers = [];
-
+	<script>   
+    window.switchers = [];
+    
 		function switcharoo(selector, delay = 3000, idx, start) {
 			if (typeof idx === "undefined") {
 				idx = window.switchers.length;
