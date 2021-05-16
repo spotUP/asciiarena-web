@@ -368,7 +368,7 @@
         foreach($comments as $comment) {
           $data[] = [
             "id" => (int)$comment->commentid,
-            "time" => date("Y-m-d H:i:s",$comment->timestamp),
+            "time" => date("Y-m-d H:i",$comment->timestamp),
             "nick" => $comment->nick,
             "rating" => $comment->rating,
             "comment" => $comment->comment
@@ -1074,6 +1074,7 @@
           "display_mail" => $row->display_mail,
           "def_font" => $row->def_font,
           "crt_effect" => $row->crt_effect,
+          "anim_effect" => $row->anim_effect,
           ];
         exit(json_out($data));
       } else {
@@ -1144,11 +1145,12 @@
       $display_mail = $_POST[ 'display_mail' ] ?? "";
       $def_font = $_POST[ 'def_font' ] ?? "";
       $crt_effect= $_POST[ 'crt_effect' ] ?? "";   
+      $anim_effect= $_POST[ 'anim_effect' ] ?? "";   
       
       
       $status = doQuery("update users set nick=:nick, crew=:crew, byear=:byear, bmonth=:bmonth, bday=:bday, country=:country,
         mail=:mail, upload_signature=:uploadsig, list_view_mode=:viewmode, def_fg_col=:def_fg_col, def_bg_col=:def_bg_col, display_mail=:display_mail,
-        def_font=:def_font, crt_effect=:crt_effect where id = :user_id",[
+        def_font=:def_font, crt_effect=:crt_effect, anim_effect=:anim_effect where id = :user_id",[
         ":user_id" => $user_id,
         ":nick" => $nick,
         ":crew" => $crew,
@@ -1163,7 +1165,8 @@
         ":def_fg_col" => $def_fg_col,
         ":display_mail" => $display_mail,
         ":def_font" => $def_font,
-        ":crt_effect" => $crt_effect
+        ":crt_effect" => $crt_effect,
+        ":anim_effect" => $anim_effect
       ]);
       $code = ($status) ? 200 : 400;
 

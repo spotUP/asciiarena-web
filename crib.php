@@ -208,6 +208,19 @@ include "header.php";
 						</div>
 					</div>
 				</div>
+				<div class="row amb-1">
+					<div class="col-3">
+						Modem animation effect:
+					</div>
+					<div class="col-3">
+						<div class="form-group">
+							<div class="custom-control custom-switch">
+								<input type="checkbox" class="custom-control-input" id="anim_effect" name="anim_effect" value="1">
+								<label class="custom-control-label" for="anim_effect"></label>
+							</div>
+						</div>
+					</div>
+				</div>
 				<div class="row amb-1 apt-1">
 					<div class="col-12">		
 						<span class="white">Upload Signature:</span>
@@ -281,6 +294,7 @@ include "header.php";
           "display_mail": $("#display_mail").is(':checked') ? "Yes": "No",
           "def_font": $("#def_font").val(),
           "crt_effect": $("#crt_effect").is(':checked') ? "Y": "N",
+          "anim_effect": $("#anim_effect").is(':checked') ? "Y": "N",
           "oldpass": oldpass,
           "newpass": newpass1
         },
@@ -321,6 +335,7 @@ include "header.php";
         $("#display_mail").prop('checked', settings.display_mail=="Yes");
         $("#def_font").val(settings.def_font).trigger('change');
         $("#crt_effect").prop('checked', settings.crt_effect=="Y");
+        $("#anim_effect").prop('checked', settings.anim_effect=="Y");
         $("#btnSave").removeAttr("disabled");
       }).fail(function() {
         showAlert('An error occured loading your settings!');
