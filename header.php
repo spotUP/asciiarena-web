@@ -28,7 +28,11 @@ include "header_ascii.php";
   <script type="module">
     import init386 from "/assets/js/386-animation/index.js";
     init386({
-      fastLoad: true,
+      fastLoad: 
+      <?php 
+      $anim = fetchOne("SELECT anim_effect FROM users WHERE id = :id union select false as anim_effect", [":id" => $_user['id']]);
+        if ($anim->anim_effect=='Y') { echo "false,"; } else { echo "true,"; }
+      ?>
       onePass: true,
       speedFactor: 1,
       background: '#000000',
