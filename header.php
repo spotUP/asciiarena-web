@@ -36,7 +36,7 @@ include "header_ascii.php";
       onePass: true,
       speedFactor: 1,
       background: '#000000',
-      cursorColor: 'ff0000', // The colour of the terminal cursor/bar.
+      cursorColor: '#ff0000', // The colour of the terminal cursor/bar.
     });
 
   </script>
