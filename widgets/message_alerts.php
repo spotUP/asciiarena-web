@@ -1,5 +1,5 @@
 <?php defined('VALID') or die('Nuh-uh!');
-$messages = fetchOne("SELECT COUNT(*) messages FROM messages WHERE postedto = :nick AND new = 1", [":nick" => $_user[ "nick" ]])->messages;
+$messages = fetchOne("SELECT distinct COUNT(thread) messages FROM messages WHERE postedto = :nick AND new = 1", [":nick" => $_user[ "nick" ]])->messages;
 if (!$messages) {
 	return;
 }
