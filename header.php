@@ -184,7 +184,7 @@ include "header_ascii.php";
 								<div class="logo nolink overflow-hidden"><?=implode('</div><div class="logo nolink" style="display: none;">', $logos)?></div>
 							</div>
 						</div>
-						<pre class="overflow-hidden d-lg-none"><a class="magenta nolink" href="www.asciiarena.se"><?=$mobilelogo?></a></pre>
+						<pre class="overflow-hidden d-lg-none"><a class="magenta nolink" href="https://www.asciiarena.se"><?=$mobilelogo?></a></pre>
 						<pre class="overflow-hidden d-none d-lg-block" style="position: relative; left: -32px;"><span class="magenta"><?=$stars2?></span></pre>
 					</div>
 				</div>
