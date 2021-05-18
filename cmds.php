@@ -32,7 +32,7 @@
 	   	}
       
 	   	foreach ($fileids as $fileid) {
-	   		shell_exec('/usr/bin/lha pq "'.$filename.'" "'.$fileid.'" | sed 1,3d >$tempDiz');
+	   		shell_exec('/usr/bin/lha pq "'.$filename.'" "'.$fileid.'" | sed 1,3d >'.$tempDiz);
         if (file_exists($tempDiz))
         {
           $size_check = filesize($tempDiz);
