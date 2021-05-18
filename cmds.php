@@ -18,103 +18,36 @@
           $contents = fread($handle, filesize($tempDiz));
           fclose($handle);
         }
-        unlink ($tempDiz);
+        unlink($tempDiz);
       }
 
     }
       
     if (($ext == ".lha") || ($ext == ".LHA") || ($ext == ".lzh") || ($ext == ".LZH")) {
 
-      $contents_check=strlen($contents);
-      if ($contents_check <1)
-      {
-        exec("/usr/bin/lha pq ./$filename file_id.diz >$tempDiz");
-        $size_check = filesize($tempDiz);
-        if ($size_check>0)
+      $lhal = shell_exec('/usr/bin/lha l "'.$filename.'"');
+	   	$fileids = array();
+	   	foreach (explode("\n", $lhal) as $l) {
+	   		if (preg_match('/%\s+[A-Za-z]+\s+\d+\s+\d{4}\s+(.*file_id\.diz)$/i', $l, $m)) $fileids[] = $m[1];
+	   	}
+      
+	   	foreach ($fileids as $fileid) {
+	   		shell_exec('/usr/bin/lha pq "'.$filename.'" "'.$fileid.'" | sed 1,3d >$tempDiz');
+        if (file_exists($tempDiz))
         {
-          $handle = fopen($tempDiz, "r");
-          $contents = fread($handle, filesize($tempDiz));
-          fclose($handle);
+          $size_check = filesize($tempDiz);
+          if ($size_check>0)
+          {
+            $handle = fopen($tempDiz, "r");
+            $contents = fread($handle, filesize($tempDiz));
+            fclose($handle);
+          }
+          unlink($tempDiz);
+          if ($size_check>0) break;
         }
-      }
 
-      $contents_check=strlen($contents);
-      if ($contents_check <1)
-      {
-        exec("/usr/bin/lha pq ./$filename FILE_ID.DIZ >$tempDiz");
-        $size_check = filesize($tempDiz);
-        if ($size_check > 0)
-        {
-          $handle = fopen($tempDiz, "r");
-          $contents = fread($handle, filesize($tempDiz));
-          fclose($handle);
-        }
-      }				
-      
-      $contents_check=strlen($contents);
-      if ($contents_check <1)
-      {
-        exec("/usr/bin/lha pq ./$filename File_Id.Diz >$tempDiz");
-        $size_check = filesize($tempDiz);
-        if ($size_check > 0)
-        {
-          $handle = fopen($tempDiz, "r");
-          $contents = fread($handle, filesize($tempDiz));
-          fclose($handle);
-        }
-      }
-      
-      $contents_check=strlen($contents);
-      if ($contents_check <1)
-      {
-        exec("/usr/bin/lha pq ./$filename File_Id.Diz >$tempDiz");
-        $size_check = filesize($tempDiz);
-        if ($size_check > 0)
-        {
-          $handle = fopen($tempDiz, "r");
-          $contents = fread($handle, filesize($tempDiz));
-          fclose($handle);
-        }
-      }				
-      
-      $contents_check=strlen($contents);
-      if ($contents_check <1)
-      {
-        exec("/usr/bin/lha pq ./$filename *.DiZ >$tempDiz");
-        $size_check = filesize($tempDiz);
-        if ($size_check > 0)
-        {
-          $handle = fopen($tempDiz, "r");
-          $contents = fread($handle, filesize($tempDiz));
-          fclose($handle);
-        }
-      }				
-      $contents_check=strlen($contents);
-      if ($contents_check <1)
-      {
-        exec("/usr/bin/lha pq ./$filename *.dIZ >$tempDiz");
-        $size_check = filesize($tempDiz);
-        if ($size_check > 0)
-        {
-          $handle = fopen($tempDiz, "r");
-          $contents = fread($handle, filesize($tempDiz));
-          fclose($handle);
-        }
-      }
-      $contents_check=strlen($contents);
-      if ($contents_check <1)
-      {
-        exec("/usr/bin/lha pq $filename *.diZ >$tempDiz");
-        $size_check = filesize($tempDiz);
-        if ($size_check > 0)
-        {
-          $handle = fopen($tempDiz, "r");
-          $contents = fread($handle, filesize($tempDiz));
-          fclose($handle);
-        }
-      }
-      unlink ($tempDiz);
-    }			
+      }			
+    }
     
     if (($ext == ".txt") || ($ext == ".TXT")) 
     { 
@@ -209,7 +142,7 @@
           fclose($handle);
         }
       }
-      unlink ($tempDiz);
+      if (file_exists($tempDiz)) unlink($tempDiz);
     }
       
     return $contents;
