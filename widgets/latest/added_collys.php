@@ -1,7 +1,7 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
 <div class="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
 	<div class="header col-lg-12 p-0">
-		<h2 class="ap-1 bg-header text-truncate lightgreen"><a class="lightgreen" href="/collys.php?sort_by=timestamp">LATEST ADDED COLLYS</a> <a class="lightgreen"
+		<h2 class="ap-1 bg-header text-truncate lightgreen"><a class="lightgreen" href="/collys.php?sort_by=uploaddate">LATEST ADDED COLLYS</a> <a class="lightgreen"
 			href="/rss.php?id=1">[RSS]</a>
 		</h2>
 	</div>
