@@ -738,16 +738,20 @@
       } else {
         file_put_contents($dizName, $fileDiz);
       }
+      
+      $file_id_name = $filename.'.diz';
 
       $data = [
         ":name" =>$name,
         ":author" =>$author,
         ":filename" => $filename ?? "",
         ":filesize" => $filesize,
-        ":uploaderid" => $_user[ "id" ]
+        ":uploader" => $_user[ "nick" ],
+        ":uploaderid" => $_user[ "id" ],
+        ":file_id" => $file_id_name,
       ];
     
-      $q = "INSERT INTO apps (name, filename, filedate, timestamp, author, filesize, uploader_id) VALUES (:name, :filename, null, UNIX_TIMESTAMP(), :author, :filesize, :uploaderid)";
+      $q = "INSERT INTO apps (name, filename, filedate, timestamp, author, filesize, uploader_id, uploader, view_counter, downloads,file_id) VALUES (:name, :filename, null, UNIX_TIMESTAMP(), :author, :filesize, :uploaderid, :uploader,0,0,:file_id)";
       $response = 201;
 
       if(!doQuery($q, $data)) {
