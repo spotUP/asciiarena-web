@@ -35,7 +35,7 @@ include "header_ascii.php";
         if ($anim->anim_effect=='Y') { echo "false,"; } else { echo "true,"; }
       ?>
       onePass: true,
-      speedFactor: 1,
+      speedFactor: 3,
       background: '#000000',
       cursorColor: '#ff0000', // The colour of the terminal cursor/bar.
     });
