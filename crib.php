@@ -7,7 +7,7 @@ include "header.php";
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
 		<?php if (is_logged_in()) { ?>
     <div id="alerts"></div>
-			<form enctype="multipart/form-data" action="/crib.php" method="post">
+			<form autocomplete="off" enctype="multipart/form-data" action="/crib.php" method="post">
 				<div class="row amb-1">
 					<div class="col-12">
 						<span class="white">User Settings</span>
