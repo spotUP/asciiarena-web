@@ -105,7 +105,10 @@ include "header.php";
 						New password
 					</div>
 					<div class="col-3">						
-						<input type="password"  class="w-100" autocomplete="none" id="password">
+						<input type="password"  readonly class="w-100" autocomplete="none" id="password" onfocus="if (this.hasAttribute('readonly')) {
+    this.removeAttribute('readonly');
+    // fix for mobile safari to show virtual keyboard
+    this.blur();    this.focus();  }" />
 					</div>
 				</div>
 				<div class="row amb-1">
@@ -113,7 +116,10 @@ include "header.php";
 						New password again
 					</div>
 					<div class="col-3">						
-						<input type="password" class="w-100" autocomplete="none" id="repeat_password">
+						<input type="password" readonly class="w-100" autocomplete="none" id="repeat_password" onfocus="if (this.hasAttribute('readonly')) {
+    this.removeAttribute('readonly');
+    // fix for mobile safari to show virtual keyboard
+    this.blur();    this.focus();  }" />
 					</div>
 				</div>
 				<div class="row amb-1">
