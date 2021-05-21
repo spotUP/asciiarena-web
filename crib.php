@@ -94,7 +94,7 @@ include "header.php";
 						Old password
 					</div>
 					<div class="col-3">	
-						<input type="password" class="w-100" id="old_password">
+						<input type="password" class="w-100" autocomplete="off" id="old_password">
 					</div>
 				</div>
 				<div class="row amb-1">
@@ -102,7 +102,7 @@ include "header.php";
 						New password
 					</div>
 					<div class="col-3">						
-						<input type="password"  class="w-100" id="password">
+						<input type="password"  class="w-100" autocomplete="off" id="password">
 					</div>
 				</div>
 				<div class="row amb-1">
@@ -110,7 +110,7 @@ include "header.php";
 						New password again
 					</div>
 					<div class="col-3">						
-						<input type="password" class="w-100" id="repeat_password">
+						<input type="password" class="w-100" autocomplete="off" id="repeat_password">
 					</div>
 				</div>
 				<div class="row amb-1">
