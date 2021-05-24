@@ -261,7 +261,7 @@ include_once "header.php";
         </div>
         <div class="row">
           <div class="col-1">
-            <span class="cyan" style="white-space: pre-wrap;">/ ${msg.postername}</span>
+            <span class="cyan" style="white-space: pre-wrap;">${msg.postername}</span>
           </div>
         </div>
         <div class="row apb-1">
