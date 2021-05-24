@@ -79,7 +79,7 @@ include "header.php";
 				}
         ?>
 				
-        <div class="row apt-1"><a class="button btn-big" href="/messages.php?sendmsg=<?=$member->id?>" ><input type="button" id="btnMsg" class="btn-big" value="Send Message" ></a></div>
+        <div class="row apt-1"><a class="button apl-1" href="/messages.php?sendmsg=<?=$member->id?>" ><input type="button" id="btnMsg" class="btn-big" value="Send Message" ></a></div>
         <?php
 				
 				$colly_amount = fetchOne("SELECT COUNT(*) total from collys where uploader_id = :uid", [":uid" => $member->id])->total;
