@@ -370,7 +370,7 @@ require_once "header.php";?>
     $.ajax(url);
     var link = document.createElement("a");
     link.setAttribute('download', '');
-    link.href = '/collections/<?=$dirname?>/<?=$filename?>';
+    link.href = '/collections/<?=addslashes($dirname)?>/<?=addslashes($filename)?>';
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -392,7 +392,7 @@ require_once "header.php";?>
       url
       ).done(data => {
         if (data.status === true) {
-          showAlert('You added <?=$filename?> as a favourite!','#messages')
+          showAlert('You added <?=addslashes($filename)?> as a favourite!','#messages')
         }
       });   
   }
@@ -403,7 +403,7 @@ require_once "header.php";?>
       url
       ).done(data => {
         if (data.status === true) {
-          showAlert('You removed <?=$filename?> from your favourites!','#messages')
+          showAlert('You removed <?=addslashes($filename)?> from your favourites!','#messages')
         }
       });   
   }
@@ -419,7 +419,7 @@ require_once "header.php";?>
     }).done(data => {
         if (data.status === true) {
           $("#broken_comment").val("")
-          showAlert('You reported <?=$filename?> as broken!','#messages')
+          showAlert('You reported <?=addslashes($filename)?> as broken!','#messages')
         }
       });   
   }
