@@ -1108,6 +1108,9 @@
       $code = ($status) ? 200 : 400;
 
       $_user['nick'] = $nick;
+      $_user['settings']['crt_effect'] = $crt_effect;
+      $_SESSION[ "_user" ]['nick'] = $nick;
+      $_SESSION[ "_user" ]['settings']['crt_effect'] = $crt_effect;
 
       exit(json_out([
         "status" => $status

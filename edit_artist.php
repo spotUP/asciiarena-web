@@ -8,7 +8,7 @@
 		$("#artist_id, #artist_nick, #artist_acronym, #artist_www, #artist_country, #artist_status").val('').trigger('change');
 		let crewslist = $("#artist_crew_fetch_id");
 		crewslist.empty();
-		$("#artist_crew_add_fetch_id").val("0")
+		$("#artist_crew_add_fetch_id").val("0").trigger('change');
 	}
 	
 	function addArtistCrewItem(crewslist,id,name) {
@@ -75,7 +75,7 @@
       showArtistAlert("You must fill the artist nick field!",false);
       return;
     }
-
+    addArtistCrew(true);
 		const form = $("#artist_form");
 		const url = form.attr("action");
 		$.ajax({
@@ -108,7 +108,7 @@
 		}
 	}
 	
-	function addArtistCrew() {
+	function addArtistCrew(quiet=false) {
 		let crewid = $("#artist_crew_add_fetch_id").val()
 		let crewname = $("#artist_crew_add_fetch_id option:selected").text()
 		
@@ -117,8 +117,8 @@
 				let crewlist = $("#artist_crew_fetch_id");
 				addArtistCrewItem(crewlist,crewid,crewname)
 			}
-			$("#artist_crew_add_fetch_id").val('0');
-			showArtistAlert("Crew Added!",true);
+			$("#artist_crew_add_fetch_id").val('0').trigger('change');
+			if (!quiet) showArtistAlert("Crew Added!",true);
 		}
 	}  
 	

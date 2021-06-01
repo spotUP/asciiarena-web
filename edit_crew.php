@@ -14,7 +14,7 @@
 
 		let bbslist = $("#crew_bbs_fetch_id");
 		bbslist.empty();
-		$("#crew_bbs_add_fetch_id").val("0")
+		$("#crew_bbs_add_fetch_id").val("0").trigger('change');
 	}
 	
 	function addCrewBBSItem(bbslist,id,name) {
@@ -85,6 +85,8 @@
       return;
     }
 
+    addCrewBBS(true);
+    
 		const form = $("#crew_form");
 		const url = form.attr("action");
 		$.ajax({
@@ -117,7 +119,7 @@
 		}
 	}
 	
-	function addCrewBBS() {
+	function addCrewBBS(quiet=false) {
     let bbsid = $("#crew_bbs_add_fetch_id").val()
     let bbsname = $("#crew_bbs_add_fetch_id option:selected").text()
     
@@ -126,8 +128,8 @@
         let bbslist = $("#crew_bbs_fetch_id");
         addCrewBBSItem(bbslist,bbsid,bbsname)
       }
-      $("#crew_bbs_add_fetch_id").val("0")
-      showCrewAlert("BBS Added!", true);
+      $("#crew_bbs_add_fetch_id").val("0").trigger('change');
+      if (!quiet) showCrewAlert("BBS Added!", true);
     }
 	}
 
