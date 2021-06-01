@@ -11,8 +11,8 @@
 		crewslist.empty();
 		let artistslist = $("#colly_artist_fetch_id");
 		artistslist.empty();
-		$("#colly_crew_add_fetch_id").val("0")
-		$("#colly_artist_add_fetch_id").val("0")
+		$("#colly_crew_add_fetch_id").val("0").trigger('change');
+		$("#colly_artist_add_fetch_id").val("0").trigger('change');
 	}
 
 	function addCollyCrewItem(crewslist,id,name) {
@@ -100,6 +100,9 @@
       return
     }
     
+    addCollyArtist(true);
+    addCollyCrew(true);
+    
 		const form = $("#colly_form");
 		const url = form.attr("action");
     const data = new FormData(form[0]);
@@ -158,7 +161,7 @@
 		}
 	}
 
-	function addCollyArtist() {
+	function addCollyArtist(quiet=false) {
 		let artistid = $("#colly_artist_add_fetch_id").val()
 		let artistnick = $("#colly_artist_add_fetch_id option:selected").text()
 
@@ -166,8 +169,8 @@
 			if (!($("#colly_artist_entry"+artistid).length)) {
 				let artistlist = $("#colly_artist_fetch_id");
 				addCollyArtistItem(artistlist,artistid,artistnick)
-				$("#colly_artist_add_fetch_id").val('0');
-				showCollyAlert("Author Added!", true);   
+				$("#colly_artist_add_fetch_id").val('0').trigger('change');
+				if (!quiet) showCollyAlert("Author Added!", true);   
 			}
 		}
 	}
@@ -181,7 +184,7 @@
 		}
 	}
 
-	function addCollyCrew() {
+	function addCollyCrew(quiet=false) {
 		let crewid = $("#colly_crew_add_fetch_id").val()
 		let crewname = $("#colly_crew_add_fetch_id option:selected").text()
 
@@ -189,8 +192,8 @@
 			if (!($("#colly_crew_entry"+crewid).length)) {
 				let crewlist = $("#colly_crew_fetch_id");
 				addCollyCrewItem(crewlist,crewid,crewname)
-				$("#colly_crew_add_fetch_id").val('0');
-				showCollyAlert("Crew Added!", true);
+				$("#colly_crew_add_fetch_id").val('0').trigger('change');
+				if (!quiet) showCollyAlert("Crew Added!", true);
 			}
 		}
 	}
