@@ -1119,6 +1119,57 @@
    
   }
 
+  function loadFont() {
+    global $_user;
+    if (is_ajax() && is_logged_in()) {
+      $id = $_GET[ "id" ] ?? 0;
+      $data = [];
+      if($id) {
+        $styles = fetchAll("SELECT * FROM styles WHERE id = :id and user=:username", [":id" => $id, ":username" => $_user[ "nick" ]]);
+      } else {
+        $styles = fetchAll("SELECT * FROM styles where user=:username ORDER BY name", [":username" => $_user[ "nick" ]]);
+      }
+      foreach($styles as $style) {
+        $data[] = [
+          "fontid" => (int)$style->id,
+          "fontname" => $style->name,
+          "fontdata" => $style->style
+        ];
+      }
+      if(!empty($data)) {
+        exit(json_out($data));
+      }
+      exit(json_out(["status" => false], 404));
+    }
+  }
+  
+  function saveFont() {
+    global $_user;
+    if (is_ajax() && is_logged_in()) {
+
+      $response = 200;
+      $data = [
+        ":fontname" => $_POST[ "fontname" ] ?? "",
+        ":fontdata" => $_POST[ "fontdata" ] ?? "",
+        ":username" => $_user[ "nick" ]
+      ];
+      if(!empty($_POST[ "fontid" ])) {
+        $q = "UPDATE styles SET name = :fontname, style = :fontdata WHERE id = :id and user=:username";
+        $data[ ":id" ] = $_POST[ "fontid" ];
+      } else {
+        $q = "INSERT INTO styles (name, style, user, user_ids, status) VALUES (:fontname, :fontdata, :username, :userid, :status)";
+        $data[":userid"] = $_user[ "id" ];
+        $data[":status"] = "1";
+        $response = 201;
+      }
+      if(doQuery($q, $data)) {
+        exit(json_out(["status" => true], $response));
+      }
+      exit(json_out(["status" => true], 400));      
+    }
+   
+  }
+
 	$cmd = $_GET[ "cmd" ] ?? $_current[ 0 ] ?? "";
 	$reDir = "/";
 
@@ -1204,6 +1255,10 @@
       getSettings();
     case "save_settings":
       saveSettings();
+    case "get_font":
+      loadFont();
+    case "save_font":
+      saveFont();
 		default:
 			if (is_ajax()) {
 				exit(json_out(["status" => false], 400));
