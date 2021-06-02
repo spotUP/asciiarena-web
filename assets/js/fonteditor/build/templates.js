@@ -84,12 +84,27 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "</div><!-- /.modal -->"
   );
 
-
   $templateCache.put('partials/main.htm',
     "<div>\n" +
     "    <div class=\"row apt-1 apb-1\">\n" +
     "        <div class=\"col-md-6\">\n" +
     "            <div class=\"row\">\n" +
+    "               <div class=\"col-md-12\">\n" +
+    "                   <select  ng-model=\"input.fontid\" id=\"fontSelect\" ng-change=\"loadFont()\" id=\"figFontSelect\">\n" +
+    "					             <option value=\"0\">Select Font</option>\n" +
+		"                 		 <option value=\"1\">ANSI</option>\n" +
+    "                   </select>\n" +
+    "               </div>\n" +
+    "           </div>\n" +
+    "            <div class=\"row apt-1\">\n" +
+    "               <div class=\"col-md-6\">\n" +
+    "                   <label class=\"fig-draw-label\" for=\"figFontName\">Font Name:</label>\n" +
+    "               </div>\n" +
+    "               <div class=\"col-md-6\">\n" +
+    "                   <input id=\"figFontName\" type=\"text\" class=\"txt-single-input\" maxlength=20 ng-model=\"input.fontname\"></input>\n" +
+    "               </div>\n" +
+    "           </div>\n" +
+    "            <div class=\"row apt-1\">\n" +
     "               <div class=\"col-md-6\">\n" +
     "                   <label class=\"fig-draw-label\" for=\"figCharSelect\">Character:</label>\n" +
     "               </div>\n" +
@@ -192,9 +207,7 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "               <div class=\"row align-items-end\">\n" +
     "               <br><br><br><br><br><br>\n" +
     "                   <div class=\"fig-opt-entry\">\n" +
-    "                       <button class=\"btn btn-default\" ng-click=\"export()\">Export</button>\n" +
-    "                       <button class=\"btn btn-default\" ng-click=\"import()\">Import</button>\n" +
-    "                       <button class=\"btn btn-default\" ng-click=\"submitFont()\"> Save </button>\n" +
+    "                       <input type=\"button\" class=\"btn-big btn-default\" ng-click=\"saveFont()\" value=\"Save\">\n" +
     "                   </div>\n" +
     "               </div>\n" +
     "            </div>\n" +

@@ -86,9 +86,25 @@ appControllers.controller('MainCtrl', [
         charOrder.push(252);
         charOrder.push(223);
 
+        getUserFonts();
+
         // setup default comment header
         $scope.input.figChars[-1] = "Font Author: Enter your name here\n\n" +
             "FIGFont created with: http://www.asciiarena.com";
+
+        function getUserFonts() {
+          let fontlist = $("#fontSelect");
+          fontlist.empty();
+          fontlist.append($("<option/>").val("0").text("Select Font"));
+    
+          $.get('/cmds.php?cmd=get_font', function (data) {  
+            
+            $.each(data, function (i, font) {
+              fontlist.append($("<option/>").val(font.fontid).text(font.fontname));
+            });
+            
+          });
+        }
 
         /*
             Utility functions
@@ -101,49 +117,49 @@ appControllers.controller('MainCtrl', [
         * @param data The FIGfont data - a flf file in text form.
         * @return {undefined} Returns nothing.
         */
-        function importFont(data) {
+        function importFont(fontName, fontData = null) {
             var ii,
                 ch;
 
-            figlet.parseFont(fontName, data, function(err, opts) {
+
+            figlet.parseFont(fontName, fontData, function(err, opts, comment) {
                 if (err) {
                     return;
                 }
 
-                figlet.metadata(fontName, function(err, opts, headerComment) {
-                    if (err) return;
-                    $scope.input.figChars[-1] = headerComment;
+                $scope.input.figChars[-1] = comment;
+                
+                $scope.input.fontname = fontName;
 
-                    $scope.input.horizontalLayout = getLayoutFromNumber(opts.fittingRules.hLayout);
-                    $scope.input.verticalLayout = getLayoutFromNumber(opts.fittingRules.vLayout);
-                    $scope.input.hrule[1] = opts.fittingRules.hRule1;
-                    $scope.input.hrule[2] = opts.fittingRules.hRule2;
-                    $scope.input.hrule[3] = opts.fittingRules.hRule3;
-                    $scope.input.hrule[4] = opts.fittingRules.hRule4;
-                    $scope.input.hrule[5] = opts.fittingRules.hRule5;
-                    $scope.input.hrule[6] = opts.fittingRules.hRule6;
-                    $scope.input.vrule[1] = opts.fittingRules.vRule1;
-                    $scope.input.vrule[2] = opts.fittingRules.vRule2;
-                    $scope.input.vrule[3] = opts.fittingRules.vRule3;
-                    $scope.input.vrule[4] = opts.fittingRules.vRule4;
-                    $scope.input.vrule[5] = opts.fittingRules.vRule5;
+                $scope.input.horizontalLayout = getLayoutFromNumber(opts.fittingRules.hLayout);
+                $scope.input.verticalLayout = getLayoutFromNumber(opts.fittingRules.vLayout);
+                $scope.input.hrule[1] = opts.fittingRules.hRule1;
+                $scope.input.hrule[2] = opts.fittingRules.hRule2;
+                $scope.input.hrule[3] = opts.fittingRules.hRule3;
+                $scope.input.hrule[4] = opts.fittingRules.hRule4;
+                $scope.input.hrule[5] = opts.fittingRules.hRule5;
+                $scope.input.hrule[6] = opts.fittingRules.hRule6;
+                $scope.input.vrule[1] = opts.fittingRules.vRule1;
+                $scope.input.vrule[2] = opts.fittingRules.vRule2;
+                $scope.input.vrule[3] = opts.fittingRules.vRule3;
+                $scope.input.vrule[4] = opts.fittingRules.vRule4;
+                $scope.input.vrule[5] = opts.fittingRules.vRule5;
 
-                    $scope.input.printDirection = opts.printDirection;
-                    $scope.input.caseInsensitive = library.get('caseInsensitive');
-                    $scope.input.codeTagCount = opts.codeTagCount;
-                    $scope.input.hardBlank = opts.hardBlank;
-                    $scope.input.baseline = opts.baseline;
-                });
+                $scope.input.printDirection = opts.printDirection;
+                $scope.input.caseInsensitive = library.get('caseInsensitive');
+                $scope.input.codeTagCount = opts.codeTagCount;
+                $scope.input.hardBlank = opts.hardBlank;
+                $scope.input.baseline = opts.baseline;
 
                 for (ii = 0; ii < charOrder.length; ii++) {
-                    setFigChar(charOrder[ii], String.fromCharCode(charOrder[ii]));
+                    setFigChar(fontName,charOrder[ii], String.fromCharCode(charOrder[ii]));
                 }
 
             });
 
         }
 
-        function setFigChar(idx, ch) {
+        function setFigChar(fontName,idx, ch) {
             figlet.text(ch, {
                 font: fontName,
                 showHardBlanks: true
@@ -456,19 +472,34 @@ appControllers.controller('MainCtrl', [
             }
         };
 
-        $scope.export = function() {
-            $rootScope.$broadcast('dialog:export', {
-                data: createFigFileData()
-            });
+        $scope.saveFont = function() {
+          $.ajax({
+            "type": "POST",
+            "url": "/cmds.php?cmd=save_font",
+            "data": {
+              "fontid": $scope.input.fontid,
+              "fontname": $scope.input.fontname,
+              "fontdata": createFigFileData()
+            },
+            "success": () => {
+            }
+          });
+            
         };
+        
+        $scope.loadFont = function() {
+          var fontid = $scope.input.fontid;
+          $scope.input.fontname = '';
 
-        $scope.import = function() {
-            $rootScope.$broadcast('dialog:import');
-        };
-
-        $scope.submitFont = function() {
-            console.log('font submit');
-            $rootScope.$broadcast('dialog:submitFont');
+          $.get(`/cmds.php?cmd=get_font&id=${fontid}`, function (data) {  
+            if (data.length>0) {
+              importFont(data[0].fontname, data[0].fontdata);
+              fixFigChars();
+              $scope.$digest();
+            }
+            
+          });
+            
         };
 
         /*
@@ -537,6 +568,8 @@ appControllers.controller('TestCtrl', [
         var fontName = '__FONT_IN_PROGRESS__';
 
         $scope.input = {};
+        $scope.input.fontid = null;
+        $scope.input.fontname = '';
         $scope.input.figText = library.get('figTestText') || '';
         $scope.input.showHardBlanks = library.get('figTestHb') || false;
 

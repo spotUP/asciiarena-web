@@ -900,7 +900,7 @@ var figlet = figlet || (function() {
             return;
         }
 
-        next && next(null, opts);
+        next && next(null, opts, figFont.comment);
     };
 
     /*
