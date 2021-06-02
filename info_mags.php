@@ -87,7 +87,7 @@ require_once "header.php"; ?>
                                 <script>
 					var link = document.createElement("a");
                                         link.setAttribute('download', '');
-					link.href = '/mags/<?=$dirname?>/<?=$filename?>';
+					link.href = '/mags/<?=addslashes($dirname)?>/<?=addslashes($filename)?>';
                                         document.body.appendChild(link);
                                         link.click();
                                         link.remove();
