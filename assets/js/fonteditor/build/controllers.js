@@ -26,8 +26,16 @@ appControllers.controller('MainCtrl', [
 
         "use strict";
 
+        getUserFonts();
+        $("#fontSelect").change(loadFont);
+
         $scope.figCharDropDown = [];
         $scope.input = {};
+        
+        $scope.input.fontname = '';
+        $scope.input.fontstatus = 1;
+        $scope.input.fontid = 0;
+        
         $scope.input.selectedChar = 65;
         $scope.input.txt = '';
         $scope.input.figChars = {}; 
@@ -86,7 +94,6 @@ appControllers.controller('MainCtrl', [
         charOrder.push(252);
         charOrder.push(223);
 
-        getUserFonts();
 
         // setup default comment header
         $scope.input.figChars[-1] = "Font Author: Enter your name here\n\n" +
@@ -102,7 +109,6 @@ appControllers.controller('MainCtrl', [
             $.each(data, function (i, font) {
               fontlist.append($("<option/>").val(font.fontid).text(font.fontname));
             });
-            
           });
         }
 
@@ -437,6 +443,42 @@ appControllers.controller('MainCtrl', [
             return output;
         }
 
+        function showAlert(content, success) {
+          var alertContent = '';
+          if (success) {
+          alertContent = `<div id="#success-alert" class="bs-component quick-alert amt-1 animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
+          } else {
+          alertContent = `<div id="#failure-alert" class="bs-component quick-alert amt-1 animate__animated animate__shakeX alert alert-dismissible alert-warning"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
+          }
+          $("#main").parent().prepend(alertContent);
+        }
+
+
+        function loadFont() {
+          var fontid = $("#fontSelect").val();
+          if (fontid>0) {
+            $.get(`/cmds.php?cmd=get_font&id=${fontid}`, function (data) {  
+              if (data.length>0) {
+                importFont(data[0].fontname, data[0].fontdata);
+                $scope.input.fontid = fontid;
+                $scope.input.fontstatus = data[0].fontstatus;
+                fixFigChars();
+                $scope.$digest();
+              } else {
+                $scope.input.fontname = '';         
+                $scope.input.fontid = 0;
+                $scope.input.fontstatus = 1;
+              }
+              
+            });
+          } else {
+            $scope.input.fontname = '';         
+            $scope.input.fontid = 0;
+            $scope.input.fontstatus = 1;
+          }
+            
+        };
+
         /*
             GUI functions
         */
@@ -473,35 +515,31 @@ appControllers.controller('MainCtrl', [
         };
 
         $scope.saveFont = function() {
+          if ($scope.input.fontname.trim().length==0) {
+            showAlert("You must fill the name field!", false);
+            return
+          }
+
           $.ajax({
             "type": "POST",
             "url": "/cmds.php?cmd=save_font",
             "data": {
               "fontid": $scope.input.fontid,
+              "fontstatus": $scope.input.fontstatus,
               "fontname": $scope.input.fontname,
               "fontdata": createFigFileData()
             },
+            "error": (r) => {
+                showAlert("There was an error during saving!",false);
+              },
             "success": () => {
-            }
+                showAlert("Font Saved!", true);
+                getUserFonts();              
+              }
           });
             
         };
         
-        $scope.loadFont = function() {
-          var fontid = $scope.input.fontid;
-          $scope.input.fontname = '';
-
-          $.get(`/cmds.php?cmd=get_font&id=${fontid}`, function (data) {  
-            if (data.length>0) {
-              importFont(data[0].fontname, data[0].fontdata);
-              fixFigChars();
-              $scope.$digest();
-            }
-            
-          });
-            
-        };
-
         /*
             watches
         */
@@ -568,8 +606,9 @@ appControllers.controller('TestCtrl', [
         var fontName = '__FONT_IN_PROGRESS__';
 
         $scope.input = {};
-        $scope.input.fontid = null;
+        $scope.input.fontid = "0";
         $scope.input.fontname = '';
+        $scope.input.fontstatus = 1;
         $scope.input.figText = library.get('figTestText') || '';
         $scope.input.showHardBlanks = library.get('figTestHb') || false;
 
