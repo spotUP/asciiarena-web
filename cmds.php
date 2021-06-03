@@ -1125,13 +1125,14 @@
       $id = $_GET[ "id" ] ?? 0;
       $data = [];
       if($id) {
-        $styles = fetchAll("SELECT * FROM styles WHERE id = :id and user=:username", [":id" => $id, ":username" => $_user[ "nick" ]]);
+        $styles = fetchAll("SELECT * FROM styles WHERE id = :id and (user=:username OR status>1)", [":id" => $id, ":username" => $_user[ "nick" ]]);
       } else {
-        $styles = fetchAll("SELECT * FROM styles where user=:username ORDER BY name", [":username" => $_user[ "nick" ]]);
+        $styles = fetchAll("SELECT * FROM styles where (user=:username or status>1) ORDER BY name", [":username" => $_user[ "nick" ]]);
       }
       foreach($styles as $style) {
         $data[] = [
           "fontid" => (int)$style->id,
+          "fontstatus" => (int)$style->status,
           "fontname" => $style->name,
           "fontdata" => $style->style
         ];
@@ -1149,17 +1150,28 @@
 
       $response = 200;
       $data = [
-        ":fontname" => $_POST[ "fontname" ] ?? "",
         ":fontdata" => $_POST[ "fontdata" ] ?? "",
-        ":username" => $_user[ "nick" ]
+        ":userid" => $_user[ "id" ]
       ];
       if(!empty($_POST[ "fontid" ])) {
-        $q = "UPDATE styles SET name = :fontname, style = :fontdata WHERE id = :id and user=:username";
+        $q = "UPDATE styles SET name = :fontname, status = :status WHERE id = :id and user_ids=:userid";
+        $data2 = [
+          ":status" => $_POST[ "fontstatus" ] ?? "1",
+          ":fontname" => $_POST[ "fontname" ] ?? "",
+          ":id" => $_POST[ "fontid" ],
+          ":userid" => $_user[ "id" ]
+        ];
+        if(!doQuery($q, $data2)) {
+          exit(json_out(["status" => true], 400));      
+        }
+        
+        $q = "UPDATE styles SET style = :fontdata WHERE id = :id and (user_ids=:userid or status=3)";
         $data[ ":id" ] = $_POST[ "fontid" ];
       } else {
         $q = "INSERT INTO styles (name, style, user, user_ids, status) VALUES (:fontname, :fontdata, :username, :userid, :status)";
-        $data[":userid"] = $_user[ "id" ];
-        $data[":status"] = "1";
+        $data[":fontname"] = $_POST[ "fontname" ] ?? "";
+        $data[":username"] = $_user[ "nick" ];
+        $data[":status"] = $_POST[ "fontstatus" ] ?? "1";
         $response = 201;
       }
       if(doQuery($q, $data)) {

@@ -86,16 +86,27 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('partials/main.htm',
     "<div>\n" +
-    "    <div class=\"row apt-1 apb-1\">\n" +
+    "    <div id=\"main\" class=\"row apt-1 apb-1\">\n" +
     "        <div class=\"col-md-6\">\n" +
     "            <div class=\"row\">\n" +
     "               <div class=\"col-md-12\">\n" +
-    "                   <select  ng-model=\"input.fontid\" id=\"fontSelect\" ng-change=\"loadFont()\" id=\"figFontSelect\">\n" +
-    "					             <option value=\"0\">Select Font</option>\n" +
-		"                 		 <option value=\"1\">ANSI</option>\n" +
+    "                   <select id=\"fontSelect\">\n" +
     "                   </select>\n" +
     "               </div>\n" +
     "           </div>\n" +
+    "            <div class=\"row apt-1\">\n" +
+    "               <div class=\"col-md-6\">\n" +
+    "                   <label class=\"fig-draw-label\" for=\"figStatus\">Visibility:</label>\n" +
+    "               </div>\n" +
+    "               <div class=\"col-md-6\">\n" +
+    "                   <select  ng-model=\"input.fontstatus\" id=\"figStatus\">\n" +
+    "					             <option value=\"1\">Private</option>\n" +
+		"                 		 <option value=\"2\">Public (Anyone can view)</option>\n" +
+		"                 		 <option value=\"3\">Public (Anyone can edit)</option>\n" +
+    "                   </select>\n" +
+    "               </div>\n" +
+    "           </div>\n" +
+    
     "            <div class=\"row apt-1\">\n" +
     "               <div class=\"col-md-6\">\n" +
     "                   <label class=\"fig-draw-label\" for=\"figFontName\">Font Name:</label>\n" +
