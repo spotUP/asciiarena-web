@@ -109,6 +109,8 @@ appControllers.controller('MainCtrl', [
             $.each(data, function (i, font) {
               fontlist.append($("<option/>").val(font.fontid).text(font.fontname));
             });
+            
+            $("#fontSelect").val($scope.input.fontid)
           });
         }
 
@@ -556,13 +558,20 @@ appControllers.controller('MainCtrl', [
         $scope.$on('data:import', function() {
             var figfont = library.get('figfont');
             if (figfont) {
-                importFont(figfont);
+                var fontName = library.get('fontName');
+                importFont(fontName, figfont);
+                $scope.input.fontid = library.get('fontId');
+                $scope.input.fontstatus=library.get('fontStatus');
+
                 fixFigChars();
             }
         });
 
         $scope.$on('$destroy', function() {
             library.set('caseInsensitive', $scope.input.caseInsensitive);
+            library.set('fontName', $scope.input.fontname);
+            library.set('fontId', $scope.input.fontid);
+            library.set('fontStatus', $scope.input.fontstatus);
             library.set('figfont', createFigFileData());
         });
 
@@ -574,8 +583,13 @@ appControllers.controller('MainCtrl', [
 
         var figfont = library.get('figfont');
         if (figfont) {
-            importFont(figfont);
+            var fontName = library.get('fontName');
+            importFont(fontName,figfont);
+            $scope.input.fontid = library.get('fontId');
+            $scope.input.fontstatus=library.get('fontStatus');
+
             fixFigChars();
+            $("#fontSelect").val($scope.input.fontid)
         }
 
         $timeout(function() {
@@ -658,7 +672,10 @@ appControllers.controller('TestCtrl', [
 
         var figfont = library.get('figfont');
         if (figfont) {
+            var fontName = library.get('fontName');
             figlet.parseFont(fontName, figfont);
+            $scope.input.fontid = library.get('fontId');
+            $scope.input.fontstatus=library.get('fontStatus');
         }
 
         $timeout(function() {
