@@ -111,31 +111,56 @@
 
 .fontbtn {
  color:#000;
- border-color:#000;
+/* border-color:#000; */
  background-color:#bbb;
- border:.875px solid #000;
- margin-top:7px;
- padding-top:6.125px;
- padding-bottom:7px;
- margin-bottom:6.125px;
- border-left-width:2px;
- border-right-width:2px;
- margin-left:3.5px;
+ width: 24px !important;
+ margin-left:  0px !important;
+ margin-bottom:  8px !important;
+ margin-right: 8px !important;
+ margin-top:  0px !important;
+ padding-top: 16px !important;
+ padding-bottom:  16px;
+ padding-left: 8px;
+/* border:.875px solid #000; */
+/* margin-top:8px; */
+/* padding-top:8px; */
+/* padding-bottom:8px; */
+/* margin-bottom:8px; */
+/* border-left-width:2px;
+ border-right-width:2px; */
+/* margin-left:3.5px;
  padding-left:10.5px;
  padding-right:11.5px;
- margin-right:2.5px;
- box-shadow:-3.5px -7px 0 0 #bbb,2.5px 6.125px 0 0 #bbb,-3.5px 6.125px 0 0 #bbb,2.5px -7px 0 0 #bbb;
+ margin-right:2.5px; */
+/* box-shadow:-3.5px -7px 0 0 #bbb,2.5px 6.125px 0 0 #bbb,-3.5px 6.125px 0 0 #bbb,2.5px -7px 0 0 #bbb;
  -webkit-filter:drop-shadow(7px 8px 0 #222);
- filter:drop-shadow(7px 8px 0 #222);
-  margin-top:20px;
- margin-right:10.5px;
- margin-bottom:20px;
+ filter:drop-shadow(7px 8px 0 #222); */
+/*  margin-top:20px; */
+/* margin-right:8px; */
+/* margin-bottom:20px; */
 }
 
 .fontbtn:hover {
-  box-shadow:-3.5px -7px 0 0 #555,2.5px 6.125px 0 0 #555,-3.5px 6.125px 0 0 #555,2.5px -7px 0 0 #555;
+/*  box-shadow:-3.5px -7px 0 0 #555,2.5px 6.125px 0 0 #555,-3.5px 6.125px 0 0 #555,2.5px -7px 0 0 #555; */
  color:#fff;
  border-color:#fff;
  background-color:#555
 
+}
+
+
+label.btn.btn-lg.fontbtn:active{
+    background: #999 !important;
+    width: 8px;
+}
+
+label.btn.btn-lg.fontbtn:focus{
+    background: red !important;
+    width: 8px;
+}
+
+label.btn.btn-lg.fontbtn:focus-within{
+    background-color:#555;
+    color:  white;
+    width: 8px;
 }
