@@ -115,14 +115,14 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                   <input id=\"figFontName\" type=\"text\" class=\"txt-single-input\" maxlength=20 ng-model=\"input.fontname\"></input>\n" +
     "               </div>\n" +
     "           </div>\n" +
-    "            <div class=\"row apt-1\">\n" +
-    "               <div class=\"col-md-6\">\n" +
-    "                   <label class=\"fig-draw-label\" for=\"figCharSelect\">Character:</label>\n" +
-    "               </div>\n" +
-    "               <div class=\"col-md-6\">\n" +
-    "                   <select id=\"figCharSelect\" ng-model=\"input.selectedChar\" ng-options=\"elm.code as elm.character for elm in figCharDropDown\" class=\"fig-chardropdown\" size=\"1\"></select>\n" +
-    "               </div>\n" +
-    "           </div>\n" +
+    //"            <div class=\"row apt-1\">\n" +
+    //"               <div class=\"col-md-6\">\n" +
+    //"                   <label class=\"fig-draw-label\" for=\"figCharSelect\">Character:</label>\n" +
+    //"               </div>\n" +
+    //"               <div class=\"col-md-6\">\n" +
+    //"                   <select id=\"figCharSelect\" ng-model=\"input.selectedChar\" ng-options=\"elm.code as elm.character for elm in figCharDropDown\" class=\"fig-chardropdown\" size=\"1\"></select>\n" +
+    //"               </div>\n" +
+    //"           </div>\n" +
     "           <div class=\"row\">\n" +
     "             <div class=\"col-md-12 apt-1\">\n" +       
     //"               <div data-toggle=\"buttons\">\n" +
@@ -291,19 +291,19 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                    <strong>Note:</strong> Not selecting any smushing rules is the same as selecting \"Universal Smushing\".\n" +
     "                </div>\n" +
     "            </div>\n" +
-    "            <div class=\"row apt-1\">\n" +
-    "               <div class=\"col-md-6\">\n" +
-    "                    <label class=\"fig-opt-label\" for=\"printDirection\">Print Direction:</label>\n" +
-    "               </div>\n" +
-    "               <div class=\"col-md-6\">\n" +
-    "                    <select\n" +
-    "                        id=\"printDirection\"\n" +
-    "                        ng-model=\"input.printDirection\"\n" +
-    "                        ng-options=\"elm.value as elm.label for elm in printDirection\"\n" +
-    "                        size=\"1\"\n" +
-    "                    ></select>\n" +
-    "               </div>\n" +
-    "            </div>\n" +
+    //"            <div class=\"row apt-1\">\n" +
+    //"               <div class=\"col-md-6\">\n" +
+    //"                    <label class=\"fig-opt-label\" for=\"printDirection\">Print Direction:</label>\n" +
+    //"               </div>\n" +
+    //"               <div class=\"col-md-6\">\n" +
+    //"                    <select\n" +
+    //"                        id=\"printDirection\"\n" +
+    //"                        ng-model=\"input.printDirection\"\n" +
+    //"                        ng-options=\"elm.value as elm.label for elm in printDirection\"\n" +
+    //"                        size=\"1\"\n" +
+    //"                    ></select>\n" +
+    //"               </div>\n" +
+    //"            </div>\n" +
     "            <div class=\"row apt-1\">\n" +
     "               <div class=\"col-md-6\">\n" +
     "                    <label class=\"fig-opt-label\" for=\"hardBlank\">Hard blank:</label>\n" +
