@@ -98,12 +98,12 @@ appControllers.controller('MainCtrl', [
 
         // setup default comment header
         $scope.input.figChars[-1] = "Font Author: Enter your name here\n\n" +
-            "FIGFont created with: http://www.asciiarena.com";
+            "FIGFont created with: http://www.asciiarena.se";
 
         function getUserFonts() {
           let fontlist = $("#fontSelect");
           fontlist.empty();
-          fontlist.append($("<option/>").val("0").text("Select Font"));
+          fontlist.append($("<option/>").val("0").text("Select Style"));
     
           $.get('/cmds.php?cmd=get_font', function (data) {  
             
