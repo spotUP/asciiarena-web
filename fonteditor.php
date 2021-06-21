@@ -30,6 +30,7 @@ include "header.php";
                 <div dialog-export></div>
                 <div dialog-import></div>
                 <div dialog-submit-font></div>
+                <link rel="stylesheet" href="/assets/css/fonteditor.css" media="screen">
                 <script src='/assets/js/fonteditor/vendor/figlet/lib/figlet.js'></script>
                 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
                 <script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
