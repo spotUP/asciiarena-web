@@ -8,12 +8,12 @@
     padding: 0;
 }
 
-.fig-txt {
-    height:250px;
-    width:320px;
-    box-sizing:border-box;
-}
 
+.fig-txt {
+    height: 497px;
+    width: 100%;
+    box-sizing: border-box;
+}
 .fig-pad {
     margin-bottom:16px;
 }

@@ -23,7 +23,7 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "        </div><!-- /.modal-content -->\n" +
     "    </div><!-- /.modal-dialog -->\n" +
     "</div><!-- /.modal -->"
-  );
+    );
 
 
   $templateCache.put('partials/dialog-import.htm',
@@ -50,7 +50,7 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "        </div><!-- /.modal-content -->\n" +
     "    </div><!-- /.modal-dialog -->\n" +
     "</div><!-- /.modal -->"
-  );
+    );
 
 
   $templateCache.put('partials/dialog-submit-font.htm',
@@ -82,14 +82,17 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "        </div><!-- /.modal-content -->\n" +
     "    </div><!-- /.modal-dialog -->\n" +
     "</div><!-- /.modal -->"
-  );
+    );
 
   $templateCache.put('partials/main.htm',
     "<div>\n" +
     "    <div id=\"main\" class=\"row apt-1 apb-1\">\n" +
-    "        <div class=\"col-md-6\">\n" +
+    "        <div class=\"col-md-4\">\n" +
     "            <div class=\"row\">\n" +
-    "               <div class=\"col-md-12\">\n" +
+    "               <div class=\"col-md-6\">\n" +
+    "                   <label class=\"fig-draw-label\" for=\"figStatus\">Style:</label>\n" +
+    "               </div>\n" +
+    "               <div class=\"col-md-6\">\n" +
     "                   <select id=\"fontSelect\">\n" +
     "                   </select>\n" +
     "               </div>\n" +
@@ -101,8 +104,8 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "               <div class=\"col-md-6\">\n" +
     "                   <select  ng-model=\"input.fontstatus\" id=\"figStatus\">\n" +
     "					             <option value=\"1\">Private</option>\n" +
-		"                 		 <option value=\"2\">Public (Anyone can view)</option>\n" +
-		"                 		 <option value=\"3\">Public (Anyone can edit)</option>\n" +
+    "                 		 <option value=\"2\">Public (Anyone can view)</option>\n" +
+    "                 		 <option value=\"3\">Public (Anyone can edit)</option>\n" +
     "                   </select>\n" +
     "               </div>\n" +
     "           </div>\n" +
@@ -123,8 +126,92 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     //"                   <select id=\"figCharSelect\" ng-model=\"input.selectedChar\" ng-options=\"elm.code as elm.character for elm in figCharDropDown\" class=\"fig-chardropdown\" size=\"1\"></select>\n" +
     //"               </div>\n" +
     //"           </div>\n" +
-    "           <div class=\"row\">\n" +
-    "             <div class=\"col-md-12 apt-1\">\n" +       
+
+
+    "        </div>\n" +
+    "        <div class=\"col-md-6\">\n" +
+    "            <div class=\"row\">\n" +
+    "               <div class=\"col-md-6\">\n" +
+    "                     <label class=\"fig-opt-label\" for=\"hlayout\">H-Layout:</label>\n" +
+    "             </div>\n" +
+    "                <div class=\"col-md-6\">\n" +
+    "                     <select id=\"hlayout\" ng-model=\"input.horizontalLayout\" ng-options=\"elm as elm for elm in input.layouts\"></select>\n" +
+    "                </div>\n" +
+    "            </div>\n" +
+    "            <div ng-show=\"input.horizontalLayout==='Controlled Smushing'\">\n" +
+    "                <div class=\"fig-opt-entry\" ng-repeat=\"idx in [1, 6] | makeRange\">\n" +
+    "                    <div class=\"fig-opt\">\n" +
+    "                        <label class=\"fig-opt-label\" for=\"hrule{{idx}}\">Rule #{{idx}}:</label>\n" +
+    "                        <input id=\"hrule{{idx}}\" ng-model=\"input.hrule[idx]\" type=\"checkbox\"/>\n" +
+    "                    </div>\n" +
+    "                    <div class=\"fig-opt-info2\">\n" +
+    "                        <span class=\"glyphicon glyphicon-info-sign fig-opt-tips fig-icon\" data-toggle=\"tooltip\" title=\"{{ruleToolTip('h', idx)}}\"></span>\n" +
+    "                    </div>\n" +
+    "                    <div style=\"clear:both\"></div>\n" +
+    "                </div>\n" +
+    "                <div style=\"margin-bottom:16px;\" ng-show=\"input.hrule[1] === false && input.hrule[2] === false && input.hrule[3] === false && input.hrule[4] === false && input.hrule[5] === false && input.hrule[6] === false\">\n" +
+    "                    <strong>Note:</strong> Not selecting any smushing rules is the same as selecting \"Universal Smushing\".\n" +
+    "                </div>\n" +
+    "            </div>\n" +
+    "            <div class=\"row apt-1\">\n" +
+    "               <div class=\"col-md-6\">\n" +
+    "                    <label for=\"vlayout\" class=\"fig-opt-label\">V-Layout:</label>\n" +
+    "               </div>\n" +
+    "               <div class=\"col-md-6\">\n" +
+    "                    <select id=\"vlayout\" ng-model=\"input.verticalLayout\" ng-options=\"elm as elm for elm in input.layouts\"></select>\n" +
+    "                </div>\n" +
+    "                </div>\n" +
+    "                <div class=\"fig-opt-info2\">\n" +
+    "                    <span class=\"glyphicon glyphicon-info-sign fig-opt-tips fig-icon\" data-toggle=\"tooltip\" title=\"The vertical kerning for the font.\"></span>\n" +
+    "                </div>\n" +
+    "            <div ng-show=\"input.verticalLayout==='Controlled Smushing'\">\n" +
+    "                <div class=\"fig-opt-entry\" ng-repeat=\"idx in [1, 5] | makeRange\">\n" +
+    "                    <div class=\"fig-opt\">\n" +
+    "                        <label class=\"fig-opt-label\" for=\"vrule{{idx}}\">Rule #{{idx}}:</label>\n" +
+    "                        <input id=\"vrule{{idx}}\" ng-model=\"input.vrule[idx]\" type=\"checkbox\"/>\n" +
+    "                    </div>\n" +
+    "                </div>\n" +
+    "                <div style=\"margin-bottom:16px;\" ng-show=\"input.vrule[1] === false && input.vrule[2] === false && input.vrule[3] === false && input.vrule[4] === false && input.vrule[5] === false\">\n" +
+    "                    <strong>Note:</strong> Not selecting any smushing rules is the same as selecting \"Universal Smushing\".\n" +
+    "                </div>\n" +
+    "            </div>\n" +
+    "            <div class=\"row apt-1\">\n" +
+    "               <div class=\"col-md-6\">\n" +
+    "                    <label class=\"fig-opt-label\" for=\"hardBlank\">Hard blank:</label>\n" +
+    "              </div>\n" +
+    "               <div class=\"col-md-6\">\n" +
+    "                    <input id=\"hardBlank\" type=\"text\" class=\"txt-single-input\" maxlength=1 ng-model=\"input.hardBlank\"></input>\n" +
+    "              </div>\n" +
+    "            </div>\n" +
+    "            <div class=\"row apt-1\">\n" +
+    "               <div class=\"col-md-6\">\n" +
+    "                    <label class=\"fig-opt-label\" for=\"baseline\">Baseline:</label>\n" +
+    "                </div>\n" +
+    "               <div class=\"col-md-6\">\n" +
+    "                    <input id=\"baseline\" type=\"text\" class=\"txt-single-input\" maxlength=1 ng-model=\"input.baseline\"></input>\n" +
+    "                </div>\n" +
+    "            </div>\n" +
+    "            </div>\n" +
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    "           <div class=\"row m-0\">\n" +
+    "             <div class=\"col-md-6\">\n" +       
+    "           <div class=\"row ap-1 white\">\n" +
+    "               <br><br>Character Table\n" +
+    "           </div>\n" +
     //"               <div data-toggle=\"buttons\">\n" +
     "                 <div class=\"btn-group btn-group-toggle\">\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"32\">&nbsp;</label>\n" +
@@ -235,61 +322,23 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"252\" autocomplete=\"off\">ü</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"223\" autocomplete=\"off\">ß</label>\n" +
     "                 </div>\n" +
-    //"               </div>\n" +
     "             </div>\n" +
 
-    "           </div>\n" +
-    "           <div class=\"row\">\n" +
-    "               <div class=\"col-md-12 apt-1\">\n" +
-    "                   <textarea id=\"figCharArt\" ng-model=\"input.figChars[input.selectedChar]\" ng-trim='false' class=\"fig-txt fig-font bg-secondary\"></textarea>\n" +
+
+
+
+
+
+    "           <div class=\"col-md-6\">\n" +
+    "             <div class=\"col-md-12\">\n" +
+    "               <div class=\"row ap-1 white\">\n" +
+    "                 <br><br>Character Editor\n" +
     "               </div>\n" +
+    "               <div class=\"row bg-blue\">\n" +
+    "                   <textarea id=\"figCharArt\" ng-model=\"input.figChars[input.selectedChar]\" ng-trim='false' class=\"fig-txt w-100 fig-font bg-secondary\"></textarea>\n" +
     "           </div>\n" +
-    "        </div>\n" +
-    "        <div class=\"col-md-6\">\n" +
-    "            <div class=\"row\">\n" +
-    "               <div class=\"col-md-6\">\n" +
-    "                     <label class=\"fig-opt-label\" for=\"hlayout\">Horizontal Layout:</label>\n" +
-    "             </div>\n" +
-    "                <div class=\"col-md-6\">\n" +
-    "                     <select id=\"hlayout\" ng-model=\"input.horizontalLayout\" ng-options=\"elm as elm for elm in input.layouts\"></select>\n" +
-    "                </div>\n" +
-    "            </div>\n" +
-    "            <div ng-show=\"input.horizontalLayout==='Controlled Smushing'\">\n" +
-    "                <div class=\"fig-opt-entry\" ng-repeat=\"idx in [1, 6] | makeRange\">\n" +
-    "                    <div class=\"fig-opt\">\n" +
-    "                        <label class=\"fig-opt-label\" for=\"hrule{{idx}}\">Rule #{{idx}}:</label>\n" +
-    "                        <input id=\"hrule{{idx}}\" ng-model=\"input.hrule[idx]\" type=\"checkbox\"/>\n" +
-    "                    </div>\n" +
-    "                    <div class=\"fig-opt-info2\">\n" +
-    "                        <span class=\"glyphicon glyphicon-info-sign fig-opt-tips fig-icon\" data-toggle=\"tooltip\" title=\"{{ruleToolTip('h', idx)}}\"></span>\n" +
-    "                    </div>\n" +
-    "                    <div style=\"clear:both\"></div>\n" +
-    "                </div>\n" +
-    "                <div style=\"margin-bottom:16px;\" ng-show=\"input.hrule[1] === false && input.hrule[2] === false && input.hrule[3] === false && input.hrule[4] === false && input.hrule[5] === false && input.hrule[6] === false\">\n" +
-    "                    <strong>Note:</strong> Not selecting any smushing rules is the same as selecting \"Universal Smushing\".\n" +
-    "                </div>\n" +
-    "            </div>\n" +
-    "            <div class=\"row apt-1\">\n" +
-    "               <div class=\"col-md-6\">\n" +
-    "                    <label for=\"vlayout\" class=\"fig-opt-label\">Vertical Layout:</label>\n" +
+    "                   </div>\n" +
     "               </div>\n" +
-    "               <div class=\"col-md-6\">\n" +
-    "                    <select id=\"vlayout\" ng-model=\"input.verticalLayout\" ng-options=\"elm as elm for elm in input.layouts\"></select>\n" +
-    "                </div>\n" +
-    "                </div>\n" +
-    "                <div class=\"fig-opt-info2\">\n" +
-    "                    <span class=\"glyphicon glyphicon-info-sign fig-opt-tips fig-icon\" data-toggle=\"tooltip\" title=\"The vertical kerning for the font.\"></span>\n" +
-    "                </div>\n" +
-    "            <div ng-show=\"input.verticalLayout==='Controlled Smushing'\">\n" +
-    "                <div class=\"fig-opt-entry\" ng-repeat=\"idx in [1, 5] | makeRange\">\n" +
-    "                    <div class=\"fig-opt\">\n" +
-    "                        <label class=\"fig-opt-label\" for=\"vrule{{idx}}\">Rule #{{idx}}:</label>\n" +
-    "                        <input id=\"vrule{{idx}}\" ng-model=\"input.vrule[idx]\" type=\"checkbox\"/>\n" +
-    "                    </div>\n" +
-    "                </div>\n" +
-    "                <div style=\"margin-bottom:16px;\" ng-show=\"input.vrule[1] === false && input.vrule[2] === false && input.vrule[3] === false && input.vrule[4] === false && input.vrule[5] === false\">\n" +
-    "                    <strong>Note:</strong> Not selecting any smushing rules is the same as selecting \"Universal Smushing\".\n" +
-    "                </div>\n" +
     "            </div>\n" +
     //"            <div class=\"row apt-1\">\n" +
     //"               <div class=\"col-md-6\">\n" +
@@ -304,35 +353,8 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     //"                    ></select>\n" +
     //"               </div>\n" +
     //"            </div>\n" +
-    "            <div class=\"row apt-1\">\n" +
-    "               <div class=\"col-md-6\">\n" +
-    "                    <label class=\"fig-opt-label\" for=\"hardBlank\">Hard blank:</label>\n" +
-    "              </div>\n" +
-    "               <div class=\"col-md-6\">\n" +
-    "                    <input id=\"hardBlank\" type=\"text\" class=\"txt-single-input\" maxlength=1 ng-model=\"input.hardBlank\"></input>\n" +
-    "              </div>\n" +
-    "            </div>\n" +
-    "            <div class=\"row apt-1\">\n" +
-    "               <div class=\"col-md-6\">\n" +
-    "                    <label class=\"fig-opt-label\" for=\"baseline\">Baseline:</label>\n" +
-    "                </div>\n" +
-    "               <div class=\"col-md-6\">\n" +
-    "                    <input id=\"baseline\" type=\"text\" class=\"txt-single-input\" maxlength=1 ng-model=\"input.baseline\"></input>\n" +
-    "                </div>\n" +
-    "            </div>\n" +
-    "            <div class=\"row apt-1\">\n" +
-    "               <div class=\"col-md-12\">\n" +
-    "                   <div class=\"col-md-6 p-0\">\n" +
-    "                       <div class=\"custom-control custom-switch\">\n" +
-    "                           <input type=\"checkbox\" class=\"custom-control-input\" id=\"caseInsensitive\"  ng-model=\"input.caseInsensitive\" checked>\n" +
-    "                           <label class=\"fig-opt-label custom-control-label\" for=\"caseInsensitive\">Case Insensitive</label>\n" +
-    "                       </div>\n" +
-    "                   </div>\n" +
-    "               </div>\n" +
-    "            </div>\n" +
     "            <div class=\"container\">\n"+
-    "               <div class=\"row align-items-end\">\n" +
-    "               <br><br><br><br><br><br>\n" +
+    "               <div class=\"row m-0\">\n" +
     "                   <div class=\"fig-opt-entry\">\n" +
     "                       <input type=\"button\" class=\"btn-big btn-default\" ng-click=\"saveFont()\" value=\"Save\">\n" +
     "                   </div>\n" +
@@ -341,21 +363,21 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "        </div>\n" +
     "    </div>\n" +
     "</div>"
-  );
+    );
 
 
-  $templateCache.put('partials/test.htm',
-    "<div>\n" +
-    "    <textarea ng-model=\"input.figText\" class=\"fig-test-txt\" ng-trim=\"false\"></textarea>\n" +
-    "    <div style=\"margin-top:16px;margin-bottom:16px;\">\n" +
-    "        <div style=\"float:left\">\n" +
-    "            <input type=\"checkbox\" ng-model=\"input.showHardBlanks\" id=\"fig-showhardblanks\" />\n" +
-    "            <label for=\"fig-showhardblanks\">Show Hardblanks</label>\n" +
-    "        </div>\n" +
-    "        <div style=\"clear:both\"></div>\n" +
-    "    </div>\n" +
-    "    <div class=\"fig-test-output\" >{{figOutput}}</div>\n" +
-    "</div>"
+$templateCache.put('partials/test.htm',
+  "<div>\n" +
+  "    <textarea ng-model=\"input.figText\" class=\"fig-test-txt\" ng-trim=\"false\"></textarea>\n" +
+  "    <div style=\"margin-top:16px;margin-bottom:16px;\">\n" +
+  "        <div style=\"float:left\">\n" +
+  "            <input type=\"checkbox\" ng-model=\"input.showHardBlanks\" id=\"fig-showhardblanks\" />\n" +
+  "            <label for=\"fig-showhardblanks\">Show Hardblanks</label>\n" +
+  "        </div>\n" +
+  "        <div style=\"clear:both\"></div>\n" +
+  "    </div>\n" +
+  "    <div class=\"fig-test-output\" >{{figOutput}}</div>\n" +
+  "</div>"
   );
 
 }]);
