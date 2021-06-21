@@ -37,6 +37,7 @@ appControllers.controller('MainCtrl', [
         $scope.input.fontid = 0;
         
         $scope.input.selectedChar = 65;
+        $scope.input.selectedChar2 = 48;
         $scope.input.txt = '';
         $scope.input.figChars = {}; 
         $scope.input.hardBlank = '$';
