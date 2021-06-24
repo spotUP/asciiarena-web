@@ -448,12 +448,21 @@ appControllers.controller('MainCtrl', [
 
         function showAlert(content, success) {
           var alertContent = '';
+          var id = new Date().getTime().toString()+(Math.floor(Math.random()*9000)+1000).toString();
           if (success) {
-          alertContent = `<div id="#success-alert" class="bs-component quick-alert amt-1 animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
+            id = 'success-alert'+id;
+            alertContent = `<div id="${id}" class="bs-component quick-alert amt-1 animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
           } else {
-          alertContent = `<div id="#failure-alert" class="bs-component quick-alert amt-1 animate__animated animate__shakeX alert alert-dismissible alert-warning"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
+            id = 'failure-alert'+id;
+            alertContent = `<div id="${id}" class="bs-component quick-alert amt-1 animate__animated animate__shakeX alert alert-dismissible alert-warning"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
           }
           $("#main").parent().prepend(alertContent);
+          id = '#'+id;
+          $(id).fadeTo(5000, 1,function(){
+            $(this).fadeTo(500, 0).slideUp(500, function(){
+              $(this).remove(); 
+            });
+          });
         }
 
 
