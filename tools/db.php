@@ -1,5 +1,5 @@
 <?php defined('VALID') or die('Nuh-uh!');
-
+//test
     $dbuser = getenv('DBUSER') ?: 'root';
     $dbpw   = getenv('DBPW')   ?: '';
     $dbhost = getenv('DBHOST') ?: 'localhost';
