@@ -29,43 +29,8 @@ appControllers.controller('MainCtrl', [
         getUserFonts();
         $("#fontSelect").change(loadFont);
 
-        $scope.figCharDropDown = [];
-        $scope.input = {};
+        reset();
         
-        $scope.input.fontname = '';
-        $scope.input.fontstatus = 1;
-        $scope.input.fontid = 0;
-        
-        $scope.input.selectedChar = 65;
-        $scope.input.selectedChar2 = 48;
-        $scope.input.txt = '';
-        $scope.input.figChars = {}; 
-        $scope.input.hardBlank = '$';
-        $scope.input.endMark = '@';
-        $scope.input.layouts = [
-            'Full',
-            'Fitted',
-            'Controlled Smushing',
-            'Universal Smushing'
-        ];
-        $scope.input.horizontalLayout = 'Fitted';
-        $scope.input.verticalLayout = 'Full';
-        $scope.input.hrule = {};
-        $scope.input.hrule[1] = false;
-        $scope.input.hrule[2] = false;
-        $scope.input.hrule[3] = false;
-        $scope.input.hrule[4] = false;
-        $scope.input.hrule[5] = false;
-        $scope.input.hrule[6] = false;
-        $scope.input.vrule = {};
-        $scope.input.vrule[1] = false;
-        $scope.input.vrule[2] = false;
-        $scope.input.vrule[3] = false;
-        $scope.input.vrule[4] = false;
-        $scope.input.vrule[5] = false;
-        $scope.input.printDirection = 0;
-        $scope.input.caseInsensitive = false;
-        $scope.input.codeTagCount = 0;
 
         $scope.printDirection = [
             {
@@ -95,11 +60,6 @@ appControllers.controller('MainCtrl', [
         charOrder.push(252);
         charOrder.push(223);
 
-
-        // setup default comment header
-        $scope.input.figChars[-1] = "Font Author: Enter your name here\n\n" +
-            "FIGFont created with: http://www.asciiarena.se";
-
         function getUserFonts() {
           let fontlist = $("#fontSelect");
           fontlist.empty();
@@ -118,6 +78,51 @@ appControllers.controller('MainCtrl', [
         /*
             Utility functions
         */
+
+        function reset() {
+          $scope.figCharDropDown = [];
+          $scope.input = {};
+          
+          $scope.input.fontname = '';
+          $scope.input.fontstatus = 1;
+          $scope.input.fontid = 0;
+          
+          $scope.input.selectedChar = 65;
+          $scope.input.selectedChar2 = 48;
+          $scope.input.txt = '';
+          $scope.input.figChars = {}; 
+          $scope.input.hardBlank = '$';
+          $scope.input.endMark = '@';
+          $scope.input.layouts = [
+              'Full',
+              'Fitted',
+              'Controlled Smushing',
+              'Universal Smushing'
+          ];
+          $scope.input.horizontalLayout = 'Fitted';
+          $scope.input.verticalLayout = 'Full';
+          $scope.input.hrule = {};
+          $scope.input.hrule[1] = false;
+          $scope.input.hrule[2] = false;
+          $scope.input.hrule[3] = false;
+          $scope.input.hrule[4] = false;
+          $scope.input.hrule[5] = false;
+          $scope.input.hrule[6] = false;
+          $scope.input.vrule = {};
+          $scope.input.vrule[1] = false;
+          $scope.input.vrule[2] = false;
+          $scope.input.vrule[3] = false;
+          $scope.input.vrule[4] = false;
+          $scope.input.vrule[5] = false;
+          $scope.input.printDirection = 0;
+          $scope.input.caseInsensitive = false;
+          $scope.input.codeTagCount = 0;
+        
+        // setup default comment header
+          $scope.input.figChars[-1] = "Font Author: Enter your name here\n\n" +
+            "FIGFont created with: http://www.asciiarena.se";        
+        }
+        
 
         /**
         * Imports a font.
@@ -290,7 +295,14 @@ appControllers.controller('MainCtrl', [
                 if (idx === '-1') continue; // ignore comment header
 
                 figChar = $scope.input.figChars[idx].replace('\r\n','\n').split('\n');
-                height = Math.max(height, figChar.length);
+                ii = figChar.length-1
+                var fheight = -1
+                while (ii>=0 && fheight==-1) {
+                  if (figChar[ii].trim().length>0) fheight=ii
+                  ii--
+                }
+                
+                height = Math.max(height, fheight+2);
                 charWidth[idx] = 0;
 
                 for (ii = 0; ii < figChar.length;ii++) {
@@ -310,9 +322,17 @@ appControllers.controller('MainCtrl', [
                 if (idx === '-1') continue; // ignore comment header
 
                 figChar = $scope.input.figChars[idx].replace('\r\n','\n').split('\n');
+                if (figChar.length > height) {
+                  while (figChar.length > height) {
+                    figChar.pop();
+                  }
+                  $scope.input.figChars[idx] = figChar.join('\n')
+                }
+                
                 if (figChar.length < height) {
                     $scope.input.figChars[idx] = figChar.join('\n') + '\n' + blankLines(height - figChar.length, charWidth[idx]);
                 }
+                
             }
 
             $scope.input.height = height;
@@ -477,16 +497,16 @@ appControllers.controller('MainCtrl', [
                 fixFigChars();
                 $scope.$digest();
               } else {
-                $scope.input.fontname = '';         
-                $scope.input.fontid = 0;
-                $scope.input.fontstatus = 1;
+                reset();
+                $scope.$digest();
+
               }
               
             });
           } else {
-            $scope.input.fontname = '';         
-            $scope.input.fontid = 0;
-            $scope.input.fontstatus = 1;
+            reset();
+            $scope.$digest();
+
           }
             
         };
@@ -526,6 +546,39 @@ appControllers.controller('MainCtrl', [
             }
         };
 
+        $scope.deleteFont = function() {
+          if ($scope.input.fontid==0) {
+            showAlert("You cannot delete a font that has not been saved!", false);
+            return
+          }
+          
+          if (confirm("Are you sure you want to delete this font?")) {
+            $.ajax({
+              "type": "POST",
+              "url": "/cmds.php/delete_font/"+$scope.input.fontid,
+              "error": (r) => {
+                  if (r.status==403) {
+                    showAlert("You do not have permission to delete that!",false);
+                  } else {
+                    showAlert("There was an error during deleting!",false);
+                  }              
+                },
+              "success": () => {
+                  showAlert("Font Deleted!", true);
+                  reset();
+                  $scope.$digest();
+                  getUserFonts();              
+                }
+            });          
+          }
+        }
+
+        $scope.export = function() {
+            $rootScope.$broadcast('dialog:export', {
+                data: createFigFileData()
+            });
+        }
+                
         $scope.saveFont = function() {
           if ($scope.input.fontname.trim().length==0) {
             showAlert("You must fill the name field!", false);
