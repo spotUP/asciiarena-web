@@ -214,7 +214,7 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "           </div>\n" +
     //"               <div data-toggle=\"buttons\">\n" +
     "                 <div class=\"btn-group btn-group-toggle\">\n" +
-    "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"32\">&nbsp;</label>\n" +
+    "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"32\"></label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"33\">!</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"34\">\"</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"35\">#</label>\n" +
@@ -370,6 +370,8 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "               <div class=\"row m-0\">\n" +
     "                   <div class=\"fig-opt-entry\">\n" +
     "                       <input type=\"button\" class=\"btn-big btn-default\" ng-click=\"saveFont()\" value=\"Save\">\n" +
+    "                       <input type=\"button\" class=\"btn-big btn-default\" ng-click=\"deleteFont()\" value=\"Delete\">\n" +
+    "                       <input type=\"button\" class=\"btn-big btn-default\" ng-click=\"export()\" value=\"Export\">\n" +
     "                   </div>\n" +
     "               </div>\n" +
     "            </div>\n" +

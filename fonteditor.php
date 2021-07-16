@@ -6,9 +6,9 @@ include "header.php";
 <div class="modal-body row m-0 p-0">
     <div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
         <?php
- //       if (is_logged_in()) 
- //       {
-            ?>
+        if (is_logged_in()) 
+        {
+        ?>
             <html ng-app="figfont">
             <div class="row" >
                 <div class="col-lg-12">
@@ -45,7 +45,7 @@ include "header.php";
                 <script src="/assets/js/fonteditor/build/templates.js"></script>
             </div>
             <?php
-/*        }
+        }
         else
         {
             ?>
@@ -58,7 +58,7 @@ include "header.php";
                 </div>
             </div>
             <?php
-        } */
+        } 
         ?>
     </div>
     <div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">

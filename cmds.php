@@ -1182,6 +1182,34 @@
    
   }
 
+  function deleteFont($fontId) {
+    global $_user;
+    if (is_ajax() && is_logged_in()) {
+
+      $q = "select count(*) as cnt from styles where id = :fontid and user_ids=:userid ";
+      $data = [
+        ":fontid" => $fontId,
+        ":userid" => $_user[ "id" ]
+      ];
+      $count = fetchOne($q, $data);
+      if (((int)$count->cnt)<1) {
+        exit(json_out(["status" => true], 403));     
+      }
+      
+      $status = doQuery("delete FROM styles WHERE id = :fontid and user_ids=:userid", [
+        ":fontid" => $fontId,
+        ":userid" => $_user[ "id" ]
+      ]);
+      $code = ($status) ? 200 : 400;
+      exit(json_out([
+        "status" => $status
+      ], $code));
+
+      exit(json_out(["status" => false], 400));
+    }  
+  }
+
+
 	$cmd = $_GET[ "cmd" ] ?? $_current[ 0 ] ?? "";
 	$reDir = "/";
 
@@ -1271,6 +1299,8 @@
       loadFont();
     case "save_font":
       saveFont();
+    case "delete_font":
+      deleteFont($_current[1]);
 		default:
 			if (is_ajax()) {
 				exit(json_out(["status" => false], 400));
