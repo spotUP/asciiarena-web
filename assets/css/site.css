@@ -2340,3 +2340,8 @@ input:-webkit-autofill, input:-webkit-autofill:hover, and input:-webkit-autofill
 .icon:active:after {
   opacity: 0;
 }
+
+
+.btn-group, .btn-group-vertical {
+    display: inherit !important;
+}

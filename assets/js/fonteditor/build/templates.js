@@ -212,7 +212,6 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "           <div class=\"row ap-1 white\">\n" +
     "               <br><br>Character Table\n" +
     "           </div>\n" +
-    //"               <div data-toggle=\"buttons\">\n" +
     "                 <div class=\"btn-group btn-group-toggle\">\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"32\"></label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"33\">!</label>\n" +
@@ -225,8 +224,6 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"40\">(</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"41\">)</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"42\">*</label>\n" +
-    "                 </div>\n" +
-    "                 <div class=\"btn-group btn-group-toggle\">\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"43\">+</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"44\">,</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"45\">-</label>\n" +
@@ -238,8 +235,6 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"51\">3</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"52\">4</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"53\">5</label>\n" +
-    "                 </div>\n" +
-    "                 <div class=\"btn-group btn-group-toggle\">\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"54\">6</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"55\">7</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"56\">8</label>\n" +
@@ -251,8 +246,6 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"62\">&gt;</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"63\">?</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"64\">@</label>\n" +
-    "                 </div>\n" +
-    "                 <div class=\"btn-group btn-group-toggle\">\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"65\">A</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"66\">B</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"67\">C</label>\n" +
@@ -264,8 +257,6 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"73\">I</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"74\">J</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"75\">K</label>\n" +
-    "                 </div>\n" +
-    "                 <div class=\"btn-group btn-group-toggle\">\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"76\">L</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"77\">M</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"78\">N</label>\n" +
@@ -277,8 +268,6 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"84\">T</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"85\">U</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"86\">V</label>\n" +
-    "                 </div>\n" +
-    "                 <div class=\"btn-group btn-group-toggle\">\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"87\">W</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"88\">X</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"89\">Y</label>\n" +
@@ -290,8 +279,6 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"95\">_</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"96\">`</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"97\">a</label>\n" +
-    "                 </div>\n" +
-    "                 <div class=\"btn-group btn-group-toggle\">\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"98\">b</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"99\">c</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"100\">d</label>\n" +
@@ -303,8 +290,6 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"106\">j</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"107\">k</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"108\">l</label>\n" +
-    "                 </div>\n" +
-    "                 <div class=\"btn-group btn-group-toggle\">\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"109\">m</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"110\">n</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"111\">o</label>\n" +
@@ -316,8 +301,6 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"117\">u</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"118\">v</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"119\">w</label>\n" +
-    "                 </div>\n" +
-    "                 <div class=\"btn-group btn-group-toggle\">\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"120\">x</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"121\">y</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"122\">z</label>\n" +
@@ -329,8 +312,6 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"214\">Ö</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"220\">Ü</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"228\">ä</label>\n" +
-    "                 </div>\n" +
-    "                 <div class=\"btn-group btn-group-toggle\">\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"246\" autocomplete=\"off\">ö</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"252\" autocomplete=\"off\">ü</label>\n" +
     "                 <label class=\"btn btn-lg fontbtn\"><input type=\"radio\" ng-model=\"input.selectedChar\" ng-value=\"223\" autocomplete=\"off\">ß</label>\n" +
