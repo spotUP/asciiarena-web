@@ -114,9 +114,9 @@ include "header_ascii.php";
 					<li class="nav-item">
 						<a class="nav-link ascii apr-1" href="/about.php">ABOUT</a>
 					</li>
-				<!--	<li class="nav-item">
-						<a class="nav-link ascii apr-1" href="/fonteditor.php">ASCII STYLE DESIGNER</a>
-					</li> -->
+					<li class="nav-item">
+						<a class="nav-link ascii apr-1" href="/styleeditor.php">ASCII STYLE DESIGNER</a>
+					</li>
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle ascii" style="padding-right: 8px;" data-toggle="dropdown" href="/admin.php" id="themes">SUBMiT<span class="caret" style="padding-right: 8px;"></span></a>
 						<div class="dropdown-menu ascii" aria-labelledby="themes">
