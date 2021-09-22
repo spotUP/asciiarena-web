@@ -124,7 +124,7 @@ $dirname = $dirname[0];
 						}
 						?>
 						<?php
-						if (empty($collyrating)) {
+						if ($votecount<3) {
 							$votesleft = (3 - $votecount);
 							echo "Awaiting $votesleft vote";
 							if ($votesleft > 1) {
