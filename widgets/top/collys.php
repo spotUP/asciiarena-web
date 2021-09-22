@@ -5,7 +5,7 @@
 	</div>
 	<div class="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
 		<?php
-		foreach (fetchAll("SELECT * FROM collys ORDER BY rating DESC LIMIT 5") as $row) {
+		foreach (fetchAll("SELECT * FROM collys where (SELECT COUNT(rating) votes FROM comments WHERE filename = collys.filename)>=3 ORDER BY rating DESC LIMIT 5") as $row) {
 			$filename = htmlentities($row->filename);
 			$colly_rating = sprintf("%0.2f", $row->rating)
 			?>
