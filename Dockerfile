@@ -1,6 +1,6 @@
 FROM library/php:7.4-apache
 
-RUN apt-get -y update
+RUN apt-get -y update --allow-releaseinfo-change
 
 RUN mkdir -p /usr/share/man/man1
 
