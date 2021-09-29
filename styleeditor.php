@@ -16,10 +16,10 @@ include "header.php";
                     <div class="bs-component">
                         <ul class="nav nav-tabs apt-1 bg-secondary">
                             <li class="nav-item">
-                                <p><a class="nav-link" href='fonteditor.php#/edit'>Edit </a></p>
+                                <p><a class="nav-link" href='styleeditor.php#/edit'>Edit </a></p>
                             </li>
                             <li class="nav-item">
-                                <p><a class="nav-link" href='fonteditor.php#/test'>Test </a></p>
+                                <p><a class="nav-link" href='styleeditor.php#/test'>Test </a></p>
                             </li>
                         </ul>
                     </div>
