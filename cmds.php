@@ -369,6 +369,14 @@
       $comment = $_POST[ 'comment' ] ?? "";
       $rating = $_POST[ 'rating' ] ?? "";
       if (empty($rating)) $rating = null;
+      
+      if (!is_null($rating)) {
+          $status = doQuery("update comments set rating = null where colly_id=:colly_id and user_id=:user_id",[
+          ":colly_id" => (int)$colly,
+          ":user_id" => $_user[ "id" ],
+        ]);
+      }
+      
       if ($colly > 0) {
         $status = doQuery("insert into comments (colly_id, filename, crew, artist, comment, rating, nick, timestamp,user_id) 
           values (:colly_id,:filename,(select group_concat(w.name) from collys_crews cc LEFT JOIN crews w ON w.id=cc.crew_id where cc.colly_id=:colly_id group by cc.colly_id),(select group_concat(a.nick) from artists_collys ac LEFT JOIN artists a ON a.id=ac.artist_id where ac.colly_id=:colly_id GROUP BY ac.colly_id),:comment, :rating, :nick, :time, :user_id)",[
