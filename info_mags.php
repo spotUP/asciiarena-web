@@ -36,7 +36,7 @@ require_once "header.php"; ?>
                                                 $file_id = $mag->filename.'.diz';
 						if (file_exists('mags/'.$dirname.'/'.$file_id)) {
 							echo '<pre>';
-							echo file_get_contents('mags/'.$dirname.'/'.$file_id);
+							echo utf8_encode(file_get_contents('mags/'.$dirname.'/'.$file_id));
 							echo '</pre>';
 						}
 						?>
