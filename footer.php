@@ -1,11 +1,11 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
 </div>
 
-<div class="mx-auto navbar navbar-expand-lg fixed-bottom navbar-dark bg-primary d-flex justify-content-lg-around" style="height: 22px;">
+<!-- <div class="mx-auto navbar navbar-expand-lg fixed-bottom navbar-dark bg-primary d-flex justify-content-lg-around" style="height: 22px;">
 	<span cass="red ml-xl-2">NComm 2.0</span>
 	<span class="green">aSCIIaRENA</span>
 	<span class="green mr-xl-2"><?php echo Date("H:i", time()), " 00:00"; ?></span>
-</div>
+</div> -->
 
 <script>
 	document.addEventListener("visibilitychange", () => {
