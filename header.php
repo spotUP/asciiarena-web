@@ -80,7 +80,7 @@ include "header_ascii.php";
 		<span style="margin-left: 16px;" class="ncommm">NComm 2.0 Copyright 1988-1992 Daniel Bloch & co.</span>
 		<span><a href="/accounting.php"><img src="/assets/data/multitask.png" alt="" width="23" height="22"></a></span>
 	</div> -->
-	<div class="navbar navbar-expand-lg fixed-top bg-blue m-0 p-0" style="top: 22px; height: 21px">
+	<div class="navbar navbar-expand-lg fixed-top bg-blue m-0 p-0" style="height: 21px">
 		<div class="container-fluid m-md-0 p-md-0">
 			<a href="/" style="color: #fff" class="navbar-brand ascii">aSCIIaRENA</a>
 			<a class="navbar-toggler ascii" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">mENU</a>
