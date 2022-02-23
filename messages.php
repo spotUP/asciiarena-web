@@ -140,6 +140,10 @@ include_once "header.php";
 	</div>
 </div>
 <script>
+  function htmlEncode(s) {
+    return $('<div>').text(s).html();
+  }
+
   function sendNewMessage() {
   const receiver = $("#posttomember").val();
   const subject = $("#postnewsubject").val();
@@ -256,12 +260,12 @@ include_once "header.php";
         threadBody.append(`
         <div class="row">
           <div class="col-12 apt-1 apb-1">
-            <span class="white" style="white-space: pre-wrap;">${msg.message}</span>
+            <span class="white" style="white-space: pre-wrap;">${htmlEncode(msg.message)}</span>
           </div>
         </div>
         <div class="row">
           <div class="col-1">
-            <span class="cyan" style="white-space: pre-wrap;">${msg.postername}</span>
+            <span class="cyan" style="white-space: pre-wrap;">${htmlEncode(msg.postername)}</span>
           </div>
         </div>
         <div class="row apb-1">
@@ -295,10 +299,10 @@ include_once "header.php";
         
         let msgtxt = `
           <div class="col-7">
-            <a class="${colour} text-truncate !important;" id="msg${msg.id}" onclick="getMessageThread(${msg.id},${msg.thread})">${msg.subject}</a>
+            <a class="${colour} text-truncate !important;" id="msg${msg.id}" onclick="getMessageThread(${msg.id},${msg.thread})">${htmlEncode(msg.subject)}</a>
           </div>
           <div class="col-2">
-            <span class="cyan">${mailbox==1 ? 'From:' : 'To:'}</span> <span class="white">${mailbox==1 ? msg.postername : msg.postedto}</span>
+            <span class="cyan">${mailbox==1 ? 'From:' : 'To:'}</span> <span class="white">${mailbox==1 ? htmlEncode(msg.postername) : htmlEncode(msg.postedto)}</span>
           </div>
           <div class="col-2">
             <span class="cyan">Date:</span> <span class="white">${dateStr}</span>
