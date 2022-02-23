@@ -292,6 +292,10 @@ require_once "header.php";?>
 
 <script type="text/javascript">
 
+  function htmlEncode(s) {
+    return $('<div>').text(s).html();
+  }
+
 	function showFullscreen() {
 		var element = document.getElementById("colly");
 		element.classList.toggle("fullscreen");
@@ -504,14 +508,14 @@ require_once "header.php";?>
           commentlist.append(`
           <div class="header bg-header col-12 ap-1">
             <span> BY:</span>
-            <span class="yellow">${comment.nick}</span>
+            <span class="yellow">${htmlEncode(comment.nick)}</span>
             <span>DATE:</span>
             <span class="white">${comment.time}</span>
             <span class="yellow">RATING:</span>
             <span class="white">${comment.rating}</span>
           </div>
           <div class="bg-secondary col-12 ap-1 amb-1">
-            <span id="comment${comment.id}"class="cyan" style="white-space: pre-wrap;">${comment.comment}</span>
+            <span id="comment${comment.id}"class="cyan" style="white-space: pre-wrap;">${htmlEncode(comment.comment)}</span>
             <div class="col-12 p-0 m-0 apt-1">
             ${buttons}
             </div>
@@ -521,12 +525,12 @@ require_once "header.php";?>
           commentlist.append(`
           <div class="header bg-header col-12 ap-1">
             <span> BY:</span>
-            <span class="yellow">${comment.nick}</span>
+            <span class="yellow">${htmlEncode(comment.nick)}</span>
             <span>DATE:</span>
             <span class="white">${comment.time}</span>
           </div>
           <div class="bg-secondary col-12 ap-1 amb-1">
-            <span id="comment${comment.id}"class="cyan" style="white-space: pre-wrap;">${comment.comment}</span>
+            <span id="comment${comment.id}"class="cyan" style="white-space: pre-wrap;">${htmlEncode(comment.comment)}</span>
             <div class="col-12 p-0 m-0 apt-1">
             ${buttons}
             </div>
