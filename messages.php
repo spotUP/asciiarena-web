@@ -141,7 +141,8 @@ include_once "header.php";
 </div>
 <script>
   function htmlEncode(s) {
-    return $('<div>').text(s).html();
+    return $('<div>').text(s).html().replace("<br>","\n");
+
   }
 
   function sendNewMessage() {
