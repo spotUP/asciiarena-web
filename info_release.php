@@ -293,7 +293,7 @@ require_once "header.php";?>
 <script type="text/javascript">
 
   function htmlEncode(s) {
-    return $('<div>').text(s).html().replace("<br>","\n");
+    return $('<div>').text(s).html();
   }
 
 	function showFullscreen() {
