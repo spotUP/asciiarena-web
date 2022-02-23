@@ -60,6 +60,8 @@ appControllers.controller('MainCtrl', [
         charOrder.push(252);
         charOrder.push(223);
 
+        $scope.input.selectedChar = library.get('selChar');
+        
         function getUserFonts() {
           let fontlist = $("#fontSelect");
           fontlist.empty();
@@ -634,6 +636,7 @@ appControllers.controller('MainCtrl', [
             library.set('caseInsensitive', $scope.input.caseInsensitive);
             library.set('fontName', $scope.input.fontname);
             library.set('fontId', $scope.input.fontid);
+            library.set('selChar', $scope.input.selectedChar);
             library.set('fontStatus', $scope.input.fontstatus);
             library.set('figfont', createFigFileData());
         });
