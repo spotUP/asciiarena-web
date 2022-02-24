@@ -1,1 +1,209 @@
-<!doctypehtml><html lang=en-us><head><meta charset=utf-8><meta content="text/html; charset=utf-8"http-equiv=Content-Type><title>Emscripten-Generated Code</title><style>.emscripten{padding-right:0;margin-left:auto;margin-right:auto;display:block}textarea.emscripten{font-family:monospace;width:80%}div.emscripten{text-align:center}canvas.emscripten{border:0 none;background-color:#000}.spinner{height:50px;width:50px;margin:0 auto;-webkit-animation:rotation .8s linear infinite;-moz-animation:rotation .8s linear infinite;-o-animation:rotation .8s linear infinite;animation:rotation .8s linear infinite;border-left:10px solid #0096f0;border-right:10px solid #0096f0;border-bottom:10px solid #0096f0;border-top:10px solid #6400c8;border-radius:100%;background-color:#c864fa}@-webkit-keyframes rotation{from{-webkit-transform:rotate(0)}to{-webkit-transform:rotate(360deg)}}@-moz-keyframes rotation{from{-moz-transform:rotate(0)}to{-moz-transform:rotate(360deg)}}@-o-keyframes rotation{from{-o-transform:rotate(0)}to{-o-transform:rotate(360deg)}}@keyframes rotation{from{transform:rotate(0)}to{transform:rotate(360deg)}}#output{width:100%;height:200px;margin:0 auto;margin-top:10px;border-left:0;border-right:0px;padding-left:0;padding-right:0;display:block;background-color:#000;color:#fff;font-family:'Lucida Console',Monaco,monospace;outline:0}</style></head><body><figure id=spinner style=overflow:visible><div class=spinner></div><center style=margin-top:.5em><strong>emscripten</strong></center></figure><div class=emscripten id=status>Downloading...</div><div class=emscripten><progress hidden id=progress max=100 value=0></progress></div><div class=emscripten_border><canvas class=emscripten id=canvas oncontextmenu=event.preventDefault() ondragover=dragHandler(event) ondrop=dropHandler(event) onmouseup=mouseUp() tabindex=-1></canvas></div><hr><textarea class=emscripten id=output rows=8></textarea><hr><script>var statusElement=document.getElementById("status"),progressElement=document.getElementById("progress"),spinnerElement=document.getElementById("spinner"),Module={preRun:[],postRun:[],print:function(){var e=document.getElementById("output");return e&&(e.value=""),function(t){arguments.length>1&&(t=Array.prototype.slice.call(arguments).join(" ")),console.log(t),e&&(e.value+=t+"\n",e.scrollTop=e.scrollHeight)}}(),canvas:function(){var e=document.getElementById("canvas");return e.addEventListener("webglcontextlost",(function(e){alert("WebGL context lost. You will need to reload the page."),e.preventDefault()}),!1),e}(),setStatus:function(e){if(Module.setStatus.last||(Module.setStatus.last={time:Date.now(),text:""}),e!==Module.setStatus.last.text){var t=e.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/),n=Date.now();t&&n-Module.setStatus.last.time<30||(Module.setStatus.last.time=n,Module.setStatus.last.text=e,t?(e=t[1],progressElement.value=100*parseInt(t[2]),progressElement.max=100*parseInt(t[4]),progressElement.hidden=!1,spinnerElement.hidden=!1):(progressElement.value=null,progressElement.max=null,progressElement.hidden=!0,e||(spinnerElement.hidden=!0)),statusElement.innerHTML=e)}},totalDependencies:0,monitorRunDependencies:function(e){this.totalDependencies=Math.max(this.totalDependencies,e),Module.setStatus(e?"Preparing... ("+(this.totalDependencies-e)+"/"+this.totalDependencies+")":"All downloads complete.")}};Module.setStatus("Downloading..."),window.onerror=function(){Module.setStatus("Exception thrown, see JavaScript console"),spinnerElement.style.display="none",Module.setStatus=function(e){e&&Module.printErr("[post-exception status] "+e)}}</script><script async src=pt2-clone.js></script><script>function mouseUp(){const e=Module.ccall("GetFileOpFromJS","number");if(1==e){var t=document.createElement("input");t.setAttribute("type","file"),t.setAttribute("onchange","loadFileEvent(event)"),t.setAttribute("multiple",!0),t.click()}else if(2==e){const e=Module.ccall("GetDownloadFileName","string"),t=Module.FS.readFile(e),n="application/octet-stream",o=e.substr(e.lastIndexOf("/")+1);var l=document.createElement("a");l.download=o,l.href=URL.createObjectURL(new Blob([t],{type:n})),l.style.display="none",document.body.appendChild(l),l.click(),setTimeout((()=>{document.body.removeChild(l),URL.revokeObjectURL(l.href)}),2e3)}}function loadFileEvent(e){Array.prototype.forEach.call(e.target.files,(function(e){loadFile(e)}))}function loadFile(e){const t=new FileReader;t.onload=e=>{const t=e.target.fileName,l=new Uint8Array(e.target.result),n=l.length*l.BYTES_PER_ELEMENT,o=Module._malloc(n),r=new Uint8Array(Module.HEAPU8.buffer,o,n);r.set(l);Module.ccall("CopyFileFromJS","number",["string","number","number"],[t,r.byteOffset,l.length])},t.fileName=e.name,t.readAsArrayBuffer(e)}function dragHandler(e){e.preventDefault()}function dropHandler(e){e.preventDefault(),Array.prototype.forEach.call(e.dataTransfer.files,(function(e){loadFile(e)}))}</script></body></html>
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8" />
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+        <title>Emscripten-Generated Code</title>
+        <style>
+            .emscripten {
+                padding-right: 0;
+                margin-left: auto;
+                margin-right: auto;
+                display: block;
+            }
+            textarea.emscripten {
+                font-family: monospace;
+                width: 80%;
+            }
+            div.emscripten {
+                text-align: center;
+            }
+            canvas.emscripten {
+                border: 0 none;
+                background-color: #000;
+            }
+            .spinner {
+                height: 50px;
+                width: 50px;
+                margin: 0 auto;
+                -webkit-animation: rotation 0.8s linear infinite;
+                -moz-animation: rotation 0.8s linear infinite;
+                -o-animation: rotation 0.8s linear infinite;
+                animation: rotation 0.8s linear infinite;
+                border-left: 10px solid #0096f0;
+                border-right: 10px solid #0096f0;
+                border-bottom: 10px solid #0096f0;
+                border-top: 10px solid #6400c8;
+                border-radius: 100%;
+                background-color: #c864fa;
+            }
+            @-webkit-keyframes rotation {
+                from {
+                    -webkit-transform: rotate(0);
+                }
+                to {
+                    -webkit-transform: rotate(360deg);
+                }
+            }
+            @-moz-keyframes rotation {
+                from {
+                    -moz-transform: rotate(0);
+                }
+                to {
+                    -moz-transform: rotate(360deg);
+                }
+            }
+            @-o-keyframes rotation {
+                from {
+                    -o-transform: rotate(0);
+                }
+                to {
+                    -o-transform: rotate(360deg);
+                }
+            }
+            @keyframes rotation {
+                from {
+                    transform: rotate(0);
+                }
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+            #output {
+                width: 100%;
+                height: 200px;
+                margin: 0 auto;
+                margin-top: 10px;
+                border-left: 0;
+                border-right: 0px;
+                padding-left: 0;
+                padding-right: 0;
+                display: block;
+                background-color: #000;
+                color: #fff;
+                font-family: "Lucida Console", Monaco, monospace;
+                outline: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <figure id="spinner" style="overflow: visible;">
+            <div class="spinner"></div>
+            <center style="margin-top: 0.5em;"><strong>emscripten</strong></center>
+        </figure>
+        <div class="emscripten" id="status">Downloading...</div>
+        <div class="emscripten"><progress hidden id="progress" max="100" value="0"></progress></div>
+        <div class="emscripten_border"><canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" ondragover="dragHandler(event)" ondrop="dropHandler(event)" onmouseup="mouseUp()" tabindex="-1"></canvas></div>
+        <!-- <hr />
+         <textarea class="emscripten" id="output" rows="8"></textarea>
+        <hr /> -->
+        <script>
+            var statusElement = document.getElementById("status"),
+                progressElement = document.getElementById("progress"),
+                spinnerElement = document.getElementById("spinner"),
+                Module = {
+                    preRun: [],
+                    postRun: [],
+                    print: (function () {
+                        var e = document.getElementById("output");
+                        return (
+                            e && (e.value = ""),
+                            function (t) {
+                                arguments.length > 1 && (t = Array.prototype.slice.call(arguments).join(" ")), console.log(t), e && ((e.value += t + "\n"), (e.scrollTop = e.scrollHeight));
+                            }
+                        );
+                    })(),
+                    canvas: (function () {
+                        var e = document.getElementById("canvas");
+                        return (
+                            e.addEventListener(
+                                "webglcontextlost",
+                                function (e) {
+                                    alert("WebGL context lost. You will need to reload the page."), e.preventDefault();
+                                },
+                                !1
+                            ),
+                            e
+                        );
+                    })(),
+                    setStatus: function (e) {
+                        if ((Module.setStatus.last || (Module.setStatus.last = { time: Date.now(), text: "" }), e !== Module.setStatus.last.text)) {
+                            var t = e.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/),
+                                n = Date.now();
+                            (t && n - Module.setStatus.last.time < 30) ||
+                                ((Module.setStatus.last.time = n),
+                                (Module.setStatus.last.text = e),
+                                t
+                                    ? ((e = t[1]), (progressElement.value = 100 * parseInt(t[2])), (progressElement.max = 100 * parseInt(t[4])), (progressElement.hidden = !1), (spinnerElement.hidden = !1))
+                                    : ((progressElement.value = null), (progressElement.max = null), (progressElement.hidden = !0), e || (spinnerElement.hidden = !0)),
+                                (statusElement.innerHTML = e));
+                        }
+                    },
+                    totalDependencies: 0,
+                    monitorRunDependencies: function (e) {
+                        (this.totalDependencies = Math.max(this.totalDependencies, e)), Module.setStatus(e ? "Preparing... (" + (this.totalDependencies - e) + "/" + this.totalDependencies + ")" : "All downloads complete.");
+                    },
+                };
+            Module.setStatus("Downloading..."),
+                (window.onerror = function () {
+                    Module.setStatus("Exception thrown, see JavaScript console"),
+                        (spinnerElement.style.display = "none"),
+                        (Module.setStatus = function (e) {
+                            e && Module.printErr("[post-exception status] " + e);
+                        });
+                });
+        </script>
+        <script async src="pt2-clone.js"></script>
+        <script>
+            function mouseUp() {
+                const e = Module.ccall("GetFileOpFromJS", "number");
+                if (1 == e) {
+                    var t = document.createElement("input");
+                    t.setAttribute("type", "file"), t.setAttribute("onchange", "loadFileEvent(event)"), t.setAttribute("multiple", !0), t.click();
+                } else if (2 == e) {
+                    const e = Module.ccall("GetDownloadFileName", "string"),
+                        t = Module.FS.readFile(e),
+                        n = "application/octet-stream",
+                        o = e.substr(e.lastIndexOf("/") + 1);
+                    var l = document.createElement("a");
+                    (l.download = o),
+                        (l.href = URL.createObjectURL(new Blob([t], { type: n }))),
+                        (l.style.display = "none"),
+                        document.body.appendChild(l),
+                        l.click(),
+                        setTimeout(() => {
+                            document.body.removeChild(l), URL.revokeObjectURL(l.href);
+                        }, 2e3);
+                }
+            }
+            function loadFileEvent(e) {
+                Array.prototype.forEach.call(e.target.files, function (e) {
+                    loadFile(e);
+                });
+            }
+            function loadFile(e) {
+                const t = new FileReader();
+                (t.onload = (e) => {
+                    const t = e.target.fileName,
+                        l = new Uint8Array(e.target.result),
+                        n = l.length * l.BYTES_PER_ELEMENT,
+                        o = Module._malloc(n),
+                        r = new Uint8Array(Module.HEAPU8.buffer, o, n);
+                    r.set(l);
+                    Module.ccall("CopyFileFromJS", "number", ["string", "number", "number"], [t, r.byteOffset, l.length]);
+                }),
+                    (t.fileName = e.name),
+                    t.readAsArrayBuffer(e);
+            }
+            function dragHandler(e) {
+                e.preventDefault();
+            }
+            function dropHandler(e) {
+                e.preventDefault(),
+                    Array.prototype.forEach.call(e.dataTransfer.files, function (e) {
+                        loadFile(e);
+                    });
+            }
+        </script>
+    </body>
+</html>
