@@ -6,6 +6,7 @@
 		"top/crews",
 		"top/uploaders",
 		"top/commenters",
-		"arena_stats"
+		"arena_stats",
+    "bbsweektop"
 	], false);
 ?>

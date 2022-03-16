@@ -6,5 +6,6 @@
 		"latest/added_collys",
 		"latest/added_mags",
 		"latest/added_apps",
-		"new_users"
+		"new_users",
+    "weektop"
 	]);
