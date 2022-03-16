@@ -14,7 +14,7 @@ $weektophdr = "weektophdr_{$weektop_id}";
 <script>
 	function fetch_weektop_<?=$weektop?>() {
 		$.ajax({
-			url: "http://scenewall.bbs.io:1541/GlobalLastCallers/api/GlobalLastCallers/Stats?StatType=16&Count=5"
+			url: "https://scenewall.bbs.io:1543/GlobalLastCallers/api/GlobalLastCallers/Stats?StatType=16&Count=5"
 		}).done(function (data) {
       var a = ''
 			$.each(data.stats, function (i, item) {
