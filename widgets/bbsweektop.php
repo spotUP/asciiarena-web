@@ -14,7 +14,7 @@ $bbsweektophdr = "bbsweektophdr_{$bbsweektop_id}";
 <script>
 	function fetch_bbsweektop_<?=$bbsweektop?>() {
 		$.ajax({
-			url: "http://scenewall.bbs.io:1541/GlobalLastCallers/api/GlobalLastCallers/Stats?StatType=2&Count=5"
+			url: "http://scenewall.bbs.io:1541/GlobalLastCallers/api/GlobalLastCallers/Stats?StatType=26&Count=5"
 		}).done(function (data) {
       var a = ''
 			$.each(data.stats, function (i, item) {
