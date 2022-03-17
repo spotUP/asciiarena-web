@@ -23,7 +23,23 @@ $weektophdr = "weektophdr_{$weektop_id}";
         a = a+item.name
         a = a+'</a>'
         a = a+'<span class="text-truncate">'
-        a = a+item.count
+        var cnt = item.count
+        if (cnt>10485759) {
+          cnt = (cnt / 1024 / 1024).toFixed(0)
+          a = a +cnt+' GB'
+        } else if (cnt>900000) {
+          cnt = (cnt / 1024 / 1024).toFixed(2)
+          a = a +cnt+' GB'
+        } else if (cnt>10239) {
+          cnt = (cnt / 1024).toFixed(0)
+          a = a+cnt+' MB'
+        } else if (cnt>900) {
+          cnt = (cnt / 1024).toFixed(2)
+          a = a+cnt+' MB'
+            
+        } else {
+          a = a+cnt+' KB'
+        }
         a = a+'</span></div>'
         $("#<?=$weektop?>").html(a)
       });
