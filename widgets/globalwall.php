@@ -3,6 +3,8 @@ $wall_id = random_int(0, 65536);
 $wall = "wall_{$wall_id}";
 $form = "form_{$wall_id}";
 $tag = "tag_{$wall_id}";
+$nick = "";
+if (is_logged_in()) $nick=$_user[ "nick" ];
 ?>
 <div class="header col-12 col-lg-12">
 	<h2 class="apt-1 apb-1 bg-header">TAG THE GLOBAL BBS WALL</h2>
@@ -64,7 +66,7 @@ $tag = "tag_{$wall_id}";
             }
 
             comment = clean(comment)
-            userName = clean("<?=$_user[ "nick" ]?>")
+            userName = clean("<?=$nick?>")
 
             data = {"userName": userName,
                 "source": 'aSCIIaRENA',
