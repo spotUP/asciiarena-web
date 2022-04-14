@@ -3,6 +3,8 @@
 	define("VALID", true);
 	define("BASEDIR", __DIR__);
 	if (session_status() === PHP_SESSION_NONE) {
+    $sessionpath = getenv('SESSIONPATH') ?: session_save_path();
+    session_save_path($sessionpath);
 		session_start();
 	}
 	$_user = $_SESSION[ "_user" ] ?? [
