@@ -16,6 +16,9 @@ COPY ./ /var/www/html/
 
 RUN a2enmod rewrite
 
+RUN chmod 777 /tmp
+RUN chmod +t /tmp
+
 RUN apt-get -y install msmtp mailutils
 
 ARG MAILROOT
