@@ -9,7 +9,7 @@ include "header.php";
 			"message_alerts",
 			["file" => "latest/releases", "header" => "LATEST RELEASES", "columns" => 2],
 			["file" => "wall"],
-      ["file" => "globalwall"],
+//      ["file" => "globalwall"],
 //			["file" => "cedd_sessions"],
 			["file" => "latest/comments"],
 		]); ?>
