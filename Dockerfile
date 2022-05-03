@@ -18,8 +18,7 @@ RUN a2enmod rewrite
 
 RUN chmod 777 /tmp
 RUN chmod +t /tmp
-
-RUN apt-get -y install msmtp mailutils
+RUN apt-get update && apt-get -y install msmtp mailutils
 
 ARG MAILROOT
 ARG MAILHOST
