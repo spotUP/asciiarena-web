@@ -101,7 +101,7 @@ require_once "header.php"; ?>
 			}
 
 			if ($viewmode === "BBS") { ?>
-				<div class="container d-xs-none d-sm-none d-md-block d-lg-block d-xl-block">
+				<div class="container d-none d-sm-none d-md-block d-lg-block d-xl-block d-xxl-block">
 					<?php foreach ($rows as $row) { ?>
 						<div class="row apt-1">
 							<div class="col-6 col-am-6 text-center text-md-left">
@@ -148,7 +148,7 @@ require_once "header.php"; ?>
 
 
 
-				<div class="container d-xs-block d-sm-block d-md-none d-lg-none d-xl-none">
+				<div class="container d-block d-xs-block d-sm-block d-md-none d-lg-none d-xl-none d-xxl-none">
 					<?php foreach ($rows as $row) { ?>
 						<div class="row apt-1">
 							<div class="col-12 text-left">
