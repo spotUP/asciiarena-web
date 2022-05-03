@@ -164,7 +164,7 @@ require_once "header.php"; ?>
 									<pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$row->filename?>"><?=$file_id?></a></pre><br><br>
 								<?php } ?>
 								<span class="pink text-left"><?=$row->upload_signature?></span><br><br>
-								<span class="green text-left">[ aSCIIaRENa ] [ FREE LEECH ]</span>
+								<span class="green text-left">[ aSCIIaRENa ] [ FREE LEECH ]</span><br><br><br><br>
 							</div>
 						</div>
 					<?php } ?>
