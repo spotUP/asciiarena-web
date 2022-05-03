@@ -132,15 +132,15 @@ if (is_logged_in()) $nick=$_user[ "nick" ];
 
             var colour = '<font color="#ffffff">';
 
-            if ((comment.indexOf('\33[0m')>=0) || (comment.indexOf('\33[0;0m')>=0)) colour = '<font color="#ffffff">';
+            if ((comment.indexOf('\33[0m')>=0) || (comment.indexOf('\33[0;0m')>=0)) colour = '<font style="opacity:.7" color="#ffffff">';
             if ((comment.indexOf('\33[31m')>=0) || (comment.indexOf('\33[0;31m')>=0)) colour = '<font color="#ff5555">';
             if ((comment.indexOf('\33[32m')>=0) || (comment.indexOf('\33[0;32m')>=0)) colour = '<font color="#55ff55">';
             if ((comment.indexOf('\33[33m')>=0) || (comment.indexOf('\33[0;33m')>=0)) colour = '<font color="#ffff55">';
-            if ((comment.indexOf('\33[34m')>=0) || (comment.indexOf('\33[0;34m')>=0)) colour = '<font color="#5555ff">';
+            if ((comment.indexOf('\33[34m')>=0) || (comment.indexOf('\33[0;34m')>=0)) colour = '<font color="#0000aa">';
             if ((comment.indexOf('\33[35m')>=0) || (comment.indexOf('\33[0;35m')>=0)) colour = '<font color="#ff55ff">';
-            if ((comment.indexOf('\33[36m')>=0) || (comment.indexOf('\33[0;36m')>=0)) colour = '<font color="#55ffff">';
-            if ((comment.indexOf('\33[37m')>=0) || (comment.indexOf('\33[0;37m')>=0)) colour = '<font color="#ffffff">';
-            
+            if ((comment.indexOf('\33[36m')>=0) || (comment.indexOf('\33[0;36m')>=0)) colour = '<font color="#00bbbb">';
+            if ((comment.indexOf('\33[37m')>=0) || (comment.indexOf('\33[0;37m')>=0)) colour = '<font style="opacity:.7" color="#ffffff">';            
+           
             var regex = new RegExp('\33', 'g');
             comment = comment.replace(regex,'');
 
