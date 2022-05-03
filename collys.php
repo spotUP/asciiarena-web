@@ -152,7 +152,7 @@ require_once "header.php"; ?>
 					<?php foreach ($rows as $row) { ?>
 						<div class="row apt-1">
 							<div class="col-12 text-left">
-								<a href="/release/<?=$row->filename?>"><span class="cyan" style="margin-right: 8px;"><?=$row->filename?></span></a> <span class="green" style="margin-right: 16px;">PF--</span> <span class="yellow" style="margin-right: 8px;"><?=$row->filesize?></span> <span class="yellow"><?=date("d.m.y", $row->timestamp);?></span>
+								<a href="/release/<?=$row->filename?>"><span class="cyan" style="margin-right: 8px;"><?=$row->filename?></span></a> <span class="green" style="margin-right: 16px;">PF--</span> <span class="yellow" style="margin-right: 8px;"><?=$row->filesize?></span> <span class="yellow"><?=date("d.m.y", $row->timestamp);?></span><br><br>
 								<?php
 								$dirname = @array_shift(explode(".", $row->filename));
 								$filen = 'collections/'.$dirname.'/'.$row->filename;
@@ -161,10 +161,10 @@ require_once "header.php"; ?>
 									$file_id = utf8_encode($file_id);
 									$file_id = htmlentities($file_id, ENT_SUBSTITUTE);
 									?>
-									<pre style="overflow: hidden;"><a class="magenta ascii amt-1" href="/release/<?=$row->filename?>"><?=$file_id?></a></pre>
+									<pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$row->filename?>"><?=$file_id?></a></pre><br><br>
 								<?php } ?>
-								<span class="pink text-left amt-1"><?=$row->upload_signature?></span>
-								<span class="green text-left amt-1">[ aSCIIaRENa ] [ FREE LEECH ]</span>
+								<span class="pink text-left"><?=$row->upload_signature?></span><br><br>
+								<span class="green text-left">[ aSCIIaRENa ] [ FREE LEECH ]</span>
 							</div>
 						</div>
 					<?php } ?>
