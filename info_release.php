@@ -506,7 +506,7 @@ require_once "header.php";?>
 
         if (comment.rating.length>0) {
           commentlist.append(`
-          <div class="header bg-header col-12 ap-1">
+          <div class="header bg-header col-12 ap-1 text-truncate">
             <span> BY:</span>
             <span class="yellow">${htmlEncode(comment.nick)}</span>
             <span>DATE:</span>
@@ -523,7 +523,7 @@ require_once "header.php";?>
         }
         else {
           commentlist.append(`
-          <div class="header bg-header col-12 ap-1">
+          <div class="header bg-header col-12 ap-1 text-truncate">
             <span> BY:</span>
             <span class="yellow">${htmlEncode(comment.nick)}</span>
             <span>DATE:</span>

@@ -11,7 +11,7 @@ $viewmode = $_GET['viewmode'] ?? "Standard";
 $sort_order = (isset($_GET['sort_order'])) ? strtolower($_GET['sort_order']) : "";
 switch ($sort_order) {
 	case "desc": $sort_order = 'DESC'; $osort_order = 'asc'; break;
-	default: $sort_order = 'ASC'; $osort_order = 'desc'; break;
+	default: $sort_order = 'desc'; $osort_order = 'asc'; break;
 }
 $sort_by = $_GET['sort_by'] ?? "";
 switch ($sort_by) {
