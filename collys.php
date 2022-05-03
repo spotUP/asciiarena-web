@@ -168,61 +168,60 @@ require_once "header.php"; ?>
 								<span class="green text-right block d-sm-none">[ aSCIIaRENa ] [ FREE LEECH ]</span>
 							</div>
 						</div>
-					</div>
-				<?php } ?>
-			</div>
-
-
-
-
-
-
-
-
-
-
-
-
-		<?php } else { ?>
-			<div class="container">
-				<div class="row amb-1">
-					<div class="col"><span class="white"><a href="?sort_by=name&sort_order=<?=$osort_order?>">NAME</a></span></div>
-					<div class="col"><span class="white"><a href="?sort_by=filename&sort_order=<?=$osort_order?>">FILENAME</a></span></div>
-					<div class="col text-truncate"><span class="white"><a href="?sort_by=artist&sort_order=<?=$osort_order?>">ARTiST</a></span></div>
-					<div class="col text-truncate"><span class="white"><a href="?sort_by=crew&sort_order=<?=$osort_order?>">CREW</a></span></div>
-					<div class="col text-truncate"><span class="white"><a href="?sort_by=date&sort_order=<?=$osort_order?>">DATE</a></span></div>
+					<?php } ?>
 				</div>
-				<?php foreach ($rows as $row) { ?>
-					<div class="row">
-						<div class="col text-truncate">
-							<a class="magenta" href="/release/<?=$row->filename?>"><?=$row->name?></a>
-						</div>
-						<div class="col text-truncate">
-							<a class="magenta" href="/release/<?=$row->filename?>"><?=$row->filename?></a>
-						</div>
-						<div class="col green text-truncate">
-							<span class="yellow"><?=combinize($row->artists, $row->artists, "/artist/", $row->artists)?></span>
-						</div>
-						<div class="col green text-truncate">
-							<span class="yellow"><?=combinize($row->crews, $row->crews, "/crew/", $row->crews)?></span>
-						</div>
-						<div class="col text-truncate">
-							<?=sprintf("%04d", $row->year).'-'.sprintf("%02d", $row->month).'-'.sprintf("%02d", $row->day)?>
-						</div>
+
+
+
+
+
+
+
+
+
+
+
+
+			<?php } else { ?>
+				<div class="container">
+					<div class="row amb-1">
+						<div class="col"><span class="white"><a href="?sort_by=name&sort_order=<?=$osort_order?>">NAME</a></span></div>
+						<div class="col"><span class="white"><a href="?sort_by=filename&sort_order=<?=$osort_order?>">FILENAME</a></span></div>
+						<div class="col text-truncate"><span class="white"><a href="?sort_by=artist&sort_order=<?=$osort_order?>">ARTiST</a></span></div>
+						<div class="col text-truncate"><span class="white"><a href="?sort_by=crew&sort_order=<?=$osort_order?>">CREW</a></span></div>
+						<div class="col text-truncate"><span class="white"><a href="?sort_by=date&sort_order=<?=$osort_order?>">DATE</a></span></div>
 					</div>
-				<?php } ?>
-			</div>
-		<?php } ?>
+					<?php foreach ($rows as $row) { ?>
+						<div class="row">
+							<div class="col text-truncate">
+								<a class="magenta" href="/release/<?=$row->filename?>"><?=$row->name?></a>
+							</div>
+							<div class="col text-truncate">
+								<a class="magenta" href="/release/<?=$row->filename?>"><?=$row->filename?></a>
+							</div>
+							<div class="col green text-truncate">
+								<span class="yellow"><?=combinize($row->artists, $row->artists, "/artist/", $row->artists)?></span>
+							</div>
+							<div class="col green text-truncate">
+								<span class="yellow"><?=combinize($row->crews, $row->crews, "/crew/", $row->crews)?></span>
+							</div>
+							<div class="col text-truncate">
+								<?=sprintf("%04d", $row->year).'-'.sprintf("%02d", $row->month).'-'.sprintf("%02d", $row->day)?>
+							</div>
+						</div>
+					<?php } ?>
+				</div>
+			<?php } ?>
+		</div>
 	</div>
-</div>
 
-<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
-	<?php include('sidebar.php'); ?>
-</div>
+	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+		<?php include('sidebar.php'); ?>
+	</div>
 
-<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
-	<?php include('sidebar_right.php'); ?>
-</div>
+	<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
+		<?php include('sidebar_right.php'); ?>
+	</div>
 </div>
 </div>
 <?php include('footer.php'); ?>
