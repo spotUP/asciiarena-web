@@ -11,7 +11,7 @@ $viewmode = $_GET['viewmode'] ?? "Standard";
 $sort_order = (isset($_GET['sort_order'])) ? strtolower($_GET['sort_order']) : "";
 switch ($sort_order) {
 	case "desc": $sort_order = 'DESC'; $osort_order = 'asc'; break;
-	default: $sort_order = 'desc'; $osort_order = 'asc'; break;
+	default: $sort_order = 'ASC'; $osort_order = 'desc'; break;
 }
 $sort_by = $_GET['sort_by'] ?? "";
 switch ($sort_by) {
@@ -103,7 +103,7 @@ require_once "header.php"; ?>
 			if ($viewmode === "BBS") { ?>
 				<div class="container">
 					<?php foreach ($rows as $row) { ?>
-						<div class="row apt-1">
+						<div class="row apt-1 d-sm-none d-md-none">
 							<div class="col-6 col-am-6 text-center text-md-left">
 								<a href="/release/<?=$row->filename?>"><span class="cyan" style="margin-right: 8px;"><?=$row->filename?></span></a> <span class="green" style="margin-right: 16px;">PF--</span> <span class="yellow" style="margin-right: 8px;"><?=$row->filesize?></span> <span class="yellow"><?=date("d.m.y", $row->timestamp);?></span>
 							</div>
@@ -120,13 +120,13 @@ require_once "header.php"; ?>
 								<?php } ?>
 							</div>
 						</div>
-						<div class="row apb-1">
+						<div class="row apb-1 d-sm-none d-md-none">
 							<div class="col-12 col-sm-6"></div>
 							<div class="col-12 col-sm-6 text-center text-md-left">
 								<span class="pink text-right"><?=$row->upload_signature?></span>
 							</div>
 						</div>
-						<div class="row apb-2">
+						<div class="row apb-2 d-sm-none d-md-none">
 							<div class="col-12 col-sm-6"></div>
 							<div class="col-12 col-sm-6 text-center text-md-left d-none d-sm-block">
 								<span class="green text-right">[ aSCIIaRENa ] [ FREE LEECH ] [ aSCIIaRENa ]</span>
