@@ -103,7 +103,7 @@ require_once "header.php"; ?>
 			if ($viewmode === "BBS") { ?>
 				<div class="container">
 					<?php foreach ($rows as $row) { ?>
-						<div class="row apt-1 d-sm-none d-md-none">
+						<div class="row apt-1 d-sm-none">
 							<div class="col-6 col-am-6 text-center text-md-left">
 								<a href="/release/<?=$row->filename?>"><span class="cyan" style="margin-right: 8px;"><?=$row->filename?></span></a> <span class="green" style="margin-right: 16px;">PF--</span> <span class="yellow" style="margin-right: 8px;"><?=$row->filesize?></span> <span class="yellow"><?=date("d.m.y", $row->timestamp);?></span>
 							</div>
