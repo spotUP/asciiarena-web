@@ -161,11 +161,10 @@ require_once "header.php"; ?>
 									$file_id = utf8_encode($file_id);
 									$file_id = htmlentities($file_id, ENT_SUBSTITUTE);
 									?>
-									<pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$row->filename?>"><?=$file_id?></a></pre>
+									<pre style="overflow: hidden;"><a class="magenta ascii amt-1" href="/release/<?=$row->filename?>"><?=$file_id?></a></pre>
 								<?php } ?>
-								<span class="pink text-right"><?=$row->upload_signature?></span>
-								<span class="green text-right">[ aSCIIaRENa ] [ FREE LEECH ] [ aSCIIaRENa ]</span>
-								<span class="green text-right block d-sm-none">[ aSCIIaRENa ] [ FREE LEECH ]</span>
+								<span class="pink text-left amt-1"><?=$row->upload_signature?></span>
+								<span class="green text-left amt-1">[ aSCIIaRENa ] [ FREE LEECH ]</span>
 							</div>
 						</div>
 					<?php } ?>
