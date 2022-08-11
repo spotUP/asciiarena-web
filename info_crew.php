@@ -198,7 +198,7 @@ include "header.php";
 		</div>
 
 		<?php
-		$ask="select nick from member_of where crew=:showcrew";
+		$ask="select nick from member_of where crew=:showcrew order by nick";
 		$result=fetchAll($ask, [ 'showcrew' => $showcrew ]);
 		foreach($result as $row)
 		{
