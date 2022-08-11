@@ -553,7 +553,7 @@ include "header.php";
 				</div>
 			</div>
 			<?php
-			$ask = "SELECT c.*,a.nick,w.name, 
+			$ask = "SELECT c.*,a.nick,
 				GROUP_CONCAT(a.nick) as author
 				FROM collys c
   				LEFT JOIN artists_collys ac ON c.id=ac.colly_id
