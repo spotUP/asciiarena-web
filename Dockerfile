@@ -39,7 +39,7 @@ RUN echo "account email" >> /etc/msmtprc
 RUN echo "host ${MAILHOST}" >> /etc/msmtprc
 RUN echo "port ${MAILPORT}" >> /etc/msmtprc
 RUN echo "from ${MAILROOT}" >> /etc/msmtprc
-RUN echo "auth on" >> /etc/msmtprc
+RUN echo "auth login" >> /etc/msmtprc
 RUN echo "user ${MAILUSER}" >> /etc/msmtprc
 RUN echo "password ${MAILPASS}" >> /etc/msmtprc
 RUN echo "account default : email" >> /etc/msmtprc
