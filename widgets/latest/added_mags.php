@@ -17,7 +17,7 @@
 			$upload_date = date("y-m-d", $upload_date);
 			?>
 			<div class="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
-				<a class="magenta text-truncate" href="/mags.php?sort_by=timestamp"><?=$filename?></a>
+				<a class="magenta text-truncate" href="/magazine/<?=$filename?>"><?=$filename?></a>
 				<span class="text-truncate"><?=$upload_date?></span>
 			</div>
 			<?php 
