@@ -515,7 +515,7 @@ require_once "header.php";?>
             <span class="white">${comment.rating}</span>
           </div>
           <div class="bg-secondary col-12 ap-1 amb-1">
-            <span id="comment${comment.id}"class="cyan" style="white-space: pre-wrap;">${htmlEncode(comment.comment)}</span>
+            <span id="comment${comment.id}"class="cyan" style="white-space: pre-wrap;">${htmlEncode(comment.comment.length ===0 ? `"${comment.nick} voted ${comment.rating}"`  : comment.comment)}</span>
             <div class="col-12 p-0 m-0 apt-1">
             ${buttons}
             </div>
