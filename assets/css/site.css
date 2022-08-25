@@ -2350,10 +2350,16 @@ Selector::file-selector-button {
    font-size:  16px;
    height: 16px;
    line-height: 16px;
+   border-radius: 0px;
+   padding: 0px;
+   margin: 0px;
 }
 Selector::-webkit-file-upload-button {
    font-size:  16px;
    font-size:  16px;
    height: 16px;
    line-height: 16px;
+   border-radius: 0px;
+   padding: 0px;
+   margin: 0px;
 }
