@@ -2345,3 +2345,15 @@ input:-webkit-autofill, input:-webkit-autofill:hover, and input:-webkit-autofill
 .btn-group, .btn-group-vertical {
     display: inherit !important;
 }
+
+Selector::file-selector-button {
+   font-size:  16px;
+   height: 16px;
+   line-height: 16px;
+}
+Selector::-webkit-file-upload-button {
+   font-size:  16px;
+   font-size:  16px;
+   height: 16px;
+   line-height: 16px;
+}
