@@ -540,6 +540,7 @@ input, optgroup {
   border: 0 !important;
   white-space: pre;
   color: #bbbbbb !important;
+  line-height: 14px;
 }
 
 input:active, optgroup:active {
@@ -547,6 +548,7 @@ input:active, optgroup:active {
   max-height: 16px;
   min-height: 16px;
   color: #bbbbbb !important;
+  line-height: 14px;
 }
 
 input:hover, optgroup:hover {
