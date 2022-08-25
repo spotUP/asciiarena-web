@@ -17,7 +17,7 @@
 			</div>
 		</div>
 		<?php
-		foreach(fetchAll("SELECT * FROM comments ORDER BY timestamp DESC LIMIT 10") as $row) {
+		foreach(fetchAll('SELECT filename,nick,IFNULL(comment,concat(nick," voted ",rating)) comment FROM comments ORDER BY timestamp DESC LIMIT 10') as $row) {
 			?>
 			<div class="row">
 				<div class="col-sm-7 cyan text-truncate">
