@@ -20,61 +20,67 @@ include "header_ascii.php";
 	<link rel="stylesheet" href="/assets/css/bootstrap.min.css" media="screen">
 	<link rel="stylesheet" href="/assets/css/bootstrap-colorselector.css" media="screen">
 	<link rel="stylesheet" href="/assets/css/site.css" media="screen">
-  <link rel="stylesheet" href="/assets/css/386.css" media="screen">
+	<link rel="stylesheet" href="/assets/css/386.css" media="screen">
 	<script>document.domain = 'asciiarena.se';</script>
-  <link rel="preload" href="/assets/fonts/TopazPlus_a1200.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="/assets/fonts/TopazPlus_a1200.woff2" as="font" type="font/woff2" crossorigin>
 	<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 	<script src="/assets/js/bootstrap.bundle.min.js"></script>
 	<script src="/assets/js/bootstrap-colorselector.js"></script>
 	<!-- <script async defer data-domain="asciiarena.se" src="https://asciiarena-plausible.caprover.asciiarena.se/js/plausible.js"></script> -->
-  <script type="module">
-    import init386 from "/assets/js/386-animation/index.js";
-    init386({
-      fastLoad: 
-      <?php 
-      $anim = fetchOne("SELECT anim_effect FROM users WHERE id = :id union select false as anim_effect", [":id" => $_user['id']]);
-        if ($anim->anim_effect=='Y') { echo "false,"; } else { echo "true,"; }
-      ?>
-      onePass: true,
-      speedFactor: 4,
-      background: '#000000',
+	<script type="module">
+		import init386 from "/assets/js/386-animation/index.js";
+		init386({
+			fastLoad: 
+			<?php 
+			$anim = fetchOne("SELECT anim_effect FROM users WHERE id = :id union select false as anim_effect", [":id" => $_user['id']]);
+			if ($anim->anim_effect=='Y') { echo "false,"; } else { echo "true,"; }
+			?>
+			onePass: true,
+			speedFactor: 4,
+			background: '#000000',
       cursorColor: '#ff0000', // The colour of the terminal cursor/bar.
     });
 
   </script>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
-	<script>   
-    window.switchers = [];
-    
-		function switcharoo(selector, delay = 3000, idx, start) {
-			if (typeof idx === "undefined") {
-				idx = window.switchers.length;
-			}
-			if (typeof start === "undefined") {
-				start = 1;
-			}
-			window.switchers[idx] = [start, selector, delay];
-			window.switchers[idx][3] = setInterval(() => {
-				$(`${selector}:nth-child(${window.switchers[idx][0]})`).fadeOut(300, () => {
-					$(selector).css("display", "none");
-					if (window.switchers[idx][0] === $(`${selector}`).length) {
-						window.switchers[idx][0] = 1;
-					} else {
-						window.switchers[idx][0]++;
-					}
-					$(`${selector}:nth-child(${window.switchers[idx][0]})`).fadeIn(300);
-				});
-			}, delay);
-		}
-	</script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+  <script>   
+  	window.switchers = [];
+  	
+  	function switcharoo(selector, delay = 3000, idx, start) {
+  		if (typeof idx === "undefined") {
+  			idx = window.switchers.length;
+  		}
+  		if (typeof start === "undefined") {
+  			start = 1;
+  		}
+  		window.switchers[idx] = [start, selector, delay];
+  		window.switchers[idx][3] = setInterval(() => {
+  			$(`${selector}:nth-child(${window.switchers[idx][0]})`).fadeOut(300, () => {
+  				$(selector).css("display", "none");
+  				if (window.switchers[idx][0] === $(`${selector}`).length) {
+  					window.switchers[idx][0] = 1;
+  				} else {
+  					window.switchers[idx][0]++;
+  				}
+  				$(`${selector}:nth-child(${window.switchers[idx][0]})`).fadeIn(300);
+  			});
+  		}, delay);
+  	}
+  </script>
+  <script type="text/javascript">
+  	document.getElementById("uploadBtn").onchange = function () {
+  		document.getElementById("uploadFile").value = this.value;
+  	};
+  </script>
 </head>
 <body>
 	<div id="spotclose" class="spotclose" onclick='showFullscreen()'><div class="noevents">x</div></div>
 	<?php if (!isset($_user['settings']['crt_effect']) || $_user['settings']['crt_effect'] === 'Y') { ?>
-	<div class="scanlines"></div>
+		<div class="scanlines"></div>
 	<?php } ?>
 	<div class="vignette"></div>
 <!--	<div class="navbar navbar-expand-lg fixed-top navbar-dark bg-white d-flex justify-content-between m-0 p-0" style="height: 22px; margin-bottom: 2px; padding-right: 2px;">
@@ -218,10 +224,10 @@ include "header_ascii.php";
 					<div class="col-lg-12">
 						<div class="bs-component aml-1 amb-1 apl-1 apr-1 apt-1">
 							<?php if ($detect->isMobile()) { ?>
-							<div class="animate__animated animate__tada alert alert-dismissible alert-danger hide-on-landscape">
-								<button type="button" class="close" data-dismiss="alert">x</button>
-								Rotate your phone for a better viewing experience.
-							</div>
+								<div class="animate__animated animate__tada alert alert-dismissible alert-danger hide-on-landscape">
+									<button type="button" class="close" data-dismiss="alert">x</button>
+									Rotate your phone for a better viewing experience.
+								</div>
 							<?php } ?>
 						</div>
 					</div>
