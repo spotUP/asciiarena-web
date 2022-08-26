@@ -2364,6 +2364,8 @@ Selector::-webkit-file-upload-button {
    border-radius: 0px;
    padding: 0px;
    margin: 0px;
+   color: #444444;
+   background: #ededed;
 }
 
 input::-webkit-file-upload-button {
@@ -2374,4 +2376,49 @@ input::-webkit-file-upload-button {
    border-radius: 0px;
    padding: 0px;
    margin: 0px;
+}
+
+::file-selector-button{
+   background-color: #ffffff00;
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+   font-size:  16px;
+   font-size:  16px;
+   height: 16px;
+   line-height: 16px;
+   border-radius: 0px;
+   padding: 0px;
+   margin: 0px;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;  
+} 
+
+input[type="file"]::-ms-browse {
+    background-color: #ffffff00;
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+   font-size:  16px;
+   font-size:  16px;
+   height: 16px;
+   line-height: 16px;
+   border-radius: 0px;
+   padding: 0px;
+   margin: 0px;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
+}
+
+input[type="file"]::-webkit-file-upload-button {
+    background-color: #ffffff00;
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+   font-size:  16px;
+   font-size:  16px;
+   height: 16px;
+   line-height: 16px;
+   border-radius: 0px;
+   padding: 0px;
+   margin: 0px;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
 }
