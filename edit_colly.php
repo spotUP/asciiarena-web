@@ -356,10 +356,6 @@
 	</div>
 	<div class="row">
 		<div class="col-12">
-<label for="file-upload" class="custom-file-upload">
-     Upload
-</label>
-<input id="file-upload" type="file"/>
 			<input type="button" class="btn-big" value="Save" onclick="saveColly();">
         <?php if ($admin_edit && is_admin()) { ?>
 			<input type="button" class="btn-big bg-red" value="Delete" onclick="delColly()">
