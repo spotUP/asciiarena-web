@@ -302,7 +302,7 @@ include_once "header.php";
             <a class="${colour} text-truncate !important;" id="msg${msg.id}" onclick="getMessageThread(${msg.id},${msg.thread})">${htmlEncode(msg.subject)}</a>
           </div>
           <div class="col-2">
-            <span class="cyan">${mailbox==1 ? 'From:' : 'To:'}</span> <span class="white">${mailbox==1 ? htmlEncode(msg.postername) : htmlEncode(msg.postedto)}</span>
+            <span class="cyan">${mailbox==1 ? 'From:' : 'To:'}</span> <a class="yellow" href="/member/${mailbox==1 ? htmlEncode(msg.postername) : htmlEncode(msg.postedto)}" >${mailbox==1 ? htmlEncode(msg.postername) : htmlEncode(msg.postedto)}</a>           
           </div>
           <div class="col-2">
             <span class="cyan">Date:</span> <span class="white">${dateStr}</span>
