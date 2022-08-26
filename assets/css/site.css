@@ -2355,6 +2355,9 @@ Selector::file-selector-button {
    border-radius: 0px;
    padding: 0px;
    margin: 0px;
+   color: #444444;
+   background: #ededed !important;
+   border: 0px;
 }
 Selector::-webkit-file-upload-button {
    font-size:  16px;
@@ -2364,25 +2367,29 @@ Selector::-webkit-file-upload-button {
    border-radius: 0px;
    padding: 0px;
    margin: 0px;
+   border: 0px;
    color: #444444;
-   background: #ededed;
+   background: #ededed !important;
 }
 
 input::-webkit-file-upload-button {
-  font-size:  16px;
+   font-size:  16px;
    font-size:  16px;
    height: 16px;
    line-height: 16px;
    border-radius: 0px;
    padding: 0px;
    margin: 0px;
+   color: #444444;
+   background: #ededed !important;
+   border: 0px;
 }
 
 ::file-selector-button{
    background-color: #ffffff00;
-    margin: 0px;
-    padding: 0px;
-    border: 0px;
+   margin: 0px;
+   padding: 0px;
+   border: 0px;
    font-size:  16px;
    font-size:  16px;
    height: 16px;
@@ -2390,14 +2397,16 @@ input::-webkit-file-upload-button {
    border-radius: 0px;
    padding: 0px;
    margin: 0px;
-  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;  
+   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
+   color: #444444;
+   background: #ededed !important;
 } 
 
 input[type="file"]::-ms-browse {
-    background-color: #ffffff00;
-    margin: 0px;
-    padding: 0px;
-    border: 0px;
+   background-color: #ffffff00;
+   margin: 0px;
+   padding: 0px;
+   border: 0px;
    font-size:  16px;
    font-size:  16px;
    height: 16px;
@@ -2405,14 +2414,15 @@ input[type="file"]::-ms-browse {
    border-radius: 0px;
    padding: 0px;
    margin: 0px;
-  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
+   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
+   color: #444444;
+   background: #ededed !important;
 }
 
 input[type="file"]::-webkit-file-upload-button {
-    background-color: #ffffff00;
-    margin: 0px;
-    padding: 0px;
-    border: 0px;
+   margin: 0px;
+   padding: 0px;
+   border: 0px;
    font-size:  16px;
    font-size:  16px;
    height: 16px;
@@ -2420,5 +2430,7 @@ input[type="file"]::-webkit-file-upload-button {
    border-radius: 0px;
    padding: 0px;
    margin: 0px;
-  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
+   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
+   color: #444444;
+   background: #ededed !important;
 }
