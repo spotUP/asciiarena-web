@@ -241,7 +241,12 @@
       
 		<div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
-				<label for="colly_name" class="lightgrey">Name (rquired)</label>
+				<label for="colly_name" class="lightgrey">Name (required)</label>
+			</div>
+		</div>
+
+		<div class="row apb-1">
+			<div class="col-6 d-flex justify-content-between">
 				<input type="text" size="24" id="colly_name" name="name">
 			</div>
 		</div>
@@ -250,6 +255,13 @@
 		<div class="row apb-1">
 			<div class="col-6 d-flex justify-content-between">
 				<label for="colly_filename" class="lightgrey">Filename (required)</label>
+				<input type="text" size="24" id="colly_filename" name="filename">
+				<input type="hidden"  id="colly_filename2">
+			</div>
+		</div>
+
+		<div class="row apb-1">
+			<div class="col-6 d-flex justify-content-between">
 				<input type="text" size="24" id="colly_filename" name="filename">
 				<input type="hidden"  id="colly_filename2">
 			</div>
@@ -360,7 +372,6 @@
         <?php if ($admin_edit && is_admin()) { ?>
 			<input type="button" class="btn-big bg-red" value="Delete" onclick="delColly()">
         <?php } ?>
-      
 		</div>
 	</div>
 </form>  
