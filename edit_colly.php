@@ -200,7 +200,7 @@
 
 	function showCollyAlert(content, success) {
 		if (success) {
-			alertContent = `<div id="#success-alert" class="bs-component quick-alert amb-1 animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
+			alertContent = `<div id="#success-alert" class="bs-component quick-alert amb-1 animate__animated animate__bounceIn alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
 		} else {
 			alertContent = `<div id="#failure-alert" class="bs-component quick-alert amb-1 animate__animated animate__shakeX alert alert-dismissible alert-warning"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
 		}
@@ -280,17 +280,19 @@
 				</div>
 
 				<div class="row apb-1">
-					<div class="col-xs-12 col-md-6">
+					<div class="col-xs-12 col-md-4">
 						<input type="hidden"  id="colly_filename2">
 						<input type="file" class="w-100" id="colly_filename" onchange="fileInputchange(event)" name="filename">
 					</div>
-				</div>
-
-				<div class="row apb-1">
-					<div class="col-xs-12 col-md-6">
-						<input type="button" class="w-100" onclick="collyDupeCheck()" value="Dupe Check"></span>
+					<div class="col-xs-12 col-md-2">
+						<div class="d-block d-sm-none" style="height: 16px;"></div>
+						<input type="button" class="d-sm-none btn-big w-100" onclick="collyDupeCheck()" value="Dupe Check"></span>
+						<input type="button" class="d-none d-sm-block w-100" onclick="collyDupeCheck()" value="Dupe Check"></span>
+						<div class="d-block d-sm-none" style="height: 16px;"></div>
 					</div>
 				</div>
+
+
 
 			<?php } ?>
 
@@ -298,8 +300,8 @@
 			<div class="row apb-1">
 				<div class="col-xs-12 col-md-6">
 					<label for="colly_year" class="lightgrey">Release Date</label>
-					<div class="row">							
-						<div>
+					<div class="row">
+						<div class="col-4">
 							<select class="select2" name="year" id="colly_year">
 								<option value="0">Unknown</option>
 								<?php for ($i=date('Y'); $i>=1986; $i--) { ?>
@@ -307,7 +309,7 @@
 								<?php } ?>
 							</select>
 						</div>
-						<div>
+						<div class="col-4">
 							<select class="select2" name="month" id="colly_month">
 								<?php
 								$countmonth=1;
@@ -322,7 +324,7 @@
 								?>
 							</select>
 						</div>
-						<div>
+						<div class="col-4">
 							<select class="select2" name="day" id="colly_day">
 								<?php
 								$countday=1;
@@ -337,18 +339,18 @@
 								?>
 							</select>
 						</div>
-
+						<div class="d-block d-sm-none" style="height: 16px;"></div>
 					</div>
 				</div>
 			</div>    
 
 
 			<div class="row apb-0">
-				<div class="col-6 d-flex justify-content-between">Artists:</div>
+				<div class="col-6 d-flex justify-content-between">Artist(s):</div>
 			</div>
 			<div id="colly_artist_fetch_id"></div>
 			<div class="row">
-				<div class="col-xs-12 col-md-6 apb-1">
+				<div class="col-xs-12 col-md-4">
 					<select class="select2" name="colly_artist_add_id" id="colly_artist_add_fetch_id" class="w-100">
 						<option value="0">Select Artist</option>
 						<?php
@@ -363,48 +365,55 @@
 				</div>
 
 
-				<div class="col-xs-12 col-md-6 abp-1">
-					<input type="button" class="w-100" value="Add Artist!" onclick="addCollyArtist()"/>
+				<div class="col-xs-12 col-md-2">
+					<div class="d-block d-sm-none" style="height: 16px;"></div>
+					<input class="d-block d-sm-none btn-big w-100" type="button" value="Add Artist" onclick="addCollyArtist()"/>
+					<input class="d-none d-sm-block w-100" type="button" value="Add Artist" onclick="addCollyArtist()"/>
+					<div class="d-block d-sm-none" style="height: 16px;"></div>
 				</div>
 			</div>
 
-			<div class="row apb-0"><div class="col-12">Crews:</div></div>
-			<div id="colly_crew_fetch_id"></div>
-			<div class="row apb-1">
-				<div class="col-xs-12 col-md-6">
-					<select class="select2" name="colly_crew_add_id" id="colly_crew_add_fetch_id" class="w-100">
-						<option value="0">Select Crew</option>
-						<?php
-						$result = fetchAll("SELECT id, name FROM crews ORDER BY name");
-						foreach($result as $row) {
-							?>
-							<option value="<?=$row->id?>"><?=$row->name?></option>
+			<div class="row apb-0 apt-1">
+				<div class="col-12">Crew(s):</div></div>
+				<div id="colly_crew_fetch_id"></div>
+				<div class="row apb-1">
+					<div class="col-xs-12 col-md-4">
+						<select class="select2" name="colly_crew_add_id" id="colly_crew_add_fetch_id" class="w-100">
+							<option value="0">Select Crew</option>
 							<?php
-						}
-						?>
-					</select>
+							$result = fetchAll("SELECT id, name FROM crews ORDER BY name");
+							foreach($result as $row) {
+								?>
+								<option value="<?=$row->id?>"><?=$row->name?></option>
+								<?php
+							}
+							?>
+						</select>
+					</div>
+					<div class="col-xs-12 col-md-2 apb-1">
+						<div class="d-block d-sm-none" style="height: 16px;"></div>
+						<input type="button" class="d-block d-sm-none btn-big w-100" value="Add Crew" onclick="addCollyCrew()"/>
+						<input type="button" class="w-100 d-none d-sm-block" value="Add Crew" onclick="addCollyCrew()"/>
+					</div>
+				</div>
 
 
+
+				<div class="row">
+					<div class="col-xs-12 col-md-2">
+						<input type="button" class="btn-big w-100 bg-green" value="Save" onclick="saveColly();">
+						<?php if ($admin_edit && is_admin()) { ?>
+							<input type="button" class="btn-big bg-red" value="Delete" onclick="delColly()">
+						<?php } ?>
+					</div>
 				</div>
-				<div class="col-xs-12 col-md-6">
-					<input type="button" class="w-100" value="Add Crew!" onclick="addCollyCrew()"/>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-12">
-					<input type="button" class="btn-big" value="Save" onclick="saveColly();">
-					<?php if ($admin_edit && is_admin()) { ?>
-						<input type="button" class="btn-big bg-red" value="Delete" onclick="delColly()">
-					<?php } ?>
-				</div>
-			</div>
-		</form>  
-		<input type="hidden" id="edit_colly_id" value="<?php if(isset($_POST['getcollyname']) && (isset($_POST['open_edit_colly_field']))) echo $_POST['getcollyname']; ?>">
-	</div>
-	<?php if ($admin_edit && is_admin()) { ?>
-		<script>
-			$(function () {
-				getCollyList();
-			});
-		</script>
-	<?php } ?>
+			</form>  
+			<input type="hidden" id="edit_colly_id" value="<?php if(isset($_POST['getcollyname']) && (isset($_POST['open_edit_colly_field']))) echo $_POST['getcollyname']; ?>">
+		</div>
+		<?php if ($admin_edit && is_admin()) { ?>
+			<script>
+				$(function () {
+					getCollyList();
+				});
+			</script>
+		<?php } ?>
