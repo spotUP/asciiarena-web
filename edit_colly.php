@@ -287,8 +287,8 @@
 				</div>
 
 				<div class="row apb-1">
-					<div class="col-12">
-						<input type="button" onclick="collyDupeCheck()" value="Dupe Check"></span>
+					<div class="col-xs-12 col-md-6">
+						<input type="button" class="w-100" onclick="collyDupeCheck()" value="Dupe Check"></span>
 					</div>
 				</div>
 
@@ -348,7 +348,7 @@
 			</div>
 			<div id="colly_artist_fetch_id"></div>
 			<div class="row">
-				<div class="col-4 apb-1">
+				<div class="col-xs-12 col-md-6 apb-1">
 					<select class="select2" name="colly_artist_add_id" id="colly_artist_add_fetch_id" class="w-100">
 						<option value="0">Select Artist</option>
 						<?php
@@ -363,15 +363,15 @@
 				</div>
 
 
-				<div class="col-2">
-					<input type="button" class="w-100" value="Add Author!" onclick="addCollyArtist()"/>
+				<div class="col-xs-12 col-md-6 abp-1">
+					<input type="button" class="w-100" value="Add Artist!" onclick="addCollyArtist()"/>
 				</div>
 			</div>
 
 			<div class="row apb-0"><div class="col-12">Crews:</div></div>
 			<div id="colly_crew_fetch_id"></div>
 			<div class="row apb-1">
-				<div class="col-4">
+				<div class="col-xs-12 col-md-6">
 					<select class="select2" name="colly_crew_add_id" id="colly_crew_add_fetch_id" class="w-100">
 						<option value="0">Select Crew</option>
 						<?php
@@ -386,7 +386,7 @@
 
 
 				</div>
-				<div class="col-2">
+				<div class="col-xs-12 col-md-6">
 					<input type="button" class="w-100" value="Add Crew!" onclick="addCollyCrew()"/>
 				</div>
 			</div>
