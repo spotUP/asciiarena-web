@@ -678,7 +678,7 @@ option {
 
 .bg-green
 {    
-  background: rgb(0, 170, 0);
+  background: rgb(0, 170, 0) !important;
 }
 
 .bg-cyan
@@ -2096,6 +2096,7 @@ form{
 
 .select2{
   width: 100% !important;
+  margin-top: 0px;
 }
 
 span.select2-selection__arrow > b::before{
