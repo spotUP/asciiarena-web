@@ -2028,13 +2028,13 @@ body > div.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-white > span
   width: 0;
   height: 0;
   border: 6px solid transparent;
-  border-color: #fff transparent transparent transparent;
+  border-color: #aaa transparent transparent transparent !important;
   z-index: 99999;
 }
 
 /*point the arrow upwards when the select box is open (active):*/
 .select-selected.select-arrow-active:after {
-  border-color: transparent transparent #fff transparent;
+  border-color: transparent transparent #aaa transparent !important;
   top: 16px;
   z-index: 99999;
 }
@@ -2140,7 +2140,7 @@ li.select2-results__option.select2-results__option--highlighted{
 }
 
 .select2-container--default .select2-selection--single .select2-selection__rendered {
-  color: #fff !important;
+  color: rgb(170, 170, 170) !important; text-shadow: 1px 1px 10px rgba(170, 170, 170, 0.40) !important;
   line-height: 16px !important;
   padding-left: 2px !important;
 }
