@@ -239,7 +239,7 @@
 				</div>
 			<?php } ?>
 
-			<div class="row apb-0">
+			<div class="row apb-1 apt-1">
 				<div class="col-xs-12 col-md-6">
 					<label for="colly_name" class="lightgrey">Name (required)</label>
 				</div>
@@ -252,7 +252,7 @@
 			</div>
 
 			<?php if ($admin_edit && is_admin()) { ?>
-				<div class="row">
+				<div class="row apb-1 apt-1">
 					<div class="col-xs-12 col-md-6">
 						<label class="w-100" for="colly_filename" class="lightgrey w-100">File:</label>
 					</div>
@@ -273,7 +273,7 @@
 					</div>
 				</div>
 			<?php } else { ?>  
-				<div class="row">
+				<div class="row apb-1 apt-1">
 					<div class="col-xs-12 col-md-6">
 						<label for="colly_filename" class="lightgrey w-100">File:</label>
 					</div>
@@ -297,10 +297,10 @@
 			<?php } ?>
 
 
-			<div class="row apb-1">
-				<div class="col-xs-12 col-md-6">
+			<div class="row apb-1 apt-1">
+				<div class="col-xs-12 col-md-6 apb-1">
 					<label for="colly_year" class="lightgrey">Release Date</label>
-					<div class="row">
+					<div class="row apt-1">
 						<div class="col-4">
 							<select class="select2" name="year" id="colly_year">
 								<option value="0">Unknown</option>
@@ -345,7 +345,7 @@
 			</div>    
 
 
-			<div class="row apb-0">
+			<div class="row apb-1">
 				<div class="col-6 d-flex justify-content-between">Artist(s):</div>
 			</div>
 			<div id="colly_artist_fetch_id"></div>
@@ -373,8 +373,8 @@
 				</div>
 			</div>
 
-			<div class="row apb-0 apt-1">
-				<div class="col-12">Crew(s):</div></div>
+			<div class="row apb-0 apt-1 apb-1">
+				<div class="col-12 apt-1">Crew(s):</div></div>
 				<div id="colly_crew_fetch_id"></div>
 				<div class="row apb-1">
 					<div class="col-xs-12 col-md-4">
@@ -401,7 +401,7 @@
 
 				<div class="row">
 					<div class="col-xs-12 col-md-2">
-						<input type="button" class="btn-big w-100 bg-green" value="Save" onclick="saveColly();">
+						<input type="button" class="btn-big w-100 white bg-green" value="Save" onclick="saveColly();">
 						<?php if ($admin_edit && is_admin()) { ?>
 							<input type="button" class="btn-big bg-red" value="Delete" onclick="delColly()">
 						<?php } ?>
