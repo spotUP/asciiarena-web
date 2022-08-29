@@ -120,34 +120,50 @@
   
 		<input type="hidden" name="id" id="bbs_id">
 		<div class="row apb-1">
-			<div class="col-6 d-flex justify-content-between">
+			<div class="col-xs-12 col-md-6 apt-1">
 				<label for="bbs_name" class="lightgrey">Name (required)</label>
-				<input type="text" size="24" id="bbs_name" name="name">
 			</div>
 		</div>
 		<div class="row apb-1">
-			<div class="col-6 d-flex justify-content-between">
+			<div class="col-xs-12 col-md-6 apb-1">
+				<input type="text" class="w-100" id="bbs_name" name="name">
+			</div>
+		</div>
+		<div class="row apb-1">
+			<div class="col-xs-12 col-md-6">
 				<label for="bbs_sysop" class="lightgrey">Sysop</label>
-				<input type="text" size="24" id="bbs_sysop" name="sysop">
 			</div>
 		</div>
 		<div class="row apb-1">
-			<div class="col-6 d-flex justify-content-between">
+			<div class="col-xs-12 col-md-6 apb-1">
+				<input type="text" class="w-100" id="bbs_sysop" name="sysop">
+			</div>
+		</div>
+		<div class="row apb-1">
+			<div class="col-xs-12 col-md-6">
 				<label for="bbs_address" class="lightgrey">Address</label>
-				<input type="text" size="24" id="bbs_address" name="address"/>
 			</div>
 		</div>
 		<div class="row apb-1">
-			<div class="col-6 d-flex justify-content-between">
-				<label for="bbs_number" class="lightgrey">Phone Number</label>
-				<input type="text" size="24" id="bbs_number" name="number"/>
+			<div class="col-xs-12 col-md-6 apb-1">
+				<input type="text" class="w-100" id="bbs_address" name="address"/>
 			</div>
 		</div>
-		<div class="row apt-1">
+		<div class="row apb-1">
+			<div class="col-xs-12 col-md-6">
+				<label for="bbs_number" class="lightgrey">Phone Number</label>
+			</div>
+		</div>
+		<div class="row apb-1">
+			<div class="col-xs-12 col-md-6 apb-1">
+				<input type="text" class="w-100" id="bbs_number" name="number"/>
+			</div>
+		</div>
+		<div class="row">
 			<div class="col-12">
-				<input type="button" class="btn-big" value="Save" onclick="saveBBS()">
+				<input type="button" class="btn-big bg-green white" value="Save" onclick="saveBBS()">
         <?php if ($admin_edit && is_admin()) { ?>
-				<input type="button" class="btn-big bg-red" value="Delete" onclick="delBBS()">
+				<input type="button" class="btn-big bg-red white" value="Delete" onclick="delBBS()">
         <?php } ?>
 			</div>
 		</div>
