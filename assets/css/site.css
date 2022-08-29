@@ -2435,3 +2435,7 @@ input[type="file"]::-webkit-file-upload-button {
    color: #444444;
    background: #ededed !important;
 }
+
+input::file-selector-button {
+  margin-right: 16px !important;
+}

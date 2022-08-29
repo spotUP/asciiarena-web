@@ -57,26 +57,38 @@
 <div class="tab-pane fade ap-1" id="app">
 	<form id="app_form" action="/cmds.php?cmd=save_app" method="post"> 
 		<div class="row apb-1">
-			<div class="col-6 d-flex justify-content-between">
+			<div class="col-xs-12 col-md-6 apt-1">
 				<label for="app_name" class="lightgrey">App Name (required)</label>
-				<input type="text" size="24" id="app_name" name="name">
 			</div>
 		</div>
 		<div class="row apb-1">
-			<div class="col-6 d-flex justify-content-between">
+			<div class="col-xs-12 col-md-6 apb-1">
+				<input type="text" class="w-100"  id="app_name" name="name">
+			</div>
+		</div>
+		<div class="row apb-1">
+			<div class="col-xs-12 col-md-6">
 				<label for="app_author" class="lightgrey">App Author</label>
-				<input type="text" size="24" id="app_author" name="author">
+			</div>
+		</div>
+		<div class="row apb-1">
+			<div class="col-xs-12 col-md-6">
+				<input type="text" class="w-100" id="app_author" name="author">
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-6 d-flex justify-content-between">
+			<div class="col-xs-12 col-md-6 apb-1 apt-1">
 				<label for="app_file" class="lightgrey">File (required)</label>
-				<input type="file" size="24" id="app_file" name="file"/>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-12 col-md-6 apb-1">
+				<input type="file" class="w-100" id="app_file" name="file"/>
 			</div>
 		</div>
 		<div class="row apt-1">
 			<div class="col-12">
-				<input type="button" class="btn-big" value="Save" onclick="saveapp()">
+				<input type="button" class="btn-big bg-green white" value="Save" onclick="saveapp()">
 			</div>
 		</div>
 	</form>
