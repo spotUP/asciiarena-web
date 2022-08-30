@@ -12,7 +12,7 @@
 	}
 	
 	function addArtistCrewItem(crewslist,id,name) {
-		crewslist.append('<div id="artist_crew_entry'+id+'" class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between"><span id="crew_fetch_name_'+id+'">'+name+'</span><input type="hidden" name="crewname[]" value="'+name+'"><input type="button" value="Delete" onclick="deleteArtistCrew('+id+')"/></div></div>')
+		crewslist.append('<div id="artist_crew_entry'+id+'" class="p-0 row apb-1"><div class="col-xs-12 col-md-5"><span class="am-0 ap-0 d-block bg-input grey-text w-100" id="crew_fetch_name_'+id+'">'+name+'</span><input type="hidden" name="crewname[]" value="'+name+'"></div><div class="col-xs-12 col-md-1"><input type="button" class="white bg-red w-100" value="Delete" onclick="deleteArtistCrew('+id+')"/></div></div>')
 	}
 
 	<?php if ($admin_edit && is_admin()) { ?>
@@ -188,11 +188,11 @@
 			</div>
 
 			<div class="row">
-				<div class="col-xs-12 col-md-6 apb-1">Crews:</div>
+				<div class="col-xs-12 col-md-6 apb-1">Crews</div>
 			</div>
 			<div id="artist_crew_fetch_id"></div>
 			<div class="row apb-1">
-				<div class="col-6 d-flex">
+				<div class="col-xs-12 col-md-5">
 					<select class="select2" id="artist_crew_add_fetch_id" class="w-100">
 						<option value="0">Select Crew</option>
 						<?php
@@ -204,7 +204,9 @@
 						}
 						?>
 					</select>
-					<span class="apl-1"><input type="button" value="Add Crew!" onclick="addArtistCrew()"/></span>
+				</div>
+				<div class="col-xs-12 col-md-1">
+					<input type="button" value="Add Crew" onclick="addArtistCrew()"/>
 				</div>
 			</div>
 			<div class="row">
