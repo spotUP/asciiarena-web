@@ -305,7 +305,7 @@
 							<select class="select2" name="year" id="colly_year">
 								<option value="0">Unknown</option>
 								<?php for ($i=date('Y'); $i>=1986; $i--) { ?>
-									<option value="<?=$i?>"><?=$i?></option>
+									<option <?php if ($i==date('Y')) { ?> selected="selected" <?php } ?> value="<?=$i?>"><?=$i?></option>
 								<?php } ?>
 							</select>
 						</div>
@@ -317,7 +317,7 @@
 								while($countmonth<=$maxmonth)
 								{
 									?>
-									<option><?=$countmonth?></option>
+									<option <?php if ($countmonth==date('m')) { ?> selected="selected" <?php } ?>><?=$countmonth?></option>
 									<?php
 									$countmonth++;
 								}
@@ -332,7 +332,7 @@
 								while($countday<=$maxday)
 								{
 									?>
-									<option><?=$countday?></option>
+									<option <?php if ($countday==date('d')) { ?> selected="selected" <?php } ?>><?=$countday?></option>
 									<?php
 									$countday++;
 								}
