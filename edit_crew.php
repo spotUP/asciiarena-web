@@ -18,7 +18,7 @@
 	}
 	
 	function addCrewBBSItem(bbslist,id,name) {
-		bbslist.append('<div id="crew_bbs_entry'+id+'" class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between"><span id="bbs_fetch_name_'+id+'">'+name+'</span><input type="hidden" name="bbsname[]" value="'+name+'"><input type="button" class="btn-big" value="Delete" onclick="deleteCrewBBS('+id+')"/></div></div>')
+		bbslist.append('<div id="crew_bbs_entry'+id+'" class="p-0 row apb-1"><div class="col-xs-12 col-md-5"><div class="w-100 bg-input grey-text" id="bbs_fetch_name_'+id+'">'+name+'</div><input type="hidden" name="bbsname[]" value="'+name+'"></div><div class="col-xs-12 col-md-1"><input type="button" class="bg-red white w-100" value="Delete" onclick="deleteCrewBBS('+id+')"/></div></div>')
 	}
 	
 	<?php if ($admin_edit && is_admin()) { ?>
@@ -161,7 +161,7 @@
 			<?php } ?>
 
 			<input type="hidden" name="id" id="crew_id">
-			<div class="row apb-1 apt-1">
+			<div class="row apb-1">
 				<div class="col-xs-12 col-md-6">
 					<label for="crew_name" class="lightgrey">Name (required)</label>
 				</div>
@@ -171,7 +171,7 @@
 					<input type="text" class="w-100" id="crew_name" name="name">
 				</div>
 			</div>
-			<div class="row apb-1 apt-1">
+			<div class="row apb-1">
 				<div class="col-xs-12 col-md-6">
 					<label for="crew_acronym" class="lightgrey">Acronym</label>
 				</div>
@@ -181,7 +181,7 @@
 					<input type="text" class="w-100" id="crew_acronym" name="acronym">
 				</div>
 			</div>
-			<div class="row apb-1 apt-1">
+			<div class="row apb-1">
 				<div class="col-xs-12 col-md-6">
 					<label for="crew_www" class="lightgrey">Webpage</label>
 				</div>
@@ -191,7 +191,7 @@
 					<input type="text" class="w-100" id="crew_www" name="www">
 				</div>
 			</div>
-			<div class="row apb-1 apt-1">
+			<div class="row apb-1">
 				<div class="col-xs-12 col-md-6">
 					<label for="crew_contact" class="lightgrey">Contact</label>
 				</div>
@@ -201,68 +201,72 @@
 					<input type="text" class="w-100" id="crew_contact" name="contact">
 				</div>
 			</div>
-
 			<?php if ($admin_edit && is_admin()) { ?>
 				<div class="row apb-1">
-					<div class="col-6">
+					<div class="col-xs-12 col-md-6">
 						<label for="crew_rating" class="lightgrey">Rating</label>
-						<input type="text" size="24" id="crew_rating" name="rating">
+					</div>
+				</div>
+				<div class="row apb-1">
+					<div class="col-xs-12 col-md-6">
+						<input type="text" class="w-100" id="crew_rating" name="rating">
 					</div>
 				</div>
 			<?php } ?>
 
-			<div class="row apb-1 apt-1">
+			<div class="row apb-1">
 				<div class="col-xs-12 col-md-6">
 					<label for="crew_active" class="lightgrey">Status</label>
 				</div>
 			</div>
-
 			<div class="row apb-1">
-				<div class="col-xs-12 col-md-6">
-					<select class="select2 w-100" name="active" id="crew_active">
-						<option value="Active">Active</option>
-						<option value="Inactive">Inactive</option>
-					</select>
-				</div>
+				<div class="col-xs-12 col-md-6">				<select class="select2" name="active" id="crew_active">
+					<option value="Active">Active</option>
+					<option value="Inactive">Inactive</option>
+				</select>
 			</div>
+		</div>
 
-			<div class="row apb-1">
-				<div class="col-xs-12 col-md-4 apt-1">BBSes:</div>
-			</div>
-			<div class="row apb-1">
-				<div id="crew_bbs_fetch_id"></div>
-				<div class="col-xs-12 col-md-5">
-					<select class="select2" id="crew_bbs_add_fetch_id">
-						<option value="0">Select BBS</option>
-						<?php
-						$result = fetchAll("SELECT id, name FROM bbses ORDER BY name");
-						foreach($result as $row) {
-							?>
-							<option value="<?=$row->id?>"><?=$row->name?></option>
-							<?php
-						}
-						?>
-					</select>
-				</div>
-				<div class="col-xs-12 col-md-1">
-					<input type="button" value="Add BBS!" onclick="addCrewBBS()"/>
-				</div>
-			</div>
-			<div class="row apt-1">
-				<div class="col-12">
-					<input type="button" class="btn-big white bg-green" value="Save" onclick="saveCrew()">
-					<?php if ($admin_edit && is_admin()) { ?>
-						<input type="button" class="btn-big bg-red" value="Delete" onclick="delCrew()">
-					<?php } ?>
-				</div>
-			</div>
-
-		</form>
+	<div class="row apb-1">
+		<div class="col-xs-12 col-md-5">BBSes</div>
 	</div>
-	<?php if ($admin_edit && is_admin()) { ?>
-		<script>
-			$(function () {
-				getCrewList();
-			});
-		</script>
-	<?php } ?>
+	<div id="crew_bbs_fetch_id"></div>
+	<div class="p-0 row apb-1">
+		<div class="col-xs-12 col-md-5">
+			<select class="select2" id="crew_bbs_add_fetch_id" class="w-100">
+				<option value="0">Select BBS</option>
+				<?php
+				$result = fetchAll("SELECT id, name FROM bbses ORDER BY name");
+				foreach($result as $row) {
+					?>
+					<option value="<?=$row->id?>"><?=$row->name?></option>
+					<?php
+				}
+				?>
+			</select>
+
+
+		</div>
+		<div class="col-xs-12 col-md-1">
+
+			<input type="button" class="w-100" value="Add BBS" onclick="addCrewBBS()"/>
+		</div>
+	</div>
+	<div class="row apt-1">
+		<div class="col-12">
+			<input type="button" class="btn-big" value="Save" onclick="saveCrew()">
+			<?php if ($admin_edit && is_admin()) { ?>
+				<input type="button" class="btn-big bg-red" value="Delete" onclick="delCrew()">
+			<?php } ?>
+		</div>
+	</div>
+
+</form>
+</div>
+<?php if ($admin_edit && is_admin()) { ?>
+	<script>
+		$(function () {
+			getCrewList();
+		});
+	</script>
+<?php } ?>

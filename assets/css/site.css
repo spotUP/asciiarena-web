@@ -540,7 +540,7 @@ input, optgroup {
   border: 0 !important;
   white-space: pre;
   color: #bbbbbb !important;
-  line-height: 14px !important;
+  line-height: 16px !important;
 }
 
 input:active, optgroup:active {
@@ -711,6 +711,11 @@ option {
   background: rgb(85, 85, 85);
 }         
 
+.bg-input
+{   
+  background: #444444 !important;
+}
+
 .bg-lightgrey
 {   
   background: rgb(170, 170, 170);
@@ -830,6 +835,10 @@ a.cyan:hover{
   text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
 }         
 
+.grey-text{   
+  color: #bbbbbb !important;
+  text-shadow: 1px 1px 10px rgba(187, 187, 187, 0.40) !important;
+}  
 
 .lightgrey
 {   
@@ -2147,8 +2156,16 @@ li.select2-results__option.select2-results__option--highlighted{
 
 .select2-container .select2-selection--single {
   height: 16px !important;
+  vertical-align: initial !important;
 }
 
+.select2-container {
+    box-sizing: border-box;
+    display: inline-block;
+    margin: 0;
+    position: relative;
+    vertical-align: initial !important;
+}
 
 .select2-container--default .select2-selection--single {
   background-color: #444 !important;

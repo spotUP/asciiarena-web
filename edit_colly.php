@@ -16,11 +16,11 @@
 	}
 
 	function addCollyCrewItem(crewslist,id,name) {
-		crewslist.append('<div id="colly_crew_entry'+id+'" class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between"><span id="crew_fetch_name_'+id+'">'+name+'</span><input type="hidden" name="crewname[]" value="'+name+'"><input type="button" value="Delete" onclick="deleteCollyCrew('+id+')"/></div></div>')
+		crewslist.append('<div id="colly_crew_entry'+id+'" class="p-0 row apb-1"><div class="col-xs-12 col-md-5"><span class="am-0 ap-0 d-block bg-input grey-text w-100" id="crew_fetch_name_'+id+'">'+name+'</span><input type="hidden" name="crewname[]" value="'+name+'"></div><div class="col-xs-12 col-md-1"><input type="button" class="white bg-red w-100" value="Delete" onclick="deleteCollyCrew('+id+')"/></div></div>')
 	}
 
 	function addCollyArtistItem(artistslist,id,name) {
-		artistslist.append('<div id="colly_artist_entry'+id+'" class="pl-2 pr-2 row apb-1"><div class="col-6 d-flex justify-content-between"><span id="artist_fetch_name_'+id+'">'+name+'</span><input type="hidden" name="artistname[]" value="'+name+'"><input type="button" value="Delete" onclick="deleteCollyArtist('+id+')"/></div></div>')
+		artistslist.append('<div id="colly_artist_entry'+id+'" class="p-0 row apb-1"><div class="col-xs-12 col-md-5"><span class="am-0 ap-0 d-block bg-input grey-text w-100" id="artist_fetch_name_'+id+'">'+name+'</span><input type="hidden" name="artistname[]" value="'+name+'"></div><div class="col-xs-12 col-md-1"><input type="button" class="white bg-red w-100" value="Delete" onclick="deleteCollyArtist('+id+')"/></div></div>')
 	}
 
 	<?php if ($admin_edit && is_admin()) { ?>
@@ -346,7 +346,7 @@
 
 
 			<div class="row apb-1">
-				<div class="col-6 d-flex justify-content-between">Artist(s):</div>
+				<div class="col-6 d-flex justify-content-between">Artist(s)</div>
 			</div>
 			<div id="colly_artist_fetch_id"></div>
 			<div class="row">
@@ -374,7 +374,7 @@
 			</div>
 
 			<div class="row apb-0 apt-1 apb-1">
-				<div class="col-12 apt-1">Crew(s):</div></div>
+				<div class="col-12 apt-1">Crew(s)</div></div>
 				<div id="colly_crew_fetch_id"></div>
 				<div class="row apb-1">
 					<div class="col-xs-12 col-md-4">
