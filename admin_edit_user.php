@@ -102,7 +102,7 @@ function showUserAlert(content, success) {
 		<input type="hidden" name="id" id="del_user_id">
 	</form>
 	<div class="row apb-1">
-		<div class="col-12">
+		<div class="col-xs-12 col-md-6">
 			<form>
 				<select class="select2" name="user_id" id="user_fetch_id" class="w-100" onchange="getUser();">
 				</select>

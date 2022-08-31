@@ -90,7 +90,7 @@
 		<input type="hidden" name="id" id="del_logo_id">
 	</form>
 	<div class="row apb-1">
-		<div class="col-12">
+		<div class="col-xs-12 col-md-6">
 			<form>
 				<select class="select2" name="logo_id" id="logo_fetch_id" class="w-100" onchange="getLogo();">
 				</select>

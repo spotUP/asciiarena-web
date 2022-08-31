@@ -213,7 +213,7 @@
 			<input type="hidden" name="id" id="del_colly_id">
 		</form>
 		<div class="row apb-1">
-			<div class="col-12">
+			<div class="col-xs-12 col-md-6">
 				<form>
 					<select class="select2" name="colly_id" id="colly_fetch_id" class="w-100" onchange="getColly();">
 					</select>
@@ -252,9 +252,9 @@
 			</div>
 
 			<?php if ($admin_edit && is_admin()) { ?>
-				<div class="row apb-1 apt-1">
+				<div class="row apb-1">
 					<div class="col-xs-12 col-md-6">
-						<label class="w-100" for="colly_filename" class="lightgrey w-100">File:</label>
+						<label for="colly_filename" class="lightgrey w-100">File</label>
 					</div>
 				</div>
 
@@ -265,7 +265,7 @@
 
 				<div class="row">
 					<div class="col-xs-12 col-md-6">
-						<label for="colly_type" class="lightgrey">Type</label>
+						<label for="colly_type" class="lightgrey apt-1 apb-1">Type</label>
 						<select class="select2" name="type" id="colly_type">
 							<option value="ASCII">ASCII</option>
 							<option value="ANSI">ANSI</option>
@@ -298,7 +298,7 @@
 
 
 			<div class="row apb-1 apt-1">
-				<div class="col-xs-12 col-md-6 apb-1">
+				<div class="col-xs-12 col-md-6 apb-1 apt-1">
 					<label for="colly_year" class="lightgrey">Release Date</label>
 					<div class="row apt-1">
 						<div class="col-4">
