@@ -15,7 +15,7 @@ $dirname = $dirname[0];
 	$dirname = $dirname[ 0 ];
 	$file_id = "$filenameandpath.diz";
 	$colly_id = $colly->id;
-	$show_colly_name = preg_replace('/[^(\x20-\x7F)]*/','', $colly->name);
+	$show_colly_name = preg_replace('/[^(\x20-\xFF)]*/','', $colly->name);
 	htmlspecialchars($show_colly_name, ENT_QUOTES);
 	if (file_exists($file_id)) {
 		$file_id_diz = file_get_contents($file_id);
