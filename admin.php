@@ -7,6 +7,11 @@ include "header.php";
 	$(document).ready(function() {
 		var hash = window.location.hash;
 		hash && $('ul.nav a[href="' + hash + '"]').tab('show');
+
+		window.addEventListener('hashchange', function(){
+			var hash = window.location.hash;
+			hash && $('ul.nav a[href="' + hash + '"]').tab('show');
+    	});
 	});
 </script>
 <div class="modal-body row m-0 p-0">
