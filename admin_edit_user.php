@@ -113,7 +113,7 @@
 		<input type="hidden" name="id" id="user_id">
 		<div class="row apb-1">
 			<div class="col-xs-12 col-md-6">
-				<label for="user_nick" class="lightgrey">Nick (required)</label>
+				<label for="user_nick" class="lightgrey apt-1">Nick (required)</label>
 			</div>
 		</div>
 		<div class="row apb-1">
@@ -123,7 +123,7 @@
 		</div>
 		<div class="row apb-1">
 			<div class="col-xs-12 col-md-6">
-				<label for="user_crew" class="lightgrey">Crew</label>
+				<label for="user_crew" class="lightgrey apt-1">Crew</label>
 			</div>
 		</div>
 		<div class="row apb-1">
@@ -133,7 +133,7 @@
 		</div>
 		<div class="row apb-1">
 			<div class="col-xs-12 col-md-6">
-				<label for="uesr_rank" class="lightgrey">Rank</label>
+				<label for="user_rank" class="lightgrey apb-1 apt-1">Rank</label>
 				<div>
 					<select class="select2" name="rank" id="user_rank">
 						<option value="User">User</option>
@@ -143,11 +143,15 @@
 				</div>
 			</div>
 		</div>
-		<div class="row apb-1">
-			<div class="col-xs-12 col-md-6">
-				<label for="user_birth_year" class="lightgrey">Birth</label>
-				<div class="col-4">
-					<select class="select2 d-block w-100" name="byear" id="user_byear">
+		<div class="row apl-0">
+			<div class="col-xs-12 col-md-6 p-0">
+				<label for="user_birth_year" class="lightgrey apb-1 col-12 apt-1">Birth</label>
+			</div>
+		</div>
+		<div class="col-xs-12 col-md-6">
+			<div class="row p-0">
+				<div class="col-4 pl-0">
+					<select class="select2 w-100" name="byear" id="user_byear">
 						<?php
 						$countyear=1900;
 						$maxyear=date("Y")-5;
@@ -162,7 +166,7 @@
 					</select>
 				</div>
 				<div class="col-4">
-					<select class="select2 d-block w-100" name="bmonth" id="user_bmonth">
+					<select class="select2 w-100" name="bmonth" id="user_bmonth">
 						<?php
 						$countmonth=1;
 						$maxmonth=12;
@@ -177,7 +181,7 @@
 					</select>
 				</div>
 				<div class="col-4">
-					<select class="select2 d-block w-100" name="bday" id="user_bday">
+					<select class="select2 w-100" name="bday" id="user_bday">
 						<?php
 						$countday=1;
 						$maxday=31;
@@ -194,25 +198,23 @@
 			</div>
 		</div>
 		<div class="row apb-1">
-			<div class="col-xs-12 col-md-6">
-				<label for="user_country" class="lightgrey">Country</label>
-				<div style="min-width:40%">
-					<select class="select2" name="country" id="user_country">
-						<?php
-						foreach($country_list as $symbol => $country)
-						{
-							?>
-							<option value="<?=$symbol?>"><?=$country?></option>
-							<?php
-						}
+			<div class="col-xs-12 col-md-6 apt-1">
+				<label for="user_country" class="lightgrey apb-1">Country</label>
+				<select class="select2" name="country" id="user_country">
+					<?php
+					foreach($country_list as $symbol => $country)
+					{
 						?>
-					</select>
-				</div>
+						<option value="<?=$symbol?>"><?=$country?></option>
+						<?php
+					}
+					?>
+				</select>
 			</div>
 		</div>
 		<div class="row apb-1">
 			<div class="col-xs-12 col-md-6">
-				<label for="user_mail" class="lightgrey">Mail</label>
+				<label for="user_mail" class="lightgrey apt-1">Mail</label>
 			</div>
 		</div>
 		<div class="row apb-1">
@@ -222,8 +224,8 @@
 		</div>    
 		<div class="row apt-1">
 			<div class="col-12">
-				<input type="button" class="btn-big" value="Save" onclick="saveUser()">
-				<input type="button" class="btn-big bg-red" value="Delete" onclick="delUser()">
+				<input type="button" class="btn-big bg-green white w-100 col-2" value="Save" onclick="saveUser()">
+				<input type="button" class="btn-big bg-red white w-100 col-2" value="Delete" onclick="delUser()">
 			</div>
 		</div>
 	</form>

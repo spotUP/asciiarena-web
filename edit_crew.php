@@ -252,13 +252,11 @@
 			<input type="button" class="w-100" value="Add BBS" onclick="addCrewBBS()"/>
 		</div>
 	</div>
-	<div class="row apt-1">
-		<div class="col-12">
-			<input type="button" class="btn-big" value="Save" onclick="saveCrew()">
+	<div class="row col-12 apt-1 p-0">
+			<div class="col-xs-12 col-md-2 apl-1"><input type="button" class="w-100 btn-big bg-green white" value="Save" onclick="saveCrew()"></div>
 			<?php if ($admin_edit && is_admin()) { ?>
-				<input type="button" class="btn-big bg-red" value="Delete" onclick="delCrew()">
+				<div class="col-xs-12 col-md-2"><input type="button" class="w-100 btn-big bg-red white" value="Delete" onclick="delCrew()"></div>
 			<?php } ?>
-		</div>
 	</div>
 
 </form>
