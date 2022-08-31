@@ -12,7 +12,7 @@
 		const id = $("#user_fetch_id").val();
 		if (id > 0) {
 			$.get(`/admin_cmds.php?cmd=get_user&id=${id}`, function (data) {
-        userclear();
+				userclear();
 				$('#user_id').val(data[0].id);
 				$('#user_nick').val(data[0].nick);
 				$('#user_crew').val(data[0].crew);
@@ -40,10 +40,10 @@
 	}
 
 	function saveUser() {
-    if ($("#user_nick").val().trim().length==0) {
-      showUserAlert("You must fill the user nick field!", false);
-      return;
-    }
+		if ($("#user_nick").val().trim().length==0) {
+			showUserAlert("You must fill the user nick field!", false);
+			return;
+		}
 
 		const form = $("#user_form");
 		const url = form.attr("action");
@@ -51,13 +51,13 @@
 			"type": "POST",
 			"url": url,
 			"data": form.serialize(),
-      "error": (r) => {
-        if (r.status==409) {
-          showUserAlert("The user already exists!",false);
-        } else {
-          showUserAlert("There was an error during saving!",false);
-        }
-      },      
+			"error": (r) => {
+				if (r.status==409) {
+					showUserAlert("The user already exists!",false);
+				} else {
+					showUserAlert("There was an error during saving!",false);
+				}
+			},      
 			"success": () => {
 				showUserAlert("User Saved!", true);
 				userclear();
@@ -87,14 +87,14 @@
 		}
 	}
 
-function showUserAlert(content, success) {
-    if (success) {
-		alertContent = `<div id="#success-alert" class="bs-component quick-alert animate__animated animate__bounceIn alert alert-success">${content}</div>`;
-    } else {
-		alertContent = `<div id="#failure-alert" class="bs-component quick-alert animate__animated animate__shakeX alert alert-warning">${content}</div>`;
-    }
+	function showUserAlert(content, success) {
+		if (success) {
+			alertContent = `<div id="#success-alert" class="bs-component quick-alert animate__animated animate__bounceIn alert alert-success">${content}</div>`;
+		} else {
+			alertContent = `<div id="#failure-alert" class="bs-component quick-alert animate__animated animate__shakeX alert alert-warning">${content}</div>`;
+		}
 		$("#edituser").prepend(alertContent).children().first().delay(2000).slideUp();
-}
+	}
 </script>
 
 <div class="tab-pane fade ap-1" id="edituser">
@@ -112,36 +112,43 @@ function showUserAlert(content, success) {
 	<form id="user_form" action="/admin_cmds.php?cmd=save_user" method="post">
 		<input type="hidden" name="id" id="user_id">
 		<div class="row apb-1">
-			<div class="col-6 d-flex justify-content-between">
+			<div class="col-xs-12 col-md-6">
 				<label for="user_nick" class="lightgrey">Nick (required)</label>
-				<input type="text" size="24" id="user_nick" name="nick">
 			</div>
 		</div>
 		<div class="row apb-1">
-			<div class="col-6 d-flex justify-content-between">
+			<div class="col-xs-12 col-md-6">
+				<input type="text" class="w-100" id="user_nick" name="nick">
+			</div>
+		</div>
+		<div class="row apb-1">
+			<div class="col-xs-12 col-md-6">
 				<label for="user_crew" class="lightgrey">Crew</label>
-				<input type="text" size="24" id="user_crew" name="crew">
 			</div>
 		</div>
 		<div class="row apb-1">
-			<div class="col-6 d-flex justify-content-between">
+			<div class="col-xs-12 col-md-6">
+				<input type="text" class="w-100" id="user_crew" name="crew">
+			</div>
+		</div>
+		<div class="row apb-1">
+			<div class="col-xs-12 col-md-6">
 				<label for="uesr_rank" class="lightgrey">Rank</label>
-        <div>
-				<select class="select2" name="rank" id="user_rank">
-					<option value="User">User</option>
-					<option value="Elite">Elite</option>
-					<option value="Admin">Admin</option>
-				</select>
-        </div>
+				<div>
+					<select class="select2" name="rank" id="user_rank">
+						<option value="User">User</option>
+						<option value="Elite">Elite</option>
+						<option value="Admin">Admin</option>
+					</select>
+				</div>
 			</div>
 		</div>
 		<div class="row apb-1">
-			<div class="col-6 d-flex justify-content-between">
+			<div class="col-xs-12 col-md-6">
 				<label for="user_birth_year" class="lightgrey">Birth</label>
-        <div class="d-flex">
-        <div>
-				<select class="select2" name="byear" id="user_byear">
-					<?php
+				<div class="col-4">
+					<select class="select2 d-block w-100" name="byear" id="user_byear">
+						<?php
 						$countyear=1900;
 						$maxyear=date("Y")-5;
 						while($countyear<$maxyear)
@@ -151,61 +158,66 @@ function showUserAlert(content, success) {
 							<?php
 							$countyear++;
 						}
-					?>
-				</select>
-        </div><div>
-        <select class="select2" name="bmonth" id="user_bmonth">
-					<?php
-					$countmonth=1;
-					$maxmonth=12;
-					while($countmonth<=$maxmonth)
-					{
 						?>
-						<option><?=$countmonth?></option>
+					</select>
+				</div>
+				<div class="col-4">
+					<select class="select2 d-block w-100" name="bmonth" id="user_bmonth">
 						<?php
-						$countmonth++;
-					}
-					?>
-				</select>
-        </div><div>
-        <select class="select2" name="bday" id="user_bday">
-					<?php
-					$countday=1;
-					$maxday=31;
-					while($countday<=$maxday)
-					{
+						$countmonth=1;
+						$maxmonth=12;
+						while($countmonth<=$maxmonth)
+						{
+							?>
+							<option><?=$countmonth?></option>
+							<?php
+							$countmonth++;
+						}
 						?>
-						<option><?=$countday?></option>
+					</select>
+				</div>
+				<div class="col-4">
+					<select class="select2 d-block w-100" name="bday" id="user_bday">
 						<?php
-						$countday++;
-					}
-					?>
-				</select>
-        </div>
-        </div>
+						$countday=1;
+						$maxday=31;
+						while($countday<=$maxday)
+						{
+							?>
+							<option><?=$countday?></option>
+							<?php
+							$countday++;
+						}
+						?>
+					</select>
+				</div>
 			</div>
 		</div>
 		<div class="row apb-1">
-			<div class="col-6 d-flex justify-content-between">
+			<div class="col-xs-12 col-md-6">
 				<label for="user_country" class="lightgrey">Country</label>
-        <div style="min-width:40%">
-				<select class="select2" name="country" id="user_country">
-					<?php
-					foreach($country_list as $symbol => $country)
+				<div style="min-width:40%">
+					<select class="select2" name="country" id="user_country">
+						<?php
+						foreach($country_list as $symbol => $country)
 						{
 							?>
-								<option value="<?=$symbol?>"><?=$country?></option>
+							<option value="<?=$symbol?>"><?=$country?></option>
 							<?php
 						}
 						?>
-				</select>
-        </div>
+					</select>
+				</div>
 			</div>
 		</div>
 		<div class="row apb-1">
-			<div class="col-6 d-flex justify-content-between">
+			<div class="col-xs-12 col-md-6">
 				<label for="user_mail" class="lightgrey">Mail</label>
-				<input type="text" size="24" id="user_mail" name="mail">
+			</div>
+		</div>
+		<div class="row apb-1">
+			<div class="col-xs-12 col-md-6">
+				<input type="text" class="w-100" id="user_mail" name="mail">
 			</div>
 		</div>    
 		<div class="row apt-1">

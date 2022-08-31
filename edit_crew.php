@@ -161,7 +161,7 @@
 			<?php } ?>
 
 			<input type="hidden" name="id" id="crew_id">
-			<div class="row apb-1">
+			<div class="row apb-1 apt-1">
 				<div class="col-xs-12 col-md-6">
 					<label for="crew_name" class="lightgrey">Name (required)</label>
 				</div>
@@ -172,7 +172,7 @@
 				</div>
 			</div>
 			<div class="row apb-1">
-				<div class="col-xs-12 col-md-6">
+				<div class="col-xs-12 col-md-6 apt-1">
 					<label for="crew_acronym" class="lightgrey">Acronym</label>
 				</div>
 			</div>
@@ -182,7 +182,7 @@
 				</div>
 			</div>
 			<div class="row apb-1">
-				<div class="col-xs-12 col-md-6">
+				<div class="col-xs-12 col-md-6 apt-1">
 					<label for="crew_www" class="lightgrey">Webpage</label>
 				</div>
 			</div>
@@ -192,7 +192,7 @@
 				</div>
 			</div>
 			<div class="row apb-1">
-				<div class="col-xs-12 col-md-6">
+				<div class="col-xs-12 col-md-6 apt-1">
 					<label for="crew_contact" class="lightgrey">Contact</label>
 				</div>
 			</div>
@@ -203,7 +203,7 @@
 			</div>
 			<?php if ($admin_edit && is_admin()) { ?>
 				<div class="row apb-1">
-					<div class="col-xs-12 col-md-6">
+					<div class="col-xs-12 col-md-6 apt-1">
 						<label for="crew_rating" class="lightgrey">Rating</label>
 					</div>
 				</div>
@@ -215,7 +215,7 @@
 			<?php } ?>
 
 			<div class="row apb-1">
-				<div class="col-xs-12 col-md-6">
+				<div class="col-xs-12 col-md-6 apt-1">
 					<label for="crew_active" class="lightgrey">Status</label>
 				</div>
 			</div>
@@ -227,7 +227,7 @@
 			</div>
 		</div>
 
-	<div class="row apb-1">
+	<div class="row apb-1 apt-1">
 		<div class="col-xs-12 col-md-5">BBSes</div>
 	</div>
 	<div id="crew_bbs_fetch_id"></div>
