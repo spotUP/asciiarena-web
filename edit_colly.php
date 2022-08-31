@@ -254,7 +254,7 @@
 			<?php if ($admin_edit && is_admin()) { ?>
 				<div class="row apb-1">
 					<div class="col-xs-12 col-md-6">
-						<label for="colly_filename" class="lightgrey w-100">File</label>
+						<label for="colly_filename" class="lightgrey w-100 apt-1">File</label>
 					</div>
 				</div>
 
@@ -400,10 +400,10 @@
 
 
 				<div class="row">
-					<div class="col-xs-12 col-md-2">
-						<input type="button" class="btn-big w-100 white bg-green" value="Save" onclick="saveColly();">
+					<div class="col-12">
+						<input type="button" class="btn-big w-100 white bg-green col-2" value="Save" onclick="saveColly();">
 						<?php if ($admin_edit && is_admin()) { ?>
-							<input type="button" class="btn-big bg-red" value="Delete" onclick="delColly()">
+							<input type="button" class="btn-big w-100 bg-red white w-100 col-2" value="Delete" onclick="delColly()">
 						<?php } ?>
 					</div>
 				</div>
