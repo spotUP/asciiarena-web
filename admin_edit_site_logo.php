@@ -90,7 +90,7 @@
 		<input type="hidden" name="id" id="del_logo_id">
 	</form>
 	<div class="row apb-1">
-		<div class="col-xs-12 col-md-6">
+		<div class="col-xs-12 col-md-10">
 			<form>
 				<select class="select2" name="logo_id" id="logo_fetch_id" class="w-100" onchange="getLogo();">
 				</select>
@@ -103,8 +103,8 @@
 		<input type="hidden" name="author" id="logo_author">
 		<input type="hidden" name="name" id="logo_name">
 
-		<div class="row apb-1 apt-1">
-			<div class="col-12">
+		<div class="row apb-1">
+			<div class="col-xs-12 col-10">
 				<textarea id="logo_ascii" class="w-100" wrap="physical" name="ascii" rows="8"/></textarea>
 			</div>
 		</div>
