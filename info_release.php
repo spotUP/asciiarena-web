@@ -306,7 +306,7 @@ require_once "header.php";?>
 	}
   
 	function showAlert(content, prependTo) {
- 		const alertContent = '<div id="#success-alert" class="amb-1 animate__animated animate__shakeX alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>'+content+'</div>';
+ 		const alertContent = '<div id="#success-alert" class="animate__animated animate__shakeX alert alert-success">'+content+'</div>';
 		$(prependTo).prepend(alertContent).children().first().delay(2000).slideUp();
 	}
 

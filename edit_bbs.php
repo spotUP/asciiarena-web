@@ -93,9 +93,9 @@
 
 	function showBBSAlert(content, success) {
     if (success) {
-		alertContent = `<div id="#success-alert" class="bs-component quick-alert amb-1 animate__animated animate__bounceIn alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
+		alertContent = `<div id="#success-alert" class="bs-component quick-alert animate__animated animate__bounceIn alert alert-success">${content}</div>`;
     } else {
-		alertContent = `<div id="#failure-alert" class="bs-component quick-alert amb-1 animate__animated animate__shakeX alert alert-dismissible alert-warning"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
+		alertContent = `<div id="#failure-alert" class="bs-component quick-alert animate__animated animate__shakeX alert alert-warning">${content}</div>`;
     }
 		$("#bbs").prepend(alertContent).children().first().delay(2000).slideUp();
 	}
