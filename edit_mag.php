@@ -51,7 +51,7 @@
     } else {
 		alertContent = `<div id="#failure-alert" class="bs-component quick-alert amb-1 animate__animated animate__shakeX alert alert-dismissible alert-warning"><button type="button" class="close" data-dismiss="alert">x</button>${content}</div>`;
     }
-		$("#ascii_mag").prepend(alertContent);
+		$("#ascii_mag").prepend(alertContent).children().first().delay(2000).slideUp();
 	}
 </script>
 <div class="tab-pane fade ap-1" id="ascii_mag">
