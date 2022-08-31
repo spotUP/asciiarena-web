@@ -1,5 +1,5 @@
 <?php defined('VALID') or die('Nuh-uh!'); ?>
-<div class="header col-lg-12">
+<div class="header w-100 col-12 col-lg-12">
 	<h2 class="ap-1 am-0 bg-header">LATEST COMMENTS</h2>
 </div>
 

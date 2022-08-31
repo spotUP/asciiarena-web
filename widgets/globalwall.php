@@ -7,7 +7,7 @@ $nick = "";
 if (is_logged_in()) $nick=$_user[ "nick" ];
 ?>
 <div class="header col-12 col-lg-12">
-	<h2 class="apt-1 apb-1 bg-header">TAG THE GLOBAL BBS WALL</h2>
+	<h2 class="apt-1 apb-1 bg-header"><a href="https://scenewall.bbs.io?wall">TAG THE GLOBAL BBS WALL</a></h2>
 </div>
 <div class="container-fluid p-0 p-lg-2">
 	<div class="row m-0 p-0 bg-secondary apb-1" id="<?=$wall?>"></div>
