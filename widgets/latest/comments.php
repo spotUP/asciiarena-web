@@ -3,16 +3,16 @@
 	<h2 class="ap-1 am-0 bg-header">LATEST COMMENTS</h2>
 </div>
 
-<div class="container-fluid apt-1 p-0 p-lg-2">
-	<div class="col-12 bg-secondary">
-		<div class="row apb-1">
-			<div class="col-6 col-sm-7 text-truncate">
+<div class="container-fluid m-0">
+	<div class="col-12 bg-secondary apb-1">
+		<div class="row">
+			<div class="col-6 col-sm-7 text-truncate apb-1 apt-1">
 				<span class="white text-truncate">COMMENT</span>
 			</div>
-			<div class="col-sm-3 text-truncate d-none d-sm-block">
+			<div class="col-sm-3 text-truncate d-none d-sm-block apt-1">
 				<span class="white">COLLY</span>
 			</div>
-			<div class="col-6 col-sm-2 text-truncate">
+			<div class="col-6 col-sm-2 text-truncate apt-1">
 				<span class="white float-right">NiCK</span>
 			</div>
 		</div>

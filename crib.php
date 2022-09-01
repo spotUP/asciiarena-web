@@ -9,31 +9,37 @@ include "header.php";
 			<div id="alerts"></div>
 			<form autocomplete="off" enctype="multipart/form-data" action="/crib.php" method="post">
 				<div class="row amb-1">
-					<div class="col-12">
+					<div class="col-xs-12 col-md-6">
 						<span class="white">User Settings</span>
 					</div>
 				</div>
 				<div class="row amb-1">
-					<div class="col-3">
+					<div class="col-xs-12 col-md-6">
 						Nick: 
 					</div>
-					<div class="col-3">
+				</div>
+				<div class="row amb-1">
+					<div class="col-xs-12 col-md-6 apb-1 apt-1">
 						<input type="text" class="w-100" maxlength="14" id="nick" value="">
 					</div>
 				</div>
 				<div class="row amb-1">
-					<div class="col-3">
+					<div class="col-xs-12 col-md-6">
 						Crew: 
 					</div>
-					<div class="col-3">
+				</div>
+				<div class="row amb-1">
+					<div class="col-xs-12 col-md-6">
 						<input type="text" class="w-100" id="crew" value=""> 
 					</div>
 				</div>
 				<div class="row amb-1">
-					<div class="col-3">			
+					<div class="col-xs-12 col-md-6">
 						Birth:
 					</div>
-					<div class="col-3">
+				</div>
+				<div class="row amb-1">
+					<div class="col-xs-12 col-md-6">
 						<select id="byear" class="select2">
 							<?php for ($i=1920; $i<(date('Y')-5); $i++) { ?>
 								<option value="<?=$i?>"><?=$i?></option>
@@ -52,11 +58,13 @@ include "header.php";
 					</div>
 				</div>
 				<div class="row amb-1">
-					<div class="col-3">
+					<div class="col-xs-12 col-md-6">
 						Country:
 					</div>
-					<div class="col-3">
-						<select class="select2" id="country"> 
+				</div>
+				<div class="row amb-1">
+					<div class="col-xs-12 col-md-6">
+						<select class="select2 w-100" id="country"> 
 							<?php foreach($country_list as $symbol => $scountry) { ?>
 								<option value="<?=$symbol?>"><?=$country_list[$symbol]?></option>
 							<?php } ?>
@@ -64,24 +72,22 @@ include "header.php";
 					</div>
 				</div>
 				<div class="row amb-1">
-					<div class="col-3">		
+					<div class="col-xs-12 col-md-6">
 						Mail:
-					</div>
-					<div class="col-3">		
-						<input id="mail" type="text" class="w-100" value="">
 					</div>
 				</div>
 				<div class="row amb-1">
-					<div class="col-3">		
+					<div class="col-xs-12 col-md-4">
+						<input id="mail" type="text" class="w-100" value="">
+					</div>
+					<div class="col-xs-12 col-md-2">
 						Show E-Mail:
 					</div>
-					<div class="col-3">
-						<div class="form-group">
-							<div class="custom-control custom-switch">
-								<input type="checkbox" class="custom-control-input" id="display_mail"value="1">
-								<label class="custom-control-label" for="display_mail"></label>
-							</div>
-						</div>
+<!--					<div class="form-group"> -->
+						<div class="custom-control custom-switch">
+							<input type="checkbox" class="custom-control-input" id="display_mail"value="1">
+							<label class="custom-control-label" for="display_mail"></label>
+<!--						</div> -->
 					</div>          
 				</div>
 				<div class="row amb-1">
@@ -98,7 +104,7 @@ include "header.php";
 							this.removeAttribute('readonly');
     // fix for mobile safari to show virtual keyboard
     this.blur();    this.focus();  }" />
-  </div>
+</div>
 </div>
 <div class="row amb-1">
 	<div class="col-3">						
@@ -109,7 +115,7 @@ include "header.php";
 			this.removeAttribute('readonly');
     // fix for mobile safari to show virtual keyboard
     this.blur();    this.focus();  }" />
-  </div>
+</div>
 </div>
 <div class="row amb-1">
 	<div class="col-3">						
@@ -120,7 +126,7 @@ include "header.php";
 			this.removeAttribute('readonly');
     // fix for mobile safari to show virtual keyboard
     this.blur();    this.focus();  }" />
-  </div>
+</div>
 </div>
 <div class="row amb-1">
 	<div class="col-12 apt-1">
