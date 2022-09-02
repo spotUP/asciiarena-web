@@ -28,47 +28,46 @@ $sort_criteria .= ' '.$sort_order;
 
 require_once "header.php"; ?>
 
-<div id="blacker"></div>
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
-        <div class="row apl-1 apb-1">
-            <div class="col-12 d-flex justify-content-between">
+        <div class="row apl-1 apb-1 apt-0">
+            <div class="col-12 bg-secondary apb-1">
                <?php
                require_once "pagination.php";
                $limit = "LIMIT 30";
                $pageno = $_GET['pageno'] ?? 1;
                $rows_per_page = ($viewmode === "BBS") ? 6 : 30;
                $pagination = pagination("mags", $pageno, $rows_per_page, "viewmode={$viewmode}&sort_by={$sort_by}&sort_order={$sort_order}");
-               
+
                if (!$is_search) {
                    echo $pagination[ "pager" ];
                }
                ?>
-               <div class="row apb-1">
-                <div class="col-12">
-                    <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
-                        <div class="btn-group" role="group">
-                            <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">View Mode:</button>
-                            <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                <a class="dropdown-item" href="?sort_by=date&viewmode=Standard">Standard</a>
-                                <a class="dropdown-item" href="?sort_by=date&viewmode=BBS">BBS</a>
-                            </div>
-                        </div>
-
-                        <form action="?sort_by=<?=$sort_criteria?>&sort_order=<?=$sort_order?>&viewmode=<?=$viewmode?>" method="post">
-                            <span class="amr-1 d-none d-sm-block">Search: <input type="text" name="search" autocomplete="off" style="background-color: #555 !important;" value="<?=$searchquery?>"></span>
-                        </form>
+           </div>
+           <div class="col-3 apt-1 bg-secondary apb-1">
+            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                <div class="btn-group" role="group">
+                    <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">View Mode:</button>
+                    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                        <a class="dropdown-item" href="?sort_by=date&viewmode=Standard">Standard</a>
+                        <a class="dropdown-item" href="?sort_by=date&viewmode=BBS">BBS</a>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-lg-12 d-none d-sm-block">
-             <span class="green">- --/\-\/- -</span> <span class="cyan">aSCIIaRENA</span> <span class="red">--=*=-- </span><span class="pink">[<?=date("D")?>, the <?=date("d-m-y")?>]</span><span class="red"> --=*=-- </span> <span class="cyan">aSCIIaRENA</span> <span class="green"> - -/\-\/- -- -</span><br><br>
+            <div class="col-5 apt-1 bg-secondary apb-1">
+                <form action="?sort_by=<?=$sort_criteria?>&sort_order=<?=$sort_order?>&viewmode=<?=$viewmode?>" method="post">
+                    <span class="amr-1 d-none d-sm-block">Search: <input type="text" name="search" autocomplete="off" style="background-color: #555 !important;" value="<?=$searchquery?>"></span>
+                </form>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12 d-none d-sm-block">
+                 <span class="green">- --/\-\/- -</span> <span class="cyan">aSCIIaRENA</span> <span class="red">--=*=-- </span><span class="pink">[<?=date("D")?>, the <?=date("d-m-y")?>]</span><span class="red"> --=*=-- </span> <span class="cyan">aSCIIaRENA</span> <span class="green"> - -/\-\/- -- -</span><br><br>
+             </div>
          </div>
      </div>
-     
+
      <?php
      if ($is_search) {
         $ask = "SELECT a.*,u.upload_signature FROM mags a
@@ -88,7 +87,7 @@ require_once "header.php"; ?>
 
     if ($viewmode === "BBS") {
        ?>
-       <div class="container">
+       <div class="container bg-secondary apb-1">
         <?php
         foreach ($rows as $row) {
          ?>
