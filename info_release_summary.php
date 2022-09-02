@@ -141,7 +141,7 @@ $dirname = $dirname[0];
 			</div>
 			<?php
 			echo "type $type";
-			if (strpos($type, "ascii") !== false) {
+			if (strpos($type, "ASCII") !== false) {
 				?>
 				<div class="row d-flex justify-content-between">
 					<span>Viewed:</span>
@@ -150,7 +150,7 @@ $dirname = $dirname[0];
 				<?php
 			}
 			echo "type $type";
-			if (strpos($type, "ansi") !== false) {
+			if (strpos($type, "ANSI") !== false) {
 				?>
 				<div class="row d-flex justify-content-between">
 					<span>Viewed:</span>
