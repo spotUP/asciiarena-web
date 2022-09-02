@@ -1,5 +1,4 @@
 <?php defined('VALID') or die('Nuh-uh!');
-
 $colly = fetchOne("SELECT * FROM collys WHERE filename = :filename", [":filename" => $filename]);
 
 $dirname = explode(".", $colly->filename);
@@ -70,21 +69,27 @@ $dirname = $dirname[0];
 						?>
 					</span>
 				</div>
-				<div class="row d-flex justify-content-between">
-					<span>Crew(s):</span>
-					<?php
-					$crews = [];
-					foreach (fetchAll("SELECT w.name as crew FROM collys c LEFT JOIN collys_crews cc ON cc.colly_id=c.id LEFT JOIN crews w ON w.id=cc.crew_id 
-						WHERE c.filename=:filename", [":filename" => $filename]) as $row) {
-						$crews[] = "<a href=\"/crew/".urlsafe($row->crew)."\">{$row->crew}</a>";
-				}
-				?>
-				<span clas="truncate">
-					<?php
-					echo pluralize($crews);
-					?>
-				</span>
-			</div>
+<div class="row d-flex justify-content-between">
+    <?php
+        $crews = [];
+        foreach (fetchAll("SELECT w.name as crew FROM collys c LEFT JOIN collys_crews cc ON cc.colly_id=c.id LEFT JOIN crews w ON w.id=cc.crew_id 
+        WHERE c.filename=:filename", [":filename" => $filename]) as $row) {
+            if(!empty($row->crew)) {
+                $crews[] = '<a href="/crew/'.urlsafe($row->crew).'">' . $row->crew . '</a>';
+        }
+        }
+        if(!empty($crews)) {
+            ?>
+            <span>Crew(s):</span>
+            <span class="truncate">
+            <?php
+                echo pluralize($crews);
+            ?>
+        </span>
+            <?php
+        }
+    ?>
+</div>
 
 			<div class="row d-flex justify-content-between">
 				<span>Filename:</span>
