@@ -186,8 +186,9 @@ select:-webkit-autofill:focus {
 }
 
 
-
-
+input:active, input:hover, input:focus, select:active, select:hover, select:focus, a:active, a:hover, a:focus, .select2:active, .select2:hover, .select2:focus {
+  animation: boing 400ms ease-in-out;
+}
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -1305,7 +1306,14 @@ button.btn.btn-primary{
   padding-left: 16px !important;
   padding-right: 16px !important;
   margin-right: 8px;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
 }
+
+.btn-big:hover {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+}
+
 
 .dropdown-menu {
   position: absolute !important;
@@ -1681,18 +1689,19 @@ a.disabled{
   cursor: pointer;
 }
 
+
 @keyframes boing {
   15%, 40%, 75%, 100% {
     transform-origin: center center;
   }
   15% {
-    transform: scale(1.2, 1.1);
+    transform: scale(1.02, 1.1);
   }
   40% {
     transform: scale(0.95, 0.95);
   }
   75% {
-    transform: scale(1.05, 1);
+    transform: scale(1.0, 1);
   }
   100% {
     transform: scale(1, 1);

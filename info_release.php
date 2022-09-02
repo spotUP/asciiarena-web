@@ -48,9 +48,10 @@ require_once "header.php";?>
         include('info_release_summary.php');
     ?>
       
-    <div class="container-fluid bg-secondary amb-1 apb-1">
+    <div class="container-fluid bg-secondary amb-1 sticky-top" style="padding-top: 36px;">
     <?php if ($type !== 'Archive') { ?>
 		<input type="button" id="viewbutton" onclick="toggleColly()" class="btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s" value="View Colly">
+
 		<input type="button" id="fsbutton" style="display:none" onclick="showFullscreen()" class="btn-big amb-1" value="Fullscreen">
     <?php } ?>
 		<input type="button" onclick="downloadfile()" class="btn-big amb-1" value="Download">
@@ -59,8 +60,8 @@ require_once "header.php";?>
       $favourite = (fetchOne("SELECT 1 FROM favourites WHERE user_id = :user AND colly_id = :colly", [ "user" => $_user['id'], "colly" => $colly_id])) ? "Remove favourite" : "Favourite";
     ?>
     
-    
-		<input type="button" class="btn-big amb-1" onclick="addComment()" value="Comment">
+    <a href="#comments" class="btn-big amb-1 bg-header text apt-1 apb-1 grey-text" role="button" aria-disabled="true">View Comments</a>
+		<input type="button" class="btn-big amb-1" onclick="addComment()" value="Add Comment">
 		<input type="button" id="favbutton" onclick="favourite()" class="btn-big amb-1" value="<?=$favourite?>">
 		<input type="button" class="btn-big amb-1" onclick="reportAsBroken()" value="Report Broken">   
 
