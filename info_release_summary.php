@@ -140,7 +140,6 @@ $dirname = $dirname[0];
 				<span><a href="/member/<?=urlsafe($uploader)?>"><?=$uploader?></a></span>
 			</div>
 			<?php
-			echo "type $type";
 			if (strpos($type, "ASCII") !== false) {
 				?>
 				<div class="row d-flex justify-content-between">
@@ -149,7 +148,6 @@ $dirname = $dirname[0];
 				</div>
 				<?php
 			}
-			echo "type $type";
 			if (strpos($type, "ANSI") !== false) {
 				?>
 				<div class="row d-flex justify-content-between">
