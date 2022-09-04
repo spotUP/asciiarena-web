@@ -27,7 +27,7 @@ $dirname = $dirname[0];
 			</div>
 		</div>
 		<div class="container-fluid">
-			<div class="row ap-1 bg-secondary overflow-hidden">
+			<div class="row apt-1 apl-1 apr-1 bg-secondary overflow-hidden">
 				<div class="animate__animated animate__backInLeft col-lg-8 d-flex justify-content-center justify-content-lg-start" style="position: relative; top: -16px;">
 					<span>
 						<?php

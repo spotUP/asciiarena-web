@@ -1,5 +1,5 @@
 export default function init386(options = {}) {
-  var character = { height: 20, width: 12.4 };
+  var character = { height: 16, width: 12.4 };
   const loading = () => {
     if (options.fastLoad) {
       document.body.style.visibility = 'visible';
@@ -40,7 +40,7 @@ export default function init386(options = {}) {
       cursor.style.color = options.cursorColor
     }
 
-    cursor.innerHTML = bar.innerHTML = '&#9604;';
+    cursor.innerHTML = bar.innerHTML = '&#9608;';
 
     // only inject the wrap if the pass is 0
     if (pass === 0) {
