@@ -26,8 +26,9 @@ if (is_logged_in()) $nick=$_user[ "nick" ];
       }
 
       function callersitemsRead(id,data) {
-          $(id).html('<div class="col-lg-12 d-flex apb-1"><span class="col-xs-12 col-md-2 white text-truncate" style="white-space: pre">Username</span><span class="col-xs-12 col-md-3 white text-truncate" style="white-space: pre">BBS</span><span class="col-xs-2 col-md-2 white text-truncate" style="white-space: pre">Date</span><span class="col-xs-2  col-md-1 white text-truncate" style="white-space: pre">Time On</span><span class="col-xs-2  col-md-1 white text-truncate" style="white-space: pre">Time Off</span><span class="col-xs-2  col-md-1 white text-truncate" style="white-space: pre">Actions</span><span class="col-xs-2  col-md-1 white text-truncate" style="white-space: pre">Upload</span><span class="col-xs-2 col-md-1 apb-1 white text-truncate" style="white-space: pre">Dnload</span></div>')
 
+          $(id).html('<div class="col-lg-12 d-flex apb-1"><span class="col-lg-2 white text-truncate" style="white-space: pre">Username</span><span class="col-lg-2 white text-truncate" style="white-space: pre">BBS</span><span class="col-lg-2 white text-truncate" style="white-space: pre">Date</span><span class="col-lg-1 white text-truncate" style="white-space: pre">Time On</span><span class="col-lg-1 white text-truncate" style="white-space: pre">Time Off</span><span class="col-lg-2 white text-truncate" style="white-space: pre">Actions</span><span class="col-lg-1 white text-truncate" style="white-space: pre">Upload</span><span class="col-lg-1 white text-truncate" style="white-space: pre">Dnload</span></div>')
+					
           data.calls.forEach(  function(callersItem) {
             
 						username = unclean(callersItem.Username)
@@ -83,7 +84,7 @@ if (is_logged_in()) $nick=$_user[ "nick" ];
             ul = ul.slice(ul.length - 5)
 
 						
-            output = '<div class="col-lg-12 d-flex"><span class="col-xs-12 col-md-2 cyan text-truncate" style="white-space: pre">'+username+'</span><span class="col-xs-12 col-md-3 white text-truncate" style="white-space: pre">'+bbsname+'</span><span class="col-xs-2 col-md-2 white text-truncate" style="white-space: pre">'+dateon+'</span><span class="col-xs-2 col-md-1 cyan text-truncate" style="white-space: pre">'+timeon+'</span><span class="col-xs-2 col-md-1 cyan text-truncate" style="white-space: pre">'+timeoff+'</span><span class="col-xs-2 col-md-1 white text-truncate" style="white-space: pre">'+actions+'</span><span class="col-xs-2 col-md-1 white text-truncate" style="white-space: pre">'+ul+'</span><span class="col-xs-2 col-md-1 white text-truncate" style="white-space: pre">'+dl+'</span></div>'
+            output = '<div class="col-lg-12 d-flex"><span class="col-lg-2 cyan text-truncate" style="white-space: pre">'+username+'</span><span class="col-lg-2 green text-truncate" style="white-space: pre">'+bbsname+'</span><span class="col-lg-2 white text-truncate" style="white-space: pre">'+dateon+'</span><span class="col-lg-1 cyan text-truncate" style="white-space: pre">'+timeon+'</span><span class="col-lg-1 cyan text-truncate" style="white-space: pre">'+timeoff+'</span><span class="col-lg-2 white text-truncate" style="white-space: pre">'+actions+'</span><span class="col-lg-1 white text-truncate" style="white-space: pre">'+ul+'</span><span class="col-lg-1 white text-truncate" style="white-space: pre">'+dl+'</span></div>'
 			
             //output = '<font color="#0000ff">¦</font>'+comment+colour+'-'+username+'<font color="#0000ff">¦</font><font color="#ffffff">'+clean2(shortCode)+'<font color="#0000ff">¦</font>\n';
             $(id).append(output)
