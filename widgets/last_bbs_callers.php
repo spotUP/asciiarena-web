@@ -26,9 +26,8 @@ if (is_logged_in()) $nick=$_user[ "nick" ];
       }
 
       function callersitemsRead(id,data) {
-
-          $(id).html('<div class="col-lg-12 d-flex apb-1"><span class="col-lg-2 white text-truncate" style="white-space: pre">Username</span><span class="col-lg-2 white text-truncate" style="white-space: pre">BBS</span><span class="col-lg-2 white text-truncate" style="white-space: pre">Date</span><span class="col-lg-1 white text-truncate" style="white-space: pre">Time On</span><span class="col-lg-1 white text-truncate" style="white-space: pre">Time Off</span><span class="col-lg-2 white text-truncate" style="white-space: pre">Actions</span><span class="col-lg-1 white text-truncate" style="white-space: pre">Upload</span><span class="col-lg-1 white text-truncate" style="white-space: pre">Dnload</span></div>')
-					
+          $(id).html('<div class="col-lg-12 d-flex apb-1"><span class="col-xs-12 col-md-2 white text-truncate" style="white-space: pre">Username</span><span class="col-xs-12 col-md-3 white text-truncate" style="white-space: pre">BBS</span><span class="col-xs-2 col-md-2 white text-truncate" style="white-space: pre">Date</span><span class="col-xs-2  col-md-1 white text-truncate" style="white-space: pre">Time On</span><span class="col-xs-2  col-md-1 white text-truncate" style="white-space: pre">Time Off</span><span class="col-xs-2  col-md-1 white text-truncate" style="white-space: pre">Actions</span><span class="col-xs-2  col-md-1 white text-truncate" style="white-space: pre">Upload</span><span class="col-xs-2 col-md-1 apb-1 white text-truncate" style="white-space: pre">Dnload</span></div>')
+          
           data.calls.forEach(  function(callersItem) {
             
 						username = unclean(callersItem.Username)
