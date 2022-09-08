@@ -13,7 +13,7 @@ include "header.php";
 						<span class="white">User Settings</span>
 					</div>
 				</div>
-				<div class="row amb-1">
+				<div class="row apt-1">
 					<div class="col-xs-12 col-md-6">
 						Nick: 
 					</div>
@@ -34,7 +34,7 @@ include "header.php";
 					</div>
 				</div>
 				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6">
+					<div class="col-xs-12 col-md-6 apt-1">
 						Birth:
 					</div>
 				</div>
@@ -58,7 +58,7 @@ include "header.php";
 					</div>
 				</div>
 				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6">
+					<div class="col-xs-12 col-md-6 apt-1">
 						Country:
 					</div>
 				</div>
@@ -72,195 +72,208 @@ include "header.php";
 					</div>
 				</div>
 				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6">
+					<div class="col-xs-12 col-md-6 apt-1">
 						Mail:
 					</div>
 				</div>
+
 				<div class="row amb-1">
-					<div class="col-xs-12 col-md-4">
+					<div class="col-xs-12 col-md-6">
 						<input id="mail" type="text" class="w-100" value="">
 					</div>
-					<div class="col-xs-12 col-md-2">
-						Show E-Mail:
+				</div>
+
+				<div class="row amb-1 apt-1">
+					<div class="col-xs-12 col-md-3">
+						<span>Show E-Mail:</span> 
 					</div>
-<!--					<div class="form-group"> -->
+				</div>
+				<div class="row amb-1">
+
+					<div class="col-xs-12 col-md-3">
 						<div class="custom-control custom-switch">
 							<input type="checkbox" class="custom-control-input" id="display_mail"value="1">
 							<label class="custom-control-label" for="display_mail"></label>
-<!--						</div> -->
-					</div>          
+						</div>
+					</div>
 				</div>
-				<div class="row amb-1">
-					<div class="col-12 apt-1">
+
+				<div class="row amb-1 apt-1">
+					<div class="col-xs-12 col-md-12 apt-1">
 						<span class="white">Password Settings</span>
 					</div>
 				</div>
-				<div class="row amb-1">
-					<div class="col-3">	
+				<div class="row amb-1 apt-1">
+					<div class="col-xs-12 col-md-6">	
 						Old password
 					</div>
-					<div class="col-3">	
-						<input type="password" readonly class="w-100" autocomplete="none" id="old_password" onfocus="if (this.hasAttribute('readonly')) {
-							this.removeAttribute('readonly');
-    // fix for mobile safari to show virtual keyboard
-    this.blur();    this.focus();  }" />
-</div>
-</div>
-<div class="row amb-1">
-	<div class="col-3">						
-		New password
-	</div>
-	<div class="col-3">						
-		<input type="password"  readonly class="w-100" autocomplete="none" id="password" onfocus="if (this.hasAttribute('readonly')) {
-			this.removeAttribute('readonly');
-    // fix for mobile safari to show virtual keyboard
-    this.blur();    this.focus();  }" />
-</div>
-</div>
-<div class="row amb-1">
-	<div class="col-3">						
-		New password again
-	</div>
-	<div class="col-3">						
-		<input type="password" readonly class="w-100" autocomplete="none" id="repeat_password" onfocus="if (this.hasAttribute('readonly')) {
-			this.removeAttribute('readonly');
-    // fix for mobile safari to show virtual keyboard
-    this.blur();    this.focus();  }" />
-</div>
-</div>
-<div class="row amb-1">
-	<div class="col-12 apt-1">
-		<span class="white">Site Settings</span>
-	</div>
-</div>
+				</div>
+				<div class="row amb-1">
+					<div class="col-xs-12 col-md-6">	
+						<input type="password" readonly class="w-100" autocomplete="none" id="old_password" onfocus="if (this.hasAttribute('readonly')) { this.removeAttribute('readonly');	this.blur();    this.focus();  }" />
+					</div>
+				</div>
 
-<div class="row amb-1">
-	<div class="col-3">		
-		File list mode:
-	</div>
-	<div class="col-3">	
-		<select class="select2" id="viewmode">
-			<option value="Standard">Standard</option>
-			<option value="BBS" >BBS</option>
-		</select>
-	</div>
-</div>
-<div class="row amb-1">
-	<div class="col-3">	
-		Default Colly BG:
-	</div>
-	<div class="col-3">	
-		<select class="custom-select" id="def_bg_col">
-			<option id="sel_bg_col" value="" data-color="">Custom</option>
-			<option value='#555555' data-color="#555555">Bright Black</option>
-			<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
-			<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
-			<option value='#ff5555' data-color="#ff5555">Bright Red</option>
-			<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
-			<option value='#55ff55' data-color="#55ff55">Bright Green</option>
-			<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
-			<option value='#ffffff' data-color="#ffffff">White</option>
-			<option value='#000000' data-color="#000000">Black</option>
-			<option value='#0000aa' data-color="#0000aa">Blue</option>
-			<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
-			<option value='#aa0000' data-color="#aa0000">Red</option>
-			<option value='#aa5500' data-color="#aa5500">Yellow</option>
-			<option value='#00aa00' data-color="#00aa00">Green</option>
-			<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
-			<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
-		</select>
-	</div>
-</div>
-<div class="row amb-1">
-	<div class="col-3">	
-		Default Colly FG:
-	</div>
-	<div class="col-3">	
-		<select class="custom-select" id="def_fg_col">
-			<option id="sel_bg_col" value="" data-color="">Custom</option>
-			<option value='#555555' data-color="#555555">Bright Black</option>
-			<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
-			<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
-			<option value='#ff5555' data-color="#ff5555">Bright Red</option>
-			<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
-			<option value='#55ff55' data-color="#55ff55">Bright Green</option>
-			<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
-			<option value='#ffffff' data-color="#ffffff">White</option>
-			<option value='#000000' data-color="#000000">Black</option>
-			<option value='#0000aa' data-color="#0000aa">Blue</option>
-			<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
-			<option value='#aa0000' data-color="#aa0000">Red</option>
-			<option value='#aa5500' data-color="#aa5500">Yellow</option>
-			<option value='#00aa00' data-color="#00aa00">Green</option>
-			<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
-			<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
-		</select>
-	</div>
-</div>
-<div class="row amb-1">
-	<div class="col-3">	
-		Default Colly Font:
-	</div>
-	<div class="col-3">	
-		<select class="select2" id='def_font'>
-			<option value="mosoul">mosoul</option>
-			<option value="topaz" >topaz</option>
-			<option value="microknight" >microknight</option>
-			<option value="pot-noodle" >pot-noodle</option>
-		</select>
-	</div>
-</div>
-<div class="row amb-1">
-	<div class="col-3">
-		CRT screen effect:
-	</div>
-	<div class="col-3">
-		<div class="form-group">
-			<div class="custom-control custom-switch">
-				<input type="checkbox" class="custom-control-input" id="crt_effect" name="crt_effect" value="1">
-				<label class="custom-control-label" for="crt_effect"></label>
-			</div>
-		</div>
-	</div>
-</div>
-<div class="row amb-1">
-	<div class="col-3">
-		Modem animation effect:
-	</div>
-	<div class="col-3">
-		<div class="form-group">
-			<div class="custom-control custom-switch">
-				<input type="checkbox" class="custom-control-input" id="anim_effect" name="anim_effect" value="1">
-				<label class="custom-control-label" for="anim_effect"></label>
-			</div>
-		</div>
-	</div>
-</div>
-<div class="row amb-1 apt-1">
-	<div class="col-12">		
-		<span class="white">Upload Signature:</span>
-	</div>
-</div>
-<div class="row amb-1">
-	<div class="col-6">		
-		<input type="text" class="w-100" size="44" maxlength="44" id="upload_signature" value="">
-	</div>							
-</div>
-<div class="row amb-1">
-	<div class="col-12 apt-1">	
-		<input type="button" id="btnSave" class="btn-big" onclick="saveSettings()" value="Save" name="Save">
-	</div>
-</div>
-</form>	
-<?php } // is_logged_in() ?>
-</div>
+				<div class="row amb-1 apt-1">
+					<div class="col-xs-12 col-md-6">
+						New password
+					</div>
+				</div>
+				<div class="row amb-1">
+					<div class="col-xs-12 col-md-6">
+						<input type="password"  readonly class="w-100" autocomplete="none" id="password" onfocus="if (this.hasAttribute('readonly')) {this.removeAttribute('readonly'); this.blur();    this.focus();  }" />
+					</div>
+				</div>
+				<div class="row amb-1 apt-1">
+					<div class="col-xs-12 col-md-6">
+						New password again
+					</div>
+				</div>
+				<div class="row amb-1">
+					<div class="col-xs-12 col-md-6">
+						<input type="password" readonly class="w-100" autocomplete="none" id="repeat_password" onfocus="if (this.hasAttribute('readonly')) {this.removeAttribute('readonly'); this.blur();    this.focus();  }" />
+					</div>
+				</div>
+				<div class="row amb-1 apt-1">
+					<div class="col-xs-12 col-md-6 apt-1">
+						<span class="white">Site Settings</span>
+					</div>
+				</div>
 
-<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
-	<?php include "sidebar.php"; ?>
-</div>
-<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
-	<?php include "sidebar_right.php"; ?>
-</div>
+				<div class="row amb-1 apt-1">
+					<div class="col-xs-12 col-md-6">
+						File list mode:
+					</div>
+				</div>
+				<div class="row amb-1">
+					<div class="col-xs-12 col-md-6 apb-1">	
+						<select class="select2 w-100" id="viewmode">
+							<option value="Standard">Standard</option>
+							<option value="BBS" >BBS</option>
+						</select>
+					</div>
+				</div>
+				<div class="row amb-1">
+					<div class="col-xs-12 col-md-5">	
+						Default Colly BG:
+					</div>
+					<div class="col-xs-12 col-md-1 apb-1">	
+						<select class="custom-select" id="def_bg_col">
+							<option id="sel_bg_col" value="" data-color="">Custom</option>
+							<option value='#555555' data-color="#555555">Bright Black</option>
+							<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
+							<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
+							<option value='#ff5555' data-color="#ff5555">Bright Red</option>
+							<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
+							<option value='#55ff55' data-color="#55ff55">Bright Green</option>
+							<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
+							<option value='#ffffff' data-color="#ffffff">White</option>
+							<option value='#000000' data-color="#000000">Black</option>
+							<option value='#0000aa' data-color="#0000aa">Blue</option>
+							<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
+							<option value='#aa0000' data-color="#aa0000">Red</option>
+							<option value='#aa5500' data-color="#aa5500">Yellow</option>
+							<option value='#00aa00' data-color="#00aa00">Green</option>
+							<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
+							<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
+						</select>
+					</div>
+				</div>
+				<div class="row amb-1">
+					<div class="col-xs-12 col-md-5">	
+						Default Colly FG:
+					</div>
+					<div class="col-xs-12 col-md-1 apb-1">	
+						<select class="custom-select" id="def_fg_col">
+							<option id="sel_bg_col" value="" data-color="">Custom</option>
+							<option value='#555555' data-color="#555555">Bright Black</option>
+							<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
+							<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
+							<option value='#ff5555' data-color="#ff5555">Bright Red</option>
+							<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
+							<option value='#55ff55' data-color="#55ff55">Bright Green</option>
+							<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
+							<option value='#ffffff' data-color="#ffffff">White</option>
+							<option value='#000000' data-color="#000000">Black</option>
+							<option value='#0000aa' data-color="#0000aa">Blue</option>
+							<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
+							<option value='#aa0000' data-color="#aa0000">Red</option>
+							<option value='#aa5500' data-color="#aa5500">Yellow</option>
+							<option value='#00aa00' data-color="#00aa00">Green</option>
+							<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
+							<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
+						</select>
+					</div>
+				</div>
+				<div class="row amb-1">
+					<div class="col-xs-12 col-md-6">	
+						Default Colly Font:
+					</div>
+				</div>
+				<div class="row amb-1">
+					<div class="col-xs-12 col-md-6 apb-1">	
+						<select class="select2 w-100" id='def_font'>
+							<option value="mosoul">mosoul</option>
+							<option value="topaz" >topaz</option>
+							<option value="microknight" >microknight</option>
+							<option value="pot-noodle" >pot-noodle</option>
+						</select>
+					</div>
+				</div>
+				<div class="row amb-1">
+					<div class="col-xs-12 col-md-6">
+						CRT screen effect:
+					</div>
+					<div class="col-xs-12 col-md-6">
+						<div class="form-group">
+							<div class="custom-control custom-switch">
+								<input type="checkbox" class="custom-control-input" id="crt_effect" name="crt_effect" value="1">
+								<label class="custom-control-label" for="crt_effect"></label>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row amb-1">
+					<div class="col-xs-12 col-md-6">
+						Modem animation effect:
+					</div>
+				</div>
+				<div class="row amb-1">
+					<div class="col-3">
+						<div class="form-group">
+							<div class="custom-control custom-switch">
+								<input type="checkbox" class="custom-control-input" id="anim_effect" name="anim_effect" value="1">
+								<label class="custom-control-label" for="anim_effect"></label>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row amb-1">
+					<div class="col-xs-12 col-md-6">		
+						<span class="white">Upload Signature:</span>
+					</div>
+				</div>
+				<div class="row amb-1">
+					<div class="col-xs-12 col-md-6 apb-1">		
+						<input type="text" class="w-100" size="44" maxlength="44" id="upload_signature" value="">
+					</div>							
+				</div>
+				<div class="row amb-1">
+					<div class="col-12 apt-1">	
+						<input type="button" id="btnSave" class="btn-big" onclick="saveSettings()" value="Save" name="Save">
+					</div>
+				</div>
+			</div>
+
+		</form>	
+	<?php } // is_logged_in() ?>
+
+	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
+		<?php include "sidebar.php"; ?>
+	</div>
+	<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
+		<?php include "sidebar_right.php"; ?>
+	</div>
 </div>
 
 <script>
@@ -360,9 +373,9 @@ include "header.php";
 
 	function showAlert(content,success) {
 		if (success) {
-			alertContent = `<div id="#success-alert" class="bs-component quick-alert animate__animated animate__bounceIn alert alert-success">${content}fittkuk</div>`;
+			alertContent = `<div id="#success-alert" class="bs-component quick-alert animate__animated animate__bounceIn alert alert-success">${content}</div>`;
 		} else {
-			alertContent = `<div id="#failure-alert" class="bs-component quick-alert animate__animated animate__shakeX alert alert-warning">${content}rövhora</div>`;
+			alertContent = `<div id="#failure-alert" class="bs-component quick-alert animate__animated animate__shakeX alert alert-warning">${content}</div>`;
 		}
 		$("#alerts").prepend(alertContent).children().first().delay(2000).slideUp();
 		$(window).scrollTop(0);
