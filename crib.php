@@ -3,262 +3,269 @@ require_once "session.php";
 $h1 = ["wELCOME tO aSCIIaRENA", "bY uP rOUGH and diViNE sTYLERS"];
 include "header.php";
 ?>
+
 <div class="modal-body row m-0 p-0">
-	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
-		<?php if (is_logged_in()) { ?>
-			<div id="alerts"></div>
-			<form autocomplete="off" enctype="multipart/form-data" action="/crib.php" method="post">
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6">
-						<span class="white">User Settings</span>
-					</div>
-				</div>
-				<div class="row apt-1">
-					<div class="col-xs-12 col-md-6">
-						Nick 
-					</div>
-				</div>
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6 apb-1 apt-1">
-						<input type="text" class="w-100" maxlength="14" id="nick" value="">
-					</div>
-				</div>
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6">
-						Crew 
-					</div>
-				</div>
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6">
-						<input type="text" class="w-100" id="crew" value=""> 
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-12 col-md-6 apt-1">
-						Birth
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-12 col-md-2 apt-1">
-						<select id="byear" class="select2">
-							<?php for ($i=1920; $i<(date('Y')-5); $i++) { ?>
-								<option value="<?=$i?>"><?=$i?></option>
-							<?php } ?>
-						</select>
-					</div>
-					<div class="col-xs-12 col-md-2 apt-1">
-						<select id="bmonth" class="select2">
-							<?php for ($i=1; $i<=12; $i++) { ?>
-								<option value="<?=$i?>"><?=$i?></option>
-							<?php } ?>
-						</select>
-					</div>
-					<div class="col-xs-12 col-md-2 apt-1">
-						<select id="bday" class="select2">
-							<?php for ($i=1; $i<=31; $i++) { ?>
-								<option value="<?=$i?>"><?=$i?></option>
-							<?php } ?>
-						</select>
-					</div>
-				</div>
+	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1 bg-secondary">
+		<div class="header col-lg-12 pl-0 pr-0 apb-1">
+			<h2 class="ap-1 bg-header p-0">SETTiNGS</h2>
+		</div> 
+		<div class="ap-1">
 
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6 apt-1 am">
-						Country
-					</div>
-				</div>
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6">
-						<select class="select2 w-100" id="country"> 
-							<?php foreach($country_list as $symbol => $scountry) { ?>
-								<option value="<?=$symbol?>"><?=$country_list[$symbol]?></option>
-							<?php } ?>
-						</select>
-					</div>
-				</div>
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6 apt-1">
-						Mail
-					</div>
-				</div>
-
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6">
-						<input id="mail" type="text" class="w-100" value="">
-					</div>
-				</div>
-
-				<div class="row amb-1 apt-1">
-					<div class="col-xs-12 col-md-6">
-						<div class="custom-control custom-switch">Show E-Mail
-							<input type="checkbox" class="custom-control-input" id="display_mail"value="1">
-							<label class="custom-control-label" for="display_mail"></label>
+			<?php if (is_logged_in()) { ?>
+				<div id="alerts"></div>
+				<form autocomplete="off" enctype="multipart/form-data" action="/crib.php" method="post">
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-6">
+							<span class="white">User Settings</span>
 						</div>
 					</div>
-				</div>
-
-				<div class="row amb-1 apt-1">
-					<div class="col-xs-12 col-md-12 apt-1">
-						<span class="white">Password Settings</span>
+					<div class="row apt-1">
+						<div class="col-xs-12 col-md-6">
+							Nick 
+						</div>
 					</div>
-				</div>
-				<div class="row amb-1 apt-1">
-					<div class="col-xs-12 col-md-6">	
-						Old password
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-6 apb-1 apt-1">
+							<input type="text" class="w-100" maxlength="14" id="nick" value="">
+						</div>
 					</div>
-				</div>
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6">	
-						<input type="password" readonly class="w-100" autocomplete="none" id="old_password" onfocus="if (this.hasAttribute('readonly')) { this.removeAttribute('readonly');	this.blur();    this.focus();  }" />
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-6">
+							Crew 
+						</div>
 					</div>
-				</div>
-
-				<div class="row amb-1 apt-1">
-					<div class="col-xs-12 col-md-6">
-						New password
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-6">
+							<input type="text" class="w-100" id="crew" value=""> 
+						</div>
 					</div>
-				</div>
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6">
-						<input type="password"  readonly class="w-100" autocomplete="none" id="password" onfocus="if (this.hasAttribute('readonly')) {this.removeAttribute('readonly'); this.blur();    this.focus();  }" />
+					<div class="row">
+						<div class="col-xs-12 col-md-6 apt-1">
+							Birth
+						</div>
 					</div>
-				</div>
-				<div class="row amb-1 apt-1">
-					<div class="col-xs-12 col-md-6">
-						New password again
-					</div>
-				</div>
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6">
-						<input type="password" readonly class="w-100" autocomplete="none" id="repeat_password" onfocus="if (this.hasAttribute('readonly')) {this.removeAttribute('readonly'); this.blur();    this.focus();  }" />
-					</div>
-				</div>
-				<div class="row amb-1 apt-1">
-					<div class="col-xs-12 col-md-6 apt-1">
-						<span class="white">Site Settings</span>
-					</div>
-				</div>
-
-				<div class="row amb-1 apt-1">
-					<div class="col-xs-12 col-md-6">
-						File list mode
-					</div>
-				</div>
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6 apb-1">	
-						<select class="select2 w-100" id="viewmode">
-							<option value="Standard">Standard</option>
-							<option value="BBS" >BBS</option>
-						</select>
-					</div>
-				</div>
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6 d-flex">	
-						<div class="apr-1">Default Colly BG</div>
-						<div>
-							<select class="custom-select" id="def_bg_col">
-								<option id="sel_bg_col" value="" data-color="">Custom</option>
-								<option value='#555555' data-color="#555555">Bright Black</option>
-								<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
-								<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
-								<option value='#ff5555' data-color="#ff5555">Bright Red</option>
-								<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
-								<option value='#55ff55' data-color="#55ff55">Bright Green</option>
-								<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
-								<option value='#ffffff' data-color="#ffffff">White</option>
-								<option value='#000000' data-color="#000000">Black</option>
-								<option value='#0000aa' data-color="#0000aa">Blue</option>
-								<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
-								<option value='#aa0000' data-color="#aa0000">Red</option>
-								<option value='#aa5500' data-color="#aa5500">Yellow</option>
-								<option value='#00aa00' data-color="#00aa00">Green</option>
-								<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
-								<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
+					<div class="row">
+						<div class="col-xs-12 col-md-2 apt-1">
+							<select id="byear" class="select2">
+								<?php for ($i=1920; $i<(date('Y')-5); $i++) { ?>
+									<option value="<?=$i?>"><?=$i?></option>
+								<?php } ?>
+							</select>
+						</div>
+						<div class="col-xs-12 col-md-2 apt-1">
+							<select id="bmonth" class="select2">
+								<?php for ($i=1; $i<=12; $i++) { ?>
+									<option value="<?=$i?>"><?=$i?></option>
+								<?php } ?>
+							</select>
+						</div>
+						<div class="col-xs-12 col-md-2 apt-1">
+							<select id="bday" class="select2">
+								<?php for ($i=1; $i<=31; $i++) { ?>
+									<option value="<?=$i?>"><?=$i?></option>
+								<?php } ?>
 							</select>
 						</div>
 					</div>
-				</div>
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-5 d-flex">	
-						<div class="apr-1">Default Colly FG</div>
-						<div>
-							<select class="custom-select" id="def_fg_col">
-								<option id="sel_bg_col" value="" data-color="">Custom</option>
-								<option value='#555555' data-color="#555555">Bright Black</option>
-								<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
-								<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
-								<option value='#ff5555' data-color="#ff5555">Bright Red</option>
-								<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
-								<option value='#55ff55' data-color="#55ff55">Bright Green</option>
-								<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
-								<option value='#ffffff' data-color="#ffffff">White</option>
-								<option value='#000000' data-color="#000000">Black</option>
-								<option value='#0000aa' data-color="#0000aa">Blue</option>
-								<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
-								<option value='#aa0000' data-color="#aa0000">Red</option>
-								<option value='#aa5500' data-color="#aa5500">Yellow</option>
-								<option value='#00aa00' data-color="#00aa00">Green</option>
-								<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
-								<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
+
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-6 apt-1 am">
+							Country
+						</div>
+					</div>
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-6">
+							<select class="select2 w-100" id="country"> 
+								<?php foreach($country_list as $symbol => $scountry) { ?>
+									<option value="<?=$symbol?>"><?=$country_list[$symbol]?></option>
+								<?php } ?>
 							</select>
 						</div>
 					</div>
-				</div>
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6 apt-1">
-						Default Colly Font
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-6 apt-1">
+							Mail
+						</div>
 					</div>
-				</div>
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6 apb-1">
-						<select class="select2 w-100" id='def_font'>
-							<option value="mosoul">mosoul</option>
-							<option value="topaz" >topaz</option>
-							<option value="microknight" >microknight</option>
-							<option value="pot-noodle" >pot-noodle</option>
-						</select>
+
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-6">
+							<input id="mail" type="text" class="w-100" value="">
+						</div>
 					</div>
-				</div>
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6">
-						<div class="form-group">
-							<div class="custom-control custom-switch">CRT screen effect
-								<input type="checkbox" class="custom-control-input" id="crt_effect" name="crt_effect" value="1">
-								<label class="custom-control-label" for="crt_effect"></label>
+
+					<div class="row amb-1 apt-1">
+						<div class="col-xs-12 col-md-6">
+							<div class="custom-control custom-switch">Show E-Mail
+								<input type="checkbox" class="custom-control-input" id="display_mail"value="1">
+								<label class="custom-control-label" for="display_mail"></label>
 							</div>
 						</div>
 					</div>
-				</div>
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6">
-						<div class="form-group">
-							<div class="custom-control custom-switch">Modem animation effect
-								<input type="checkbox" class="custom-control-input" id="anim_effect" name="anim_effect" value="1">
-								<label class="custom-control-label" for="anim_effect"></label>
+
+					<div class="row amb-1 apt-1">
+						<div class="col-xs-12 col-md-12 apt-1">
+							<span class="white">Password Settings</span>
+						</div>
+					</div>
+					<div class="row amb-1 apt-1">
+						<div class="col-xs-12 col-md-6">	
+							Old password
+						</div>
+					</div>
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-6">	
+							<input type="password" readonly class="w-100" autocomplete="none" id="old_password" onfocus="if (this.hasAttribute('readonly')) { this.removeAttribute('readonly');	this.blur();    this.focus();  }" />
+						</div>
+					</div>
+
+					<div class="row amb-1 apt-1">
+						<div class="col-xs-12 col-md-6">
+							New password
+						</div>
+					</div>
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-6">
+							<input type="password"  readonly class="w-100" autocomplete="none" id="password" onfocus="if (this.hasAttribute('readonly')) {this.removeAttribute('readonly'); this.blur();    this.focus();  }" />
+						</div>
+					</div>
+					<div class="row amb-1 apt-1">
+						<div class="col-xs-12 col-md-6">
+							New password again
+						</div>
+					</div>
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-6">
+							<input type="password" readonly class="w-100" autocomplete="none" id="repeat_password" onfocus="if (this.hasAttribute('readonly')) {this.removeAttribute('readonly'); this.blur();    this.focus();  }" />
+						</div>
+					</div>
+					<div class="row amb-1 apt-1">
+						<div class="col-xs-12 col-md-6 apt-1">
+							<span class="white">Site Settings</span>
+						</div>
+					</div>
+
+					<div class="row amb-1 apt-1">
+						<div class="col-xs-12 col-md-6">
+							File list mode
+						</div>
+					</div>
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-6 apb-1">	
+							<select class="select2 w-100" id="viewmode">
+								<option value="Standard">Standard</option>
+								<option value="BBS" >BBS</option>
+							</select>
+						</div>
+					</div>
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-6 d-flex">	
+							<div class="apr-1">Default Colly BG</div>
+							<div>
+								<select class="custom-select" id="def_bg_col">
+									<option id="sel_bg_col" value="" data-color="">Custom</option>
+									<option value='#555555' data-color="#555555">Bright Black</option>
+									<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
+									<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
+									<option value='#ff5555' data-color="#ff5555">Bright Red</option>
+									<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
+									<option value='#55ff55' data-color="#55ff55">Bright Green</option>
+									<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
+									<option value='#ffffff' data-color="#ffffff">White</option>
+									<option value='#000000' data-color="#000000">Black</option>
+									<option value='#0000aa' data-color="#0000aa">Blue</option>
+									<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
+									<option value='#aa0000' data-color="#aa0000">Red</option>
+									<option value='#aa5500' data-color="#aa5500">Yellow</option>
+									<option value='#00aa00' data-color="#00aa00">Green</option>
+									<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
+									<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
+								</select>
 							</div>
+						</div>
+					</div>
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-5 d-flex">	
+							<div class="apr-1">Default Colly FG</div>
+							<div>
+								<select class="custom-select" id="def_fg_col">
+									<option id="sel_bg_col" value="" data-color="">Custom</option>
+									<option value='#555555' data-color="#555555">Bright Black</option>
+									<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
+									<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
+									<option value='#ff5555' data-color="#ff5555">Bright Red</option>
+									<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
+									<option value='#55ff55' data-color="#55ff55">Bright Green</option>
+									<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
+									<option value='#ffffff' data-color="#ffffff">White</option>
+									<option value='#000000' data-color="#000000">Black</option>
+									<option value='#0000aa' data-color="#0000aa">Blue</option>
+									<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
+									<option value='#aa0000' data-color="#aa0000">Red</option>
+									<option value='#aa5500' data-color="#aa5500">Yellow</option>
+									<option value='#00aa00' data-color="#00aa00">Green</option>
+									<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
+									<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-6 apt-1">
+							Default Colly Font
+						</div>
+					</div>
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-6 apb-1">
+							<select class="select2 w-100" id='def_font'>
+								<option value="mosoul">mosoul</option>
+								<option value="topaz" >topaz</option>
+								<option value="microknight" >microknight</option>
+								<option value="pot-noodle" >pot-noodle</option>
+							</select>
+						</div>
+					</div>
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-6">
+							<div class="form-group">
+								<div class="custom-control custom-switch">CRT screen effect
+									<input type="checkbox" class="custom-control-input" id="crt_effect" name="crt_effect" value="1">
+									<label class="custom-control-label" for="crt_effect"></label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-6">
+							<div class="form-group">
+								<div class="custom-control custom-switch">Modem animation effect
+									<input type="checkbox" class="custom-control-input" id="anim_effect" name="anim_effect" value="1">
+									<label class="custom-control-label" for="anim_effect"></label>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-6">		
+							<span class="white">Upload Signature</span>
+						</div>
+					</div>
+					<div class="row amb-1">
+						<div class="col-xs-12 col-md-6 apb-1">		
+							<input type="text" class="w-100" size="44" maxlength="44" id="upload_signature" value="">
+						</div>							
+					</div>
+					<div class="row amb-1">
+						<div class="col-12 apt-1">	
+							<input type="button" id="btnSave" class="btn-big bg-green white" onclick="saveSettings()" value="Save" name="Save">
 						</div>
 					</div>
 				</div>
 
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6">		
-						<span class="white">Upload Signature</span>
-					</div>
-				</div>
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6 apb-1">		
-						<input type="text" class="w-100" size="44" maxlength="44" id="upload_signature" value="">
-					</div>							
-				</div>
-				<div class="row amb-1">
-					<div class="col-12 apt-1">	
-						<input type="button" id="btnSave" class="btn-big bg-green white" onclick="saveSettings()" value="Save" name="Save">
-					</div>
-				</div>
-			</div>
-
-		</form>	
-	<?php } // is_logged_in() ?>
+			</form>	
+		<?php } // is_logged_in() ?>
+	</div>
 
 	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
 		<?php include "sidebar.php"; ?>
