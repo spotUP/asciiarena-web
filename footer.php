@@ -100,9 +100,9 @@ if (DEBUG) {
 							</div>
 							<div class="col-12 col-sm-6">
 								<div class="form-group">
-									<div class="custom-control custom-switch">
+									<div class="custom-control custom-switch lightgrey">Remember me
 										<input type="checkbox" class="custom-control-input" id="customSwitch1" name="rememberme" value="1" checked>
-										<label class="custom-control-label" for="customSwitch1"><span style="margin-left: -8px !important;">Remember me</span></label>
+										<label class="custom-control-label" for="customSwitch1"><span style="margin-left: -8px !important;"></span></label>
 									</div>
 								</div>
 								<a href="/register.php">Register</a> <span style="color: #999999;">new account!</span><br><br>
