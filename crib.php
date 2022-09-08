@@ -15,7 +15,7 @@ include "header.php";
 				</div>
 				<div class="row apt-1">
 					<div class="col-xs-12 col-md-6">
-						Nick: 
+						Nick 
 					</div>
 				</div>
 				<div class="row amb-1">
@@ -25,7 +25,7 @@ include "header.php";
 				</div>
 				<div class="row amb-1">
 					<div class="col-xs-12 col-md-6">
-						Crew: 
+						Crew 
 					</div>
 				</div>
 				<div class="row amb-1">
@@ -33,23 +33,27 @@ include "header.php";
 						<input type="text" class="w-100" id="crew" value=""> 
 					</div>
 				</div>
-				<div class="row amb-1">
+				<div class="row">
 					<div class="col-xs-12 col-md-6 apt-1">
-						Birth:
+						Birth
 					</div>
 				</div>
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6">
+				<div class="row">
+					<div class="col-xs-12 col-md-2 apt-1">
 						<select id="byear" class="select2">
 							<?php for ($i=1920; $i<(date('Y')-5); $i++) { ?>
 								<option value="<?=$i?>"><?=$i?></option>
 							<?php } ?>
 						</select>
+					</div>
+					<div class="col-xs-12 col-md-2 apt-1">
 						<select id="bmonth" class="select2">
 							<?php for ($i=1; $i<=12; $i++) { ?>
 								<option value="<?=$i?>"><?=$i?></option>
 							<?php } ?>
 						</select>
+					</div>
+					<div class="col-xs-12 col-md-2 apt-1">
 						<select id="bday" class="select2">
 							<?php for ($i=1; $i<=31; $i++) { ?>
 								<option value="<?=$i?>"><?=$i?></option>
@@ -57,9 +61,10 @@ include "header.php";
 						</select>
 					</div>
 				</div>
+
 				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6 apt-1">
-						Country:
+					<div class="col-xs-12 col-md-6 apt-1 am">
+						Country
 					</div>
 				</div>
 				<div class="row amb-1">
@@ -73,7 +78,7 @@ include "header.php";
 				</div>
 				<div class="row amb-1">
 					<div class="col-xs-12 col-md-6 apt-1">
-						Mail:
+						Mail
 					</div>
 				</div>
 
@@ -84,14 +89,8 @@ include "header.php";
 				</div>
 
 				<div class="row amb-1 apt-1">
-					<div class="col-xs-12 col-md-3">
-						<span>Show E-Mail:</span> 
-					</div>
-				</div>
-				<div class="row amb-1">
-
-					<div class="col-xs-12 col-md-3">
-						<div class="custom-control custom-switch">
+					<div class="col-xs-12 col-md-6">
+						<div class="custom-control custom-switch">Show E-Mail
 							<input type="checkbox" class="custom-control-input" id="display_mail"value="1">
 							<label class="custom-control-label" for="display_mail"></label>
 						</div>
@@ -142,7 +141,7 @@ include "header.php";
 
 				<div class="row amb-1 apt-1">
 					<div class="col-xs-12 col-md-6">
-						File list mode:
+						File list mode
 					</div>
 				</div>
 				<div class="row amb-1">
@@ -154,64 +153,64 @@ include "header.php";
 					</div>
 				</div>
 				<div class="row amb-1">
-					<div class="col-xs-12 col-md-5">	
-						Default Colly BG:
-					</div>
-					<div class="col-xs-12 col-md-1 apb-1">	
-						<select class="custom-select" id="def_bg_col">
-							<option id="sel_bg_col" value="" data-color="">Custom</option>
-							<option value='#555555' data-color="#555555">Bright Black</option>
-							<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
-							<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
-							<option value='#ff5555' data-color="#ff5555">Bright Red</option>
-							<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
-							<option value='#55ff55' data-color="#55ff55">Bright Green</option>
-							<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
-							<option value='#ffffff' data-color="#ffffff">White</option>
-							<option value='#000000' data-color="#000000">Black</option>
-							<option value='#0000aa' data-color="#0000aa">Blue</option>
-							<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
-							<option value='#aa0000' data-color="#aa0000">Red</option>
-							<option value='#aa5500' data-color="#aa5500">Yellow</option>
-							<option value='#00aa00' data-color="#00aa00">Green</option>
-							<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
-							<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
-						</select>
-					</div>
-				</div>
-				<div class="row amb-1">
-					<div class="col-xs-12 col-md-5">	
-						Default Colly FG:
-					</div>
-					<div class="col-xs-12 col-md-1 apb-1">	
-						<select class="custom-select" id="def_fg_col">
-							<option id="sel_bg_col" value="" data-color="">Custom</option>
-							<option value='#555555' data-color="#555555">Bright Black</option>
-							<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
-							<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
-							<option value='#ff5555' data-color="#ff5555">Bright Red</option>
-							<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
-							<option value='#55ff55' data-color="#55ff55">Bright Green</option>
-							<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
-							<option value='#ffffff' data-color="#ffffff">White</option>
-							<option value='#000000' data-color="#000000">Black</option>
-							<option value='#0000aa' data-color="#0000aa">Blue</option>
-							<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
-							<option value='#aa0000' data-color="#aa0000">Red</option>
-							<option value='#aa5500' data-color="#aa5500">Yellow</option>
-							<option value='#00aa00' data-color="#00aa00">Green</option>
-							<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
-							<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
-						</select>
+					<div class="col-xs-12 col-md-6 d-flex">	
+						<div class="apr-1">Default Colly BG</div>
+						<div>
+							<select class="custom-select" id="def_bg_col">
+								<option id="sel_bg_col" value="" data-color="">Custom</option>
+								<option value='#555555' data-color="#555555">Bright Black</option>
+								<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
+								<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
+								<option value='#ff5555' data-color="#ff5555">Bright Red</option>
+								<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
+								<option value='#55ff55' data-color="#55ff55">Bright Green</option>
+								<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
+								<option value='#ffffff' data-color="#ffffff">White</option>
+								<option value='#000000' data-color="#000000">Black</option>
+								<option value='#0000aa' data-color="#0000aa">Blue</option>
+								<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
+								<option value='#aa0000' data-color="#aa0000">Red</option>
+								<option value='#aa5500' data-color="#aa5500">Yellow</option>
+								<option value='#00aa00' data-color="#00aa00">Green</option>
+								<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
+								<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
+							</select>
+						</div>
 					</div>
 				</div>
 				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6">	
-						Default Colly Font:
+					<div class="col-xs-12 col-md-5 d-flex">	
+						<div class="apr-1">Default Colly FG</div>
+						<div>
+							<select class="custom-select" id="def_fg_col">
+								<option id="sel_bg_col" value="" data-color="">Custom</option>
+								<option value='#555555' data-color="#555555">Bright Black</option>
+								<option value='#5555ff' data-color="#5555ff">Bright Blue</option>
+								<option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
+								<option value='#ff5555' data-color="#ff5555">Bright Red</option>
+								<option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
+								<option value='#55ff55' data-color="#55ff55">Bright Green</option>
+								<option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
+								<option value='#ffffff' data-color="#ffffff">White</option>
+								<option value='#000000' data-color="#000000">Black</option>
+								<option value='#0000aa' data-color="#0000aa">Blue</option>
+								<option value='#aa00aa' data-color="#aa00aa">Magenta</option>
+								<option value='#aa0000' data-color="#aa0000">Red</option>
+								<option value='#aa5500' data-color="#aa5500">Yellow</option>
+								<option value='#00aa00' data-color="#00aa00">Green</option>
+								<option value='#00aaaa' data-color="#00aaaa">Cyan</option>
+								<option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
+							</select>
+						</div>
 					</div>
 				</div>
 				<div class="row amb-1">
-					<div class="col-xs-12 col-md-6 apb-1">	
+					<div class="col-xs-12 col-md-6 apt-1">
+						Default Colly Font
+					</div>
+				</div>
+				<div class="row amb-1">
+					<div class="col-xs-12 col-md-6 apb-1">
 						<select class="select2 w-100" id='def_font'>
 							<option value="mosoul">mosoul</option>
 							<option value="topaz" >topaz</option>
@@ -222,11 +221,8 @@ include "header.php";
 				</div>
 				<div class="row amb-1">
 					<div class="col-xs-12 col-md-6">
-						CRT screen effect:
-					</div>
-					<div class="col-xs-12 col-md-6">
 						<div class="form-group">
-							<div class="custom-control custom-switch">
+							<div class="custom-control custom-switch">CRT screen effect
 								<input type="checkbox" class="custom-control-input" id="crt_effect" name="crt_effect" value="1">
 								<label class="custom-control-label" for="crt_effect"></label>
 							</div>
@@ -235,22 +231,18 @@ include "header.php";
 				</div>
 				<div class="row amb-1">
 					<div class="col-xs-12 col-md-6">
-						Modem animation effect:
-					</div>
-				</div>
-				<div class="row amb-1">
-					<div class="col-3">
 						<div class="form-group">
-							<div class="custom-control custom-switch">
+							<div class="custom-control custom-switch">Modem animation effect
 								<input type="checkbox" class="custom-control-input" id="anim_effect" name="anim_effect" value="1">
 								<label class="custom-control-label" for="anim_effect"></label>
 							</div>
 						</div>
 					</div>
 				</div>
+
 				<div class="row amb-1">
 					<div class="col-xs-12 col-md-6">		
-						<span class="white">Upload Signature:</span>
+						<span class="white">Upload Signature</span>
 					</div>
 				</div>
 				<div class="row amb-1">
@@ -260,7 +252,7 @@ include "header.php";
 				</div>
 				<div class="row amb-1">
 					<div class="col-12 apt-1">	
-						<input type="button" id="btnSave" class="btn-big" onclick="saveSettings()" value="Save" name="Save">
+						<input type="button" id="btnSave" class="btn-big bg-green white" onclick="saveSettings()" value="Save" name="Save">
 					</div>
 				</div>
 			</div>

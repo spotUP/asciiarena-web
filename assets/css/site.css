@@ -1487,7 +1487,7 @@ input[type="password"]:active {
 }
 
 .custom-switch {
-  padding-left: 32px;
+/*  padding-left: 32px; */
 }
 
 .custom-switch .custom-control-label {
@@ -1499,7 +1499,7 @@ input[type="password"]:active {
 }
 
 .custom-switch .custom-control-label::before {
-  left: -32px;
+  left: 0px;
   width: 16px;
   pointer-events: all;
   height: 16px !important;
@@ -1511,7 +1511,7 @@ input[type="password"]:active {
 
 .custom-switch .custom-control-label::after {
   margin-top: -3px !important;
-  left: -32px;
+  left: 0px;
   width: 8px!important;
   height: 16px !important;
   content: '\2589';
