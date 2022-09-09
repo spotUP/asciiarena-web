@@ -3,7 +3,7 @@
 	<div class="header col-lg-12 p-0">
 		<h2 class="ap-1 bg-header">aSCIIaRENA STATS</h2>
 	</div>
-	<div class="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
+	<div class="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary" style="min-height: 112px;">
 			<div class="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
 			<span class="white text-truncate">Collys Online:</span>
 			<span class="text-truncate"><?=fetchOne("SELECT COUNT(*) total FROM collys")->total?></span>

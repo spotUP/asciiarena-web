@@ -4,7 +4,7 @@ $h1 = "ASCII STYLE DESIGNER";
 include "header.php";
 ?>
 <div class="modal-body row m-0 p-0">
-    <div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
+    <div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1 bg-secondary">
         <?php
         if (is_logged_in()) 
         {
@@ -15,11 +15,11 @@ include "header.php";
                     <h2 class="bg-header" id="nav-tabs"></h2>
                     <div class="bs-component">
                         <ul class="nav nav-tabs apt-1 bg-secondary">
-                            <li class="nav-item">
-                                <p><a class="nav-link" href='styleeditor.php#/edit'>Character Editor </a></p>
+                            <li class="nav-item bg-secondary">
+                                <p><a class="nav-link bg-secondary" href='styleeditor.php#/edit'>Character Editor </a></p>
                             </li>
-                            <li class="nav-item">
-                                <p><a class="nav-link" href='styleeditor.php#/test'>Logo Maker </a></p>
+                            <li class="nav-item bg-secondary">
+                                <p><a class="nav-link bg-secondary" href='styleeditor.php#/test'>Logo Maker </a></p>
                             </li>
                         </ul>
                     </div>

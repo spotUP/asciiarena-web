@@ -86,7 +86,7 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('partials/main.htm',
     "<div>\n" +
-    "    <div id=\"main\" class=\"row apt-1 apb-1\">\n" +
+    "    <div id=\"main\" class=\"row apt-1 apb-1 bg-secondary\">\n" +
     "        <div class=\"col-md-4\">\n" +
     "            <div class=\"row\">\n" +
     "               <div class=\"col-md-6\">\n" +
@@ -364,8 +364,8 @@ angular.module('figfont').run(['$templateCache', function($templateCache) {
 
 $templateCache.put('partials/test.htm',
   "<div>\n" +
-  "    <textarea ng-model=\"input.figText\" class=\"fig-test-txt\" ng-trim=\"false\"></textarea>\n" +
-  "    <div style=\"margin-top:16px;margin-bottom:16px;\">\n" +
+  "    <div class=\"apr-1 apl-1\"><textarea ng-model=\"input.figText\" class=\"fig-test-txt\" ng-trim=\"false\"></textarea></div>\n" +
+  "    <div style=\"margin-top:16px;margin-bottom:16px; margin-left: 8px; margin-right: 8px;\">\n" +
   "        <div style=\"float:left\">\n" +
   "            <input type=\"checkbox\" ng-model=\"input.showHardBlanks\" id=\"fig-showhardblanks\" />\n" +
   "            <label for=\"fig-showhardblanks\">Show Hardblanks</label>\n" +

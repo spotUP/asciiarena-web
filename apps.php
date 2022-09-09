@@ -28,9 +28,8 @@ $sort_criteria .= ' '.$sort_order;
 
 require_once "header.php"; ?>
 
-<div id="blacker"></div>
 <div class="modal-body row m-0 p-0">
-	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
+	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1 bg-secondary">
     <div class="row apl-1 apb-1">
       <div class="col-12 d-flex justify-content-between">
        <?php

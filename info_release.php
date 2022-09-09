@@ -68,7 +68,7 @@ require_once "header.php";?>
     <form action="/admin.php#colly" method="post" id="edit-colly">
       <input type="hidden" name="getcollyname" value="<?=$filename?>">
       <input type="hidden" name="open_edit_colly_field" value="1">
-      <input type="submit" class="btn-big amb-1" name="edit_colly" value="Edit Colly">
+      <input type="submit" class="btn-big amb-1" name="edit_colly" value="Edit">
     </form>
     <?php } ?>
     </div>
