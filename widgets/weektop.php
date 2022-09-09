@@ -4,10 +4,10 @@ $weektop = "weektop_{$weektop_id}";
 $weektophdr = "weektophdr_{$weektop_id}";
 ?>
 <div class="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
-	<div class="header col-lg-12 p-0">
+	<div class="header col-lg-12 p-0 bg">
 		<h2 id="<?=$weektophdr?>" class="ap-1 bg-header">WEEKTOP - BBS UPLOADERS</h2>
 	</div>
-<div class="container-fluid p-0 p-lg-2">
+<div class="container-fluid p-0 p-lg-2 bg-secondary">
 	<div class="row m-0 p-0 bg-secondary apb-1" id="<?=$weektop?>"></div>
 	</div>
 </div>

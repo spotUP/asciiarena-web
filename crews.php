@@ -6,7 +6,7 @@ $searchquery = $_POST[ 'search' ] ?? "";
 
 ?>
 <div class="modal-body row m-0 p-0">
-	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2">
+	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 bg-secondary">
 		<div class="row apl-1 apb-1">
 			<div class="col-12 d-flex justify-content-between">
 				<?php

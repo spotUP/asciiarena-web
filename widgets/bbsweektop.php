@@ -7,7 +7,7 @@ $bbsweektophdr = "bbsweektophdr_{$bbsweektop_id}";
 	<div class="header col-lg-12 p-0">
 		<h2 id="<?=$bbsweektophdr?>" class="ap-1 bg-header">WEEKTOP - BBS:ES</h2>
 	</div>
-<div class="container-fluid p-0 p-lg-2">
+<div class="container-fluid p-0 p-lg-2 bg-secondary">
 	<div class="row m-0 p-0 bg-secondary apb-1" id="<?=$bbsweektop?>"></div>
 	</div>
 </div>
