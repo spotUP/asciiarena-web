@@ -218,10 +218,14 @@ include "header.php";
 					<div class="row amb-1">
 						<div class="col-xs-12 col-md-6 apb-1">
 							<select class="select2 w-100" id='def_font'>
-								<option value="mosoul">mosoul</option>
-								<option value="topaz" >topaz</option>
-								<option value="microknight" >microknight</option>
-								<option value="pot-noodle" >pot-noodle</option>
+                <option value="MicroKnight">MicroKnight</option>
+                <option value="MicroKnightPlus">MicroKnight+</option>
+                <option value="mOsOul">mOsOul</option>
+                <option value="P0T-NOoDLE">P0T-NOoDLE</option>
+                <option value="Topaz_a500">A500 Topaz</option>
+                <option value="TopazPlus_a500">A500 Topaz+</option>
+                <option value="Topaz_a1200">A1200 Topaz</option>
+                <option value="TopazPlus_a1200">A1200 Topaz+</option>
 							</select>
 						</div>
 					</div>
