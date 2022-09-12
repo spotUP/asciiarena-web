@@ -2,7 +2,9 @@
 header('Content-Type: text/plain');  
 header("Content-Transfer-Encoding: utf-8");   
 require_once "session.php";
-
+?>
+<?="filename".chr(9)."path".chr(9)."description".chr(13).chr(10)?>
+<?php
 foreach(fetchAll("SELECT * FROM collys") as $row) {
   if (strlen($row->filename)>0) {
   $dirname = explode(".", $row->filename);
