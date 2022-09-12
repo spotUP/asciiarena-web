@@ -104,14 +104,14 @@
 		<input type="hidden" name="name" id="logo_name">
 
 		<div class="row apb-1">
-			<div class="col-xs-12 col-10">
+			<div class="col-xs-12 col-md-10">
 				<textarea id="logo_ascii" class="w-100" wrap="physical" name="ascii" rows="8"/></textarea>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-12">
-				<input type="button" class="btn-big" value="Save" onclick="saveLogo()">
-				<input type="button" class="btn-big bg-red" value="Delete" onclick="delLogo()">
+				<input type="button" class="btn-big bg-green whitew-100 col-xs-12 col-md-2 amb-1" value="Save" onclick="saveLogo()">
+				<input type="button" class="btn-big bg-red w-100 col-xs-12 col-md-2 amb-1 white" value="Delete" onclick="delLogo()">
 			</div>
 		</div>
 	</form>  

@@ -401,9 +401,9 @@
 
 				<div class="row">
 					<div class="col-12">
-						<input type="button" class="btn-big w-100 white bg-green col-2" value="Save" onclick="saveColly();">
+						<input type="button" class="btn-big w-100 white bg-green col-xs-12 col-md-2 amb-1" value="Save" onclick="saveColly();">
 						<?php if ($admin_edit && is_admin()) { ?>
-							<input type="button" class="btn-big w-100 bg-red white w-100 col-2" value="Delete" onclick="delColly()">
+							<input type="button" class="btn-big w-100 bg-red white w-100 col-xs-12 col-md-2 amb-1" value="Delete" onclick="delColly()">
 						<?php } ?>
 					</div>
 				</div>

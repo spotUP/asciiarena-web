@@ -669,25 +669,25 @@ include "header.php";
 					<div class="bs-component">
 						<ul class="nav nav-tabs apt-1 bg-secondary">
 							<li class="nav-item">
-								<a class="nav-link active" data-toggle="tab" href="#colly">Colly</a>
+								<a class="nav-link active m-0 p-0 apl-1" data-toggle="tab" href="#colly">Colly</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#crew">Crew</a>
+								<a class="nav-link m-0 p-0 apl-1" data-toggle="tab" href="#crew">Crew</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#artist">Artist</a>
+								<a class="nav-link m-0 p-0 apl-1" data-toggle="tab" href="#artist">Artist</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#edituser">User</a>
+								<a class="nav-link m-0 p-0 apl-1" data-toggle="tab" href="#edituser">User</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#sitelogo">Logo</a>
+								<a class="nav-link m-0 p-0 apl-1" data-toggle="tab" href="#sitelogo">Logo</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#bbs">BBS</a>
+								<a class="nav-link m-0 p-0 apl-1" data-toggle="tab" href="#bbs">BBS</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#broken">Broken</a>
+								<a class="nav-link m-0 p-0 apl-1" data-toggle="tab" href="#broken">Broken</a>
 							</li>
 						</ul>
 						<div id="myTabContent" class="tab-content apt-1" style="background-color: #1a1a1a;">

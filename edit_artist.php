@@ -140,7 +140,7 @@
 		<div class="row apb-1">
 			<div class="col-6">
 				<form>
-					<select class="select2" name="artist_id" id="artist_fetch_id" onchange="getArtist();"></select>
+					<select class="select2 w-100" name="artist_id" id="artist_fetch_id" onchange="getArtist();"></select>
 				</form>
 			</div>
 		</div>
@@ -193,7 +193,7 @@
 			<div id="artist_crew_fetch_id"></div>
 			<div class="row apb-1">
 				<div class="col-xs-12 col-md-5">
-					<select class="select2" id="artist_crew_add_fetch_id" class="w-100">
+					<select class="select2 w-100" id="artist_crew_add_fetch_id" class="w-100">
 						<option value="0">Select Crew</option>
 						<?php
 						$result = fetchAll("SELECT id, name FROM crews ORDER BY name");
@@ -248,8 +248,8 @@
 
 			<div class="row apt-1">
 				<div class="col-12">
-					<input type="button" class="btn-big white bg-green w-100 col-2" value="Save" onclick="saveArtist()">
-					<input type="button" class="btn-big white bg-red w-100 col-2" value="Delete" onclick="delArtist()">
+					<input type="button" class="btn-big white bg-green w-100 col-xs-12 col-md-2 amb-1" value="Save" onclick="saveArtist()">
+					<input type="button" class="btn-big white bg-red w-100 col-xs-12 col-md-2 amb-1" value="Delete" onclick="delArtist()">
 				</div>
 			</div>
 

@@ -161,9 +161,9 @@
 		</div>
 		<div class="row">
 			<div class="col-12">
-				<input type="button" class="btn-big bg-green white" value="Save" onclick="saveBBS()">
+				<input type="button" class="btn-big bg-green white w-100 col-xs-12 col-md-2 amb-1" value="Save" onclick="saveBBS()">
         <?php if ($admin_edit && is_admin()) { ?>
-				<input type="button" class="btn-big bg-red white" value="Delete" onclick="delBBS()">
+				<input type="button" class="btn-big bg-red white w-100 col-xs-12 col-md-2 amb-1" value="Delete" onclick="delBBS()">
         <?php } ?>
 			</div>
 		</div>
