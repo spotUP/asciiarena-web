@@ -19,7 +19,7 @@ switch ($sort_by) {
 ?>
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 bg-secondary">
-		<div class="row apl-1">
+		<div class="row">
 			<div class="col-12 d-flex justify-content-between">
 				<?php
 				$pageno = $_GET[ 'pageno' ] ?? 1;
@@ -28,13 +28,14 @@ switch ($sort_by) {
 				if (!isset($_POST[ "search" ])) {
 					echo $pagination[ "pager" ];
 				}
-				?>				
-				<div>
+				?>
+				<div class="col-5 apt-1 bg-secondary apb-1">
 					<form action="?sort_by=<?=$sort_by?>" method="post">
-					<span class="amr-1">Search: <input type="text" name="search" autocomplete="off" value="<?=$searchquery?>"></span>
+						<div class="amr-1"><input placeholder="Search..." type="text" name="search" autocomplete="off" class="w-100"value="<?=$searchquery?>"></div>
 					</form>
 				</div>
 			</div>
+
 		</div>
 		<?php
 		//-----------------------------------------------------------------------------
@@ -58,10 +59,10 @@ switch ($sort_by) {
 		} else {
 			$searchquery = $_POST[ 'search' ];
 			$q = "SELECT a.nick,GROUP_CONCAT(m.crew) as crews FROM artists a LEFT JOIN member_of m on a.nick=m.nick 
-				  WHERE MATCH(a.nick) AGAINST (:searchquery IN BOOLEAN MODE) 
-				    OR MATCH(m.crew) AGAINST (:searchquery IN BOOLEAN MODE)
-				    OR a.nick LIKE :wcquery
-				  GROUP BY a.id ORDER BY {$sort_by} ASC {$pagination["limit"]}";
+			WHERE MATCH(a.nick) AGAINST (:searchquery IN BOOLEAN MODE) 
+			OR MATCH(m.crew) AGAINST (:searchquery IN BOOLEAN MODE)
+			OR a.nick LIKE :wcquery
+			GROUP BY a.id ORDER BY {$sort_by} ASC {$pagination["limit"]}";
 			$p = [":searchquery" => $searchquery, ":wcquery" => '%'.$searchquery.'%'];
 		}
 		foreach (fetchAll($q, $p) as $row) {

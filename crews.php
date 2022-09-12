@@ -7,7 +7,7 @@ $searchquery = $_POST[ 'search' ] ?? "";
 ?>
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 bg-secondary">
-		<div class="row apl-1 apb-1">
+		<div class="row">
 			<div class="col-12 d-flex justify-content-between">
 				<?php
 				require_once "pagination.php";
@@ -32,18 +32,12 @@ $searchquery = $_POST[ 'search' ] ?? "";
 					echo $pagination[ "pager" ];
 				}
 				?>
-				<div class="col-6 d-none d-sm-block">
+				<div class="col-5 apt-1 bg-secondary apb-1">
 					<form action="?sort_by=<?=$sort_by?>" method="post">
-							<span class="amr-1 ">Search: <input type="text" name="search" autocomplete="off" value="<?=$searchquery?>"></span>
+						<span class="amr-1 "><input placeholder="Search..." type="text" name="search" autocomplete="off" class="w-100" value="<?=$searchquery?>"></span>
 					</form>
 				</div>
-				<div class="row">
-					<div class="col-12 block d-sm-none">
-						<form action="?sort_by=<?=$sort_by?>" method="post">
-							<span class="amr-1 ">Search: <input type="text" name="search" autocomplete="off" value="<?=$searchquery?>"></span>
-						</form>
-					</div>
-				</div>
+
 			</div>
 		</div>
 		<?php
@@ -82,7 +76,7 @@ $searchquery = $_POST[ 'search' ] ?? "";
 			(SELECT COUNT(nick) FROM member_of WHERE crew = crews.name) AS members 
 			FROM crews 
 			WHERE MATCH(crews.name, crews.acronym) AGAINST (:searchquery IN BOOLEAN MODE)
-				OR crews.name LIKE :wcquery OR crews.acronym LIKE :wcquery
+			OR crews.name LIKE :wcquery OR crews.acronym LIKE :wcquery
 			ORDER BY {$sort_by} {$sort_order} {$pagination["limit"]}";
 			$p = [":searchquery" => $searchquery, ":wcquery" => '%'.$searchquery.'%'];
 		}

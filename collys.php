@@ -61,7 +61,7 @@ require_once "header.php"; ?>
 
 			<div class="col-5 apt-1 bg-secondary apb-1">
 				<form action="?sort_by=<?=$sort_by?>&sort_order=<?=$sort_order?>&viewmode=<?=$viewmode?>" method="post">
-					<span class="amr-1 d-none d-sm-block"><input placeholder="search" type="text" name="search" autocomplete="off" class="w-100" style="background-color: #555 !important;" value="<?=$searchquery?>"></span>
+					<span class="amr-1 d-none d-sm-block"><input placeholder="Search..." type="text" name="search" autocomplete="off" class="w-100" style="background-color: #555 !important;" value="<?=$searchquery?>"></span>
 				</form>
 			</div>
 
