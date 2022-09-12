@@ -16,7 +16,7 @@ $type = fetchOne("SELECT type FROM collys WHERE filename = :filename", [":filena
 
 $row = fetchOne("SELECT def_font,def_fg_col,def_bg_col FROM users WHERE nick = :nick", [":nick" => $nick]);
 if ($row) {
-$font = (strlen($row->font) > 1) ? $row->font : 'mOsOul';
+$font = (strlen($row->def_font) > 1) ? $row->def_font : 'mOsOul';
 $fgcolor = (strlen($row->def_fg_col) > 1) ? $row->def_fg_col : '#ffffff';
 $bgcolor = (strlen($row->def_bg_col) > 1) ? $row->def_bg_col : '#000000';
 } else {
@@ -216,7 +216,7 @@ require_once "header.php";?>
           <div class="col-3">
             Font:
           </div>
-          <div class="col-2">
+          <div class="col-2 amb-1">
             <select class="custom-select" id="colly-font">
               <option class="dropdown-item" value="MicroKnight"<?php if ($font == 'MicroKnight') echo ' selected'; ?>>MicroKnight</option>
               <option class="dropdown-item" value="MicroKnightPlus"<?php if ($font == 'MicroKnightPlus') echo ' selected'; ?>>MicroKnight+</option>
