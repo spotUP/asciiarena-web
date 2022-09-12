@@ -26,8 +26,6 @@ $bgcolor = (strlen($row->def_bg_col) > 1) ? $row->def_bg_col : '#000000';
 
 require_once "header.php";?>
 
-<div id="blacker" style="background-color: <?=$bgcolor?>;"></div>
-
 <div class="modal-body row m-0 p-0">
 	<div id="messages" class="col-lg-8 order-md-1 order-lg-2 order-xl-2 m-0 p-0 m-sm-1 p-sm-1">
     <?php
