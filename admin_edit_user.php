@@ -224,8 +224,8 @@
 		</div>    
 		<div class="row apt-1">
 			<div class="col-12">
-				<input type="button" class="btn-big bg-green white w-100 col-2" value="Save" onclick="saveUser()">
-				<input type="button" class="btn-big bg-red white w-100 col-2" value="Delete" onclick="delUser()">
+				<input type="button" class="btn-big bg-green white w-100 col-xs-12 col-md-2 amb-1" value="Save" onclick="saveUser()">
+				<input type="button" class="btn-big bg-red white w-100 col-xs-12 col-md-2 amb-1" value="Delete" onclick="delUser()">
 			</div>
 		</div>
 	</form>
