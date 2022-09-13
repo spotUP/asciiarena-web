@@ -1,6 +1,5 @@
 <?php  
-header('Content-Type: text/plain');  
-header("Content-Transfer-Encoding: utf-8");   
+header('Content-Type: text/plain; charset=ISO-8859-1');  
 require_once "session.php";
 echo "Filename".chr(9)."Path".chr(9)."Artist(s)".chr(9)."Crew(s)".chr(9)."Description".chr(13).chr(10);
 
@@ -9,7 +8,7 @@ foreach(fetchAll("select co.name, co.filename, (SELECT GROUP_CONCAT(c.name) FROM
   $dirname = explode(".", $row->filename);
   $dirname = $dirname[0];
   if (file_exists("collections/".$dirname."/".$row->filename)) {
-    echo $row->filename.chr(9)."collections/".$dirname.chr(9).$row->artists.chr(9).$row->crews.chr(9).$row->name.chr(13).chr(10);
+    echo utf8_decode($row->filename).chr(9)."collections/".utf8_decode($dirname).chr(9).utf8_decode($row->artists).chr(9).utf8_decode($row->crews).chr(9).utf8_decode($row->name).chr(10);
   }
   }
 }
