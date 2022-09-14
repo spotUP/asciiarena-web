@@ -103,7 +103,7 @@ require_once "header.php"; ?>
            $display_file_id = file_get_contents('apps/'.$dirname.'/'.$file_id); 
            $display_file_id=utf8_encode($display_file_id);
            ?>
-           <pre style="overflow: hidden;"><a class="ascii magenta" href="/magazine/<?=$row->filename?>"><?=$display_file_id?></a></pre>
+           <pre class="ascii magenta overflow-hidden"><a class="ascii magenta" href="/magazine/<?=$row->filename?>"><?=$display_file_id?></a></pre>
          <?php } ?>
        </div>
      </div>
