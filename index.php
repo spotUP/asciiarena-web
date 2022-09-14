@@ -8,6 +8,7 @@ include "header.php";
 		<?php widgets([
 			"message_alerts",
 			["file" => "latest/releases", "header" => "LATEST RELEASES", "columns" => 2],
+			["file" => "random_releases", "header" => "RANDOM RELEASES", "columns" => 2],
 			["file" => "wall"],
 			["file" => "globalwall"],
 			["file" => "last_bbs_callers"],
