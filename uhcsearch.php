@@ -8,7 +8,7 @@ foreach(fetchAll("select co.name, co.filename, (SELECT GROUP_CONCAT(c.name) FROM
   $dirname = explode(".", $row->filename);
   $dirname = $dirname[0];
   if (file_exists("collections/".$dirname."/".$row->filename)) {
-    echo utf8_decode($row->filename).chr(9)."collections/".utf8_decode($dirname).chr(9).utf8_decode($row->artists).chr(9).utf8_decode($row->crews).chr(9).utf8_decode($row->name).chr(9).utf8_decode(utf8_decode($row->name)).chr(10);
+    echo utf8_decode($row->filename).chr(9)."collections/".utf8_decode($dirname).chr(9).utf8_decode($row->artists).chr(9).utf8_decode($row->crews).chr(9).utf8_decode($row->name).chr(10);
   }
   }
 }
