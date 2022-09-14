@@ -29,11 +29,11 @@ require_once "header.php"; ?>
                         <div class="row ap-1 bg-secondary overflow-hidden">
                                 <div class="animate__animated animate__backInLeft col-lg-8 d-flex justify-content-center justify-content-lg-start" style="position: relative; top: -16px;">
 					<br/>
-                                        <span class="ascii magenta">
+                                        <span>
 						<?php
 						$file_id = preg_replace('/\\.[^.\\s]{3,4}$/', '', $filename).'.diz';
 						if (file_exists('apps/'.$file_id)) {
-							echo '<pre>';
+							echo '<pre class="ascii magenta">';
 							echo utf8_encode(file_get_contents('apps/'.$file_id));
 							echo '</pre>';
 						} elseif (file_exists('apps/'.$filename.'.diz.png')) {
