@@ -29,12 +29,3 @@ RewriteRule "^magazine/([^/]+)/?$" /info_mags.php?filename=$1 [L,QSA,B]
 
 Options Indexes FollowSymLinks MultiViews
 
-
-
-
-# Prevent further processing if the "/images" directory is requested
-RewriteRule ^uhc($|/) - [L]
-
-# Redirect everything else to HTTPS
-RewriteCond %{HTTP:X-Forwarded-Proto} !https
-RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
