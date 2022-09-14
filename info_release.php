@@ -340,7 +340,7 @@ require_once "header.php";?>
     if ($('#viewbutton').val() == 'View Colly') {
       const url = `/cmds.php/countview/${$("#collyid").data("id")}`;
       $.ajax(url);
-      $('#colly-main').slideUp(500);
+      $('#colly-main').show(500);
       $('#comments').hide(500);
       $('#viewbutton').val('Hide Colly')
       $('#fsbutton').show(100);
