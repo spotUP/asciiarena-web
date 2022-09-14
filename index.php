@@ -9,11 +9,11 @@ include "header.php";
 			"message_alerts",
 			["file" => "latest/releases", "header" => "LATEST RELEASES", "columns" => 2],
 			["file" => "random_releases", "header" => "RANDOM RELEASES", "columns" => 2],
+			["file" => "latest/comments"],
 			["file" => "wall"],
 			["file" => "globalwall"],
 			["file" => "last_bbs_callers"],
 //			["file" => "cedd_sessions"],
-			["file" => "latest/comments"],
 		]); ?>
 	</div>
 	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
