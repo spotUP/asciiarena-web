@@ -8,7 +8,11 @@ if(empty($breakpoint)) {
 $breakpoint = rtrim($breakpoint, "-") . "-";
 $releases = [];
 $res = fetchAll("select * from (
+(SELECT 'A' as type, filename, year(from_unixtime(timestamp)) fyear,month(from_unixtime(timestamp)) fmonth,dayofmonth(from_unixtime(timestamp)) fday from apps order by rand() desc limit 10)
+union
 (select 'C' as type, filename, year fyear, month fmonth, day fday from collys order by year desc, month desc,day desc limit 10)
+union
+(SELECT 'M' as type, filename, year(from_unixtime(timestamp)) fyear,month(from_unixtime(timestamp)) fmonth,dayofmonth(from_unixtime(timestamp)) fday from mags order by rand() desc limit 10)
 ) a
 order by rand() limit 10");
 foreach($res as $row) {
