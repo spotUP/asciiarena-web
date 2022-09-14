@@ -1,3 +1,0 @@
-# disable mod_rewrite
-RewriteEngine off
-
