@@ -29,3 +29,12 @@ RewriteRule "^magazine/([^/]+)/?$" /info_mags.php?filename=$1 [L,QSA,B]
 
 Options Indexes FollowSymLinks MultiViews
 
+RewriteCond %{HTTPS} off
+RewriteCond %{THE_REQUEST} !\s/+uhc[/?\s] [NC]
+RewriteCond %{REQUEST_URI} !^/[0-9]+\..+\.cpaneldcv$
+RewriteCond %{REQUEST_URI} !^/[A-F0-9]{32}\.txt(?:\ Comodo\ DCV)?$
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
+
+RewriteCond %{HTTPS} on
+RewriteCond %{THE_REQUEST} \s/+uhc[/?\s] [NC]
+RewriteRule ^ http://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
