@@ -14,7 +14,7 @@ union
 union
 (SELECT 'M' as type, filename, year(from_unixtime(timestamp)) fyear,month(from_unixtime(timestamp)) fmonth,dayofmonth(from_unixtime(timestamp)) fday from mags order by rand() desc limit 10)
 ) a
-order by a.fyear desc, a.fmonth desc, a.fday desc limit 10");
+order by rand() limit 10");
 foreach($res as $row) {
 	$dirname = explode(".", $row->filename);
 
