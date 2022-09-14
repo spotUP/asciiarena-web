@@ -29,3 +29,16 @@ RewriteRule "^magazine/([^/]+)/?$" /info_mags.php?filename=$1 [L,QSA,B]
 
 Options Indexes FollowSymLinks MultiViews
 
+
+
+
+RewriteEngine On
+RewriteBase /
+
+RewriteCond %{HTTPS} off
+RewriteCond %{REQUEST_URI} !^/uhc
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+RewriteCond %{HTTPS} on
+RewriteCond %{REQUEST_URI} ^/uhc
+RewriteRule ^(.*)$ http://%{HTTP_HOST}/$1 [R=301,L]
