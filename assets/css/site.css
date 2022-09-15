@@ -1618,6 +1618,16 @@ input[type="password"]:active {
   font-family: 'TopazPlus_a1200' !important;
 }
 
+.alert-danger::before {
+  margin: 0 -8px 14px;
+  padding: 0 8px;
+  display: block;
+  text-transform: uppercase;
+  color: #fff;
+  background: #aa0000;
+  content: "Alert" !important;
+}
+
 .fullscreen{
   position: absolute !important;
   top:0;
