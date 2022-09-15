@@ -26,9 +26,12 @@ RewriteRule "^magazine/([^/]+)/?$" /info_mags.php?filename=$1 [L,QSA,B]
 RewriteRule uhcsearch\.php - [L]
 
 RewriteCond %{HTTPS} !=on
-RewriteCond %{REQUEST_URI} ^(?!collections\/).+. [NC] 
 # If we receive a forwarded http request from a proxy...
-RewriteCond %{HTTP:X-Forwarded-Proto} =http
+RewriteCond %{HTTP:X-Forwarded-Proto} =http [OR]
+
+# ...or just a plain old http request directly from the client
+RewriteCond %{HTTP:X-Forwarded-Proto} =""
+
 # Redirect to https version
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
