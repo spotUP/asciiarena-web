@@ -16,7 +16,6 @@ RewriteBase /
 # Rewrite all other URLs to index.php/URL
 #RewriteRule .* index.php/$0 [PT,L]
 
-RewriteRule /uhcsearch\.php/ - [L]
 
 RewriteRule "^crew/([^/]+)/?$" /info_crew.php?crew=$1 [L,QSA]
 RewriteRule "^artist/([^/]+)/?$" /info_artist.php?artist=$1 [L,QSA]
@@ -24,6 +23,12 @@ RewriteRule "^member/([^/]+)/?$" /members.php?member=$1 [L,QSA]
 RewriteRule "^release/([^/]+)/?$" /info_release.php?filename=$1 [L,QSA,B]
 RewriteRule "^application/([^/]+)/?$" /info_apps.php?filename=$1 [L,QSA,B]
 RewriteRule "^magazine/([^/]+)/?$" /info_mags.php?filename=$1 [L,QSA,B]
+
+
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} =http [OR]
+RewriteCond %{HTTP:X-Forwarded-Proto} =""
+RewriteRule ^(collections) - [L]
 
 
 RewriteCond %{HTTPS} !=on
