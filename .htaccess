@@ -29,9 +29,8 @@ RewriteCond %{HTTP:X-Forwarded-Proto} =http [OR]
 # ...or just a plain old http request directly from the client
 RewriteCond %{HTTP:X-Forwarded-Proto} =""
 RewriteCond %{HTTPS} !=on
-
-#RewriteCond %{REQUEST_URI} ^(?!collections\/).+. [NC] 
-#RewriteCond %{REQUEST_URI} ^(?!uhcsearch\.php).+. [NC] 
+RewriteCond %{REQUEST_URI} ^(?!collections\/).+. [NC] 
+RewriteCond %{REQUEST_URI} ^(?!uhcsearch\.php).+. [NC] 
 
 # Redirect to https version
 
