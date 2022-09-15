@@ -24,7 +24,8 @@ RewriteRule "^release/([^/]+)/?$" /info_release.php?filename=$1 [L,QSA,B]
 RewriteRule "^application/([^/]+)/?$" /info_apps.php?filename=$1 [L,QSA,B]
 RewriteRule "^magazine/([^/]+)/?$" /info_mags.php?filename=$1 [L,QSA,B]
 
-RewriteCond %{REQUEST_URI} [\/]?uhcsearch\.php [NC]
+RewriteCond %{REQUEST_URI} [\/]?uhcsearch\.php [OR]
+RewriteCond %{REQUEST_URI} [\/]?collections\/
 RewriteRule ^(.*)$ - [L]
 
 RewriteCond %{HTTPS} !=on
