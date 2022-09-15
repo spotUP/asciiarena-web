@@ -24,6 +24,7 @@ RewriteRule "^release/([^/]+)/?$" /info_release.php?filename=$1 [L,QSA,B]
 RewriteRule "^application/([^/]+)/?$" /info_apps.php?filename=$1 [L,QSA,B]
 RewriteRule "^magazine/([^/]+)/?$" /info_mags.php?filename=$1 [L,QSA,B]
 
+RewriteCond %{HTTP:X-Forwarded-Proto} =https [OR]
 RewriteCond %{HTTPS} on
 RewriteRule uchsearch\.php http://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
