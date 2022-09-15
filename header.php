@@ -217,7 +217,7 @@ include "header_ascii.php";
 					<?php }
 				}
 				?>
-				<div class="row">
+				<div class="row amb-1">
 					<div class="col-lg-12">
 						<div class="bs-component aml-1 apl-1 apr-1 apt-1">
 							<?php if ($detect->isMobile()) { ?>
