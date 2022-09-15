@@ -23,10 +23,13 @@ RewriteRule "^release/([^/]+)/?$" /info_release.php?filename=$1 [L,QSA,B]
 RewriteRule "^application/([^/]+)/?$" /info_apps.php?filename=$1 [L,QSA,B]
 RewriteRule "^magazine/([^/]+)/?$" /info_mags.php?filename=$1 [L,QSA,B]
 
-RewriteCond %{HTTPS} !=on
-RewriteCond %{REQUEST_URI} ^(?!collections\/).+. [NC] 
-RewriteCond %{REQUEST_URI} ^(?!uhcsearch\.php).+. [NC] 
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
+RewriteCond %{HTTPS} off 
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+#RewriteCond %{HTTPS} !=on
+#RewriteCond %{REQUEST_URI} ^(?!collections\/).+. [NC] 
+#RewriteCond %{REQUEST_URI} ^(?!uhcsearch\.php).+. [NC] 
+#RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
 
 #Header always set Content-Security-Policy "upgrade-insecure-requests;"
 
