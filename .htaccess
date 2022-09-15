@@ -24,10 +24,8 @@ RewriteRule "^release/([^/]+)/?$" /info_release.php?filename=$1 [L,QSA,B]
 RewriteRule "^application/([^/]+)/?$" /info_apps.php?filename=$1 [L,QSA,B]
 RewriteRule "^magazine/([^/]+)/?$" /info_mags.php?filename=$1 [L,QSA,B]
 
-RewriteCond %{HTTP:X-Forwarded-Proto} =https [OR]
-RewriteCond %{HTTP:X-Forwarded-Proto} =""
-RewriteCond %{HTTPS} on
-RewriteRule uhcsearch\.php http://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+RewriteCond %{REQUEST_URI} [\/]?uhcsearch\.php [NC]
+RewriteRule ^(.*)$ http://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
 RewriteCond %{HTTPS} !=on
 # If we receive a forwarded http request from a proxy...
