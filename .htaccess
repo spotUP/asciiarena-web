@@ -23,9 +23,10 @@ RewriteRule "^release/([^/]+)/?$" /info_release.php?filename=$1 [L,QSA,B]
 RewriteRule "^application/([^/]+)/?$" /info_apps.php?filename=$1 [L,QSA,B]
 RewriteRule "^magazine/([^/]+)/?$" /info_mags.php?filename=$1 [L,QSA,B]
 
+RewriteRule uhcsearch\.php - [L]
+
 RewriteCond %{HTTPS} !=on
 RewriteCond %{REQUEST_URI} ^(?!collections\/).+. [NC] 
-RewriteCond %{REQUEST_URI} ^(?!uhcsearch\.php).+. [NC] 
 # If we receive a forwarded http request from a proxy...
 RewriteCond %{HTTP:X-Forwarded-Proto} =http
 # Redirect to https version
