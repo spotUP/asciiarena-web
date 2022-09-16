@@ -269,6 +269,7 @@
 						<select class="select2" name="type" id="colly_type">
 							<option value="ASCII">ASCII</option>
 							<option value="ANSI">ANSI</option>
+							<option value="ANSI">Archive</option>
 						</select>
 					</div>
 				</div>
