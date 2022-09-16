@@ -148,6 +148,9 @@
 
 }
 
+label.btn{
+    display: inline-flex;
+}
 
 label.btn.btn-lg.fontbtn:active{
     background: #999 !important;
