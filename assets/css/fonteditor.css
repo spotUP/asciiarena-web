@@ -148,6 +148,12 @@
 
 }
 
+.btn-group-toggle>.btn, .btn-group-toggle>.btn-group>.btn {
+    margin-bottom: 0;
+    display: inline-flex;
+    min-height: 48px;
+}
+
 label.btn{
     display: inline-flex;
 }
