@@ -43,7 +43,7 @@ require_once "header.php";?>
 			</div>
         <script type="text/javascript" src="/assets/js/ansilove.js"></script>
         <script>
-          AnsiLove.splitRender("<?php echo "{/assets/data/404.ans}"; ?>", function (canvases, sauce) {
+          AnsiLove.splitRender("<?php echo "{assets/data/404.ans}"; ?>", function (canvases, sauce) {
             canvases.forEach(function (canvas) {
               canvas.style.verticalAlign = "bottom";
               canvas.style.margin = "0 auto";
