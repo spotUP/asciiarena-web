@@ -41,18 +41,6 @@ require_once "header.php";?>
 					</div>
 				</div>
 			</div>
-        <script type="text/javascript" src="/assets/js/ansilove.js"></script>
-        <script>
-          AnsiLove.splitRender("<?php echo "{$_SERVER['DOCUMENT_ROOT'].'/assets/data/404.ans'}"; ?>", function (canvases, sauce) {
-            canvases.forEach(function (canvas) {
-              canvas.style.verticalAlign = "bottom";
-              canvas.style.margin = "0 auto";
-              canvas.style.display = "block";
-              document.getElementById("colly").appendChild(canvas);
-            });
-            document.getElementById("loading").style.display = "none";
-          }, 100, {"font": "mosoul", "bits": "8", "icecolors": 1, "columns": 80, "thumbnail": 0, "filetype": "ans"});
-        </script>
 			<?php
       } else {
         include('info_release_summary.php');
