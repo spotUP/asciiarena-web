@@ -63,6 +63,7 @@ require_once "header.php";?>
     $site_url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
     // post title
     $site_title  = "Check out " . $show_colly_name . " at asciiarena.se";
+    $twitterdesc = "Check%20out%20" . $show_colly_name . "%20at asciiarena.se&amp;hashtags=asciiarena.se";
     ?>
 
     <div class="bs-component">
@@ -74,7 +75,7 @@ require_once "header.php";?>
           <a class="dropdown-item" href="http://www.facebook.com/sharer.php?u=<?=$site_url?>" target="_blank">Facebook</a>
           <a class="dropdown-item" href="javascript:void((function()%7Bvar%20e=document.createElement('script');e.setAttribute('type','text/javascript');e.setAttribute('charset','UTF-8');e.setAttribute('src','http://assets.pinterest.com/js/pinmarklet.js?r='+Math.random()*99999999);document.body.appendChild(e)%7D)());">Pinterest</a>
           <a class="dropdown-item" href="http://reddit.com/submit?url=<?=$site_url?>&amp;title=<?=$site_title?>" target="_blank">Reddit</a>
-          <a class="dropdown-item" href="https://twitter.com/share?url=<?=$site_url?>&amp;text=Simple%20Share%20Buttons&amp;hashtags=asciiarena.se" target="_blank">Twitter</a>
+          <a class="dropdown-item" href="https://twitter.com/share?url=<?=$site_url?>&amp;text=<?=$twitterdesc?>" target="_blank">Twitter</a>
         </div>
       </div>
     </div>
