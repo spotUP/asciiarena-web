@@ -54,27 +54,25 @@ require_once "header.php";?>
     <?php } ?>
     <input type="button" onclick="downloadfile()" class="btn-big amb-1" value="Download">
     <input id="collyid" type="hidden" data-id="<?=$colly_id?>" >
+    <?php 
+    // pass web-site url
+    $site_url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+    // post title
+    $site_title  = "Check out " . $show_colly_name . " at asciiarena.se";
+    $twitterdesc = "Check%20out%20" . $show_colly_name . "%20at asciiarena.se&amp;hashtags=asciiarena";
+    ?>
+
+
+    <button id="btnGroupDrop1" type="button" class="btn-big bg-header grey-text amb-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Share </button>
+    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+      <a class="dropdown-item" href="mailto:?Subject=<?=$site_title?>&amp;Body=Check%20out%20<?=$show_colly_name?>%20at%20aSCIIaRENA!%20<?=$site_url?>">Mail</a>
+      <a class="dropdown-item" href="http://www.facebook.com/sharer.php?u=<?=$site_url?>" target="_blank">Facebook</a>
+      <a class="dropdown-item" href="http://reddit.com/submit?url=<?=$site_url?>&amp;title=<?=$site_title?>" target="_blank">Reddit</a>
+      <a class="dropdown-item" href="https://twitter.com/share?url=<?=$site_url?>&amp;text=<?=$twitterdesc?>" target="_blank">Twitter</a>
+    </div>
     <?php if (is_logged_in()) {
       $favourite = (fetchOne("SELECT 1 FROM favourites WHERE user_id = :user AND colly_id = :colly", [ "user" => $_user['id'], "colly" => $colly_id])) ? "Remove favourite" : "Favourite";
       ?>
-
-      <?php 
-    // pass web-site url
-      $site_url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-    // post title
-      $site_title  = "Check out " . $show_colly_name . " at asciiarena.se";
-      $twitterdesc = "Check%20out%20" . $show_colly_name . "%20at asciiarena.se&amp;hashtags=asciiarena";
-      ?>
-
-
-      <button id="btnGroupDrop1" type="button" class="btn-big bg-header grey-text amb-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Share </button>
-      <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-        <a class="dropdown-item" href="mailto:?Subject=<?=$site_title?>&amp;Body=Check%20out%20<?=$show_colly_name?>%20at%20aSCIIaRENA!%20<?=$site_url?>">Mail</a>
-        <a class="dropdown-item" href="http://www.facebook.com/sharer.php?u=<?=$site_url?>" target="_blank">Facebook</a>
-        <a class="dropdown-item" href="http://reddit.com/submit?url=<?=$site_url?>&amp;title=<?=$site_title?>" target="_blank">Reddit</a>
-        <a class="dropdown-item" href="https://twitter.com/share?url=<?=$site_url?>&amp;text=<?=$twitterdesc?>" target="_blank">Twitter</a>
-      </div>
-
       <a href="#comments" class="btn-big amb-1 bg-header text apt-1 apb-1 grey-text" role="button" aria-disabled="true">View Comments</a>
       <input type="button" class="btn-big amb-1" onclick="addComment()" value="Add Comment">
       <input type="button" id="favbutton" onclick="favourite()" class="btn-big amb-1" value="<?=$favourite?>">
