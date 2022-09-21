@@ -45,7 +45,7 @@ require_once "header.php";?>
 } else {
   include('info_release_summary.php');
   ?>
-  
+
   <div class="container-fluid bg-secondary amb-1 sticky-top" style="padding-top: 36px;">
     <?php if ($type !== 'Archive') { ?>
       <input type="button" id="viewbutton" onclick="toggleColly()" class="btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s" value="View Colly">
@@ -66,15 +66,13 @@ require_once "header.php";?>
       $twitterdesc = "Check%20out%20" . $show_colly_name . "%20at asciiarena.se&amp;hashtags=asciiarena";
       ?>
 
-      <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
 
-        <button id="btnGroupDrop1" type="button" class="btn btn-big amb-1 btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Share </button>
-        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-          <a class="dropdown-item" href="mailto:?Subject=<?=$site_title?>&amp;Body=Check%20out%20<?=$show_colly_name?>%20at%20aSCIIaRENA!%20<?=$site_url?>">Mail</a>
-          <a class="dropdown-item" href="http://www.facebook.com/sharer.php?u=<?=$site_url?>" target="_blank">Facebook</a>
-          <a class="dropdown-item" href="http://reddit.com/submit?url=<?=$site_url?>&amp;title=<?=$site_title?>" target="_blank">Reddit</a>
-          <a class="dropdown-item" href="https://twitter.com/share?url=<?=$site_url?>&amp;text=<?=$twitterdesc?>" target="_blank">Twitter</a>
-        </div>
+      <button id="btnGroupDrop1" type="button" class="btn btn-big amb-1 btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Share </button>
+      <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+        <a class="dropdown-item" href="mailto:?Subject=<?=$site_title?>&amp;Body=Check%20out%20<?=$show_colly_name?>%20at%20aSCIIaRENA!%20<?=$site_url?>">Mail</a>
+        <a class="dropdown-item" href="http://www.facebook.com/sharer.php?u=<?=$site_url?>" target="_blank">Facebook</a>
+        <a class="dropdown-item" href="http://reddit.com/submit?url=<?=$site_url?>&amp;title=<?=$site_title?>" target="_blank">Reddit</a>
+        <a class="dropdown-item" href="https://twitter.com/share?url=<?=$site_url?>&amp;text=<?=$twitterdesc?>" target="_blank">Twitter</a>
       </div>
 
       <a href="#comments" class="btn-big amb-1 bg-header text apt-1 apb-1 grey-text" role="button" aria-disabled="true">View Comments</a>
@@ -363,7 +361,7 @@ function toggleColly() {
     $('#comments').hide(500);
     $('#viewbutton').val('Hide Colly')
     $('#fsbutton').show(100);
-    
+
   } else {
     $('#colly-main').fadeOut(500);
     $('#comments').show(500);
@@ -429,7 +427,7 @@ function addFavourite() {
         }
       });   
     }
-    
+
     function sendBrokenReport() {
       const url = `/cmds.php/broken/${$("#collyid").data("id")}`;
       $.ajax({
@@ -445,7 +443,7 @@ function addFavourite() {
         }
       });   
     }
-    
+
     function sendComment() {
       const url = `/cmds.php/addcomment/${$("#collyid").data("id")}`;
       $.ajax({
@@ -464,7 +462,7 @@ function addFavourite() {
         }
       });   
     }
-    
+
     function sendEditedComment() {
       const url = `/cmds.php/editcomment/${$("#user_edit_comment_id").val()}`;
       $.ajax({
@@ -485,7 +483,7 @@ function addFavourite() {
         $("#editcomment").hide(500);     
       });   
     }
-    
+
     function deleteComment(commentid) {
       const url = `/cmds.php/delcomment/${commentid}`;
       $.ajax({
@@ -501,7 +499,7 @@ function addFavourite() {
         }
       });
     }
-    
+
     function getComments() {
       let commentlist = $("#comments");
       commentlist.empty();
@@ -557,7 +555,7 @@ function addFavourite() {
         });
       });   
     }
-    
+
     $(function() {
       getComments();
     });
