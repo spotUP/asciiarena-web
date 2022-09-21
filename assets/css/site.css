@@ -2488,4 +2488,11 @@ padding-bottom: 16px;
 margin-bottom:  16px;
 }
 
+#button_share img {
+width: 36px;
+box-shadow: 0;
+padding: 6px;
+display: inline;
+border: 0;
+}
 
