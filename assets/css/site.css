@@ -643,7 +643,6 @@ pre{
 
 pre.wall{
   color: rgb(0, 187, 187) !important;
-  text-shadow: 1px 1px 10px rgba(0, 187, 187, 0.50), 1px 1px 20px #000 !important;
 }
 pre.fig{
   color: #999999;
@@ -755,33 +754,28 @@ option {
 .black
 {   
   color: #000000 !important;
-  text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.40) !important;
 }
 
 
 .blue
 {   
   color: rgb(0, 0, 170) !important;
-  text-shadow: 1px 1px 10px rgba(0, 0, 170, 0.40) !important;
 }
 
 .green
 {    
   color: rgb(85, 255, 85) !important;
-  text-shadow: 1px 1px 10px rgba(0, 170, 0, 0.40) !important;
 }
 
 .green:hover
 {   
   color: rgb(255, 255, 255) !important;
-  text-shadow: 1px 1px 10px rgba(85, 255, 85, 0.40) !important;
 }
 
 
 .cyan
 {   
   color: rgb(0, 187, 187) !important;
-  text-shadow: 1px 1px 10px rgba(0, 187, 187, 0.40) !important;
 }
 
 a.cyan:hover{
@@ -791,99 +785,83 @@ a.cyan:hover{
 .red
 {   
   color: #aa0000 !important;
-  text-shadow: 1px 1px 10px rgba(170, 0, 0, 0.40) !important;
 }
 
 .magenta
 {   
   color: rgb(255, 85, 255) !important; 
-  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
 }
 
 .magenta:hover
 {   
   color: rgb(255, 255, 255) !important;
-  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
 }
 
 .pink
 {   
   color: #bb00bb !important;
-  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
 }
 
 .pink
 {   
   color: #bb00bb !important;
-  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
 }
 
 .pink:hover{
   color: rgb(255, 255, 255) !important;
-  text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.40) !important;
 }
 
 .brown
 {   
   color: #aa5500 !important;
-  text-shadow: 1px 1px 10px rgba(170, 85, 0, 0.40) !important;
 }
 
 
 .grey
 {   
   color: rgb(85, 85, 85) !important;
-  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
 }         
 
 .grey-text{   
   color: #bbbbbb !important;
-  text-shadow: 1px 1px 10px rgba(187, 187, 187, 0.40) !important;
 }  
 
 .lightgrey
 {   
   color: rgb(170, 170, 170) !important;
-  text-shadow: 1px 1px 10px rgba(170, 170, 170, 0.40) !important;
 }
 
 
 .white
 {   
   color: rgb(255, 255, 255) !important;
-  text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.40) !important;
 }
 
 .lightcyan
 {   
   color: rgb(85, 255, 255) !important;
-  text-shadow: 1px 1px 10px rgba(85, 255, 255, 0.40) !important;
 }
 
 .lightgreen
 {   
   color: rgb(85, 255, 85) !important;
-  text-shadow: 1px 1px 10px rgba(85, 255, 85, 0.40) !important;
 }
 
 
 .lightpink
 {   
   color: rgb(255, 85, 255) !important;
-  text-shadow: 1px 1px 10px rgba(255, 85, 255, 0.40) !important;
 }
 
 .lightblue
 {   
   color: rgb(85, 85, 255) !important;
-  text-shadow: 1px 1px 10px rgba(85, 85, 255, 0.40) !important;
 }
 
 
 .lightred
 {   
   color: rgb(255, 85, 85) !important;
-  text-shadow: 1px 1px 10px rgba(255, 85, 85, 0.40) !important;
 }
 
 a.nav-link{
@@ -931,25 +909,21 @@ a.arena:hover::before{
 a.grey
 {   
   color: rgb(85, 85, 85) !important;
-  text-shadow: 1px 1px 10px rgba(85, 85, 85, 0.40) !important;
 }
 
 a.yellow
 {   
   color: rgb(255,255,85) !important;
-  text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.40) !important;
 }
 
 .yellow
 {   
   color: rgb(255,255,85) !important;
-  text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.40) !important;
 }
 
 .yellow:hover
 {   
   color: #ffffff !important;
-  text-shadow: 1px 1px 10px rgba(255, 255, 85, 0.40) !important;
 }
 
 .bg-primary {
@@ -2171,7 +2145,7 @@ li.select2-results__option.select2-results__option--highlighted{
 }
 
 .select2-container--default .select2-selection--single .select2-selection__rendered {
-  color: rgb(170, 170, 170) !important; text-shadow: 1px 1px 10px rgba(170, 170, 170, 0.40) !important;
+  color: rgb(170, 170, 170) !important;
   line-height: 16px !important;
   padding-left: 2px !important;
 }
