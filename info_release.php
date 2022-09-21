@@ -68,14 +68,13 @@ require_once "header.php";?>
     <div class="bs-component">
       <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
 
-        <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Share </button>
+        <button id="btnGroupDrop1" type="button" class="btn btn-big amb-1 btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Share </button>
         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
           <a class="dropdown-item" href="mailto:?Subject=<?=$site_title?>&amp;Body=I%20saw%20this%20and%20thought%20of%20you!%20 <?=$site_url?>">Mail</a>
           <a class="dropdown-item" href="http://www.facebook.com/sharer.php?u=<?=$site_url?>" target="_blank">Facebook</a>
           <a class="dropdown-item" href="javascript:void((function()%7Bvar%20e=document.createElement('script');e.setAttribute('type','text/javascript');e.setAttribute('charset','UTF-8');e.setAttribute('src','http://assets.pinterest.com/js/pinmarklet.js?r='+Math.random()*99999999);document.body.appendChild(e)%7D)());">Pinterest</a>
           <a class="dropdown-item" href="http://reddit.com/submit?url=<?=$site_url?>&amp;title=<?=$site_title?>" target="_blank">Reddit</a>
-          <a class="dropdown-item" href="http://www.tumblr.com/share/link?url=<?=$site_url?>&amp;title=<?=$site_title?>" target="_blank">Tumblr</a>
-          <a class="dropdown-item" href="https://twitter.com/share?url=<?=$site_url?>&amp;text=Simple%20Share%20Buttons&amp;hashtags=simplesharebuttons" target="_blank">Twitter</a>
+          <a class="dropdown-item" href="https://twitter.com/share?url=<?=$site_url?>&amp;text=Simple%20Share%20Buttons&amp;hashtags=asciiarena.se" target="_blank">Twitter</a>
         </div>
       </div>
     </div>
