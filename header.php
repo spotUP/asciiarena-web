@@ -99,11 +99,21 @@ include "header_ascii.php";
 							<a class="dropdown-item ascii" href="/collys.php?sort_by=uploader">By Uploader<span style="padding-left: 13px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;</span></a>
 						</div>
 					</li>
-					<li class="nav-item">
-						<a class="nav-link ascii apr-1" href="/mags.php">MAGS</a>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle ascii apr-1" data-toggle="dropdown" href="/mags.php?sort_by=date" id="themes">MAGS<span class="caret" style="padding-right: 8px;"></span></a>
+						<div class="dropdown-menu ascii" aria-labelledby="themes">
+							<a class="dropdown-item ascii" href="/mags.php?sort_by=name">By Name<span style="padding-left: 7px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
+							<a class="dropdown-item ascii" href="/mags.php?sort_by=filename">By Filename<span style="padding-left: 4px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
+							<a class="dropdown-item ascii" href="/mags.php?sort_by=author">By Author<span style="padding-left: 10px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
+						</div>
 					</li>
-					<li class="nav-item">
-						<a class="nav-link ascii apr-1" href="/apps.php">APPS</a>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle ascii apr-1" data-toggle="dropdown" href="/mags.php?sort_by=date" id="themes">APPS<span class="caret" style="padding-right: 8px;"></span></a>
+						<div class="dropdown-menu ascii" aria-labelledby="themes">
+							<a class="dropdown-item ascii" href="/apps.php?sort_by=name">By Name<span style="padding-left: 7px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
+							<a class="dropdown-item ascii" href="/apps.php?sort_by=filename">By Filename<span style="padding-left: 4px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
+							<a class="dropdown-item ascii" href="/apps.php?sort_by=author">By Author<span style="padding-left: 10px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
+						</div>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link ascii apr-1" href="/artists.php?sort_by=nick">ARTiSTS</a>
