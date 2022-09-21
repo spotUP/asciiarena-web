@@ -15,6 +15,12 @@ include "header_ascii.php";
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+	<meta property="og:title" content="aSCIIaRENA.se"/>
+	<meta property="og:image" content="https://www.asciiarena.se/assets/data/socialmedia.png"/>
+	<meta property="og:url" content="ASCII Art"/>
+	<meta property="og:description" content="A community for asciiartist by Up Rough and Divine Stylers"/>
+
 	<link rel="icon" href="/favicon.ico" type="image/x-icon">
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 	<link rel="stylesheet" href="/assets/css/bootstrap.min.css" media="screen">
