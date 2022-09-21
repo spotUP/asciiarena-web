@@ -67,7 +67,7 @@ require_once "header.php";?>
       ?>
 
 
-      <button id="btnGroupDrop1" type="button" class="btn btn-big amb-1 btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Share </button>
+      <button id="btnGroupDrop1" type="button" class="btn-big bg-header text amb-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Share </button>
       <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
         <a class="dropdown-item" href="mailto:?Subject=<?=$site_title?>&amp;Body=Check%20out%20<?=$show_colly_name?>%20at%20aSCIIaRENA!%20<?=$site_url?>">Mail</a>
         <a class="dropdown-item" href="http://www.facebook.com/sharer.php?u=<?=$site_url?>" target="_blank">Facebook</a>
