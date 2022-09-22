@@ -259,7 +259,7 @@ require_once "header.php";?>
       $content = file_get_contents("collections/{$dirname}/{$filename}");
       $content = utf8_encode($content);
       $content = htmlentities($content);
-      $content = str_replace("&nbsp;"," ",$content)
+      $content = str_replace("&nbsp;"," ",$content);
       echo "<br><br><br><br>";
       echo $content;
       echo "<br><br><br><br>";
