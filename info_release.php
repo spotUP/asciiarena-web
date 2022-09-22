@@ -257,9 +257,9 @@ require_once "header.php";?>
     if (file_exists("collections/{$dirname}/{$filename}")) 
     {
       $content = file_get_contents("collections/{$dirname}/{$filename}");
+      $content = str_replace(" "," ",$content);    //replace char 160 with space
       $content = utf8_encode($content);
       $content = htmlentities($content);
-      $content = str_replace(" "," ",$content);    //replace char 160 with space
       echo "<br><br><br><br>";
       echo $content;
       echo "<br><br><br><br>";
