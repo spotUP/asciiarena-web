@@ -312,6 +312,7 @@
 						</div>
 						<div class="col-4">
 							<select class="select2" name="month" id="colly_month">
+								<option value="0">Unknown</option>
 								<?php
 								$countmonth=1;
 								$maxmonth=12;
@@ -327,6 +328,7 @@
 						</div>
 						<div class="col-4">
 							<select class="select2" name="day" id="colly_day">
+								<option value="0">Unknown</option>
 								<?php
 								$countday=1;
 								$maxday=31;
