@@ -32,6 +32,14 @@
 					<input type="hidden" name="filename" value="<?=$filename?>">
 					<input type="submit" class="btn-big white bg-green" name="colly_fixed" value="Fixed">
 					<a href="/release/<?=$filename?>" class="btn-big amb-1 bg-header text apt-1 apb-1 grey-text" role="button" aria-disabled="true">View</a>
+
+
+      <form action="/admin.php#colly" method="post" id="edit-colly">
+        <input type="hidden" name="getcollyname" value="<?=$filename?>">
+        <input type="hidden" name="open_edit_colly_field" value="1">
+        <input type="submit" class="btn-big amb-1" name="edit_colly" value="Edit">
+      </form>
+
 				</div>
 			</div>
 			
