@@ -19,30 +19,6 @@ include "header.php";
 		<?php
 
 //---------------------------------------------------------------------------------------------------------------
-// SET COLLY TO FIXED
-//---------------------------------------------------------------------------------------------------------------
-
-		if(isset($_POST['colly_fixed']) && is_admin())
-		{
-			$fixed_colly=$_POST['filename'];
-			if(!empty($fixed_colly))
-			{
-				$ask="update collys set broken=0 where filename=:fixed_colly";
-				doQuery($ask,['fixed_colly' => $fixed_colly]);
-			}
-			?>
-			<div class="bs-component">
-				<div class="animate__animated animate__tada alert alert-dismissible alert-success">
-					<button type="button" class="close" data-dismiss="alert">x</button>
-					<span>Good bwai! Colly marked as fixed!</span>
-				</div>
-			</div>
-			<meta http-equiv="Refresh" content="4"; url="admin.php">
-			<?php
-			exit;
-		}	
-
-//---------------------------------------------------------------------------------------------------------------
 // DELETE USER FROM DB
 //---------------------------------------------------------------------------------------------------------------
 

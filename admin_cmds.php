@@ -534,6 +534,29 @@
 					exit(json_out(["status" => true], $response));
 				}
 				exit(json_out(["status" => true], 400));
+        
+ 			case "broken_collys":
+				$data = [];
+        $broken = fetchAll("SELECT * FROM collys WHERE broken='1' ORDER BY filename ASC");
+				foreach($broken as $bcolly) {
+					$data[] = [
+            "colly_id" => (int)$bcolly->id,
+						"filename" => $bcolly->filename,
+						"broken_comment" => $bcolly->broken_comment
+					];
+				}
+				if(!empty($data)) {
+					exit(json_out($data));
+				}
+				exit(json_out(["status" => false], 404));
+        
+ 			case "fix_colly":
+        $id = $_GET[ "id" ] ?? 0;
+        if($id && doQuery("update collys set broken=0 where id = :id", [":id" => $id])) {
+          exit(json_out(["status" => true]));
+        }
+				exit(json_out(["status" => false], 404));      
+        
 			default:
 				if($is_ajax) {
 					exit(json_out(["status" => false], 404));
