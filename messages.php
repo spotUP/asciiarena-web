@@ -324,6 +324,7 @@ include_once "header.php";
 					"type": "POST",
 					"url": "/cmds.php/delete_message/"+threadid,
 					"success": () => {
+            showAlert("Message deleted", true);
             getMessages($("#inboxId").val());
 					},
           "error": () => {
