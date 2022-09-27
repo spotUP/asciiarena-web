@@ -7,7 +7,7 @@
     $tempDiz="temp.diz";
     $contents="";
     
-    if (($ext == ".dms") || ($ext == ".DMS")) {		
+    if (strtolower($ext) == ".dms") {		
       exec("./bin/xdms d $filename >$tempDiz");
       if (file_exists($tempDiz))
       {
@@ -23,7 +23,7 @@
 
     }
       
-    if (($ext == ".lha") || ($ext == ".LHA") || ($ext == ".lzh") || ($ext == ".LZH")) {
+    if ((strtolower($ext) == ".lha") || (strtolower($ext) == ".lzh")) {
 
       $lhal = shell_exec('/usr/bin/lha l "'.$filename.'"');
 	   	$fileids = array();
@@ -49,7 +49,7 @@
       }			
     }
     
-    if (($ext == ".txt") || ($ext == ".TXT")) 
+    if (strtolower($ext) == ".txt") 
     { 
       $word1='@BEGIN_FILE_ID.DIZ';
       $word2='@END_FILE_ID.DIZ';
@@ -67,7 +67,7 @@
       }
     }
 
-    if (($ext == ".zip") || ($ext == ".ZiP")) 
+    if (strtolower($ext) == ".zip")
     {
       $contents_check=strlen($contents);
       if ($contents_check <1)
@@ -596,12 +596,7 @@
         exit(json_out(["status" => true], 409));     
       }      
 
-      $allowed_filetypes = array('.txt','.TXT','.asc','.ASC','.ans','.ANS','.diz','.DIZ','.lha','.LHA'); 	// allowed extensions
-      $ext = substr($filename, strrpos($filename,'.'), strlen($filename)-1); 	// extract extension 
-      if(!in_array($ext,$allowed_filetypes)) {									// filetype allowed?		
-        exit(json_out(["status" => false, "data" =>$filename, "result" => "This filetype is not allowed here! Only LHA, LZH, DMS, ZIP and TXT can do it!"], 400));     
-      }
-      
+      $ext = substr($filename, strrpos($filename,'.'), strlen($filename)-1); 	// extract extension      
       $upload_path = "collections/";
       if(!is_writable($upload_path)) {								// upload dir ok?
         exit(json_out(["status" => false, "result" => "You can not upload to the specified directory, inform an Admin!"], 400));     
@@ -624,7 +619,7 @@
       
       $type = 'ASCII';
       if (in_array(strtolower($ext), array('ans'))) $type = 'ANSI';
-      if (in_array(strtolower($ext), array('lha', 'zip'))) $type = 'Archive';
+      if (in_array(strtolower($ext), array('dms,','lzh','lha', 'zip'))) $type = 'Archive';
 
       $fileDiz = extractFileDiz($filen);
       $dizName = $upload_path.$dirname.'/'.$filename.'.diz';
