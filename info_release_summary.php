@@ -100,6 +100,9 @@ $dirname = $dirname[0];
 				<span>Size:</span>
 				<span><?=formatBytes($colly->filesize)?></span>
 			</div>
+					<?php
+            if (($prodday!=0) || ($prodmonth!=0) || ($prodyear!=0)) {
+          ?>
 			<div class="row d-flex justify-content-between">
 				<span>Released:</span>
 				<span>
@@ -116,6 +119,9 @@ $dirname = $dirname[0];
 					?>
 				</span>
 			</div>
+					<?php
+            }
+          ?>
 
 			<div class="row d-flex justify-content-between">
 				<span>Rating:</span>
