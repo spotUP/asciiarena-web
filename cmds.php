@@ -8,7 +8,7 @@
     $contents="";
     
     if (strtolower($ext) == ".dms") {		
-      exec("./bin/xdms d $filename >$tempDiz");
+      exec("/usr/bin/xdms d $filename >$tempDiz");
       if (file_exists($tempDiz))
       {
         $size_check = filesize($tempDiz);
