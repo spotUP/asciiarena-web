@@ -38,6 +38,17 @@
 						}
 					}
           
+          $upload_path = "collections/";
+          $dirname = explode(".", $colly->filename);
+          $dirname = $dirname[0];
+
+          $dizName = $upload_path.$dirname.'/'.$colly->filename.'.diz';
+          $dizdata = file_get_contents($dizName);
+          if ($dizdata == false) 
+          {
+            $dizdata = "";
+          }
+          
 					$data[] = [
 						"id" => (int)$colly->id,
 						"name" => $colly->name,
@@ -46,6 +57,7 @@
 						"month" => $colly->month,
 						"day" => $colly->day,
 						"type" => $colly->type,
+            "diztext" => $dizdata,
 						"diz" => $colly->file_id,
             					"crews" => $crewdata,
             					"artists" => $artistdata,
@@ -81,6 +93,15 @@
 					exit(json_out(["status" => true], 400));     
 				}
 
+        if ($_POST[ "diztext" ])
+          $filename = $_POST[ "filename" ];
+          $upload_path = "collections/";
+          $dirname = explode(".", $filename);
+          $dirname = $dirname[0];
+
+          $dizName = $upload_path.$dirname.'/'.$filename.'.diz';
+          file_put_contents($dizName,$_POST[ "diztext" ]);
+      
         if (empty($id)) {
           $rowInserted = fetchOne("SELECT LAST_INSERT_ID() rowid");
           $collyid = $rowInserted->rowid;
