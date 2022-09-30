@@ -105,6 +105,16 @@ require_once "header.php"; ?>
 					<form action="/magazine/<?=$filename?>" method="post" id="download-mag">
 						<input type="submit" class="btn-big amb-1" name="download" value="Download">
 					</form>
+
+          <?php if (is_admin()) { ?>
+
+          <form action="/admin.php#ascii_mag" method="post" id="edit-mag">
+            <input type="hidden" name="getmagid" value="<?=$mag->id?>">
+            <input type="hidden" name="open_edit_mag_field" value="1">
+            <input type="submit" class="btn-big amb-1" name="edit_mag" value="Edit">
+          </form>      
+          <?php } ?>
+          
 					<?php
 				} else {
 					echo "downloading...";

@@ -34,6 +34,10 @@
 			$.get("/admin_cmds.php?cmd=get_app", function (data) {
 				$.each(data, function (i, app) {
 					applist.append($("<option/>").val(app.id).text(app.name));
+					if (($("#edit_app_id").val().length) && (app.id == $("#edit_app_id").val())) {         
+						$("#app_fetch_id").val(app.id).trigger("change");
+						$("#edit_app_id").val("")
+          }
 				});
 			});
 		}
@@ -223,7 +227,8 @@
 			</div>
 		</div>
 	</form>
-</div>
+  <input type="hidden" id="edit_app_id" value="<?php if(isset($_POST['getappid']) && (isset($_POST['open_edit_app_field']))) echo $_POST['getappid']; ?>">
+  </div>
 
 		<?php if ($admin_edit && is_admin()) { ?>
 			<script>
