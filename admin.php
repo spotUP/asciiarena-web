@@ -669,6 +669,9 @@ include "header.php";
 								<a class="nav-link m-0 p-0 apl-1" data-toggle="tab" href="#bbs">BBS</a>
 							</li>
 							<li class="nav-item">
+								<a class="nav-link m-0 p-0 apl-1" data-toggle="tab" href="#request">Request</a>
+							</li>
+							<li class="nav-item">
 								<a class="nav-link m-0 p-0 apl-1" data-toggle="tab" href="#broken">Broken</a>
 							</li>
 						</ul>
@@ -684,6 +687,7 @@ include "header.php";
 							include ("admin_edit_user.php");
 							include ("admin_edit_site_logo.php");
 							include ("edit_bbs.php");
+							include ("edit_request.php");
 							include ("admin_edit_broken_collys.php");
 
 							?>

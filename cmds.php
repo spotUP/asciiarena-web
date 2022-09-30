@@ -1218,6 +1218,24 @@
     }  
   }
 
+  function saveRequest() {
+    global $_user;
+    if (is_ajax() && is_logged_in()) {
+
+      $data = [
+        ":title" => $_POST[ "title" ] ?? "",
+        ":description" => $_POST[ "description" ] ?? "",
+        ":requestedby" => $_user[ "id" ]
+      ];
+      
+      $q = "INSERT INTO requests (title, description,requestedby) VALUES (:title, :description, :requestedby)";
+      $response = 201;
+      if(!doQuery($q, $data)) {
+        exit(json_out(["status" => true], 400));
+      }
+      exit(json_out(["status" => true], $response));
+    }
+  }
 
 	$cmd = $_GET[ "cmd" ] ?? $_current[ 0 ] ?? "";
 	$reDir = "/";
@@ -1310,6 +1328,8 @@
       saveFont();
     case "delete_font":
       deleteFont($_current[1]);
+    case "save_request":
+      saveRequest();
 		default:
 			if (is_ajax()) {
 				exit(json_out(["status" => false], 400));

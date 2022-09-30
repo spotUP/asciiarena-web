@@ -668,6 +668,57 @@
 					}
 				}
 				exit(json_out(["status" => true]));
+
+			case "get_request":
+				$id = $_GET[ "id" ] ?? 0;
+				$data = [];
+				if($id) {
+					$requests = fetchAll("SELECT r.*, u.nick FROM requests r, users u WHERE r.requestedby = u.id and r.id = :id", [":id" => $id]);
+				} else {
+					$requests = fetchAll("SELECT r.*, u.nick FROM requests r, users u where r.requestedby = u.id ORDER BY title");
+				}
+				foreach($requests as $req) {
+					$data[] = [
+						"id" => (int)$req->id,
+						"title" => $req->title,
+						"description" => $req->description,
+						"requested_by" => $req->nick
+					];
+				}
+				if(!empty($data)) {
+					exit(json_out($data));
+				}
+				exit(json_out(["status" => false], 404));
+
+			case "save_request":
+				$response = 200;
+				$data = [
+					":title" => $_POST[ "title" ] ?? "",
+					":description" => $_POST[ "description" ] ?? "",
+				];
+				if(!empty($_POST[ "id" ])) {
+					$q = "UPDATE requests SET title = :title, description = :description WHERE id = :id";
+					$data[ ":id" ] = $_POST[ "id" ];
+				} else {
+					$q = "INSERT INTO requests (title,description,requestedby) VALUES (:title, :description, :requestedby)";
+					$data[ ":requestesdby" ] = $_user[ "id" ];
+					$response = 201;
+				}
+				if(doQuery($q, $data)) {
+					exit(json_out(["status" => true], $response));
+				}
+				exit(json_out(["status" => true], 400));
+      
+			case "del_request":
+				if(!empty($_POST[ 'id' ])) {
+					$id = (int)$_POST[ 'id' ];
+					if($id) {
+						if (!doQuery("DELETE FROM requests WHERE id = :id", [":id" => $id])) {
+							exit(json_out(["status" => false], 404));
+						}
+					}
+				}
+				exit(json_out(["status" => true]));
       
  			case "broken_collys":
 				$data = [];
