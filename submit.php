@@ -102,6 +102,16 @@ include "header.php";
 							<li class="nav-item">
 								<a class="nav-link" data-toggle="tab" href="#ascii_mag">Mag</a>
 							</li>
+								<?php
+								if(is_admin()) 
+								{
+   							?>
+							<li class="nav-item">
+								<a class="nav-link" data-toggle="tab" href="#request">Request</a>
+							</li>
+								<?php
+                }
+   							?>
 						</ul>
 					</div>
 				</div>
@@ -115,6 +125,7 @@ include "header.php";
 				include ("edit_bbs.php");
 				include ("edit_app.php");
 				include ("edit_mag.php");
+				include ("edit_request.php");
 				?>
 			</div>
 			<?php

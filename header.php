@@ -145,6 +145,16 @@ include "header_ascii.php";
 							<a class="dropdown-item ascii" href="/submit.php#bbs">BBS<span style="font-size: 16px;"> </span></a>
 							<a class="dropdown-item ascii" href="/submit.php#app">ASCII App<span style="font-size: 16px;"> </span></a>
 							<a class="dropdown-item ascii" href="/submit.php#ascii_mag">ASCII Mag<span style="font-size: 16px;"> </span></a>
+								<?php
+								if(is_admin()) 
+								{
+   							?>
+
+							<a class="dropdown-item ascii" href="/submit.php#request">Request<span style="font-size: 16px;"> </span></a>
+								<?php
+                }
+                ?>
+
 						</div>
 					</li>
 					<ul class="nav navbar-nav menu-right">
@@ -185,6 +195,7 @@ include "header_ascii.php";
 											<a class="dropdown-item ascii" href="/admin.php#edituser">Edit User<span style="font-size: 16px;"> </span></a>
 											<a class="dropdown-item ascii" href="/admin.php#sitelogo">Edit Logo<span style="padding-left: 8px;"> </span></a>
 											<a class="dropdown-item ascii" href="/admin.php#bbs">Edit BBS<span style="padding-left: 13px;">   </span></a>
+											<a class="dropdown-item ascii" href="/admin.php#request">Edit Requests<span style="padding-left: 13px;">   </span></a>
 											<a class="dropdown-item ascii" href="/admin.php#broken">Broken Collys<span style="padding-left: 13px;">   </span></a>
 										</div>
 									</li>
