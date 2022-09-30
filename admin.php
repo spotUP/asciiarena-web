@@ -648,6 +648,12 @@ include "header.php";
 								<a class="nav-link active m-0 p-0 apl-1" data-toggle="tab" href="#colly">Colly</a>
 							</li>
 							<li class="nav-item">
+								<a class="nav-link m-0 p-0 apl-1" data-toggle="tab" href="#app">App</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link m-0 p-0 apl-1" data-toggle="tab" href="#ascii_mag">Mag</a>
+							</li>
+							<li class="nav-item">
 								<a class="nav-link m-0 p-0 apl-1" data-toggle="tab" href="#crew">Crew</a>
 							</li>
 							<li class="nav-item">
@@ -671,6 +677,8 @@ include "header.php";
 							<?php
            					$admin_edit=true;
 							include ("edit_colly.php");
+							include ("edit_app.php");
+							include ("edit_mag.php");
 							include ("edit_crew.php");
 							include ("edit_artist.php");
 							include ("admin_edit_user.php");
