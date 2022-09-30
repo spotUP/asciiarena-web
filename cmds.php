@@ -596,7 +596,7 @@
         exit(json_out(["status" => true], 409));     
       }      
 
-      $ext = substr($filename, strrpos($filename,'.'), strlen($filename)-1); 	// extract extension      
+      $ext = substr($filename, strrpos($filename,'.')+1); 	// extract extension      
       $upload_path = "collections/";
       if(!is_writable($upload_path)) {								// upload dir ok?
         exit(json_out(["status" => false, "result" => "You can not upload to the specified directory, inform an Admin!"], 400));     
