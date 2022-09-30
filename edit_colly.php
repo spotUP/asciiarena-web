@@ -6,7 +6,7 @@
 
 <script>
 	function collyclear() {
-		$("#colly_id, #colly_name, #colly_filename, #colly_year, #colly_month, #colly_day, #colly_type, #colly_diz").val('').trigger('change');
+		$("#colly_diztext, #colly_id, #colly_name, #colly_filename, #colly_year, #colly_month, #colly_day, #colly_type, #colly_diz").val('').trigger('change');
 		let crewslist = $("#colly_crew_fetch_id");
 		crewslist.empty();
 		let artistslist = $("#colly_artist_fetch_id");
@@ -36,6 +36,8 @@
 					$('#colly_day').val(data[0].day).trigger('change');
 					$('#colly_type').val(data[0].type).trigger('change');
 					$('#colly_diz').val(data[0].diz);
+ 					$('#colly_diztext').val(data[0].diztext);
+
 					let crewslist = $("#colly_crew_fetch_id");
 					crewslist.empty();
 					$.each(data[0].crews, function (i, crew) {
@@ -228,9 +230,15 @@
 			<input type="hidden" name="id" id="colly_id">
 
 			<?php if ($admin_edit && is_admin()) { ?>
+        <div class="row apb-1 apt-1">
+          <div class="col-xs-12 col-md-6">
+            <label for="colly_diztext" class="lightgrey">file id</label>
+					</div>
+				</div>
+
 				<div class="row apb-1">
-					<div class="col-6 d-flex justify-content-between">
-						<span>file_id_here</span>
+					<div class="col-xs-12 col-md-6">
+						<textarea rows="8" class="w-100 h-25" id = "colly_diztext" name="diztext"></textarea>
 					</div>
 				</div>
 			<?php } else { ?>
