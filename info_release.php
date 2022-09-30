@@ -78,11 +78,13 @@ require_once "header.php";?>
       <input type="button" id="favbutton" onclick="favourite()" class="btn-big amb-1" value="<?=$favourite?>">
       <input type="button" class="btn-big amb-1" onclick="reportAsBroken()" value="Report Broken">   
 
+   		<?php if (is_admin()) { ?>
       <form action="/admin.php#colly" method="post" id="edit-colly">
         <input type="hidden" name="getcollyname" value="<?=$filename?>">
         <input type="hidden" name="open_edit_colly_field" value="1">
         <input type="submit" class="btn-big amb-1" name="edit_colly" value="Edit">
       </form>
+      <?php } ?>
     <?php } ?>
   </div>
   <div id="comments">

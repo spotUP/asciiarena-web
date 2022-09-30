@@ -71,6 +71,10 @@
 			$.get("/admin_cmds.php?cmd=get_mag", function (data) {
 				$.each(data, function (i, mag) {
 					maglist.append($("<option/>").val(mag.id).text(mag.name));
+					if (($("#edit_mag_id").val().length) && (mag.id == $("#edit_mag_id").val())) {         
+						$("#mag_fetch_id").val(mag.id).trigger("change");
+						$("#edit_mag_id").val("")
+          }
 				});
 			});
 		}
@@ -262,6 +266,7 @@
 			</div>
 		</div>
 	</form>
+  <input type="hidden" id="edit_mag_id" value="<?php if(isset($_POST['getmagid']) && (isset($_POST['open_edit_mag_field']))) echo $_POST['getmagid']; ?>">
 </div>
 
 		<?php if ($admin_edit && is_admin()) { ?>

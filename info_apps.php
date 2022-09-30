@@ -108,6 +108,15 @@ require_once "header.php"; ?>
 			<form action="/application/<?=$filename?>" method="post" id="download-app">
 				<input type="submit" class="btn-big amb-1" name="download" value="Download">
 			</form>
+      
+   		<?php if (is_admin()) { ?>
+      <form action="/admin.php#app" method="post" id="edit-app">
+        <input type="hidden" name="getappid" value="<?=$app->id?>">
+        <input type="hidden" name="open_edit_app_field" value="1">
+        <input type="submit" class="btn-big amb-1" name="edit_app" value="Edit">
+      </form>      
+			<?php } ?>
+      
 			<?php
 			} else {
 				echo "downloading...";
