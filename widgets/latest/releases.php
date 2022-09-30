@@ -8,11 +8,15 @@ if(empty($breakpoint)) {
 $breakpoint = rtrim($breakpoint, "-") . "-";
 $releases = [];
 $res = fetchAll("select * from (
-(SELECT 'A' as type, filename, year(from_unixtime(timestamp)) fyear,month(from_unixtime(timestamp)) fmonth,dayofmonth(from_unixtime(timestamp)) fday from apps order by id desc limit 10)
+(SELECT 'A' as type, filename, year(from_unixtime(timestamp)) fyear,month(from_unixtime(timestamp)) fmonth,dayofmonth(from_unixtime(timestamp)) fday from apps where year=0 and month=0 and day=0 order by fyear,fmonth,fday desc limit 10)
+union
+(SELECT 'A' as type, filename, year fyear,month fmonth,day fday from apps where year<>0 or month<>0 or day<>0 order by fyear,fmonth,fday desc limit 10)
 union
 (select 'C' as type, filename, year fyear, month fmonth, day fday from collys order by year desc, month desc,day desc limit 10)
 union
-(SELECT 'M' as type, filename, year(from_unixtime(timestamp)) fyear,month(from_unixtime(timestamp)) fmonth,dayofmonth(from_unixtime(timestamp)) fday from mags order by timestamp desc limit 10)
+(SELECT 'M' as type, filename, year(from_unixtime(timestamp)) fyear,month(from_unixtime(timestamp)) fmonth,dayofmonth(from_unixtime(timestamp)) fday from mags where year=0 and month=0 and day=0 order by fyear,fmonth,fday desc limit 10)
+union
+(SELECT 'M' as type, filename, year fyear,month fmonth,day fday from mags where year<>0 or month<>0 or day<>0 order by fyear,fmonth,fday desc limit 10)
 ) a
 order by a.fyear desc, a.fmonth desc, a.fday desc limit 10");
 foreach($res as $row) {
