@@ -178,6 +178,8 @@ include "header_ascii.php";
 										<a class="nav-link dropdown-toggle ascii yellow" style="padding-right: 8px;" data-toggle="dropdown" href="/admin.php" id="themes">ADMiN<span class="caret" style="padding-right: 8px;"></span></a>
 										<div class="dropdown-menu dropdown-menu-fix bg-red ascii" aria-labelledby="themes">
 											<a class="dropdown-item ascii" href="/admin.php#colly">Edit Colly<span style="padding-left: 7px;">       </span></a>
+                      <a class="dropdown-item ascii" href="/admin.php#app">Edit App<span style="padding-left: 13px;">   </span></a>
+                      <a class="dropdown-item ascii" href="/admin.php#mag">Edit Mag<span style="padding-left: 13px;">   </span></a>
 											<a class="dropdown-item ascii" href="/admin.php#crew">Edit Crew<span style="padding-left: 4px;">    </span></a>
 											<a class="dropdown-item ascii" href="/admin.php#artist">Edit Artist<span style="padding-left: 10px;">     </span></a>
 											<a class="dropdown-item ascii" href="/admin.php#edituser">Edit User<span style="font-size: 16px;"> </span></a>

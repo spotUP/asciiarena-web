@@ -13,6 +13,11 @@ if (!fetchOne("SELECT 1 FROM mags WHERE filename = :filename", [":filename" => $
 } else {
 	$mag = fetchOne("SELECT * FROM mags WHERE filename = :filename", [":filename" => $filename]);
 	$dirname = preg_replace('/\\.[^.\\s]{3,4}$/', '', $mag->filename);
+ 	$magyear = $mag->year;
+	$magmonth = $mag->month;
+	$magday = $mag->day;
+
+  
 }
 
 require_once "header.php"; ?>
@@ -50,6 +55,29 @@ require_once "header.php"; ?>
 							<span>Size:</span>
 							<span><?=formatBytes($mag->filesize)?></span>
 						</div>
+
+          <?php
+            if (($magday!=0) || ($magmonth!=0) || ($magyear!=0)) {
+          ?>
+			<div class="row d-flex justify-content-between">
+				<span>Released:</span>
+				<span>
+					<?php
+					if (!empty($magday)) {
+						echo "<span>{$magday}</span>";
+					}
+					if (isset($magmonth) && $month_list[ $magmonth ] !== "Unknown") {
+						echo " {$month_list[$magmonth]} ";
+					}
+					if (!empty($magyear)) {
+						echo $magyear;
+					}
+					?>
+				</span>
+			</div>
+					<?php
+            }
+          ?>                      
 						<div class="row d-flex justify-content-between">
 							<span>Author:</span>
 							<span><?=$mag->author?></span>

@@ -752,9 +752,12 @@
         ":uploader" => $_user[ "nick" ],
         ":uploaderid" => $_user[ "id" ],
         ":file_id" => $file_id_name,
+        ":year" => $_POST[ "year" ] ?? 1900,
+        ":month" => $_POST[ "month" ] ?? 1,
+        ":day" => $_POST[ "day" ] ?? 1,
       ];
     
-      $q = "INSERT INTO apps (name, filename, filedate, timestamp, author, filesize, uploader_id, uploader, view_counter, downloads,file_id) VALUES (:name, :filename, null, UNIX_TIMESTAMP(), :author, :filesize, :uploaderid, :uploader,0,0,:file_id)";
+      $q = "INSERT INTO apps (name, filename, filedate, timestamp, author, filesize, uploader_id, uploader, view_counter, downloads,file_id, year, month, day) VALUES (:name, :filename, null, UNIX_TIMESTAMP(), :author, :filesize, :uploaderid, :uploader,0,0,:file_id,:year,:month,:day)";
       $response = 201;
 
       if(!doQuery($q, $data)) {
@@ -826,9 +829,12 @@
         ":file_id" => $file_id_name,
         ":filesize" =>$filesize,
         ":uploader" =>$_user['nick'],
+        ":year" => $_POST[ "year" ] ?? 1900,
+        ":month" => $_POST[ "month" ] ?? 1,
+        ":day" => $_POST[ "day" ] ?? 1,
       ];
     
-      $q = "INSERT INTO mags (name, filename, filedate, timestamp, author, filesize, file_id, view_counter, downloads, uploader) VALUES (:name, :filename, null, UNIX_TIMESTAMP(), :author, :filesize, :file_id, 0, 0, :uploader)";
+      $q = "INSERT INTO mags (name, filename, filedate, timestamp, author, filesize, file_id, view_counter, downloads, uploader, year, month, day) VALUES (:name, :filename, null, UNIX_TIMESTAMP(), :author, :filesize, :file_id, 0, 0, :uploader, :year, :month, :day)";
       $response = 201;
 
       if(!doQuery($q, $data)) {

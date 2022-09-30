@@ -12,6 +12,10 @@ if (!fetchOne("SELECT 1 FROM apps WHERE filename = :filename", [":filename" => $
 		$app_available = false;
 } else {
 	$app = fetchOne("SELECT * FROM apps WHERE filename = :filename", [":filename" => $filename]);
+ 	$appyear = $app->year;
+	$appmonth = $app->month;
+	$appday = $app->day;
+
 }
 
 require_once "header.php"; ?>
@@ -53,6 +57,30 @@ require_once "header.php"; ?>
 						<span>Size:</span>
 						<span><?=formatBytes($app->filesize)?></span>
 					</div>
+          
+          <?php
+            if (($appday!=0) || ($appmonth!=0) || ($appyear!=0)) {
+          ?>
+			<div class="row d-flex justify-content-between">
+				<span>Released:</span>
+				<span>
+					<?php
+					if (!empty($appday)) {
+						echo "<span>{$appday}</span>";
+					}
+					if (isset($appmonth) && $month_list[ $appmonth ] !== "Unknown") {
+						echo " {$month_list[$appmonth]} ";
+					}
+					if (!empty($appyear)) {
+						echo $appyear;
+					}
+					?>
+				</span>
+			</div>
+					<?php
+            }
+          ?>          
+          
                                         <div class="row d-flex justify-content-between">
 						<span>Author:</span>
 						<span><?=$app->author?></span>

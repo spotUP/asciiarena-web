@@ -7,7 +7,11 @@ include "header.php";
 	$(document).ready(function() {
 		var hash = window.location.hash;
 		hash && $('ul.nav a[href="' + hash + '"]').tab('show');
-		setTimeout(function() { window.scrollTo(0, 0); }, 1)
+
+		window.addEventListener('hashchange', function(){
+			var hash = window.location.hash;
+			hash && $('ul.nav a[href="' + hash + '"]').tab('show');
+    	});
 	});
 </script>
 <script type="text/javascript">

@@ -497,6 +497,7 @@
 				foreach($bbses as $bbs) {
 					$data[] = [
 						"id" => (int)$bbs->id,
+						"id" => (int)$bbs->id,
 						"name" => $bbs->name,
 						"sysop" => $bbs->sysop,
 						"address" => $bbs->address,
@@ -534,7 +535,119 @@
 					exit(json_out(["status" => true], $response));
 				}
 				exit(json_out(["status" => true], 400));
-        
+      
+			case "get_app":
+				$id = $_GET[ "id" ] ?? 0;
+				$data = [];
+				if($id) {
+					$apps = fetchAll("SELECT * FROM apps WHERE id = :id", [":id" => $id]);
+				} else {
+					$apps = fetchAll("SELECT * FROM apps ORDER BY name");
+				}
+				foreach($apps as $app) {
+					$data[] = [
+						"id" => (int)$app->id,
+						"name" => $app->name,
+						"filename" => $app->filename,
+						"author" => $app->author,
+						"year" => $app->year,
+						"month" => $app->month,
+						"day" => $app->day
+					];
+				}
+				if(!empty($data)) {
+					exit(json_out($data));
+				}
+				exit(json_out(["status" => false], 404));
+			case "save_app":
+				$response = 200;
+				$data = [
+					":name" => $_POST[ "name" ] ?? "",
+					":filename" => $_POST[ "file" ] ?? "",
+					":author" => $_POST[ "author" ] ?? "",
+					":year" => $_POST[ "year" ] ?? 1900,
+					":month" => $_POST[ "month" ] ?? 1,
+					":day" => $_POST[ "day" ] ?? 1
+				];
+				if(!empty($_POST[ "id" ])) {
+					$q = "UPDATE apps SET name = :name, filename = :filename, author = :author, year = :year, month = :month, day = :day WHERE id = :id";
+					$data[ ":id" ] = $_POST[ "id" ];
+				} else {
+					$q = "INSERT INTO apps (name, filename, author, year, month, day) VALUES (:name, :filename, :author, :year, :month, :day)";
+					$response = 201;
+				}
+				if(doQuery($q, $data)) {
+					exit(json_out(["status" => true], $response));
+				}
+				exit(json_out(["status" => true], 400));
+      
+			case "del_app":
+				if(!empty($_POST[ 'id' ])) {
+					$id = (int)$_POST[ 'id' ];
+					if($id) {
+						if (!doQuery("DELETE FROM apps WHERE id = :id", [":id" => $id])) {
+							exit(json_out(["status" => false], 404));
+						}
+					}
+				}
+				exit(json_out(["status" => true]));
+      
+			case "get_mag":
+				$id = $_GET[ "id" ] ?? 0;
+				$data = [];
+				if($id) {
+					$mags = fetchAll("SELECT * FROM mags WHERE id = :id", [":id" => $id]);
+				} else {
+					$mags = fetchAll("SELECT * FROM mags ORDER BY name");
+				}
+				foreach($mags as $mag) {
+					$data[] = [
+						"id" => (int)$mag->id,
+						"name" => $mag->name,
+						"filename" => $mag->filename,
+						"author" => $mag->author,
+						"year" => $mag->year,
+						"month" => $mag->month,
+						"day" => $mag->day
+					];
+				}
+				if(!empty($data)) {
+					exit(json_out($data));
+				}
+				exit(json_out(["status" => false], 404));
+			case "save_mag":
+				$response = 200;
+				$data = [
+					":name" => $_POST[ "name" ] ?? "",
+					":filename" => $_POST[ "file" ] ?? "",
+					":author" => $_POST[ "author" ] ?? "",
+					":year" => $_POST[ "year" ] ?? 1900,
+					":month" => $_POST[ "month" ] ?? 1,
+					":day" => $_POST[ "day" ] ?? 1
+				];
+				if(!empty($_POST[ "id" ])) {
+					$q = "UPDATE mags SET name = :name, filename = :filename, author = :author, year = :year, month = :month, day = :day WHERE id = :id";
+					$data[ ":id" ] = $_POST[ "id" ];
+				} else {
+					$q = "INSERT INTO mags (name, filename, author, year, month, day) VALUES (:name, :filename, :author, :year, :month, :day)";
+					$response = 201;
+				}
+				if(doQuery($q, $data)) {
+					exit(json_out(["status" => true], $response));
+				}
+				exit(json_out(["status" => true], 400));
+      
+			case "del_mag":
+				if(!empty($_POST[ 'id' ])) {
+					$id = (int)$_POST[ 'id' ];
+					if($id) {
+						if (!doQuery("DELETE FROM mags WHERE id = :id", [":id" => $id])) {
+							exit(json_out(["status" => false], 404));
+						}
+					}
+				}
+				exit(json_out(["status" => true]));
+      
  			case "broken_collys":
 				$data = [];
         $broken = fetchAll("SELECT * FROM collys WHERE broken='1' ORDER BY filename ASC");
