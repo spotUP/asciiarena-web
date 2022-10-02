@@ -82,6 +82,7 @@
  
         exec("echo /bin/unzip -p -Ca $filename file_id.diz >>$debugname");
         exec("unzip -Ca $filename file_id.diz >>$debugname");
+        exec("unzip -l $filename >>$debugname");
         exec("unzip -p -Ca $filename file_id.diz >$tempDiz");
         exec("ls -l $filename >>$debugname");
         exec("ls -l >>$debugname");
