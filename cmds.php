@@ -80,7 +80,7 @@
  exec("echo $filename $tempDiz >>$debugname");
  exec("pwd >>$debugname");
  
-        exec("echo /bin/unzip -p -Ca $filename file_id.diz >$tempDiz");
+        exec("echo /bin/unzip -p -Ca $filename file_id.diz >>$debugname");
         exec("/bin/unzip -p -Ca $filename file_id.diz >$tempDiz");
         $size_check = filesize($tempDiz);
         if ($size_check > 0)
