@@ -78,6 +78,9 @@
       if ($contents_check <1)
       {
  exec("echo $filename $tempDiz >>$debugname");
+ exec("pwd >>$debugname");
+ 
+        exec("echo /bin/unzip -p -Ca $filename file_id.diz >$tempDiz");
         exec("/bin/unzip -p -Ca $filename file_id.diz >$tempDiz");
         $size_check = filesize($tempDiz);
         if ($size_check > 0)
