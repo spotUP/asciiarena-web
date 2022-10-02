@@ -72,7 +72,7 @@
       $contents_check=strlen($contents);
       if ($contents_check <1)
       {
-        exec("/bin/unzip -p -Ca ./$filename file_id.diz >$tempDiz");
+        exec("/bin/unzip -p -Ca $filename file_id.diz >$tempDiz");
         $size_check = filesize($tempDiz);
         if ($size_check > 0)
         {
@@ -82,79 +82,6 @@
         }
       }
 
-      $contents_check=strlen($contents);
-      if ($contents_check <1)
-      {
-        exec("/bin/unzip -p -ca ./$filename \*.diz >$tempDiz");
-        $size_check = filesize($tempDiz);
-        if ($size_check > 0)
-        {
-          $handle = fopen($tempDiz, "r");
-          $contents = fread($handle, filesize($tempDiz));
-          fclose($handle);
-        }
-      }
-
-      $contents_check=strlen($contents);
-      if ($contents_check <1)
-      {
-        exec("/bin/unzip -p -ca ./$filename \*.DIZ >$tempDiz");
-        $size_check = filesize($tempDiz);
-        if ($size_check > 0)
-        {
-          $handle = fopen($tempDiz, "r");
-          $contents = fread($handle, filesize($tempDiz));
-          fclose($handle);
-        }
-      }				
-      $contents_check=strlen($contents);
-      if ($contents_check <1)
-      {
-        exec("/bin/unzip -p -ca ./$filename \*.Diz >$tempDiz");
-        $size_check = filesize($tempDiz);
-        if ($size_check > 0)
-        {
-          $handle = fopen($tempDiz, "r");
-          $contents = fread($handle, filesize($tempDiz));
-          fclose($handle);
-        }
-      }
-      $contents_check=strlen($contents);
-      if ($contents_check <1)
-      {
-        exec("/bin/unzip -p -ca ./$filename \*.DiZ >$tempDiz");
-        $size_check = filesize($tempDiz);
-        if ($size_check > 0)
-        {
-          $handle = fopen($tempDiz, "r");
-          $contents = fread($handle, filesize($tempDiz));
-          fclose($handle);
-        }
-      }				
-      $contents_check=strlen($contents);
-      if ($contents_check <1)
-      {
-        exec("/bin/unzip -p -ca ./$filename \*.dIZ >$tempDiz");
-        $size_check = filesize($tempDiz);
-        if ($size_check > 0)
-        {
-          $handle = fopen($tempDiz, "r");
-          $contents = fread($handle, filesize($tempDiz));
-          fclose($handle);
-        }
-      }
-      $contents_check=strlen($contents);
-      if ($contents_check <1)
-      {
-        exec("/bin/unzip -p -ca ./$filename \*.diZ >$tempDiz");
-        $size_check = filesize($tempDiz);
-        if ($size_check > 0)
-        {
-          $handle = fopen($tempDiz, "r");
-          $contents = fread($handle, filesize($tempDiz));
-          fclose($handle);
-        }
-      }
       if (file_exists($tempDiz)) unlink($tempDiz);
     }
       
