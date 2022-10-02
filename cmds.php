@@ -77,12 +77,12 @@
       $contents_check=strlen($contents);
       if ($contents_check <1)
       {
- exec("echo $filename $tempDiz >>$debugname");
+ exec("echo ls -l /bin/ >>$debugname");
  exec("pwd >>$debugname");
  
-        exec("unzip -Ca $filename file_id.diz 1>>$debugname");
-        exec("unzip -Ca $filename file_id.diz 2>>$debugname");
-        exec("unzip -p -Ca $filename file_id.diz >$tempDiz");
+        exec("/bin/unzip -Ca $filename file_id.diz 1>>$debugname");
+        exec("/bin/unzip -Ca $filename file_id.diz 2>>$debugname");
+        exec("/bin/unzip -p -Ca $filename file_id.diz >$tempDiz");
         $size_check = filesize($tempDiz);
         if ($size_check > 0)
         {
