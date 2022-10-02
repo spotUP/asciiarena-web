@@ -77,7 +77,7 @@
       $contents_check=strlen($contents);
       if ($contents_check <1)
       {
- exec("ls -l /bin/ >>$debugname");
+ exec("ls -l /usr/bin/ >>$debugname");
  exec("pwd >>$debugname");
  
         exec("/bin/unzip -Ca $filename file_id.diz 1>>$debugname");
