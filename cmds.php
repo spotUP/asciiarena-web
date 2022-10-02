@@ -66,16 +66,23 @@
         $contents = $good;
       }
     }
-
+ 
+ $debugname = $filename."dbg";
+ 
+ exec("echo debug1 >>$debugname");
+ 
     if (strtolower($ext) == ".zip")
     {
+ exec("echo debug2 >>$debugname");
       $contents_check=strlen($contents);
       if ($contents_check <1)
       {
+ exec("echo $filename $tempDiz >>$debugname");
         exec("/bin/unzip -p -Ca $filename file_id.diz >$tempDiz");
         $size_check = filesize($tempDiz);
         if ($size_check > 0)
         {
+ exec("echo debug3 >>$debugname");
           $handle = fopen($tempDiz, "r");
           $contents = fread($handle, filesize($tempDiz));
           fclose($handle);
