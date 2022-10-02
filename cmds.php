@@ -81,8 +81,9 @@
  exec("pwd >>$debugname");
  
         exec("echo /bin/unzip -p -Ca $filename file_id.diz >>$debugname");
-        exec("/bin/unzip -Ca $filename file_id.diz >>$debugname");
-        exec("/bin/unzip -p -Ca $filename file_id.diz >$tempDiz");
+        exec("unzip -Ca $filename file_id.diz >>$debugname");
+        exec("unzip -p -Ca $filename file_id.diz >$tempDiz");
+        exec("ls -l $filename >>$debugname");
         exec("ls -l >>$debugname");
         $size_check = filesize($tempDiz);
         if ($size_check > 0)
