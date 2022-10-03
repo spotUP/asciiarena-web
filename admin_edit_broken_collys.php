@@ -41,7 +41,7 @@
 				$.each(data, function (i, colly) {
           var colly_id = colly.colly_id
           var broken_comment = colly.broken_comment
-          var filename = colly.filename
+          var filename = escape(colly.filename)
           collylist.append(`<div class="row apb-1">
 				<div class="col-12">
 					<h1 class="ap-1 bg-header"><a href="/release/${filename}">${filename}</a></h1>

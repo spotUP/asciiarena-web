@@ -184,10 +184,14 @@ foreach (fetchAll($q, $p) as $row) {
             if ($row['file_id'] == "file_id.diz.png") {
               echo file_get_contents("collections/file_id.diz.txt");
             } else {
-              if (file_exists(__DIR__ . "/collections/{$dirname}/{$row['filename']}.diz")) {
-                $content = encodeFileText(__DIR__ . "/collections/{$dirname}/{$row['filename']}.diz");
-                echo $content;
+              $file_id = __DIR__ . "/collections/{$dirname}/{$row['filename']}.diz";
+              if (file_exists($file_id))
+              {
+                $content = encodeFileText($file_id);
+              } else {
+                $content = encodeFileText("collections/file_id.diz.txt");
               }
+              echo $content;
             }
             ?>
           </pre>
