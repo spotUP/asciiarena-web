@@ -828,20 +828,31 @@
     }  
   }
 
-  function getMessages($msgboxId) {
+  function getMessages($msgboxId, $page) {
     global $_user;
     if (is_ajax() && is_logged_in()) {
       $data = [];
       
       $messages = [];
+      
+      $pagesize = 20;
+      $start = ($page-1) * $pagesize;
+      $cnt = 0;
+      
+      $user = $_user['id'];
+      $user        = 2;
+      
       if ((int)$msgboxId==1) {
-        $messages = fetchAll("SELECT * FROM messages WHERE to_id = :user_id GROUP BY thread ORDER BY timestamp DESC", [":user_id" => $_user['id']]);
+        $messages = fetchAll("SELECT * FROM messages WHERE to_id = :user_id GROUP BY thread ORDER BY timestamp DESC LIMIT $start, $pagesize", [":user_id" => $user]);
+        $cnt= fetchOne("select count(distinct thread) cnt FROM messages WHERE to_id = :user_id", [":user_id" => $user]);
       } else if ((int)$msgboxId == 2) {
-        $messages = fetchAll("SELECT * FROM messages WHERE from_id = :user_id GROUP BY thread ORDER BY timestamp DESC", [":user_id" => $_user['id']]);
+        $messages = fetchAll("SELECT * FROM messages WHERE from_id = :user_id GROUP BY thread ORDER BY timestamp DESC LIMIT $start, $pagesize", [":user_id" => $user]);
+        $cnt= fetchOne("select count(distinct thread) cnt FROM messages WHERE from_id = :user_id", [":user_id" => $user]);
       }
       
       foreach($messages as $msg) {
         $data[] = [
+          "total_count" => (int)$cnt->cnt,
           "id" => (int)$msg->id,
           "thread" =>(int)$msg->thread,
           "postedto" =>$msg->postedto,
@@ -859,16 +870,23 @@
     }  
   }
 
-  function getMessageThread($msgId, $threadId) {
+  function getMessageThread($msgId, $threadId, $page) {
     global $_user;
     if (is_ajax() && is_logged_in()) {
       $data = [];
       
+      $pagesize = 20;
+
+      $cnt= fetchOne("select count(id) cnt FROM messages WHERE thread = :thread", [ 'thread' => $threadId ]);
+      $maxpage = (int)(($cnt->cnt + $pagesize - 1 ) / $pagesize);
+      $start = ($maxpage - $page) * $pagesize;
+      
       doQuery("update messages set new=0 where thread=:thread and to_id=:user_id",[ 'thread' => $threadId,":user_id" => $_user['id']]);      
-      $messages = fetchAll("select * from messages where thread = :thread", [ 'thread' => $threadId ]);
+      $messages = fetchAll("select * from messages where thread = :thread LIMIT $start, $pagesize", [ 'thread' => $threadId ]);
       
       foreach($messages as $msg) {
         $data[] = [
+          "total_count" => (int)$cnt->cnt,
           "id" => (int)$msg->id,
           "thread" =>(int)$msg->thread,
           "postedto" =>$msg->postedto,
@@ -1249,10 +1267,10 @@
       deleteMessage($_current[1]);
       break;      
     case "get_messages":
-      getMessages($_current[1]);
+      getMessages($_current[1],$_current[2]);
       break;      
     case "get_thread":
-      getMessageThread($_current[1],$_current[2]);
+      getMessageThread($_current[1],$_current[2],$_current[3]);
       break;      
     case "new_message":
       newMessage();
