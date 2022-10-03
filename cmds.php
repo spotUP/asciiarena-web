@@ -840,7 +840,6 @@
       $cnt = 0;
       
       $user = $_user['id'];
-      $user        = 2;
       
       if ((int)$msgboxId==1) {
         $messages = fetchAll("SELECT * FROM messages WHERE to_id = :user_id GROUP BY thread ORDER BY timestamp DESC LIMIT $start, $pagesize", [":user_id" => $user]);
