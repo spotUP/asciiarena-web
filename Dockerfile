@@ -4,7 +4,7 @@ RUN apt-get -y update --allow-releaseinfo-change
 
 RUN mkdir -p /usr/share/man/man1
 
-RUN apt-get -y install jlha-utils xdms unzip libonig-dev libmcrypt-dev
+RUN apt-get -y install jlha-utils xdms libonig-dev libmcrypt-dev
 
 RUN docker-php-ext-install mbstring pdo pdo_mysql
 RUN pecl install mcrypt-1.0.4
