@@ -1,5 +1,6 @@
 <?php
 require_once "session.php";
+require_once "tools/text.php";
 $h1 = "rELEAsE iNFO";
 
 $filename = $_GET['filename'];
@@ -258,9 +259,7 @@ require_once "header.php";?>
     <div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;" id="colly-div"><pre id="colly" style="font-family: <?=$font;?>; color: <?=$fgcolor?>; white-space: pre;"><?php
     if (file_exists("collections/{$dirname}/{$filename}")) 
     {
-      $content = file_get_contents("collections/{$dirname}/{$filename}");
-      $content = utf8_encode($content);
-      $content = htmlentities($content);
+      $content = encodeFileText("collections/{$dirname}/{$filename}");
       echo "<br><br><br><br>";
       echo $content;
       echo "<br><br><br><br>";

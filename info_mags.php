@@ -1,5 +1,6 @@
 <?php
 require_once "session.php";
+require_once "tools/text.php";
 $h1 = "rELEAsE iNFO";
 
 $filename = $_GET['filename'];
@@ -40,7 +41,7 @@ require_once "header.php"; ?>
 							$file_id = $mag->filename.'.diz';
 							if (file_exists('mags/'.$dirname.'/'.$file_id)) {
 								echo '<pre class="ascii magenta">';
-								echo utf8_encode(file_get_contents('mags/'.$dirname.'/'.$file_id));
+								echo encodeFileText('mags/'.$dirname.'/'.$file_id);
 								echo '</pre>';
 							}
 							?>

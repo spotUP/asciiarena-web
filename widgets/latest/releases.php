@@ -1,4 +1,6 @@
 <?php defined('VALID') or die('Nuh-uh!');
+require_once "tools/text.php";
+
 if(empty($columns)) {
 	$columns = 2;
 }
@@ -38,7 +40,7 @@ foreach($res as $row) {
   }
 
 	if((count($releases) < $columns) && strlen($file_id)>0 && file_exists($file_id)) {
-		$releases[ $filename ] = utf8_encode(file_get_contents($file_id));
+		$releases[ $filename ] = encodeFileText($file_id);
 	}
 }
 foreach($releases as $fname => $release) 

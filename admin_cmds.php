@@ -1,6 +1,7 @@
 <?php
 	define("NO_PING", true);
 	require_once "session.php";
+	require_once "tools/text.php";
 
 	$cmd = $_GET[ "cmd" ] ?? $_current[ 0 ] ?? "";
 	$reDir = "/";
@@ -44,6 +45,10 @@
 
           $dizName = $upload_path.$dirname.'/'.$colly->filename.'.diz';
           $dizdata = file_get_contents($dizName);
+          if (mb_detect_encoding($dizdata,'UTF-8',true)==false) {
+            $dizdata = utf8_encode($dizdata);
+          }
+
           if ($dizdata == false) 
           {
             $dizdata = "";
@@ -100,7 +105,13 @@
           $dirname = $dirname[0];
 
           $dizName = $upload_path.$dirname.'/'.$filename.'.diz';
-          file_put_contents($dizName,$_POST[ "diztext" ]);
+          
+          
+          $dizText = convertToAsciiText($_POST[ "diztext" ]);
+          if ($dizText == false) {
+             $dizText = $_POST[ "diztext" ];
+          }
+          file_put_contents($dizName,$dizText);
       
         if (empty($id)) {
           $rowInserted = fetchOne("SELECT LAST_INSERT_ID() rowid");
