@@ -41,7 +41,8 @@
 				$.each(data, function (i, colly) {
           var colly_id = colly.colly_id
           var broken_comment = colly.broken_comment
-          var filename = escape(colly.filename)
+          var filename = colly.filename
+          var escfilename = escape(colly.filename)
           collylist.append(`<div class="row apb-1">
 				<div class="col-12">
 					<h1 class="ap-1 bg-header"><a href="/release/${filename}">${filename}</a></h1>
@@ -56,7 +57,7 @@
 
 			<div class="row apl-1 apr-1 apb-1">
 				<div class="col-2 d-flex">
-						<input type="button" class="btn-big white bg-green" onclick="fixColly('${filename}',${colly_id})" value="Fixed">
+						<input type="button" class="btn-big white bg-green" onclick="fixColly('${escfilename}',${colly_id})" value="Fixed">
 						<a href="/release/${filename}" class="btn-big amb-1 bg-header text apt-1 apb-1 grey-text" role="button" aria-disabled="true">View</a>
 						<form action="#colly" method="post" id="edit-colly">
 							<input type="hidden" name="getcollyname" value="${filename}">
