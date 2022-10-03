@@ -1,5 +1,6 @@
 <?php
 require_once "session.php";
+require_once "tools/text.php";
 $h1 = "aRTIST iNFO";
 
 $artist_available = true;
@@ -184,8 +185,8 @@ foreach (fetchAll($q, $p) as $row) {
               echo file_get_contents("collections/file_id.diz.txt");
             } else {
               if (file_exists(__DIR__ . "/collections/{$dirname}/{$row['filename']}.diz")) {
-                $content = file_get_contents(__DIR__ . "/collections/{$dirname}/{$row['filename']}.diz");
-                echo utf8_encode($content);
+                $content = encodeFileText(__DIR__ . "/collections/{$dirname}/{$row['filename']}.diz");
+                echo $content;
               }
             }
             ?>

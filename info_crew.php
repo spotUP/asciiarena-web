@@ -1,5 +1,6 @@
 <?php
 require_once "session.php";
+require_once "tools/text.php";
 $h1 = "cREW dETAiLS";
 
 $crewurl=$_GET['crew'] ?? '';
@@ -377,10 +378,10 @@ include "header.php";
 			$file_id = "collections/" . $dirname . "/" . $filename . ".diz";
 			if (file_exists($file_id)) 
 			{
-				$file_id = utf8_encode(file_get_contents($file_id));
+				$file_id = encodeFileText($file_id);
 			}
 			else
-				$file_id = utf8_encode(file_get_contents("collections/file_id.diz.txt"));	
+				$file_id = encodeFileText("collections/file_id.diz.txt");	
 			?>
 
 			<div class="row apb-1 apt-1">

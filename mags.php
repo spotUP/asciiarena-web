@@ -1,5 +1,6 @@
 <?php
 require_once "session.php";
+require_once "tools/text.php";
 $h1 = "mAGAZiNES";
 
 $is_search = (isset($_POST['search'])) ? true : false;
@@ -100,8 +101,7 @@ require_once "header.php"; ?>
                    $dirname = preg_replace('/\\.[^.\\s]{3,4}$/', '', $row->filename);
                    $file_id = $row->filename.'.diz';
                    if (file_exists('mags/'.$dirname.'/'.$file_id)) {
-                    $display_file_id=file_get_contents('mags/'.$dirname.'/'.$file_id);
-                    $display_file_id=utf8_encode($display_file_id);
+                    $display_file_id=encodeFileText('mags/'.$dirname.'/'.$file_id);
                     ?>
                     <pre class="magenta ascii overflow-hidden"><a class="magenta ascii" href="/magazine/<?=$row->filename?>"><?=$display_file_id?></a></pre>
                     <?php

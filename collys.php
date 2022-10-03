@@ -1,5 +1,6 @@
 <?php
 require_once "session.php";
+require_once "tools/text.php";
 $h1 = "COLLYS";
 
 $is_search = (isset($_POST['search'])) ? true : false;
@@ -121,8 +122,7 @@ require_once "header.php"; ?>
 									$filen = 'collections/'.$dirname.'/'.$row->filename;
 									$file_id = preg_match('/@BEGIN_FILE_ID\.DIZ(.{1,2000})@END_FILE_ID\.DIZ/s', file_get_contents($filen), $m) ? $m[1] : '';
 									if (strlen($file_id) > 0) { 
-										$file_id = utf8_encode($file_id);
-										$file_id = htmlentities($file_id, ENT_SUBSTITUTE);
+										$file_id = encodeText($file_id);
 										?>
 										<pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$row->filename?>"><?=$file_id?></a></pre>
 									<?php } ?>
@@ -156,8 +156,7 @@ require_once "header.php"; ?>
 									$filen = 'collections/'.$dirname.'/'.$row->filename;
 									$file_id = preg_match('/@BEGIN_FILE_ID\.DIZ(.{1,2000})@END_FILE_ID\.DIZ/s', file_get_contents($filen), $m) ? $m[1] : '';
 									if (strlen($file_id) > 0) { 
-										$file_id = utf8_encode($file_id);
-										$file_id = htmlentities($file_id, ENT_SUBSTITUTE);
+										$file_id = encodeText($file_id);
 										?>
 										<pre style="overflow: hidden;"><a class="magenta ascii" href="/release/<?=$row->filename?>"><?=$file_id?></a></pre><br>
 									<?php } ?>
