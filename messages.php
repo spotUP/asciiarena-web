@@ -11,10 +11,10 @@ include_once "header.php";
     ?>
     <ul class="nav nav-tabs" id="myTab" role="tablist">
       <li class="nav-item">
-        <a class="nav-link active" id="inboxTab" data-toggle="tab" onclick="getMessages(1)" href="#msgList" role="tab" aria-controls="msgList" aria-selected="true">Inbox</a>
+        <a class="nav-link active" id="inboxTab" data-toggle="tab" onclick="getMessages(1,1)" href="#msgList" role="tab" aria-controls="msgList" aria-selected="true">Inbox</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" id="outboxTab" onclick="getMessages(2)" href="#msgList" role="tab" aria-controls="msgList" aria-selected="false">Outbox</a>
+        <a class="nav-link" data-toggle="tab" id="outboxTab" onclick="getMessages(2,1)" href="#msgList" role="tab" aria-controls="msgList" aria-selected="false">Outbox</a>
       </li>
       
       <li class="nav-item">
@@ -108,6 +108,7 @@ include_once "header.php";
       <div class="row">
         <div class="col-12 apt-1">
           <input type="button" id="replybutton" onclick="sendreply()" value="Send">
+          <span id="msgbutton"></span>
         </div>
       </div>
 
@@ -177,7 +178,7 @@ include_once "header.php";
           $("#postnewmessage").val("");
           $("#postnewsubject").val("");
           showAlert("Message sent succesfully!", true);
-          getMessages(1);
+          getMessages(1,1);
         },
         "error": () => {
           showAlert("An error occured sending the message!", false);
@@ -211,7 +212,7 @@ include_once "header.php";
               receiver: $("#replyid").val()
             },
             "success": () => {
-              getMessageThread(msgid, threadid);
+              getMessageThread(msgid, threadid,1);
               $("#postreply").val("");
             },
             "error": () => {
@@ -222,7 +223,7 @@ include_once "header.php";
     }
   }
   
-  function getMessageThread(msgid, threadid) {
+  function getMessageThread(msgid, threadid,page) {
     let a = $("#msg"+msgid);
     a.removeClass("yellow");
     a.addClass("green");
@@ -253,9 +254,14 @@ include_once "header.php";
       $("#replyid").val(msg.replyid);
     });
     
-    $.get("/cmds.php/get_thread/"+msgid+"/"+threadid, function (data) {
-			$.each(data, function (i, msg) {
-        
+      
+    $.get("/cmds.php/get_thread/"+msgid+"/"+threadid+"/"+page, function (data) {
+      let pagesize = 20
+      if (data.length>0) {
+        cnt = data[0].total_count
+      }
+			
+      $.each(data, function (i, msg) {
         count++;
         threadBody.append(`
         <div class="row">
@@ -274,12 +280,29 @@ include_once "header.php";
           </div>
         </div>`);
 			});        
+
+      let nextpage = page-1;
+      let prevpage = page+1;
+      let maxpage = ~~((cnt+pagesize-1) / pagesize)
+      
+      pagectrl = '<input class="m-2" type="button" '
+      if (page >= maxpage) pagectrl = pagectrl + 'disabled '
+      pagectrl = pagectrl + `onclick="getMessageThread(${msgid},${threadid},${prevpage})" value="Prev Page">`
+      pagectrl = pagectrl + '<input class="m-2" type="button" '
+      if (page<=1) pagectrl = pagectrl + 'disabled ';
+      pagectrl = pagectrl + `onclick="getMessageThread(${msgid},${threadid},${nextpage})" value="Next Page">`
+      page = maxpage - (page-1)
+      pagectrl = pagectrl + `<span> Page ${page} of ${maxpage}</span>`
+       
+      $("#msgbutton").html(pagectrl);
+
+
       $('#postreply')[0].scrollIntoView(false);
       
     });
   }
   
-  function getMessages(mailbox) {
+  function getMessages(mailbox,page) {
     $("#msgList").show();
     $("#newMessage").hide();
     $("#msgDetails").hide();
@@ -288,7 +311,12 @@ include_once "header.php";
     let msglist = $("#msgList");
 		msglist.empty();
     
-    $.get("/cmds.php/get_messages/"+mailbox, function (data) {
+    $.get("/cmds.php/get_messages/"+mailbox+"/"+page, function (data) {
+      let cnt = 1
+      let pagesize = 20
+      if (data.length>0) {
+        cnt = data[0].total_count
+      }
 			$.each(data, function (i, msg) {
         
         colour = "green";
@@ -299,7 +327,7 @@ include_once "header.php";
         
         let msgtxt = `
           <div class="col-7">
-            <a class="${colour} text-truncate !important;" id="msg${msg.id}" onclick="getMessageThread(${msg.id},${msg.thread})">${htmlEncode(msg.subject)}</a>
+            <a class="${colour} text-truncate !important;" id="msg${msg.id}" onclick="getMessageThread(${msg.id},${msg.thread},1)">${htmlEncode(msg.subject)}</a>
           </div>
           <div class="col-2">
             <span class="cyan">${mailbox==1 ? 'From:' : 'To:'}</span> <a class="yellow" href="/member/${mailbox==1 ? htmlEncode(msg.postername) : htmlEncode(msg.postedto)}" >${mailbox==1 ? htmlEncode(msg.postername) : htmlEncode(msg.postedto)}</a>           
@@ -315,7 +343,24 @@ include_once "header.php";
         }
           
         msglist.append(msgtxt);
+        
 			});
+        let nextpage = page+1;
+        let prevpage = page-1;
+        let pagectrl = '<div class="apt-1 col-5">'
+        let maxpage = ~~((cnt+pagesize-1) / pagesize)
+        
+        pagectrl = pagectrl + '<input class="m-2" type="button" '
+        if (page<=1) pagectrl = pagectrl + 'disabled '
+        pagectrl = pagectrl + `onclick="getMessages(${mailbox},${prevpage})" value="Prev Page">`
+        pagectrl = pagectrl + '<input class="m-2" type="button" '
+        if (page >= maxpage) pagectrl = pagectrl + 'disabled ';
+        pagectrl = pagectrl + `onclick="getMessages(${mailbox},${nextpage})" value="Next Page">`
+        pagectrl = pagectrl + `<span> Page ${page} of ${maxpage}</span>`
+         
+        pagectrl = pagectrl + "</div>"
+
+        msglist.append(pagectrl);
 		});    
   }
   
@@ -325,7 +370,7 @@ include_once "header.php";
 					"url": "/cmds.php/delete_message/"+threadid,
 					"success": () => {
             showAlert("Message deleted", true);
-            getMessages($("#inboxId").val());
+            getMessages($("#inboxId").val(),1);
 					},
           "error": () => {
             showAlert("An error occured deleting the message!", false);
@@ -355,7 +400,7 @@ include_once "header.php";
     let msguser = getQueryParam('sendmsg','');
     
     if (msguser.length==0) {
-      getMessages(1);    
+      getMessages(1,1);    
     } else {
       newMessage();
       $('#posttomember').val(msguser).trigger('change');
