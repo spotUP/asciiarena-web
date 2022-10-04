@@ -5,7 +5,8 @@
 ?>
 <script>
   function bbsclear() {
-    $("#bbs_id, #bbs_name, #bbs_sysop, #bbs_number, #bbs_address").val('');
+    $("#bbs_id, #bbs_name, #bbs_sysop, #bbs_number, #bbs_address, #bbs_country").val('').trigger('change');
+    $("#bbs_online").prop( "checked", false );
   }
 
   <?php if ($admin_edit && is_admin()) { ?> 
@@ -18,6 +19,12 @@
 				$('#bbs_name').val(data[0].name);
 				$('#bbs_sysop').val(data[0].sysop);
 				$('#bbs_address').val(data[0].address);
+        $('#bbs_country').val(data[0].country).trigger('change');;
+        if (data[0].online) {
+          $('#bbs_online').prop( "checked", true );
+        } else {
+          $('#bbs_online').prop( "checked", false );
+        }
 				$('#bbs_number').val(data[0].number);
 			});
 		} else {
@@ -159,6 +166,36 @@
 				<input type="text" class="w-100" id="bbs_number" name="number"/>
 			</div>
 		</div>
+
+		<div class="row apb-1">
+			<div class="col-xs-12 col-md-6">
+				<label for="bbs_country" class="lightgrey">Country</label>
+			</div>
+		</div>
+		<div class="row apb-1">
+			<div class="col-xs-12 col-md-6 apb-1">
+					<select class="select2 w-100" name="country" id="bbs_country">
+						<?php
+						foreach($country_list as $symbol => $country)
+						{
+							?>
+							<option value="<?=$country?>"><?=$country?></option>
+							<?php
+						}
+						?>
+					</select>
+			</div>
+    </div>
+
+		<div class="row apb-1">
+			<div class="col-xs-12 col-md-6">
+				<div class="custom-control custom-switch">Online
+								<input type="checkbox" class="custom-control-input" name="online" id="bbs_online">
+								<label class="custom-control-label" for="bbs_online"></label>
+				</div>
+			</div>
+		</div>
+
 		<div class="row">
 			<div class="col-12">
 				<input type="button" class="btn-big bg-green white w-100 col-xs-12 col-md-2 amb-1" value="Save" onclick="saveBBS()">

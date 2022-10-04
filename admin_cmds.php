@@ -529,11 +529,12 @@
 				foreach($bbses as $bbs) {
 					$data[] = [
 						"id" => (int)$bbs->id,
-						"id" => (int)$bbs->id,
 						"name" => $bbs->name,
 						"sysop" => $bbs->sysop,
 						"address" => $bbs->address,
 						"number" => $bbs->number,
+            "country" => $bbs->country,
+            "online" => $bbs->online,
 					];
 				}
 				if(!empty($data)) {
@@ -555,12 +556,19 @@
 					":address" => $_POST[ "address" ] ?? "",
 					":sysop" => $_POST[ "sysop" ] ?? "",
 					":number" => $_POST[ "number" ] ?? "",
+          ":country" => $_POST[ "country" ] ?? "",
+          ":online" => 0,
 				];
+        
+          if (($_POST[ "online" ] ?? "") == "on") {
+            $data[":online"] = 1;
+          }
+        
 				if(!empty($_POST[ "id" ])) {
-					$q = "UPDATE bbses SET name = :name, address = :address, sysop = :sysop, number = :number WHERE id = :id";
+					$q = "UPDATE bbses SET name = :name, address = :address, sysop = :sysop, number = :number, country = :country, online = :online WHERE id = :id";
 					$data[ ":id" ] = $_POST[ "id" ];
 				} else {
-					$q = "INSERT INTO bbses (name, address, sysop, number) VALUES (:name, :address, :sysop, :number)";
+					$q = "INSERT INTO bbses (name, address, sysop, number, country, online) VALUES (:name, :address, :sysop, :number, :country, :online)";
 					$response = 201;
 				}
 				if(doQuery($q, $data)) {

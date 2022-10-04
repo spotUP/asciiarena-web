@@ -308,6 +308,14 @@ include "header.php";
 					$sysop=$row_bbs->sysop;
 					$address=$row_bbs->address;
 					$number=$row_bbs->number;
+          $country=$row_bbs->country;
+          if ($row_bbs->online) {
+            $online="Yes";
+          } else {
+            $online="No";
+          }
+           
+          
 					if (empty($sysop))
 					{
 						$sysop="Unknown";
@@ -323,6 +331,11 @@ include "header.php";
 						$number="Unknown";
 					}
 
+          if (empty($country))
+					{
+						$country="Unknown";
+					}
+
 					?>
 					<div class="row apt-1">
 						<div class="col-4">
@@ -332,7 +345,7 @@ include "header.php";
 							<span class="white">Sysop: </span><?=$sysop?>
 						</div>
 						<div class="col-4">
-							<span class="white">Online: </span>Dummy
+							<span class="white">Online: </span><?=$online?>
 						</div>
 					</div>
 					<div class="row">
@@ -344,7 +357,7 @@ include "header.php";
 							<span class="white">Number: </span><?=$number?>
 						</div>
 						<div class="col-4">
-							<span class="white">Country: </span>Dummy
+							<span class="white">Country: </span><?=$country?>
 						</div>
 					</div>
 					<?php
