@@ -309,13 +309,18 @@ include "header.php";
 					$address=$row_bbs->address;
 					$number=$row_bbs->number;
           $country=$row_bbs->country;
+          $software=$row_bbs->software;
           if ($row_bbs->online) {
             $online="Yes";
           } else {
             $online="No";
           }
            
-          
+ 					if (empty($software))
+					{
+						$software="Unknown";
+					}
+
 					if (empty($sysop))
 					{
 						$sysop="Unknown";
@@ -358,6 +363,9 @@ include "header.php";
 						</div>
 						<div class="col-4">
 							<span class="white">Country: </span><?=$country?>
+						</div>
+						<div class="col-4">
+							<span class="white">Software: </span><?=$software?>
 						</div>
 					</div>
 					<?php

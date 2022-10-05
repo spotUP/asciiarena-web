@@ -5,7 +5,7 @@
 ?>
 <script>
   function bbsclear() {
-    $("#bbs_id, #bbs_name, #bbs_sysop, #bbs_number, #bbs_address, #bbs_country").val('').trigger('change');
+    $("#bbs_id, #bbs_name, #bbs_sysop, #bbs_number, #bbs_address, #bbs_country, #bbs_software").val('').trigger('change');
     $("#bbs_online").prop( "checked", false );
   }
 
@@ -20,6 +20,7 @@
 				$('#bbs_sysop').val(data[0].sysop);
 				$('#bbs_address').val(data[0].address);
         $('#bbs_country').val(data[0].country).trigger('change');;
+        $('#bbs_software').val(data[0].software).trigger('change');;
         if (data[0].online) {
           $('#bbs_online').prop( "checked", true );
         } else {
@@ -195,6 +196,33 @@
 				</div>
 			</div>
 		</div>
+
+		<div class="row apb-1">
+			<div class="col-xs-12 col-md-6">
+				<label for="bbs_software" class="lightgrey">Software</label>
+			</div>
+		</div>
+		<div class="row apb-1">
+			<div class="col-xs-12 col-md-6 apb-1">
+					<select class="select2 w-100" name="software" id="bbs_software">
+						<option value="">Unknown</option>
+						<option value="Ami-Express">Ami-Express</option>
+            <option value="C-Net">C-Net</option>
+            <option value="Daydream">DayDream</option>
+            <option value="Fame">Fame</option>
+            <option value="Mystic">Mystic</option>
+            <option value="PC Board">PC Board</option>
+            <option value="PC Express">PC Express</option>
+            <option value="ProBoard">ProBoard</option>
+            <option value="Remote Access">Remote Access</option>
+            <option value="Sigma-Express">Sigma-Express</option>
+            <option value="Synchronet">Synchronet</option>
+            <option value="System-X">System-X</option>
+            <option value="Tempest">Tempest</option>           
+            <option value="Other">Other</option>
+					</select>
+			</div>
+    </div>
 
 		<div class="row">
 			<div class="col-12">

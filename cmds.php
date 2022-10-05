@@ -489,14 +489,23 @@
       if (((int)$count->cnt) >0) {
         exit(json_out(["status" => true], 409));     
       }
-
+ 
       $data = [
         ":name" => $_POST[ "name" ] ?? "",
         ":address" => $_POST[ "address" ] ?? "",
         ":sysop" => $_POST[ "sysop" ] ?? "",
         ":number" => $_POST[ "number" ] ?? "",
-      ];
-      $q = "INSERT INTO bbses (name, address, sysop, number) VALUES (:name, :address, :sysop, :number)";
+        ":country" => $_POST[ "country" ] ?? "",
+        ":software" => $_POST[ "software" ] ?? "",
+        ":online" => 0,
+				];
+        
+        if (($_POST[ "online" ] ?? "") == "on") {
+          $data[":online"] = 1;
+        }
+
+ 
+      $q = "INSERT INTO bbses (name, address, sysop, number, country, online, software) VALUES (:name, :address, :sysop, :number, :country, :online, :software)";
       $response = 201;
       if(!doQuery($q, $data)) {
         exit(json_out(["status" => true], 400));
