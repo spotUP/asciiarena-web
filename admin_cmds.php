@@ -535,6 +535,7 @@
 						"number" => $bbs->number,
             "country" => $bbs->country,
             "online" => $bbs->online,
+            "software" => $bbs->software,
 					];
 				}
 				if(!empty($data)) {
@@ -557,6 +558,7 @@
 					":sysop" => $_POST[ "sysop" ] ?? "",
 					":number" => $_POST[ "number" ] ?? "",
           ":country" => $_POST[ "country" ] ?? "",
+          ":software" => $_POST[ "software" ] ?? "",
           ":online" => 0,
 				];
         
@@ -565,10 +567,10 @@
           }
         
 				if(!empty($_POST[ "id" ])) {
-					$q = "UPDATE bbses SET name = :name, address = :address, sysop = :sysop, number = :number, country = :country, online = :online WHERE id = :id";
+					$q = "UPDATE bbses SET name = :name, address = :address, sysop = :sysop, number = :number, country = :country, online = :online, software=:software WHERE id = :id";
 					$data[ ":id" ] = $_POST[ "id" ];
 				} else {
-					$q = "INSERT INTO bbses (name, address, sysop, number, country, online) VALUES (:name, :address, :sysop, :number, :country, :online)";
+					$q = "INSERT INTO bbses (name, address, sysop, number, country, online, software) VALUES (:name, :address, :sysop, :number, :country, :online, :software)";
 					$response = 201;
 				}
 				if(doQuery($q, $data)) {
