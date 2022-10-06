@@ -23,7 +23,13 @@ require_once "header.php";
 		//-----------------------------------------------------------------------------
 		?>
 
-		<div class="row amb-1 amt-1">
+        <div class="container-fluid bg-secondary apb-1">
+          <div class="d-none d-sm-block text-truncate text-center">
+           <span class="green">- --/\-\/- -</span> <span class="cyan">aSCIIaRENA</span> <span class="red">--=*=-- </span><span class="pink">[<?=date("D")?>, the <?=date("d-m-y")?>]</span><span class="red"> --=*=-- </span> <span class="cyan">aSCIIaRENA</span> <span class="green"> - -/\-\/- -- -</span><br><br>
+         </div>
+       </div>
+
+		<div class="row amb-1">
 			<div class="col-2">
  				<a class="white" onclick="updateSort('Nick')">ARTiST</a>
 			</div>

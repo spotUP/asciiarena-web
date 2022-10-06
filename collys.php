@@ -43,6 +43,11 @@ $sort_order = $_GET['sort_order'] ?? "A";
 
 
 		?>
+      <div class="container-fluid bg-secondary apb-1">
+        <div class="d-none d-sm-block text-truncate text-center">
+         <span class="green">- --/\-\/- -</span> <span class="cyan">aSCIIaRENA</span> <span class="red">--=*=-- </span><span class="pink">[<?=date("D")?>, the <?=date("d-m-y")?>]</span><span class="red"> --=*=-- </span> <span class="cyan">aSCIIaRENA</span> <span class="green"> - -/\-\/- -- -</span><br><br>
+       </div>
+     </div>
 
     <div id = "hdrcols"class="row mb-4">
       <div class="col-md-7 text-truncate d-none d-md-block">
