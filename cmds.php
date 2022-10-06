@@ -2,6 +2,7 @@
 	define("NO_PING", true);
 	require_once "session.php";
 	require_once "functions.php";
+	require_once "tools/text.php";
  
   function extractFileDiz($filename) {
     $ext = substr($filename, strrpos($filename,'.'), strlen($filename)-1); 	// extract extension 
@@ -1339,7 +1340,7 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
       $cnt= fetchOne("select count(distinct id) cnt FROM apps $sqlFilter");
       
       foreach($apps as $app) {
-         $dizName = 'apps'.preg_replace('/\\.[^.\\s]{3,4}$/', '', $app->filename).'.diz';
+         $dizName = 'apps/'.preg_replace('/\\.[^.\\s]{3,4}$/', '', $app->filename).'.diz';
          $display_file_id = "";
          if (file_exists($dizName)) { 
            $display_file_id = encodeFileText($dizName); 
@@ -1384,19 +1385,19 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
       $cnt= fetchOne("select count(distinct id) cnt FROM mags $sqlFilter");
       
       foreach($mags as $mag) {
-         /*$file_id = $mag->filename.'.diz';
+         $file_id = $mag->filename.'.diz';
          $dirname = @array_shift(explode(".", $mag->filename));
          $display_file_id = "";
          if (file_exists('mags/'.$dirname.'/'.$file_id)) { 
            $display_file_id = encodeFileText('mags/'.$dirname.'/'.$file_id); 
-         }*/
+         }
 
         $data[] = [
           "url" => "/magazine/".$mag->filename,
           "id" => (int)$mag->id,
           "name" =>$mag->name,
           "filesize" =>$mag->filesize,
-          "fileid" => "",
+          "fileid" => $display_file_id,
           "timestamp" =>date("d.m.y", $mag->timestamp),
           "filename" =>$mag->filename,
           "author" =>$mag->author,
