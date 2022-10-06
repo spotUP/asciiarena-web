@@ -1384,19 +1384,19 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
       $cnt= fetchOne("select count(distinct id) cnt FROM mags $sqlFilter");
       
       foreach($mags as $mag) {
-         $file_id = $mag->filename.'.diz';
+         /*$file_id = $mag->filename.'.diz';
          $dirname = @array_shift(explode(".", $mag->filename));
          $display_file_id = "";
          if (file_exists('mags/'.$dirname.'/'.$file_id)) { 
            $display_file_id = encodeFileText('mags/'.$dirname.'/'.$file_id); 
-         }
+         }*/
 
         $data[] = [
           "url" => "/magazine/".$mag->filename,
           "id" => (int)$mag->id,
           "name" =>$mag->name,
           "filesize" =>$mag->filesize,
-          "fileid" => $display_file_id,
+          "fileid" => "",
           "timestamp" =>date("d.m.y", $mag->timestamp),
           "filename" =>$mag->filename,
           "author" =>$mag->author,
