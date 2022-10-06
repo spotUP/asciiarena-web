@@ -1206,7 +1206,7 @@
 
   function getCrews($page, $sort, $asc, $pagesize, $filter) {
     global $_user;
-    if (is_ajax() && is_logged_in()) {
+    if (is_ajax()) {
       $data = [];     
     
       $start = ($page-1) * $pagesize;
@@ -1244,7 +1244,7 @@
 
 function getArtists($page, $sort, $asc, $pagesize, $filter) {
     global $_user;
-    if (is_ajax() && is_logged_in()) {
+    if (is_ajax()) {
       $data = [];     
     
       $start = ($page-1) * $pagesize;
