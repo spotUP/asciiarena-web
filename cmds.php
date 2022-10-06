@@ -1347,7 +1347,7 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
          }
 
         $data[] = [
-          "url" => "/application/".urlsafe($app->filename),
+          "url" => "/application/".$app->filename,
           "id" => (int)$app->id,
           "name" =>$app->name,
           "filesize" =>$app->filesize,
@@ -1393,7 +1393,7 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
          }
 
         $data[] = [
-          "url" => "/application/".urlsafe($mag->filename),
+          "url" => "/application/".$mag->filename,
           "id" => (int)$mag->id,
           "name" =>$mag->name,
           "filesize" =>$mag->filesize,
