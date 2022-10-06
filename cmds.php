@@ -1316,6 +1316,98 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
     }  
   }
 
+  function getApps($page, $sort, $asc, $pagesize, $filter) {
+    global $_user;
+    if (is_ajax()) {
+      $data = [];     
+    
+      $start = ($page-1) * $pagesize;
+      $cnt = 0;
+
+      if ($asc=="A") {
+        $order = $sort; 
+      } else {
+        $order = $sort." DESC";
+      }
+      
+      $sqlFilter = "";
+      if ($filter != "") {
+        $sqlFilter = "WHERE name like \"%$filter%\" or filename like \"%$filter%\" or author like \"%$filter%\" ";
+      }
+      
+      $apps = fetchAll("SELECT * FROM apps $sqlFilter order by $order LIMIT $start, $pagesize");
+      $cnt= fetchOne("select count(distinct id) cnt FROM apps $sqlFilter");
+      
+      foreach($apps as $app) {
+         $file_id = $app->filename.'.diz';
+         $dirname = @array_shift(explode(".", $app->filename));
+         $display_file_id = "";
+         if (file_exists('apps/'.$dirname.'/'.$file_id)) { 
+           $display_file_id = encodeFileText('apps/'.$dirname.'/'.$file_id); 
+         }
+
+        $data[] = [
+          "url" => "/application/".urlsafe($app->filename),
+          "id" => (int)$app->id,
+          "name" =>$app->name,
+          "filesize" =>$app->filesize,
+          "fileid" => $display_file_id,
+          "timestamp" =>date("d.m.y", $app->timestamp),
+          "filename" =>$app->filename,
+          "author" =>$app->author,
+          "total_count" =>$cnt->cnt
+        ];
+      }
+      exit(json_out($data));
+    }  
+  }
+
+  function getMags($page, $sort, $asc, $pagesize, $filter) {
+    global $_user;
+    if (is_ajax()) {
+      $data = [];     
+    
+      $start = ($page-1) * $pagesize;
+      $cnt = 0;
+
+      if ($asc=="A") {
+        $order = $sort; 
+      } else {
+        $order = $sort." DESC";
+      }
+      
+      $sqlFilter = "";
+      if ($filter != "") {
+        $sqlFilter = "WHERE name like \"%$filter%\" or filename like \"%$filter%\" or author like \"%$filter%\" ";
+      }
+      
+      $mags = fetchAll("SELECT * FROM mags $sqlFilter order by $order LIMIT $start, $pagesize");
+      $cnt= fetchOne("select count(distinct id) cnt FROM mags $sqlFilter");
+      
+      foreach($mags as $mag) {
+         $file_id = $mag->filename.'.diz';
+         $dirname = @array_shift(explode(".", $mag->filename));
+         $display_file_id = "";
+         if (file_exists('magazines/'.$dirname.'/'.$file_id)) { 
+           $display_file_id = encodeFileText('magazines/'.$dirname.'/'.$file_id); 
+         }
+
+        $data[] = [
+          "url" => "/application/".urlsafe($mag->filename),
+          "id" => (int)$mag->id,
+          "name" =>$mag->name,
+          "filesize" =>$mag->filesize,
+          "fileid" => $display_file_id,
+          "timestamp" =>date("d.m.y", $mag->timestamp),
+          "filename" =>$mag->filename,
+          "author" =>$mag->author,
+          "total_count" =>$cnt->cnt
+        ];
+      }
+      exit(json_out($data));
+    }  
+  }
+
 	$cmd = $_GET[ "cmd" ] ?? $_current[ 0 ] ?? "";
 	$reDir = "/";
 
@@ -1417,6 +1509,12 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
       break;      
     case "get_bbs":
       getBBS($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
+      break;      
+    case "get_apps":
+      getApps($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
+      break;      
+    case "get_mags":
+      getMags($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
       break;      
 		default:
 			if (is_ajax()) {
