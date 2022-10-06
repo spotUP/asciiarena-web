@@ -1,6 +1,7 @@
 <?php
 	define("NO_PING", true);
 	require_once "session.php";
+	require_once "functions.php";
  
   function extractFileDiz($filename) {
     $ext = substr($filename, strrpos($filename,'.'), strlen($filename)-1); 	// extract extension 
@@ -1203,6 +1204,84 @@
     }
   }
 
+  function getCrews($page, $sort, $asc, $pagesize, $filter) {
+    global $_user;
+    if (is_ajax() && is_logged_in()) {
+      $data = [];     
+    
+      $start = ($page-1) * $pagesize;
+      $cnt = 0;
+
+      if ($asc=="A") {
+        $order = $sort; 
+      } else {
+        $order = $sort." DESC";
+      }
+      
+      $sqlFilter = "";
+      if ($filter != "") {
+        $sqlFilter = "WHERE name like \"%$filter%\"";
+      }
+      
+      $crews = fetchAll("SELECT *, (select count(id) from collys_crews cc where cc.crew_id = c.id) as releases_cnt,(select count(id) from member_of mo where mo.crew= c.name) as members_cnt  FROM crews c $sqlFilter order by $order LIMIT $start, $pagesize");
+      $cnt= fetchOne("select count(distinct id) cnt FROM crews $sqlFilter");
+      
+      foreach($crews as $crew) {
+        $data[] = [
+          "url" => "/crew/".urlsafe($crew->name),
+          "id" => (int)$crew->id,
+          "name" =>$crew->name,
+          "acronym" =>$crew->acronym,
+          "members_cnt" =>$crew->members_cnt,
+          "releases_cnt" =>$crew->releases_cnt,
+          "rating" =>$crew->rating,
+          "total_count" =>$cnt->cnt
+        ];
+      }
+      exit(json_out($data));
+    }  
+  }
+
+function getArtists($page, $sort, $asc, $pagesize, $filter) {
+    global $_user;
+    if (is_ajax() && is_logged_in()) {
+      $data = [];     
+    
+      $start = ($page-1) * $pagesize;
+      $cnt = 0;
+
+      if ($asc=="A") {
+        $order = $sort; 
+      } else {
+        $order = $sort." DESC";
+      }
+      
+      $sqlFilter = "";
+      if ($filter != "") {
+        $sqlFilter = "WHERE s.nick like \"%$filter%\" or s.crews like \"%$filter%\"";
+      }
+      
+      $artists = fetchAll("SELECT s.id, s.nick, s.crews FROM (select a.id,a.nick, GROUP_CONCAT(m.crew) crews from artists a LEFT JOIN member_of m on a.nick=m.nick GROUP BY a.id) s $sqlFilter order by $order LIMIT $start, $pagesize");
+      $cnt= fetchOne("select count(*) cnt FROM (select a.id,a.nick, GROUP_CONCAT(m.crew) crews from artists a LEFT JOIN member_of m on a.nick=m.nick GROUP BY a.id) s $sqlFilter");
+      
+      foreach($artists as $artist) {
+
+   			$crews = explode(',', $artist->crews);
+	  		$crews = array_map(function($crew) { return '<a href="/crew/'.urlsafe($crew).'">'.$crew.'</a>'; }, $crews);
+        
+        $data[] = [
+          "crews" => pluralize($crews),
+          "url" => "/artist/".urlsafe($artist->nick),
+          "id" => (int)$artist->id,
+          "nick" =>$artist->nick,
+          "total_count" =>$cnt->cnt
+        ];
+      }
+      exit(json_out($data));
+    }  
+  }
+
+
 	$cmd = $_GET[ "cmd" ] ?? $_current[ 0 ] ?? "";
 	$reDir = "/";
 
@@ -1296,6 +1375,12 @@
       deleteFont($_current[1]);
     case "save_request":
       saveRequest();
+    case "get_crews":
+      getCrews($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
+      break;      
+    case "get_artists":
+      getArtists($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
+      break;      
 		default:
 			if (is_ajax()) {
 				exit(json_out(["status" => false], 400));
