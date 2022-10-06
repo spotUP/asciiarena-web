@@ -1339,11 +1339,10 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
       $cnt= fetchOne("select count(distinct id) cnt FROM apps $sqlFilter");
       
       foreach($apps as $app) {
-         $file_id = $app->filename.'.diz';
-         $dirname = @array_shift(explode(".", $app->filename));
+         $dizName = 'apps'.preg_replace('/\\.[^.\\s]{3,4}$/', '', $app->filename).'.diz';
          $display_file_id = "";
-         if (file_exists('apps/'.$dirname.'/'.$file_id)) { 
-           $display_file_id = encodeFileText('apps/'.$dirname.'/'.$file_id); 
+         if (file_exists($dizName)) { 
+           $display_file_id = encodeFileText($dizName); 
          }
 
         $data[] = [
@@ -1388,12 +1387,12 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
          $file_id = $mag->filename.'.diz';
          $dirname = @array_shift(explode(".", $mag->filename));
          $display_file_id = "";
-         if (file_exists('magazines/'.$dirname.'/'.$file_id)) { 
-           $display_file_id = encodeFileText('magazines/'.$dirname.'/'.$file_id); 
+         if (file_exists('mags/'.$dirname.'/'.$file_id)) { 
+           $display_file_id = encodeFileText('mags/'.$dirname.'/'.$file_id); 
          }
 
         $data[] = [
-          "url" => "/application/".$mag->filename,
+          "url" => "/magazine/".$mag->filename,
           "id" => (int)$mag->id,
           "name" =>$mag->name,
           "filesize" =>$mag->filesize,
