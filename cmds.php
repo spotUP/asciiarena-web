@@ -1281,6 +1281,40 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
     }  
   }
 
+  function getBBS($page, $sort, $asc, $pagesize, $filter) {
+    global $_user;
+    if (is_ajax()) {
+      $data = [];     
+    
+      $start = ($page-1) * $pagesize;
+      $cnt = 0;
+
+      if ($asc=="A") {
+        $order = $sort; 
+      } else {
+        $order = $sort." DESC";
+      }
+      
+      $sqlFilter = "";
+      if ($filter != "") {
+        $sqlFilter = "WHERE name like \"%$filter%\" or sysop like \"%$filter%\" ";
+      }
+      
+      $bbses = fetchAll("SELECT * FROM bbses $sqlFilter order by $order LIMIT $start, $pagesize");
+      $cnt= fetchOne("select count(distinct id) cnt FROM bbses $sqlFilter");
+      
+      foreach($bbses as $bbs) {
+        $data[] = [
+          "url" => "/bbs/".urlsafe($bbs->id),
+          "id" => (int)$bbs->id,
+          "name" =>$bbs->name,
+          "sysop" =>$bbs->sysop,
+          "total_count" =>$cnt->cnt
+        ];
+      }
+      exit(json_out($data));
+    }  
+  }
 
 	$cmd = $_GET[ "cmd" ] ?? $_current[ 0 ] ?? "";
 	$reDir = "/";
@@ -1380,6 +1414,9 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
       break;      
     case "get_artists":
       getArtists($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
+      break;      
+    case "get_bbs":
+      getBBS($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
       break;      
 		default:
 			if (is_ajax()) {

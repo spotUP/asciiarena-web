@@ -19,6 +19,7 @@ RewriteBase /
 
 RewriteRule "^crew/([^/]+)/?$" /info_crew.php?crew=$1 [L,QSA]
 RewriteRule "^artist/([^/]+)/?$" /info_artist.php?artist=$1 [L,QSA]
+RewriteRule "^bbs/([^/]+)/?$" /info_bbs.php?bbs=$1 [L,QSA,B]
 RewriteRule "^member/([^/]+)/?$" /members.php?member=$1 [L,QSA]
 RewriteRule "^release/([^/]+)/?$" /info_release.php?filename=$1 [L,QSA,B]
 RewriteRule "^application/([^/]+)/?$" /info_apps.php?filename=$1 [L,QSA,B]

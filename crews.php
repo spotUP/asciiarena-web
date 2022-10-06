@@ -2,8 +2,6 @@
 require_once "session.php";
 $h1 = "CREWS";
 require_once "header.php";
-$searchquery = $_POST[ 'search' ] ?? "";
-
 ?>
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 bg-secondary">
