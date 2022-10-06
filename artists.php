@@ -2,37 +2,17 @@
 require_once "session.php";
 $h1 = "ARTISTS";
 require_once "header.php";
-require_once "pagination.php";
-
-$sort_by = $_GET[ 'sort_by' ] ?? "";
-switch ($sort_by) {
-	case "crew":
-	case "nick":
-	$sort_criteria = $sort_by;
-	break;
-	default:
-	$sort_criteria = "nick";
-	$sort_by = "nick";
-	break;
-}
 
 ?>
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 bg-secondary">
 		<div class="row">
 			<div class="col-12 d-flex justify-content-between">
-				<?php
-				$pageno = $_GET[ 'pageno' ] ?? 1;
-				$rows_per_page = 138;
-				$pagination = pagination("artists", $pageno, $rows_per_page, "&sort_by={$sort_by}");
-				if (!isset($_POST[ "search" ])) {
-					echo $pagination[ "pager" ];
-				}
-				?>
+
+      <div class="row m-0 apt-1">
+        <input type="hidden" id="pageno"><input type="hidden" id="sort1"><input type="hidden" id="sort2"><input type="hidden" id="maxpage"><ul class="pagination"><li class="page-item"> <a onclick="firstPage(event)" href="#" class="page-link" >FIRST</a></li><li class="page-item"> <a onclick="prevPage(event)" href="#" class="page-link" >PREV</a></li><span id="currpage"></span><li class="page-item"> <a onclick="nextPage(event)" href="#" class="page-link" >NEXT</a></li><li class="page-item"> <a onclick="lastPage(event)" href="#" class="page-link" >LAST</a></li></ul></div>
 				<div class="col-5 apt-1 bg-secondary apb-1">
-					<form action="?sort_by=<?=$sort_by?>" method="post">
-						<div class="amr-1"><input placeholder="Search..." type="text" name="search" autocomplete="off" class="w-100"value="<?=$searchquery?>"></div>
-					</form>
+						<span class="amr-1 "><input id="filter" oninput="search(this.value)" placeholder="Search..." type="text" autocomplete="off" class="w-100"></span>
 				</div>
 			</div>
 
@@ -45,55 +25,132 @@ switch ($sort_by) {
 
 		<div class="row amb-1 amt-1">
 			<div class="col-2">
-				<a class="white" href="artists.php?sort_by=nick">ARTiST</a>
+ 				<a class="white" onclick="updateSort('Nick')">ARTiST</a>
 			</div>
 			<div class="col-10">
-				<a class="white" href="artists.php?sort_by=crew">CREW</a>
+				<a class="white" onclick="updateSort('crews')">CREW</a>
 			</div>
 		</div>
-
-		<?php
-		if (!isset($_POST[ 'search' ])) {
-			$q = "SELECT a.nick,GROUP_CONCAT(m.crew) as crews FROM artists a LEFT JOIN member_of m on a.nick=m.nick GROUP BY a.id ORDER BY {$sort_by} ASC {$pagination["limit"]}";
-			$p = [];
-		} else {
-			$searchquery = $_POST[ 'search' ];
-			$q = "SELECT a.nick,GROUP_CONCAT(m.crew) as crews FROM artists a LEFT JOIN member_of m on a.nick=m.nick 
-			WHERE MATCH(a.nick) AGAINST (:searchquery IN BOOLEAN MODE) 
-			OR MATCH(m.crew) AGAINST (:searchquery IN BOOLEAN MODE)
-			OR a.nick LIKE :wcquery
-			GROUP BY a.id ORDER BY {$sort_by} ASC {$pagination["limit"]}";
-			$p = [":searchquery" => $searchquery, ":wcquery" => '%'.$searchquery.'%'];
-		}
-		foreach (fetchAll($q, $p) as $row) {
-			$artist = $row->nick;
-			$crews = explode(',', $row->crews);
-			$crews = array_map(function($crew) { return '<a href="/crew/'.urlsafe($crew).'">'.$crew.'</a>'; }, $crews);
-			?>
-			<div class="row">
-				<div class="forum_nick col-2">
-					<a href="/artist/<?=urlsafe($artist)?>"><?=$artist?></a>
-				</div>
-				<div class="artist_crew col-10"><?=pluralize($crews)?></div>
-			</div>
-			<?php
-		}
-		?>
-		<div class="row apl-1 apt-1">
-			<div class="col-12">
-				<?php
-				if (!isset($_POST[ "search" ])) {
-					echo $pagination[ "pager" ];
-				}
-				?>
-			</div>
+    <div id="artistList">
 		</div>
 	</div>
+
+
+<script>
+   function search(v) {
+    page = 1;
+    sort = $("#sort1").val()
+    order = $("#sort2").val()
+    filter = v
+    getArtists(page,sort,order,filter)
+   }
+
+  function nextPage(e) {
+    e.preventDefault(); 
+    page = ~~ $("#pageno").val();
+    maxpage = ~~ $("#maxpage").val();
+    if (page<maxpage) {
+      sort = $("#sort1").val()
+      order = $("#sort2").val()
+      filter = $("#filter").val()
+      getArtists(page+1,sort,order,filter)
+    }
+  }
+  
+  function prevPage(e) {
+    e.preventDefault(); 
+    let page = ~~ $("#pageno").val();
+    if (page>1) {
+      sort = $("#sort1").val()
+      order = $("#sort2").val()
+      filter = $("#filter").val()
+      getArtists(page-1,sort,order,filter)
+    }
+  }
+
+  function firstPage(e) {
+    e.preventDefault(); 
+    sort = $("#sort1").val()
+    order = $("#sort2").val()
+    filter = $("#filter").val()
+    getArtists(1,sort,order,filter)
+  }
+
+  function lastPage(e) {
+    e.preventDefault(); 
+    page = $("#maxpage").val();
+    sort = $("#sort1").val()
+    order = $("#sort2").val()
+    filter = $("#filter").val()
+    getArtists(page,sort,order,filter)
+  }
+
+  function updateSort(sort) {
+    if ($("#sort1").val() == sort) {
+      if ($("#sort2").val()=="A") {
+        order = "D";
+      } else {
+        order = "A";
+      }
+
+    } else {
+      order = "A";
+    }
+    filter = $("#filter").val()
+    getArtists(1,sort,order,filter)
+  }
+
+  function getArtists(page,sort,order,filter) {
+
+    $("#pageno").val(page);
+    $("#sort1").val(sort);
+    $("#sort2").val(order);
+
+    filter = filter.trim();
+
+    let pagesize = 120
+    
+    $.get("/cmds.php/get_artists/"+page+"/"+sort+"/"+order+"/"+"/"+pagesize+"/"+filter, function (data) {
+      let artistlist = $("#artistList");
+      artistlist.empty();
+      
+      let cnt = 0
+      let maxpage = 1;
+      if (data.length>0) {
+        cnt = data[0].total_count
+        maxpage = Math.trunc((cnt + pagesize - 1)/pagesize);
+      }
+      $("#maxpage").val(maxpage);
+      $("#currpage").text("( Page "+page+" of "+maxpage+" ) ");
+			$.each(data, function (i, artist) {
+
+        let artisttxt = `
+			<div class="row">
+				<div class="forum_nick col-2">
+      <a href="${artist.url}">${artist.nick}</a>
+				</div>
+				<div class="artist_crew col-10">
+					${artist.crews}
+				</div>
+			</div>`;
+        artistlist.append(artisttxt);        
+      });
+          
+      });
+    }
+        
+
+	$(function() {
+		getArtists(1,'Nick','A','');
+	});
+</script>
 
 	<div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
 		<?php include "sidebar.php"; ?>
 	</div>
+
 	<div class="col-lg-2 order-md-3 order-lg-3 order-xl-3">
 		<?php include "sidebar_right.php"; ?>
 	</div>
-	<?php include "footer.php";
+ 	<?php include "footer.php"; ?>
+</div>
