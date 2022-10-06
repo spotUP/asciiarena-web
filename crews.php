@@ -137,8 +137,9 @@ $searchquery = $_POST[ 'search' ] ?? "";
         }
         
         let rating = "";
-        if (crew.rating>0) {
-          rating = crew.rating.toFixed(2)
+        let r2 = parseFloat(crew.rating)
+        if ((r2!=NaN) && (r2>0)) {
+          rating = parseFloat(crew.rating).toFixed(2)
         }
           
         let crewtxt = `
