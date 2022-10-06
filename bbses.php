@@ -1,7 +1,8 @@
 <?php
 require_once "session.php";
-$h1 = "CREWS";
+$h1 = "BBS";
 require_once "header.php";
+
 ?>
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 bg-secondary">
@@ -19,26 +20,21 @@ require_once "header.php";
 		<?php
 
 	//-----------------------------------------------------------------------------
-	// SHOW CREWS
+	// SHOW BBS
 	//-----------------------------------------------------------------------------
 
 
 		?>
 		<div class="row amb-1">
 			<div class="col-4">
-				<a class="white" onclick="updateSort('Name')">CREW</a>
+				<a class="white" onclick="updateSort('Name')">NAME</a>
 			</div>
 			<div class="col-3">
-				<a class="white" onclick="updateSort('members_cnt')">MEMBERS</a>
+				<a class="white" onclick="updateSort('sysop')">SYSOP</a>
 			</div>
-			<div class="col-3">
-				<a class="white" onclick="updateSort('releases_cnt')">RELEASES</a>
-			</div>
-			<div class="col-2">
-				<a class="white" onclick="updateSort('rating')">SCORE</a>
-			</div>
+      
 		</div>
-    <div id="crewList">
+    <div id="bbsList">
 		</div>
 	</div>
   
@@ -48,7 +44,7 @@ require_once "header.php";
     sort = $("#sort1").val()
     order = $("#sort2").val()
     filter = v
-    getCrews(page,sort,order,filter)
+    getBBS(page,sort,order,filter)
    }
 
   function nextPage(e) {
@@ -59,7 +55,7 @@ require_once "header.php";
       sort = $("#sort1").val()
       order = $("#sort2").val()
       filter = $("#filter").val()
-      getCrews(page+1,sort,order,filter)
+      getBBS(page+1,sort,order,filter)
     }
   }
   
@@ -70,7 +66,7 @@ require_once "header.php";
       sort = $("#sort1").val()
       order = $("#sort2").val()
       filter = $("#filter").val()
-      getCrews(page-1,sort,order,filter)
+      getBBS(page-1,sort,order,filter)
     }
   }
 
@@ -79,7 +75,7 @@ require_once "header.php";
     sort = $("#sort1").val()
     order = $("#sort2").val()
     filter = $("#filter").val()
-    getCrews(1,sort,order,filter)
+    getBBS(1,sort,order,filter)
   }
 
   function lastPage(e) {
@@ -88,7 +84,7 @@ require_once "header.php";
     sort = $("#sort1").val()
     order = $("#sort2").val()
     filter = $("#filter").val()
-    getCrews(page,sort,order,filter)
+    getBBS(page,sort,order,filter)
   }
 
   function updateSort(sort) {
@@ -103,10 +99,10 @@ require_once "header.php";
       order = "A";
     }
     filter = $("#filter").val()
-    getCrews(1,sort,order,filter)
+    getBBS(1,sort,order,filter)
   }
 
-  function getCrews(page,sort,order,filter) {
+  function getBBS(page,sort,order,filter) {
 
     $("#pageno").val(page);
     $("#sort1").val(sort);
@@ -116,9 +112,9 @@ require_once "header.php";
 
     let pagesize = 120
     
-    $.get("/cmds.php/get_crews/"+page+"/"+sort+"/"+order+"/"+"/"+pagesize+"/"+filter, function (data) {
-      let crewlist = $("#crewList");
-      crewlist.empty();
+    $.get("/cmds.php/get_bbs/"+page+"/"+sort+"/"+order+"/"+"/"+pagesize+"/"+filter, function (data) {
+      let bbsList = $("#bbsList");
+      bbsList.empty();
       let cnt = 0
       let maxpage = 1;
       console.log(data.length);
@@ -128,34 +124,18 @@ require_once "header.php";
       }
       $("#maxpage").val(maxpage);
       $("#currpage").text("( Page "+page+" of "+maxpage+" ) ");
-			$.each(data, function (i, crew) {
-        let acro = '';
-        if (crew.acronym.length>0) {
-          acro = "("+crew.acronym+")";
-        }
-        
-        let rating = "";
-        let r2 = parseFloat(crew.rating)
-        if ((r2!=NaN) && (r2>0)) {
-          rating = parseFloat(crew.rating).toFixed(2)
-        }
-          
-        let crewtxt = `
+			$.each(data, function (i, bbs) {
+         
+        let bbstxt = `
 			<div class="row">
 				<div class="col-4 text-truncate">
-      <a href="${crew.url}">${crew.name} ${acro}</a>
+      <a href="${bbs.url}">${bbs.name}</a>
 				</div>
 				<div class="col-3 green">
-					${crew.members_cnt}
-				</div>
-				<div class="magenta col-3 nolink">
-          ${crew.releases_cnt}
-				</div>
-				<div class="col-2">
-          ${rating}
+        <a href="${bbs.url}">${bbs.sysop}</a>
 				</div>
 			</div>`;
-        crewlist.append(crewtxt);        
+        bbsList.append(bbstxt);        
       });
           
       });
@@ -163,7 +143,7 @@ require_once "header.php";
         
 
 	$(function() {
-		getCrews(1,'Name','A','');
+		getBBS(1,'Name','A','');
 	});
 </script>
   

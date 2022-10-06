@@ -121,10 +121,13 @@ include "header_ascii.php";
 						</div>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link ascii apr-1" href="/artists.php?sort_by=nick">ARTiSTS</a>
+						<a class="nav-link ascii apr-1" href="/artists.php">ARTiSTS</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link ascii apr-1" href="/crews.php">CREWS</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link ascii apr-1" href="/bbses.php">BBS</a>
 					</li>
 
 					<li class="nav-item">
