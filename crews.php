@@ -125,7 +125,7 @@ $searchquery = $_POST[ 'search' ] ?? "";
       let maxpage = 1;
       console.log(data.length);
       if (data.length>0) {
-        cnt = data[0].total_count
+        cnt = parseInt(data[0].total_count)
         maxpage = Math.trunc((cnt + pagesize - 1)/pagesize);
       }
       $("#maxpage").val(maxpage);
