@@ -1339,12 +1339,16 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
       $apps = fetchAll("SELECT * FROM apps $sqlFilter order by $order LIMIT $start, $pagesize");
       $cnt= fetchOne("select count(distinct id) cnt FROM apps $sqlFilter");
       
+     
       foreach($apps as $app) {
          $dizName = 'apps/'.preg_replace('/\\.[^.\\s]{3,4}$/', '', $app->filename).'.diz';
          $display_file_id = "";
          if (file_exists($dizName)) { 
            $display_file_id = encodeFileText($dizName); 
          }
+
+         $usersig= fetchOne("select upload_signature FROM users where id =:uploader_id",[":uploader_id" => $app->uploader_id]);
+         $usersig = $usersig->upload_signature;
 
         $data[] = [
           "url" => "/application/".$app->filename,
@@ -1353,6 +1357,7 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
           "filesize" =>$app->filesize,
           "fileid" => $display_file_id,
           "timestamp" =>date("d.m.y", $app->timestamp),
+          "usersig" => $usersig,
           "filename" =>$app->filename,
           "author" =>$app->author,
           "total_count" =>$cnt->cnt
@@ -1392,6 +1397,9 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
            $display_file_id = encodeFileText('mags/'.$dirname.'/'.$file_id); 
          }
 
+         $usersig= fetchOne("select upload_signature FROM users where nick =:uploader",[":uploader" => $mag->uploader]);
+         $usersig = $usersig->upload_signature;
+
         $data[] = [
           "url" => "/magazine/".$mag->filename,
           "id" => (int)$mag->id,
@@ -1400,10 +1408,65 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
           "fileid" => $display_file_id,
           "timestamp" =>date("d.m.y", $mag->timestamp),
           "filename" =>$mag->filename,
+          "usersig" => $usersig,
           "author" =>$mag->author,
           "total_count" =>$cnt->cnt
         ];
       }
+      exit(json_out($data));
+    }  
+  }
+
+  function getCollys($page, $sort, $asc, $pagesize, $filter) {
+    global $_user;
+    if (is_ajax()) {
+      $data = [];     
+    
+      $start = ($page-1) * $pagesize;
+      $cnt = 0;
+
+      if ($asc=="A") {
+        $order = $sort; 
+      } else {
+        $order = $sort." DESC";
+      }
+      
+      $sqlFilter = "";
+      if ($filter != "") {
+        $sqlFilter = "having name like \"%$filter%\" or filename like \"%$filter%\" or crews like \"%$filter%\" or artists like \"%$filter%\"";
+      }
+      
+      $collys = fetchAll("select *, concat(lpad(c.year,4,0),'-',lpad(c.month,2,0),'-',lpad(c.day,2,0)) cdate, (select coalesce(GROUP_CONCAT(a.nick),'') artists FROM artists_collys ac  LEFT JOIN artists a on a.id = ac.artist_id where ac.colly_id=c.id) artists, (select coalesce(GROUP_CONCAT(cr.name),'') crews FROM collys_crews cc  LEFT JOIN crews cr on cr.id = cc.crew_id where cc.colly_id=c.id) crews from collys c $sqlFilter order by $order LIMIT $start, $pagesize");
+      $cnt= fetchOne("select count(c.id) cnt from (select *, (select coalesce(GROUP_CONCAT(a.nick),'') artists FROM artists_collys ac  LEFT JOIN artists a on a.id = ac.artist_id where ac.colly_id=c.id) artists, (select coalesce(GROUP_CONCAT(cr.name),'') crews FROM collys_crews cc  LEFT JOIN crews cr on cr.id = cc.crew_id where cc.colly_id=c.id) crews from collys c $sqlFilter) c");
+
+      
+      foreach($collys as $colly) {
+  
+         $file_id = $colly->filename.'.diz';
+         $dirname = @array_shift(explode(".", $colly->filename));
+         $display_file_id = "";
+         if (file_exists('collections/'.$dirname.'/'.$file_id)) { 
+           $display_file_id = encodeFileText('collections/'.$dirname.'/'.$file_id); 
+         }        
+
+         $usersig= fetchOne("select upload_signature FROM users where id=:uploader_id",[":uploader_id" => $colly->uploader_id]);
+         $usersig = $usersig->upload_signature;
+
+         $data[] = [
+          "url" => "/release/".$colly->filename,
+          "id" => (int)$colly->id,
+          "name" =>$colly->name,
+          "filename" => $colly->filename,
+          "filesize" => $colly->filesize,
+          "fileid" => $display_file_id,
+          "artists" => combinize($colly->artists, $colly->artists, "/artist/", $colly->artists),
+          "crews" => combinize($colly->crews, $colly->crews, "/crew/", $colly->crews),
+          "cdate" => $colly->cdate,
+          "usersig" => $usersig,
+          "total_count" =>$cnt->cnt
+        ];
+      }
+
       exit(json_out($data));
     }  
   }
@@ -1515,6 +1578,9 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
       break;      
     case "get_mags":
       getMags($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
+      break;      
+    case "get_collys":
+      getCollys($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
       break;      
 		default:
 			if (is_ajax()) {

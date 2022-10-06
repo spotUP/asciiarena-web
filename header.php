@@ -97,10 +97,10 @@ include "header_ascii.php";
 						<div class="dropdown-menu ascii" aria-labelledby="themes">
 							<a class="dropdown-item ascii" href="/collys.php?sort_by=name">By Name<span style="padding-left: 7px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
 							<a class="dropdown-item ascii" href="/collys.php?sort_by=filename">By Filename<span style="padding-left: 4px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
-							<a class="dropdown-item ascii" href="/collys.php?sort_by=nick">By Artist<span style="padding-left: 10px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
-							<a class="dropdown-item ascii" href="/collys.php?sort_by=crew">By Crew<span style="padding-left: 10px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
-							<a class="dropdown-item ascii" href="/collys.php?sort_by=date">By Release Date<span style="font-size: 16px; font-family:Monaco, monospace;">&nbsp;</span></a>
-							<a class="dropdown-item ascii" href="/collys.php?sort_by=uploaddate">By Upload Date<span style="padding-left: 8px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;</span></a>
+							<a class="dropdown-item ascii" href="/collys.php?sort_by=artists">By Artist<span style="padding-left: 10px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
+							<a class="dropdown-item ascii" href="/collys.php?sort_by=crews">By Crew<span style="padding-left: 10px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
+							<a class="dropdown-item ascii" href="/collys.php?sort_by=cdate&sort_order=D">By Release Date<span style="font-size: 16px; font-family:Monaco, monospace;">&nbsp;</span></a>
+							<a class="dropdown-item ascii" href="/collys.php?sort_by=timestamp&sort_order=D">By Upload Date<span style="padding-left: 8px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;</span></a>
 							<a class="dropdown-item ascii" href="/collys.php?sort_by=uploader">By Uploader<span style="padding-left: 13px; font-size: 16px; font-family:Monaco, monospace;">&nbsp;&nbsp;&nbsp;</span></a>
 						</div>
 					</li>

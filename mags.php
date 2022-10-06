@@ -158,46 +158,45 @@ $sort_by = $_GET['sort_by'] ?? "Name";
       magazineList.empty();
       let cnt = 0
       let maxpage = 1;
-      console.log(data.length);
       if (data.length>0) {
         cnt = parseInt(data[0].total_count)
         maxpage = Math.trunc((cnt + pagesize - 1)/pagesize);
       }
       $("#maxpage").val(maxpage);
       $("#currpage").text("( Page "+page+" of "+maxpage+" ) ");
-			$.each(data, function (i, app) {
+			$.each(data, function (i, mag) {
          
 
-        apptxt = ''
+        magtxt = ''
         v = $("#viewmode").val();
 
         if (v==1) {
-          apptxt = `<div class="row">
+          magtxt = `<div class="row">
       <div class="col-4 col-sm-4 text-truncate">
-        <a class="magenta" href="${app.url}">${app.filename}</a>
+        <a class="magenta" href="${mag.url}">${mag.filename}</a>
       </div>
       <div class="col-4 col-sm-4 text-truncate">
-        <a class="magenta" href="${app.url}">${app.name}</a>
+        <a class="magenta" href="${mag.url}">${mag.name}</a>
       </div>
       <div class="col-4 col-sm-4 green text-truncate">
-       <span class="yellow">${app.author}</span>
+       <span class="yellow">${mag.author}</span>
      </div>`;
         }
      
      
      if (v==2) {
-        apptxt = `<div class="row apt-1">
+        magtxt = `<div class="row apt-1">
        <div class="col-6 col-am-6 text-center text-md-left">
-         <a href="${app.url}"><span class="cyan" style="margin-right: 8px;">${app.filename}</span></a> <span class="green" style="margin-right: 16px;">PF--</span> <span class="yellow" style="margin-right: 8px;">${app.filesize}</span> <span class="yellow">${app.timestamp}</span>
+         <a href="${mag.url}"><span class="cyan" style="margin-right: 8px;">${mag.filename}</span></a> <span class="green" style="margin-right: 16px;">PF--</span> <span class="yellow" style="margin-right: 8px;">${mag.filesize}</span> <span class="yellow">${mag.timestamp}</span>
        </div>
        <div class="col-6 col-sm-6 apb-1 text-center text-md-left">
-           <pre class="ascii magenta overflow-hidden"><a class="ascii magenta" href="${app.url}">${app.fileid}</a></pre>
+           <pre class="ascii magenta overflow-hidden"><a class="ascii magenta" href="${mag.url}">${mag.fileid}</a></pre>
        </div>
      </div>
      <div class="row apb-1">
        <div class="col-12 col-sm-6"></div>
        <div class="col-12 col-sm-6 text-center text-md-left">
-         <span class="pink text-right"><?=$row->upload_signature?></span>
+         <span class="pink text-right">${mag.usersig}</span>
        </div>
      </div>
      <div class="row apb-2">
@@ -215,7 +214,7 @@ $sort_by = $_GET['sort_by'] ?? "Name";
        
      }
      
-        magazineList.append(apptxt);
+        magazineList.append(magtxt);
       });
           
       });
