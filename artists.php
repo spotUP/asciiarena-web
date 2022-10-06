@@ -117,7 +117,7 @@ require_once "header.php";
       let cnt = 0
       let maxpage = 1;
       if (data.length>0) {
-        cnt = data[0].total_count
+        cnt = parseInt(data[0].total_count)
         maxpage = Math.trunc((cnt + pagesize - 1)/pagesize);
       }
       $("#maxpage").val(maxpage);
