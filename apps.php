@@ -197,7 +197,7 @@ $sort_by = $_GET['sort_by'] ?? "Name";
      <div class="row apb-1">
        <div class="col-12 col-sm-6"></div>
        <div class="col-12 col-sm-6 text-center text-md-left">
-         <span class="pink text-right"><?=$row->upload_signature?></span>
+         <span class="pink text-right">${app.usersig}</span>
        </div>
      </div>
      <div class="row apb-2">
