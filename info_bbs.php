@@ -94,6 +94,31 @@ if ($bbs_available) {
           <span class="white">Software: </span><?=$software?>
         </div>
       </div>
+
+			<div class="row apt-1">
+				<div class="col-12">
+					<h2 class="ap-1 bg-header">AFFILIATED GROUPS</h2>											
+				</div>
+			</div>
+
+    <?php
+
+      $ask="select b.crew,c.crewurl from bbs_of b left join crews c on b.crew = c.name where b.name=:showbbs";
+			$result=fetchAll($ask, [ 'showbbs' => $showbbs ]);
+			foreach($result as $row)
+			{
+        ?>
+        
+          <div class="row apt-1">
+						<div class="col-4">
+							<a href="/crew/<?=$row->crewurl?>" class="white"><?=$row->crew?></a>
+						</div>
+					</div>
+
+    <?php
+      }
+    ?>
+
     <?php
 
   ?>
