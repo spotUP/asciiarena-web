@@ -470,6 +470,20 @@ foreach (fetchAll($q, $p) as $row) {
 
 <?php
 }
+
+  ?>
+        <?php if (is_admin()) { ?>
+        <div class="amt-1" >
+        <form action="/admin.php#artist" method="post" id="edit-artist">
+          <input type="hidden" name="getartist" value="<?=$showartist?>">
+          <input type="hidden" name="open_edit_artist_field" value="1">
+          <input type="submit" class="btn-big amb-1" name="edit_artist" value="Edit">
+        </form>
+        </div>
+        <?php } ?>
+
+  <?php
+
 } else {
 	                        ?>
                                 <div class="row">

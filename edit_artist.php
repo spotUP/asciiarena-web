@@ -41,10 +41,16 @@
 		function getArtistList() {
 			let artistlist = $("#artist_fetch_id");
 			artistlist.empty();
+          console.log("se "+$("#edit_artist_name").val()+"!")
 			artistlist.append($("<option/>").val("").text("Select Artist"));
 			$.get("/admin_cmds.php?cmd=get_artist", function (data) {
 				$.each(data, function (i, artist) {
 					artistlist.append($("<option/>").val(artist.id).text(artist.nick));
+          if (($("#edit_artist_name").val().length) && (artist.nick == $("#edit_artist_name").val())) {         
+            $("#artist_fetch_id").val(artist.id).trigger("change");
+            $("#edit_artist_name").val("")
+          }
+          
 				});
 			});
 		}
@@ -254,6 +260,7 @@
 			</div>
 
 		</form>
+    <input type="hidden" id="edit_artist_name" value="<?php if(isset($_POST['getartist']) && (isset($_POST['open_edit_artist_field']))) echo $_POST['getartist']; ?>">
 	</div>
 	<?php if ($admin_edit && is_admin()) { ?>
 		<script>

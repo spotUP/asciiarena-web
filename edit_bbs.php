@@ -37,9 +37,14 @@
 		let bbslist = $("#bbs_fetch_id");
 		bbslist.empty();
 		bbslist.append($("<option/>").val("").text("Select BBS"));
+
 		$.get("/admin_cmds.php?cmd=get_bbs", function (data) {
 			$.each(data, function (i, bbs) {
 				bbslist.append($("<option/>").val(bbs.id).text(bbs.name));
+  			if (($("#edit_bbs_id").val().length) && (bbs.id == $("#edit_bbs_id").val())) {         
+					$("#bbs_fetch_id").val(bbs.id).trigger("change");
+					$("#edit_bbs_id").val("")
+        }
 			});
 		});
 	}
@@ -233,6 +238,7 @@
 			</div>
 		</div>
 	</form>
+  <input type="hidden" id="edit_bbs_id" value="<?php if(isset($_POST['getbbsid']) && (isset($_POST['open_edit_bbs_field']))) echo $_POST['getbbsid']; ?>">
 </div>
 <?php if ($admin_edit && is_admin()) { ?>
 <script>
