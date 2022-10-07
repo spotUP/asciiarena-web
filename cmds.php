@@ -1346,7 +1346,7 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
          }
 
          $usersig= fetchOne("select upload_signature FROM users where id =:uploader_id",[":uploader_id" => $app->uploader_id]);
-         $usersig = $usersig->upload_signature;
+         $usersig = $usersig->upload_signature ?? "";
 
         $data[] = [
           "url" => "/application/".$app->filename,
@@ -1396,7 +1396,7 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
          }
 
          $usersig= fetchOne("select upload_signature FROM users where nick =:uploader",[":uploader" => $mag->uploader]);
-         $usersig = $usersig->upload_signature;
+         $usersig = $usersig->upload_signature ?? "";
 
         $data[] = [
           "url" => "/magazine/".$mag->filename,
@@ -1448,7 +1448,7 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
          }        
 
          $usersig= fetchOne("select upload_signature FROM users where id=:uploader_id",[":uploader_id" => $colly->uploader_id]);
-         $usersig = $usersig->upload_signature;
+         $usersig = $usersig->upload_signature ?? "";
 
          $data[] = [
           "url" => "/release/".$colly->filename,
