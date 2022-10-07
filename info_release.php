@@ -71,10 +71,10 @@ require_once "header.php";?>
       <a class="dropdown-item" href="http://reddit.com/submit?url=<?=$site_url?>&amp;title=<?=$site_title?>" target="_blank">Reddit</a>
       <a class="dropdown-item" href="https://twitter.com/share?url=<?=$site_url?>&amp;text=<?=$twitterdesc?>" target="_blank">Twitter</a>
     </div>
+    <a id="viewcomment" href="#comments" class="btn-big amb-1 bg-header text apt-1 apb-1 grey-text" role="button" aria-disabled="true">View Comments</a>
     <?php if (is_logged_in()) {
       $favourite = (fetchOne("SELECT 1 FROM favourites WHERE user_id = :user AND colly_id = :colly", [ "user" => $_user['id'], "colly" => $colly_id])) ? "Remove favourite" : "Favourite";
       ?>
-      <a href="#comments" class="btn-big amb-1 bg-header text apt-1 apb-1 grey-text" role="button" aria-disabled="true">View Comments</a>
       <input type="button" class="btn-big amb-1" onclick="addComment()" value="Add Comment">
       <input type="button" id="favbutton" onclick="favourite()" class="btn-big amb-1" value="<?=$favourite?>">
       <input type="button" class="btn-big amb-1" onclick="reportAsBroken()" value="Report Broken">   
@@ -519,6 +519,13 @@ function addFavourite() {
         type: 'GET',
         url: `/cmds.php/getcomments/${$("#collyid").data("id")}`
       }).done(function (data) {
+        
+        if (data.length==0) {
+          $("#viewcomment").hide();
+        } else {
+          $("#viewcomment").show();
+        }
+        
         $.each(data, function (i, comment) {
           let buttons = ''
           <?php if (is_admin())  {         

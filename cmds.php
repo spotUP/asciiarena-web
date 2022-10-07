@@ -249,9 +249,7 @@
             "comment" => $comment->comment
           ];
         }
-        if(!empty($data)) {
-          exit(json_out($data));
-        }
+        exit(json_out($data));
       }
       exit(json_out(["status" => false], 404));
     }  
