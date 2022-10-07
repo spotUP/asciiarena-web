@@ -89,7 +89,7 @@ require_once "header.php";?>
     <?php } ?>
   </div>
 
-<div id="colly-main">
+<div id="colly-main"     <?php if ($type == 'Archive') { ?> style="display: none;"; <?php } ?>>
   <div class="container-fluid">
     <div class="row apb-0">
       <div class="col-3">
