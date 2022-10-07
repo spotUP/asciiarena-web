@@ -96,6 +96,19 @@ if ($bbs_available) {
       </div>
     <?php
 
+  ?>
+        <?php if (is_admin()) { ?>
+        <div class="amt-1" >
+        <form action="/admin.php#bbs" method="post" id="edit-bbs">
+          <input type="hidden" name="getbbsid" value="<?=$bbsid?>">
+          <input type="hidden" name="open_edit_bbs_field" value="1">
+          <input type="submit" class="btn-big amb-1" name="edit_bbs" value="Edit">
+        </form>
+        </div>
+        <?php } ?>
+
+  <?php
+
 } else {
 	                        ?>
                                 <div class="row">

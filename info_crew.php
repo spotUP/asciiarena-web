@@ -609,10 +609,25 @@ include "header.php";
 					</div>
 
 				</div>
+
 				<?php
 			}
-		}
-	} else {
+
+  		}
+	
+  ?>
+        <?php if (is_admin()) { ?>
+        <div class="amt-1" >
+        <form action="/admin.php#crew" method="post" id="edit-crew">
+          <input type="hidden" name="getcrew" value="<?=$showcrew?>">
+          <input type="hidden" name="open_edit_crew_field" value="1">
+          <input type="submit" class="btn-big amb-1" name="edit_crew" value="Edit">
+        </form>
+        </div>
+        <?php } ?>
+
+  <?php
+  } else {
 			        ?>
                                 <div class="row">
                                         <div class="col-lg-12">
@@ -623,9 +638,11 @@ include "header.php";
                                                 </div>
                                         </div>
                                 </div>
+
                                 <?php
 	}
 		?>
+
 
 	</div>
 	

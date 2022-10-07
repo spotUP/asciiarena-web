@@ -53,6 +53,10 @@
 			$.get("/admin_cmds.php?cmd=get_crew", function (data) {
 				$.each(data, function (i, crew) {
 					crewlist.append($("<option/>").val(crew.id).text(crew.name));
+          if (($("#edit_crew_name").val().length) && (crew.name == $("#edit_crew_name").val())) {         
+            $("#crew_fetch_id").val(crew.id).trigger("change");
+            $("#edit_artist_name").val("")
+          }
 				});
 			});
 		}
@@ -259,6 +263,7 @@
 	</div>
 
 </form>
+    <input type="hidden" id="edit_crew_name" value="<?php if(isset($_POST['getcrew']) && (isset($_POST['open_edit_crew_field']))) echo $_POST['getcrew']; ?>">
 </div>
 <?php if ($admin_edit && is_admin()) { ?>
 	<script>
