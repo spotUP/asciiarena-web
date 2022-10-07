@@ -51,7 +51,7 @@ require_once "header.php";?>
     <?php if ($type !== 'Archive') { ?>
       <input type="button" id="viewbutton" onclick="toggleColly()" class="btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s" value="Hide Colly">
 
-      <input type="button" id="fsbutton" style="display:none" onclick="showFullscreen()" class="btn-big amb-1" value="Fullscreen">
+      <input type="button" id="fsbutton"  onclick="showFullscreen()" class="btn-big amb-1" value="Fullscreen">
     <?php } ?>
     <input type="button" onclick="downloadfile()" class="btn-big amb-1" value="Download">
     <input id="collyid" type="hidden" data-id="<?=$colly_id?>" >
@@ -267,6 +267,7 @@ elseif ($type == "ANSI")
       <input type="hidden" id="user_edit_comment_id"/>
     </div>
     <div class="col-12 apt-1">
+      <input type="button" class="btn-big" onclick="cancelBroken()" align="right" value="Cancel">
       <input type="button" class="btn-big" onclick="sendEditedComment()" align="right" value="Save">
     </div>
   </div>
@@ -491,13 +492,7 @@ function addFavourite() {
       }).done(data => {
         let commentid=$('#user_edit_comment_id').val();
         $(`#comment${commentid}`).text($('#user_edit_comment').val());
-        $('#viewbutton').val('View Colly')
-        $('#fsbutton').hide(100);
-        $('#colly-main').hide(500);
-        $('#reportbroken').hide(500);
-        $('#comments').show(500);
-        $("#addcomment").hide(500);
-        $("#editcomment").hide(500);     
+        cancelBroken();
       });   
     }
 

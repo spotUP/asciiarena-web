@@ -127,7 +127,7 @@ require_once "header.php";
         maxpage = Math.trunc((cnt + pagesize - 1)/pagesize);
       }
       $("#maxpage").val(maxpage);
-      $("#currpage").text("( Page "+page+" of "+maxpage+" ) ");
+      $("#currpage").text(page+" of "+maxpage);
 			$.each(data, function (i, artist) {
 
         let artisttxt = `
