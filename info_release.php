@@ -49,7 +49,7 @@ require_once "header.php";?>
 
   <div class="container-fluid bg-secondary amb-1 sticky-top" style="padding-top: 36px;">
     <?php if ($type !== 'Archive') { ?>
-      <input type="button" id="viewbutton" onclick="toggleColly()" class="btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s" value="View Colly">
+      <input type="button" id="viewbutton" onclick="toggleColly()" class="btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s" value="Hide Colly">
 
       <input type="button" id="fsbutton" style="display:none" onclick="showFullscreen()" class="btn-big amb-1" value="Fullscreen">
     <?php } ?>
@@ -88,76 +88,8 @@ require_once "header.php";?>
       <?php } ?>
     <?php } ?>
   </div>
-  <div id="comments">
-  </div>
-  <div id="addcomment" style="display:none" >
-    <div class="row apl-1 apr-1">
-      <div class="header bg-header col-12 ap-1">ENTER YOUR COMMENT</div>
-    </div>
 
-    <div class="row">
-     <div class="col-12 aml-1 amr-1">
-      <textarea style="height: 128px; width: 100%;" class="bg-secondary cyan ap-1" id="user_comment" ></textarea>
-    </div>
-  </div>
-
-  <div class="row aml-1 apl-1 apr-1">
-   <div class="col-12 apl-1 apr-1 apb-1 apt-1 bg-secondary">
-    <div class="col-2 d-flex justify-content-between">
-      <label class="apr-1" for="user_rating">RATING</label>
-      <select id="user_rating" class="custom-select">
-        <option value="" selected="selected">Blank</option><?php
-        for ($i = 1; $i < 11; $i++) 
-        {
-          echo "<option value=$i>$i</option>";
-        } ?>
-      </select>
-    </div>
-    <div class="col-12 p-0 m-0 apt-1">
-      <input type="button" class="btn-big" onclick="sendComment()" align="right" value="Comment">
-    </div>
-  </div>
-</div>
-</div>
-<div id="editcomment" style="display:none" >
-  <div class="row">
-    <div class="col-12 apb-1">
-      <span class="white">Edit Your Comment...</span>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-12">
-      <textarea rows="5" class="w-100" id="user_edit_comment"></textarea>
-      <input type="hidden" id="user_edit_comment_id"/>
-    </div>
-    <div class="col-12 apt-1">
-      <input type="button" class="btn-big" onclick="sendEditedComment()" align="right" value="Save">
-    </div>
-  </div>
-</div>
-
-<div id="reportbroken" style="display:none" >
- <div class="container-fluid bg-secondary amb-1 apb-1">
-   <div class="row">
-    <div class="col-12 amt-1">
-     <span class="white">DESCRiBE THE PROBLEM</span>
-   </div>
- </div>
- <div class="row">
-  <div class="col-12 amt-1 amb-1">
-   <textarea class="w-100" style="height: 64px;" id="broken_comment" ></textarea>
- </div>
-</div>
-<div class="row">
-  <div class="col-12">
-   <input type="button" class="btn-big" onclick="sendBrokenReport()" value="Report">
- </div>
-</div>
-</div>
-</div>
-
-
-<div style="display:none" id="colly-main">
+<div id="colly-main">
   <div class="container-fluid">
     <div class="row apb-0">
       <div class="col-3">
@@ -291,9 +223,81 @@ elseif ($type == "ANSI")
 }
 ?>    
 </div>
+
+  <div id="comments">
+  </div>
+  <div id="addcomment" style="display:none" >
+    <div class="row apl-1 apr-1">
+      <div class="header bg-header col-12 ap-1">ENTER YOUR COMMENT</div>
+    </div>
+
+    <div class="row">
+     <div class="col-12 aml-1 amr-1">
+      <textarea style="height: 128px; width: 100%;" class="bg-secondary cyan ap-1" id="user_comment" ></textarea>
+    </div>
+  </div>
+
+  <div class="row aml-1 apl-1 apr-1">
+   <div class="col-12 apl-1 apr-1 apb-1 apt-1 bg-secondary">
+    <div class="col-2 d-flex justify-content-between">
+      <label class="apr-1" for="user_rating">RATING</label>
+      <select id="user_rating" class="custom-select">
+        <option value="" selected="selected">Blank</option><?php
+        for ($i = 1; $i < 11; $i++) 
+        {
+          echo "<option value=$i>$i</option>";
+        } ?>
+      </select>
+    </div>
+    <div class="col-12 p-0 m-0 apt-1">
+      <input type="button" class="btn-big" onclick="sendComment()" align="right" value="Comment">
+    </div>
+  </div>
+</div>
+</div>
+<div id="editcomment" style="display:none" >
+  <div class="row">
+    <div class="col-12 apb-1">
+      <span class="white">Edit Your Comment...</span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <textarea rows="5" class="w-100" id="user_edit_comment"></textarea>
+      <input type="hidden" id="user_edit_comment_id"/>
+    </div>
+    <div class="col-12 apt-1">
+      <input type="button" class="btn-big" onclick="sendEditedComment()" align="right" value="Save">
+    </div>
+  </div>
+</div>
+
+<div id="reportbroken" style="display:none" >
+ <div class="container-fluid bg-secondary amb-1 apb-1">
+   <div class="row">
+    <div class="col-12 amt-1">
+     <span class="white">DESCRiBE THE PROBLEM</span>
+   </div>
+ </div>
+ <div class="row">
+  <div class="col-12 amt-1 amb-1">
+   <textarea class="w-100" style="height: 64px;" id="broken_comment" ></textarea>
+ </div>
+</div>
+<div class="row">
+  <div class="col-12">
+   <input type="button" class="btn-big" onclick="cancelBroken()" value="Cancel">
+   <input type="button" class="btn-big" onclick="sendBrokenReport()" value="Report">
+ </div>
+</div>
+</div>
+</div>
+
+
 <?php } ?>
 
 </div>
+
 
 <div class="col-lg-2 order-md-2 order-lg-1 order-xl-1">
   <?php include('sidebar.php'); ?>
@@ -326,9 +330,6 @@ elseif ($type == "ANSI")
  }
 
  function addComment() {
-  $('#viewbutton').val('View Colly')
-  $('#fsbutton').hide(100);
-  $('#colly-main').hide(500);
   $('#reportbroken').hide(500);
   $('#comments').show(500);
   $("#addcomment").show(500);
@@ -354,20 +355,17 @@ function toggleColly() {
   $('#reportbroken').hide(500);
   
   if ($('#viewbutton').val() == 'View Colly') {
-    const url = `/cmds.php/countview/${$("#collyid").data("id")}`;
-    $.ajax(url);
     $('#colly-main').fadeIn(500);
-    $('#comments').hide(500);
     $('#viewbutton').val('Hide Colly')
     $('#fsbutton').show(100);
 
   } else {
     $('#colly-main').fadeOut(500);
-    $('#comments').show(500);
-    getComments();
     $('#viewbutton').val('View Colly')
     $('#fsbutton').hide(100);
   }
+  $('#comments').show(500);
+  getComments();
 }
 
 function editComment(commentid) {
@@ -425,6 +423,26 @@ function addFavourite() {
           showAlert('You removed <?=addslashes($filename)?> from your favourites!','#messages')
         }
       });   
+    }
+
+    function cancelBroken() {
+      $("#addcomment").hide(500);
+      $("#editcomment").hide(500);
+      $('#reportbroken').hide(500);
+      
+      if ($('#viewbutton').val() == 'View Colly') {
+        $('#colly-main').fadeIn(500);
+        //$('#comments').hide(500);
+        $('#viewbutton').val('Hide Colly')
+        $('#fsbutton').show(100);
+
+      } else {
+        $('#colly-main').fadeOut(500);
+        $('#viewbutton').val('View Colly')
+        $('#fsbutton').hide(100);
+      }
+      $('#comments').show(500);
+      getComments();
     }
 
     function sendBrokenReport() {
@@ -556,6 +574,8 @@ function addFavourite() {
     }
 
     $(function() {
+      const url = `/cmds.php/countview/${$("#collyid").data("id")}`;
+      $.ajax(url);
       getComments();
     });
   </script>
