@@ -3,7 +3,7 @@ require_once "session.php";
 $h1 = "aPPLiCATiONS";
 require_once "header.php";
 $sort_by = $_GET['sort_by'] ?? "Name";
-
+$userprefs = fetchOne("select list_view_mode from users where id = :userid", [":userid" => $_user['id']]);
 ?>
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 bg-secondary">
@@ -224,6 +224,11 @@ $sort_by = $_GET['sort_by'] ?? "Name";
 
 	$(function() {
 		getApplications(1,'<?=$sort_by?>','A','');
+    <?php if ($userprefs->list_view_mode == 'Standard') {
+      ?> setView(1) <?php
+    } else {
+      ?> setView(2) <?php
+    } ?>
 	});
 </script>
   
