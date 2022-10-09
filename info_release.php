@@ -187,8 +187,8 @@ require_once "header.php";?>
   <?php
   if ($type == "ASCII") 
   {
-    ?><div style="background: red;" class="container-fluid d-flex justify-content-center text-center">
-    <div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;" id="colly-div"><pre id="colly" style="font-family: <?=$font;?>; color: <?=$fgcolor?>; white-space: pre;"></div><?php
+    ?>
+    <div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;" id="colly-div"><pre id="colly" style="font-family: <?=$font;?>; color: <?=$fgcolor?>; white-space: pre;"><?php
     if (file_exists("collections/{$dirname}/{$filename}")) 
     {
       $content = encodeFileText("collections/{$dirname}/{$filename}");
