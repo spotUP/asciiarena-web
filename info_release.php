@@ -187,7 +187,7 @@ require_once "header.php";?>
   <?php
   if ($type == "ASCII") 
   {
-    ?>
+    ?><div class="contauner-fluid d-flex justify-content-center align-items-center">
     <div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="width: 640px; background-color: <?=$bgcolor?>;" id="colly-div"><pre id="colly" style="font-family: <?=$font;?>; color: <?=$fgcolor?>; white-space: pre;"><?php
     if (file_exists("collections/{$dirname}/{$filename}")) 
     {
@@ -198,6 +198,8 @@ require_once "header.php";?>
     }
   ?></pre>
 </div>
+</div>
+
 <?php
 }
 elseif ($type == "ANSI") 
