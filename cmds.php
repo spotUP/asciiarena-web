@@ -1472,6 +1472,57 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
     }  
   }
 
+  function getRequests($page, $sort, $asc, $pagesize, $filter) {
+    global $_user;
+    if (is_ajax()) {
+      $data = [];     
+    
+      $start = ($page-1) * $pagesize;
+      $cnt = 0;
+
+      if ($asc=="A") {
+        $order = $sort; 
+      } else {
+        $order = $sort." DESC";
+      }
+      
+      $sqlFilter = "";
+      if ($filter != "") {
+        $sqlFilter = "WHERE title like \"%$filter%\" or description like \"%$filter%\" or user like \"%$filter%\" ";
+      }
+      
+      $requests = fetchAll("SELECT requests.*, users.nick as user FROM requests LEFT JOIN users on users.id = requests.requestedby $sqlFilter order by $order LIMIT $start, $pagesize");
+      $cnt= fetchOne("select count(distinct requests.id) cnt FROM requests  LEFT JOIN users on users.id = requests.requestedby $sqlFilter");
+      
+      foreach($requests as $req) {
+        $data[] = [
+          "id" => (int)$req->id,
+          "title" =>$req->title,
+          "user" =>$req->user,
+          "url" => "info_requests.php?id=".$req->id,
+          "total_count" =>$cnt->cnt
+        ];
+      }
+      exit(json_out($data));
+    }  
+  }
+
+  function getRequestComments($reqid) {
+    $rows = fetchAll("select rc.*, u.nick user from request_comments rc LEFT JOIN users u on u.id = rc.user_id where rc.request_id=:reqid", ['reqid' => $reqid ]);
+     
+      $data = [];     
+     
+      foreach($rows as $comment) {
+        $data[] = [
+          "id" => (int)$comment->comment_id,
+          "user" => $comment->user,
+          "time" => date("Y-m-d H:i",$comment->timestamp),
+          "comment" =>$comment->comment,
+        ];
+      }
+      exit(json_out($data));
+  }
+
 	$cmd = $_GET[ "cmd" ] ?? $_current[ 0 ] ?? "";
 	$reDir = "/";
 
@@ -1582,6 +1633,12 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
       break;      
     case "get_collys":
       getCollys($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
+      break;      
+    case "get_reqs":
+      getRequests($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
+      break;      
+    case "get_req_comments":
+      getRequestComments($_current[1]);
       break;      
 		default:
 			if (is_ajax()) {
