@@ -6,6 +6,11 @@
 <script>
   function bbsclear() {
     $("#bbs_id, #bbs_name, #bbs_sysop, #bbs_number, #bbs_address, #bbs_country, #bbs_software").val('').trigger('change');
+
+		let crewlist = $("#bbs_crew_fetch_id");
+		crewlist.empty();
+		$("#bbs_crew_add_fetch_id").val("0").trigger('change');
+
     $("#bbs_online").prop( "checked", false );
   }
 
@@ -27,6 +32,12 @@
           $('#bbs_online').prop( "checked", false );
         }
 				$('#bbs_number').val(data[0].number);
+					let crewlist = $("#bbs_crew_fetch_id");
+        crewlist.empty();
+        $.each(data[0].crews, function (i, crew) {
+						addBBSCrewItem(crewlist,crew.id,crew.name)
+					});
+
 			});
 		} else {
 			bbsclear();
@@ -74,12 +85,42 @@
 	}
   <?php } ?>
 
+	function addBBSCrewItem(bbslist,id,name) {
+		bbslist.append('<div id="bbs_crew_entry'+id+'" class="p-0 row apb-1"><div class="col-xs-12 col-md-5"><div class="w-100 bg-input grey-text" id="bbs_fetch_name_'+id+'">'+name+'</div><input type="hidden" name="crewname[]" value="'+name+'"></div><div class="col-xs-12 col-md-1"><input type="button" class="bg-red white w-100" value="Delete" onclick="deleteBBSCrew('+id+')"/></div></div>')
+	}
+
+	function deleteBBSCrew(id) {
+		const activeName = $("#bbs_fetch_name_"+id.toString()).text();
+		if (confirm(`Are you sure you want to delete ${activeName} Crew?`)) {
+			let bbsitem = $("#bbs_crew_entry"+id.toString());
+			bbsitem.remove();
+			showCrewAlert("Crew Deleted!", true);
+		}
+	}
+
+	function addBBSCrew(quiet=false) {
+		let crewid = $("#bbs_crew_add_fetch_id").val()
+		let crewname = $("#bbs_crew_add_fetch_id option:selected").text()
+
+		if (crewid>0) {
+			if (!($("#bbs_crew_entry"+crewid).length)) {
+				let crewlist = $("#bbs_crew_fetch_id");
+				addBBSCrewItem(crewlist,crewid,crewname)
+			}
+			$("#bbs_crew_add_fetch_id").val("0").trigger('change');
+			if (!quiet) showCrewAlert("Crew Added!", true);
+		}
+	}
+
+
   function saveBBS() {
     if ($("#bbs_name").val().trim().length==0) {
       showBBSAlert("You must fill the name field!", false);
       return
     }
     
+		addBBSCrew(true);
+
     const form = $("#bbs_form");
     const url = form.attr("action");
     $.ajax({
@@ -228,6 +269,32 @@
 					</select>
 			</div>
     </div>
+
+	<div class="row apb-1">
+		<div class="col-xs-12 col-md-5">Crews</div>
+	</div>
+	<div id="bbs_crew_fetch_id"></div>
+	<div class="p-0 row apb-1">
+		<div class="col-xs-12 col-md-5">
+			<select class="select2" id="bbs_crew_add_fetch_id" class="w-100">
+				<option value="0">Select Crew</option>
+				<?php
+				$result = fetchAll("SELECT id, name FROM crews ORDER BY name");
+				foreach($result as $row) {
+					?>
+					<option value="<?=$row->id?>"><?=$row->name?></option>
+					<?php
+				}
+				?>
+			</select>
+
+
+		</div>
+		<div class="col-xs-12 col-md-1 apt-1">
+			<input type="button" class="w-100 btn-big" value="Add Crew" onclick="addBBSCrew()"/>
+		</div>
+	</div>
+
 
 		<div class="row">
 			<div class="col-12">

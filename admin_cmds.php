@@ -527,6 +527,16 @@
 					$bbses = fetchAll("SELECT * FROM bbses ORDER BY name");
 				}
 				foreach($bbses as $bbs) {
+ 					if($id) {
+						$crews = fetchAll("SELECT crews.id,crews.name FROM bbs_of, crews where bbs_of.crew=crews.name and bbs_of.name=:bbs",[":bbs" => $bbs->name]);
+						foreach($crews as $crew) {
+							$crewdata[] = [
+								"id" => (int)$crew->id,
+								"name" => $crew->name,
+							];
+						}
+					}
+          
 					$data[] = [
 						"id" => (int)$bbs->id,
 						"name" => $bbs->name,
@@ -536,6 +546,7 @@
             "country" => $bbs->country,
             "online" => $bbs->online,
             "software" => $bbs->software,
+            "crews" => $crewdata
 					];
 				}
 				if(!empty($data)) {
@@ -545,9 +556,13 @@
 			case "del_bbs":
 				if(!empty($_POST[ 'id' ])) {
 					$id = (int)$_POST[ 'id' ];
-					if($id && doQuery("DELETE FROM bbses WHERE id = :id", [":id" => $id])) {
-						exit(json_out(["status" => true]));
-					}
+          
+					if($id) {
+              doQuery("DELETE FROM bbs_of WHERE name = (select name from bbses where id = :id)", [":id" => $id]);
+              if (doQuery("DELETE FROM bbses WHERE id = :id", [":id" => $id])) {
+                exit(json_out(["status" => true]));
+              } 
+          }
 				}
 				exit(json_out(["status" => false], 404));
 			case "save_bbs":
@@ -569,15 +584,53 @@
 				if(!empty($_POST[ "id" ])) {
 					$q = "UPDATE bbses SET name = :name, address = :address, sysop = :sysop, number = :number, country = :country, online = :online, software=:software WHERE id = :id";
 					$data[ ":id" ] = $_POST[ "id" ];
+					$id = $_POST[ "id" ];
 				} else {
 					$q = "INSERT INTO bbses (name, address, sysop, number, country, online, software) VALUES (:name, :address, :sysop, :number, :country, :online, :software)";
+					$id = "";
 					$response = 201;
 				}
-				if(doQuery($q, $data)) {
-					exit(json_out(["status" => true], $response));
+
+				if(!doQuery($q, $data)) {
+					exit(json_out(["status" => true], 400));     
 				}
-				exit(json_out(["status" => true], 400));
-      
+
+				if (!empty($id)) {
+					if(!doQuery("UPDATE bbs_of SET updated='Y' WHERE name = (select name from bbses where id = :id)", [":id" => $id]))
+					{
+						exit(json_out(["status" => true], 400));     
+					}
+				}
+				        
+        
+        $crewnames = $_POST[ "crewname" ] ?? "";     
+				
+				if(!empty($crewnames)) {
+					foreach($crewnames as $crewname) {
+						$q = "INSERT INTO bbs_of (name,crew) select :name, :crew where (select count(*) from bbs_of where name = :name and crew = :crew)=0";
+						$data = [
+							":crew" => $crewname ?? "",
+							":name" => $_POST[ "name" ] ?? ""
+						];
+						if(!doQuery($q, $data)) {
+							exit(json_out(["status" => true], 400));     
+						}
+
+						$q = "UPDATE bbs_of SET updated = null where name = :name and crew = :crew";
+						if(!doQuery($q, $data)) {
+							exit(json_out(["status" => true], 400));     
+						}
+					}
+				}
+
+				if (!empty($id)) {
+					if(!doQuery("DELETE FROM bbs_of WHERE updated='Y' AND name = (select name from bbses where id = :id)", [":id" => $id])) {
+						exit(json_out(["status" => true], 400));     
+					}
+				}
+		
+        exit(json_out(["status" => true], $response));
+  
 			case "get_app":
 				$id = $_GET[ "id" ] ?? 0;
 				$data = [];
