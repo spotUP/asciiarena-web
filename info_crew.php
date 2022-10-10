@@ -175,10 +175,10 @@ include "header.php";
 				<div class="col-4">
 					Releases: <?=$releases?>
         </div>
+		</div>
 					<?php
 				}
 				?>
-		</div>
 		    <?php if (is_admin()) { ?>
         <div class="amt-1" >
         <form action="/admin.php#crew" method="post" id="edit-crew">
