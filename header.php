@@ -129,6 +129,14 @@ include "header_ascii.php";
 					<li class="nav-item">
 						<a class="nav-link ascii apr-1" href="/bbses.php">BBS</a>
 					</li>
+								<?php if(is_admin()) 
+								{
+   							?>
+					<li class="nav-item">
+						<a class="nav-link ascii apr-1" href="/requests.php">REQUESTS</a>
+					</li>
+								<?php }
+   							?>
 
 					<li class="nav-item">
 						<a class="nav-link ascii apr-1" href="/about.php">ABOUT</a>
