@@ -174,381 +174,383 @@ include "header.php";
 				</div>
 				<div class="col-4">
 					Releases: <?=$releases?>
-					<?php}?>
-				</div>
+					<?php
+				}
+				?>
 			</div>
 		</div>
-		<div class="row apb-1 apt-1">
+	</div>
+	<div class="row apb-1 apt-1">
+		<div class="col-12">
+			<h2 class="ap-1 bg-header">MEMBERS</h2>											
+		</div>
+	</div>
+
+	<div class="row apb-1">
+		<div class="col-4">
+			<yellow>ARTiST</yellow>
+		</div>
+		<div class="col-4">
+			<yellow>RATiNG</yellow>
+		</div>
+		<div class="col-4">
+
+			<yellow>RELEASES</yellow>
+		</div>
+	</div>
+
+	<?php
+	$ask="select nick from member_of where crew=:showcrew order by nick";
+	$result=fetchAll($ask, [ 'showcrew' => $showcrew ]);
+	foreach($result as $row)
+	{
+		$crewmember=$row->nick;
+
+		$ask_memb="SELECT acronym FROM artists WHERE nick=:crewmember";
+		$result_memb=fetchAll($ask_memb, [ 'crewmember' => $crewmember ]);
+		foreach($result_memb as $row_memb)
+		{
+			$membacronym=$row_memb->acronym;
+
+			?>
+			<div class="row">
+				<div class="col-4">
+					<a href="/artist/<?=urlsafe($crewmember)?>" /> <?=$crewmember?> 
+					<?php
+					if(!empty($membacronym))
+					{
+						echo "[$membacronym]";
+					}
+					?>
+				</a>
+			</div>
+			<?php
+			$ask_artist_rating="SELECT rating FROM artists where nick=:crewmember";
+			$result_artist_rating=fetchAll($ask_artist_rating, [ 'crewmember' => $crewmember ]);
+			foreach($result_artist_rating as $row_artist_rating)
+			{
+				$artistrating = sprintf("%0.2f", $row_artist_rating->rating);
+			}
+
+			if(empty($artistrating))
+			{
+				$askagain="SELECT COUNT(rating) AS count from comments where artist=:crewmember";
+				$resultagain=fetchAll($askagain, [ 'crewmember' => $crewmember ]);
+				foreach($resultagain as $rowagain)
+				{
+					$votecount=$rowagain->count;
+				}
+
+				$votesleft=(3-$votecount);
+				if ($votesleft==1)
+				{
+					echo "<div class=\"col-4\">Awaiting $votesleft vote</div>";
+				}
+				elseif ($votesleft > 0)
+				{
+					echo "<div class=\"col-4\">Awaiting $votesleft votes</div>";
+				}
+			}
+			else
+			{
+				$askagain="SELECT COUNT(rating) AS count from comments where artist=:crewmember";
+				$resultagain=fetchAll($askagain, [ 'crewmember' => $crewmember ]);
+				foreach($resultagain as $rowagain)
+				{
+					$votecount=$rowagain->count;
+				}
+
+				echo "<div class=\"col-4\">$artistrating ($votecount votes)</div>";
+			}
+			?>
+			<?php
+			$ask_memb_rels="SELECT COUNT(colly_id) as count FROM artists_collys WHERE artist_id = (SELECT id FROM artists WHERE nick=:crewmember)";
+			$result_memb_rels=fetchAll($ask_memb_rels, [ 'crewmember' => $crewmember ]);
+			foreach($result_memb_rels as $row_memb_rels)
+			{
+				$membrels=$row_memb_rels->count;
+			}			
+			echo "<div class=\"col-4\">$membrels</div></div>";
+		}
+	}
+	?>
+
+	<!-- ----------------------------------------------------------------------------- -->
+	<!-- BBSLIST                                                                    -->
+	<!-- ----------------------------------------------------------------------------- -->
+
+	<?php
+	$ask_bbs="select name from bbs_of where crew=:showcrew";
+	$result_bbs=fetchAll($ask_bbs, [ 'showcrew' => $showcrew ]);
+	foreach($result_bbs as $row_bbs)
+	{
+		$bbscount=$row_bbs->name;
+	}
+	if(!empty($bbscount))
+	{ 
+		?>
+
+		<div class="row apt-1">
 			<div class="col-12">
-				<h2 class="ap-1 bg-header">MEMBERS</h2>											
+				<h2 class="ap-1 bg-header">Boards</h2>											
 			</div>
 		</div>
-
-		<div class="row apb-1">
-			<div class="col-4">
-				<yellow>ARTiST</yellow>
-			</div>
-			<div class="col-4">
-				<yellow>RATiNG</yellow>
-			</div>
-			<div class="col-4">
-
-				<yellow>RELEASES</yellow>
-			</div>
-		</div>
-
 		<?php
-		$ask="select nick from member_of where crew=:showcrew order by nick";
+		$ask="select name from bbs_of where crew=:showcrew";
 		$result=fetchAll($ask, [ 'showcrew' => $showcrew ]);
 		foreach($result as $row)
 		{
-			$crewmember=$row->nick;
-
-			$ask_memb="SELECT acronym FROM artists WHERE nick=:crewmember";
-			$result_memb=fetchAll($ask_memb, [ 'crewmember' => $crewmember ]);
-			foreach($result_memb as $row_memb)
+			$bbs_name=$row->name;
+			$ask_bbs="select * from bbses where name=:bbs_name";
+			$result_bbs=fetchAll($ask_bbs, [ 'bbs_name' => $bbs_name ]);
+			foreach($result_bbs as $row_bbs)
 			{
-				$membacronym=$row_memb->acronym;
+				$name=$row_bbs->name;
+				$sysop=$row_bbs->sysop;
+				$address=$row_bbs->address;
+				$number=$row_bbs->number;
+				$country=$row_bbs->country;
+				$software=$row_bbs->software;
+				if ($row_bbs->online) {
+					$online="Yes";
+				} else {
+					$online="No";
+				}
+
+				if (empty($software))
+				{
+					$software="Unknown";
+				}
+
+				if (empty($sysop))
+				{
+					$sysop="Unknown";
+				}
+
+				if (empty($address))
+				{
+					$address="Unknown";
+				}
+
+				if (empty($number))
+				{
+					$number="Unknown";
+				}
+
+				if (empty($country))
+				{
+					$country="Unknown";
+				}
 
 				?>
+				<div class="row apt-1">
+					<div class="col-4">
+						<span class="white">Name: </span><?=$name?>
+					</div>
+					<div class="col-4">
+						<span class="white">Sysop: </span><?=$sysop?>
+					</div>
+					<div class="col-4">
+						<span class="white">Online: </span><?=$online?>
+					</div>
+				</div>
 				<div class="row">
 					<div class="col-4">
-						<a href="/artist/<?=urlsafe($crewmember)?>" /> <?=$crewmember?> 
-						<?php
-						if(!empty($membacronym))
-						{
-							echo "[$membacronym]";
-						}
-						?>
-					</a>
+						<span class="white">Address: </span><?=$address?> 
+					</div>
+
+					<div class="col-4">
+						<span class="white">Number: </span><?=$number?>
+					</div>
+					<div class="col-4">
+						<span class="white">Country: </span><?=$country?>
+					</div>
+					<div class="col-4">
+						<span class="white">Software: </span><?=$software?>
+					</div>
 				</div>
 				<?php
-				$ask_artist_rating="SELECT rating FROM artists where nick=:crewmember";
-				$result_artist_rating=fetchAll($ask_artist_rating, [ 'crewmember' => $crewmember ]);
-				foreach($result_artist_rating as $row_artist_rating)
-				{
-					$artistrating = sprintf("%0.2f", $row_artist_rating->rating);
-				}
-
-				if(empty($artistrating))
-				{
-					$askagain="SELECT COUNT(rating) AS count from comments where artist=:crewmember";
-					$resultagain=fetchAll($askagain, [ 'crewmember' => $crewmember ]);
-					foreach($resultagain as $rowagain)
-					{
-						$votecount=$rowagain->count;
-					}
-
-					$votesleft=(3-$votecount);
-					if ($votesleft==1)
-					{
-						echo "<div class=\"col-4\">Awaiting $votesleft vote</div>";
-					}
-					elseif ($votesleft > 0)
-					{
-						echo "<div class=\"col-4\">Awaiting $votesleft votes</div>";
-					}
-				}
-				else
-				{
-					$askagain="SELECT COUNT(rating) AS count from comments where artist=:crewmember";
-					$resultagain=fetchAll($askagain, [ 'crewmember' => $crewmember ]);
-					foreach($resultagain as $rowagain)
-					{
-						$votecount=$rowagain->count;
-					}
-
-					echo "<div class=\"col-4\">$artistrating ($votecount votes)</div>";
-				}
-				?>
-				<?php
-				$ask_memb_rels="SELECT COUNT(colly_id) as count FROM artists_collys WHERE artist_id = (SELECT id FROM artists WHERE nick=:crewmember)";
-				$result_memb_rels=fetchAll($ask_memb_rels, [ 'crewmember' => $crewmember ]);
-				foreach($result_memb_rels as $row_memb_rels)
-				{
-					$membrels=$row_memb_rels->count;
-				}			
-				echo "<div class=\"col-4\">$membrels</div></div>";
 			}
+
 		}
-		?>
-
-		<!-- ----------------------------------------------------------------------------- -->
-		<!-- BBSLIST                                                                    -->
-		<!-- ----------------------------------------------------------------------------- -->
-
-		<?php
-		$ask_bbs="select name from bbs_of where crew=:showcrew";
-		$result_bbs=fetchAll($ask_bbs, [ 'showcrew' => $showcrew ]);
-		foreach($result_bbs as $row_bbs)
-		{
-			$bbscount=$row_bbs->name;
-		}
-		if(!empty($bbscount))
-		{ 
-			?>
-
-			<div class="row apt-1">
-				<div class="col-12">
-					<h2 class="ap-1 bg-header">Boards</h2>											
-				</div>
-			</div>
-			<?php
-			$ask="select name from bbs_of where crew=:showcrew";
-			$result=fetchAll($ask, [ 'showcrew' => $showcrew ]);
-			foreach($result as $row)
-			{
-				$bbs_name=$row->name;
-				$ask_bbs="select * from bbses where name=:bbs_name";
-				$result_bbs=fetchAll($ask_bbs, [ 'bbs_name' => $bbs_name ]);
-				foreach($result_bbs as $row_bbs)
-				{
-					$name=$row_bbs->name;
-					$sysop=$row_bbs->sysop;
-					$address=$row_bbs->address;
-					$number=$row_bbs->number;
-					$country=$row_bbs->country;
-					$software=$row_bbs->software;
-					if ($row_bbs->online) {
-						$online="Yes";
-					} else {
-						$online="No";
-					}
-
-					if (empty($software))
-					{
-						$software="Unknown";
-					}
-
-					if (empty($sysop))
-					{
-						$sysop="Unknown";
-					}
-
-					if (empty($address))
-					{
-						$address="Unknown";
-					}
-
-					if (empty($number))
-					{
-						$number="Unknown";
-					}
-
-					if (empty($country))
-					{
-						$country="Unknown";
-					}
-
-					?>
-					<div class="row apt-1">
-						<div class="col-4">
-							<span class="white">Name: </span><?=$name?>
-						</div>
-						<div class="col-4">
-							<span class="white">Sysop: </span><?=$sysop?>
-						</div>
-						<div class="col-4">
-							<span class="white">Online: </span><?=$online?>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-4">
-							<span class="white">Address: </span><?=$address?> 
-						</div>
-
-						<div class="col-4">
-							<span class="white">Number: </span><?=$number?>
-						</div>
-						<div class="col-4">
-							<span class="white">Country: </span><?=$country?>
-						</div>
-						<div class="col-4">
-							<span class="white">Software: </span><?=$software?>
-						</div>
-					</div>
-					<?php
-				}
-
-			}
-		}
+	}
 
 //-----------------------------------------------------------------------------
 // LATEST RELEASE
 //-----------------------------------------------------------------------------
 
-		$ask="SELECT c.*,a.nick,w.name as crew FROM collys c
-		LEFT JOIN artists_collys ac ON c.id=ac.colly_id
-		LEFT JOIN artists a ON ac.artist_id=a.id
-		LEFT JOIN collys_crews cc ON cc.colly_id=c.id
-		LEFT JOIN crews w ON cc.crew_id=w.id
-		WHERE c.id in (SELECT colly_id FROM collys_crews WHERE crew_id IN (SELECT id FROM crews WHERE name=:showcrew))
-		GROUP BY c.filename ORDER BY c.year DESC, c.month DESC, c.day LIMIT 1";
-		$result=fetchAll($ask, [ 'showcrew' => $showcrew ]);
-		foreach($result as $row)
-		{
-			$crew = $row->crew;
-			$viewtimes = $row->view_counter;
-			$year = $row->year;
-			$filename = $row->filename;
-			$uploader = $row->uploader;
-			$dirname = explode(".", $filename);
-			$dirname = $dirname[0];
+	$ask="SELECT c.*,a.nick,w.name as crew FROM collys c
+	LEFT JOIN artists_collys ac ON c.id=ac.colly_id
+	LEFT JOIN artists a ON ac.artist_id=a.id
+	LEFT JOIN collys_crews cc ON cc.colly_id=c.id
+	LEFT JOIN crews w ON cc.crew_id=w.id
+	WHERE c.id in (SELECT colly_id FROM collys_crews WHERE crew_id IN (SELECT id FROM crews WHERE name=:showcrew))
+	GROUP BY c.filename ORDER BY c.year DESC, c.month DESC, c.day LIMIT 1";
+	$result=fetchAll($ask, [ 'showcrew' => $showcrew ]);
+	foreach($result as $row)
+	{
+		$crew = $row->crew;
+		$viewtimes = $row->view_counter;
+		$year = $row->year;
+		$filename = $row->filename;
+		$uploader = $row->uploader;
+		$dirname = explode(".", $filename);
+		$dirname = $dirname[0];
 
-			$file_id = "collections/" . $dirname . "/" . $filename . ".diz";
-			if (file_exists($file_id)) 
+		$file_id = "collections/" . $dirname . "/" . $filename . ".diz";
+		if (file_exists($file_id)) 
+		{
+			$file_id = encodeFileText($file_id);
+		}
+		else
+			$file_id = encodeFileText("collections/file_id.diz.txt");	
+		?>
+
+		<div class="row apb-1 apt-1">
+			<div class="col-12">
+				<h2 class="ap-1 bg-header">LATEST RELEASE</h2>											
+			</div>
+		</div>
+
+		<div class="row apr-1">
+			<div class="col-8">
+				<?php
+				?>	
+				<a class="ascii magenta" href="/release/<?=$filename?>"><pre class="magenta"><?=$file_id?></pre></a>
+				<?php
+				?>
+			</div>
+			<div class="col-4">
+				<div class="row d-flex justify-content-between">
+					Artist(s):
+					<?php
+					$authors = [];
+					foreach(fetchAll("SELECT a.nick FROM collys c LEFT JOIN artists_collys ac ON ac.colly_id=c.id LEFT JOIN artists a ON a.id=ac.artist_id 
+						WHERE c.filename=:filename GROUP BY ac.artist_id", [ ':filename' => $filename ]) as $author) {
+						$authors[] = "<a href=\"/artist/".urlsafe($author->nick)."\">{$author->nick}</a>";
+				}
+				echo pluralize($authors, '<span class="magenta"> & </span>');
+				?>
+			</div>
+			<div class="row d-flex justify-content-between">
+				Crew(s):
+				<?php
+				$crews = [];
+				foreach(fetchAll("SELECT w.name as crew FROM collys c LEFT JOIN collys_crews cc ON cc.colly_id=c.id LEFT JOIN crews w ON w.id=cc.crew_id 
+					WHERE c.filename=:filename GROUP BY cc.crew_id", [ ':filename' => $filename ]) as $crew) {
+					$crews[] = "<a href=\"/crew/".urlsafe($crew->crew)."/\">{$crew->crew}</a>";
+			}
+			echo pluralize($crews, '<span class="magenta"> & </span>');
+			?>
+		</div>
+		<div class="row d-flex justify-content-between">
+			Filename:
+
+			<a href="/release/<?=$filename?>"><?=mb_strimwidth($row->filename, 0, 12);?></a>
+		</div>
+		<div class="row d-flex justify-content-between">	
+			<span>Size:</span>
+			<?=$row->filesize?>
+		</div>
+		<div class="row d-flex justify-content-between">
+			<span>Released:</span>
+			<?php
+			if(!empty($prodday))
 			{
-				$file_id = encodeFileText($file_id);
+				echo "$prodday ";
+			}
+			if(isset($prodmonth))
+			{
+				if ($month_list[$prodmonth]!=Unknown)
+					echo "$month_list[$prodmonth] ";
+			}
+			if(!empty($year))
+			{
+				echo "$year";
+			}
+			?>
+		</div>
+		<div class="row d-flex justify-content-between">
+			<span>Rating:</span>
+
+			<?php
+			$ask_collyrating="SELECT rating from collys where filename=:filename";
+			$result_collyrating=fetchAll($ask_collyrating, [ 'filename' => $filename ]);
+			foreach($result_collyrating as $row_collyrating)
+			{
+				$collyrating=$row_collyrating->rating;
+			}
+
+			$ask_votes="SELECT COUNT(rating) AS count from comments where filename=:filename";
+			$result_votes=fetchAll($ask_votes, [ 'filename' => $filename ]);
+			foreach($result_votes as $row_votes)
+			{
+				$votecount=$row_votes->count;
+			}
+			?>
+			<?php
+			if(empty($collyrating))
+			{
+				$askagain="SELECT COUNT(rating) AS count from comments where filename=:filename";
+				$resultagain=fetchAll($askagain, [ 'filename' => $filename ]);
+				foreach($resultagain as $rowagain)
+				{
+					$votecount=$rowagain->count;
+					$votesleft=(3-$votecount);
+				}
+				if ($votesleft==1)
+				{
+					echo "Awaiting $votesleft vote";
+				}
+				elseif ($votesleft > 1)
+				{
+					echo "Awaiting $votesleft votes";
+				}
 			}
 			else
-				$file_id = encodeFileText("collections/file_id.diz.txt");	
+			{
+				echo "$collyrating ($votecount votes)";
+			}
 			?>
+		</div>
+		<div class="row d-flex justify-content-between">
+			<span>Added by:</span>
 
-			<div class="row apb-1 apt-1">
-				<div class="col-12">
-					<h2 class="ap-1 bg-header">LATEST RELEASE</h2>											
-				</div>
-			</div>
+			<a href="/member/<?=urlsafe($uploader)?>"><?=$uploader?></a>
+		</div>
 
-			<div class="row apr-1">
-				<div class="col-8">
-					<?php
-					?>	
-					<a class="ascii magenta" href="/release/<?=$filename?>"><pre class="magenta"><?=$file_id?></pre></a>
-					<?php
-					?>
-				</div>
-				<div class="col-4">
-					<div class="row d-flex justify-content-between">
-						Artist(s):
-						<?php
-						$authors = [];
-						foreach(fetchAll("SELECT a.nick FROM collys c LEFT JOIN artists_collys ac ON ac.colly_id=c.id LEFT JOIN artists a ON a.id=ac.artist_id 
-							WHERE c.filename=:filename GROUP BY ac.artist_id", [ ':filename' => $filename ]) as $author) {
-							$authors[] = "<a href=\"/artist/".urlsafe($author->nick)."\">{$author->nick}</a>";
-					}
-					echo pluralize($authors, '<span class="magenta"> & </span>');
-					?>
-				</div>
-				<div class="row d-flex justify-content-between">
-					Crew(s):
-					<?php
-					$crews = [];
-					foreach(fetchAll("SELECT w.name as crew FROM collys c LEFT JOIN collys_crews cc ON cc.colly_id=c.id LEFT JOIN crews w ON w.id=cc.crew_id 
-						WHERE c.filename=:filename GROUP BY cc.crew_id", [ ':filename' => $filename ]) as $crew) {
-						$crews[] = "<a href=\"/crew/".urlsafe($crew->crew)."/\">{$crew->crew}</a>";
-				}
-				echo pluralize($crews, '<span class="magenta"> & </span>');
-				?>
-			</div>
-			<div class="row d-flex justify-content-between">
-				Filename:
-
-				<a href="/release/<?=$filename?>"><?=mb_strimwidth($row->filename, 0, 12);?></a>
-			</div>
-			<div class="row d-flex justify-content-between">	
-				<span>Size:</span>
-				<?=$row->filesize?>
-			</div>
-			<div class="row d-flex justify-content-between">
-				<span>Released:</span>
-				<?php
-				if(!empty($prodday))
-				{
-					echo "$prodday ";
-				}
-				if(isset($prodmonth))
-				{
-					if ($month_list[$prodmonth]!=Unknown)
-						echo "$month_list[$prodmonth] ";
-				}
-				if(!empty($year))
-				{
-					echo "$year";
-				}
-				?>
-			</div>
-			<div class="row d-flex justify-content-between">
-				<span>Rating:</span>
-
-				<?php
-				$ask_collyrating="SELECT rating from collys where filename=:filename";
-				$result_collyrating=fetchAll($ask_collyrating, [ 'filename' => $filename ]);
-				foreach($result_collyrating as $row_collyrating)
-				{
-					$collyrating=$row_collyrating->rating;
-				}
-
-				$ask_votes="SELECT COUNT(rating) AS count from comments where filename=:filename";
-				$result_votes=fetchAll($ask_votes, [ 'filename' => $filename ]);
-				foreach($result_votes as $row_votes)
-				{
-					$votecount=$row_votes->count;
-				}
-				?>
-				<?php
-				if(empty($collyrating))
-				{
-					$askagain="SELECT COUNT(rating) AS count from comments where filename=:filename";
-					$resultagain=fetchAll($askagain, [ 'filename' => $filename ]);
-					foreach($resultagain as $rowagain)
-					{
-						$votecount=$rowagain->count;
-						$votesleft=(3-$votecount);
-					}
-					if ($votesleft==1)
-					{
-						echo "Awaiting $votesleft vote";
-					}
-					elseif ($votesleft > 1)
-					{
-						echo "Awaiting $votesleft votes";
-					}
-				}
-				else
-				{
-					echo "$collyrating ($votecount votes)";
-				}
-				?>
-			</div>
-			<div class="row d-flex justify-content-between">
-				<span>Added by:</span>
-
-				<a href="/member/<?=urlsafe($uploader)?>"><?=$uploader?></a>
-			</div>
-
-			<div class="row d-flex justify-content-between">
-				<span>Viewed:</span>
-				<?=$viewtimes?> times
-			</div>
-			<div class="row d-flex justify-content-between">
-				<span>Downloaded:</span>
-				<?php
-				$ask="SELECT downloads from collys where filename=:filename";
-				$result=fetchAll($ask, [ 'filename' => $filename ]);
-				foreach($result as $row)
-				{
-					$downloads=$row->downloads;
-				}
-
-				if(empty($downloads))
-				{
-					echo "0 Times";
-				}
-				elseif($downloads == 1)
-				{
-					echo "$downloads Time";
-				}
-				else
-				{
-					echo "$downloads Times";
-				}
-				?>
-			</div>
+		<div class="row d-flex justify-content-between">
+			<span>Viewed:</span>
+			<?=$viewtimes?> times
+		</div>
+		<div class="row d-flex justify-content-between">
+			<span>Downloaded:</span>
 			<?php
-		}
-		?>
-	</div>
+			$ask="SELECT downloads from collys where filename=:filename";
+			$result=fetchAll($ask, [ 'filename' => $filename ]);
+			foreach($result as $row)
+			{
+				$downloads=$row->downloads;
+			}
+
+			if(empty($downloads))
+			{
+				echo "0 Times";
+			}
+			elseif($downloads == 1)
+			{
+				echo "$downloads Time";
+			}
+			else
+			{
+				echo "$downloads Times";
+			}
+			?>
+		</div>
+		<?php
+	}
+	?>
+</div>
 
 </div>
 <?php
