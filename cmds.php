@@ -1340,9 +1340,10 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
      
       foreach($apps as $app) {
          $dizName = 'apps/'.preg_replace('/\\.[^.\\s]{3,4}$/', '', $app->filename).'.diz';
-         $display_file_id = "";
          if (file_exists($dizName)) { 
            $display_file_id = encodeFileText($dizName); 
+         } else {
+           $display_file_id = encodeFileText("collections/file_id.diz.txt");
          }
 
          $usersig= fetchOne("select upload_signature FROM users where id =:uploader_id",[":uploader_id" => $app->uploader_id]);
@@ -1390,9 +1391,10 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
       foreach($mags as $mag) {
          $file_id = $mag->filename.'.diz';
          $dirname = @array_shift(explode(".", $mag->filename));
-         $display_file_id = "";
          if (file_exists('mags/'.$dirname.'/'.$file_id)) { 
            $display_file_id = encodeFileText('mags/'.$dirname.'/'.$file_id); 
+         } else {
+           $display_file_id = encodeFileText("collections/file_id.diz.txt");
          }
 
          $usersig= fetchOne("select upload_signature FROM users where nick =:uploader",[":uploader" => $mag->uploader]);
@@ -1442,10 +1444,11 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
   
          $file_id = $colly->filename.'.diz';
          $dirname = @array_shift(explode(".", $colly->filename));
-         $display_file_id = "";
          if (file_exists('collections/'.$dirname.'/'.$file_id)) { 
            $display_file_id = encodeFileText('collections/'.$dirname.'/'.$file_id); 
-         }        
+         } else {
+           $display_file_id = encodeFileText("collections/file_id.diz.txt");
+         }
 
          $usersig= fetchOne("select upload_signature FROM users where id=:uploader_id",[":uploader_id" => $colly->uploader_id]);
          $usersig = $usersig->upload_signature ?? "";
