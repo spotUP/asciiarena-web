@@ -53,6 +53,14 @@ $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":
       <div class="col-4 col-sm-4"><span class="white"><a onclick="updateSort('Name')">NAME</a></span></div>
       <div class="col-4 col-sm-4 text-truncate"><span class="white"><a onclick="updateSort('Author')"">AUTHOR</a></span></div>     
 		</div>
+		<div id = "hdrcols2" class="row amb-1">
+      <span class="col-2 col-sm-2 white"><a onclick="updateSort('filename')">FILENAME</a></span>
+         <span class="col-1 col-sm-1 white" >FLAGS</span>
+         <span class="col-1 col-sm-1 white" ><a onclick="updateSort('filesize')">FILESIZE</a></span>
+         <span class="col-2 col-sm-2 white"><a onclick="updateSort('timestamp')">DATE</a></span>
+         <span class="white">DESCRIPTION</span>
+		</div>
+    
     <div id="applicationList">
 		</div>
 	</div>
@@ -62,9 +70,10 @@ $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":
    function setView(v) {
      $("#viewmode").val(v);
      page = ~~ $("#pageno").val();
+     filter = $("#filter").val()
      sort = $("#sort1").val()
      order = $("#sort2").val()
-     filter = $("#filter").val()
+    
      getApplications(page,sort,order,filter);
    }
    
@@ -145,12 +154,11 @@ $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":
     v = $("#viewmode").val();
     if (v==1) {
       $("#hdrcols").show()
+      $("#hdrcols2").hide()
     } else if (v==2) {
       $("#hdrcols").hide()
-      pagesize = 6;
-      sort = "timestamp";
-      order = "D";
-      
+      $("#hdrcols2").show()
+      pagesize = 6;     
     }
     
     $.get("/cmds.php/get_apps/"+page+"/"+sort+"/"+order+"/"+"/"+pagesize+"/"+filter, function (data) {
@@ -185,15 +193,14 @@ $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":
         }
      
      
-     if (v==2) {
-        apptxt = `<div class="row apt-1">
-       <div class="col-6 col-am-6 text-center text-md-left">
-         <a href="${app.url}"><span class="cyan" style="margin-right: 8px;">${app.filename}</span></a> <span class="green" style="margin-right: 16px;">PF--</span> <span class="yellow" style="margin-right: 8px;">${app.filesize}</span> <span class="yellow">${app.timestamp}</span>
-       </div>
+     if (v==2) {     
+       apptxt = `<div class="row apt-1 text-center text-md-left">
+       <span class="col-2 col-sm-2"><a class="cyan" href="${app.url}">${app.filename}</a></span> <span class="col-1 col-sm-1 green" >PF--</span> <span class="col-1 col-sm-21 yellow" >${app.filesize}</span> <span class="col-2 col-sm-2 yellow">${app.timestamp}</span>
        <div class="col-6 col-sm-6 apb-1 text-center text-md-left">
            <pre class="ascii magenta overflow-hidden"><a class="ascii magenta" href="${app.url}">${app.fileid}</a></pre>
        </div>
-     </div>
+     </div>    
+        
      <div class="row apb-1">
        <div class="col-12 col-sm-6"></div>
        <div class="col-12 col-sm-6 text-center text-md-left">
@@ -210,9 +217,6 @@ $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":
       </div>
     </div>
     `;
-
-       
-       
      }
      
         applicationList.append(apptxt);
@@ -220,14 +224,16 @@ $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":
           
       });
     }
-        
 
 	$(function() {
-		getApplications(1,'<?=$sort_by?>','A','');
-    <?php if ($userprefs->list_view_mode == 'Standard') {
-      ?> setView(1) <?php
-    } else {
+    $("#pageno").val("1");
+    $("#sort1").val("<?=$sort_by?>");
+    $("#sort2").val('A')
+   
+    <?php if ($userprefs->list_view_mode == 'BBS') {
       ?> setView(2) <?php
+    } else {
+      ?> setView(1) <?php
     } ?>
 	});
 </script>
