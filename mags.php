@@ -53,6 +53,15 @@ $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":
       <div class="col-4 col-sm-4"><span class="white"><a onclick="updateSort('Name')">NAME</a></span></div>
       <div class="col-4 col-sm-4 text-truncate"><span class="white"><a onclick="updateSort('Author')"">AUTHOR</a></span></div>     
 		</div>
+    
+		<div id = "hdrcols2" class="row amb-1">
+      <span class="col-2 col-sm-2 white"><a onclick="updateSort('filename')">FILENAME</a></span>
+         <span class="col-1 col-sm-1 white" >FLAGS</span>
+         <span class="col-1 col-sm-1 white" ><a onclick="updateSort('filesize')">FILESIZE</a></span>
+         <span class="col-2 col-sm-2 white"><a onclick="updateSort('timestamp')">DATE</a></span>
+         <span class="white">DESCRIPTION</span>
+		</div>
+    
     <div id="magazineList">
 		</div>
 	</div>
@@ -140,17 +149,16 @@ $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":
     filter = filter.trim();
 
 
-    let pagesize = 120
+    let pagesize = 120;
     
     v = $("#viewmode").val();
     if (v==1) {
       $("#hdrcols").show()
+      $("#hdrcols2").hide()
     } else if (v==2) {
       $("#hdrcols").hide()
-      pagesize = 6;
-      sort = "timestamp";
-      order = "D";
-      
+      $("#hdrcols2").show()
+      pagesize = 6;     
     }
     
     $.get("/cmds.php/get_mags/"+page+"/"+sort+"/"+order+"/"+"/"+pagesize+"/"+filter, function (data) {
@@ -185,14 +193,13 @@ $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":
      
      
      if (v==2) {
-        magtxt = `<div class="row apt-1">
-       <div class="col-6 col-am-6 text-center text-md-left">
-         <a href="${mag.url}"><span class="cyan" style="margin-right: 8px;">${mag.filename}</span></a> <span class="green" style="margin-right: 16px;">PF--</span> <span class="yellow" style="margin-right: 8px;">${mag.filesize}</span> <span class="yellow">${mag.timestamp}</span>
-       </div>
+        magtxt = `<div class="row apt-1 text-center text-md-left">
+       <span class="col-2 col-sm-2"><a class="cyan" href="${mag.url}">${mag.filename}</a></span> <span class="col-1 col-sm-1 green" >PF--</span> <span class="col-1 col-sm-21 yellow" >${mag.filesize}</span> <span class="col-2 col-sm-2 yellow">${mag.timestamp}</span>
        <div class="col-6 col-sm-6 apb-1 text-center text-md-left">
            <pre class="ascii magenta overflow-hidden"><a class="ascii magenta" href="${mag.url}">${mag.fileid}</a></pre>
        </div>
-     </div>
+     </div>    
+        
      <div class="row apb-1">
        <div class="col-12 col-sm-6"></div>
        <div class="col-12 col-sm-6 text-center text-md-left">
@@ -208,10 +215,7 @@ $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":
         <span class="green text-right block d-sm-none">[ aSCIIaRENa ] [ FREE LEECH ]</span>
       </div>
     </div>
-    `;
-
-       
-       
+    `;     
      }
      
         magazineList.append(magtxt);
@@ -222,12 +226,16 @@ $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":
         
 
 	$(function() {
-		getMagazines(1,'<?=$sort_by?>','A','');
-    <?php if ($userprefs->list_view_mode == 'Standard') {
-      ?> setView(1) <?php
-    } else {
+    $("#pageno").val("1");
+    $("#sort1").val("<?=$sort_by?>");
+    $("#sort2").val('A')
+   
+    <?php if ($userprefs->list_view_mode == 'BBS') {
       ?> setView(2) <?php
+    } else {
+      ?> setView(1) <?php
     } ?>
+
 	});
 </script>
   

@@ -174,10 +174,10 @@ include "header.php";
 				</div>
 				<div class="col-4">
 					Releases: <?=$releases?>
+        </div>
 					<?php
 				}
 				?>
-			</div>
 		</div>
 		<div class="row apb-1 apt-1">
 			<div class="col-12">
