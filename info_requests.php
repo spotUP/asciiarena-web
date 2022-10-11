@@ -24,29 +24,28 @@ include "header.php";
   }
 
     function getReqComments() {
-      let commentlist = $("#comments");
-      commentlist.empty();
+      reqcommentlist = $("#reqcomments");
+      reqcommentlist.empty();
       $.ajax({
         type: 'GET',
         url: '/cmds.php/get_req_comments/<?=$reqid?>'
       }).done(function (data) {
-        
+
         $.each(data, function (i, comment) {
+
           let buttons = ''
           <?php if (is_admin())  {         
             ?>
-            buttons = `<input type="button" class="btn-big" onclick="editComment(${comment.id})" value="Edit"><input type="button" onclick="deleteComment(${comment.id})" class="btn-big" value="Delete">`
+            buttons = `<input type="button" class="btn-big" onclick="editReqComment(${comment.id})" value="Edit"><input type="button" onclick="deleteReqComment(${comment.id})" class="btn-big" value="Delete">`
           <?php } elseif (is_logged_in()){
             ?>
             if (comment.nick == "<?=$_user[ "nick" ]?>") {
-              buttons = `<input type="button" class="btn-big" onclick="editComment(${comment.id})" value="Edit">`
+              buttons = `<input type="button" class="btn-big" onclick="editReqComment(${comment.id})" value="Edit">`
             }
           <?php }
           ?>
 
-          commentlist.append(`
-            <div class="header bg-header col-12 ap-1 text-truncate">
-            <span> BY:</span>
+            reqcommentlist.append(`
             <span class="yellow">${htmlEncode(comment.user)}</span>
             <span>DATE:</span>
             <span class="white">${comment.time}</span>
@@ -55,13 +54,14 @@ include "header.php";
             <span id="comment${comment.id}"class="cyan" style="white-space: pre-wrap;">${htmlEncode(comment.comment)}</span>
             <div class="col-12 p-0 m-0 apt-1">
             ${buttons}
-            </div>
-            </div>`); 
+            </div>`);
         });
-      });   
+      });
     }
 
-    getReqComments();
+    $(function() {
+      getReqComments();
+    });
   </script>
 
 <div class="modal-body row m-0 p-0">
@@ -81,22 +81,25 @@ if ($req_available) {
         </div>
       </div>
 
-      <div class="apb-1 col-8">
+      <div class="apb-1">
         <span class="white">Title: </span><?=$title?>
       </div>
-      <div class="apb-1 col-4">
+      <div class="apb-1">
         <span class="white">Requested By: </span><?=$user?>
       </div>
-      <div class="col-8">
+      <div class="apb-1">
         <span class="white">Description: </span><?=$description?>
+      </div>
+      <div class="apb-1">
+        <span class="white">Comments: </span>
       </div>
       <div class="apb-1"></div>
 
 
-test
- <div id="comments">
+<div class="col-8">
+ <div id="reqcomments">
   </div>
-test2
+  </div>
   <div id="addcomment" >
     <div class="row apl-1 apr-1">
       <div class="header bg-header col-12 ap-1">ENTER YOUR COMMENT</div>
