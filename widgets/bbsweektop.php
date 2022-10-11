@@ -48,6 +48,6 @@ $bbsweektophdr = "bbsweektophdr_{$bbsweektop_id}";
 
 	$(function () {
 		fetch_bbsweektop_<?=$bbsweektop?>();
-		setInterval(fetch_bbsweektop_<?=$bbsweektop?>, 60000);
+		//setInterval(fetch_bbsweektop_<?=$bbsweektop?>, 60000);
 	});
 </script>

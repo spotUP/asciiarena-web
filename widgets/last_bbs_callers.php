@@ -101,6 +101,6 @@ if (is_logged_in()) $nick=$_user[ "nick" ];
 
 	$(function () {
 		fetch_callers_<?=$callers?>();
-		setInterval(fetch_callers_<?=$callers?>, 10000);
+		//setInterval(fetch_callers_<?=$callers?>, 10000);
 	});
 </script>

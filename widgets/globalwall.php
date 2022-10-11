@@ -206,6 +206,6 @@ if (is_logged_in()) $nick=$_user[ "nick" ];
 
 	$(function () {
 		fetch_wall_<?=$wall?>();
-		setInterval(fetch_wall_<?=$wall?>, 10000);
+		//setInterval(fetch_wall_<?=$wall?>, 60000);
 	});
 </script>
