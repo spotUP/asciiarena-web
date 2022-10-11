@@ -48,6 +48,6 @@ $weektophdr = "weektophdr_{$weektop_id}";
 
 	$(function () {
 		fetch_weektop_<?=$weektop?>();
-		setInterval(fetch_weektop_<?=$weektop?>, 60000);
+		//setInterval(fetch_weektop_<?=$weektop?>, 60000);
 	});
 </script>
