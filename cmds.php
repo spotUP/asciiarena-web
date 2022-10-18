@@ -1498,6 +1498,7 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
         $data[] = [
           "id" => (int)$req->id,
           "title" =>$req->title,
+          "status" =>$req->status,
           "user" =>$req->user,
           "url" => "info_requests.php?id=".$req->id,
           "total_count" =>$cnt->cnt
@@ -1521,6 +1522,100 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
         ];
       }
       exit(json_out($data));
+  }
+
+  function delReqComment($commentid) {
+    if (is_ajax() && is_logged_in() &&is_admin()) {
+      $reqid = $_POST[ "req_id" ];
+      if (($commentid > 0) && ($reqid>0)) {
+        $status = doQuery("delete from request_comments where comment_id = :commentid and request_id = :request_id",[
+          ":commentid" => (int)$commentid,
+          ":request_id" => (int)$reqid
+        ]);
+        $code = ($status) ? 200 : 400;
+  
+        exit(json_out([
+          "status" => $status
+        ], $code));
+      }
+      exit(json_out(["status" => false], 40));
+    }
+  }
+
+  function addReqComment($requestid) {
+    global $_user;
+    if (is_ajax() && is_logged_in()) {
+      $reqid = $_POST[ "request_id" ] ?? $requestid ?? 0;
+      $comment = $_POST[ 'comment' ] ?? "";
+      
+      if ($reqid> 0) {
+        $status = doQuery("insert into request_comments (request_id, user_id, comment, timestamp) 
+          values (:request_id, :user_id, :comment, :time)",[
+          ":request_id" => (int)$reqid,
+          ":user_id" => $_user[ "id" ],
+          ":comment" => $comment,
+          ":time" => time()
+        ]);
+        $code = ($status) ? 200 : 400;
+  
+        exit(json_out([
+          "status" => $status
+        ], $code));
+      }
+      exit(json_out(["status" => false], 400));
+    }
+  }
+
+  function editReqComment($commentid) {
+    global $_user;
+    if (is_ajax() && is_logged_in()) {
+      $id = $_POST[ "comment_id" ] ?? $commentid ?? 0;
+      $comment = $_POST[ 'comment' ] ?? "";
+      if ($id > 0) {
+        if (is_admin()) {
+          $admin=1;
+        } else {
+          $admin=0;
+        }
+        $status = doQuery("update request_comments set comment = :comment where (:admin = 1 or user_id = :user_id) and comment_id = :commentid",[
+          ":commentid" => (int)$id,
+          ":comment" => $comment,
+          ":user_id" => $_user[ "id" ],
+          ":admin" => $admin
+        ]);
+        $code = ($status) ? 200 : 400;
+        exit(json_out([
+          "status" => $status,
+        ], $code));
+      }
+      exit(json_out(["status" => false], 400));
+    }
+  }
+  
+  function updateReqStatus($reqid) {
+    global $_user;
+    if (is_ajax() && is_logged_in()) {
+      $id = $_POST[ "request_id" ] ?? $reqid ?? 0;
+      $status = $_POST[ 'status' ] ?? 0;
+      if ($id > 0) {
+        if (is_admin()) {
+          $admin=1;
+        } else {
+          $admin=0;
+        }
+        $status = doQuery("update requests set status = :status where (:admin = 1 or requestedby = :user_id) and id = :requestid",[
+          ":requestid" => (int)$id,
+          ":status" => (int)$status,
+          ":user_id" => $_user[ "id" ],
+          ":admin" => $admin
+        ]);
+        $code = ($status) ? 200 : 400;
+        exit(json_out([
+          "status" => $status,
+        ], $code));
+      }
+      exit(json_out(["status" => false], 400));
+    }
   }
 
 	$cmd = $_GET[ "cmd" ] ?? $_current[ 0 ] ?? "";
@@ -1640,6 +1735,18 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
     case "get_req_comments":
       getRequestComments($_current[1]);
       break;      
+    case "delreqcomment":
+      delReqComment($_current[1]);
+			break;         
+    case "addreqcomment":
+      addReqComment($_current[1]);
+			break;         
+    case "editreqcomment":
+      editReqComment($_current[1]);
+			break;         
+    case "updatereqstatus":
+      updateReqStatus($_current[1]);
+			break;         
 		default:
 			if (is_ajax()) {
 				exit(json_out(["status" => false], 400));
