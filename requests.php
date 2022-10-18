@@ -13,6 +13,22 @@ $sort_by = $_GET['sort_by'] ?? "id";
 
       <div class="row m-0 apt-1">
         <input type="hidden" id="sort1"><input type="hidden" id="viewmode" value="1"><input type="hidden" id="pageno"><input type="hidden" id="sort1"><input type="hidden" id="sort2"><input type="hidden" id="maxpage"><ul class="pagination"><li class="page-item"> <a onclick="firstPage(event)" href="#" class="page-link" >FIRST</a></li><li class="page-item"> <a onclick="prevPage(event)" href="#" class="page-link" >PREV</a></li><span id="currpage"></span><li class="page-item"> <a onclick="nextPage(event)" href="#" class="page-link" >NEXT</a></li><li class="page-item"> <a onclick="lastPage(event)" href="#" class="page-link" >LAST</a></li></ul></div>
+
+			
+      <div class="col-3 apt-1 bg-secondary apb-1">
+        <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+          <div class="btn-group" role="group">
+            <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Show:</button>
+            <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+              <a class="dropdown-item" onclick="setView(1)">Open</a>
+              <a class="dropdown-item" onclick="setView(2)">Closed (Unfulfilled)</a>
+              <a class="dropdown-item" onclick="setView(2)">Closed (Fulfilled)</a>
+              <a class="dropdown-item" onclick="setView(2)">All</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
 				
         <div class="col-5 apt-1 bg-secondary apb-1">
 						<span class="amr-1 "><input id="filter" oninput="search(this.value)" placeholder="Search..." type="text" autocomplete="off" class="w-100"></span>
@@ -36,7 +52,8 @@ $sort_by = $_GET['sort_by'] ?? "id";
        </div>
 
 		<div id = "hdrcols" class="row amb-1">
-      <div class="col-8 col-sm-8"><span class="white"><a onclick="updateSort('title')">Title</a></span></div>
+      <div class="col-8 col-sm-6"><span class="white"><a onclick="updateSort('title')">Title</a></span></div>
+      <div class="col-8 col-sm-2"><span class="white"><a onclick="updateSort('title')">Status</a></span></div>
       <div class="col-4 col-sm-4"><span class="white"><a onclick="updateSort('user')">Requested By</a></span></div>
 		</div>
       
@@ -142,9 +159,24 @@ $sort_by = $_GET['sort_by'] ?? "id";
       $("#currpage").text(page+" of "+maxpage);
 			$.each(data, function (i, req) {
          
+         var status;
+         switch(req.status) {
+           case 0:
+            status ="Open"
+            break
+           case 1:
+            status ="Closed (Unfulfilled)"
+            break
+           case 2:
+            status ="Closed (Fulfilled)"
+            break
+         }
           reqtxt = `<div class="row">
-      <div class="col-8 col-sm-8 text-truncate">
+      <div class="col-8 col-sm-6 text-truncate">
         <a class="magenta" href="${req.url}">${req.title}</a>
+      </div>
+      <div class="col-8 col-sm-2 text-truncate">
+        <a class="magenta" href="${req.url}">${status}</a>
       </div>
       <div class="col-4 col-sm-4 text-truncate">
         <a class="magenta" href="${req.url}">${req.user}</a>
