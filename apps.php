@@ -161,7 +161,7 @@ $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":
       pagesize = 6;     
     }
     
-    $.get("/cmds.php/get_apps/"+page+"/"+sort+"/"+order+"/"+"/"+pagesize+"/"+filter, function (data) {
+    $.get("/cmds.php/get_apps/"+page+"/"+sort+"/"+order+"/"+pagesize+"/"+filter, function (data) {
       let applicationList = $("#applicationList");
       applicationList.empty();
       let cnt = 0

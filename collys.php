@@ -174,7 +174,7 @@ $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":
       pagesize = 6;     
     }
     
-    $.get("/cmds.php/get_collys/"+page+"/"+sort+"/"+order+"/"+"/"+pagesize+"/"+filter, function (data) {
+    $.get("/cmds.php/get_collys/"+page+"/"+sort+"/"+order+"/"+pagesize+"/"+filter, function (data) {
       let collyList = $("#collyList");
       collyList.empty();
       let cnt = 0

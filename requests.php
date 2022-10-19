@@ -20,10 +20,11 @@ $sort_by = $_GET['sort_by'] ?? "id";
           <div class="btn-group" role="group">
             <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Show:</button>
             <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-              <a class="dropdown-item" onclick="setView(1)">Open</a>
-              <a class="dropdown-item" onclick="setView(2)">Closed (Unfulfilled)</a>
+              <a class="dropdown-item" onclick="setView(0)">Open</a>
+              <a class="dropdown-item" onclick="setView(1)">Closed (Unfulfilled)</a>
               <a class="dropdown-item" onclick="setView(2)">Closed (Fulfilled)</a>
-              <a class="dropdown-item" onclick="setView(2)">All</a>
+              <a class="dropdown-item" onclick="setView(3)">Closed (Any)</a>
+              <a class="dropdown-item" onclick="setView(4)">All</a>
             </div>
           </div>
         </div>
@@ -52,13 +53,14 @@ $sort_by = $_GET['sort_by'] ?? "id";
        </div>
 
 		<div id = "hdrcols" class="row amb-1">
-      <div class="col-8 col-sm-6"><span class="white"><a onclick="updateSort('title')">Title</a></span></div>
-      <div class="col-8 col-sm-2"><span class="white"><a onclick="updateSort('title')">Status</a></span></div>
+      <div class="col-8 col-sm-5"><span class="white"><a onclick="updateSort('title')">Title</a></span></div>
+      <div class="col-8 col-sm-3"><span class="white"><a onclick="updateSort('title')">Status</a></span></div>
       <div class="col-4 col-sm-4"><span class="white"><a onclick="updateSort('user')">Requested By</a></span></div>
 		</div>
       
-    <div id="requestsList">
-		</div>
+    <div class="apb-1" id="requestsList">
+    </div>
+    <a href="/submit.php#request" ><input type="submit" class="btn-big" value="Add Request"></a>
 	</div>
   
 <script>
@@ -141,12 +143,14 @@ $sort_by = $_GET['sort_by'] ?? "id";
     $("#sort1").val(sort);
     $("#sort2").val(order);
 
-    filter = filter.trim();
+    viewmode = $("#viewmode").val();
 
+    filter = filter.trim();
 
     let pagesize = 120;   
    
-    $.get("/cmds.php/get_reqs/"+page+"/"+sort+"/"+order+"/"+"/"+pagesize+"/"+filter, function (data) {
+  
+    $.get("/cmds.php/get_reqs/"+page+"/"+sort+"/"+order+"/"+pagesize+"/"+viewmode+"/"+filter, function (data) {
       let requestsList = $("#requestsList");
       requestsList.empty();
       let cnt = 0
@@ -172,10 +176,10 @@ $sort_by = $_GET['sort_by'] ?? "id";
             break
          }
           reqtxt = `<div class="row">
-      <div class="col-8 col-sm-6 text-truncate">
+      <div class="col-8 col-sm-5 text-truncate">
         <a class="magenta" href="${req.url}">${req.title}</a>
       </div>
-      <div class="col-8 col-sm-2 text-truncate">
+      <div class="col-8 col-sm-3 text-truncate">
         <a class="magenta" href="${req.url}">${status}</a>
       </div>
       <div class="col-4 col-sm-4 text-truncate">
@@ -195,7 +199,7 @@ $sort_by = $_GET['sort_by'] ?? "id";
     $("#sort1").val("<?=$sort_by?>");
     $("#sort2").val('A')
    
-    setView(1);
+    setView(0);
   });
 </script>
   

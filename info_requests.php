@@ -28,6 +28,41 @@ include "header.php";
    $(prependTo).prepend(alertContent).children().first().delay(2000).slideUp();
  }
 
+  function downloadAttachment(e,attachid) {
+    e.preventDefault();
+    
+    $.ajax({
+      type: 'GET',
+      url: '/cmds.php/get_req_comment_attach/'+attachid
+    }).done(function (data) {
+      var a = $('#dlfiledata')
+      a[0].href = data.filedata
+      a[0].download = data.filename; //File name Here
+      a[0].click(); //Downloaded file
+    });   
+  }
+  
+  function getBase64(file) {
+    return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+    });      
+  }
+
+  function fileAttached() {
+    var files=$('#filebtn').prop("files");
+    if (files.length>0) {
+      $('#filename').text(files[0].name);
+      getBase64(files[0]).then(data => $('#filedata').val(data));
+    }
+  }
+
+  function attachFile() {
+    $('#filebtn').trigger('click');
+  }
+  
   function editReqComment(commentid) {
     $('#reqcomments').hide(500);
     $("#addreqcomment").hide(500);
@@ -82,12 +117,16 @@ include "header.php";
         "type": "POST",
         "url": url,
         "data": { 
-          comment: $("#user_comment").val()
+          comment: $("#user_comment").val(),
+          filename: $("#filename").text(),
+          filedata: $("#filedata").val()
         }
       }).done(data => {
         if (data.status === true) {
           showAlert('Comment added successfully!','#messages')
           $("#user_comment").val("")
+          $("#filename").text("")
+          $("#filedata").val("")
           getReqComments();
         }
       });   
@@ -119,6 +158,11 @@ include "header.php";
 
         $.each(data, function (i, comment) {
 
+          let file="";
+          if (comment.filename) {           
+            file = `<div onclick="downloadAttachment(event,${comment.id})"><a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-text" viewBox="0 0 16 16"><path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z"/><path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5L9.5 0zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/></svg>${comment.filename}</a></div>`
+          }
+
           let buttons = ''
           <?php if (is_admin())  {         
             ?>
@@ -139,6 +183,7 @@ include "header.php";
             <div class="bg-secondary col-12 ap-1 amb-1">
             <span id="comment${comment.id}"class="cyan" style="white-space: pre-wrap;">${htmlEncode(comment.comment)}</span>
             <div class="col-12 p-0 m-0 apt-1">
+            ${file}
             ${buttons}
             </div>`);
         });
@@ -225,6 +270,7 @@ if ($req_available) {
 
 
 <div class="col-8">
+<a id="dlfiledata" style="display:none"> </a>
  <div id="reqcomments">
   </div>
   </div>
@@ -242,6 +288,10 @@ if ($req_available) {
   <div class="row aml-1 apl-1 apr-1">
    <div class="col-12 apl-1 apr-1 apb-1 apt-1 bg-secondary">
     <div class="col-12 p-0 m-0 apt-1">
+      <div id="filename"></div>
+      <input type="file" id="filebtn" oninput="fileAttached()" style="display:none" align="right" value="Attach file">
+      <input id="filedata" type="hidden">
+      <input type="button" class="btn-big" onclick="attachFile()" align="right" value="Attach file">
       <input type="button" class="btn-big" onclick="sendReqComment()" align="right" value="Comment">
     </div>
   </div>

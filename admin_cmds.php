@@ -756,6 +756,7 @@
 						"id" => (int)$req->id,
 						"title" => $req->title,
 						"description" => $req->description,
+            "status" => $req->status,
 						"requested_by" => $req->nick
 					];
 				}
@@ -769,12 +770,13 @@
 				$data = [
 					":title" => $_POST[ "title" ] ?? "",
 					":description" => $_POST[ "description" ] ?? "",
+					":status" => $_POST[ "status" ] ?? "",
 				];
 				if(!empty($_POST[ "id" ])) {
-					$q = "UPDATE requests SET title = :title, description = :description WHERE id = :id";
+					$q = "UPDATE requests SET title = :title, description = :description, status = :status WHERE id = :id";
 					$data[ ":id" ] = $_POST[ "id" ];
 				} else {
-					$q = "INSERT INTO requests (title,description,requestedby) VALUES (:title, :description, :requestedby)";
+					$q = "INSERT INTO requests (title,description,status, requestedby) VALUES (:title, :description, :status, :requestedby)";
 					$data[ ":requestesdby" ] = $_user[ "id" ];
 					$response = 201;
 				}
