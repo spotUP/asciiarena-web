@@ -161,7 +161,7 @@ $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":
       pagesize = 6;     
     }
     
-    $.get("/cmds.php/get_mags/"+page+"/"+sort+"/"+order+"/"+"/"+pagesize+"/"+filter, function (data) {
+    $.get("/cmds.php/get_mags/"+page+"/"+sort+"/"+order+"/"+pagesize+"/"+filter, function (data) {
       let magazineList = $("#magazineList");
       magazineList.empty();
       let cnt = 0

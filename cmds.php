@@ -1472,7 +1472,7 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
     }  
   }
 
-  function getRequests($page, $sort, $asc, $pagesize, $filter) {
+  function getRequests($page, $sort, $asc, $pagesize, $viewmode, $filter) {
     global $_user;
     if (is_ajax()) {
       $data = [];     
@@ -1484,11 +1484,36 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
         $order = $sort; 
       } else {
         $order = $sort." DESC";
+      }     
+      
+      $viewsql="";
+     	switch ((int)$viewmode) {
+        case 0:
+          $viewsql="status=0";
+          break;
+        case 1:
+          $viewsql="status=1";
+          break;
+        case 2:
+          $viewsql="status=2";
+          break;
+        case 3:
+          $viewsql="status in (1,2)";
+          break;
+        case 4:
+          $viewsql="";
+          break;
       }
       
       $sqlFilter = "";
       if ($filter != "") {
-        $sqlFilter = "WHERE title like \"%$filter%\" or description like \"%$filter%\" or user like \"%$filter%\" ";
+        if ($viewsql != "") {
+          $sqlFilter = "WHERE (title like \"%$filter%\" or description like \"%$filter%\" or users.nick like \"%$filter%\") and $viewsql";
+        } else {
+          $sqlFilter = "WHERE title like \"%$filter%\" or description like \"%$filter%\" or users.nick like \"%$filter%\"";
+        }
+      } else if ($viewsql != "") {
+        $sqlFilter = "WHERE $viewsql";
       }
       
       $requests = fetchAll("SELECT requests.*, users.nick as user FROM requests LEFT JOIN users on users.id = requests.requestedby $sqlFilter order by $order LIMIT $start, $pagesize");
@@ -1519,6 +1544,7 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
           "user" => $comment->user,
           "time" => date("Y-m-d H:i",$comment->timestamp),
           "comment" =>$comment->comment,
+          "filename" =>$comment->attach_filename,
         ];
       }
       exit(json_out($data));
@@ -1547,13 +1573,17 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
     if (is_ajax() && is_logged_in()) {
       $reqid = $_POST[ "request_id" ] ?? $requestid ?? 0;
       $comment = $_POST[ 'comment' ] ?? "";
+      $filename = $_POST[ 'filename' ] ?? "";
+      $filedata = $_POST[ 'filedata' ] ?? "";
       
       if ($reqid> 0) {
-        $status = doQuery("insert into request_comments (request_id, user_id, comment, timestamp) 
-          values (:request_id, :user_id, :comment, :time)",[
+        $status = doQuery("insert into request_comments (request_id, user_id, comment, attach_filename, attach_filedata, timestamp) 
+          values (:request_id, :user_id, :comment, :filename, :filedata, :time)",[
           ":request_id" => (int)$reqid,
           ":user_id" => $_user[ "id" ],
           ":comment" => $comment,
+          ":filename" => $filename,
+          ":filedata" => $filedata,
           ":time" => time()
         ]);
         $code = ($status) ? 200 : 400;
@@ -1618,6 +1648,21 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
     }
   }
 
+  function getReqCommentAttachment($commentid) {
+    $attachdata = fetchOne("SELECT attach_filename, attach_filedata FROM request_comments WHERE comment_id = :commentid", ['commentid' => $commentid ]);
+     
+      $data = [];     
+     
+      if ($attachdata) {
+
+        $data = [
+          "filename" => $attachdata->attach_filename,
+          "filedata" => $attachdata->attach_filedata
+        ];
+      }
+      exit(json_out($data));
+  }
+  
 	$cmd = $_GET[ "cmd" ] ?? $_current[ 0 ] ?? "";
 	$reDir = "/";
 
@@ -1730,7 +1775,7 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
       getCollys($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
       break;      
     case "get_reqs":
-      getRequests($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
+      getRequests($_current[1],$_current[2],$_current[3],$_current[4],$_current[5],$_current[6]);
       break;      
     case "get_req_comments":
       getRequestComments($_current[1]);
@@ -1746,6 +1791,9 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
 			break;         
     case "updatereqstatus":
       updateReqStatus($_current[1]);
+			break;         
+    case "get_req_comment_attach":
+      getReqCommentAttachment($_current[1]);
 			break;         
 		default:
 			if (is_ajax()) {

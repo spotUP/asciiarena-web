@@ -5,7 +5,7 @@
 ?>
 <script>
   function requestclear() {
-    $("#request_id, #request_title, #request_description").val('').trigger('change');;
+    $("#request_id, #request_owner, #request_title, #request_description, #request_status").val('').trigger('change');;
   }
 
 	<?php if ($admin_edit && is_admin()) { ?>
@@ -18,6 +18,7 @@
 					$('#request_owner').val(data[0].requested_by);
 					$('#request_title').val(data[0].title);
 					$('#request_description').val(data[0].description);
+          $('#request_status').val(data[0].status).trigger('change');
 				});
 			} else {
 				requestclear();
@@ -92,6 +93,10 @@
       },            
       "success": () => {
         showRequestAlert("Request Saved!", true);
+        <?php if ($admin_edit && is_admin()) { ?>
+        getRequestList();
+        <?php } ?>
+        
         requestclear();       
       }
     });
@@ -132,10 +137,26 @@
 			</div>
 		</div>
 		<div class="row apb-1">
-			<div class="col-xs-12 col-md-6 apb-1">
+			<div class="col-xs-12 col-md-6">
 				<input readonly="readonly" type="text" class="w-100" id="request_owner">
 			</div>
 		</div>
+		<div class="row apb-1">
+			<div class="col-xs-12 col-md-6 apt-1">
+				<label for="request_status" class="lightgrey">Status</label>
+			</div>
+		</div>
+		<div class="row apb-1">
+    		<div class="col-xs-12 col-md-5">
+			<select class="select2" id="request_status" name="status" class="w-100">
+				<option value="0">Open</option>
+				<option value="1">Closed (Fulfilled)</option>
+				<option value="2">Closed (Unfulfilled)</option>
+			</select>
+</div>
+
+		</div>
+
 		<?php } ?>
 
 		<div class="row apb-1">
