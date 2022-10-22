@@ -10,6 +10,7 @@ include "header.php";
 			["file" => "latest/releases", "header" => "LATEST RELEASES", "columns" => 2],
 			["file" => "random_releases", "header" => "RANDOM RELEASES", "columns" => 2],
 			["file" => "latest/comments"],
+			["file" => "latest/requests"],
 			["file" => "wall"],
 			["file" => "globalwall"],
 			["file" => "last_bbs_callers"],

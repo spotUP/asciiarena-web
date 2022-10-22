@@ -1,6 +1,6 @@
 <?php
 require_once "session.php";
-$h1 = "rEQUESTS";
+$h1 = "ASCII rEQUESTS";
 require_once "header.php";
 $sort_by = $_GET['sort_by'] ?? "id";
 ?>
