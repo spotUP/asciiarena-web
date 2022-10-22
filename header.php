@@ -129,15 +129,9 @@ include "header_ascii.php";
 					<li class="nav-item">
 						<a class="nav-link ascii apr-1" href="/bbses.php">BBS</a>
 					</li>
-								<?php if(is_admin()) 
-								{
-   							?>
 					<li class="nav-item">
 						<a class="nav-link ascii apr-1" href="/requests.php">REQUESTS</a>
 					</li>
-								<?php }
-   							?>
-
 					<li class="nav-item">
 						<a class="nav-link ascii apr-1" href="/about.php">ABOUT</a>
 					</li>
@@ -156,16 +150,7 @@ include "header_ascii.php";
 							<a class="dropdown-item ascii" href="/submit.php#bbs">BBS<span style="font-size: 16px;"> </span></a>
 							<a class="dropdown-item ascii" href="/submit.php#app">ASCII App<span style="font-size: 16px;"> </span></a>
 							<a class="dropdown-item ascii" href="/submit.php#ascii_mag">ASCII Mag<span style="font-size: 16px;"> </span></a>
-								<?php
-								if(is_admin()) 
-								{
-   							?>
-
 							<a class="dropdown-item ascii" href="/submit.php#request">Request<span style="font-size: 16px;"> </span></a>
-								<?php
-                }
-                ?>
-
 						</div>
 					</li>
 					<ul class="nav navbar-nav menu-right">
