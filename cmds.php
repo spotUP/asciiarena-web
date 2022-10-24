@@ -1189,9 +1189,11 @@
     global $_user;
     if (is_ajax() && is_logged_in()) {
 
+      $desc = $_POST[ "description" ] ?? "";
+
       $data = [
         ":title" => $_POST[ "title" ] ?? "",
-        ":description" => $_POST[ "description" ] ?? "",
+        ":description" => $desc,
         ":requestedby" => $_user[ "id" ],
         ":time" => time()
       ];
@@ -1201,6 +1203,9 @@
       if(!doQuery($q, $data)) {
         exit(json_out(["status" => true], 400));
       }
+      
+      exec("curl -H \"Content-Type: application/json\" -d '{\"username\": \"ASCII ARENA Requests\", \"content\": \"A new ascii request has just been created at asciiarena.com by ".$_user[ "nick" ]." titled ".addslashes($desc)."\"}' \"https://discord.com/api/webhooks/1034079696066977812/o4io-aAcWGHBVPWj5Zp57lj8aiEgBdLzmfaknZR8VJwpSNR0y5zlcCgTdGYfx6A_QSVZ\"");
+          
       exit(json_out(["status" => true], $response));
     }
   }
