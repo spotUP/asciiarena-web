@@ -901,6 +901,7 @@
           "postername" =>$msg->postername,
           "subject" =>$msg->subject,
           "message" =>$msg->message,
+          "filename" =>$msg->attach_filename,
           "timestamp" =>$msg->timestamp,
         ];
       }
@@ -1191,10 +1192,11 @@
       $data = [
         ":title" => $_POST[ "title" ] ?? "",
         ":description" => $_POST[ "description" ] ?? "",
-        ":requestedby" => $_user[ "id" ]
+        ":requestedby" => $_user[ "id" ],
+        ":time" => time()
       ];
       
-      $q = "INSERT INTO requests (title, description,requestedby) VALUES (:title, :description, :requestedby)";
+      $q = "INSERT INTO requests (title, description,requestedby,timestamp) VALUES (:title, :description, :requestedby,:time)";
       $response = 201;
       if(!doQuery($q, $data)) {
         exit(json_out(["status" => true], 400));
@@ -1524,6 +1526,7 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
           "id" => (int)$req->id,
           "title" =>$req->title,
           "status" =>$req->status,
+          "time" => date("Y-m-d H:i",$req->timestamp),
           "user" =>$req->user,
           "url" => "info_requests.php?id=".$req->id,
           "total_count" =>$cnt->cnt
@@ -1587,6 +1590,24 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
           ":time" => time()
         ]);
         $code = ($status) ? 200 : 400;
+
+        if ($status && $filename && $filedata)
+        {
+      
+          $requser= fetchOne("select users.id, users.nick FROM requests LEFT JOIN users on users.id = requests.requestedby where requests.id = :reqid",["reqid" => (int)$reqid]);
+      
+          doQuery("insert into messages (thread,from_id,to_id,postedto,postername,timestamp,subject,message,new,unread,attach_filename, attach_filedata) 
+            select ifnull(max(thread)+1,1),:fromuserid,:touserid,:tousername,:fromusername,UNIX_TIMESTAMP(),:subject,:msgtext,1,1,:filename,:filedata from messages",[
+            ":fromusername" => $_user["nick"],
+            ":fromuserid" => $_user["id"],
+            ":subject" => "Your request has a new upload",
+            ":tousername" => $requser->nick,
+            ":touserid" => $requser->id,
+            ":filename" => $filename,
+            ":filedata" => $filedata,
+            ":msgtext" => $_user[ "nick" ]." has added a comment to your request and attached a file."
+          ]);
+        }
   
         exit(json_out([
           "status" => $status
@@ -1663,6 +1684,21 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
       exit(json_out($data));
   }
   
+  function getMessageAttachment($msgid) {
+    $attachdata = fetchOne("SELECT attach_filename, attach_filedata FROM messages WHERE id = :msgid", ['msgid' => $msgid ]);
+     
+      $data = [];     
+     
+      if ($attachdata) {
+
+        $data = [
+          "filename" => $attachdata->attach_filename,
+          "filedata" => $attachdata->attach_filedata
+        ];
+      }
+      exit(json_out($data));
+  }
+
 	$cmd = $_GET[ "cmd" ] ?? $_current[ 0 ] ?? "";
 	$reDir = "/";
 
@@ -1794,6 +1830,9 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
 			break;         
     case "get_req_comment_attach":
       getReqCommentAttachment($_current[1]);
+			break;         
+    case "get_message_attach":
+      getMessageAttachment($_current[1]);
 			break;         
 		default:
 			if (is_ajax()) {

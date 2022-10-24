@@ -204,6 +204,7 @@ if ($req_available) {
 					$title=$result->title;
 					$description=$result->description;
           $user=$result->user;
+          $timestamp=date("Y-m-d H:i",$result->timestamp);
           switch ($result->status) {
             case 0:
               $status = "Open";
@@ -232,6 +233,9 @@ if ($req_available) {
       </div>
       <div class="apb-1">
         <span class="white">Current Status: </span><?=$status?>
+      </div>
+      <div class="apb-1">
+        <span class="white">Requested On: </span><?=$timestamp?>
       </div>
       <div class="apb-1">
         <span class="white">Description: </span>
