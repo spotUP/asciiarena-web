@@ -639,6 +639,8 @@
         }
       }
 
+      exec("curl -H \"Content-Type: application/json\" -d '{\"username\": \"ASCII ARENA Uploads\", \"content\": \"A new ascii collection has just been uploaded to asciiarena.com by ".$_user[ "nick" ]." named ".addslashes($name)."\"}' \"https://discord.com/api/webhooks/1034089537544126494/MdurdpqtOlFhb2W2-N3xuRV4tW9lqXVhIDzl3tDez3W74A4QVCv3t0T70FVolfuGirYG\"");
+
       doQuery("update users set uploaded=uploaded+:pumped where id=:userid", [ 'pumped' => $filesize, 'userid' => $_user['id'] ]);
       exit(json_out(["status" => true], $response));
     }
@@ -712,6 +714,8 @@
       if(!doQuery($q, $data)) {
         exit(json_out(["status" => true], 400));        
       }
+
+      exec("curl -H \"Content-Type: application/json\" -d '{\"username\": \"ASCII ARENA Uploads\", \"content\": \"A new application has just been uploaded to asciiarena.com by ".$_user[ "nick" ]." named ".addslashes($name)."\"}' \"https://discord.com/api/webhooks/1034089537544126494/MdurdpqtOlFhb2W2-N3xuRV4tW9lqXVhIDzl3tDez3W74A4QVCv3t0T70FVolfuGirYG\"");
 
       doQuery("update users set uploaded=uploaded+:pumped where id=:userid", [ 'pumped' => $filesize, 'userid' => $_user['id'] ]);
       exit(json_out(["status" => true], $response));
@@ -789,6 +793,8 @@
       if(!doQuery($q, $data)) {
         exit(json_out(["status" => true], 400));        
       }
+
+      exec("curl -H \"Content-Type: application/json\" -d '{\"username\": \"ASCII ARENA Uploads\", \"content\": \"A new magazine has just been uploaded to asciiarena.com by ".$_user[ "nick" ]." named ".addslashes($name)."\"}' \"https://discord.com/api/webhooks/1034089537544126494/MdurdpqtOlFhb2W2-N3xuRV4tW9lqXVhIDzl3tDez3W74A4QVCv3t0T70FVolfuGirYG\"");     
       
       doQuery("update users set uploaded=uploaded+:pumped where id=:userid", [ 'pumped' => $filesize, 'userid' => $_user['id'] ]);
       exit(json_out(["status" => true], $response));
