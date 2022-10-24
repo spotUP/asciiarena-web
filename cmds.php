@@ -1525,7 +1525,7 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
         $data[] = [
           "id" => (int)$req->id,
           "title" =>$req->title,
-          "status" =>$req->status,
+          "status" =>(int)$req->status,
           "time" => date("Y-m-d H:i",$req->timestamp),
           "user" =>$req->user,
           "url" => "info_requests.php?id=".$req->id,
