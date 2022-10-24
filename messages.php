@@ -111,6 +111,7 @@ include_once "header.php";
           <span id="msgbutton"></span>
         </div>
       </div>
+      <a id="dlfiledata" style="display:none"> </a>
 
 		</div>
 
@@ -141,6 +142,21 @@ include_once "header.php";
 	</div>
 </div>
 <script>
+  function downloadAttachment(e,msgid) {
+    e.preventDefault();
+    
+    $.ajax({
+      type: 'GET',
+      url: '/cmds.php/get_message_attach/'+msgid
+    }).done(function (data) {
+      var a = $('#dlfiledata')
+      a[0].href = data.filedata
+      a[0].download = data.filename; //File name Here
+      a[0].click(); //Downloaded file
+    });   
+  }
+  
+
   function htmlEncode(s) {
     return $('<div>').text(s).html();
   }
@@ -263,12 +279,18 @@ include_once "header.php";
 			
       $.each(data, function (i, msg) {
         count++;
+        let file="";
+          if (msg.filename) {           
+            file = `<div onclick="downloadAttachment(event,${msg.id})"><a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-text" viewBox="0 0 16 16"><path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z"/><path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5L9.5 0zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/></svg>${msg.filename}</a></div>`
+          }
+
         threadBody.append(`
         <div class="row">
           <div class="col-12 apt-1 apb-1">
             <span class="white" style="white-space: pre-wrap;">${htmlEncode(msg.message)}</span>
           </div>
         </div>
+        ${file}
         <div class="row">
           <div class="col-1">
             <span class="cyan" style="white-space: pre-wrap;">${htmlEncode(msg.postername)}</span>

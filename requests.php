@@ -55,7 +55,8 @@ $sort_by = $_GET['sort_by'] ?? "id";
 		<div id = "hdrcols" class="row amb-1">
       <div class="col-8 col-sm-5"><span class="white"><a onclick="updateSort('title')">Title</a></span></div>
       <div class="col-8 col-sm-3"><span class="white"><a onclick="updateSort('title')">Status</a></span></div>
-      <div class="col-4 col-sm-4"><span class="white"><a onclick="updateSort('user')">Requested By</a></span></div>
+      <div class="col-4 col-sm-2"><span class="white"><a onclick="updateSort('user')">Requested By</a></span></div>
+      <div class="col-4 col-sm-2"><span class="white"><a onclick="updateSort('user')">Date</a></span></div>
 		</div>
       
     <div class="apb-1" id="requestsList">
@@ -182,8 +183,11 @@ $sort_by = $_GET['sort_by'] ?? "id";
       <div class="col-8 col-sm-3 text-truncate">
         <a class="magenta" href="${req.url}">${status}</a>
       </div>
-      <div class="col-4 col-sm-4 text-truncate">
+      <div class="col-4 col-sm-2 text-truncate">
         <a class="magenta" href="${req.url}">${req.user}</a>
+      </div>
+      <div class="col-4 col-sm-2 text-truncate">
+        <a class="magenta" >${req.time}</a>
       </div>`
    
        
