@@ -1204,7 +1204,7 @@
         exit(json_out(["status" => true], 400));
       }
       
-      exec("curl -H \"Content-Type: application/json\" -d '{\"username\": \"ASCII ARENA Requests\", \"content\": \"A new ascii request has just been created at asciiarena.com by ".$_user[ "nick" ]." titled ".addslashes($desc)."\"}' \"https://discord.com/api/webhooks/1034079696066977812/o4io-aAcWGHBVPWj5Zp57lj8aiEgBdLzmfaknZR8VJwpSNR0y5zlcCgTdGYfx6A_QSVZ\"");
+      exec("curl -H \"Content-Type: application/json\" -d '{\"username\": \"ASCII ARENA Requests\", \"content\": \"A new ascii request has just been created at asciiarena.com by ".$_user[ "nick" ]." titled ".addslashes($desc)."\"}' \"https://discord.com/api/webhooks/1034087774225178624/on_uHSDNg8cf4-M5EBB_NV_d_1i0Ne1N_grTwpZXy0Q6pvUo8G7Jbt6MIdCrBG4INqBx\"");
           
       exit(json_out(["status" => true], $response));
     }
