@@ -241,7 +241,7 @@ if ($req_available) {
         <span class="white">Description: </span>
       </div>
         <div class="bg-secondary col-12 ap-1 amb-1">
-          <?=$description?>
+          <pre><?=$description?></pre>
         </div>
         
         <?php
