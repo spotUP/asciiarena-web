@@ -639,10 +639,16 @@
         }
       }
 
-      exec("curl -H \"Content-Type: application/json\" -d '{\"username\": \"ASCII ARENA Uploads\", \"content\": \"A new ascii collection has just been uploaded to [asciiarena.se](https://asciiarena.se) by ".$_user[ "nick" ]." named ".addslashes($name)."\"}' \"https://discord.com/api/webhooks/1034089537544126494/MdurdpqtOlFhb2W2-N3xuRV4tW9lqXVhIDzl3tDez3W74A4QVCv3t0T70FVolfuGirYG\"");
+      exec("curl -H \"Content-Type: application/json\" -d '{\"username\": \"ASCII ARENA Uploads\", \"content\": \"A new ascii collection has just been uploaded to [asciiarena.se](https://asciiarena.se) by ".$_user[ "nick" ]." named ".addslashes($_POST[ "name" ])."\"}' \"https://discord.com/api/webhooks/1034089537544126494/MdurdpqtOlFhb2W2-N3xuRV4tW9lqXVhIDzl3tDez3W74A4QVCv3t0T70FVolfuGirYG\"");
 
       $link="https://asciiarena.se/release/".$filename;
-      $fbmessage = urlencode("\"".$_POST[ "name" ]."\" by ".implode(" ",$artistnames));
+      if(!empty($artistnames)) {
+        $fbmessage = urlencode("\"".$_POST[ "name" ]."\" by ".implode(" ",$artistnames));
+      } else if(!empty($crewnames)) {
+        $fbmessage = urlencode("\"".$_POST[ "name" ]."\" by ".implode(" ",$crewnames));
+      } else {
+        $fbmessage = urlencode("\"".$_POST[ "name" ]."\"");
+      }
       
       exec("curl -i -X POST \"https://graph.facebook.com/aSCIIaRENA/feed?message=".$fbmessage."&link=".$link."&access_token=EAALbaIZCnZBCoBAJL6BJGS6DqGTB6RkLeL4WE6ZBDfwVX9RwS6nCUUcgYO8HMz6srxKYZARI7bf0dZANuWKejZCkvEZBpfIZAZAtshMc9tnW48lDx5zixifRtssXDzi5tOJNLJGZArquUX27jCl5IjIQWhToAaqmZC4TW43MuVpojfRCzoNk5x2fINK\"");
 
