@@ -3,6 +3,8 @@ require_once "session.php";
 $h1 = "mAGAZiNES";
 require_once "header.php";
 $sort_by = $_GET['sort_by'] ?? "Name";
+$sort_order = $_GET['sort_order'] ?? "A";
+
 $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":userid" => $_user['id']]);
 ?>
 <div class="modal-body row m-0 p-0">
@@ -228,7 +230,7 @@ $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":
 	$(function() {
     $("#pageno").val("1");
     $("#sort1").val("<?=$sort_by?>");
-    $("#sort2").val('A')
+    $("#sort2").val("<?=$sort_order?>")
    
     <?php if ($userprefs->list_view_mode == 'BBS') {
       ?> setView(2) <?php
