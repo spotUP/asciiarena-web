@@ -817,6 +817,60 @@
           exit(json_out(["status" => true]));
         }
 				exit(json_out(["status" => false], 404));      
+
+			case "get_playlist":
+				$id = $_GET[ "id" ] ?? 0;
+				$data = [];
+				if($id) {
+					$playlists = fetchAll("SELECT * FROM hippo_playlists WHERE id = :id", [":id" => $id]);
+				} else {
+					$playlists = fetchAll("SELECT * FROM hippo_playlists ORDER BY id");
+				}
+				foreach($playlists as $pl) {
+					$data[] = [
+						"id" => (int)$pl->id,
+						"title" => $pl->title,
+            "author" => $pl->author,
+						"genre" => $pl->genre,
+						"filename" => $pl->filename
+					];
+				}
+				if(!empty($data)) {
+					exit(json_out($data));
+				}
+				exit(json_out(["status" => false], 404));
+
+      case "save_playlist":
+				$response = 200;
+				$data = [
+					":title" => $_POST[ "title" ] ?? "",
+					":genre" => $_POST[ "genre" ] ?? "",
+          ":filename" => $_POST[ "filename" ] ?? "",
+          ":author" => $_POST[ "author" ] ?? ""
+				];
+				if(!empty($_POST[ "id" ])) {
+					$q = "UPDATE hippo_playlists SET title = :title, genre = :genre, filename = :filename, author=:author WHERE id = :id";
+					$data[ ":id" ] = $_POST[ "id" ];
+				} else {
+					$q = "INSERT INTO hippo_playlists (title,author, genre,uploaddate, filename, filedata) VALUES (:title,:author,:genre,UNIX_TIMESTAMP(), :filename, :filedata)";
+					$data[ ":filedata" ] = $_POST[ "filedata" ] ?? "";
+					$response = 201;
+				}
+				if(doQuery($q, $data)) {
+					exit(json_out(["status" => true], $response));
+				}
+				exit(json_out(["status" => true], 400));
+			case "del_playlist":
+				if(!empty($_POST[ 'id' ])) {
+					$id = (int)$_POST[ 'id' ];
+					if($id) {
+						if (!doQuery("DELETE FROM hippo_playlists WHERE id = :id", [":id" => $id])) {
+							exit(json_out(["status" => false], 404));
+						}
+					}
+				}
+				exit(json_out(["status" => true]));
+
         
 			default:
 				if($is_ajax) {

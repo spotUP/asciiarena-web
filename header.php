@@ -192,6 +192,7 @@ include "header_ascii.php";
 											<a class="dropdown-item ascii" href="/admin.php#sitelogo">Edit Logo<span style="padding-left: 8px;"> </span></a>
 											<a class="dropdown-item ascii" href="/admin.php#bbs">Edit BBS<span style="padding-left: 13px;">   </span></a>
 											<a class="dropdown-item ascii" href="/admin.php#request">Edit Requests<span style="padding-left: 13px;">   </span></a>
+											<a class="dropdown-item ascii" href="/admin.php#playlist">Edit Playlists<span style="padding-left: 13px;">   </span></a>
 											<a class="dropdown-item ascii" href="/admin.php#broken">Broken Collys<span style="padding-left: 13px;">   </span></a>
 										</div>
 									</li>
