@@ -23,10 +23,10 @@ if (!empty($file)) {
   }  
 } else {
   header('Content-Type: text/plain; charset=ISO-8859-1');  
-  echo "Filename".chr(9)."Path".chr(9)."Author".chr(9)."Title".chr(9)."Genre".chr(10);
+  echo "Filename".chr(9)."Path".chr(9)."Title".chr(9)."Author".chr(9)."Genre".chr(10);
 
   foreach(fetchAll("select * from hippo_playlists") as $row) {
-      echo utf8_decode($row->filename).chr(9)."playlist/".chr(9).utf8_decode($row->author).chr(9).utf8_decode($row->title).chr(9).utf8_decode($row->genre).chr(10);
+      echo utf8_decode($row->filename).chr(9)."playlist/".chr(9).utf8_decode($row->title).chr(9).utf8_decode($row->author).chr(9).utf8_decode($row->genre).chr(10);
     }
 }
 ?>
