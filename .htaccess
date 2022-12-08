@@ -17,6 +17,7 @@ RewriteBase /
 #RewriteRule .* index.php/$0 [PT,L]
 
 
+RewriteRule "^playlist/([^/]+)/?$" /uhcplaylists.php?file=$1 [L,QSA]
 RewriteRule "^crew/([^/]+)/?$" /info_crew.php?crew=$1 [L,QSA]
 RewriteRule "^artist/([^/]+)/?$" /info_artist.php?artist=$1 [L,QSA]
 RewriteRule "^bbs/([^/]+)/?$" /info_bbs.php?bbs=$1 [L,QSA,B]
@@ -27,6 +28,8 @@ RewriteRule "^magazine/([^/]+)/?$" /info_mags.php?filename=$1 [L,QSA,B]
 
 #uhc search and collections are except from http redirect
 RewriteCond %{REQUEST_URI} [\/]?uhcsearch\.php [OR]
+RewriteCond %{REQUEST_URI} [\/]?uhcplaylists\.php [OR]
+RewriteCond %{REQUEST_URI} [\/]?playlist\.php [OR]
 RewriteCond %{REQUEST_URI} [\/]?collections\/
 RewriteRule ^(.*)$ - [L]
 
