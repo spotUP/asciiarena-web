@@ -36,7 +36,7 @@ include "header.php";
 		<span class="white bg-blue ap-1"><a href="https://www.facebook.com/asciiarena">Facebook</a></span><br><br><br>
 
 		<span class="white">CHAT</span><br><br><br>
-		<span class="white bg-lightblue ap-1"><a href="https://discord.gg/KzVPpZrR">Discord</a></span><br><br><br>
+		<span class="white bg-lightblue ap-1"><a href="https://discord.gg/gwHPVHZXAz">Discord</a></span><br><br><br>
 
 		<span class="cyan">You can also reach us on IRCNet in #asciiarena</span><br><br><br>
 	</div>
