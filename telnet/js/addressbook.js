@@ -167,7 +167,7 @@ function LoadMyServers() {
 
             var NewRow = '<tr>';
             NewRow += ' <td>';
-            NewRow += '  <a onclick=\''+Url+'\'  target="_blank">' + MyServers[i].Description + '</a>';
+            NewRow += '  <a style="color: #fff" onclick=\''+Url+'\'  target="_blank">' + MyServers[i].Description + '</a>';
             NewRow += '  <a href="#" data-index="' + i + '" class="Delete btn btn-xs btn-danger pull-right"><span class="glyphicon glyphicon-remove"></span> Delete</a>';
             NewRow += '  <a href="#" data-index="' + i + '" class="Edit btn btn-xs btn-primary pull-right"><span class="glyphicon glyphicon-pencil"></span> Edit</a>';
             NewRow += ' </td>';
