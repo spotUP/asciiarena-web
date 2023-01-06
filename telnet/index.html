@@ -127,11 +127,14 @@
         Options.ProxyPortSecure = 11235;
         Options.ConnectionType = c;
         Options.VirtualKeyboardVisible = (k=='on')
-        Options.Emulation = e;
+        Options.Emulation = 'ansi-bbs';
         Options.Hostname = h;
         Options.Port = p;
         Options.Font = "Amiga-Topaz"
         var Client = new fTelnetClient('fTelnetContainer', Options);
+        if (e=='c64') {
+         Client._Crt._C64 = true;
+        }
         if (h!="") Client.Connect();
       }
     </script>
