@@ -36,7 +36,7 @@
                 </div>
             </div>
             
-            <div class="col-sm-7">
+            <div class="col-sm-7" >
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         Telnet
@@ -104,6 +104,7 @@
 
     <script src="/telnet/js/localstorage.js"></script>
     <script src="/telnet/js/addressbook.js"></script>
+    <script id="fTelnetScript" src="/telnet/ftelnet.norip.xfer.min.js"></script>
 
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -114,7 +115,6 @@
       ga('create', 'UA-4602017-8', 'auto');
       ga('send', 'pageview');
     </script>
-    <script>document.write('<script src="//embed-v2.ftelnet.ca/js/ftelnet-loader.norip.xfer.js?v=' + (new Date()).getTime() + '"><\/script>');</script>
     <script>
         goTelnet('',0);
         
@@ -130,7 +130,13 @@
         Options.Emulation = 'ansi-bbs';
         Options.Hostname = h;
         Options.Port = p;
-        Options.Font = "Amiga-Topaz"
+        Options.Font = "Amiga-Topaz";
+        Options.ScreenColumns=80;
+        Options.ScreenRows=25;
+        if (e=='c64') {
+         Options.Font = "C64-Lower";
+         Options.ScreenColumns=40;
+        }
         var Client = new fTelnetClient('fTelnetContainer', Options);
         if (e=='c64') {
          Client._Crt._C64 = true;
