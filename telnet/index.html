@@ -14,7 +14,7 @@
     <!-- Begin page content -->
     <div class="container">
         <div class="row">
-            <div class="col-sm-7">
+            <div class="col-sm-8">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         My Address Book
@@ -36,7 +36,7 @@
                 </div>
             </div>
             
-            <div class="col-sm-7" >
+            <div class="col-sm-8" >
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         Telnet
@@ -132,10 +132,11 @@
         Options.Port = p;
         Options.Font = "Amiga-Topaz";
         Options.ScreenColumns=80;
-        Options.ScreenRows=25;
+        Options.ScreenRows=30;
         if (e=='c64') {
          Options.Font = "C64-Lower";
          Options.ScreenColumns=40;
+          Options.ScreenRows=30;
         }
         var Client = new fTelnetClient('fTelnetContainer', Options);
         if (e=='c64') {
