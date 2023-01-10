@@ -163,7 +163,7 @@ function LoadMyServers() {
                 Proxy += '&ProxyPort=' + HostPorts[1];
                 Proxy += '&ProxyPortSecure=' + HostPorts[2];
             }
-            var Url = 'goTelnet("'+MyServers[i].Hostname+'",'+MyServers[i].Port.toString()+',"'+MyServers[i].ConnectionType + '","'+ MyServers[i].Emulation + '","on")';
+            var Url = 'goTelnet("'+MyServers[i].Hostname+'",'+MyServers[i].Port.toString()+',"'+MyServers[i].ConnectionType + '","'+ MyServers[i].Emulation + '","off")';
 
             var NewRow = '<tr>';
             NewRow += ' <td>';
