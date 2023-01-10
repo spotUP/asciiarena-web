@@ -136,8 +136,10 @@
         if (e=='c64') {
          Options.Font = "C64-Lower";
          Options.ScreenColumns=40;
-          Options.ScreenRows=30;
+          Options.ScreenRows=25;
         }
+        window.localStorage.setItem('ScreenColumns',null);
+        window.localStorage.setItem('ScreenRows',null);
         var Client = new fTelnetClient('fTelnetContainer', Options);
         if (e=='c64') {
          Client._Crt._C64 = true;
