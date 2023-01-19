@@ -66,7 +66,7 @@ if (is_logged_in()) $nick=$_user[ "nick" ];
             }
 
             comment = clean(comment)
-            userName = clean("<?=$nick?>")
+            userName = clean("<?=addslashes($nick)?>")
 
             data = {"userName": userName,
                 "source": 'aSCIIaRENA',

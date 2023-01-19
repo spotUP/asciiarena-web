@@ -200,7 +200,7 @@ $sort_by = $_GET['sort_by'] ?? "id";
 
 	$(function() {
     $("#pageno").val("1");
-    $("#sort1").val("<?=$sort_by?>");
+    $("#sort1").val("<?=addslashes($sort_by)?>");
     $("#sort2").val('A')
    
     setView(0);
