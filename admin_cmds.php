@@ -849,8 +849,14 @@
           ":author" => $_POST[ "author" ] ?? ""
 				];
 				if(!empty($_POST[ "id" ])) {
-					$q = "UPDATE hippo_playlists SET title = :title, genre = :genre, filename = :filename, author=:author WHERE id = :id";
-					$data[ ":id" ] = $_POST[ "id" ];
+          if(!empty($_POST[ "filedata" ])) {
+            $data[":filedata"] = $_POST[ "filedata" ];
+            $q = "UPDATE hippo_playlists SET title = :title, genre = :genre, filename = :filename, filedata = :filedata, author=:author WHERE id = :id";
+            $data[ ":id" ] = $_POST[ "id" ];           
+          } else {
+            $q = "UPDATE hippo_playlists SET title = :title, genre = :genre, filename = :filename, author=:author WHERE id = :id";
+            $data[ ":id" ] = $_POST[ "id" ];
+          }
 				} else {
 					$q = "INSERT INTO hippo_playlists (title,author, genre,uploaddate, filename, filedata) VALUES (:title,:author,:genre,UNIX_TIMESTAMP(), :filename, :filedata)";
 					$data[ ":filedata" ] = $_POST[ "filedata" ] ?? "";
