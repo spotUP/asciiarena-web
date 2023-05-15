@@ -7,6 +7,7 @@
 <script>
   function playlistclear() {
     $("#playlist_id, #playlist_title, #playlist_author, #playlist_filename, #playlist_filename1, #playlist_filename2, #playlist_genre").val('').trigger('change');;
+    $("#btnReplace").hide();
     showselfile();
   }
 
@@ -23,6 +24,7 @@ function getBase64(file) {
     var files=$('#playlist_filename2').prop("files");
     if (files.length>0) {
       $('#playlist_filename').val(files[0].name);
+      $('#playlist_filename1').val(files[0].name);
       getBase64(files[0]).then(data => $('#playlist_filedata').val(data));
     }
   }
@@ -31,12 +33,14 @@ function getBase64(file) {
     {
       $("#playlist_filename1").hide();
       $("#playlist_filename2").show();
+      $("#btnReplace").hide();
     }
     
     function showeditfile()
     {
       $("#playlist_filename1").show();
       $("#playlist_filename2").hide();
+      $("#btnReplace").show();
     }
   
 		function getPlaylist() {
@@ -117,7 +121,6 @@ function getBase64(file) {
 			return
 		}
 
-
     const form = $("#playlist_form");
     const url = form.attr("action");
     $.ajax({
@@ -143,6 +146,10 @@ function getBase64(file) {
         playlistclear();       
       }
     });
+  }
+
+  function replacePlaylist() {
+    $("#playlist_filename2").trigger('click');
   }
 
 	function showPlaylistAlert(content, success) {
@@ -222,6 +229,7 @@ function getBase64(file) {
 			<div class="col-12">
 				<input type="button" class="btn-big w-100 white bg-green col-xs-12 col-md-2 amb-1" value="Save" onclick="savePlaylist()">
           <input type="button" class="btn-big w-100 bg-red white w-100 col-xs-12 col-md-2 amb-1" value="Delete" onclick="delplaylist()">
+          <input type="button" class="btn-big w-100 white w-100 col-xs-12 col-md-2 amb-1" id="btnReplace" value="Replace Playlist" onclick="replacePlaylist()">
 			</div>
 		</div>
 	</form>
