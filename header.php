@@ -26,12 +26,10 @@ include "header_ascii.php";
 	<link rel="stylesheet" href="/assets/css/bootstrap-colorselector.css" media="screen">
 	<link rel="stylesheet" href="/assets/css/site.css" media="screen">
 	<link rel="stylesheet" href="/assets/css/386.css" media="screen">
-	<script>document.domain = 'asciiarena.se';</script>
 	<link rel="preload" href="/assets/fonts/TopazPlus_a1200.woff2" as="font" type="font/woff2" crossorigin>
 	<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 	<script src="/assets/js/bootstrap.bundle.min.js"></script>
 	<script src="/assets/js/bootstrap-colorselector.js"></script>
-	<!-- <script async defer data-domain="asciiarena.se" src="https://asciiarena-plausible.caprover.asciiarena.se/js/plausible.js"></script> -->
 	<script type="module">
 		import init386 from "/assets/js/386-animation/index.js";
 		init386({
@@ -75,7 +73,6 @@ include "header_ascii.php";
   		}, delay);
   	}
   </script>
-  <script defer data-domain="asciiarena.se" src="http://plausible.caprover.asciiarena.se/js/script.js"></script>
 </head>
 <body>
 	<div id="spotclose" class="spotclose" onclick='showFullscreen()'><div class="noevents">x</div></div>
