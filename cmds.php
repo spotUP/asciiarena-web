@@ -97,11 +97,12 @@
     $pw = $_POST[ "password" ] ?? "";
     $ni = $_POST[ "nick" ] ?? "";
     $loc = $_POST[ "location" ] ?? "/";
-    $spw = fetchOne("SELECT pwhash FROM users WHERE (nick = :nick OR mail = :nick)", [ ":nick" => $ni ])->pwhash;
+    $spw = fetchOne("SELECT pwhash FROM users WHERE (nick = :nick OR mail = :mail)", [ ":nick" => $ni, ":mail" => $ni ])->pwhash;
     if (preg_match('/^[a-f0-9]{32}$/i', $spw)) {
-      $login = fetchOne("SELECT id,nick,crew,rank,crt_effect FROM users WHERE pwhash = :pwhash AND (nick = :nick OR mail = :nick)", [
+      $login = fetchOne("SELECT id,nick,crew,`rank`,crt_effect FROM users WHERE pwhash = :pwhash AND (nick = :nick OR mail = :mail)", [
         ":pwhash" => md5($pw),
-        ":nick" => $ni
+	":nick" => $ni,
+	":mail" => $ni
       ]);
       if ($login) {
         $pwhash = password_hash($pw, PASSWORD_BCRYPT, array('cost' => 13));
@@ -109,7 +110,7 @@
       }
     } else {
       if (password_verify($pw, $spw)) {
-        $login = fetchOne("SELECT id,nick,crew,rank,crt_effect FROM users WHERE (nick = :nick OR mail = :nick)", [ ":nick" => $ni ]);
+        $login = fetchOne("SELECT id,nick,crew,`rank`,crt_effect FROM users WHERE (nick = :nick OR mail = :mail)", [ ":nick" => $ni, ":mail" => $ni ]);
       }
     }
     if ($login) {
