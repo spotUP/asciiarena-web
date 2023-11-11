@@ -1,11 +1,12 @@
 <?php defined('VALID') or die('Nuh-uh!');
 //test
-    error_reporting(0);
+    error_reporting(-1);
+    $env = parse_ini_file("/var/www/configs/asciiarena.env");
 
-    $dbuser = getenv('DBUSER') ?: 'root';
-    $dbpw   = getenv('DBPW')   ?: '';
-    $dbhost = getenv('DBHOST') ?: 'localhost';
-    $dbname = getenv('DBNAME') ?: 'uprough_ascii';
+    $dbuser = @$env['DBUSER'] ?: 'spot';
+    $dbpw   = @$env['DBPW']   ?: '';
+    $dbhost = @$env['DBHOST'] ?: 'localhost';
+    $dbname = @$env['DBNAME'] ?: 'uprough_ascii';
 
 	$_db = new PDO("mysql:dbname={$dbname};host={$dbhost}", $dbuser, $dbpw,
 		[PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
