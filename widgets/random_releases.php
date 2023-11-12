@@ -35,7 +35,7 @@ foreach($res as $row) {
 foreach($releases as $fname => $release) 
 {
 	?>
-	<div class="col-12 d-flex justify-content-center col-<?=$breakpoint?><?=(round(12 / $columns))?> overflow-hidden apt-1 apb-1">
+	<div class="col-12 d-flex justify-content-center align-items-center col-<?=$breakpoint?><?=(round(12 / $columns))?> overflow-hidden apt-1 apb-1">
 		<div class="row animate__animated animate__backInUp">
 			<pre><a href="<?=$fname?>" class="ascii magenta"><?=$release?></a></pre>
 		</div>
