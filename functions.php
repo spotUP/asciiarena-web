@@ -487,13 +487,13 @@ function setremember() {
   global $_user;
   global $remember_salt;
   if (is_logged_in() && isset($_user['id'])) {
-    $selector = bin2hex(mcrypt_create_iv(8, MCRYPT_DEV_URANDOM)); // generate selector (to not use id for selection)
-    $token = bin2hex(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM)); // generate token - only present in cookie
+    $selector = bin2hex(random_bytes(8)); // generate selector (to not use id for selection)
+    $token = bin2hex(random_bytes(16)); // generate token - only present in cookie
     $hash = hash('sha256', $token.$remember_salt); // create hash (only kept in database
     if (doQuery("REPLACE INTO auth (selector, hash, user_id, expiration) VALUES (:selector, :hash, :user_id, NOW()+INTERVAL 14 DAY)", 
-	[ 'selector' => $selector, 'hash' => $hash, 'user_id' => $_user['id'] ])) {
-	setcookie('aarm', $selector.":".$token, (time()+86400*14), '/', 'asciiarena.se', true, true);
-	return true;
+    [ 'selector' => $selector, 'hash' => $hash, 'user_id' => $_user['id'] ])) {
+    setcookie('aarm', $selector.":".$token, (time()+86400*14), '/', 'asciiarena.se', true, true);
+    return true;
     }
   }
   return false;
