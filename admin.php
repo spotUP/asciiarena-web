@@ -541,7 +541,7 @@ include "header.php";
 				$edit_user_rank=$_POST['edit_user_rank'];
 				$user_nick=$_POST['usernick'];
 
-				$ask="update users set rank=:edit_user_rank where nick=:change_user_nick";
+				$ask="update users set `rank`=:edit_user_rank where nick=:change_user_nick";
 				doQuery($ask, ['edit_user_rank' => $edit_user_rank, 'change_user_nick' => $change_user_nick]);	
 			}
 			if(isset($_POST['changeuserbyear']))

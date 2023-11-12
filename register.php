@@ -91,7 +91,7 @@ if (isset($_GET['confirm'])) {
 	if (is_logged_in()) $errors[] = "you're already logged in";
 
 	if (count($errors) == 0) {
-		$ask = "UPDATE users SET rank='User', joined=:now WHERE nick=:nick AND id=:id";
+		$ask = "UPDATE users SET `rank`='User', joined=:now WHERE nick=:nick AND id=:id";
 		doQuery($ask, [ ":now" => time(), ":nick" => $nick, ":id" => $user_id] );
 		$messages[] = 'Your account has been activated, you can now  <a class="ascii" data-toggle="modal" style="padding-right: 8px;" href="#login">logon</a>';
 	} else {
