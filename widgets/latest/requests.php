@@ -8,7 +8,7 @@
 		<div class="row">
 			<div class="col-12 apt-1 apb-1 d-flex">
 				<div class="col-4"><span class="white text-truncate">REQUESTED BY</span></div>
-				<div class="col-8"><span class="white">REQUEST</div>
+				<div class="col-8"><span class="white text-right">REQUEST</div>
 			</div>
 		</div>
 		<?php
@@ -17,7 +17,7 @@
 			<div class="row">
 				<div class="col-12 d-flex">
 					<div class="col-4"><a class="yellow" href="/member/<?=$row->nick?>"><?=($row->nick)?></a></div>
-					<div class="col-8"><a class="cyan text-truncate" href="/info_requests.php?id=<?=$row->id?>"><?=$row->title?></a></div>
+					<div class="col-8"><a class="cyan text-truncate text-right" href="/info_requests.php?id=<?=$row->id?>"><?=$row->title?></a></div>
 				</div>
 			</div>
 			<?php
