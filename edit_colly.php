@@ -266,7 +266,7 @@
 					</div>
 				</div>
 
-				<div class="row apb-1 col-xs-12 col-md-6 m-0 p-0">
+				<div class="row apb-1 col-xs-12 col-md-6" style="padding-left: 0px; margin-left: 0px; padding-right: 8px;">
 					<input class="w-100" type="text" id="colly_filename" name="filename">
 					<input type="hidden"  id="colly_filename2">
 				</div>
