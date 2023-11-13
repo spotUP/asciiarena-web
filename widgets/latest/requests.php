@@ -6,9 +6,9 @@
 <div class="container-fluid m-0">
 	<div class="col-12 bg-secondary apb-1">
 		<div class="row">
-			<div class="col-12 apt-1">
-				<span class="col-4 white text-truncate">REQUESTED BY</span>
-				<span class="col-8 white">REQUEST</span>
+			<div class="col-12 apt-1 apb-1">
+				<div class="col-4"><span class="white text-truncate">REQUESTED BY</span></div>
+				<div class="col-8"><span class="col-8 white">REQUEST</div>
 			</div>
 		</div>
 		<?php
@@ -16,8 +16,8 @@
 			?>
 			<div class="row">
 				<div class="col-12 text-truncate">
-					<span class="col-4"><a class="yellow" href="/member/<?=$row->nick?>"><?=($row->nick)?></a></span>
-					<span class="col-8"><a class="cyan text-truncate" href="/info_requests.php?id=<?=$row->id?>"><?=$row->title?></a></span>
+					<div class="col-4"><a class="yellow" href="/member/<?=$row->nick?>"><?=($row->nick)?></a></div>
+					<div class="col-8"><a class="cyan text-truncate" href="/info_requests.php?id=<?=$row->id?>"><?=$row->title?></a></div>
 				</div>
 			</div>
 			<?php
