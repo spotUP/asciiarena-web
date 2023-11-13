@@ -8,7 +8,7 @@
 		<div class="row">
 			<div class="col-12 apt-1 apb-1 d-flex">
 				<div class="col-4"><span class="white text-truncate">REQUESTED BY</span></div>
-				<div class="col-8"><span class="col-8 white">REQUEST</div>
+				<div class="col-8"><span class="white">REQUEST</div>
 			</div>
 		</div>
 		<?php
