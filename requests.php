@@ -99,7 +99,7 @@ $sort_by = $_GET['sort_by'] ?? "id";
    <div id = "hdrcols" class="row amb-1">
     <div class="col-5"><span class="white"><a onclick="updateSort('title')">Title</a></span></div>
     <div class="col-2"><span class="white"><a onclick="updateSort('title')">Status</a></span></div>
-    <div class="col-2"><span class="white"><a onclick="updateSort('user')">Requested By</a></span></div>
+    <div class="col-2"><span class="white"><a onclick="updateSort('user')">Reqed By</a></span></div>
     <div class="col-3"><span class="white"><a onclick="updateSort('user')">Date</a></span></div>
   </div>
 
@@ -221,7 +221,7 @@ function getRequests(page,sort,order,filter) {
       break
     }
     reqtxt = `<div class="row">
-    <div class="col-6 text-truncate">
+    <div class="col-5 text-truncate">
     <a class="magenta" href="${req.url}">${req.title}</a>
     </div>
     <div class="col-2 text-truncate">
