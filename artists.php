@@ -10,10 +10,20 @@ require_once "header.php";
 			<div class="col-12 d-flex justify-content-between">
 
       <div class="row m-0 apt-1">
-        <input type="hidden" id="pageno"><input type="hidden" id="sort1"><input type="hidden" id="sort2"><input type="hidden" id="maxpage"><ul class="pagination"><li class="page-item"> <a onclick="firstPage(event)" href="#" class="page-link" >FIRST</a></li><li class="page-item"> <a onclick="prevPage(event)" href="#" class="page-link" >PREV</a></li><span id="currpage"></span><li class="page-item"> <a onclick="nextPage(event)" href="#" class="page-link" >NEXT</a></li><li class="page-item"> <a onclick="lastPage(event)" href="#" class="page-link" >LAST</a></li></ul></div>
-				<div class="col-5 apt-1 bg-secondary apb-1">
-						<span class="amr-1 "><input id="filter" oninput="search(this.value)" placeholder="Search..." type="text" autocomplete="off" class="w-100"></span>
-				</div>
+        <input type="hidden" id="pageno">
+        <input type="hidden" id="sort1">
+        <input type="hidden" id="sort2">
+        <input type="hidden" id="maxpage">
+        <ul class="pagination">
+          <li class="page-item"> <a onclick="firstPage(event)" href="#" class="page-link" ><<</a></li>
+          <li class="page-item"> <a onclick="prevPage(event)" href="#" class="page-link" ><</a></li>
+          <span id="currpage"></span>
+          <li class="page-item"> <a onclick="nextPage(event)" href="#" class="page-link" >></a></li>
+          <li class="page-item"> <a onclick="lastPage(event)" href="#" class="page-link" >>></a></li>
+        </ul></div>
+          <div class="apt-1 apl-1 bg-secondary apb-1">
+            <span><input id="filter" oninput="search(this.value)" class="apl-1 w-100" placeholder="Search..." type="text" autocomplete="off"></span>
+          </div>
 			</div>
 
 		</div>
