@@ -5,41 +5,74 @@ require_once "header.php";
 $sort_by = $_GET['sort_by'] ?? "id";
 ?>
 <div class="modal-body row m-0 p-0">
-	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 bg-secondary">
-		<div class="row">
+  <div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 bg-secondary">
 
-			<div class="col-12 d-flex justify-content-between">
-
-
-        <div class="row m-0 apt-1">
-          <div class="col-12 d-flex">
-
-            <input type="hidden" id="sort1">
-            <input type="hidden" id="viewmode" value="1">
-            <input type="hidden" id="pageno">
-            <input type="hidden" id="sort1">
-            <input type="hidden" id="sort2">
-            <input type="hidden" id="maxpage">
-            <ul class="pagination">
-              <li class="page-item"> <a onclick="firstPage(event)" href="#" class="page-link"><<</a></li>
-              <li class="page-item"> <a onclick="prevPage(event)" href="#" class="page-link" ><</a></li>
-              <span id="currpage"></span>
-              <li class="page-item"> <a onclick="nextPage(event)" href="#" class="page-link" >></a></li>
-              <li class="page-item"> <a onclick="lastPage(event)" href="#" class="page-link" >>></a></li>
-            </ul>
+    <div class="row d-block d-md-none">
+      <div class="row col-12 m-0 apt-1 d-flex">
+        <input type="hidden" id="sort1">
+        <input type="hidden" id="viewmode" value="1">
+        <input type="hidden" id="pageno">
+        <input type="hidden" id="sort1">
+        <input type="hidden" id="sort2">
+        <input type="hidden" id="maxpage">
+        <ul class="pagination">
+          <li class="page-item"> <a onclick="firstPage(event)" href="#" class="page-link"><<</a></li>
+          <li class="page-item"> <a onclick="prevPage(event)" href="#" class="page-link" ><</a></li>
+          <span id="currpage"></span>
+          <li class="page-item"> <a onclick="nextPage(event)" href="#" class="page-link" >></a></li>
+          <li class="page-item"> <a onclick="lastPage(event)" href="#" class="page-link" >>></a></li>
+        </ul>
+      </div>
+      <div class="row col-12 m-0 apt-0 d-flex">
+        <div class="apt-1 bg-secondary apb-1 w-100">
+          <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+            <div class="btn-group" role="group">
+              <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Show:</button>
+              <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                <a class="dropdown-item" onclick="setView(0)">Open</a>
+                <a class="dropdown-item" onclick="setView(1)">Closed (Unfulfilled)</a>
+                <a class="dropdown-item" onclick="setView(2)">Closed (Fulfilled)</a>
+                <a class="dropdown-item" onclick="setView(3)">Closed (Any)</a>
+                <a class="dropdown-item" onclick="setView(4)">All</a>
+              </div>
+            </div>
           </div>
+        </div>
+        <div class="bg-secondary apb-1 w-100">
+          <span><input id="filter" oninput="search(this.value)" class="apl-1 w-100" placeholder="Search..." type="text" autocomplete="off"></span>
+        </div>
+      </div>
+    </div>
 
-          <div class="col-3 apt-1 bg-secondary apb-1">
-            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
-              <div class="btn-group" role="group">
-                <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Show:</button>
-                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                  <a class="dropdown-item" onclick="setView(0)">Open</a>
-                  <a class="dropdown-item" onclick="setView(1)">Closed (Unfulfilled)</a>
-                  <a class="dropdown-item" onclick="setView(2)">Closed (Fulfilled)</a>
-                  <a class="dropdown-item" onclick="setView(3)">Closed (Any)</a>
-                  <a class="dropdown-item" onclick="setView(4)">All</a>
-                </div>
+
+
+    <div class="row d-none d-md-block">
+      <div class="col-12 d-flex">
+        <div class="row m-0 apt-1">
+          <input type="hidden" id="sort1">
+          <input type="hidden" id="viewmode" value="1">
+          <input type="hidden" id="pageno">
+          <input type="hidden" id="sort1">
+          <input type="hidden" id="sort2">
+          <input type="hidden" id="maxpage">
+          <ul class="pagination">
+            <li class="page-item"> <a onclick="firstPage(event)" href="#" class="page-link"><<</a></li>
+            <li class="page-item"> <a onclick="prevPage(event)" href="#" class="page-link" ><</a></li>
+            <span id="currpage"></span>
+            <li class="page-item"> <a onclick="nextPage(event)" href="#" class="page-link" >></a></li>
+            <li class="page-item"> <a onclick="lastPage(event)" href="#" class="page-link" >>></a></li>
+          </ul>
+        </div>
+        <div class="apt-1 bg-secondary apb-1 w-100">
+          <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+            <div class="btn-group" role="group">
+              <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Show:</button>
+              <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                <a class="dropdown-item" onclick="setView(0)">Open</a>
+                <a class="dropdown-item" onclick="setView(1)">Closed (Unfulfilled)</a>
+                <a class="dropdown-item" onclick="setView(2)">Closed (Fulfilled)</a>
+                <a class="dropdown-item" onclick="setView(3)">Closed (Any)</a>
+                <a class="dropdown-item" onclick="setView(4)">All</a>
               </div>
             </div>
           </div>
@@ -47,8 +80,6 @@ $sort_by = $_GET['sort_by'] ?? "id";
         <div class="apt-1 apl-1 bg-secondary apb-1">
           <span><input id="filter" oninput="search(this.value)" class="apl-1 w-100" placeholder="Search..." type="text" autocomplete="off"></span>
         </div>
-
-
       </div>
     </div>
     <?php
@@ -66,10 +97,10 @@ $sort_by = $_GET['sort_by'] ?? "id";
    </div>
 
    <div id = "hdrcols" class="row amb-1">
-    <div class="col-8 col-sm-5"><span class="white"><a onclick="updateSort('title')">Title</a></span></div>
-    <div class="col-8 col-sm-3"><span class="white"><a onclick="updateSort('title')">Status</a></span></div>
-    <div class="col-4 col-sm-2"><span class="white"><a onclick="updateSort('user')">Requested By</a></span></div>
-    <div class="col-4 col-sm-2"><span class="white"><a onclick="updateSort('user')">Date</a></span></div>
+    <div class="col-3"><span class="white"><a onclick="updateSort('title')">Title</a></span></div>
+    <div class="col-3"><span class="white"><a onclick="updateSort('title')">Status</a></span></div>
+    <div class="col-3"><span class="white"><a onclick="updateSort('user')">Requested By</a></span></div>
+    <div class="col-3"><span class="white"><a onclick="updateSort('user')">Date</a></span></div>
   </div>
 
   <div class="apb-1" id="requestsList">
@@ -163,7 +194,7 @@ function getRequests(page,sort,order,filter) {
 
   let pagesize = 120;   
 
-
+  
   $.get("/cmds.php/get_reqs/"+page+"/"+sort+"/"+order+"/"+pagesize+"/"+viewmode+"/"+filter, function (data) {
     let requestsList = $("#requestsList");
     requestsList.empty();
@@ -190,16 +221,16 @@ function getRequests(page,sort,order,filter) {
       break
     }
     reqtxt = `<div class="row">
-    <div class="col-8 col-sm-5 text-truncate">
+    <div class="col-3 text-truncate">
     <a class="magenta" href="${req.url}">${req.title}</a>
     </div>
-    <div class="col-8 col-sm-3 text-truncate">
+    <div class="col-3 text-truncate">
     <a class="magenta" href="${req.url}">${status}</a>
     </div>
-    <div class="col-4 col-sm-2 text-truncate">
+    <div class="col-3 text-truncate">
     <a class="magenta" href="${req.url}">${req.user}</a>
     </div>
-    <div class="col-4 col-sm-2 text-truncate">
+    <div class="col-3 text-truncate">
     <a class="magenta" >${req.time}</a>
     </div>`
 
