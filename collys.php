@@ -15,10 +15,10 @@ $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":
           <div class="apt-1 bg-secondary apb-1">
             <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
               <div class="btn-group" role="group">
-                <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">View Mode:</button>
+                <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">View:</button>
                 <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                  <a class="dropdown-item" onclick="setView(1)">Standard</a>
-                  <a class="dropdown-item" onclick="setView(2)">BBS</a>
+                  <a class="dropdown-item" onclick="setView(1)">Standard List</a>
+                  <a class="dropdown-item" onclick="setView(2)">BBS List</a>
                 </div>
               </div>
             </div>
