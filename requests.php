@@ -12,37 +12,38 @@ $sort_by = $_GET['sort_by'] ?? "id";
 
 
         <div class="row m-0 apt-1">
-          <input type="hidden" id="sort1">
-          <input type="hidden" id="viewmode" value="1">
-          <input type="hidden" id="pageno">
-          <input type="hidden" id="sort1">
-          <input type="hidden" id="sort2">
-          <input type="hidden" id="maxpage">
-          <ul class="pagination">
-            <li class="page-item"> <a onclick="firstPage(event)" href="#" class="page-link"><<</a></li>
-            <li class="page-item"> <a onclick="prevPage(event)" href="#" class="page-link" ><</a></li>
-            <span id="currpage"></span>
-            <li class="page-item"> <a onclick="nextPage(event)" href="#" class="page-link" >></a></li>
-            <li class="page-item"> <a onclick="lastPage(event)" href="#" class="page-link" >>></a></li>
-          </ul>
-        </div>
+          <div class="col-12 d-flex">
 
-        <div class="col-3 apt-1 bg-secondary apb-1">
-          <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
-            <div class="btn-group" role="group">
-              <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Show:</button>
-              <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                <a class="dropdown-item" onclick="setView(0)">Open</a>
-                <a class="dropdown-item" onclick="setView(1)">Closed (Unfulfilled)</a>
-                <a class="dropdown-item" onclick="setView(2)">Closed (Fulfilled)</a>
-                <a class="dropdown-item" onclick="setView(3)">Closed (Any)</a>
-                <a class="dropdown-item" onclick="setView(4)">All</a>
+            <input type="hidden" id="sort1">
+            <input type="hidden" id="viewmode" value="1">
+            <input type="hidden" id="pageno">
+            <input type="hidden" id="sort1">
+            <input type="hidden" id="sort2">
+            <input type="hidden" id="maxpage">
+            <ul class="pagination">
+              <li class="page-item"> <a onclick="firstPage(event)" href="#" class="page-link"><<</a></li>
+              <li class="page-item"> <a onclick="prevPage(event)" href="#" class="page-link" ><</a></li>
+              <span id="currpage"></span>
+              <li class="page-item"> <a onclick="nextPage(event)" href="#" class="page-link" >></a></li>
+              <li class="page-item"> <a onclick="lastPage(event)" href="#" class="page-link" >>></a></li>
+            </ul>
+          </div>
+
+          <div class="col-3 apt-1 bg-secondary apb-1">
+            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+              <div class="btn-group" role="group">
+                <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Show:</button>
+                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                  <a class="dropdown-item" onclick="setView(0)">Open</a>
+                  <a class="dropdown-item" onclick="setView(1)">Closed (Unfulfilled)</a>
+                  <a class="dropdown-item" onclick="setView(2)">Closed (Fulfilled)</a>
+                  <a class="dropdown-item" onclick="setView(3)">Closed (Any)</a>
+                  <a class="dropdown-item" onclick="setView(4)">All</a>
+                </div>
               </div>
             </div>
           </div>
         </div>
-
-
         <div class="apt-1 apl-1 bg-secondary apb-1">
           <span><input id="filter" oninput="search(this.value)" class="apl-1 w-100" placeholder="Search..." type="text" autocomplete="off"></span>
         </div>
@@ -162,7 +163,7 @@ function getRequests(page,sort,order,filter) {
 
   let pagesize = 120;   
 
-  
+
   $.get("/cmds.php/get_reqs/"+page+"/"+sort+"/"+order+"/"+pagesize+"/"+viewmode+"/"+filter, function (data) {
     let requestsList = $("#requestsList");
     requestsList.empty();
