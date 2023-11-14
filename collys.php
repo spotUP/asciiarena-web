@@ -14,9 +14,9 @@ $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":
 
 
       <div class="row m-0 apt-1">
-        <input type="hidden" id="sort1"><input type="hidden" id="viewmode" value="1"><input type="hidden" id="pageno"><input type="hidden" id="sort1"><input type="hidden" id="sort2"><input type="hidden" id="maxpage"><ul class="pagination"><li class="page-item"> <a onclick="firstPage(event)" href="#" class="page-link" >FIRST</a></li><li class="page-item"> <a onclick="prevPage(event)" href="#" class="page-link" >PREV</a></li><span id="currpage"></span><li class="page-item"> <a onclick="nextPage(event)" href="#" class="page-link" >NEXT</a></li><li class="page-item"> <a onclick="lastPage(event)" href="#" class="page-link" >LAST</a></li></ul></div>
+        <input type="hidden" id="sort1"><input type="hidden" id="viewmode" value="1"><input type="hidden" id="pageno"><input type="hidden" id="sort1"><input type="hidden" id="sort2"><input type="hidden" id="maxpage"><ul class="pagination"><li class="page-item"> <a onclick="firstPage(event)" href="#" class="page-link" ><<</a></li><li class="page-item"> <a onclick="prevPage(event)" href="#" class="page-link" ><</a></li><span id="currpage"></span><li class="page-item"> <a onclick="nextPage(event)" href="#" class="page-link" >></a></li><li class="page-item"> <a onclick="lastPage(event)" href="#" class="page-link" >>></a></li></ul></div>
 				
-      <div class="col-3 apt-1 bg-secondary apb-1">
+      <div class="col-4 apt-1 bg-secondary apb-1 m-0 p-0">
         <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
           <div class="btn-group" role="group">
             <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">View Mode:</button>
@@ -27,11 +27,13 @@ $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":
           </div>
         </div>
       </div>
+      <div class="row m-0 apt-1">
 
         <div class="col-5 apt-1 bg-secondary apb-1">
 						<span class="amr-1 "><input id="filter" oninput="search(this.value)" placeholder="Search..." type="text" autocomplete="off" class="w-100"></span>
 				</div>
 
+      </div>
 
 			</div>
 		</div>
