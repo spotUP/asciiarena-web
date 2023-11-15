@@ -53,10 +53,10 @@
 			$.get("/admin_cmds.php?cmd=get_crew", function (data) {
 				$.each(data, function (i, crew) {
 					crewlist.append($("<option/>").val(crew.id).text(crew.name));
-					if (($("#edit_crew_name").val().length) && (crew.name == $("#edit_crew_name").val())) {         
-						$("#crew_fetch_id").val(crew.id).trigger("change");
-						$("#edit_artist_name").val("")
-					}
+          if (($("#edit_crew_name").val().length) && (crew.name == $("#edit_crew_name").val())) {         
+            $("#crew_fetch_id").val(crew.id).trigger("change");
+            $("#edit_artist_name").val("")
+          }
 				});
 			});
 		}
@@ -231,49 +231,42 @@
 			</div>
 		</div>
 
-		<div class="row apb-1 apt-1">
-			<div class="col-xs-12 col-md-5">BBSes</div>
-		</div>
-		<div id="crew_bbs_fetch_id"></div>
-		<div class="p-0 row apb-1">
-			<div class="col-xs-12 col-md-4">
-				<select class="select2" id="crew_bbs_add_fetch_id" class="w-100">
-					<option value="0">Select BBS</option>
-					<?php
-					$result = fetchAll("SELECT id, name FROM bbses ORDER BY name");
-					foreach($result as $row) {
-						?>
-						<option value="<?=$row->id?>"><?=$row->name?></option>
-						<?php
-					}
+	<div class="row apb-1 apt-1">
+		<div class="col-xs-12 col-md-5">BBSes</div>
+	</div>
+	<div id="crew_bbs_fetch_id"></div>
+	<div class="p-0 row apb-1">
+		<div class="col-xs-12 col-md-4">
+			<select class="select2" id="crew_bbs_add_fetch_id" class="w-100">
+				<option value="0">Select BBS</option>
+				<?php
+				$result = fetchAll("SELECT id, name FROM bbses ORDER BY name");
+				foreach($result as $row) {
 					?>
-				</select>
-			</div>
-			<div class="col-xs-12 col-md-2 apt-0">
-				<input type="button" class="w-100 btn-big" value="Add BBS" onclick="addCrewBBS()"/>
-			</div>
+					<option value="<?=$row->id?>"><?=$row->name?></option>
+					<?php
+				}
+				?>
+			</select>
 		</div>
-		<div class="row apt-1">
-			<div class="col-12">
-				<div class="col-6">
-					<input type="button" class="amb-1 w-100 btn-big bg-green white" value="Save" onclick="saveCrew()">
-				</div>
-				<div class="col-6">
-
-					<?php if ($admin_edit && is_admin()) { ?>
-						<input type="button" class="amb-1 w-100 btn-big bg-red white" value="Delete" onclick="delCrew()">
-					<?php } ?>
-					<div class="col-6">
-
-					</div>
-				</div>
-			</form>
-			<input type="hidden" id="edit_crew_name" value="<?php if(isset($_POST['getcrew']) && (isset($_POST['open_edit_crew_field']))) echo $_POST['getcrew']; ?>">
+		<div class="col-xs-12 col-md-2 apt-0">
+			<input type="button" class="w-100 btn-big" value="Add BBS" onclick="addCrewBBS()"/>
 		</div>
-		<?php if ($admin_edit && is_admin()) { ?>
-			<script>
-				$(function () {
-					getCrewList();
-				});
-			</script>
-		<?php } ?>
+	</div>
+	<div class="row col-12 apt-1 m-0 p-0">
+			<div class="col-xs-12 col-md-2 m-0 p-0"><input type="button" class="amb-1 w-100 btn-big bg-green white" value="Save" onclick="saveCrew()"></div>
+			<?php if ($admin_edit && is_admin()) { ?>
+				<div class="col-xs-12 col-md-2 m-0 p-0"><input type="button" class="amb-1 w-100 btn-big bg-red white" value="Delete" onclick="delCrew()"></div>
+			<?php } ?>
+	</div>
+
+</form>
+    <input type="hidden" id="edit_crew_name" value="<?php if(isset($_POST['getcrew']) && (isset($_POST['open_edit_crew_field']))) echo $_POST['getcrew']; ?>">
+</div>
+<?php if ($admin_edit && is_admin()) { ?>
+	<script>
+		$(function () {
+			getCrewList();
+		});
+	</script>
+<?php } ?>
