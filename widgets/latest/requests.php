@@ -6,18 +6,22 @@
 <div class="container-fluid m-0">
 	<div class="col-12 bg-secondary apb-1">
 		<div class="row">
-			<div class="col-12 apt-1 apb-1 d-flex">
-				<div class="col-4"><span class="white text-truncate">REQUESTED BY</span></div>
-				<div class="col-8 text-right"><span class="white">REQUEST</div>
+			<div class="col-sm-10 text-truncate d-none d-sm-block apt-1">
+				<span class="white">REQUEST</span>
+			</div>
+			<div class="col-6 col-sm-2 text-truncate apb-1 apt-1 text-right">
+				<span class="white text-truncate">REQUESTED BY</span>
 			</div>
 		</div>
 		<?php
 		foreach(fetchAll('SELECT requests.id, title,nick FROM requests, users where requests.requestedby=users.id and STATUS = 0 ORDER BY requests.id DESC LIMIT 10') as $row) {
 			?>
 			<div class="row">
-				<div class="col-12 d-flex">
-					<div class="col-4"><a class="yellow" href="/member/<?=$row->nick?>"><?=($row->nick)?></a></div>
-					<div class="col-8 text-right"><a class="cyan text-truncate" href="/info_requests.php?id=<?=$row->id?>"><?=$row->title?></a></div>
+				<div class="col-6 col-sm-10 mb-4 mb-sm-0 text-truncate">
+					<a class="cyan text-truncate" href="/info_requests.php?id=<?=$row->id?>"><?=$row->title?></a>
+				</div>
+				<div class="col-sm-2 text-truncate text-right">
+					<a class="yellow" href="/member/<?=$row->nick?>"><?=($row->nick)?></a>
 				</div>
 			</div>
 			<?php
