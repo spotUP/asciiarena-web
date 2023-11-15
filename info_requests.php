@@ -273,7 +273,7 @@ if ($req_available) {
       </div>
 
 
-<div class="col-8">
+<div class="col-12">
 <a id="dlfiledata" style="display:none"> </a>
  <div id="reqcomments">
   </div>
