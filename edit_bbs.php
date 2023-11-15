@@ -290,7 +290,7 @@
 
 
 		</div>
-		<div class="col-xs-12 col-md-2 apt-1">
+		<div class="col-xs-12 col-md-2 apt-0">
 			<input type="button" class="w-100 btn-big" value="Add Crew" onclick="addBBSCrew()"/>
 		</div>
 	</div>

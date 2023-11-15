@@ -147,7 +147,7 @@
 			</div>
 		</div>
 		<div class="row apb-1">
-    		<div class="col-xs-12 col-md-5">
+    		<div class="col-xs-12 col-md-6">
 			<select class="select2" id="request_status" name="status" class="w-100">
 				<option value="0">Open</option>
 				<option value="1">Closed (Fulfilled)</option>
