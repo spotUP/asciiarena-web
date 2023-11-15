@@ -90,11 +90,6 @@ $sort_by = $_GET['sort_by'] ?? "id";
 
 
     ?>
-    <div class="container-fluid bg-secondary apb-1">
-      <div class="d-none d-sm-block text-truncate text-center">
-       <span class="green">- --/\-\/- -</span> <span class="cyan">aSCIIaRENA</span> <span class="red">--=*=-- </span><span class="pink">[<?=date("D")?>, the <?=date("d-m-y")?>]</span><span class="red"> --=*=-- </span> <span class="cyan">aSCIIaRENA</span> <span class="green"> - -/\-\/- -- -</span><br><br>
-     </div>
-   </div>
 
    <div id = "hdrcols" class="row amb-1">
     <div class="col-5"><span class="white"><a onclick="updateSort('title')">Title</a></span></div>
