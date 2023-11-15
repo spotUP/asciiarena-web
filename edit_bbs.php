@@ -275,7 +275,7 @@
 	</div>
 	<div id="bbs_crew_fetch_id"></div>
 	<div class="p-0 row apb-1">
-		<div class="col-xs-12 col-md-5">
+		<div class="col-xs-12 col-md-4">
 			<select class="select2" id="bbs_crew_add_fetch_id" class="w-100">
 				<option value="0">Select Crew</option>
 				<?php
@@ -290,7 +290,7 @@
 
 
 		</div>
-		<div class="col-xs-12 col-md-1 apt-1">
+		<div class="col-xs-12 col-md-1 apt-2">
 			<input type="button" class="w-100 btn-big" value="Add Crew" onclick="addBBSCrew()"/>
 		</div>
 	</div>
