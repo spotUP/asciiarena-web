@@ -176,9 +176,9 @@ include "header.php";
           ?>
 
             reqcommentlist.append(`
-            <span class="yellow">${htmlEncode(comment.user)}</span>
-            <span>DATE:</span>
-            <span class="white">${comment.time}</span>
+            <div class="header bg-header col-12 ap-1 text-truncate">
+            <span class="yellow">${htmlEncode(comment.user)}</span><span>DATE:</span><span class="white">${comment.time}</span>
+            </div>
             </div>
             <div class="bg-secondary col-12 ap-1 amb-1">
             <span id="comment${comment.id}"class="cyan" style="white-space: pre-wrap;">${htmlEncode(comment.comment)}</span>
