@@ -213,13 +213,13 @@ $(function() {
      $timestamp=date("Y-m-d H:i",$result->timestamp);
      switch ($result->status) {
       case 0:
-      $status = "<span class="cyan">Open</span>";
+      $status = "<span class=\"cyan\">Open</span>";
       break;
       case 1:
-      $status = "<span class="green">Closed (Fulfilled)</span>";
+      $status = "<span class=\"green\">Closed (Fulfilled)</span>";
       break;
       case 2:
-      $status = "<span class="red">Closed (Unfulfilled)</span>";
+      $status = "<span class=\"red\">Closed (Unfulfilled)</span>";
       break;
     }
 
