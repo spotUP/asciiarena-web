@@ -208,7 +208,7 @@
 				</div>
 			<?php } else { ?>  
 		<div class="row">
-			<div class="col-xs-12 col-md-6 apb-1 apt-1">
+			<div class="col-xs-12 col-md-6 apb-1 apt-0">
 				<label for="app_file" class="lightgrey">File (required)</label>
 			</div>
 		</div>
