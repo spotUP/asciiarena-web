@@ -5,27 +5,9 @@ require_once "header.php";
 ?>
 <div class="modal-body row m-0 p-0">
 	<div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 bg-secondary">
-		<div class="row">
-			<div class="col-12 d-flex justify-content-between">
 
-        <div class="row m-0 apt-1">
-          <input type="hidden" id="pageno">
-          <input type="hidden" id="sort1">
-          <input type="hidden" id="sort2">
-          <input type="hidden" id="maxpage">
-          <ul class="pagination">
-            <li class="page-item"> <a onclick="firstPage(event)" href="#" class="page-link" ><<</a></li>
-            <li class="page-item"> <a onclick="prevPage(event)" href="#" class="page-link" ><</a></li>
-            <span id="currpage"></span>
-            <li class="page-item"> <a onclick="nextPage(event)" href="#" class="page-link" >></a></li>
-            <li class="page-item"> <a onclick="lastPage(event)" href="#" class="page-link" >>></a></li>
-          </ul>
-        </div>
-          <div class="apt-1 apl-1 bg-secondary apb-1">
-            <span><input id="filter" oninput="search(this.value)" class="apl-1 w-100" placeholder="Search..." type="text" autocomplete="off"></span>
-          </div>
-      </div>
-    </div>
+    <?php require_once "paginateslim.php"; ?>
+
     <?php
 
 	//-----------------------------------------------------------------------------
