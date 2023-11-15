@@ -397,7 +397,7 @@ small,
 
 .input-group-lg > .form-control:not(textarea),
 .input-group-lg > .custom-select {
-  height: 16px;
+  height: 48px;
 }
 
 .input-group-lg > .form-control,
@@ -412,7 +412,7 @@ small,
 
 .input-group-sm > .form-control:not(textarea),
 .input-group-sm > .custom-select {
-  height: 16px;
+  height: 48px;
 }
 
 .input-group-sm > .form-control,
@@ -513,22 +513,22 @@ input, optgroup, textarea {
 
 button:active, select:active{
   border: 0;
-  max-height: 16px;
-  min-height: 16px;
+  max-height: 48px;
+  min-height: 48px;
   color: #999999 !important;
 }
 
 button:active, select:active{
   border: 0;
-  max-height: 16px;
-  min-height: 16px;
+  max-height: 48px;
+  min-height: 48px;
   color: #999999 !important;
 }
 
 button, select{
   border: 0;
-  max-height: 16px;
-  min-height: 16px;
+  max-height: 48px;
+  min-height: 48px;
   border: 0 !important;
   white-space: pre;
   color: #999999 !important;
@@ -536,18 +536,20 @@ button, select{
 
 input, optgroup {
   border: 0;
-  max-height: 16px;
-  min-height: 16px;
+  max-height: 48px;
+  min-height: 48px;
   border: 0 !important;
   white-space: pre;
   color: #bbbbbb !important;
   line-height: 16px !important;
+  padding-left: 8px;
+  margin-left: 8px;
 }
 
 input:active, optgroup:active {
   border: 0;
-  max-height: 16px;
-  min-height: 16px;
+  max-height: 48px;
+  min-height: 48px;
   color: #bbbbbb !important;
   line-height: 14px !important;
 }
@@ -561,8 +563,8 @@ input:hover, optgroup:hover {
 
 input:active, optgroup:active {
   border: 0;
-  max-height: 16px;
-  min-height: 16px;
+  max-height: 48px;
+  min-height: 48px;
   color: #bbbbbb !important;
 }
 
@@ -1327,6 +1329,7 @@ button.btn.btn-primary{
 
 input[type=text]{
   color: #999999;
+  padding-left:8px;
 }
 
 input[type="password" i] {
@@ -2029,7 +2032,7 @@ body > div.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-white > span
   position: absolute;
   content: "";
   top: 20px;
-  right: 16px;
+  right: 16px !important;
   width: 0;
   height: 0;
   border: 6px solid transparent;
@@ -2101,7 +2104,7 @@ form{
 
 .select2{
   width: 100% !important;
-  margin-top: 0px;
+  /* margin-top: 0px; */
 }
 
 span.select2-selection__arrow > b::before{
@@ -2113,7 +2116,7 @@ span.select2-selection__arrow > b::after{
 }
 
 .select2-container--default .select2-selection--single .select2-selection__arrow {
-  height: 16px !important;
+  height: 48px !important;
   top: -0px !important;
   border-color: #fff transparent transparent transparent !important;
 }
@@ -2146,12 +2149,14 @@ li.select2-results__option.select2-results__option--highlighted{
 
 .select2-container--default .select2-selection--single .select2-selection__rendered {
   color: rgb(170, 170, 170) !important;
-  line-height: 16px !important;
+  line-height: 48px !important;
   padding-left: 2px !important;
+  margin-left: 16px;
+  padding-right: 16px;
 }
 
 .select2-container .select2-selection--single {
-  height: 16px !important;
+  height: 48px !important;
   vertical-align: initial !important;
 }
 
@@ -2214,21 +2219,21 @@ input:focus, textarea:focus, select:focus, button:focus, .btn-primary.focus, .bt
   font-size: 16px !important;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
   font-weight: normal;
-  line-height: 16px;
+  line-height: 48px;
 }
 
 input#password-form.control{
   font-size: 16px !important;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
   font-weight: normal;
-  line-height: 16px;
+  line-height: 48px;
 }
 
 #password-form.control{
   font-size: 16px !important;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
   font-weight: normal;
-  line-height: 16px;
+  line-height: 48px;
 }
 
 input:-internal-autofill-selected {
@@ -2236,7 +2241,7 @@ input:-internal-autofill-selected {
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
   font-size: 16px;
   font-weight: normal;
-  line-height: 16px;
+  line-height: 48px;
 }
 
 input:-internal-autofill {
@@ -2244,7 +2249,7 @@ input:-internal-autofill {
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
   font-size: 16px;
   font-weight: normal;
-  line-height: 16px;
+  line-height: 48px;
 }
 
 button, input, optgroup, select, textarea {
@@ -2252,7 +2257,7 @@ button, input, optgroup, select, textarea {
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
   font-size: 16px;
   font-weight: normal;
-  line-height: 16px;
+  line-height: 48px;
 }
 
 &:-webkit-autofill::first-line,
@@ -2264,7 +2269,7 @@ button, input, optgroup, select, textarea {
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
   font-size: 16px !important;
   font-weight: normal !important;
-  line-height: 16px !important;
+  line-height: 48px !important;
 }
 
 input:-webkit-autofill, input:-webkit-autofill:hover, and input:-webkit-autofill:first-line{
@@ -2272,7 +2277,7 @@ input:-webkit-autofill, input:-webkit-autofill:hover, and input:-webkit-autofill
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
   font-size: 16px !important;
   font-weight: normal !important;
-  line-height: 16px !important;
+  line-height: 48px !important;
 }
 
 
@@ -2391,7 +2396,7 @@ Selector::-webkit-file-upload-button {
 input::-webkit-file-upload-button {
    font-size:  16px;
    font-size:  16px;
-   height: 16px;
+   height: 48px;
    line-height: 16px;
    border-radius: 0px;
    padding: 0px;
@@ -2425,7 +2430,7 @@ input[type="file"]::-ms-browse {
    border: 0px;
    font-size:  16px;
    font-size:  16px;
-   height: 16px;
+   height: 48px;
    line-height: 16px;
    border-radius: 0px;
    padding: 0px;
@@ -2441,7 +2446,7 @@ input[type="file"]::-webkit-file-upload-button {
    border: 0px;
    font-size:  16px;
    font-size:  16px;
-   height: 16px;
+   height: 48px;
    line-height: 16px;
    border-radius: 0px;
    padding: 0px;
