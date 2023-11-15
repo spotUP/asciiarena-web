@@ -1,10 +1,10 @@
 <?php
-	define("NO_PING", true);
-	require_once "session.php";
-	require_once "functions.php";
-	require_once "tools/text.php";
- 
-  function extractFileDiz($filename) {
+define("NO_PING", true);
+require_once "session.php";
+require_once "functions.php";
+require_once "tools/text.php";
+
+function extractFileDiz($filename) {
     $ext = substr($filename, strrpos($filename,'.'), strlen($filename)-1); 	// extract extension 
     $tempDiz="temp.diz";
     $contents="";
@@ -24,17 +24,17 @@
       }
 
     }
-      
+
     if ((strtolower($ext) == ".lha") || (strtolower($ext) == ".lzh")) {
 
       $lhal = shell_exec('/usr/bin/lha l "'.$filename.'"');
-	   	$fileids = array();
-	   	foreach (explode("\n", $lhal) as $l) {
-	   		if (preg_match('/%\s+[A-Za-z]+\s+\d+\s+\d{4}\s+(.*file_id\.diz)$/i', $l, $m)) $fileids[] = $m[1];
-	   	}
+      $fileids = array();
+      foreach (explode("\n", $lhal) as $l) {
+        if (preg_match('/%\s+[A-Za-z]+\s+\d+\s+\d{4}\s+(.*file_id\.diz)$/i', $l, $m)) $fileids[] = $m[1];
+      }
       
-	   	foreach ($fileids as $fileid) {
-	   		shell_exec('/usr/bin/lha pq "'.$filename.'" "'.$fileid.'" | sed 1,3d >'.$tempDiz);
+      foreach ($fileids as $fileid) {
+        shell_exec('/usr/bin/lha pq "'.$filename.'" "'.$fileid.'" | sed 1,3d >'.$tempDiz);
         if (file_exists($tempDiz))
         {
           $size_check = filesize($tempDiz);
@@ -68,259 +68,262 @@
         $contents = $good;
       }
     }
- 
+
     if (strtolower($ext) == ".zip")
     {
       $contents_check=strlen($contents);
       if ($contents_check <1)
       {
-         exec("/usr/bin/unzip -p -Ca $filename file_id.diz >$tempDiz");
-        $size_check = filesize($tempDiz);
-        if ($size_check > 0)
-        {
-          $handle = fopen($tempDiz, "r");
-          $contents = fread($handle, filesize($tempDiz));
-          fclose($handle);
-        }
+       exec("/usr/bin/unzip -p -Ca $filename file_id.diz >$tempDiz");
+       $size_check = filesize($tempDiz);
+       if ($size_check > 0)
+       {
+        $handle = fopen($tempDiz, "r");
+        $contents = fread($handle, filesize($tempDiz));
+        fclose($handle);
       }
+    }
 
-      if (file_exists($tempDiz)) unlink($tempDiz);
-    }
-      
-    return $contents;
+    if (file_exists($tempDiz)) unlink($tempDiz);
   }
-  
- 
-  function login() {
-    global $_user;
-    $login = false;
-    $pw = $_POST[ "password" ] ?? "";
-    $ni = $_POST[ "nick" ] ?? "";
-    $loc = $_POST[ "location" ] ?? "/";
-    $spw = fetchOne("SELECT pwhash FROM users WHERE (nick = :nick OR mail = :mail)", [ ":nick" => $ni, ":mail" => $ni ])->pwhash;
-    if (preg_match('/^[a-f0-9]{32}$/i', $spw)) {
-      $login = fetchOne("SELECT id,nick,crew,`rank`,crt_effect FROM users WHERE pwhash = :pwhash AND (nick = :nick OR mail = :mail)", [
-        ":pwhash" => md5($pw),
-	":nick" => $ni,
-	":mail" => $ni
-      ]);
-      if ($login) {
-        $pwhash = password_hash($pw, PASSWORD_BCRYPT, array('cost' => 13));
-        doQuery("UPDATE users SET pwhash=:pwhash WHERE id=:id", [ ":pwhash" => $pwhash, ":id" => $login->id ]);
-      }
-    } else {
-      if (password_verify($pw, $spw)) {
-        $login = fetchOne("SELECT id,nick,crew,`rank`,crt_effect FROM users WHERE (nick = :nick OR mail = :mail)", [ ":nick" => $ni, ":mail" => $ni ]);
-      }
-    }
+
+  return $contents;
+}
+
+
+function login() {
+  global $_user;
+  $login = false;
+  $pw = $_POST[ "password" ] ?? "";
+  $ni = $_POST[ "nick" ] ?? "";
+  $loc = $_POST[ "location" ] ?? "/";
+  $spw = fetchOne("SELECT pwhash FROM users WHERE (nick = :nick OR mail = :mail)", [ ":nick" => $ni, ":mail" => $ni ])->pwhash;
+  if (preg_match('/^[a-f0-9]{32}$/i', $spw)) {
+    $login = fetchOne("SELECT id,nick,crew,`rank`,crt_effect FROM users WHERE pwhash = :pwhash AND (nick = :nick OR mail = :mail)", [
+      ":pwhash" => md5($pw),
+      ":nick" => $ni,
+      ":mail" => $ni
+    ]);
     if ($login) {
-      $_user = $_SESSION[ "_user" ] = [
-        "id" => $login->id,
-        "nick" => $login->nick,
-        "crew" => $login->crew,
-        "rank" => $login->rank,
-        "settings" => [
-          "crt_effect" => $login->crt_effect,
-        ]
-      ];
-      if (isset($_POST["rememberme"]) && $_POST["rememberme"] == 1) setremember();
-      doQuery("INSERT INTO lastusers (nick, crew, user_id, timestamp) VALUES (:nick, :crew, {$login->id}, UNIX_TIMESTAMP())", [
-        ":nick" => $_user[ "nick" ],
-        ":crew" => $_user[ "crew" ]
-      ]);
-      doQuery("UPDATE users SET lastactive = UNIX_TIMESTAMP() WHERE id = {$login->id}");
-      if (is_ajax()) { ?>
-        <script>window.location.replace('<?=addslashes($loc)?>');</script>
-        <?php 
-        exit;
-      }
-    } else {
-      if (is_ajax()) { ?>
-        <div class="bs-component quick-alert amb-1" id="login-failure" style="display: none;">
-          <div id="#danger-alert" class="animate__animated animate__shakeX alert alert-danger">authentication failed</div>
-        </div>
-        <script>$('#login-failure').fadeIn('slow').delay(2000).fadeOut('slow');</script>
-        <?php 
-        exit;
-      }
+      $pwhash = password_hash($pw, PASSWORD_BCRYPT, array('cost' => 13));
+      doQuery("UPDATE users SET pwhash=:pwhash WHERE id=:id", [ ":pwhash" => $pwhash, ":id" => $login->id ]);
     }
-    exit;
+  } else {
+    if (password_verify($pw, $spw)) {
+      $login = fetchOne("SELECT id,nick,crew,`rank`,crt_effect FROM users WHERE (nick = :nick OR mail = :mail)", [ ":nick" => $ni, ":mail" => $ni ]);
+    }
   }
+  if ($login) {
+    $_user = $_SESSION[ "_user" ] = [
+      "id" => $login->id,
+      "nick" => $login->nick,
+      "crew" => $login->crew,
+      "rank" => $login->rank,
+      "settings" => [
+        "crt_effect" => $login->crt_effect,
+      ]
+    ];
+    if (isset($_POST["rememberme"]) && $_POST["rememberme"] == 1) setremember();
+    doQuery("INSERT INTO lastusers (nick, crew, user_id, timestamp) VALUES (:nick, :crew, {$login->id}, UNIX_TIMESTAMP())", [
+      ":nick" => $_user[ "nick" ],
+      ":crew" => $_user[ "crew" ]
+    ]);
+    doQuery("UPDATE users SET lastactive = UNIX_TIMESTAMP() WHERE id = {$login->id}");
+    if (is_ajax()) { ?>
+      <script>window.location.replace('<?=addslashes($loc)?>');</script>
+      <?php 
+      exit;
+    }
+  } else {
+    if (is_ajax()) { ?>
+      <div class="bs-component quick-alert amb-1" id="login-failure" style="display: none;">
+        <div id="#danger-alert" class="animate__animated animate__shakeX alert alert-danger">authentication failed</div>
+      </div>
+      <script>$('#login-failure').fadeIn('slow').delay(2000).fadeOut('slow');</script>
+      <?php 
+      exit;
+    }
+  }
+  exit;
+}
 
-  function logout() {
-    global $_user;
-    $_user = $_SESSION[ "_user" ];
-    doQuery("UPDATE users SET lastactive = UNIX_TIMESTAMP()-300 WHERE id = {$_user['id']}");
-    $_SESSION = [];
-    if (ini_get("session.use_cookies")) {
-      $params = session_get_cookie_params();
-      setcookie(session_name(), '', time() - 42000, $params[ "path" ], $params[ "domain" ], $params[ "secure" ], $params[ "httponly" ]);
-    }
-    session_destroy();
-    if (isset($_COOKIE['aarm'])) setcookie('aarm', '', (time()-86400), '/', 'asciiarena.se', true, true);
+function logout() {
+  global $_user;
+  $_user = $_SESSION[ "_user" ];
+  doQuery("UPDATE users SET lastactive = UNIX_TIMESTAMP()-300 WHERE id = {$_user['id']}");
+  $_SESSION = [];
+  if (ini_get("session.use_cookies")) {
+    $params = session_get_cookie_params();
+    setcookie(session_name(), '', time() - 42000, $params[ "path" ], $params[ "domain" ], $params[ "secure" ], $params[ "httponly" ]);
   }
-  
-  function tag() {
-    global $_user;
-    $_user = $_SESSION[ "_user" ];
-    $text = $_POST[ 'tagtext' ] ?? "";
-    $text = strip_tags($text);
-    $wall = $_POST[ 'wall_id' ] ?? 1;
-    if (!empty($text) && is_logged_in()) {
-      doQuery("INSERT INTO wallposts (user_id, wall_id, nick, tag) VALUES (:user_id, :wall_id, :nick, :text)", [
-        ":user_id" => $_user[ "id" ],
-        ":wall_id" => (int)$wall,
-        ":nick" => $_user[ "nick" ],
-        ":text" => $text
-      ]);
-    }
-    if (is_ajax()) {
-      foreach (fetchAll("(SELECT * FROM wallposts WHERE wall_id = :wall_id ORDER BY id DESC LIMIT 13) ORDER BY id ASC", [":wall_id" => (int)$wall]) as $row) { ?>
-        <div class="col-lg-12 d-flex justify-content-between">
+  session_destroy();
+  if (isset($_COOKIE['aarm'])) setcookie('aarm', '', (time()-86400), '/', 'asciiarena.se', true, true);
+}
+
+function tag() {
+  global $_user;
+  $_user = $_SESSION[ "_user" ];
+  $text = $_POST[ 'tagtext' ] ?? "";
+  $text = strip_tags($text);
+  $wall = $_POST[ 'wall_id' ] ?? 1;
+  if (!empty($text) && is_logged_in()) {
+    doQuery("INSERT INTO wallposts (user_id, wall_id, nick, tag) VALUES (:user_id, :wall_id, :nick, :text)", [
+      ":user_id" => $_user[ "id" ],
+      ":wall_id" => (int)$wall,
+      ":nick" => $_user[ "nick" ],
+      ":text" => $text
+    ]);
+  }
+  if (is_ajax()) {
+    foreach (fetchAll("(SELECT * FROM wallposts WHERE wall_id = :wall_id ORDER BY id DESC LIMIT 13) ORDER BY id ASC", [":wall_id" => (int)$wall]) as $row) { ?>
+        <div class="col-10 d-flex">
           <span class="cyan text-truncate" style="white-space: pre"><?=$row->tag?></span>
+        </div>
+        <div class="col-2 text-right">
           <span class="lightpink"><a href="/member/<?=urlsafe($row->nick)?>"><?=$row->nick?></a></span>
         </div>
-      <?php }
-      exit();
-    }
-  }
-    
-	function countDownload($collyid) {
-    if (is_ajax() && is_logged_in()) {
-      $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
-      if ($colly > 0) {
-        $status = doQuery("update collys set downloads=downloads+1 where id = :colly_id",[
-          ":colly_id" => (int)$colly,
-        ]);
-        $code = ($status) ? 200 : 400;
-        exit(json_out([
-          "status" => $status
-        ], $code));
-      }
-      exit(json_out(["status" => false], 400));
-    }
-  }
-  
-  function countView($collyid) {
-    if (is_ajax() && is_logged_in()) {
-      $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
-      if ($colly > 0) {
-        $status = doQuery("update collys set view_counter=view_counter+1 where id = :colly_id",[
-          ":colly_id" => (int)$colly,
-        ]);
-        $code = ($status) ? 200 : 400;
-        exit(json_out([
-          "status" => $status
-        ], $code));
-      }
-      exit(json_out(["status" => false], 400));
-    }
-  }
 
-  function brokenColly($collyid) {
-    if (is_ajax() && is_logged_in()) {
-      $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
-      $comment = $_POST[ 'comment' ] ?? "";
-      if ($colly > 0) {
-        $status = doQuery("update collys set broken=1, broken_comment=:comment where id = :colly_id",[
-          ":colly_id" => (int)$colly,
-          ":comment" => $comment
-        ]);
-        $code = ($status) ? 200 : 400;
-        exit(json_out([
-          "status" => $status
-        ], $code));
-      }
-      exit(json_out(["status" => false], 400));
+    <?php }
+    exit();
+  }
+}
+
+function countDownload($collyid) {
+  if (is_ajax() && is_logged_in()) {
+    $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
+    if ($colly > 0) {
+      $status = doQuery("update collys set downloads=downloads+1 where id = :colly_id",[
+        ":colly_id" => (int)$colly,
+      ]);
+      $code = ($status) ? 200 : 400;
+      exit(json_out([
+        "status" => $status
+      ], $code));
     }
+    exit(json_out(["status" => false], 400));
   }
-  
-  function getComments($collyid) {
-    if (is_ajax()) {
-      $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
-      if ($colly > 0) {
-        $data = [];
-        $comments = fetchAll("SELECT commentid,timestamp,nick,ifnull(rating,'') as rating,comment FROM comments WHERE colly_id = :id", [":id" => $colly]);
-        foreach($comments as $comment) {
-          $data[] = [
-            "id" => (int)$comment->commentid,
-            "time" => date("Y-m-d H:i",$comment->timestamp),
-            "nick" => $comment->nick,
-            "rating" => $comment->rating,
-            "comment" => $comment->comment
-          ];
-        }
-        exit(json_out($data));
-      }
-      exit(json_out(["status" => false], 404));
-    }  
-  }
-  
-  function deleteComment($collyid) {
-    if (is_ajax() && is_logged_in() &&is_admin()) {
-      $id = $_POST[ "comment_id" ] ?? $collyid ?? 0;
-      $colly = $_POST[ "colly_id" ] ?? 0;
-      if ($id > 0) {
-        $status = doQuery("delete from comments where commentid = :commentid",[
-          ":commentid" => (int)$id,
-        ]);
-        $code = ($status) ? 200 : 400;
-        doQuery("update collys set rating=(select avg(rating) AS avg from comments where colly_id=:colly_id and rating>0) where id=:colly_id",[
-          ":colly_id" => (int)$colly,
-        ]);
-        recalculate_ratings();
-        exit(json_out([
-          "status" => $status
-        ], $code));
-      }
-      exit(json_out(["status" => false], 400));
+}
+
+function countView($collyid) {
+  if (is_ajax() && is_logged_in()) {
+    $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
+    if ($colly > 0) {
+      $status = doQuery("update collys set view_counter=view_counter+1 where id = :colly_id",[
+        ":colly_id" => (int)$colly,
+      ]);
+      $code = ($status) ? 200 : 400;
+      exit(json_out([
+        "status" => $status
+      ], $code));
     }
+    exit(json_out(["status" => false], 400));
   }
-    
-  function editComment($collyid) {
-    global $_user;
-    if (is_ajax() && is_logged_in()) {
-      $id = $_POST[ "comment_id" ] ?? $collyid ?? 0;
-      $comment = $_POST[ 'comment' ] ?? "";
-      if ($id > 0) {
-        if (is_admin()) {
-          $admin=1;
-        } else {
-          $admin=0;
-        }
-        $status = doQuery("update comments set comment = :comment where (:admin = 1 or nick = :nick) and commentid = :commentid",[
-          ":commentid" => (int)$id,
-          ":comment" => $comment,
-          ":nick" => $_user[ "nick" ],
-          ":admin" => $admin
-        ]);
-        $code = ($status) ? 200 : 400;
-        exit(json_out([
-          "status" => $status
-        ], $code));
-      }
-      exit(json_out(["status" => false], 400));
+}
+
+function brokenColly($collyid) {
+  if (is_ajax() && is_logged_in()) {
+    $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
+    $comment = $_POST[ 'comment' ] ?? "";
+    if ($colly > 0) {
+      $status = doQuery("update collys set broken=1, broken_comment=:comment where id = :colly_id",[
+        ":colly_id" => (int)$colly,
+        ":comment" => $comment
+      ]);
+      $code = ($status) ? 200 : 400;
+      exit(json_out([
+        "status" => $status
+      ], $code));
     }
+    exit(json_out(["status" => false], 400));
   }
-  
-  function addComment($collyid) {
-    global $_user;
-    if (is_ajax() && is_logged_in()) {
-      $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
-      $comment = $_POST[ 'comment' ] ?? "";
-      $rating = $_POST[ 'rating' ] ?? "";
-      if (empty($rating)) $rating = null;
-      
-      if (!is_null($rating)) {
-          $status = doQuery("update comments set rating = null where colly_id=:colly_id and user_id=:user_id",[
-          ":colly_id" => (int)$colly,
-          ":user_id" => $_user[ "id" ],
-        ]);
+}
+
+function getComments($collyid) {
+  if (is_ajax()) {
+    $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
+    if ($colly > 0) {
+      $data = [];
+      $comments = fetchAll("SELECT commentid,timestamp,nick,ifnull(rating,'') as rating,comment FROM comments WHERE colly_id = :id", [":id" => $colly]);
+      foreach($comments as $comment) {
+        $data[] = [
+          "id" => (int)$comment->commentid,
+          "time" => date("Y-m-d H:i",$comment->timestamp),
+          "nick" => $comment->nick,
+          "rating" => $comment->rating,
+          "comment" => $comment->comment
+        ];
       }
-      
-      if ($colly > 0) {
-        $status = doQuery("insert into comments (colly_id, filename, crew, artist, comment, rating, nick, timestamp,user_id) 
-          values (:colly_id,:filename,(select group_concat(w.name) from collys_crews cc LEFT JOIN crews w ON w.id=cc.crew_id where cc.colly_id=:colly_id group by cc.colly_id),(select group_concat(a.nick) from artists_collys ac LEFT JOIN artists a ON a.id=ac.artist_id where ac.colly_id=:colly_id GROUP BY ac.colly_id),:comment, :rating, :nick, :time, :user_id)",[
+      exit(json_out($data));
+    }
+    exit(json_out(["status" => false], 404));
+  }  
+}
+
+function deleteComment($collyid) {
+  if (is_ajax() && is_logged_in() &&is_admin()) {
+    $id = $_POST[ "comment_id" ] ?? $collyid ?? 0;
+    $colly = $_POST[ "colly_id" ] ?? 0;
+    if ($id > 0) {
+      $status = doQuery("delete from comments where commentid = :commentid",[
+        ":commentid" => (int)$id,
+      ]);
+      $code = ($status) ? 200 : 400;
+      doQuery("update collys set rating=(select avg(rating) AS avg from comments where colly_id=:colly_id and rating>0) where id=:colly_id",[
+        ":colly_id" => (int)$colly,
+      ]);
+      recalculate_ratings();
+      exit(json_out([
+        "status" => $status
+      ], $code));
+    }
+    exit(json_out(["status" => false], 400));
+  }
+}
+
+function editComment($collyid) {
+  global $_user;
+  if (is_ajax() && is_logged_in()) {
+    $id = $_POST[ "comment_id" ] ?? $collyid ?? 0;
+    $comment = $_POST[ 'comment' ] ?? "";
+    if ($id > 0) {
+      if (is_admin()) {
+        $admin=1;
+      } else {
+        $admin=0;
+      }
+      $status = doQuery("update comments set comment = :comment where (:admin = 1 or nick = :nick) and commentid = :commentid",[
+        ":commentid" => (int)$id,
+        ":comment" => $comment,
+        ":nick" => $_user[ "nick" ],
+        ":admin" => $admin
+      ]);
+      $code = ($status) ? 200 : 400;
+      exit(json_out([
+        "status" => $status
+      ], $code));
+    }
+    exit(json_out(["status" => false], 400));
+  }
+}
+
+function addComment($collyid) {
+  global $_user;
+  if (is_ajax() && is_logged_in()) {
+    $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
+    $comment = $_POST[ 'comment' ] ?? "";
+    $rating = $_POST[ 'rating' ] ?? "";
+    if (empty($rating)) $rating = null;
+
+    if (!is_null($rating)) {
+      $status = doQuery("update comments set rating = null where colly_id=:colly_id and user_id=:user_id",[
+        ":colly_id" => (int)$colly,
+        ":user_id" => $_user[ "id" ],
+      ]);
+    }
+
+    if ($colly > 0) {
+      $status = doQuery("insert into comments (colly_id, filename, crew, artist, comment, rating, nick, timestamp,user_id) 
+        values (:colly_id,:filename,(select group_concat(w.name) from collys_crews cc LEFT JOIN crews w ON w.id=cc.crew_id where cc.colly_id=:colly_id group by cc.colly_id),(select group_concat(a.nick) from artists_collys ac LEFT JOIN artists a ON a.id=ac.artist_id where ac.colly_id=:colly_id GROUP BY ac.colly_id),:comment, :rating, :nick, :time, :user_id)",[
           ":colly_id" => (int)$colly,
           ":filename" => $_SESSION['filename'],
           ":comment" => $comment,
@@ -329,222 +332,222 @@
           ":time" => time(),
           ":user_id" => $_user[ "id" ],
         ]);
-        $code = ($status) ? 200 : 400;
-        doQuery("update collys set rating=(select avg(rating) AS avg from comments where colly_id=:colly_id and rating>0) where id=:colly_id",[
-          ":colly_id" => (int)$colly,
-        ]);
-        recalculate_ratings();
+      $code = ($status) ? 200 : 400;
+      doQuery("update collys set rating=(select avg(rating) AS avg from comments where colly_id=:colly_id and rating>0) where id=:colly_id",[
+        ":colly_id" => (int)$colly,
+      ]);
+      recalculate_ratings();
 
-        exit(json_out([
-          "status" => $status
-        ], $code));
-      }
-      exit(json_out(["status" => false], 400));
+      exit(json_out([
+        "status" => $status
+      ], $code));
     }
+    exit(json_out(["status" => false], 400));
   }
-  
-  function faveColly($collyid) {
-    global $_user;
-    if (is_ajax() && is_logged_in()) {
-      $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
-      if ($colly > 0) {
-        $status = doQuery("INSERT INTO favourites (user_id, colly_id, nick, filename)
+}
+
+function faveColly($collyid) {
+  global $_user;
+  if (is_ajax() && is_logged_in()) {
+    $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
+    if ($colly > 0) {
+      $status = doQuery("INSERT INTO favourites (user_id, colly_id, nick, filename)
         VALUES (:user_id, :colly_id, :nick, :filename)", [
           ":user_id" => $_user[ "id" ],
           ":colly_id" => (int)$colly,
           ":nick" => $_user[ "nick" ],
           ":filename" => $_SESSION['filename']
         ]);
-        $code = ($status) ? 200 : 400;
-        exit(json_out([
-          "status" => $status
-        ], $code));
-      }
-      exit(json_out(["status" => false], 400));
-    }  
-  }
-
-  function unfaveColly($collyid) {
-    global $_user;
-    if (is_ajax() && is_logged_in()) {
-      $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
-      if ($colly > 0) {
-        $status = doQuery("DELETE FROM favourites WHERE user_id = :user AND colly_id = :colly", [
-          ":user" => $_user[ "id" ],
-          ":colly" => (int)$colly
-        ]);
-        $code = ($status) ? 200 : 400;
-        exit(json_out([
-          "status" => $status
-        ], $code));
-      }
-      exit(json_out(["status" => false], 400));
+      $code = ($status) ? 200 : 400;
+      exit(json_out([
+        "status" => $status
+      ], $code));
     }
+    exit(json_out(["status" => false], 400));
+  }  
+}
+
+function unfaveColly($collyid) {
+  global $_user;
+  if (is_ajax() && is_logged_in()) {
+    $colly = $_POST[ "colly_id" ] ?? $collyid ?? 0;
+    if ($colly > 0) {
+      $status = doQuery("DELETE FROM favourites WHERE user_id = :user AND colly_id = :colly", [
+        ":user" => $_user[ "id" ],
+        ":colly" => (int)$colly
+      ]);
+      $code = ($status) ? 200 : 400;
+      exit(json_out([
+        "status" => $status
+      ], $code));
+    }
+    exit(json_out(["status" => false], 400));
   }
+}
 
-  function saveArtist() {
-    if (is_ajax() && is_logged_in()) {
+function saveArtist() {
+  if (is_ajax() && is_logged_in()) {
 
-      $q = "select count(*) as cnt from artists where nick=:nick";
-      $data = [
-        ":nick" => $_POST[ "nick" ] ?? ""
-      ];
-      $count = fetchOne($q, $data);
-      if (((int)$count->cnt) >0) {
-        exit(json_out(["status" => true], 409));     
-      }
+    $q = "select count(*) as cnt from artists where nick=:nick";
+    $data = [
+      ":nick" => $_POST[ "nick" ] ?? ""
+    ];
+    $count = fetchOne($q, $data);
+    if (((int)$count->cnt) >0) {
+      exit(json_out(["status" => true], 409));     
+    }
 
-      $data = [
-        ":nick" => $_POST[ "nick" ] ?? "",
-        ":acronym" => $_POST[ "acronym" ] ?? "",
-        ":www" => $_POST[ "www" ] ?? "",
-        ":country" => $_POST[ "country" ] ?? "",
-        ":active" => $_POST[ "active" ] ?? "",
-        ":artisturl" => urlsafe($_POST[ "nick" ] ?? ""),
-      ];
+    $data = [
+      ":nick" => $_POST[ "nick" ] ?? "",
+      ":acronym" => $_POST[ "acronym" ] ?? "",
+      ":www" => $_POST[ "www" ] ?? "",
+      ":country" => $_POST[ "country" ] ?? "",
+      ":active" => $_POST[ "active" ] ?? "",
+      ":artisturl" => urlsafe($_POST[ "nick" ] ?? ""),
+    ];
 
-      $q = "INSERT INTO artists (nick, acronym, www, active, country, artisturl) VALUES (:nick, :acronym, :www, :active, :country, :artisturl)";
-      $response = 201;
-      $id = "";
-      
-      if(!doQuery($q, $data)) {
-        exit(json_out(["status" => true], 400));  
-      }			
+    $q = "INSERT INTO artists (nick, acronym, www, active, country, artisturl) VALUES (:nick, :acronym, :www, :active, :country, :artisturl)";
+    $response = 201;
+    $id = "";
+
+    if(!doQuery($q, $data)) {
+      exit(json_out(["status" => true], 400));  
+    }			
     
-      $crewnames = $_POST[ "crewname" ] ?? [];     
-      
-      if(!empty($crewnames)) {
-        foreach($crewnames as $crewname) {
-          $q = "INSERT INTO member_of (crew,nick) select :crew, :nick where (select count(*) from member_of where crew = :crew and nick = :nick)=0";
-          $data = [
-            ":crew" => $crewname ?? "",
-            ":nick" => $_POST[ "nick" ] ?? ""
-            
-          ];
-          if(!doQuery($q, $data)) {
-            exit(json_out(["status" => true], 400));     
-          }
+    $crewnames = $_POST[ "crewname" ] ?? [];     
+
+    if(!empty($crewnames)) {
+      foreach($crewnames as $crewname) {
+        $q = "INSERT INTO member_of (crew,nick) select :crew, :nick where (select count(*) from member_of where crew = :crew and nick = :nick)=0";
+        $data = [
+          ":crew" => $crewname ?? "",
+          ":nick" => $_POST[ "nick" ] ?? ""
+
+        ];
+        if(!doQuery($q, $data)) {
+          exit(json_out(["status" => true], 400));     
         }
       }
-        
-      exit(json_out(["status" => true], $response));    
     }
+
+    exit(json_out(["status" => true], $response));    
   }
-  
-  function saveCrew() {
-    if (is_ajax() && is_logged_in()) {
+}
 
-      $q = "select count(*) as cnt from crews where name=:name";
-      $data = [
-        ":name" => $_POST[ "name" ] ?? ""
-      ];
-      $count = fetchOne($q, $data);
-      if (((int)$count->cnt) >0) {
-        exit(json_out(["status" => true], 409));     
-      }
+function saveCrew() {
+  if (is_ajax() && is_logged_in()) {
 
-      $data = [
-        ":name" => $_POST[ "name" ] ?? "",
-        ":acronym" => $_POST[ "acronym" ] ?? "",
-        ":contact" => $_POST[ "contact" ] ?? "",
-        ":crewurl" => urlsafe($_POST[ "name" ] ?? ""),
-        ":rating" => null,
-        ":www" => $_POST[ "www" ] ?? "",
-        ":active" => $_POST[ "active" ] ?? "",
-      ];
-      
-      $q = "INSERT INTO crews (name, acronym, contact, crewurl, rating, www, active) VALUES (:name, :acronym, :contact, :crewurl, :rating, :www, :active)";
-      $response = 201;
+    $q = "select count(*) as cnt from crews where name=:name";
+    $data = [
+      ":name" => $_POST[ "name" ] ?? ""
+    ];
+    $count = fetchOne($q, $data);
+    if (((int)$count->cnt) >0) {
+      exit(json_out(["status" => true], 409));     
+    }
 
-      if(!doQuery($q, $data)) {
-        exit(json_out(["status" => true], 400));     
-      }
+    $data = [
+      ":name" => $_POST[ "name" ] ?? "",
+      ":acronym" => $_POST[ "acronym" ] ?? "",
+      ":contact" => $_POST[ "contact" ] ?? "",
+      ":crewurl" => urlsafe($_POST[ "name" ] ?? ""),
+      ":rating" => null,
+      ":www" => $_POST[ "www" ] ?? "",
+      ":active" => $_POST[ "active" ] ?? "",
+    ];
+
+    $q = "INSERT INTO crews (name, acronym, contact, crewurl, rating, www, active) VALUES (:name, :acronym, :contact, :crewurl, :rating, :www, :active)";
+    $response = 201;
+
+    if(!doQuery($q, $data)) {
+      exit(json_out(["status" => true], 400));     
+    }
     
-      $bbsnames = $_POST[ "bbsname" ] ?? [];     
-      
-      if(!empty($bbsnames)) {
-        foreach($bbsnames as $bbsname) {
-          $q = "INSERT INTO bbs_of (name,crew) select :name, :crew where (select count(*) from bbs_of where name = :name and crew = :crew)=0";
-          $data = [
-            ":name" => $bbsname ?? "",
-            ":crew" => $_POST[ "name" ] ?? ""
-          ];
-          if(!doQuery($q, $data)) {
-            exit(json_out(["status" => true], 400));     
-          }
+    $bbsnames = $_POST[ "bbsname" ] ?? [];     
 
-        }
-      }
-        
-      exit(json_out(["status" => true], $response));			
-    }
-  }
-  
-  function saveBBS() {
-    if (is_ajax() && is_logged_in()) {
-      $q = "select count(*) as cnt from bbses where name=:name";
-      $data = [
-        ":name" => $_POST[ "name" ] ?? ""
-      ];
-      $count = fetchOne($q, $data);
-      if (((int)$count->cnt) >0) {
-        exit(json_out(["status" => true], 409));     
-      }
- 
-      $data = [
-        ":name" => $_POST[ "name" ] ?? "",
-        ":address" => $_POST[ "address" ] ?? "",
-        ":sysop" => $_POST[ "sysop" ] ?? "",
-        ":number" => $_POST[ "number" ] ?? "",
-        ":country" => $_POST[ "country" ] ?? "",
-        ":software" => $_POST[ "software" ] ?? "",
-        ":online" => 0,
-				];
-        
-        if (($_POST[ "online" ] ?? "") == "on") {
-          $data[":online"] = 1;
+    if(!empty($bbsnames)) {
+      foreach($bbsnames as $bbsname) {
+        $q = "INSERT INTO bbs_of (name,crew) select :name, :crew where (select count(*) from bbs_of where name = :name and crew = :crew)=0";
+        $data = [
+          ":name" => $bbsname ?? "",
+          ":crew" => $_POST[ "name" ] ?? ""
+        ];
+        if(!doQuery($q, $data)) {
+          exit(json_out(["status" => true], 400));     
         }
 
- 
-      $q = "INSERT INTO bbses (name, address, sysop, number, country, online, software) VALUES (:name, :address, :sysop, :number, :country, :online, :software)";
-      $response = 201;
-      if(!doQuery($q, $data)) {
-        exit(json_out(["status" => true], 400));
       }
-      exit(json_out(["status" => true], $response));
     }
+
+    exit(json_out(["status" => true], $response));			
   }
-  
-  function dupeCheckColly() {
-    if (is_ajax() && is_logged_in()) {
-      $filename=$_GET[ "filename" ];
-      $q = "select count(*) as cnt from collys where filename=:filename";
-      $data = [
-        ":filename" => $filename
-      ];
-      $count = fetchOne($q, $data);
-      $data = [
-        "count"=>$count->cnt
-      ];
-      exit(json_out($data));     
+}
+
+function saveBBS() {
+  if (is_ajax() && is_logged_in()) {
+    $q = "select count(*) as cnt from bbses where name=:name";
+    $data = [
+      ":name" => $_POST[ "name" ] ?? ""
+    ];
+    $count = fetchOne($q, $data);
+    if (((int)$count->cnt) >0) {
+      exit(json_out(["status" => true], 409));     
     }
+
+    $data = [
+      ":name" => $_POST[ "name" ] ?? "",
+      ":address" => $_POST[ "address" ] ?? "",
+      ":sysop" => $_POST[ "sysop" ] ?? "",
+      ":number" => $_POST[ "number" ] ?? "",
+      ":country" => $_POST[ "country" ] ?? "",
+      ":software" => $_POST[ "software" ] ?? "",
+      ":online" => 0,
+    ];
+
+    if (($_POST[ "online" ] ?? "") == "on") {
+      $data[":online"] = 1;
+    }
+
+
+    $q = "INSERT INTO bbses (name, address, sysop, number, country, online, software) VALUES (:name, :address, :sysop, :number, :country, :online, :software)";
+    $response = 201;
+    if(!doQuery($q, $data)) {
+      exit(json_out(["status" => true], 400));
+    }
+    exit(json_out(["status" => true], $response));
   }
-  
-  function saveColly() {
-    global $_user;
-    if (is_ajax() && is_logged_in()) {
+}
 
-      $filename = $_FILES['filename']['name'];
+function dupeCheckColly() {
+  if (is_ajax() && is_logged_in()) {
+    $filename=$_GET[ "filename" ];
+    $q = "select count(*) as cnt from collys where filename=:filename";
+    $data = [
+      ":filename" => $filename
+    ];
+    $count = fetchOne($q, $data);
+    $data = [
+      "count"=>$count->cnt
+    ];
+    exit(json_out($data));     
+  }
+}
 
-      $q = "select count(*) as cnt from collys where name=:name or filename=:filename";
-      $data = [
-        ":name" => $_POST[ "name" ] ?? "",
-        ":filename" => $filename,
-      ];
-      $count = fetchOne($q, $data);
-      if (((int)$count->cnt) >0) {
-        exit(json_out(["status" => true], 409));     
-      }      
+function saveColly() {
+  global $_user;
+  if (is_ajax() && is_logged_in()) {
+
+    $filename = $_FILES['filename']['name'];
+
+    $q = "select count(*) as cnt from collys where name=:name or filename=:filename";
+    $data = [
+      ":name" => $_POST[ "name" ] ?? "",
+      ":filename" => $filename,
+    ];
+    $count = fetchOne($q, $data);
+    if (((int)$count->cnt) >0) {
+      exit(json_out(["status" => true], 409));     
+    }      
 
       $ext = substr($filename, strrpos($filename,'.')+1); 	// extract extension      
       $upload_path = "collections/";
@@ -625,7 +628,7 @@
           }       
         }
       }
-           
+
       if(!empty($artistnames)) {
         foreach($artistnames as $artistname) {
           $q = "INSERT INTO artists_collys (colly_id,artist_id) select :colly_id, id from artists where nick = :nick and (select count(*) from artists_collys where colly_id = :colly_id and artist_id = artists.id)=0";
@@ -657,11 +660,11 @@
       exit(json_out(["status" => true], $response));
     }
   }
-    
+
   function saveapp() {
     global $_user;
     if (is_ajax() && is_logged_in()) {
-    
+
       $filename = $_FILES['file']['name'];
       $q = "select count(*) as cnt from apps where name=:name or filename=:filename";
       $data = [
@@ -719,7 +722,7 @@
         ":month" => $_POST[ "month" ] ?? 1,
         ":day" => $_POST[ "day" ] ?? 1,
       ];
-    
+
       $q = "INSERT INTO apps (name, filename, filedate, timestamp, author, filesize, uploader_id, uploader, view_counter, downloads,file_id, year, month, day) VALUES (:name, :filename, null, UNIX_TIMESTAMP(), :author, :filesize, :uploaderid, :uploader,0,0,:file_id,:year,:month,:day)";
       $response = 201;
 
@@ -798,7 +801,7 @@
         ":month" => $_POST[ "month" ] ?? 1,
         ":day" => $_POST[ "day" ] ?? 1,
       ];
-    
+
       $q = "INSERT INTO mags (name, filename, filedate, timestamp, author, filesize, file_id, view_counter, downloads, uploader, year, month, day) VALUES (:name, :filename, null, UNIX_TIMESTAMP(), :author, :filesize, :file_id, 0, 0, :uploader, :year, :month, :day)";
       $response = 201;
 
@@ -817,19 +820,19 @@
   function getMessage($msgId) {
     global $_user;
     if (is_ajax() && is_logged_in()) {
-      
+
       $msg = fetchOne("SELECT * FROM messages WHERE id = :msgid", [":msgid" => $msgId]);
       
       $data = [
-          "id" => (int)$msg->id,
-          "thread" =>(int)$msg->thread,
-          "postedto" =>$msg->postedto,
-          "postername" =>$msg->postername,
-          "subject" =>$msg->subject,
-          "message" =>$msg->message,
-          "replyid" =>$msg->to_id==$_user['id'] ? $msg->from_id : $msg->to_id,          
-          "timestamp" =>$msg->timestamp,
-        ];
+        "id" => (int)$msg->id,
+        "thread" =>(int)$msg->thread,
+        "postedto" =>$msg->postedto,
+        "postername" =>$msg->postername,
+        "subject" =>$msg->subject,
+        "message" =>$msg->message,
+        "replyid" =>$msg->to_id==$_user['id'] ? $msg->from_id : $msg->to_id,          
+        "timestamp" =>$msg->timestamp,
+      ];
 
       if(!empty($data)) {
         exit(json_out($data));
@@ -841,7 +844,7 @@
   function deleteMessage($threadId) {
     global $_user;
     if (is_ajax() && is_logged_in()) {
-      
+
       $status = doQuery("delete FROM messages WHERE thread = :threadid and (to_id=:user_id)", [
         ":threadid" => $threadId,
         ":user_id" => $_user['id']
@@ -940,11 +943,11 @@
       
       $status = doQuery("insert into messages (thread,from_id,to_id,postedto,postername,timestamp,subject,message,new,unread) 
         select ifnull(max(thread)+1,1),:user_id,:touserid,(select nick from users where id=:touserid),(select nick from users where id=:user_id),UNIX_TIMESTAMP(),:subject,:msgtext,1,1 from messages",[
-        ":user_id" => $_user[ "id" ],
-        ":subject" => $subject,
-        ":touserid" => $touserid,
-        ":msgtext" => $msgtext
-      ]);
+          ":user_id" => $_user[ "id" ],
+          ":subject" => $subject,
+          ":touserid" => $touserid,
+          ":msgtext" => $msgtext
+        ]);
       $code = ($status) ? 200 : 400;
 
       exit(json_out([
@@ -966,12 +969,12 @@
       if ($thread > 0) {
         $status = doQuery("insert into messages (thread,from_id,to_id,postedto,postername,timestamp,subject,message,new,unread) 
           values (:thread_id,:user_id,:touserid,(select nick from users where id=:touserid),(select nick from users where id=:user_id),UNIX_TIMESTAMP(),:subject,:msgtext,1,1)",[
-          ":thread_id" => $thread,
-          ":user_id" => $_user[ "id" ],
-          ":subject" => $subject,
-          ":touserid" => $touserid,
-          ":msgtext" => $msgtext
-        ]);
+            ":thread_id" => $thread,
+            ":user_id" => $_user[ "id" ],
+            ":subject" => $subject,
+            ":touserid" => $touserid,
+            ":msgtext" => $msgtext
+          ]);
         $code = ($status) ? 200 : 400;
 
         exit(json_out([
@@ -985,7 +988,7 @@
   function getSettings() {
     global $_user;
     if (is_ajax() && is_logged_in()) {
-      
+
       $row = fetchOne("select * from users where id=:userid", ['userid' => $_user['id'] ]);
       
       if ($row) {
@@ -1006,7 +1009,7 @@
           "def_font" => $row->def_font,
           "crt_effect" => $row->crt_effect,
           "anim_effect" => $row->anim_effect,
-          ];
+        ];
         exit(json_out($data));
       } else {
         exit(json_out(["status" => false], 404));
@@ -1017,7 +1020,7 @@
   function saveSettings() {
     global $_user;
     if (is_ajax() && is_logged_in()) {
-      
+
       $user_id = $_user[ "id" ];
       
       $oldpass = $_POST[ 'oldpass' ] ?? "";
@@ -1039,16 +1042,16 @@
             $errors = 'password should include at least one upper case letter, one lower caser letter, one number and one special character';
           }
         }
-          
+
         if (strlen($errors)>0) {
           exit(json_out([
-                  "status" => false,
-                  "error" => $errors
-                ], 400));
+            "status" => false,
+            "error" => $errors
+          ], 400));
         }
-          
+
         $pwhash = password_hash($newpass, PASSWORD_BCRYPT, array('cost' => 13));
-                    
+
         $status = doQuery("update users set pwhash = :pwhash where id = :user_id",[   
           ":pwhash" => $pwhash,
           ":user_id" => $user_id
@@ -1057,9 +1060,9 @@
         if (!$status) {
           exit(json_out([
             "status" => $status
-            ], 400));
+          ], 400));
         }
-                    
+
       }
       
       $nick = $_POST[ 'nick' ] ?? "";
@@ -1082,23 +1085,23 @@
       $status = doQuery("update users set nick=:nick, crew=:crew, byear=:byear, bmonth=:bmonth, bday=:bday, country=:country,
         mail=:mail, upload_signature=:uploadsig, list_view_mode=:viewmode, def_fg_col=:def_fg_col, def_bg_col=:def_bg_col, display_mail=:display_mail,
         def_font=:def_font, crt_effect=:crt_effect, anim_effect=:anim_effect where id = :user_id",[
-        ":user_id" => $user_id,
-        ":nick" => $nick,
-        ":crew" => $crew,
-        ":byear" => $byear,
-        ":bmonth" => $bmonth,
-        ":bday" => $bday,
-        ":country" => $country,
-        ":mail" => $mail,
-        ":uploadsig" => $uploadsig,
-        ":viewmode" => $viewmode,
-        ":def_bg_col" => $def_bg_col,
-        ":def_fg_col" => $def_fg_col,
-        ":display_mail" => $display_mail,
-        ":def_font" => $def_font,
-        ":crt_effect" => $crt_effect,
-        ":anim_effect" => $anim_effect
-      ]);
+          ":user_id" => $user_id,
+          ":nick" => $nick,
+          ":crew" => $crew,
+          ":byear" => $byear,
+          ":bmonth" => $bmonth,
+          ":bday" => $bday,
+          ":country" => $country,
+          ":mail" => $mail,
+          ":uploadsig" => $uploadsig,
+          ":viewmode" => $viewmode,
+          ":def_bg_col" => $def_bg_col,
+          ":def_fg_col" => $def_fg_col,
+          ":display_mail" => $display_mail,
+          ":def_font" => $def_font,
+          ":crt_effect" => $crt_effect,
+          ":anim_effect" => $anim_effect
+        ]);
       $code = ($status) ? 200 : 400;
 
       $_user['nick'] = $nick;
@@ -1110,7 +1113,7 @@
         "status" => $status
       ], $code));
     }
-   
+
   }
 
   function loadFont() {
@@ -1173,7 +1176,7 @@
       }
       exit(json_out(["status" => true], 400));      
     }
-   
+
   }
 
   function deleteFont($fontId) {
@@ -1223,7 +1226,7 @@
       }
       
       exec("curl -H \"Content-Type: application/json\" -d '{\"username\": \"ASCII ARENA Requests\", \"content\": \"A new ascii request has just been created at [asciiarena.se](https://asciiarena.se) by ".$_user[ "nick" ]." titled ".addslashes($desc)."\"}' \"https://discord.com/api/webhooks/1034087774225178624/on_uHSDNg8cf4-M5EBB_NV_d_1i0Ne1N_grTwpZXy0Q6pvUo8G7Jbt6MIdCrBG4INqBx\"");
-          
+
       exit(json_out(["status" => true], $response));
     }
   }
@@ -1232,7 +1235,7 @@
     global $_user;
     if (is_ajax()) {
       $data = [];     
-    
+
       $start = ($page-1) * $pagesize;
       $cnt = 0;
 
@@ -1266,11 +1269,11 @@
     }  
   }
 
-function getArtists($page, $sort, $asc, $pagesize, $filter) {
+  function getArtists($page, $sort, $asc, $pagesize, $filter) {
     global $_user;
     if (is_ajax()) {
       $data = [];     
-    
+
       $start = ($page-1) * $pagesize;
       $cnt = 0;
 
@@ -1290,8 +1293,8 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
       
       foreach($artists as $artist) {
 
-   			$crews = explode(',', $artist->crews);
-	  		$crews = array_map(function($crew) { return '<a href="/crew/'.urlsafe($crew).'">'.$crew.'</a>'; }, $crews);
+        $crews = explode(',', $artist->crews);
+        $crews = array_map(function($crew) { return '<a href="/crew/'.urlsafe($crew).'">'.$crew.'</a>'; }, $crews);
         
         $data[] = [
           "crews" => pluralize($crews),
@@ -1309,7 +1312,7 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
     global $_user;
     if (is_ajax()) {
       $data = [];     
-    
+
       $start = ($page-1) * $pagesize;
       $cnt = 0;
 
@@ -1344,7 +1347,7 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
     global $_user;
     if (is_ajax()) {
       $data = [];     
-    
+
       $start = ($page-1) * $pagesize;
       $cnt = 0;
 
@@ -1362,249 +1365,249 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
       $apps = fetchAll("SELECT * FROM apps $sqlFilter order by $order LIMIT $start, $pagesize");
       $cnt= fetchOne("select count(distinct id) cnt FROM apps $sqlFilter");
       
-     
+
       foreach($apps as $app) {
-         $dizName = 'apps/'.preg_replace('/\\.[^.\\s]{3,4}$/', '', $app->filename).'.diz';
-         if (file_exists($dizName)) { 
-           $display_file_id = encodeFileText($dizName); 
-         } else {
-           $display_file_id = encodeFileText("collections/file_id.diz.txt");
-         }
+       $dizName = 'apps/'.preg_replace('/\\.[^.\\s]{3,4}$/', '', $app->filename).'.diz';
+       if (file_exists($dizName)) { 
+         $display_file_id = encodeFileText($dizName); 
+       } else {
+         $display_file_id = encodeFileText("collections/file_id.diz.txt");
+       }
 
-         $usersig= fetchOne("select upload_signature FROM users where id =:uploader_id",[":uploader_id" => $app->uploader_id]);
-         $usersig = $usersig->upload_signature ?? "";
+       $usersig= fetchOne("select upload_signature FROM users where id =:uploader_id",[":uploader_id" => $app->uploader_id]);
+       $usersig = $usersig->upload_signature ?? "";
 
-        $data[] = [
-          "url" => "/application/".$app->filename,
-          "id" => (int)$app->id,
-          "name" =>$app->name,
-          "filesize" =>$app->filesize ?? "",
-          "fileid" => $display_file_id,
-          "timestamp" =>date("d.m.y", $app->timestamp),
-          "usersig" => $usersig,
-          "filename" =>$app->filename,
-          "author" =>$app->author,
-          "total_count" =>$cnt->cnt
-        ];
-      }
-      exit(json_out($data));
-    }  
-  }
-
-  function getMags($page, $sort, $asc, $pagesize, $filter) {
-    global $_user;
-    if (is_ajax()) {
-      $data = [];     
-    
-      $start = ($page-1) * $pagesize;
-      $cnt = 0;
-
-      if ($asc=="A") {
-        $order = $sort; 
-      } else {
-        $order = $sort." DESC";
-      }
-      
-      $sqlFilter = "";
-      if ($filter != "") {
-        $sqlFilter = "WHERE name like \"%$filter%\" or filename like \"%$filter%\" or author like \"%$filter%\" ";
-      }
-      
-      $mags = fetchAll("SELECT * FROM mags $sqlFilter order by $order LIMIT $start, $pagesize");
-      $cnt= fetchOne("select count(distinct id) cnt FROM mags $sqlFilter");
-      
-      foreach($mags as $mag) {
-         $file_id = $mag->filename.'.diz';
-         $dirname = @array_shift(explode(".", $mag->filename));
-         if (file_exists('mags/'.$dirname.'/'.$file_id)) { 
-           $display_file_id = encodeFileText('mags/'.$dirname.'/'.$file_id); 
-         } else {
-           $display_file_id = encodeFileText("collections/file_id.diz.txt");
-         }
-
-         $usersig= fetchOne("select upload_signature FROM users where nick =:uploader",[":uploader" => $mag->uploader]);
-         $usersig = $usersig->upload_signature ?? "";
-
-        $data[] = [
-          "url" => "/magazine/".$mag->filename,
-          "id" => (int)$mag->id,
-          "name" =>$mag->name,
-          "filesize" =>$mag->filesize ?? "",
-          "fileid" => $display_file_id,
-          "timestamp" =>date("d.m.y", $mag->timestamp),
-          "filename" =>$mag->filename,
-          "usersig" => $usersig,
-          "author" =>$mag->author,
-          "total_count" =>$cnt->cnt
-        ];
-      }
-      exit(json_out($data));
-    }  
-  }
-
-  function getCollys($page, $sort, $asc, $pagesize, $filter) {
-    global $_user;
-    if (is_ajax()) {
-      $data = [];     
-    
-      $start = ($page-1) * $pagesize;
-      $cnt = 0;
-
-      if ($asc=="A") {
-        $order = $sort; 
-      } else {
-        $order = $sort." DESC";
-      }
-      
-      $sqlFilter = "";
-      if ($filter != "") {
-        $sqlFilter = "having name like \"%$filter%\" or filename like \"%$filter%\" or crews like \"%$filter%\" or artists like \"%$filter%\"";
-      }
-      
-      $collys = fetchAll("select *, concat(lpad(c.year,4,0),'-',lpad(c.month,2,0),'-',lpad(c.day,2,0)) cdate, (select coalesce(GROUP_CONCAT(a.nick),'') artists FROM artists_collys ac  LEFT JOIN artists a on a.id = ac.artist_id where ac.colly_id=c.id) artists, (select coalesce(GROUP_CONCAT(cr.name),'') crews FROM collys_crews cc  LEFT JOIN crews cr on cr.id = cc.crew_id where cc.colly_id=c.id) crews from collys c $sqlFilter order by $order LIMIT $start, $pagesize");
-      $cnt= fetchOne("select count(c.id) cnt from (select *, (select coalesce(GROUP_CONCAT(a.nick),'') artists FROM artists_collys ac  LEFT JOIN artists a on a.id = ac.artist_id where ac.colly_id=c.id) artists, (select coalesce(GROUP_CONCAT(cr.name),'') crews FROM collys_crews cc  LEFT JOIN crews cr on cr.id = cc.crew_id where cc.colly_id=c.id) crews from collys c $sqlFilter) c");
-
-      
-      foreach($collys as $colly) {
-  
-         $file_id = $colly->filename.'.diz';
-         $dirname = @array_shift(explode(".", $colly->filename));
-         if (file_exists('collections/'.$dirname.'/'.$file_id)) { 
-           $display_file_id = encodeFileText('collections/'.$dirname.'/'.$file_id); 
-         } else {
-           $display_file_id = encodeFileText("collections/file_id.diz.txt");
-         }
-
-         $usersig= fetchOne("select upload_signature FROM users where id=:uploader_id",[":uploader_id" => $colly->uploader_id]);
-         $usersig = $usersig->upload_signature ?? "";
-
-         $data[] = [
-          "url" => "/release/".$colly->filename,
-          "id" => (int)$colly->id,
-          "name" =>$colly->name,
-          "filename" => $colly->filename,
-          "filesize" => $colly->filesize ?? "",
-          "fileid" => $display_file_id,
-          "artists" => combinize($colly->artists, $colly->artists, "/artist/", $colly->artists),
-          "crews" => combinize($colly->crews, $colly->crews, "/crew/", $colly->crews),
-          "cdate" => $colly->cdate,
-          "usersig" => $usersig,
-          "total_count" =>$cnt->cnt
-        ];
-      }
-
-      exit(json_out($data));
-    }  
-  }
-
-  function getRequests($page, $sort, $asc, $pagesize, $viewmode, $filter) {
-    global $_user;
-    if (is_ajax()) {
-      $data = [];     
-    
-      $start = ($page-1) * $pagesize;
-      $cnt = 0;
-
-      if ($asc=="A") {
-        $order = $sort; 
-      } else {
-        $order = $sort." DESC";
-      }     
-      
-      $viewsql="";
-     	switch ((int)$viewmode) {
-        case 0:
-          $viewsql="status=0";
-          break;
-        case 1:
-          $viewsql="status=1";
-          break;
-        case 2:
-          $viewsql="status=2";
-          break;
-        case 3:
-          $viewsql="status in (1,2)";
-          break;
-        case 4:
-          $viewsql="";
-          break;
-      }
-      
-      $sqlFilter = "";
-      if ($filter != "") {
-        if ($viewsql != "") {
-          $sqlFilter = "WHERE (title like \"%$filter%\" or description like \"%$filter%\" or users.nick like \"%$filter%\") and $viewsql";
-        } else {
-          $sqlFilter = "WHERE title like \"%$filter%\" or description like \"%$filter%\" or users.nick like \"%$filter%\"";
-        }
-      } else if ($viewsql != "") {
-        $sqlFilter = "WHERE $viewsql";
-      }
-      
-      $requests = fetchAll("SELECT requests.*, users.nick as user FROM requests LEFT JOIN users on users.id = requests.requestedby $sqlFilter order by $order LIMIT $start, $pagesize");
-      $cnt= fetchOne("select count(distinct requests.id) cnt FROM requests  LEFT JOIN users on users.id = requests.requestedby $sqlFilter");
-      
-      foreach($requests as $req) {
-        $data[] = [
-          "id" => (int)$req->id,
-          "title" =>$req->title,
-          "status" =>(int)$req->status,
-          "time" => date("Y-m-d H:i",$req->timestamp),
-          "user" =>$req->user,
-          "url" => "info_requests.php?id=".$req->id,
-          "total_count" =>$cnt->cnt
-        ];
-      }
-      exit(json_out($data));
-    }  
-  }
-
-  function getRequestComments($reqid) {
-    $rows = fetchAll("select rc.*, u.nick user from request_comments rc LEFT JOIN users u on u.id = rc.user_id where rc.request_id=:reqid", ['reqid' => $reqid ]);
-     
-      $data = [];     
-     
-      foreach($rows as $comment) {
-        $data[] = [
-          "id" => (int)$comment->comment_id,
-          "user" => $comment->user,
-          "time" => date("Y-m-d H:i",$comment->timestamp),
-          "comment" =>$comment->comment,
-          "filename" =>$comment->attach_filename,
-        ];
-      }
-      exit(json_out($data));
-  }
-
-  function delReqComment($commentid) {
-    if (is_ajax() && is_logged_in() &&is_admin()) {
-      $reqid = $_POST[ "req_id" ];
-      if (($commentid > 0) && ($reqid>0)) {
-        $status = doQuery("delete from request_comments where comment_id = :commentid and request_id = :request_id",[
-          ":commentid" => (int)$commentid,
-          ":request_id" => (int)$reqid
-        ]);
-        $code = ($status) ? 200 : 400;
-  
-        exit(json_out([
-          "status" => $status
-        ], $code));
-      }
-      exit(json_out(["status" => false], 40));
+       $data[] = [
+        "url" => "/application/".$app->filename,
+        "id" => (int)$app->id,
+        "name" =>$app->name,
+        "filesize" =>$app->filesize ?? "",
+        "fileid" => $display_file_id,
+        "timestamp" =>date("d.m.y", $app->timestamp),
+        "usersig" => $usersig,
+        "filename" =>$app->filename,
+        "author" =>$app->author,
+        "total_count" =>$cnt->cnt
+      ];
     }
+    exit(json_out($data));
+  }  
+}
+
+function getMags($page, $sort, $asc, $pagesize, $filter) {
+  global $_user;
+  if (is_ajax()) {
+    $data = [];     
+    
+    $start = ($page-1) * $pagesize;
+    $cnt = 0;
+
+    if ($asc=="A") {
+      $order = $sort; 
+    } else {
+      $order = $sort." DESC";
+    }
+
+    $sqlFilter = "";
+    if ($filter != "") {
+      $sqlFilter = "WHERE name like \"%$filter%\" or filename like \"%$filter%\" or author like \"%$filter%\" ";
+    }
+
+    $mags = fetchAll("SELECT * FROM mags $sqlFilter order by $order LIMIT $start, $pagesize");
+    $cnt= fetchOne("select count(distinct id) cnt FROM mags $sqlFilter");
+
+    foreach($mags as $mag) {
+     $file_id = $mag->filename.'.diz';
+     $dirname = @array_shift(explode(".", $mag->filename));
+     if (file_exists('mags/'.$dirname.'/'.$file_id)) { 
+       $display_file_id = encodeFileText('mags/'.$dirname.'/'.$file_id); 
+     } else {
+       $display_file_id = encodeFileText("collections/file_id.diz.txt");
+     }
+
+     $usersig= fetchOne("select upload_signature FROM users where nick =:uploader",[":uploader" => $mag->uploader]);
+     $usersig = $usersig->upload_signature ?? "";
+
+     $data[] = [
+      "url" => "/magazine/".$mag->filename,
+      "id" => (int)$mag->id,
+      "name" =>$mag->name,
+      "filesize" =>$mag->filesize ?? "",
+      "fileid" => $display_file_id,
+      "timestamp" =>date("d.m.y", $mag->timestamp),
+      "filename" =>$mag->filename,
+      "usersig" => $usersig,
+      "author" =>$mag->author,
+      "total_count" =>$cnt->cnt
+    ];
+  }
+  exit(json_out($data));
+}  
+}
+
+function getCollys($page, $sort, $asc, $pagesize, $filter) {
+  global $_user;
+  if (is_ajax()) {
+    $data = [];     
+    
+    $start = ($page-1) * $pagesize;
+    $cnt = 0;
+
+    if ($asc=="A") {
+      $order = $sort; 
+    } else {
+      $order = $sort." DESC";
+    }
+
+    $sqlFilter = "";
+    if ($filter != "") {
+      $sqlFilter = "having name like \"%$filter%\" or filename like \"%$filter%\" or crews like \"%$filter%\" or artists like \"%$filter%\"";
+    }
+
+    $collys = fetchAll("select *, concat(lpad(c.year,4,0),'-',lpad(c.month,2,0),'-',lpad(c.day,2,0)) cdate, (select coalesce(GROUP_CONCAT(a.nick),'') artists FROM artists_collys ac  LEFT JOIN artists a on a.id = ac.artist_id where ac.colly_id=c.id) artists, (select coalesce(GROUP_CONCAT(cr.name),'') crews FROM collys_crews cc  LEFT JOIN crews cr on cr.id = cc.crew_id where cc.colly_id=c.id) crews from collys c $sqlFilter order by $order LIMIT $start, $pagesize");
+    $cnt= fetchOne("select count(c.id) cnt from (select *, (select coalesce(GROUP_CONCAT(a.nick),'') artists FROM artists_collys ac  LEFT JOIN artists a on a.id = ac.artist_id where ac.colly_id=c.id) artists, (select coalesce(GROUP_CONCAT(cr.name),'') crews FROM collys_crews cc  LEFT JOIN crews cr on cr.id = cc.crew_id where cc.colly_id=c.id) crews from collys c $sqlFilter) c");
+
+
+    foreach($collys as $colly) {
+
+     $file_id = $colly->filename.'.diz';
+     $dirname = @array_shift(explode(".", $colly->filename));
+     if (file_exists('collections/'.$dirname.'/'.$file_id)) { 
+       $display_file_id = encodeFileText('collections/'.$dirname.'/'.$file_id); 
+     } else {
+       $display_file_id = encodeFileText("collections/file_id.diz.txt");
+     }
+
+     $usersig= fetchOne("select upload_signature FROM users where id=:uploader_id",[":uploader_id" => $colly->uploader_id]);
+     $usersig = $usersig->upload_signature ?? "";
+
+     $data[] = [
+      "url" => "/release/".$colly->filename,
+      "id" => (int)$colly->id,
+      "name" =>$colly->name,
+      "filename" => $colly->filename,
+      "filesize" => $colly->filesize ?? "",
+      "fileid" => $display_file_id,
+      "artists" => combinize($colly->artists, $colly->artists, "/artist/", $colly->artists),
+      "crews" => combinize($colly->crews, $colly->crews, "/crew/", $colly->crews),
+      "cdate" => $colly->cdate,
+      "usersig" => $usersig,
+      "total_count" =>$cnt->cnt
+    ];
   }
 
-  function addReqComment($requestid) {
-    global $_user;
-    if (is_ajax() && is_logged_in()) {
-      $reqid = $_POST[ "request_id" ] ?? $requestid ?? 0;
-      $comment = $_POST[ 'comment' ] ?? "";
-      $filename = $_POST[ 'filename' ] ?? "";
-      $filedata = $_POST[ 'filedata' ] ?? "";
-      
-      if ($reqid> 0) {
-        $status = doQuery("insert into request_comments (request_id, user_id, comment, attach_filename, attach_filedata, timestamp) 
-          values (:request_id, :user_id, :comment, :filename, :filedata, :time)",[
+  exit(json_out($data));
+}  
+}
+
+function getRequests($page, $sort, $asc, $pagesize, $viewmode, $filter) {
+  global $_user;
+  if (is_ajax()) {
+    $data = [];     
+    
+    $start = ($page-1) * $pagesize;
+    $cnt = 0;
+
+    if ($asc=="A") {
+      $order = $sort; 
+    } else {
+      $order = $sort." DESC";
+    }     
+
+    $viewsql="";
+    switch ((int)$viewmode) {
+      case 0:
+      $viewsql="status=0";
+      break;
+      case 1:
+      $viewsql="status=1";
+      break;
+      case 2:
+      $viewsql="status=2";
+      break;
+      case 3:
+      $viewsql="status in (1,2)";
+      break;
+      case 4:
+      $viewsql="";
+      break;
+    }
+
+    $sqlFilter = "";
+    if ($filter != "") {
+      if ($viewsql != "") {
+        $sqlFilter = "WHERE (title like \"%$filter%\" or description like \"%$filter%\" or users.nick like \"%$filter%\") and $viewsql";
+      } else {
+        $sqlFilter = "WHERE title like \"%$filter%\" or description like \"%$filter%\" or users.nick like \"%$filter%\"";
+      }
+    } else if ($viewsql != "") {
+      $sqlFilter = "WHERE $viewsql";
+    }
+
+    $requests = fetchAll("SELECT requests.*, users.nick as user FROM requests LEFT JOIN users on users.id = requests.requestedby $sqlFilter order by $order LIMIT $start, $pagesize");
+    $cnt= fetchOne("select count(distinct requests.id) cnt FROM requests  LEFT JOIN users on users.id = requests.requestedby $sqlFilter");
+
+    foreach($requests as $req) {
+      $data[] = [
+        "id" => (int)$req->id,
+        "title" =>$req->title,
+        "status" =>(int)$req->status,
+        "time" => date("Y-m-d H:i",$req->timestamp),
+        "user" =>$req->user,
+        "url" => "info_requests.php?id=".$req->id,
+        "total_count" =>$cnt->cnt
+      ];
+    }
+    exit(json_out($data));
+  }  
+}
+
+function getRequestComments($reqid) {
+  $rows = fetchAll("select rc.*, u.nick user from request_comments rc LEFT JOIN users u on u.id = rc.user_id where rc.request_id=:reqid", ['reqid' => $reqid ]);
+
+  $data = [];     
+
+  foreach($rows as $comment) {
+    $data[] = [
+      "id" => (int)$comment->comment_id,
+      "user" => $comment->user,
+      "time" => date("Y-m-d H:i",$comment->timestamp),
+      "comment" =>$comment->comment,
+      "filename" =>$comment->attach_filename,
+    ];
+  }
+  exit(json_out($data));
+}
+
+function delReqComment($commentid) {
+  if (is_ajax() && is_logged_in() &&is_admin()) {
+    $reqid = $_POST[ "req_id" ];
+    if (($commentid > 0) && ($reqid>0)) {
+      $status = doQuery("delete from request_comments where comment_id = :commentid and request_id = :request_id",[
+        ":commentid" => (int)$commentid,
+        ":request_id" => (int)$reqid
+      ]);
+      $code = ($status) ? 200 : 400;
+
+      exit(json_out([
+        "status" => $status
+      ], $code));
+    }
+    exit(json_out(["status" => false], 40));
+  }
+}
+
+function addReqComment($requestid) {
+  global $_user;
+  if (is_ajax() && is_logged_in()) {
+    $reqid = $_POST[ "request_id" ] ?? $requestid ?? 0;
+    $comment = $_POST[ 'comment' ] ?? "";
+    $filename = $_POST[ 'filename' ] ?? "";
+    $filedata = $_POST[ 'filedata' ] ?? "";
+
+    if ($reqid> 0) {
+      $status = doQuery("insert into request_comments (request_id, user_id, comment, attach_filename, attach_filedata, timestamp) 
+        values (:request_id, :user_id, :comment, :filename, :filedata, :time)",[
           ":request_id" => (int)$reqid,
           ":user_id" => $_user[ "id" ],
           ":comment" => $comment,
@@ -1612,15 +1615,15 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
           ":filedata" => $filedata,
           ":time" => time()
         ]);
-        $code = ($status) ? 200 : 400;
+      $code = ($status) ? 200 : 400;
 
-        if ($status && $filename && $filedata)
-        {
-      
-          $requser= fetchOne("select users.id, users.nick FROM requests LEFT JOIN users on users.id = requests.requestedby where requests.id = :reqid",["reqid" => (int)$reqid]);
-      
-          doQuery("insert into messages (thread,from_id,to_id,postedto,postername,timestamp,subject,message,new,unread,attach_filename, attach_filedata) 
-            select ifnull(max(thread)+1,1),:fromuserid,:touserid,:tousername,:fromusername,UNIX_TIMESTAMP(),:subject,:msgtext,1,1,:filename,:filedata from messages",[
+      if ($status && $filename && $filedata)
+      {
+
+        $requser= fetchOne("select users.id, users.nick FROM requests LEFT JOIN users on users.id = requests.requestedby where requests.id = :reqid",["reqid" => (int)$reqid]);
+
+        doQuery("insert into messages (thread,from_id,to_id,postedto,postername,timestamp,subject,message,new,unread,attach_filename, attach_filedata) 
+          select ifnull(max(thread)+1,1),:fromuserid,:touserid,:tousername,:fromusername,UNIX_TIMESTAMP(),:subject,:msgtext,1,1,:filename,:filedata from messages",[
             ":fromusername" => $_user["nick"],
             ":fromuserid" => $_user["id"],
             ":subject" => "Your request has a new upload",
@@ -1630,240 +1633,240 @@ function getArtists($page, $sort, $asc, $pagesize, $filter) {
             ":filedata" => $filedata,
             ":msgtext" => $_user[ "nick" ]." has added a comment to your request and attached a file."
           ]);
-        }
-  
-        exit(json_out([
-          "status" => $status
-        ], $code));
       }
-      exit(json_out(["status" => false], 400));
+
+      exit(json_out([
+        "status" => $status
+      ], $code));
     }
+    exit(json_out(["status" => false], 400));
   }
+}
 
-  function editReqComment($commentid) {
-    global $_user;
-    if (is_ajax() && is_logged_in()) {
-      $id = $_POST[ "comment_id" ] ?? $commentid ?? 0;
-      $comment = $_POST[ 'comment' ] ?? "";
-      if ($id > 0) {
-        if (is_admin()) {
-          $admin=1;
-        } else {
-          $admin=0;
-        }
-        $status = doQuery("update request_comments set comment = :comment where (:admin = 1 or user_id = :user_id) and comment_id = :commentid",[
-          ":commentid" => (int)$id,
-          ":comment" => $comment,
-          ":user_id" => $_user[ "id" ],
-          ":admin" => $admin
-        ]);
-        $code = ($status) ? 200 : 400;
-        exit(json_out([
-          "status" => $status,
-        ], $code));
+function editReqComment($commentid) {
+  global $_user;
+  if (is_ajax() && is_logged_in()) {
+    $id = $_POST[ "comment_id" ] ?? $commentid ?? 0;
+    $comment = $_POST[ 'comment' ] ?? "";
+    if ($id > 0) {
+      if (is_admin()) {
+        $admin=1;
+      } else {
+        $admin=0;
       }
-      exit(json_out(["status" => false], 400));
+      $status = doQuery("update request_comments set comment = :comment where (:admin = 1 or user_id = :user_id) and comment_id = :commentid",[
+        ":commentid" => (int)$id,
+        ":comment" => $comment,
+        ":user_id" => $_user[ "id" ],
+        ":admin" => $admin
+      ]);
+      $code = ($status) ? 200 : 400;
+      exit(json_out([
+        "status" => $status,
+      ], $code));
     }
+    exit(json_out(["status" => false], 400));
   }
-  
-  function updateReqStatus($reqid) {
-    global $_user;
-    if (is_ajax() && is_logged_in()) {
-      $id = $_POST[ "request_id" ] ?? $reqid ?? 0;
-      $status = $_POST[ 'status' ] ?? 0;
-      if ($id > 0) {
-        if (is_admin()) {
-          $admin=1;
-        } else {
-          $admin=0;
-        }
-        $status = doQuery("update requests set status = :status where (:admin = 1 or requestedby = :user_id) and id = :requestid",[
-          ":requestid" => (int)$id,
-          ":status" => (int)$status,
-          ":user_id" => $_user[ "id" ],
-          ":admin" => $admin
-        ]);
-        $code = ($status) ? 200 : 400;
-        exit(json_out([
-          "status" => $status,
-        ], $code));
+}
+
+function updateReqStatus($reqid) {
+  global $_user;
+  if (is_ajax() && is_logged_in()) {
+    $id = $_POST[ "request_id" ] ?? $reqid ?? 0;
+    $status = $_POST[ 'status' ] ?? 0;
+    if ($id > 0) {
+      if (is_admin()) {
+        $admin=1;
+      } else {
+        $admin=0;
       }
-      exit(json_out(["status" => false], 400));
+      $status = doQuery("update requests set status = :status where (:admin = 1 or requestedby = :user_id) and id = :requestid",[
+        ":requestid" => (int)$id,
+        ":status" => (int)$status,
+        ":user_id" => $_user[ "id" ],
+        ":admin" => $admin
+      ]);
+      $code = ($status) ? 200 : 400;
+      exit(json_out([
+        "status" => $status,
+      ], $code));
     }
+    exit(json_out(["status" => false], 400));
   }
+}
 
-  function getReqCommentAttachment($commentid) {
-    $attachdata = fetchOne("SELECT attach_filename, attach_filedata FROM request_comments WHERE comment_id = :commentid", ['commentid' => $commentid ]);
-     
-      $data = [];     
-     
-      if ($attachdata) {
+function getReqCommentAttachment($commentid) {
+  $attachdata = fetchOne("SELECT attach_filename, attach_filedata FROM request_comments WHERE comment_id = :commentid", ['commentid' => $commentid ]);
 
-        $data = [
-          "filename" => $attachdata->attach_filename,
-          "filedata" => $attachdata->attach_filedata
-        ];
-      }
-      exit(json_out($data));
+  $data = [];     
+
+  if ($attachdata) {
+
+    $data = [
+      "filename" => $attachdata->attach_filename,
+      "filedata" => $attachdata->attach_filedata
+    ];
   }
-  
-  function getMessageAttachment($msgid) {
-    $attachdata = fetchOne("SELECT attach_filename, attach_filedata FROM messages WHERE id = :msgid", ['msgid' => $msgid ]);
-     
-      $data = [];     
-     
-      if ($attachdata) {
+  exit(json_out($data));
+}
 
-        $data = [
-          "filename" => $attachdata->attach_filename,
-          "filedata" => $attachdata->attach_filedata
-        ];
-      }
-      exit(json_out($data));
+function getMessageAttachment($msgid) {
+  $attachdata = fetchOne("SELECT attach_filename, attach_filedata FROM messages WHERE id = :msgid", ['msgid' => $msgid ]);
+
+  $data = [];     
+
+  if ($attachdata) {
+
+    $data = [
+      "filename" => $attachdata->attach_filename,
+      "filedata" => $attachdata->attach_filedata
+    ];
   }
+  exit(json_out($data));
+}
 
-	$cmd = $_GET[ "cmd" ] ?? $_current[ 0 ] ?? "";
-	$reDir = "/";
+$cmd = $_GET[ "cmd" ] ?? $_current[ 0 ] ?? "";
+$reDir = "/";
 
-	switch ($cmd) {
-		case "login":
-      login();
-      header("Location: {$reDir}");
-			break;
-		case "logout":
-      logout();
-      header("Location: {$reDir}");
-			break;
+switch ($cmd) {
+  case "login":
+  login();
+  header("Location: {$reDir}");
+  break;
+  case "logout":
+  logout();
+  header("Location: {$reDir}");
+  break;
 		/*			case "register":
-						break;*/
-		case "tag":
-      tag();
-			break;
+    break;*/
+    case "tag":
+    tag();
+    break;
     case "countdl":
-      countDownload($_current[1]);
-			break;
+    countDownload($_current[1]);
+    break;
     case "countview":
-      countView($_current[1]);
-			break;      
+    countView($_current[1]);
+    break;      
     case "broken":
-      brokenColly($_current[1]);
-			break;  
+    brokenColly($_current[1]);
+    break;  
     case "getcomments":      
-      getComments($_current[1]);
-			break;  
+    getComments($_current[1]);
+    break;  
     case "delcomment":
-      deleteComment($_current[1]);
-			break;         
+    deleteComment($_current[1]);
+    break;         
     case "editcomment":
-      editComment($_current[1]);
-			break;         
+    editComment($_current[1]);
+    break;         
     case "addcomment":
-      addComment($_current[1]);
-			break;         
-		case "fave":
-      faveColly($_current[1]);
-			break;
-		case "unfave":
-      unfaveColly($_current[1]);
-			break;
+    addComment($_current[1]);
+    break;         
+    case "fave":
+    faveColly($_current[1]);
+    break;
+    case "unfave":
+    unfaveColly($_current[1]);
+    break;
     case "save_artist":
-      saveArtist();
-      break;     
+    saveArtist();
+    break;     
     case "save_crew":
-      saveCrew();
-			break;
+    saveCrew();
+    break;
     case "save_bbs":
-      saveBBS();
-      break;
+    saveBBS();
+    break;
     case "dupe_check":
-      dupeCheckColly();
-      break;
+    dupeCheckColly();
+    break;
     case "save_colly":
-      saveColly();
-      break;
+    saveColly();
+    break;
     case "save_app":
-      saveApp();
-      break;
+    saveApp();
+    break;
     case "save_mag":
-      saveMag();
-      break;
+    saveMag();
+    break;
     case "get_message":
-      getMessage($_current[1]);
-      break;      
+    getMessage($_current[1]);
+    break;      
     case "delete_message":
-      deleteMessage($_current[1]);
-      break;      
+    deleteMessage($_current[1]);
+    break;      
     case "get_messages":
-      getMessages($_current[1],$_current[2]);
-      break;      
+    getMessages($_current[1],$_current[2]);
+    break;      
     case "get_thread":
-      getMessageThread($_current[1],$_current[2],$_current[3]);
-      break;      
+    getMessageThread($_current[1],$_current[2],$_current[3]);
+    break;      
     case "new_message":
-      newMessage();
+    newMessage();
     case "reply_thread":
-      replyMessage();
+    replyMessage();
     case "get_settings":
-      getSettings();
+    getSettings();
     case "save_settings":
-      saveSettings();
+    saveSettings();
     case "get_font":
-      loadFont();
+    loadFont();
     case "save_font":
-      saveFont();
+    saveFont();
     case "delete_font":
-      deleteFont($_current[1]);
+    deleteFont($_current[1]);
     case "save_request":
-      saveRequest();
+    saveRequest();
     case "get_crews":
-      getCrews($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
-      break;      
+    getCrews($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
+    break;      
     case "get_artists":
-      getArtists($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
-      break;      
+    getArtists($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
+    break;      
     case "get_bbs":
-      getBBS($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
-      break;      
+    getBBS($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
+    break;      
     case "get_apps":
-      getApps($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
-      break;      
+    getApps($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
+    break;      
     case "get_mags":
-      getMags($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
-      break;      
+    getMags($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
+    break;      
     case "get_collys":
-      getCollys($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
-      break;      
+    getCollys($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
+    break;      
     case "get_reqs":
-      getRequests($_current[1],$_current[2],$_current[3],$_current[4],$_current[5],$_current[6]);
-      break;      
+    getRequests($_current[1],$_current[2],$_current[3],$_current[4],$_current[5],$_current[6]);
+    break;      
     case "get_req_comments":
-      getRequestComments($_current[1]);
-      break;      
+    getRequestComments($_current[1]);
+    break;      
     case "delreqcomment":
-      delReqComment($_current[1]);
-			break;         
+    delReqComment($_current[1]);
+    break;         
     case "addreqcomment":
-      addReqComment($_current[1]);
-			break;         
+    addReqComment($_current[1]);
+    break;         
     case "editreqcomment":
-      editReqComment($_current[1]);
-			break;         
+    editReqComment($_current[1]);
+    break;         
     case "updatereqstatus":
-      updateReqStatus($_current[1]);
-			break;         
+    updateReqStatus($_current[1]);
+    break;         
     case "get_req_comment_attach":
-      getReqCommentAttachment($_current[1]);
-			break;         
+    getReqCommentAttachment($_current[1]);
+    break;         
     case "get_message_attach":
-      getMessageAttachment($_current[1]);
-			break;         
-		default:
-			if (is_ajax()) {
-				exit(json_out(["status" => false], 400));
-			}
-      else {
-        header("Location: {$reDir}");
-      }
-			break;   
-	}
+    getMessageAttachment($_current[1]);
+    break;         
+    default:
+    if (is_ajax()) {
+      exit(json_out(["status" => false], 400));
+    }
+    else {
+      header("Location: {$reDir}");
+    }
+    break;   
+  }
   
