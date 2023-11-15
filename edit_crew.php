@@ -255,19 +255,25 @@
 		</div>
 		<div class="row apt-1">
 			<div class="col-12">
-				<input type="button" class="amb-1 w-100 btn-big bg-green white" value="Save" onclick="saveCrew()">
-				<?php if ($admin_edit && is_admin()) { ?>
-					<input type="button" class="amb-1 w-100 btn-big bg-red white" value="Delete" onclick="delCrew()">
-				<?php } ?>
-			</div>
+				<div class="col-6">
+					<input type="button" class="amb-1 w-100 btn-big bg-green white" value="Save" onclick="saveCrew()">
+				</div>
+				<div class="col-6">
+
+					<?php if ($admin_edit && is_admin()) { ?>
+						<input type="button" class="amb-1 w-100 btn-big bg-red white" value="Delete" onclick="delCrew()">
+					<?php } ?>
+					<div class="col-6">
+
+					</div>
+				</div>
+			</form>
+			<input type="hidden" id="edit_crew_name" value="<?php if(isset($_POST['getcrew']) && (isset($_POST['open_edit_crew_field']))) echo $_POST['getcrew']; ?>">
 		</div>
-	</form>
-	<input type="hidden" id="edit_crew_name" value="<?php if(isset($_POST['getcrew']) && (isset($_POST['open_edit_crew_field']))) echo $_POST['getcrew']; ?>">
-</div>
-<?php if ($admin_edit && is_admin()) { ?>
-	<script>
-		$(function () {
-			getCrewList();
-		});
-	</script>
-<?php } ?>
+		<?php if ($admin_edit && is_admin()) { ?>
+			<script>
+				$(function () {
+					getCrewList();
+				});
+			</script>
+		<?php } ?>
