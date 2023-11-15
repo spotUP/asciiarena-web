@@ -212,7 +212,7 @@
 					</select>
 				</div>
 				<div class="col-xs-12 col-md-2">
-					<input type="button" value="Add Crew" onclick="addArtistCrew()"/>
+					<input class="w-100" type="button" value="Add Crew" onclick="addArtistCrew()"/>
 				</div>
 			</div>
 			<div class="row">
