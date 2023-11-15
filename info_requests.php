@@ -177,23 +177,21 @@ function getReqComments() {
 
       reqcommentlist.append(`
         <div class="row">
-        <div class="header bg-header col-12 ap-1 text-truncate">
-        <span class="yellow">${htmlEncode(comment.user)}</span> <span class="apl-1">DATE:</span>
-        <span class="white apl-1">${comment.time}</span>
-        </div>
-                <div class="row">
-
-        <div class="bg-secondary col-12 ap-1 amb-1">
-          <span id="comment${comment.id}" class="cyan" style="white-space: pre-wrap;">${htmlEncode(comment.comment)}</span>
-        <div class="col-12 p-0 m-0 apt-1">
-        ${file}
-        ${buttons}
-        </div>
-        </div>
-        </div>
+          <div class="header bg-header col-12 ap-1 text-truncate">
+            <span class="yellow">${htmlEncode(comment.user)}</span> <span class="apl-1">DATE:</span>
+            <span class="white apl-1">${comment.time}</span>
+          </div>
         </div>
 
-        `);
+        <div class="row">        
+          <div class="bg-secondary col-12 ap-1 amb-1">
+            <span id="comment${comment.id}"class="cyan" style="white-space: pre-wrap;">${htmlEncode(comment.comment)}</span>
+            <div class="col-12 p-0 m-0 apt-1">
+              ${file}${buttons}
+            </div>
+          </div>
+        </div>
+      `);
     });
   });
 }
