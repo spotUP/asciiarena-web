@@ -176,6 +176,7 @@ include "header.php";
           ?>
 
             reqcommentlist.append(`
+            <div class="row apl-1 apr-1">
             <div class="header bg-header col-12 ap-1 text-truncate">
             <span class="yellow">${htmlEncode(comment.user)}</span> <span class="apl-1">DATE:</span> <span class="white apl-1">${comment.time}</span>
             </div>
@@ -185,7 +186,7 @@ include "header.php";
             <div class="col-12 p-0 m-0 apt-1">
             ${file}
             ${buttons}
-            </div>`);
+            </div></div>`);
         });
       });
     }
