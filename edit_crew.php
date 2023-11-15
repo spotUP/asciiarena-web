@@ -236,7 +236,7 @@
 	</div>
 	<div id="crew_bbs_fetch_id"></div>
 	<div class="p-0 row apb-1">
-		<div class="col-xs-12 col-md-5">
+		<div class="col-xs-12 col-md-4">
 			<select class="select2" id="crew_bbs_add_fetch_id" class="w-100">
 				<option value="0">Select BBS</option>
 				<?php
