@@ -5,7 +5,7 @@
     <input type="hidden" id="sort2"><input type="hidden" id="maxpage">
     <ul class="pagination w-100">
       <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="firstPage(event)" href="#" class="page-link" ><<</button></li>
-      <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="prevPage(event)" href="#" class="page-link" ><</button></li><span id="currpage"></span>
+      <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="prevPage(event)" href="#" class="page-link" ><</button></li>
 
       <span id="currpage" class="paginator w-100"></span>
 
