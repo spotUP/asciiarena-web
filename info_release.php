@@ -165,7 +165,7 @@ require_once "header.php";?>
         Font:
       </div>
       <div class="col-2 amb-1">
-        <select class="custom-select" id="colly-font">
+        <select class="select2" id="colly-font">
           <option class="dropdown-item" value="MicroKnight"<?php if ($font == 'MicroKnight') echo ' selected'; ?>>MicroKnight</option>
           <option class="dropdown-item" value="MicroKnightPlus"<?php if ($font == 'MicroKnightPlus') echo ' selected'; ?>>MicroKnight+</option>
           <option class="dropdown-item" value="mOsOul"<?php if ($font == 'mOsOul') echo ' selected'; ?>>mOsOul</option>
@@ -188,7 +188,8 @@ require_once "header.php";?>
   if ($type == "ASCII") 
   {
     ?>
-    <div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;" id="colly-div"><pre id="colly" style="width: 640px; font-family: <?=$font;?>; color: <?=$fgcolor?>; white-space: pre;"><?php
+    <div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;">
+    <div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>; width=640px;" id="colly-div"><pre id="colly" style="font-family: <?=$font;?>; color: <?=$fgcolor?>; white-space: pre;"><?php
     if (file_exists("collections/{$dirname}/{$filename}")) 
     {
       $content = encodeFileText("collections/{$dirname}/{$filename}");
@@ -197,6 +198,7 @@ require_once "header.php";?>
       echo "<br><br><br><br>";
     }
   ?></pre>
+</div>
 </div>
 <?php
 }

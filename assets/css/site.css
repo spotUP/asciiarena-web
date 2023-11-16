@@ -183,11 +183,13 @@ select:-webkit-autofill:focus {
   line-height: 16px !important;
   margin:0 !important;
   padding:0 !important;
-  filter: brightness(170%);}
+  filter: brightness(170%);
+}
 
 
 input:active, input:hover, input:focus, select:active, select:hover, select:focus, a:active, a:hover, a:focus, .select2:active, .select2:hover, .select2:focus {
-  filter: brightness(170%);}
+  filter: brightness(170%);
+}
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -195,7 +197,8 @@ input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   -webkit-animation: autofill 0s forwards;
   animation: autofill 0s forwards;
-  filter: brightness(170%);}
+  filter: brightness(170%);
+}
 
 @keyframes autofill {
   100% {
@@ -421,7 +424,7 @@ small,
 .input-group-sm > .input-group-prepend > .btn,
 .input-group-sm > .input-group-append > .btn {
   font-size: 16px;
-  line-height: 16px;
+  line-height: 48px;
 }
 
 .custom-control {
@@ -492,11 +495,11 @@ small,
 }
 
 html {
-	font-family: 'TopazPlus_a1200';
-  line-height: 16px;
-  line-height-step: 16px;
-  color: #fff;
-  overflow-y: scroll;
+ font-family: 'TopazPlus_a1200';
+ line-height: 16px;
+ line-height-step: 16px;
+ color: #fff;
+ overflow-y: scroll;
 }
 
 
@@ -558,7 +561,8 @@ input:hover, optgroup:hover {
   font-size: 16px;
   background: #444444 !important;
   color: #bbbbbb !important;
-  filter: brightness(170%);}
+  filter: brightness(170%);
+}
 
 input:active, optgroup:active {
   border: 0;
@@ -579,7 +583,8 @@ select:hover {
   font-family: 'TopazPlus_a1200' !important;
   font-size: 16px;
   background: #999999 !important;
-  filter: brightness(170%);}
+  filter: brightness(170%);
+}
 
 button, select{
   margin: 0;
@@ -619,7 +624,8 @@ input[type=button], input[type=submit], input[type=reset] {
   width: 132px; 
   text-align: center;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
-  filter: brightness(170%);}
+  filter: brightness(170%);
+}
 
 .paginator {
   color: rgb(255,255,85) !important;;
@@ -758,7 +764,8 @@ option {
 }
 
 .green:hover{   
-  filter: brightness(170%);}
+  filter: brightness(170%);
+}
 
 
 .cyan{   
@@ -766,7 +773,8 @@ option {
 }
 
 a.cyan:hover{
-  filter: brightness(170%);}
+  filter: brightness(170%);
+}
 
 .red{   
   color: #aa0000 !important;
@@ -777,7 +785,8 @@ a.cyan:hover{
 }
 
 .magenta:hover{   
-  filter: brightness(170%);}
+  filter: brightness(170%);
+}
 
 .pink{   
   color: #bb00bb !important;
@@ -788,7 +797,8 @@ a.cyan:hover{
 }
 
 .pink:hover{
-  filter: brightness(170%);}
+  filter: brightness(170%);
+}
 
 .brown
 {   
@@ -900,7 +910,8 @@ a.yellow
 }
 
 .yellow:hover{   
-  filter: brightness(170%);}
+  filter: brightness(170%);
+}
 
 .bg-primary{
   background-color: #111111 !important;
@@ -1263,7 +1274,8 @@ button.btn.btn-primary{
 }
 
 .btn-big:hover {
-  filter: brightness(170%);}
+  filter: brightness(170%);
+}
 
 
 .dropdown-menu {
@@ -1316,7 +1328,8 @@ input[type="password" i]:hover {
   margin: 0px;
   font-size: 16px !important;
   font-family: 'TopazPlus_a1200' !important;
-  filter: brightness(170%);}
+  filter: brightness(170%);
+}
 
 input[type="password" i]:active {
   padding: 0px;
@@ -1647,7 +1660,8 @@ a.disabled{
 
 .spotclose:hover, .spotclosebutton:focus {
   cursor: pointer;
-  filter: brightness(170%);}
+  filter: brightness(170%);
+}
 
 
 @keyframes boing {
@@ -1669,7 +1683,7 @@ a.disabled{
 }
 
 .modal-title {
-  line-height: 16px;
+  line-height: 46px;
 }
 
 .modal-backdrop {
@@ -1839,7 +1853,7 @@ transition: opacity .3s linear !important;
   .nav-link {
     color: black;
   }
-  
+
   .nav-link .dropdown-toggle{
     color: black;
   }
@@ -1996,8 +2010,8 @@ body > div.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-white > span
 }
 
 .btn-primary:not(:disabled):not(.disabled).active, .btn-primary:not(:disabled):not(.disabled):active, .show>.btn-primary.dropdown-toggle {
-    color: #000 !important;
-    background-color: #999;
+  color: #000 !important;
+  background-color: #999;
 }
 
 .ng-pristine
@@ -2116,14 +2130,37 @@ span.select2-selection__arrow > b::after{
   border: none;
 }
 
-.select2-results__option {
-  padding-bottom: 0px !important;
-  padding-left: 16px !important;
-  background: #1a1a1a !important;
+li.select2-results__option.select2-results__option--highlighted{
+  background-color: #2a2a2a !important;
+  line-height: 8px !important;
 }
 
-li.select2-results__option.select2-results__option--highlighted{
-  background-color: #000084 !important;
+.select2-results__option{
+  line-height: 8px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+
+.select2-results {
+  display: block;
+  position: relative;
+  top: -8px;
+  background-color: #4a4a4a;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background: #4a4a4a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #999999;
+
+}
+::-webkit-scrollbar-track {
+  background: none;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__rendered {
@@ -2153,13 +2190,54 @@ li.select2-results__option.select2-results__option--highlighted{
   border-radius: 0px !important;
 }
 
-select2-dropdown {
+.select2-dropdown {
   background-color: #444 !important;
+}
+
+.select2-container--open .select2-dropdown--below {
+  background: transparent !important;
+}
+
+.select2-search.select2-search--dropdown > input{
+  height: 16px;
+
 }
 
 .select2-search--dropdown {
   padding: 0px !important;
+  height: 8px !important;
 }
+
+.select2-search__field{
+  max-height: 8px !important;
+  padding-left: 16px !important;
+  margin: 0px !important;
+  background-color: #111111 !important;
+}
+
+.select2-search--dropdown .select2-search__field {
+  padding: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  top: -48px;
+  position: absolute;
+  background-color: #444444 !important;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background-color: #777777 !important;
+  color: black !important;
+  filter: none !important;
+  background-color: black;
+}
+
+.select2-container--default .select2-results__option[aria-selected=true] {
+  background-color: #777777 !important;
+  color: #000000 !important;
+  filter: none !important;
+}
+
+
 
 b::before, b::after, strong::before, strong::after {
   content: '';
@@ -2261,28 +2339,6 @@ input:-webkit-autofill, input:-webkit-autofill:hover, and input:-webkit-autofill
   filter: brightness(170%);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**
- * Icon
- */
-
 .icon {
   position: relative;
   overflow: hidden;
@@ -2304,9 +2360,6 @@ input:-webkit-autofill, input:-webkit-autofill:hover, and input:-webkit-autofill
 .icon:nth-child(2) { background: salmon; }
 .icon:nth-child(3) { background: gray; }
 
-/**
- * The "shine" element
- */
 
 .icon:after {
   content: "";
