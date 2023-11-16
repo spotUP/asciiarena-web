@@ -102,16 +102,9 @@ include "header.php";
 							<li class="nav-item">
 								<a class="nav-link" data-toggle="tab" href="#ascii_mag">Mag</a>
 							</li>
-								<?php
-								if(is_admin()) 
-								{
-   							?>
 							<li class="nav-item">
 								<a class="nav-link" data-toggle="tab" href="#request">Request</a>
 							</li>
-								<?php
-                }
-   							?>
 						</ul>
 					</div>
 				</div>

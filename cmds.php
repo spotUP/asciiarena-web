@@ -570,8 +570,12 @@ function saveColly() {
       }
 
       
-      $type = 'ASCII';
-      if (in_array(strtolower($ext), array('ans'))) $type = 'ANSI';
+      $type = $_POST[ "type" ] ?? "";
+      
+      if (strlen($type)<1) {
+        $type = 'ASCII';
+        if (in_array(strtolower($ext), array('ans'))) $type = 'ANSI';
+      }
       if (in_array(strtolower($ext), array('dms,','lzh','lha', 'zip'))) $type = 'Archive';
 
       $fileDiz = extractFileDiz($filen);
@@ -1837,7 +1841,7 @@ switch ($cmd) {
     getCollys($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
     break;      
     case "get_reqs":
-    getRequests($_current[1],$_current[2],$_current[3],$_current[4],$_current[5],$_current[6]);
+    getRequests($_current[1],$_current[2],$_current[3],$_current[4],$_current[5] ?? "",$_current[6] ?? "");
     break;      
     case "get_req_comments":
     getRequestComments($_current[1]);
