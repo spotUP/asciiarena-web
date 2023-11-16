@@ -34,10 +34,10 @@ $userprefs = fetchOne("select list_view_mode from users where id = :userid", [":
     <div class="col text-truncate">
       <a onclick="updateSort('filename')">FILENAME</a>
     </div>
-    <div class="col green text-truncate">
+    <div class="col white text-truncate">
       <a onclick="updateSort('artists')">ARTiST</a>
     </div>
-    <div class="col green text-truncate">
+    <div class="col white text-truncate">
       <a onclick="updateSort('crews')">CREW</a>
     </div>
     <div class="col text-truncate d-none d-md-block">
