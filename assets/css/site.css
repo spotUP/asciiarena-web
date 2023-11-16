@@ -1778,6 +1778,10 @@ transition: opacity .3s linear !important;
 }
 */
 
+.navbar{
+  z-index: 1020;
+}
+
 .navbar-toggler-icon {
   display: block;
   width: 16px !important;
