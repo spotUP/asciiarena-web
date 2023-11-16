@@ -134,8 +134,11 @@
 	}
 
 	function fileInputchange(e) {
-		var filename = e.target.files[0].name;
-		$("#colly_filename2").val(filename); 
+		$("#colly_filename2").val(""); 
+    if (e.target.files.length>0) {
+      var filename = e.target.files[0].name;
+      $("#colly_filename2").val(filename); 
+    }
 	}
 
 	function collyDupeCheck() {
@@ -201,6 +204,7 @@
 	}
 
 	function showCollyAlert(content, success) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 		if (success) {
 			alertContent = `<div id="#success-alert" class="bs-component quick-alert animate__animated animate__bounceIn alert alert-success">${content}</div>`;
 		} else {
@@ -301,7 +305,16 @@
 					</div>
 				</div>
 
-
+				<div class="row">
+					<div class="col-xs-12 col-md-6">
+						<label for="colly_type" class="lightgrey apt-1 apb-1">Type</label>
+						<select class="select2" name="type" id="colly_type">
+							<option value="ASCII">ASCII</option>
+							<option value="ANSI">ANSI</option>
+							<option value="Archive">Archive</option>
+						</select>
+					</div>
+				</div>
 
 			<?php } ?>
 
