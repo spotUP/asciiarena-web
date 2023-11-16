@@ -256,7 +256,7 @@
 
 			<div class="row apt-1">
 				<div class="col-12">
-					<input type="button" class="btn-big white bg-green w-100 col-xs-12 col-md-2 amb-1" value="Save" onclick="saveCrew()">
+					<input type="button" class="btn-big white bg-green w-100 col-xs-12 col-md-2 amb-1" value="Save!" onclick="saveCrew()">
 			<?php if ($admin_edit && is_admin()) { ?>
 					<input type="button" class="btn-big white bg-red w-100 col-xs-12 col-md-2 amb-1" value="Delete" onclick="delCrew()">
 			<?php } ?>
