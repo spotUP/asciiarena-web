@@ -149,7 +149,7 @@ include "header_ascii.php";
 							<a class="dropdown-item ascii" href="/submit.php#app">ASCII App<span style="font-size: 16px;"> </span></a>
 							<a class="dropdown-item ascii" href="/submit.php#ascii_mag">ASCII Mag<span style="font-size: 16px;"> </span></a>
 							<a class="dropdown-item ascii" href="/submit.php#request">Request<span style="font-size: 16px;"> </span></a>
-							<a class="dropdown-item ascii" href="/submit.php#sitelogo">Logo<span style="font-size: 16px;"> </span></a>
+							<a class="dropdown-item ascii" href="/submit.php#sitelogo">aSCIIaRENA Logo<span style="font-size: 16px;"> </span></a>
 						</div>
 					</li>
 					<ul class="nav navbar-nav menu-right">
