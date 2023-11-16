@@ -1235,6 +1235,23 @@ function saveColly() {
     }
   }
 
+  function saveLogo() {
+    if (is_ajax() && is_logged_in()) {
+      $response = 200;
+      $data = [
+        ":author" => $_POST[ "author" ] ?? "",
+        ":ascii" => $_POST[ "ascii" ] ?? "",
+      ];
+      $q = "INSERT INTO logos (author, ascii) VALUES (:author, :ascii)";
+      $response = 201;
+      if(doQuery($q, $data)) {
+        exit(json_out(["status" => true], $response));
+      }
+      exit(json_out(["status" => true], 400));           
+    }
+  }
+
+
   function getCrews($page, $sort, $asc, $pagesize, $filter) {
     global $_user;
     if (is_ajax()) {
@@ -1822,6 +1839,8 @@ switch ($cmd) {
     deleteFont($_current[1]);
     case "save_request":
     saveRequest();
+    case "save_logo":
+    saveLogo();
     case "get_crews":
     getCrews($_current[1],$_current[2],$_current[3],$_current[4],$_current[5]);
     break;      

@@ -688,7 +688,7 @@ include "header.php";
 							include ("edit_crew.php");
 							include ("edit_artist.php");
 							include ("admin_edit_user.php");
-							include ("admin_edit_site_logo.php");
+							include ("edit_site_logo.php");
 							include ("edit_bbs.php");
 							include ("edit_request.php");
 							include ("edit_playlist.php");
