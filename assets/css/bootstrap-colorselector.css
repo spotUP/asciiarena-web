@@ -3,7 +3,7 @@
   left: 48px !important;
   padding: 0px;
   min-width: 384px;
-  max-width: 384px;
+  max-width: 38px;
   background-color: black;
   margin-top: 3px;
   margin-left: 0px;
@@ -54,4 +54,6 @@
 .dropdown.dropdown-colorselector > ul > li:nth-child(1){
   display: none !important;
 }
+
+
 

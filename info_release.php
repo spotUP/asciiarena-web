@@ -49,7 +49,7 @@ require_once "header.php";?>
 
   <div class="container-fluid bg-secondary amb-1 sticky-top" style="padding-top: 36px;">
     <?php if ($type !== 'Archive') { ?>
-      <input type="button" id="viewbutton" onclick="toggleColly()" class="btn-big amb-1 animate__animated animate__rubberBand animate__delay-2s" value="Hide Colly">
+      <input type="button" id="viewbutton" onclick="toggleColly()" class="btn-big amb-1" value="Hide Colly">
 
       <input type="button" id="fsbutton"  onclick="showFullscreen()" class="btn-big amb-1" value="Fullscreen">
     <?php } ?>
@@ -94,7 +94,7 @@ require_once "header.php";?>
       <div class="row apb-0 apt-1 apl-1 bg-secondary">
           <button class="btn-primary">BG Color</button>
           <span class="amr-2">
-            <select class="custom-select" class="custom-select" id="colorselector_1">
+            <select class="custom-select" id="colorselector_1">
               <option style="display: none;" id="selcol-1" selected="selected" value="<?=$bgcolor?>" data-color="<?=$bgcolor?>"></option>
               <option value='#555555' data-color="#555555">Bright Black</option>
               <option value='#5555ff' data-color="#5555ff">Bright Blue</option>
@@ -114,9 +114,9 @@ require_once "header.php";?>
               <option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
             </select>
           </span>
-        <button class="btn-primary">FG Color</button>
+        <button class="btn-primary" onclick="animTest()">FG Color</button>
         <span class="amr-2">
-          <select class="custom-select" class="custom-select animate__backInLeft" id="colorselector_2">
+          <select class="custom-select" id="colorselector_2">
             <option id="selcol-2" selected="selected" value="<?=$fgcolor?>" data-color="<?=$fgcolor?>"></option>
             <option value='#555555' data-color="#555555">Bright Black</option>
             <option value='#5555ff' data-color="#5555ff">Bright Blue</option>
