@@ -81,7 +81,7 @@ if (DEBUG) {
 <div class="modal" id="login" tabindex="-1" role="dialog" aria-hidden="true" aria-labelledby="">
 	<div class="modal-dialog animate__animated animate__backInLeft" role="document">
 		<div class="modal-content">
-			<div class="modal-header ap-1" style="background-color: #444444;">
+			<div class="modal-header" style="background-color: #444444;">
 				<span class="modal-title" id="">LOGiN</span>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 			</div>

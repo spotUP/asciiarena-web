@@ -8,22 +8,22 @@ $sort_by = $_GET['sort_by'] ?? "id";
   <div class="col-lg-8 order-md-1 order-lg-2 order-xl-2 bg-secondary">
 
     <div class="row d-block d-md-none">
-      <div class="row col-12 m-0 apt-1 d-flex">
+      <div class="row col-12 m-0 apt-1 d-flex p-0">
         <input type="hidden" id="sort1">
         <input type="hidden" id="viewmode" value="1">
         <input type="hidden" id="pageno">
         <input type="hidden" id="sort1">
         <input type="hidden" id="sort2">
         <input type="hidden" id="maxpage">
-        <ul class="pagination">
-          <li class="page-item"> <a onclick="firstPage(event)" href="#" class="page-link"><<</a></li>
-          <li class="page-item"> <a onclick="prevPage(event)" href="#" class="page-link" ><</a></li>
-          <span id="currpage"></span>
-          <li class="page-item"> <a onclick="nextPage(event)" href="#" class="page-link" >></a></li>
-          <li class="page-item"> <a onclick="lastPage(event)" href="#" class="page-link" >>></a></li>
+        <ul class="pagination w-100 aml-1">
+          <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="firstPage(event)" href="#" class="page-link" ><<</button></li>
+          <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="prevPage(event)" href="#" class="page-link" ><</button></li>
+          <button class="btn paginator w-100"><span id="currpage"></span></button>
+          <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="nextPage(event)" href="#" class="page-link" >></button></li>
+          <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="lastPage(event)" href="#" class="page-link" >>></button></li>
         </ul>
       </div>
-      <div class="row col-12 m-0 apt-0 d-flex">
+      <div class="row col-12 m-0 apt-0 d-flex m-0">
         <div class="apt-1 bg-secondary apb-1 w-100">
           <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
             <div class="btn-group" role="group">
@@ -56,11 +56,11 @@ $sort_by = $_GET['sort_by'] ?? "id";
           <input type="hidden" id="sort2">
           <input type="hidden" id="maxpage">
           <ul class="pagination">
-            <li class="page-item"> <a onclick="firstPage(event)" href="#" class="page-link"><<</a></li>
-            <li class="page-item"> <a onclick="prevPage(event)" href="#" class="page-link" ><</a></li>
-            <span id="currpage"></span>
-            <li class="page-item"> <a onclick="nextPage(event)" href="#" class="page-link" >></a></li>
-            <li class="page-item"> <a onclick="lastPage(event)" href="#" class="page-link" >>></a></li>
+          <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="firstPage(event)" href="#" class="page-link" ><<</button></li>
+          <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="prevPage(event)" href="#" class="page-link" ><</button></li>
+          <button class="btn paginator w-100"><span id="currpage"></span></button>
+          <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="nextPage(event)" href="#" class="page-link" >></button></li>
+          <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="lastPage(event)" href="#" class="page-link" >>></button></li>
           </ul>
         </div>
         <div class="apt-1 bg-secondary apb-1 w-100">
@@ -90,11 +90,16 @@ $sort_by = $_GET['sort_by'] ?? "id";
 
 
     ?>
+    <div class="container-fluid bg-secondary apb-1">
+      <div class="d-none d-sm-block text-truncate text-center">
+       <span class="green">- --/\-\/- -</span> <span class="cyan">aSCIIaRENA</span> <span class="red">--=*=-- </span><span class="pink">[<?=date("D")?>, the <?=date("d-m-y")?>]</span><span class="red"> --=*=-- </span> <span class="cyan">aSCIIaRENA</span> <span class="green"> - -/\-\/- -- -</span><br><br>
+     </div>
+   </div>
 
    <div id = "hdrcols" class="row amb-1">
-    <div class="col-5"><span class="white"><a onclick="updateSort('title')">Title</a></span></div>
-    <div class="col-2"><span class="white"><a onclick="updateSort('title')">Status</a></span></div>
-    <div class="col-2"><span class="white"><a onclick="updateSort('user')">Reqed by</a></span></div>
+    <div class="col-3"><span class="white"><a onclick="updateSort('title')">Title</a></span></div>
+    <div class="col-3"><span class="white"><a onclick="updateSort('title')">Status</a></span></div>
+    <div class="col-3"><span class="white"><a onclick="updateSort('user')">Requested By</a></span></div>
     <div class="col-3"><span class="white"><a onclick="updateSort('user')">Date</a></span></div>
   </div>
 
@@ -216,13 +221,13 @@ function getRequests(page,sort,order,filter) {
       break
     }
     reqtxt = `<div class="row">
-    <div class="col-5 text-truncate">
+    <div class="col-3 text-truncate">
     <a class="magenta" href="${req.url}">${req.title}</a>
     </div>
-    <div class="col-2 text-truncate">
+    <div class="col-3 text-truncate">
     <a class="magenta" href="${req.url}">${status}</a>
     </div>
-    <div class="col-2 text-truncate">
+    <div class="col-3 text-truncate">
     <a class="magenta" href="${req.url}">${req.user}</a>
     </div>
     <div class="col-3 text-truncate">
