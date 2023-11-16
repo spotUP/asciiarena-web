@@ -611,7 +611,7 @@ input[type=button], input[type=submit], input[type=reset] {
   color: #bbbbbb !important;
   background-color: #444444;
   margin-left: 0px !important;
-  margin-right: 8px !important; 
+  margin-right: 0px !important; 
   width: 132px; 
   text-align: center;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
@@ -620,7 +620,7 @@ input[type=button], input[type=submit], input[type=reset] {
 .btn-primary:hover {
   color: #000000 !important;
   margin-left: 0px !important;
-  margin-right: 8px !important; 
+  margin-right: 0px !important; 
   width: 132px; 
   text-align: center;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
@@ -631,7 +631,7 @@ input[type=button], input[type=submit], input[type=reset] {
   color: rgb(255,255,85) !important;;
   background-color: #444444;
   margin-left: 0px !important;
-  margin-right: 8px !important; 
+  margin-right: 0px !important; 
   text-align: center;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
 }
@@ -1378,12 +1378,12 @@ input[type="password"]:active {
   padding-top: 16px !important;
 }
 
-.amt-1 { 
-  margin-top: 16px !important;
+.apl-1 { 
+  padding-left: 8px !important;
 }
 
 .apl-1 { 
-  padding-left: 8px !important;
+  padding-left: 16px !important;
 }
 
 .apr-1 { 
@@ -1396,6 +1396,26 @@ input[type="password"]:active {
 
 .apb-2 { 
   padding-bottom: 32px !important;
+}
+
+.amt-1 { 
+  margin-top: 16px !important;
+}
+
+.aml-1 { 
+  margin-left: 8px !important;
+}
+
+.aml-2 { 
+  margin-left: 16px !important;
+}
+
+.amr-1 { 
+  margin-right: 8px !important;
+}
+
+.amr-2 { 
+  margin-right: 16px !important;
 }
 
 .amb-1 { 

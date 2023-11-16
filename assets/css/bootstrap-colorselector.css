@@ -1,8 +1,9 @@
 .dropdown-colorselector>.dropdown-menu {
-  top: 80%;
+  top: -34px !important;
+  left: 48px !important;
   padding: 0px;
-  min-width: 128px;
-  max-width: 128px;
+  min-width: 386px;
+  max-width: 386px;
   background-color: black;
   margin-top: 3px;
   margin-left: 0px;
@@ -12,23 +13,25 @@
 .dropdown-colorselector>.dropdown-menu>li {
   display: block;
   float: left;
-  width: 14px;
-  height: 14px;
+  width: 48px;
+  height: 48px;
   padding-left: 0px;
-  margin-bottom: 2px;
-  margin-right: 2px;
+  margin-bottom: 0px;
+  margin-right: 0px;
 }
 
 .dropdown-colorselector>.dropdown-menu>li>.color-btn {
   display: block;
-  width: 14px;
-  height: 14px;
+  width: 48px;
+  height: 48px;
   border-radius: 0;
   position: relative;
   -webkit-transition: all ease 0.1s;
   transition: all ease 0.1s;
-  padding-bottom: 2px;
-  padding-right: 2px;
+  padding-bottom: 0px;
+  padding-right: 0px;
+  margin-left: 0px;
+  margin-top: 0px;
 }
 
 .dropdown-colorselector>.dropdown-menu>li>.color-btn:hover {
@@ -42,12 +45,11 @@
 
 .btn-colorselector {
   display: inline-block;
-  width: 14px;
-  height: 14px;
+  width: 48px;
+  height: 48px;
   background-color: #DDD;
   vertical-align: middle;
   border-radius: 0;
-  margin-top: -4px;
 }
 .dropdown.dropdown-colorselector > ul > li:nth-child(1){
   display: none !important;

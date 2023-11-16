@@ -79,128 +79,117 @@ require_once "header.php";?>
       <input type="button" id="favbutton" onclick="favourite()" class="btn-big amb-1" value="<?=$favourite?>">
       <input type="button" class="btn-big amb-1" onclick="reportAsBroken()" value="Report Broken">   
 
-   		<?php if (is_admin()) { ?>
-      <form action="/admin.php#colly" method="post" id="edit-colly">
-        <input type="hidden" name="getcollyname" value="<?=$filename?>">
-        <input type="hidden" name="open_edit_colly_field" value="1">
-        <input type="submit" class="btn-big amb-1" name="edit_colly" value="Edit">
-      </form>
+      <?php if (is_admin()) { ?>
+        <form action="/admin.php#colly" method="post" id="edit-colly">
+          <input type="hidden" name="getcollyname" value="<?=$filename?>">
+          <input type="hidden" name="open_edit_colly_field" value="1">
+          <input type="submit" class="btn-big amb-1" name="edit_colly" value="Edit">
+        </form>
       <?php } ?>
     <?php } ?>
   </div>
 
-<div id="colly-main"     <?php if ($type == 'Archive') { ?> style="display: none;"; <?php } ?>>
-  <div class="container-fluid">
-    <div class="row apb-0">
-      <div class="col-3">
-        Colly BG:
-      </div>
-      <div class="col-3">
-        <select class="custom-select" class="custom-select" id="colorselector_1">
-          <option style="display: none;" id="selcol-1" selected="selected" value="<?=$bgcolor?>" data-color="<?=$bgcolor?>"></option>
-          <option value='#555555' data-color="#555555">Bright Black</option>
-          <option value='#5555ff' data-color="#5555ff">Bright Blue</option>
-          <option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
-          <option value='#ff5555' data-color="#ff5555">Bright Red</option>
-          <option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
-          <option value='#55ff55' data-color="#55ff55">Bright Green</option>
-          <option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
-          <option value='#ffffff' data-color="#ffffff">White</option>
-          <option value='#000000' data-color="#000000">Black</option>
-          <option value='#0000aa' data-color="#0000aa">Blue</option>
-          <option value='#aa00aa' data-color="#aa00aa">Magenta</option>
-          <option value='#aa0000' data-color="#aa0000">Red</option>
-          <option value='#aa5500' data-color="#aa5500">Yellow</option>
-          <option value='#00aa00' data-color="#00aa00">Green</option>
-          <option value='#00aaaa' data-color="#00aaaa">Cyan</option>
-          <option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
-        </select>
-      </div>
-    </div>
-    <div class="row amb-1">
-      <div class="col-3">
-        Colly FG:
-      </div>
-      <div class="col-3">
-        <select class="custom-select" class="custom-select" id="colorselector_2">
-          <option id="selcol-2" selected="selected" value="<?=$fgcolor?>" data-color="<?=$fgcolor?>"></option>
-          <option value='#555555' data-color="#555555">Bright Black</option>
-          <option value='#5555ff' data-color="#5555ff">Bright Blue</option>
-          <option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
-          <option value='#ff5555' data-color="#ff5555">Bright Red</option>
-          <option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
-          <option value='#55ff55' data-color="#55ff55">Bright Green</option>
-          <option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
-          <option value='#ffffff' data-color="#ffffff">White</option>
-          <option value='#000000' data-color="#000000">Black</option>
-          <option value='#0000aa' data-color="#0000aa">Blue</option>
-          <option value='#aa00aa' data-color="#aa00aa">Magenta</option>
-          <option value='#aa0000' data-color="#aa0000">Red</option>
-          <option value='#aa5500' data-color="#aa5500">Yellow</option>
-          <option value='#00aa00' data-color="#00aa00">Green</option>
-          <option value='#00aaaa' data-color="#00aaaa">Cyan</option>
-          <option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
-        </select>
+  <div id="colly-main"     <?php if ($type == 'Archive') { ?> style="display: none;"; <?php } ?>>
+    <div class="container-fluid">
+      <div class="row apb-0 apt-1 apl-1 bg-secondary">
+          <button class="btn-primary">BG Color</button>
+          <span class="amr-2">
+            <select class="custom-select" class="custom-select" id="colorselector_1">
+              <option style="display: none;" id="selcol-1" selected="selected" value="<?=$bgcolor?>" data-color="<?=$bgcolor?>"></option>
+              <option value='#555555' data-color="#555555">Bright Black</option>
+              <option value='#5555ff' data-color="#5555ff">Bright Blue</option>
+              <option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
+              <option value='#ff5555' data-color="#ff5555">Bright Red</option>
+              <option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
+              <option value='#55ff55' data-color="#55ff55">Bright Green</option>
+              <option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
+              <option value='#ffffff' data-color="#ffffff">White</option>
+              <option value='#000000' data-color="#000000">Black</option>
+              <option value='#0000aa' data-color="#0000aa">Blue</option>
+              <option value='#aa00aa' data-color="#aa00aa">Magenta</option>
+              <option value='#aa0000' data-color="#aa0000">Red</option>
+              <option value='#aa5500' data-color="#aa5500">Yellow</option>
+              <option value='#00aa00' data-color="#00aa00">Green</option>
+              <option value='#00aaaa' data-color="#00aaaa">Cyan</option>
+              <option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
+            </select>
+          </span>
+        <button class="btn-primary">FG Color</button>
+        <span class="amr-2">
+          <select class="custom-select" class="custom-select animate__backInLeft" id="colorselector_2">
+            <option id="selcol-2" selected="selected" value="<?=$fgcolor?>" data-color="<?=$fgcolor?>"></option>
+            <option value='#555555' data-color="#555555">Bright Black</option>
+            <option value='#5555ff' data-color="#5555ff">Bright Blue</option>
+            <option value='#ff55ff' data-color="#ff55ff">Bright Magenta</option>
+            <option value='#ff5555' data-color="#ff5555">Bright Red</option>
+            <option value='#ffff55' data-color="#ffff55">Brigt Yellow</option>
+            <option value='#55ff55' data-color="#55ff55">Bright Green</option>
+            <option value='#55FFFF' data-color="#55FFFF">Bright Cyan</option>
+            <option value='#ffffff' data-color="#ffffff">White</option>
+            <option value='#000000' data-color="#000000">Black</option>
+            <option value='#0000aa' data-color="#0000aa">Blue</option>
+            <option value='#aa00aa' data-color="#aa00aa">Magenta</option>
+            <option value='#aa0000' data-color="#aa0000">Red</option>
+            <option value='#aa5500' data-color="#aa5500">Yellow</option>
+            <option value='#00aa00' data-color="#00aa00">Green</option>
+            <option value='#00aaaa' data-color="#00aaaa">Cyan</option>
+            <option value='#aaaaaa' data-color="#aaaaaa">Grey</option>
+          </select>
+        </span>
+        <script>
+          $(function() {
+            $('#colorselector_1').colorselector({
+              callback : function(value, color, title) {
+                $("#colly").css('background-color', color);
+                $("#colly-div").css('background-color', color);
+                $("#blacker").css('background-color', color);
+              }
+            });
+            $('#colorselector_2').colorselector({
+              callback : function(value, color, title) {
+                $("#colly").css('color', color);
+              }
+            });
+
+          });
+        </script>
+        <div class="col-2 amb-1 m-0 p-0">
+          <select class="select2" id="colly-font">
+            <option class="dropdown-item" value="MicroKnight"<?php if ($font == 'MicroKnight') echo ' selected'; ?>>MicroKnight</option>
+            <option class="dropdown-item" value="MicroKnightPlus"<?php if ($font == 'MicroKnightPlus') echo ' selected'; ?>>MicroKnight+</option>
+            <option class="dropdown-item" value="mOsOul"<?php if ($font == 'mOsOul') echo ' selected'; ?>>mOsOul</option>
+            <option class="dropdown-item" value="P0T-NOoDLE"<?php if ($font == 'P0T-NOoDLE') echo ' selected'; ?>>P0T-NOoDLE</option>
+            <option class="dropdown-item" value="Topaz_a500"<?php if ($font == 'Topaz_a500') echo ' selected'; ?>>A500 Topaz</option>
+            <option class="dropdown-item" value="TopazPlus_a500"<?php if ($font == 'TopazPlus_a500') echo ' selected'; ?>>A500 Topaz+</option>
+            <option class="dropdown-item" value="Topaz_a1200"<?php if ($font == 'Topaz_a1200') echo ' selected'; ?>>A1200 Topaz</option>
+            <option class="dropdown-item" value="TopazPlus_a1200"<?php if ($font == 'TopazPlus_a1200') echo ' selected'; ?>>A1200 Topaz+</option>
+          </select>
+        </div>
       </div>
     </div>
     <script>
-      $(function() {
-        $('#colorselector_1').colorselector({
-          callback : function(value, color, title) {
-            $("#colly").css('background-color', color);
-            $("#colly-div").css('background-color', color);
-            $("#blacker").css('background-color', color);
-          }
-        });
-        $('#colorselector_2').colorselector({
-          callback : function(value, color, title) {
-            $("#colly").css('color', color);
-          }
-        });
-
+      $("#colly-font").change(function() {
+        font = $(this).val();
+        $("#colly").css('font-family', font);
       });
     </script>
-    <div class="row aml-1">
-      <div class="col-3">
-        Font:
-      </div>
-      <div class="col-2 amb-1">
-        <select class="select2" id="colly-font">
-          <option class="dropdown-item" value="MicroKnight"<?php if ($font == 'MicroKnight') echo ' selected'; ?>>MicroKnight</option>
-          <option class="dropdown-item" value="MicroKnightPlus"<?php if ($font == 'MicroKnightPlus') echo ' selected'; ?>>MicroKnight+</option>
-          <option class="dropdown-item" value="mOsOul"<?php if ($font == 'mOsOul') echo ' selected'; ?>>mOsOul</option>
-          <option class="dropdown-item" value="P0T-NOoDLE"<?php if ($font == 'P0T-NOoDLE') echo ' selected'; ?>>P0T-NOoDLE</option>
-          <option class="dropdown-item" value="Topaz_a500"<?php if ($font == 'Topaz_a500') echo ' selected'; ?>>A500 Topaz</option>
-          <option class="dropdown-item" value="TopazPlus_a500"<?php if ($font == 'TopazPlus_a500') echo ' selected'; ?>>A500 Topaz+</option>
-          <option class="dropdown-item" value="Topaz_a1200"<?php if ($font == 'Topaz_a1200') echo ' selected'; ?>>A1200 Topaz</option>
-          <option class="dropdown-item" value="TopazPlus_a1200"<?php if ($font == 'TopazPlus_a1200') echo ' selected'; ?>>A1200 Topaz+</option>
-        </select>
-      </div>
+    <?php
+    if ($type == "ASCII") 
+    {
+      ?>
+      <div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;">
+        <div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>; width: 640px;" id="colly-div"><pre id="colly" style="font-family: <?=$font;?>; color: <?=$fgcolor?>; white-space: pre;"><?php
+        if (file_exists("collections/{$dirname}/{$filename}")) 
+        {
+          $content = encodeFileText("collections/{$dirname}/{$filename}");
+          echo "<br><br><br><br>";
+          echo $content;
+          echo "<br><br><br><br>";
+        }
+      ?></pre>
     </div>
   </div>
-  <script>
-    $("#colly-font").change(function() {
-      font = $(this).val();
-      $("#colly").css('font-family', font);
-    });
-  </script>
   <?php
-  if ($type == "ASCII") 
-  {
-    ?>
-    <div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;">
-    <div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>; width: 640px;" id="colly-div"><pre id="colly" style="font-family: <?=$font;?>; color: <?=$fgcolor?>; white-space: pre;"><?php
-    if (file_exists("collections/{$dirname}/{$filename}")) 
-    {
-      $content = encodeFileText("collections/{$dirname}/{$filename}");
-      echo "<br><br><br><br>";
-      echo $content;
-      echo "<br><br><br><br>";
-    }
-  ?></pre>
-</div>
-</div>
-<?php
 }
 elseif ($type == "ANSI") 
 {
@@ -226,35 +215,35 @@ elseif ($type == "ANSI")
 ?>    
 </div>
 
-  <div id="comments">
-  </div>
-  <div id="addcomment" style="display:none" >
-    <div class="row apl-1 apr-1">
-      <div class="header bg-header col-12 ap-1">ENTER YOUR COMMENT</div>
-    </div>
-
-    <div class="row">
-     <div class="col-12 aml-1 amr-1">
-      <textarea style="height: 128px; width: 100%;" class="bg-secondary cyan ap-1" id="user_comment" ></textarea>
-    </div>
+<div id="comments">
+</div>
+<div id="addcomment" style="display:none" >
+  <div class="row apl-1 apr-1">
+    <div class="header bg-header col-12 ap-1">ENTER YOUR COMMENT</div>
   </div>
 
-  <div class="row aml-1 apl-1 apr-1">
-   <div class="col-12 apl-1 apr-1 apb-1 apt-1 bg-secondary">
-    <div class="col-2 d-flex justify-content-between">
-      <label class="apr-1" for="user_rating">RATING</label>
-      <select id="user_rating" class="custom-select">
-        <option value="" selected="selected">Blank</option><?php
-        for ($i = 1; $i < 11; $i++) 
-        {
-          echo "<option value=$i>$i</option>";
-        } ?>
-      </select>
-    </div>
-    <div class="col-12 p-0 m-0 apt-1">
-      <input type="button" class="btn-big" onclick="sendComment()" align="right" value="Comment">
-    </div>
+  <div class="row">
+   <div class="col-12 aml-1 amr-1">
+    <textarea style="height: 128px; width: 100%;" class="bg-secondary cyan ap-1" id="user_comment" ></textarea>
   </div>
+</div>
+
+<div class="row aml-1 apl-1 apr-1">
+ <div class="col-12 apl-1 apr-1 apb-1 apt-1 bg-secondary">
+  <div class="col-2 d-flex justify-content-between">
+    <label class="apr-1" for="user_rating">RATING</label>
+    <select id="user_rating" class="custom-select">
+      <option value="" selected="selected">Blank</option><?php
+      for ($i = 1; $i < 11; $i++) 
+      {
+        echo "<option value=$i>$i</option>";
+      } ?>
+    </select>
+  </div>
+  <div class="col-12 p-0 m-0 apt-1">
+    <input type="button" class="btn-big" onclick="sendComment()" align="right" value="Comment">
+  </div>
+</div>
 </div>
 </div>
 <div id="editcomment" style="display:none" >
@@ -521,7 +510,7 @@ function addFavourite() {
         type: 'GET',
         url: `/cmds.php/getcomments/${$("#collyid").data("id")}`
       }).done(function (data) {
-        
+
         if (data.length==0) {
           $("#viewcomment").hide();
         } else {
