@@ -293,7 +293,7 @@
 				</div>
 
 				<div class="row apb-1">
-					<div class="col-xs-12 col-md-4 p-0 m-0">
+					<div class="col-xs-12 col-md-4 m-0">
 						<input type="hidden"  id="colly_filename2">
 						<input type="file" class="w-100 p-0 amr-1" id="colly_filename" onchange="fileInputchange(event)" name="filename">
 					</div>

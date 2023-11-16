@@ -213,7 +213,7 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-xs-12 col-md-6 apb-1 m-0 p-0">
+			<div class="col-xs-12 col-md-6 apb-1 m-0">
 				<input type="file" class="w-100 p-0 amr-1" id="app_file" name="file"/>
 			</div>
 		</div>
