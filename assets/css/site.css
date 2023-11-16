@@ -442,11 +442,15 @@ small,
 .custom-file-label {
   height: 16px;
   line-height: 16px;
+  margin-left:0px !important;
+  padding-left:0px !important;
 }
 
 .custom-file-label::after {
   height: 16px;
   line-height: 16px;
+  margin-left:0px !important;
+  padding-left:0px !important;
 }
 
 .navbar-brand {
@@ -932,6 +936,8 @@ a.yellow
 #exampleInputFile{
   background: blue !important;
   color: white !important;
+  margin-left:0px !important;
+  padding-left:0px !important;
 }
 
 select.form-control {
@@ -1778,10 +1784,6 @@ transition: opacity .3s linear !important;
 }
 */
 
-.navbar{
-  z-index: 1020;
-}
-
 .navbar-toggler-icon {
   display: block;
   width: 16px !important;
@@ -2269,8 +2271,8 @@ b::before, b::after, strong::before, strong::after {
 
 .custom-file-input:lang(en) ~ .custom-file-label::after {
   content: "Browse" !important;
-  padding-left: 8px !important;
-  padding-right: 8px;
+  padding-left: 0px !important;
+  padding-right: 0px;
 }
 
 .p-lg-2 {
@@ -2426,6 +2428,7 @@ input:-webkit-autofill, input:-webkit-autofill:hover, and input:-webkit-autofill
 .btn-group, .btn-group-vertical {
   display: inherit !important;
 }
+
 Selector::file-selector-button {
  font-size:  16px;
  height: 16px;
@@ -2510,6 +2513,8 @@ input::file-selector-button {
   margin-right: 16px !important;
  padding: 16px !important;
 }
+
+
 
 .alert-success{
   padding-bottom: 16px;
