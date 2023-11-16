@@ -24,6 +24,7 @@
 		}
 	}
 
+	<?php if ($admin_edit && is_admin()) { ?>
 	function getLogoList() {
 		let logolist = $("#logo_fetch_id");
 		logolist.empty();
@@ -32,21 +33,6 @@
 			$.each(data, function (i, logo) {
 				logolist.append($("<option/>").val(logo.id).text(logo.id));
 			});
-		});
-	}
-	
-	function saveLogo() {
-		const form = $("#logo_form");
-		const url = form.attr("action");
-		$.ajax({
-			"type": "POST",
-			"url": url,
-			"data": form.serialize(),
-			"success": () => {
-				showSiteLogoAlert("Logo Saved!", true);
-				logoclear();
-				getLogoList();
-			}
 		});
 	}
 	
@@ -74,7 +60,23 @@
 			}
 		}
 	}
-
+	<?php } ?>
+  
+	function saveLogo() {
+		const form = $("#logo_form");
+		const url = form.attr("action");
+		$.ajax({
+			"type": "POST",
+			"url": url,
+			"data": form.serialize(),
+			"success": () => {
+				showSiteLogoAlert("Logo Saved!", true);
+				logoclear();
+				getLogoList();
+			}
+		});
+	}
+	
 	function showSiteLogoAlert(content, success) {
     if (success) {
 		alertContent = `<div id="#success-alert" class="bs-component quick-alert animate__animated animate__bounceIn alert alert-success">${content}</div>`;
@@ -86,6 +88,7 @@
 	
 </script>
 <div class="tab-pane fade ap-1" id="sitelogo">
+	<?php if ($admin_edit && is_admin()) { ?>
 	<form id="del_logo_form" action="/admin_cmds.php?cmd=del_logo" method="post">
 		<input type="hidden" name="id" id="del_logo_id">
 	</form>
@@ -99,9 +102,20 @@
 	</div>
 	
 	<form id="logo_form" enctype="multipart/form-data" action="/admin_cmds.php?cmd=save_logo" method="post">
+  		<?php } else { ?>
+	<form id="logo_form" enctype="multipart/form-data" action="/cmds.php?cmd=save_logo" method="post">
+      <?php } ?>
+      
 		<input type="hidden" name="id" id="logo_id">
 		<input type="hidden" name="author" id="logo_author">
 		<input type="hidden" name="name" id="logo_name">
+
+		<div class="row apb-1">
+			<div class="col-xs-12 col-md-6 apt-1">
+				<label for="logo_ascii" class="lightgrey">Logo design</label>
+			</div>
+		</div>
+
 
 		<div class="row apb-1">
 			<div class="col-xs-12 col-md-10">
@@ -111,13 +125,18 @@
 		<div class="row">
 			<div class="col-12">
 				<input type="button" class="btn-big bg-green whitew-100 col-xs-12 col-md-2 amb-1" value="Save" onclick="saveLogo()">
+						<?php if ($admin_edit && is_admin()) { ?>
 				<input type="button" class="btn-big bg-red w-100 col-xs-12 col-md-2 amb-1 white" value="Delete" onclick="delLogo()">
+ 						<?php } ?>
+
 			</div>
 		</div>
 	</form>  
 </div>
+	<?php if ($admin_edit && is_admin()) { ?>
 <script>
 	$(function () {
 		getLogoList();
 	});
 </script>
+	<?php } ?>
