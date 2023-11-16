@@ -87,9 +87,7 @@ require_once "header.php";?>
         </form>
       <?php } ?>
     <?php } ?>
-  </div>
-
-  <div id="colly-main"     <?php if ($type == 'Archive') { ?> style="display: none;"; <?php } ?>>
+  <div id="colly-main"     <?php if ($type == 'Archive') { ?> style="display: none; overflow-y: scroll;"; <?php } ?>>
     <div class="container-fluid">
       <div class="row apb-0 apt-1 apl-1 bg-secondary">
           <button class="btn-primary">BG Color</button>
@@ -173,11 +171,14 @@ require_once "header.php";?>
         $("#colly").css('font-family', font);
       });
     </script>
+  </div>
+
+
     <?php
     if ($type == "ASCII") 
     {
       ?>
-      <div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>;">
+      <div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="overflow-y: scroll; height: 100vh; background-color: <?=$bgcolor?>;">
         <div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: <?=$bgcolor?>; width: 640px;" id="colly-div"><pre id="colly" style="font-family: <?=$font;?>; color: <?=$fgcolor?>; white-space: pre;"><?php
         if (file_exists("collections/{$dirname}/{$filename}")) 
         {
