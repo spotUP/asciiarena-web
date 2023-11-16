@@ -223,10 +223,10 @@ function getRequests(page,sort,order,filter) {
     <a class="magenta" href="${req.url}">${status}</a>
     </div>
     <div class="col-2 text-truncate">
-    <a class="magenta" href="${req.url}">${req.user}</a>
+    <a class="yellow" href="${req.url}">${req.user}</a>
     </div>
     <div class="col-3 text-truncate">
-    <a class="magenta" >${req.time}</a>
+    <a class="white" >${req.time}</a>
     </div>`
 
 
