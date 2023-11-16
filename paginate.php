@@ -7,7 +7,7 @@
       <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="firstPage(event)" href="#" class="page-link" ><<</button></li>
       <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="prevPage(event)" href="#" class="page-link" ><</button></li>
 
-      <span id="currpage" class="paginator w-100"></span>
+      <span id="currpage" class="paginator w-100 apt-1"></span>
 
       <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="nextPage(event)" href="#" class="page-link" >></button></li>
       <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="lastPage(event)" href="#" class="page-link" >>></button></li>
