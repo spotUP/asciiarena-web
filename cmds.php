@@ -1251,7 +1251,6 @@ function saveColly() {
     }
   }
 
-
   function getCrews($page, $sort, $asc, $pagesize, $filter) {
     global $_user;
     if (is_ajax()) {
