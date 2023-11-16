@@ -218,7 +218,7 @@ function getBase64(file) {
       </div>
     </div>
 
-    <div class="row apb-1 col-xs-12 col-md-6">
+    <div class="row apb-1 col-xs-12 col-md-6 m-0">
       <input class="w-100" type="text" id="playlist_filename1">
 			<input type="file" class="w-100" id="playlist_filename2" oninput="fileAttached()">
       <input type="hidden" class="w-100" id="playlist_filename" name="filename">
