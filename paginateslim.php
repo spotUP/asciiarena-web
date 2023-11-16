@@ -5,10 +5,8 @@
     <input type="hidden" id="sort2"><input type="hidden" id="maxpage">
     <ul class="pagination w-100">
       <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="firstPage(event)" href="#" class="page-link" ><<</button></li>
-      <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="prevPage(event)" href="#" class="page-link" ><</button></li><span id="currpage"></span>
-
-      <button class="btn paginator w-100"><span id="currpage"></span></button>
-
+      <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="prevPage(event)" href="#" class="page-link" ><</button></li>
+      <span id="currpage" class="w-100"></span>
       <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="nextPage(event)" href="#" class="page-link" >></button></li>
       <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="lastPage(event)" href="#" class="page-link" >>></button></li>
     </ul>
@@ -32,7 +30,7 @@
       <ul class="pagination">
         <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="firstPage(event)" href="#" class="page-link" ><<</button></li>
         <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="prevPage(event)" href="#" class="page-link" ><</button></li>
-        <button class="btn paginator" style="width:90px;"><span id="currpage"></span></button>
+        <span id="currpage" style="width:90px;"></span>
         <li class="page-item"> <button class="btn btn-primary" style="height: 48px; width:50px;" onclick="nextPage(event)" href="#" class="page-link" >></button></li>
         <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="lastPage(event)" href="#" class="page-link" >>></button></li>
       </ul>
