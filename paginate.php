@@ -7,7 +7,7 @@
           <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="firstPage(event)" href="#" class="page-link" ><<</button></li>
           <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="prevPage(event)" href="#" class="page-link" ><</button></li><span id="currpage"></span>
 
-            <button id="currpage" class="btn paginator w-100"></button>
+            <button class="btn paginator w-100"><span id="currpage"></span></button>
 
           <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="nextPage(event)" href="#" class="page-link" >></button></li>
           <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="lastPage(event)" href="#" class="page-link" >>></button></li>
@@ -45,7 +45,7 @@
           <ul class="pagination">
             <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="firstPage(event)" href="#" class="page-link" ><<</button></li>
             <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="prevPage(event)" href="#" class="page-link" ><</button></li>
-            <button id="currpage" class="btn paginator" style="width:90px;"></button>
+            <button class="btn paginator" style="width:90px;"><span id="currpage"></span></button>
             <li class="page-item"> <button class="btn btn-primary" style="height: 48px; width:50px;" onclick="nextPage(event)" href="#" class="page-link" >></button></li>
             <li class="page-item"> <button class="btn btn-primary" style="width:50px;" onclick="lastPage(event)" href="#" class="page-link" >>></button></li>
           </ul>
