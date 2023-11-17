@@ -21,7 +21,9 @@
 				foreach($collys as $colly) {
           				$crewdata = [];
           				$artistdata = [];
+					$dizdata = "";
 					if($id) {
+
 						$crews = fetchAll("SELECT collys_crews.id,crews.name FROM collys_crews, crews where crews.id = collys_crews.crew_id and collys_crews.colly_id=:id",[":id" => $colly->id]);
 						foreach($crews as $crew) {
 							$crewdata[] = [
@@ -37,23 +39,25 @@
 								"nick" => $artist->nick,
 							];
 						}
-					}
+					
           
-          $upload_path = "collections/";
-          $dirname = explode(".", $colly->filename);
-          $dirname = $dirname[0];
+            $upload_path = "collections/";
+            $dirname = explode(".", $colly->filename);
+            $dirname = $dirname[0];
 
-          $dizName = $upload_path.$dirname.'/'.$colly->filename.'.diz';
-          $dizdata = file_get_contents($dizName);
-          if (mb_detect_encoding($dizdata,'UTF-8',true)==false) {
-            $dizdata = utf8_encode($dizdata);
+            $dizName = $upload_path.$dirname.'/'.$colly->filename.'.diz';
+            $dizdata = file_get_contents($dizName);
+            if (mb_detect_encoding($dizdata,'UTF-8',true)==false) {
+              $dizdata = utf8_encode($dizdata);
+            }
+
+            if ($dizdata == false) 
+            {
+              $dizdata = "";
+            }
+                      
           }
 
-          if ($dizdata == false) 
-          {
-            $dizdata = "";
-          }
-          
 					$data[] = [
 						"id" => (int)$colly->id,
 						"name" => $colly->name,

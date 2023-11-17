@@ -171,10 +171,8 @@ require_once "header.php";?>
         $("#colly").css('font-family', font);
       });
     </script>
-  </div>
 
-
-    <?php
+  <?php
     if ($type == "ASCII") 
     {
       ?>
@@ -213,7 +211,8 @@ elseif ($type == "ANSI")
   </script>
   <?php
 }
-?>    
+?>      
+      
 </div>
 
 <div id="comments">
@@ -328,7 +327,7 @@ elseif ($type == "ANSI")
   $("#addcomment").show(500);
   $("#editcomment").hide(500);
   $('#user_comment').focus();
-  $('#user_comment')[0].scrollIntoView(false);
+  $('#user_comment')[0].scrollIntoView(true);
 }
 
 function reportAsBroken() {
