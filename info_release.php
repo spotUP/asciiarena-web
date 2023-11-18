@@ -215,23 +215,23 @@ elseif ($type == "ANSI")
       
 </div>
 
-<div id="comments">
-</div>
+<div id="comments"></div>
+
 <div id="addcomment" style="display:none" >
   <div class="row apl-1 apr-1">
     <div class="header bg-header col-12 ap-1">ENTER YOUR COMMENT</div>
   </div>
 
-  <div class="row">
+  <div class="row apr-1">
    <div class="col-12 aml-1 amr-1">
     <textarea style="height: 128px; width: 100%;" class="bg-secondary cyan ap-1" id="user_comment" ></textarea>
   </div>
 </div>
 
-<div class="row aml-1 apl-1 apr-1">
- <div class="col-12 apl-1 apr-1 apb-1 apt-1 bg-secondary">
+<div class="row apl-1 apr-1">
+ <div class="col-12 apl-1 apr-1 apb-1 apt-1 bg-secondary d-flex">
   <div class="col-2 d-flex justify-content-between">
-    <label class="apr-1" for="user_rating">RATING</label>
+    <label class="apr-1 apb-1 apt-1" for="user_rating">RATING</label>
     <select id="user_rating" class="custom-select">
       <option value="" selected="selected">Blank</option><?php
       for ($i = 1; $i < 11; $i++) 
@@ -240,7 +240,7 @@ elseif ($type == "ANSI")
       } ?>
     </select>
   </div>
-  <div class="col-12 p-0 m-0 apt-1">
+  <div class="col-12 p-0 m-0">
     <input type="button" class="btn-big" onclick="sendComment()" align="right" value="Comment">
   </div>
 </div>
@@ -284,6 +284,8 @@ elseif ($type == "ANSI")
 </div>
 </div>
 </div>
+
+
 
 
 <?php } ?>
