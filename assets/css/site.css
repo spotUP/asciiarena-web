@@ -1,5 +1,3 @@
-
-
 @font-face {
   font-family: 'MicroKnight';
   src: url('/assets/fonts/MicroKnight.woff2') format('woff2'),
@@ -1911,7 +1909,7 @@ transition: opacity .3s linear !important;
 }
 
 .nav-tabs {
-  height: 16px;
+  height: 46px;
   margin-left: 0;
   padding-left: 0;
   border-bottom: 0;
@@ -1919,16 +1917,39 @@ transition: opacity .3s linear !important;
 }
 
 .nav-tabs .nav-link {
+  border: 0;
+  padding-top: 0;
+  padding-left: 16px;
+  padding-right: 16px !important;  
+  padding-bottom: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+  margin-right: 0;
+  border: 0px;
+  border-right: 10px solid #444444;
+  background-color: #1a1a1a !important;
+  border-bottom: 0;
+  color: #eeee44 !important;
+  height: 16px !important;
+  line-height: 46px;
+  height: 46px;
+  min-height: 46px !important;
+}
+
+.nav-tabs .nav-link {
+    border: 0;
     margin-top: 16px;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border-left-width: 0px;
     line-height: 46px;
+    margin-left: 0;
     padding-left: 16px;
     padding-right: 16px;
+    margin-right: 0;
     background-color: #1a1a1a !important;
     border-bottom: 0;
-    color: #eeee44 !important;
-    height: -17px !important;
-    border-right: 10px solid #444444;
-}
 
 .nav-tabs .nav-link:focus {
   color: #ffffff !important;
