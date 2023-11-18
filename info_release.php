@@ -171,6 +171,7 @@ require_once "header.php";?>
         $("#colly").css('font-family', font);
       });
     </script>
+  </div>
 
   <?php
     if ($type == "ASCII") 
