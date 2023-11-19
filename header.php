@@ -243,7 +243,7 @@ include "header_ascii.php";
 				?>
 				<div class="row amb-1">
 					<div class="col-lg-12">
-						<div class="bs-component aml-1 apl-1 apr-1 apt-1">
+						<div class="bs-component aml-1 apl-0 apr-1 apt-1">
 							<?php if ($detect->isMobile()) { ?>
 								<div class="animate__animated animate__tada alert alert-dismissible alert-danger hide-on-landscape">
 									<button type="button" class="close" data-dismiss="alert">x</button>
