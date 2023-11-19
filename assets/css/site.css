@@ -1628,8 +1628,7 @@ input[type="password"]:active {
   font-size: 32px !important;
   line-height: 32px !important;
   z-index: 999998 !important;
-  width: 100vw !important;
-  height: 100vh !important;  
+  width: 90vw !important;
 }
 
 #blacker{
