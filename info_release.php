@@ -47,9 +47,9 @@ require_once "header.php";?>
   include('info_release_summary.php');
   ?>
 
-  <div class="container-fluid bg-secondary amb-1" style="padding-top: 36px;">
+  <div class="container-fluid bg-secondary amb-1 p-0" style="padding-top: 36px;">
     <?php if ($type !== 'Archive') { ?>
-      <input type="button" id="viewbutton" onclick="toggleColly()" class="btn-big amb-1" value="Hide Colly">
+      <input type="button" id="viewbutton" onclick="toggleColly()" class="btn-big amb-1 aml-1" value="Hide Colly">
 
       <input type="button" id="fsbutton"  onclick="showFullscreen()" class="btn-big amb-1" value="Fullscreen">
     <?php } ?>
@@ -88,8 +88,8 @@ require_once "header.php";?>
       <?php } ?>
     <?php } ?>
   <div id="colly-main"     <?php if ($type == 'Archive') { ?> style="display: none; overflow-y: scroll;"; <?php } ?>>
-    <div class="container-fluid">
-      <div class="row apb-0 apt-1 apl-1 bg-secondary">
+    <div class="container-fluid aml-1">
+      <div class="row apb-0 apt-0 apl-0 bg-secondary">
           <button class="btn-primary">BG Color</button>
           <span class="amr-2">
             <select class="custom-select" id="colorselector_1">
