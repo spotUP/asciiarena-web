@@ -83,7 +83,7 @@ include "header.php";
 			<div class="row">
 				<div class="col-lg-12">
 					<div class="bs-component">
-						<ul class="nav nav-tabs apt-1 bg-header">
+						<ul class="apl-1 nav nav-tabs apt-1 bg-header">
 							<li class="nav-item">
 								<a class="nav-link active" data-toggle="tab" href="#colly">Colly</a>
 							</li>
