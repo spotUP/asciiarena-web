@@ -47,7 +47,7 @@ require_once "header.php";?>
   include('info_release_summary.php');
   ?>
 
-  <div class="container-fluid bg-secondary amb-1 p-0" style="padding-top: 36px;">
+  <div class="container-fluid bg-secondary amb-1 p-0" style="margin-top: 36px;">
     <?php if ($type !== 'Archive') { ?>
       <input type="button" id="viewbutton" onclick="toggleColly()" class="btn-big amb-1 aml-1" value="Hide Colly">
 
