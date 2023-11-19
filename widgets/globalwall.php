@@ -25,7 +25,7 @@ if (is_logged_in()) $nick=$_user[ "nick" ];
 			</style>
 			<form id="<?=$form?>" method="post" class="w-100">
 				<div class="row col-12 col-lg-12 m-0">
-					<div class="col-10 col-lg-11 pr-0">
+					<div class="col-10 col-lg-11 pr-0 pl-0">
 						<input class="form-control tagtext w-100" type="text" maxlength="60" name="tagtext" placeholder="Tag the wall" id="<?=$tag?>" required autocomplete="off">
 					</div>
 					<div class="col-2 col-lg-1 bg-secondary m-0 p-0">
