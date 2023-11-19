@@ -860,33 +860,22 @@ a.cyan:hover{
 a.nav-link{
   margin-top: 0px !important;
   color: #aaa !important;
-  height: 22px !important;
-  background: #1a1a1a;
 }
 
 a.nav-link:hover{
   margin-top: 0px !important;
   color: #1a1a1a !important;
-  filter: none !important;
-  height: 22px !important;
-  background: #1a1a1a;
 }
 
 a.nav-link:active{
   margin-top: 0px !important;
   color: #1a1a1a !important;
-  height: 16px !important;
-  background: #1a1a1a !!important;
-  height: 22px !important;
-  background: #1a1a1a;
 }
 
 a.nav-link:focus{
   margin-top: 0px !important;
   color: #1a1a1a !important;
   filter: none !important;
-  height: 22px !important;
-  background: #1a1a1a;
 }
 
 a.dropdown-item:hover{
@@ -1920,7 +1909,7 @@ transition: opacity .3s linear !important;
 }
 
 .nav-tabs {
-  height: 38px;
+  height: 46px;
   margin-left: 0;
   padding-left: 0;
   border-bottom: 0;
@@ -1933,17 +1922,17 @@ transition: opacity .3s linear !important;
   margin-bottom: 0;
   margin-left: 0;
   margin-right: 16px !important;
-  padding-top: 6px;
+  padding-top: 0;
   padding-bottom: 0;
   padding-left: 16px;
+  padding-right: 16px;
   padding-right: 16px !important;
   background-color: #1a1a1a !important;
   border-bottom: 0;
   color: #eeee44 !important;
-  height: 22px !important;
-/*  line-height: 46px; */
+  height: 46px !important;
+  line-height: 46px;
   white-space: pre;
-  background: #2c2c2c !important;
 }
 
 
@@ -1960,7 +1949,6 @@ transition: opacity .3s linear !important;
 .nav-tabs .nav-link:active {
   color: #ffffff !important;
   background-color: #1a1a1a !important;
-  height: 20px !!important;
 }
 
 .nav-tabs .nav-link:hover {
@@ -2015,14 +2003,10 @@ transition: opacity .3s linear !important;
 
 .nav-tabs .nav-link:active {
   background: #1a1a1a !important;
-  height: 20px !!important;
-  background: #1a1a1a;
 }
 
 .nav-tabs .nav-link:focus {
   background: #1a1a1a !important;
-  height: 20px !!important;
-  background: #1a1a1a;
 }
 
 .dropdown-item {
