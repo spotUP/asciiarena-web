@@ -178,7 +178,7 @@ require_once "header.php";?>
     {
       ?>
         <div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="overflow-y: scroll; height: 100vh; background-color: <?=$bgcolor?>;" id="colly-div">
-          <pre id="colly" style="overflow: hidden;font-family: <?=$font;?>; color: <?=$fgcolor?>; white-space: pre;  width: 640px;"><?php
+          <pre id="colly" style="overflow: hidden;font-family: <?=$font;?>; color: <?=$fgcolor?>; white-space: pre;"><?php
         if (file_exists("collections/{$dirname}/{$filename}")) 
         {
           $content = encodeFileText("collections/{$dirname}/{$filename}");
