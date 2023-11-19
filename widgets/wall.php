@@ -22,7 +22,7 @@ $tag = "tag_{$wall_id}";
 				}
 			</style>
 			<form id="<?=$form?>" action="/cmds.php?cmd=tag" method="post" class="w-100">
-				<div class="row col-12 col-lg-12 m-0">
+				<div class="row col-12 col-lg-12">
 					<div class="col-10 col-lg-11 pr-0">
 						<input class="form-control tagtext w-100" type="text" name="tagtext" placeholder="Tag the wall" id="<?=$tag?>" required autocomplete="off">
 					</div>
