@@ -209,7 +209,7 @@ include "header_ascii.php";
 						<pre class="overflow-hidden d-none d-lg-block" style="position: relative; left: 32px;"><span class="magenta"><?=$stars1?></span></pre>
 						<div class="overflow-hidden d-none d-lg-block mx-auto">
 							<div id="logoswitcher">
-								<div class="logo nolink overflow-hidden"><?=implode('</div><div class="logo nolink" style="display: none;">', $logos)?></div>
+								<pre style="white-space: pre;" class="logo nolink overflow-hidden"><?=implode('</div><div class="logo nolink" style="display: none;">', $logos)?></pre>
 							</div>
 						</div>
 						<pre class="overflow-hidden d-lg-none"><a class="magenta nolink" href="https://www.asciiarena.se"><?=$mobilelogo?></a></pre>
@@ -243,7 +243,7 @@ include "header_ascii.php";
 				?>
 				<div class="row amb-1">
 					<div class="col-lg-12">
-						<div class="bs-component aml-1 apl-0 apr-1 apt-1">
+						<div class="bs-component aml-1 apl-1 apr-1 apt-1">
 							<?php if ($detect->isMobile()) { ?>
 								<div class="animate__animated animate__tada alert alert-dismissible alert-danger hide-on-landscape">
 									<button type="button" class="close" data-dismiss="alert">x</button>
