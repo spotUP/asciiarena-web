@@ -209,7 +209,7 @@ include "header_ascii.php";
 						<pre class="overflow-hidden d-none d-lg-block" style="position: relative; left: 32px;"><span class="magenta"><?=$stars1?></span></pre>
 						<div class="overflow-hidden d-none d-lg-block mx-auto">
 							<div id="logoswitcher">
-								<div class="logo nolink overflow-hidden"><?=implode('</div><div pre class="logo nolink" style="display: none; white-space: pre;">', $logos)?></pre>
+								<div class="logo nolink overflow-hidden"><?=implode('</div><div class="logo nolink" style="display: none; white-space: pre;">', $logos)?></div>
 							</div>
 						</div>
 						<pre class="overflow-hidden d-lg-none"><a class="magenta nolink" href="https://www.asciiarena.se"><?=$mobilelogo?></a></pre>
