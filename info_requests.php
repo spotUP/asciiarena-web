@@ -211,7 +211,8 @@ $(function() {
      $description=$result->description;
      $user=$result->user;
      $timestamp=date("Y-m-d H:i",$result->timestamp);
-     switch ($result->status) {
+     $reqstatus=$result->status
+     switch ($reqstatus) {
       case 0:
       $status = "<span class=\"cyan\">Open</span>";
       break;
@@ -252,7 +253,7 @@ $(function() {
 
     <?php
     if (($result->requserid==$_user['id']) || is_admin()) {
-      if (str_contains($status,"Open")) {
+      if ($reqstatus==0) {
         ?>
         <div class="row aml-1 apl-1 apr-1">
           <div class="col-12 p-0 m-0 apb-1">
