@@ -252,7 +252,7 @@ $(function() {
 
     <?php
     if (($result->requserid==$_user['id']) || is_admin()) {
-      if ($status=="Open") {
+      if (str_contains($status,"Open")) {
         ?>
         <div class="row aml-1 apl-1 apr-1">
           <div class="col-12 p-0 m-0 apb-1">
