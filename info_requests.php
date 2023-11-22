@@ -211,7 +211,7 @@ $(function() {
      $description=$result->description;
      $user=$result->user;
      $timestamp=date("Y-m-d H:i",$result->timestamp);
-     $reqstatus=$result->status
+     $reqstatus=$result->status;
      switch ($reqstatus) {
       case 0:
       $status = "<span class=\"cyan\">Open</span>";
