@@ -236,7 +236,7 @@ $(function() {
       <span class="white">Title: </span><?=$title?>
     </div>
     <div class="apb-1">
-      <span class="white">Requested By: </span><a class="yellow text-truncate" href="/member/<?=$user?>">Spot</a>
+      <span class="white">Requested By: </span><a class="yellow text-truncate" href="/member/<?=$user?>"><?=$user?></a>
     </div>
     <div class="apb-1">
       <span class="white">Current Status: </span><?=$status?>
