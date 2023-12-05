@@ -285,7 +285,8 @@ $(function() {
       <div id="reqcomments">
       </div>
     </div>
-    <div id="addreqcomment" >
+  <?php if (is_logged_in()) { ?>
+  <div id="addreqcomment" >
       <div class="row apl-1 apr-1">
         <div class="header bg-header col-12 ap-1">ENTER YOUR COMMENT</div>
       </div>
@@ -325,6 +326,7 @@ $(function() {
     </div>
   </div>
 </div>
+<?php } ?>
 
 <?php
 
