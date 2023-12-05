@@ -21,6 +21,7 @@ if ($row) {
   $fgcolor = (strlen($row->def_fg_col) > 1) ? $row->def_fg_col : '#ffffff';
   $bgcolor = (strlen($row->def_bg_col) > 1) ? $row->def_bg_col : '#000000';
 } else {
+  $font = 'mOsOul';
   $fgcolor = '#FF55FF';
   $bgcolor = '#111111';
 }
@@ -334,6 +335,7 @@ function reportAsBroken() {
   $('#viewbutton').val('View Colly')
   $('#fsbutton').hide(100);
   $('#colly-main').hide(500);
+  $('#colly').hide(500);
   $('#comments').hide(500);
   $("#addcomment").hide(500);
   $("#editcomment").hide(500);
@@ -348,11 +350,13 @@ function toggleColly() {
   
   if ($('#viewbutton').val() == 'View Colly') {
     $('#colly-main').fadeIn(500);
+    $('#colly').fadeIn(500);
     $('#viewbutton').val('Hide Colly')
     $('#fsbutton').show(100);
 
   } else {
     $('#colly-main').fadeOut(500);
+    $('#colly').fadeOut(500);
     $('#viewbutton').val('View Colly')
     $('#fsbutton').hide(100);
   }
@@ -364,6 +368,7 @@ function editComment(commentid) {
   $('#viewbutton').val('View Colly')
   $('#fsbutton').hide(100);
   $('#colly-main').hide(500);
+  $('#colly').hide(500);
   $('#reportbroken').hide(500);
   $('#comments').hide(500);
   $("#addcomment").hide(500);
@@ -424,12 +429,14 @@ function addFavourite() {
       
       if ($('#viewbutton').val() == 'View Colly') {
         $('#colly-main').fadeIn(500);
+        $('#colly').fadeIn(500);
         //$('#comments').hide(500);
         $('#viewbutton').val('Hide Colly')
         $('#fsbutton').show(100);
 
       } else {
         $('#colly-main').fadeOut(500);
+        $('#colly').fadeOut(500);
         $('#viewbutton').val('View Colly')
         $('#fsbutton').hide(100);
       }
