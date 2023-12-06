@@ -194,7 +194,7 @@ require_once "header.php";?>
 elseif ($type == "ANSI") 
 {
   ?>
-  <div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: #000;"> 
+  <div class="row ml-0 mr-0 amb-1 p-0 xs-m-0 xs-m-0 xs-p-0 s-m-0 justify-content-center align-items-center" style="background-color: #000;" id="colly-div"> 
     <span id="loading" style="animation: blink 2s linear infinite">.LOADiNG.</span>
     <div id="colly" style="padding-top: 64px;"></div>
   </div>
@@ -350,13 +350,13 @@ function toggleColly() {
   
   if ($('#viewbutton').val() == 'View Colly') {
     $('#colly-main').fadeIn(500);
-    $('#colly').fadeIn(500);
+    $('#colly-div').fadeIn(500);
     $('#viewbutton').val('Hide Colly')
     $('#fsbutton').show(100);
 
   } else {
     $('#colly-main').fadeOut(500);
-    $('#colly').fadeOut(500);
+    $('#colly-div').fadeOut(500);
     $('#viewbutton').val('View Colly')
     $('#fsbutton').hide(100);
   }
@@ -429,14 +429,14 @@ function addFavourite() {
       
       if ($('#viewbutton').val() == 'View Colly') {
         $('#colly-main').fadeIn(500);
-        $('#colly').fadeIn(500);
+        $('#colly-div').fadeIn(500);
         //$('#comments').hide(500);
         $('#viewbutton').val('Hide Colly')
         $('#fsbutton').show(100);
 
       } else {
         $('#colly-main').fadeOut(500);
-        $('#colly').fadeOut(500);
+        $('#colly-div').fadeOut(500);
         $('#viewbutton').val('View Colly')
         $('#fsbutton').hide(100);
       }
