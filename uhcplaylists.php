@@ -29,7 +29,7 @@ if (!empty($file)) {
   if (!empty($count)) {
      $q = "select * from hippo_playlists order by id desc limit $count";
   } else {
-     $q = "select * from hippo_playlists order by id";
+     $q = "select * from hippo_playlists order by id desc";
   }
     
  
