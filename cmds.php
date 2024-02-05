@@ -647,7 +647,7 @@ function saveColly() {
         }
       }
 
-      exec("curl -H \"Content-Type: application/json\" -d '{\"username\": \"ASCII ARENA Uploads\", \"content\": \"A new ascii collection has just been uploaded to [asciiarena.se](https://asciiarena.se) by ".$_user[ "nick" ]." named ".addslashes($_POST[ "name" ])."\"}' \"https://discord.com/api/webhooks/1034089537544126494/MdurdpqtOlFhb2W2-N3xuRV4tW9lqXVhIDzl3tDez3W74A4QVCv3t0T70FVolfuGirYG\"");
+      exec("curl -H \"Content-Type: application/json\" -d '{\"username\": \"ASCII ARENA Uploads\", \"content\": \"A new ascii collection has just been uploaded to asciiarena.se by ".$_user[ "nick" ]." named [".addslashes($_POST[ "name" ])."](https://asciiarena.se/release/".$filename.") \"}' \"https://discord.com/api/webhooks/1034089537544126494/MdurdpqtOlFhb2W2-N3xuRV4tW9lqXVhIDzl3tDez3W74A4QVCv3t0T70FVolfuGirYG\"");
 
       $link="https://asciiarena.se/release/".$filename;
       if(!empty($artistnames)) {
