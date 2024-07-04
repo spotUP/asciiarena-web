@@ -1,5 +1,6 @@
 <?php
 require_once "session.php";
+include "tools/mail.php";
 
 $errors = array();
 $messages = array();
@@ -14,15 +15,12 @@ if(isset($_POST['reminder'])) {
 
 	if (count($errors) == 0) {
 		$mail_qs = qsencrypt(array($user_id, $_POST['mail'], time()));
-		$mail_from = 'asciiarenamailer@gmail.com';
 		$mail_to = $_POST['mail'];
 		$mail_subject = "aSCIIaRENA Password Reminder";
 		$mail_body = "Hi!\n\n" .
 			"Someone requested that your aSCIIaRENA password should be reset.\n".
-			"Hopefully it was you. Click this link to reset your password.\n".
-			"https://www.asciiarena.se/reminder.php?reset=$mail_qs\n";
-		$mail_headers = 'From: <'.$mail_from.'>';
-		mail($mail_to, $mail_subject, $mail_body, $mail_headers);
+			"Hopefully it was you. Click this <a href=\"https://www.asciiarena.se/reminder.php?reset=".$mail_qs."\">link</a> to reset your password.\n";
+		sendmail($mail_to, $mail_subject, $mail_body);
 		$reminder_mail = true;
 	}
 

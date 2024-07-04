@@ -1,5 +1,6 @@
 <?php
 require_once "session.php";
+include "tools/mail.php";
 
 $errors = array();
 $messages = array();
@@ -67,15 +68,13 @@ if(isset($_POST['join'])) {
 
 
 		$mail_qs = qsencrypt(array($user_id, $_POST['nick'], time()));
-		$mail_from = 'asciiarenamailer@gmail.com';
 		$mail_to = $_POST['nick'].' <'.$_POST['mail'].'>';
 		$mail_subject = "aSCIIaRENa Account Activation";
 		$mail_body = "Hi ".$_POST['nick']."! \n\n".
 			"Your aSCIIaRENA account is ready for use,\n".
-			"click the link to activate it.\n".
-			"https://www.asciiarena.se/register.php?confirm=".$mail_qs."\n";
-		$mail_headers = 'From: <'.$mail_from.'>';
-		mail($mail_to, $mail_subject, $mail_body, $mail_headers);
+			"click this <a href=\"https://www.asciiarena.se/register.php?confirm=".$mail_qs."\">link</a> to activate it.\n".
+			"\n";
+		sendmail($mail_to, $mail_subject, $mail_body);
 	}
 } // $_POST['join']
 
