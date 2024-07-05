@@ -8,10 +8,10 @@ require 'Exception.php';
 require 'PHPMailer.php';
 include 'SMTP.php';
 
-    $env = parse_ini_file("/var/www/configs/asciiarena.env");
 
   function sendmail($mail_to, $mail_subject, $mail_body) {
 
+    $env = parse_ini_file("/var/www/configs/asciiarena.env");
     $mailhost   = @$env['MAILHOST']   ?: '';
     $mailuser = @$env['MAILUSER'] ?: '';
     $mailpass = @$env['MAILPASS'] ?: '';
