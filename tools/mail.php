@@ -8,7 +8,14 @@ require 'Exception.php';
 require 'PHPMailer.php';
 include 'SMTP.php';
 
-	function sendmail($mail_to, $mail_subject, $mail_body) {
+    $env = parse_ini_file("/var/www/configs/asciiarena.env");
+
+  function sendmail($mail_to, $mail_subject, $mail_body) {
+
+    $mailhost   = @$env['MAILHOST']   ?: '';
+    $mailuser = @$env['MAILUSER'] ?: '';
+    $mailpass = @$env['MAILPASS'] ?: '';
+    $mailport = @$env['MAILPORT'] ?: '';
 
     //Create an instance; passing `true` enables exceptions
     $mail = new PHPMailer(true);
@@ -16,15 +23,15 @@ include 'SMTP.php';
     try {
         //Server settings
         $mail->isSMTP();                                            //Send using SMTP
-        $mail->Host = 'smtp.gmail.com';
-        $mail->Port       = 465;
+        $mail->Host = $mailhost;
+        $mail->Port       = $mailport;
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'asciiarenamailer@gmail.com';
-        $mail->Password   = 'rllovlcwwvuszrmx';
+        $mail->Username   = $mailuser;
+        $mail->Password   = $mailpass;
 
         //Recipients
-        $mail->setFrom('asciiarenamailer@gmail.com', 'ASCII Arena');
+        $mail->setFrom($mailuser, 'ASCII Arena');
         $mail->addAddress($mail_to);
 
         //Content
@@ -38,4 +45,4 @@ include 'SMTP.php';
     } catch (Exception $e) {
         //echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
     }
-	}
+  }
