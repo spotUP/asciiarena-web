@@ -300,7 +300,7 @@
 					":mail" => $_POST[ "mail" ] ?? "",
 				];
 				if(!empty($_POST[ "id" ])) {
-					$q = "UPDATE users SET nick = :nick, `rank` = :`rank`, crew = :crew, byear = :byear, bmonth = :bmonth, bday = :bday, country = :country, mail = :mail WHERE id = :id";
+					$q = "UPDATE users SET nick = :nick, `rank` = :rank, crew = :crew, byear = :byear, bmonth = :bmonth, bday = :bday, country = :country, mail = :mail WHERE id = :id";
 					$data[ ":id" ] = $_POST[ "id" ];
 				} else {
 					$q = "INSERT INTO users (nick, `rank`, crew, byear, bmonth, bday, country, mail) VALUES (:nick, :`rank`, :crew, :byear, :bmonth, :bday, :country, :mail)";
