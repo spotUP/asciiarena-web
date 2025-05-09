@@ -444,6 +444,7 @@ foreach (fetchAll($q, $p) as $row) {
   $name=$row['name'];
   $crew=$row['crew'];
   $encoded_crew=base64_encode($row['crew']);
+  $actualfilename=$filename;
   $filename=str_replace("&#39;", "'",$filename);        // replace ' with &#39  
   $filename=myTruncate($filename, 12);            // truncate
   $filename=str_replace("'", "&#39;",$filename);        // replace ' with &#39
@@ -454,7 +455,7 @@ foreach (fetchAll($q, $p) as $row) {
  ?>
  <div class="col-lg-12 d-flex justify-content-between pl-0">
   <div class="col-lg-3 pl-0">
-    <a class="magenta" href="/release/<?=$filename?>" ><?=$filename?></a>
+    <a class="magenta" href="/release/<?=$actualfilename?>" ><?=$filename?></a>
   </div>
 
   <div class="col-lg-3 pl-0">            
