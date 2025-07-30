@@ -4,15 +4,24 @@ include "tools/mail.php";
 
 $errors = array();
 $messages = array();
+$publickey = "6Le5rpQrAAAAACR_OlbAuKMTlgHY6wnDqJYuBkVQ";
 
 if(isset($_POST['join'])) {
+
+	$secretKey = "6Le5rpQrAAAAAKBhM5fc5xHooXx53yEyjVFSzfOl";
+	$captcha = $_POST['g-recaptcha-response'];
+  
+	$ip = $_SERVER['REMOTE_ADDR'];
+	$responsedata=file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=".$secretKey."&response=".$captcha."&remoteip=".$ip);
+	$responseKeys = json_decode($responsedata,true);
 
 	if (!preg_match('/^[A-Za-z0-9-\.#_\!\^]{2,60}$/', $_POST['nick'])) $errors[] = "invalid nickname";
 	if ($_POST['nick'] === $_POST['password']) $errors[] = "username and password may not be identical"; 
 	if ($_POST['password'] !== $_POST['repeat_password']) $errors[] = "passwords don't match"; 
         if (!checkEmail($_POST['mail'])) $errors[] = 'invalid e-mail address';
 	if (strlen($_POST['password']) < 6) $errors[] = "password is too short";
-	if ($_POST['spam'] !== 'iamnotarobot') $errors[] = "spam check not completed";
+	if(intval($responseKeys["success"]) !== 1) $errors[] = "spam check not completed";
+//	if ($_POST['spam'] !== 'iamnotarobot') $errors[] = "spam check not completed";
 	if (is_logged_in()) $errors[] = "you're already logged in";
 	if (!preg_match('/[A-Z]/', $_POST['password'])
 		|| !preg_match('/[a-z]/', $_POST['password'])
@@ -175,16 +184,12 @@ include "header.php";
 			</div>
 		</div>
 
-		<div class="row">
-			<div class="col-6">
-				Enter iamnotarobot here: 
-			</div>
+
+		<div class="row apb-1">
+	        <div class="g-recaptcha" data-sitekey="6Le5rpQrAAAAACR_OlbAuKMTlgHY6wnDqJYuBkVQ"></div>
 		</div>
-		<div class="row">
-			<div class="col-6 apb-1">
-				<input type="text" name="spam" class="w-100" value="<?=$_POST['spam']?>"> 
-			</div>
-		</div>
+
+
 		<div clas="row">
 			<input type="submit" value="Join!" name="join">
 		</div>
