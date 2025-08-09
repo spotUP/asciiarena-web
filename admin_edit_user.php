@@ -139,6 +139,7 @@
 						<option value="User">User</option>
 						<option value="Elite">Elite</option>
 						<option value="Admin">Admin</option>
+						<option value="Inactive">Inactive</option>
 					</select>
 				</div>
 			</div>
