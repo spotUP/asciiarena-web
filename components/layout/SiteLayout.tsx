@@ -75,6 +75,12 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
 
         {title && <PageHeader title={title} />}
 
+        <div className="row amb-1">
+          <div className="col-lg-12">
+            <div className="bs-component aml-1 apl-1 apr-1 apt-1"></div>
+          </div>
+        </div>
+
         <div className="modal-body row m-0 p-0">
           <div className="col-lg-8 order-md-1 order-lg-2 order-xl-2">
             {children}
