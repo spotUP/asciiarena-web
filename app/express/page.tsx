@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { auth } from "@/lib/auth";
 import SiteLayout from "@/components/layout/SiteLayout";
 import TopArtists from "@/components/widgets/TopArtists";
 import TopCollys from "@/components/widgets/TopCollys";
@@ -7,12 +8,10 @@ import TopUploaders from "@/components/widgets/TopUploaders";
 import TopCommenters from "@/components/widgets/TopCommenters";
 import MostViewedCollys from "@/components/widgets/MostViewedCollys";
 
-export const metadata: Metadata = {
-  title: "eXPRESS | aSCIIaRENA",
-  description: "aSCIIaRENA leaderboards - top artists, crews, collys, uploaders, and commenters",
-};
-
 export default async function ExpressPage() {
+  const session = await auth();
+  if ((session?.user as { rank?: string } | undefined)?.rank !== "Admin") notFound();
+
   return (
     <SiteLayout title="eXPRESS">
       <div className="row">
