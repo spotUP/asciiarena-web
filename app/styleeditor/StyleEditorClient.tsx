@@ -484,7 +484,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
 
               {/* Font options */}
               <div style={{ marginTop: "16px" }}>
-                <h6 className="white">Font Options</h6>
+                <div className="white" style={{ fontWeight: "bold", marginBottom: "4px" }}>Font Options</div>
 
                 <div className="row apt-1" style={{ fontSize: "12px" }}>
                   <div className="col-5 white">H-Layout:</div>
@@ -700,7 +700,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
             <div className="modal-dialog">
               <div className="modal-content">
                 <div className="modal-header" style={{ background: "#333" }}>
-                  <h4 className="modal-title white">Import FIGFont Data</h4>
+                  <span className="modal-title white" style={{fontWeight:"bold",fontSize:"18px"}}>Import FIGFont Data</span>
                   <button type="button" className="close white" onClick={() => setShowImport(false)}>x</button>
                 </div>
                 <div className="modal-body" style={{ background: "#222" }}>
@@ -730,7 +730,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
             <div className="modal-dialog">
               <div className="modal-content">
                 <div className="modal-header" style={{ background: "#333" }}>
-                  <h4 className="modal-title white">Exported FIGFont Data</h4>
+                  <span className="modal-title white" style={{fontWeight:"bold",fontSize:"18px"}}>Exported FIGFont Data</span>
                   <button type="button" className="close white" onClick={() => setShowExport(false)}>x</button>
                 </div>
                 <div className="modal-body" style={{ background: "#222" }}>
