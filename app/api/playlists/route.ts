@@ -70,3 +70,37 @@ export async function GET(request: NextRequest) {
     total_count: Number(r.total_count),
   })));
 }
+
+export async function POST(request: NextRequest) {
+  const session = await auth();
+  if ((session?.user as { rank?: string } | undefined)?.rank !== "Admin") return apiError("Forbidden", 403);
+
+  const body = await request.json() as {
+    title?: string;
+    author?: string;
+    genre?: string;
+    filename?: string;
+    filedata?: string;
+  };
+
+  const { title, author, genre, filename, filedata } = body;
+  if (!title || !filename) return apiError("title and filename are required", 400);
+
+  await prisma.$executeRaw`
+    INSERT INTO hippo_playlists (title, author, genre, filename, filedata, uploaddate)
+    VALUES (${title ?? ""}, ${author ?? ""}, ${genre ?? ""}, ${filename}, ${filedata ?? null}, UNIX_TIMESTAMP())
+  `;
+
+  return apiOk({ status: true }, 201);
+}
+
+export async function DELETE(request: NextRequest) {
+  const session = await auth();
+  if ((session?.user as { rank?: string } | undefined)?.rank !== "Admin") return apiError("Forbidden", 403);
+
+  const body = await request.json() as { id: number };
+  if (!body.id) return apiError("id required", 400);
+
+  await prisma.$executeRaw`DELETE FROM hippo_playlists WHERE id = ${body.id}`;
+  return apiOk({ status: true });
+}

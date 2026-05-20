@@ -29,3 +29,20 @@ export async function PATCH(
 
   return apiOk({ status: true });
 }
+
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await auth();
+  if (!session?.user?.id) return apiError("Unauthorized", 401);
+  if ((session.user as { rank?: string | null }).rank !== "Admin") return apiError("Forbidden", 403);
+
+  const { id } = await params;
+  const requestId = parseInt(id);
+
+  await prisma.$executeRaw`DELETE FROM request_comments WHERE request_id = ${requestId}`;
+  await prisma.$executeRaw`DELETE FROM requests WHERE id = ${requestId}`;
+
+  return apiOk({ status: true });
+}
