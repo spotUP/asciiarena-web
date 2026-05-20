@@ -19,8 +19,8 @@ export default function Navbar({ session }: NavbarProps) {
         </a>
         <a
           className="navbar-toggler ascii"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarResponsive"
+          data-toggle="collapse"
+          data-target="#navbarResponsive"
           aria-controls="navbarResponsive"
           aria-expanded="false"
           aria-label="Toggle navigation"
@@ -35,7 +35,7 @@ export default function Navbar({ session }: NavbarProps) {
             <li className="nav-item dropdown">
               <a
                 className="nav-link dropdown-toggle ascii apr-1"
-                data-bs-toggle="dropdown"
+                data-toggle="dropdown"
                 href="/collys"
                 id="collys-dropdown"
               >
@@ -90,7 +90,7 @@ export default function Navbar({ session }: NavbarProps) {
             <li className="nav-item dropdown">
               <a
                 className="nav-link dropdown-toggle ascii apr-1"
-                data-bs-toggle="dropdown"
+                data-toggle="dropdown"
                 href="/mags"
                 id="mags-dropdown"
               >
@@ -121,7 +121,7 @@ export default function Navbar({ session }: NavbarProps) {
             <li className="nav-item dropdown">
               <a
                 className="nav-link dropdown-toggle ascii apr-1"
-                data-bs-toggle="dropdown"
+                data-toggle="dropdown"
                 href="/apps"
                 id="apps-dropdown"
               >
@@ -189,7 +189,7 @@ export default function Navbar({ session }: NavbarProps) {
               <a
                 className="nav-link dropdown-toggle ascii"
                 style={{ paddingRight: "8px" }}
-                data-bs-toggle="dropdown"
+                data-toggle="dropdown"
                 href="/submit"
                 id="submit-dropdown"
               >
@@ -228,7 +228,7 @@ export default function Navbar({ session }: NavbarProps) {
                 <li className="nav-item">
                   <a
                     className="nav-link ascii yellow apr-1"
-                    data-bs-toggle="modal"
+                    data-toggle="modal"
                     style={{ paddingRight: "8px" }}
                     href="#login"
                   >
@@ -242,7 +242,7 @@ export default function Navbar({ session }: NavbarProps) {
                   <a
                     className="nav-link dropdown-toggle ascii yellow"
                     style={{ paddingRight: "8px" }}
-                    data-bs-toggle="dropdown"
+                    data-toggle="dropdown"
                     href="#"
                     id="account-dropdown"
                   >
@@ -278,7 +278,7 @@ export default function Navbar({ session }: NavbarProps) {
                   <a
                     className="nav-link dropdown-toggle ascii yellow"
                     style={{ paddingRight: "8px" }}
-                    data-bs-toggle="dropdown"
+                    data-toggle="dropdown"
                     href="/admin"
                     id="admin-dropdown"
                   >

@@ -29,7 +29,7 @@ export default function Paginator({
 }: PaginatorProps) {
   return (
     <div className="row">
-      <div className="row col-12 m-0 p-0 apt-1 ps-1">
+      <div className="row col-12 m-0 p-0 apt-1 pl-1">
         <ul className="pagination w-100">
           <li className="page-item">
             <button className="btn btn-primary" style={{ width: 50 }} onClick={onFirst}>
@@ -61,7 +61,7 @@ export default function Paginator({
           <div className="btn-group">
             <button
               className="btn btn-primary dropdown-toggle"
-              data-bs-toggle="dropdown"
+              data-toggle="dropdown"
               aria-expanded="false"
             >
               View Mode:
@@ -98,7 +98,7 @@ export default function Paginator({
               id="filter"
               value={filterValue ?? ""}
               onChange={(e) => onFilter(e.target.value)}
-              className="ps-1 w-100"
+              className="pl-1 w-100"
               placeholder="Search..."
               type="text"
               autoComplete="off"

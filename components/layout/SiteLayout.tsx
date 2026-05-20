@@ -81,7 +81,7 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
           <div className="modal-content">
             <div className="modal-header" style={{ backgroundColor: "#444444" }}>
               <span className="modal-title">LOGiN</span>
-              <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div className="modal-body bg-primary">
               {!session?.user ? (
@@ -99,9 +99,9 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
                       </div>
                       <div className="col-12 col-sm-6">
                         <div className="form-group">
-                          <div className="form-check form-switch lightgrey">
-                            <input className="form-check-input" type="checkbox" id="rememberme" name="rememberme" value="1" defaultChecked />
-                            <label className="form-check-label" htmlFor="rememberme">Remember me</label>
+                          <div className="custom-control custom-switch lightgrey">
+                            <input className="custom-control-input" type="checkbox" id="rememberme" name="rememberme" value="1" defaultChecked />
+                            <label className="custom-control-label" htmlFor="rememberme">Remember me</label>
                           </div>
                         </div>
                         <a href="/register">Register</a> <span style={{ color: "#999999" }}>new account!</span><br /><br />
@@ -116,7 +116,7 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
               )}
             </div>
             <div className="modal-footer bg-primary">
-              <button type="button" className="btn-secondary bg-transparent amr-1 apr-1" data-bs-dismiss="modal">CLOSE</button>
+              <button type="button" className="btn-secondary bg-transparent amr-1 apr-1" data-dismiss="modal">CLOSE</button>
               <button type="button" className="btn-primary black bg-lightgrey" id="login-submit-btn">LOG IN</button>
             </div>
           </div>

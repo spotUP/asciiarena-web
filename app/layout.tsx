@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import "bootstrap/dist/css/bootstrap.min.css";
 import "@/styles/site.css";
 import "@/app/globals.css";
 
@@ -36,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css"
         />
+        <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
         <link rel="stylesheet" href="/assets/css/bootstrap-colorselector.css" />
       </head>
       <body>
@@ -47,11 +47,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           strategy="beforeInteractive"
         />
         <Script
-          src="/bootstrap5.bundle.min.js"
+          src="/assets/js/bootstrap.bundle.min.js"
           strategy="beforeInteractive"
         />
         <Script
-          src="/bootstrap-colorselector-bs5.js"
+          src="/assets/js/bootstrap-colorselector.js"
           strategy="afterInteractive"
         />
         <Script

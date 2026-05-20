@@ -15,7 +15,7 @@ export default async function LastCallers({ limit = 5 }: LastCallersProps) {
 
   return (
     <>
-      <div className="container fluid col-12 p-0 ps-lg-2 pe-lg-2">
+      <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
         <div className="header col-lg-12 p-0">
           <h2 className="ap-1 bg-header">LAST CALLERS</h2>
         </div>
@@ -28,7 +28,7 @@ export default async function LastCallers({ limit = 5 }: LastCallersProps) {
             return (
               <div
                 key={row.id}
-                className="col-lg-12 p-0 ps-lg-2 pe-lg-2 d-flex justify-content-between"
+                className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between"
               >
                 <a
                   className="yellow text-truncate"

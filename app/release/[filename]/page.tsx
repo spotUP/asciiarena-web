@@ -112,22 +112,22 @@ export default async function ReleasePage({ params }: PageProps) {
   return (
     <SiteLayout title="rELEAsE iNFO">
       {/* Metadata summary card */}
-      <div className="info_release_summary row ms-0 me-0 apb-1">
-        <div className="col-lg-12 ps-0">
-          <div className="row ms-0 me-0">
-            <div className="col-lg-12 ps-0">
-              <div className="row ms-0 me-0 apt-1 apb-1">
-                <div className="header col-lg-12 ps-0">
+      <div className="info_release_summary row ml-0 mr-0 apb-1">
+        <div className="col-lg-12 pl-0">
+          <div className="row ml-0 mr-0">
+            <div className="col-lg-12 pl-0">
+              <div className="row ml-0 mr-0 apt-1 apb-1">
+                <div className="header col-lg-12 pl-0">
                   <h2 className="ap-1 bg-header">
                     {colly.name ?? colly.filename}
                   </h2>
                 </div>
               </div>
-              <div className="col-lg-12 ps-0">
+              <div className="col-lg-12 pl-0">
                 <span className="lightgrey">Name: </span>
                 {colly.name ?? "-"}
               </div>
-              <div className="col-lg-12 ps-0">
+              <div className="col-lg-12 pl-0">
                 <span className="lightgrey">Artist(s): </span>
                 {artists.length > 0
                   ? artists.map((a, i) => (
@@ -147,7 +147,7 @@ export default async function ReleasePage({ params }: PageProps) {
                     ))
                   : "-"}
               </div>
-              <div className="col-lg-12 ps-0">
+              <div className="col-lg-12 pl-0">
                 <span className="lightgrey">Crew(s): </span>
                 {crews.length > 0
                   ? crews.map((c, i) => (
@@ -162,42 +162,42 @@ export default async function ReleasePage({ params }: PageProps) {
                     ))
                   : "-"}
               </div>
-              <div className="col-lg-12 ps-0">
+              <div className="col-lg-12 pl-0">
                 <span className="lightgrey">Filename: </span>
                 {colly.filename}
               </div>
-              <div className="col-lg-12 ps-0">
+              <div className="col-lg-12 pl-0">
                 <span className="lightgrey">Filesize: </span>
                 {colly.filesize != null ? formatBytes(colly.filesize) : "-"}
               </div>
-              <div className="col-lg-12 ps-0">
+              <div className="col-lg-12 pl-0">
                 <span className="lightgrey">Date: </span>
                 {dateDisplay || "-"}
               </div>
-              <div className="col-lg-12 ps-0">
+              <div className="col-lg-12 pl-0">
                 <span className="lightgrey">Type: </span>
                 {colly.type ?? "-"}
               </div>
-              <div className="col-lg-12 ps-0">
+              <div className="col-lg-12 pl-0">
                 <span className="lightgrey">Rating: </span>
                 {ratingDisplay}
               </div>
-              <div className="col-lg-12 ps-0">
+              <div className="col-lg-12 pl-0">
                 <span className="lightgrey">Views: </span>
                 {colly.view_counter ?? 0}
               </div>
-              <div className="col-lg-12 ps-0">
+              <div className="col-lg-12 pl-0">
                 <span className="lightgrey">Downloads: </span>
                 {colly.downloads ?? 0}
               </div>
               {colly.uploader && (
-                <div className="col-lg-12 ps-0">
+                <div className="col-lg-12 pl-0">
                   <span className="lightgrey">Uploaded by: </span>
                   {colly.uploader}
                 </div>
               )}
               {colly.broken != null && colly.broken > 0 && (
-                <div className="col-lg-12 ps-0">
+                <div className="col-lg-12 pl-0">
                   <span className="lightgrey">Broken: </span>
                   {colly.broken_comment ?? "Reported broken"}
                 </div>
@@ -216,7 +216,7 @@ export default async function ReleasePage({ params }: PageProps) {
         className="container-fluid bg-secondary amb-1 p-0"
         style={{ marginTop: "36px" }}
       >
-        <div className="row ms-0 me-0 p-1">
+        <div className="row ml-0 mr-0 p-1">
           {/* Action buttons */}
           <div className="col d-flex flex-wrap gap-1 align-items-center">
             {!isArchiveType && (
@@ -250,7 +250,7 @@ export default async function ReleasePage({ params }: PageProps) {
               <button
                 type="button"
                 className="btn btn-sm btn-outline-secondary dropdown-toggle"
-                data-bs-toggle="dropdown"
+                data-toggle="dropdown"
               >
                 Share
               </button>
@@ -309,12 +309,12 @@ export default async function ReleasePage({ params }: PageProps) {
           </div>
 
           {/* Colour and font selectors */}
-          <div className="col-auto d-flex align-items-center gap-2 pe-2">
+          <div className="col-auto d-flex align-items-center gap-2 pr-2">
             <span className="text-secondary small">BG:</span>
             <div id="colorselector_1" />
             <span className="text-secondary small">FG:</span>
             <div id="colorselector_2" />
-            <select id="colly-font" className="form-select form-select-sm" style={{ width: "auto" }}>
+            <select id="colly-font" className="custom-select custom-select-sm" style={{ width: "auto" }}>
               <option value="Courier New, monospace">Courier New</option>
               <option value="monospace">Monospace</option>
               <option value="'Topaz', monospace">Topaz</option>
@@ -327,7 +327,7 @@ export default async function ReleasePage({ params }: PageProps) {
       {/* ASCII viewer */}
       {type === "ASCII" && (
         <div
-          className="row ms-0 me-0 amb-1 p-0 justify-content-center align-items-center"
+          className="row ml-0 mr-0 amb-1 p-0 justify-content-center align-items-center"
           style={{ overflowY: "scroll", height: "100vh", backgroundColor: bgcolor }}
           id="colly-div"
         >
@@ -347,7 +347,7 @@ export default async function ReleasePage({ params }: PageProps) {
       {/* ANSI viewer */}
       {type === "ANSI" && (
         <div
-          className="row ms-0 me-0 amb-1 p-0 justify-content-center"
+          className="row ml-0 mr-0 amb-1 p-0 justify-content-center"
           style={{ backgroundColor: "#000" }}
           id="colly-div"
         >

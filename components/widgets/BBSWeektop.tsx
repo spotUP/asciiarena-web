@@ -33,7 +33,7 @@ export default function BBSWeektop() {
               cnt = (item.count / 1024).toFixed(2);
               unit = "MB";
             }
-            html += `<div class="col-lg-12 p-0 ps-lg-2 pe-lg-2 d-flex justify-content-between">`;
+            html += `<div class="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">`;
             html += `<a class="yellow text-truncate">${item.name}</a>`;
             html += `<span class="text-truncate">${cnt} ${unit}</span>`;
             html += `</div>`;
@@ -49,13 +49,13 @@ export default function BBSWeektop() {
   }, [uid]);
 
   return (
-    <div className="container fluid col-12 p-0 ps-lg-2 pe-lg-2">
+    <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
       <div className="header col-lg-12 p-0">
         <h2 id={`bbsweektophdr_${uid}`} className="ap-1 bg-header">
           WEEKTOP - BBS:ES
         </h2>
       </div>
-      <div className="container-fluid p-0 ps-lg-2 pe-lg-2 bg-secondary">
+      <div className="container-fluid p-0 pl-lg-2 pr-lg-2 bg-secondary">
         <div
           className="row m-0 p-0 bg-secondary apb-1"
           id={`bbsweektop_${uid}`}

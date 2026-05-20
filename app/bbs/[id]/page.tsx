@@ -22,41 +22,41 @@ export default async function BbsPage({ params }: PageProps) {
         </div>
       </div>
 
-      <div className="col-lg-12 ps-0">
+      <div className="col-lg-12 pl-0">
         <span className="lightgrey">Name: </span>
         {bbs.name}
       </div>
       {bbs.sysop && (
-        <div className="col-lg-12 ps-0">
+        <div className="col-lg-12 pl-0">
           <span className="lightgrey">Sysop: </span>
           {bbs.sysop}
         </div>
       )}
       {bbs.address && (
-        <div className="col-lg-12 ps-0">
+        <div className="col-lg-12 pl-0">
           <span className="lightgrey">Address: </span>
           {bbs.address}
         </div>
       )}
       {bbs.number && (
-        <div className="col-lg-12 ps-0">
+        <div className="col-lg-12 pl-0">
           <span className="lightgrey">Number: </span>
           {bbs.number}
         </div>
       )}
       {bbs.country && (
-        <div className="col-lg-12 ps-0">
+        <div className="col-lg-12 pl-0">
           <span className="lightgrey">Country: </span>
           {bbs.country}
         </div>
       )}
       {bbs.software && (
-        <div className="col-lg-12 ps-0">
+        <div className="col-lg-12 pl-0">
           <span className="lightgrey">Software: </span>
           {bbs.software}
         </div>
       )}
-      <div className="col-lg-12 ps-0">
+      <div className="col-lg-12 pl-0">
         <span className="lightgrey">Status: </span>
         {bbs.online ? "Online" : "Offline"}
       </div>

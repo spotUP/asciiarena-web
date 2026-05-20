@@ -23,19 +23,19 @@ export default async function ArenaStats() {
         className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary"
         style={{ minHeight: "112px" }}
       >
-        <div className="col-lg-12 p-0 ps-lg-2 pe-lg-2 d-flex justify-content-between">
+        <div className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
           <span className="white text-truncate">Collys Online:</span>
           <span className="text-truncate">{collysCount}</span>
         </div>
-        <div className="col-lg-12 p-0 ps-lg-2 pe-lg-2 d-flex justify-content-between">
+        <div className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
           <span className="white text-truncate">Pumped Bytes:</span>
           <span className="text-truncate">{formatBytes(bytes)}</span>
         </div>
-        <div className="col-lg-12 p-0 ps-lg-2 pe-lg-2 d-flex justify-content-between">
+        <div className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
           <span className="white text-truncate">Users:</span>
           <span className="text-truncate">{usersCount}</span>
         </div>
-        <div className="col-lg-12 p-0 ps-lg-2 pe-lg-2 d-flex justify-content-between">
+        <div className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
           <span className="white text-truncate">Comments:</span>
           <span className="text-truncate">{commentsCount}</span>
         </div>
