@@ -30,7 +30,7 @@ interface CountRow {
 }
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
-  const { searchParams } = request.nextUrl;
+  const { searchParams } = (request as { nextUrl?: URL }).nextUrl ?? new URL(request.url);
 
   const page = Math.max(1, parseInt(searchParams.get("page") ?? "1") || 1);
   const pagesizeRaw = parseInt(searchParams.get("pagesize") ?? "25") || 25;

@@ -25,7 +25,7 @@ export async function GET(
   );
 
   const comments = rows.map((row) => ({
-    id: row.commentid,
+    id: Number(row.commentid),
     time: new Date(row.timestamp * 1000).toISOString().slice(0, 16).replace("T", " "),
     nick: row.nick,
     rating: row.rating,
