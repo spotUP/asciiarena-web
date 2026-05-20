@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import "@/styles/site.css";
 import "@/app/globals.css";
 
 export const metadata: Metadata = {
@@ -35,8 +34,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css"
         />
+        {/* Load CSS in the exact same order as the PHP site */}
         <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
         <link rel="stylesheet" href="/assets/css/bootstrap-colorselector.css" />
+        <link rel="stylesheet" href="/assets/css/site.css" />
+        <link rel="stylesheet" href="/assets/css/386.css" />
       </head>
       <body>
         {children}
