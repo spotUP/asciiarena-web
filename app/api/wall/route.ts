@@ -1,0 +1,47 @@
+import { NextRequest } from "next/server";
+import { prisma } from "@/lib/db";
+import { auth } from "@/lib/auth";
+import { apiError, apiOk } from "@/lib/utils";
+
+interface WallPostRow {
+  id: number;
+  user_id: number | null;
+  wall_id: number | null;
+  nick: string | null;
+  tag: string | null;
+}
+
+function stripHtml(input: string): string {
+  return input.replace(/<[^>]*>/g, "");
+}
+
+export async function POST(request: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) return apiError("Unauthorized", 401);
+
+  const body = await request.json() as { tagtext?: string; wall_id?: number };
+  const { tagtext, wall_id = 1 } = body;
+
+  if (!tagtext) return apiError("tagtext is required", 400);
+
+  const cleanTag = stripHtml(tagtext);
+  const userId = parseInt(session.user.id);
+  const nick = session.user.name ?? "";
+
+  await prisma.$executeRaw`
+    INSERT INTO wallposts (user_id, wall_id, nick, tag)
+    VALUES (${userId}, ${wall_id}, ${nick}, ${cleanTag})
+  `;
+
+  const rows = await prisma.$queryRaw<WallPostRow[]>`
+    SELECT * FROM wallposts WHERE wall_id = ${wall_id}
+    ORDER BY id DESC LIMIT 13
+  `;
+
+  const result = rows.reverse().map((r) => ({
+    tag: r.tag,
+    nick: r.nick,
+  }));
+
+  return apiOk(result);
+}

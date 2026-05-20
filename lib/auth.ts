@@ -33,7 +33,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           email: user.mail ?? undefined,
           rank: user.rank,
           crew: user.crew,
-        } as { id: string; name: string; email?: string; rank: string | null; crew: string | null };
+        };
       },
     }),
   ],
@@ -41,16 +41,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.rank = (user as { rank?: string | null }).rank ?? null;
-        token.crew = (user as { crew?: string | null }).crew ?? null;
+        token.rank = user.rank ?? null;
+        token.crew = user.crew ?? null;
       }
       return token;
     },
     session({ session, token }) {
       if (token) {
         session.user.id = token.id as string;
-        (session.user as { rank?: string | null }).rank = token.rank as string | null;
-        (session.user as { crew?: string | null }).crew = token.crew as string | null;
+        session.user.rank = (token.rank as string | null | undefined) ?? null;
+        session.user.crew = (token.crew as string | null | undefined) ?? null;
       }
       return session;
     },
