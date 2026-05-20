@@ -1,10 +1,4 @@
-/* Loaded last — overrides Bootstrap 4 defaults that site.css doesn't cover */
-
-/* Bootstrap 4 doesn't underline links by default; some browsers do.
-   Restore exact BS4 link behaviour. */
-a {
+/* Loaded last — overrides Bootstrap 4 link hover underline */
+a, a:hover {
   text-decoration: none;
-}
-a:hover {
-  text-decoration: underline;
 }
