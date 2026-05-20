@@ -1,0 +1,360 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model apps {
+  id           Int     @id @default(autoincrement()) @db.UnsignedInt
+  name         String? @db.Char(60)
+  filename     String? @db.Char(60)
+  filedate     Int?
+  timestamp    Int?
+  author       String? @db.Char(60)
+  filesize     Int?
+  file_id      String? @db.Char(60)
+  view_counter Int?
+  downloads    Int?
+  uploader     String? @db.Char(60)
+  uploader_id  Int?    @db.UnsignedInt
+  file_id_date Int?
+  Status       String? @db.Char(7)
+  year         Int     @default(0)
+  month        Int     @default(0)
+  day          Int     @default(0)
+
+  @@index([uploader_id], map: "uploader_id")
+  @@fulltext([author], map: "author")
+  @@fulltext([filename], map: "filename")
+  @@fulltext([name], map: "name")
+  @@fulltext([uploader], map: "uploader")
+}
+
+model artists {
+  id             Int              @id @default(autoincrement()) @db.UnsignedInt
+  nick           String           @unique(map: "nick") @default("") @db.Char(60)
+  www            String?          @db.Char(60)
+  active         String?          @db.Char(8)
+  country        String?          @db.Char(60)
+  rating         Float?           @db.Float
+  acronym        String?          @db.Char(16)
+  user_id        Int?             @db.UnsignedInt
+  artisturl      String           @db.Char(60)
+  users          users?           @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "artists_ibfk_1")
+  artists_collys artists_collys[]
+
+  @@index([artisturl], map: "artisturl")
+  @@index([user_id], map: "user_id")
+  @@fulltext([nick], map: "fts_nick")
+}
+
+model artists_collys {
+  id        Int     @id @default(autoincrement()) @db.UnsignedInt
+  artist_id Int     @db.UnsignedInt
+  colly_id  Int     @db.UnsignedInt
+  sortorder Int     @default(0) @db.TinyInt
+  updated   String? @db.VarChar(1)
+  artists   artists @relation(fields: [artist_id], references: [id], onDelete: Cascade, map: "artists_collys_ibfk_1")
+  collys    collys  @relation(fields: [colly_id], references: [id], onDelete: Cascade, map: "artists_collys_ibfk_2")
+
+  @@unique([artist_id, colly_id], map: "artist_id")
+  @@index([colly_id], map: "colly_id")
+}
+
+model auth {
+  selector   String   @unique(map: "a_selector") @db.VarChar(16)
+  hash       String   @db.VarChar(64)
+  user_id    Int      @unique(map: "a_user_id")
+  expiration DateTime @db.DateTime(0)
+}
+
+model bbs_of {
+  name    String? @db.Char(60)
+  crew    String? @db.Char(60)
+  id      Int     @id @default(autoincrement()) @db.UnsignedInt
+  updated String? @db.VarChar(1)
+
+  @@index([crew], map: "crew")
+  @@index([name], map: "name")
+}
+
+model bbses {
+  name     String? @db.Char(60)
+  sysop    String? @db.Char(60)
+  address  String? @db.Char(60)
+  number   String? @db.Char(24)
+  id       Int     @id @default(autoincrement()) @db.UnsignedInt
+  country  String? @db.VarChar(60)
+  online   Boolean @default(false)
+  software String? @db.VarChar(30)
+}
+
+model collys {
+  id             Int              @id @default(autoincrement()) @db.UnsignedInt
+  name           String?          @db.Char(128)
+  year           Int?
+  type           String?          @db.Char(11)
+  filename       String           @unique(map: "filename") @default("") @db.Char(60)
+  timestamp      Int?
+  rating         Float?           @db.Float
+  uploader       String?          @db.Char(32)
+  uploader_id    Int?             @db.UnsignedInt
+  filesize       Int?
+  month          Int?
+  file_id        String?          @db.Char(60)
+  view_counter   Int?
+  downloads      Int?
+  day            Int?
+  broken         Int?
+  broken_comment String?          @db.MediumText
+  artists_collys artists_collys[]
+  collys_crews   collys_crews[]
+
+  @@index([uploader_id], map: "uploader_id")
+  @@fulltext([name, filename], map: "name")
+}
+
+model collys_crews {
+  id        Int     @id @default(autoincrement()) @db.UnsignedInt
+  colly_id  Int     @db.UnsignedInt
+  crew_id   Int     @db.UnsignedInt
+  sortorder Int     @default(0) @db.TinyInt
+  updated   String? @db.VarChar(1)
+  collys    collys  @relation(fields: [colly_id], references: [id], onDelete: Cascade, map: "collys_crews_ibfk_1")
+  crews     crews   @relation(fields: [crew_id], references: [id], onDelete: Cascade, map: "collys_crews_ibfk_2")
+
+  @@unique([colly_id, crew_id], map: "colly_id")
+  @@index([crew_id], map: "crew_id")
+}
+
+model comments {
+  commentid Int     @id @default(autoincrement())
+  colly_id  Int?    @db.UnsignedInt
+  filename  String? @db.Char(60)
+  crew      String? @db.Char(60)
+  artist    String? @db.Char(60)
+  comment   String? @db.MediumText
+  rating    Int?
+  nick      String? @db.Char(60)
+  timestamp Int?
+  base64    Int?
+  user_id   Int?    @db.UnsignedInt
+
+  @@index([colly_id], map: "colly_id")
+  @@index([user_id], map: "user_id")
+}
+
+model crews {
+  id           Int            @id @default(autoincrement()) @db.UnsignedInt
+  name         String         @unique(map: "name") @db.Char(60)
+  www          String?        @db.Char(60)
+  contact      String?        @db.Char(60)
+  active       String         @default("No") @db.Char(8)
+  rating       Float?         @db.Float
+  acronym      String?        @db.Char(12)
+  crewurl      String         @db.Text
+  collys_crews collys_crews[]
+
+  @@fulltext([name], map: "fts_crewname")
+  @@fulltext([name, acronym], map: "ftx_crews")
+}
+
+model favourites {
+  id       Int     @id @default(autoincrement()) @db.UnsignedInt
+  user_id  Int?    @db.UnsignedInt
+  colly_id Int?    @db.UnsignedInt
+  nick     String? @db.Char(60)
+  filename String? @db.Char(60)
+
+  @@index([colly_id], map: "colly_id")
+  @@index([user_id], map: "user_id")
+}
+
+model hippo_playlists {
+  id         Int    @id @default(autoincrement())
+  title      String @db.VarChar(200)
+  author     String @db.VarChar(100)
+  genre      String @db.VarChar(100)
+  filedata   String @db.MediumText
+  filename   String @db.VarChar(200)
+  uploaddate Int
+}
+
+model lastusers {
+  id        Int    @id @default(autoincrement()) @db.UnsignedInt
+  user_id   Int?   @db.UnsignedInt
+  nick      String @db.Char(60)
+  crew      String @db.Char(60)
+  timestamp Int
+
+  @@index([user_id], map: "user_id")
+}
+
+model logos {
+  logo_id Int     @id @default(autoincrement())
+  author  String? @db.Char(60)
+  ascii   String  @db.MediumText
+  base64  Int?
+}
+
+model mags {
+  id           Int     @id @default(autoincrement())
+  name         String? @db.Char(60)
+  filename     String? @unique(map: "filename") @db.Char(60)
+  filedate     Int?
+  timestamp    Int?
+  author       String? @db.Char(60)
+  filesize     Int?
+  file_id      String? @db.Char(60)
+  view_counter Int?
+  downloads    Int?
+  uploader     String? @db.Char(60)
+  year         Int     @default(0) @db.MediumInt
+  month        Int     @default(0)
+  day          Int     @default(0)
+}
+
+model member_of {
+  id      Int     @id @default(autoincrement()) @db.UnsignedInt
+  crew    String  @db.Char(60)
+  nick    String  @db.Char(60)
+  updated String? @db.VarChar(1)
+
+  @@fulltext([crew], map: "fts_membercrew")
+  @@fulltext([nick], map: "fts_membernick")
+}
+
+model messages {
+  id                            Int     @id @default(autoincrement()) @db.UnsignedInt
+  thread                        Int?
+  from_id                       Int?    @db.UnsignedInt
+  to_id                         Int?    @db.UnsignedInt
+  postedto                      String? @db.Char(60)
+  postername                    String? @db.Char(60)
+  timestamp                     Int?
+  subject                       String? @db.VarChar(128)
+  message                       String? @db.MediumText
+  new                           Int?
+  unread                        Boolean @default(false)
+  attach_filename               String? @db.VarChar(100)
+  attach_filedata               String? @db.MediumText
+  users_messages_from_idTousers users?  @relation("messages_from_idTousers", fields: [from_id], references: [id], onDelete: Cascade, map: "messages_ibfk_1")
+  users_messages_to_idTousers   users?  @relation("messages_to_idTousers", fields: [to_id], references: [id], onDelete: Cascade, map: "messages_ibfk_2")
+
+  @@index([from_id], map: "from_id")
+  @@index([to_id], map: "to_id")
+}
+
+model request_comments {
+  comment_id      Int     @id @default(autoincrement())
+  request_id      Int
+  user_id         Int
+  comment         String  @db.MediumText
+  attach_filename String? @db.VarChar(100)
+  attach_filedata String? @db.MediumText
+  timestamp       Int
+}
+
+model requests {
+  id          Int    @id @default(autoincrement())
+  title       String @db.VarChar(255)
+  description String @db.Text
+  status      Int    @default(0)
+  requestedby Int
+  timestamp   Int
+}
+
+model styles {
+  id       Int    @id @default(autoincrement())
+  name     String @db.MediumText
+  user     String @db.MediumText
+  user_ids Int
+  style    String @db.MediumText
+  status   Int
+}
+
+model users {
+  id                               Int               @id @default(autoincrement()) @db.UnsignedInt
+  nick                             String            @unique(map: "nick") @db.Char(60)
+  crew                             String?           @db.Char(60)
+  password                         String?           @db.Char(60)
+  pwhash                           String?           @db.Char(128)
+  lastactive                       Int?
+  current                          String            @db.VarChar(255)
+  byear                            Int?
+  bmonth                           Int?
+  bday                             Int?
+  country                          Int?              @default(0) @db.SmallInt
+  mail                             String?           @db.Char(60)
+  webpage                          String?           @db.Char(60)
+  uploaded                         Int
+  rank                             String?           @db.Char(16)
+  joined                           String?           @db.Char(11)
+  def_bg_col                       String?           @db.Char(15)
+  def_fg_col                       String?           @db.Char(15)
+  upload_signature                 String            @default("- -- - aSCIIaRENa - ---- - aSCIIaRENa - -- -") @db.VarChar(80)
+  list_view_mode                   String?           @default("standard") @db.Char(8)
+  display_mail                     String?           @db.Char(3)
+  temp_pw_hash                     String?           @db.Char(60)
+  def_font                         String?           @db.Char(32)
+  nickurl                          String            @db.Char(60)
+  crt_effect                       users_crt_effect  @default(N)
+  anim_effect                      users_anim_effect @default(N)
+  artists                          artists[]
+  messages_messages_from_idTousers messages[]        @relation("messages_from_idTousers")
+  messages_messages_to_idTousers   messages[]        @relation("messages_to_idTousers")
+  wallposts                        wallposts[]
+
+  @@index([nickurl], map: "nickurl")
+}
+
+model users_online {
+  id        BigInt  @id @default(autoincrement()) @db.UnsignedBigInt
+  timestamp Int
+  session   String? @db.VarChar(128)
+  current   String  @db.VarChar(255)
+}
+
+model wall {
+  id      Int      @id @default(autoincrement())
+  nick    String?  @db.Char(60)
+  tag     String?  @db.Char(128)
+  created DateTime @default(now()) @db.Timestamp(0)
+}
+
+model wallposts {
+  id      Int      @id @default(autoincrement()) @db.UnsignedInt
+  wall_id Int?     @db.UnsignedInt
+  user_id Int?     @db.UnsignedInt
+  tag     String   @db.VarChar(255)
+  nick    String   @db.VarChar(255)
+  created DateTime @default(now()) @db.Timestamp(0)
+  walls   walls?   @relation(fields: [wall_id], references: [id], onDelete: Cascade, map: "wallposts_ibfk_1")
+  users   users?   @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "wallposts_ibfk_2")
+
+  @@index([user_id], map: "user_id")
+  @@index([wall_id], map: "wall_id")
+}
+
+model walls {
+  id          Int         @id @default(autoincrement()) @db.UnsignedInt
+  name        String      @db.VarChar(64)
+  description String      @db.VarChar(255)
+  user_id     Int?        @db.UnsignedInt
+  wallposts   wallposts[]
+
+  @@index([user_id], map: "user_id")
+}
+
+enum users_crt_effect {
+  Y
+  N
+}
+
+enum users_anim_effect {
+  Y
+  N
+}
