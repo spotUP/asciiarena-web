@@ -1,1 +1,10 @@
 /* global overrides beyond site.css go here */
+
+/* Bootstrap 5 changed link decoration default from none to underline.
+   The site was designed without underlines — restore BS4 behaviour. */
+a {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
