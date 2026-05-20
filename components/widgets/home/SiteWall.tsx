@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useId, useRef } from "react";
+import { ansiToHtml } from "@/lib/ansi";
 
 export default function SiteWall({ isLoggedIn }: { isLoggedIn: boolean }) {
   const uid = useId().replace(/:/g, "");
@@ -10,7 +11,7 @@ export default function SiteWall({ isLoggedIn }: { isLoggedIn: boolean }) {
   useEffect(() => {
     const renderPosts = (data: { tag: string | null; nick: string | null }[]) => {
       const html = data.map(p =>
-        `<div class="col-10 d-flex"><span class="cyan text-truncate" style="white-space:pre">${p.tag ?? ""}</span></div><div class="col-2 text-right"><span class="lightpink">${p.nick ?? ""}</span></div>`
+        `<div class="col-10 d-flex"><span class="text-truncate" style="white-space:pre">${ansiToHtml(p.tag ?? "")}</span></div><div class="col-2 text-right"><span class="lightpink">${p.nick ?? ""}</span></div>`
       ).join("");
       const el = document.getElementById(wallId);
       if (el) el.innerHTML = html;
@@ -35,7 +36,7 @@ export default function SiteWall({ isLoggedIn }: { isLoggedIn: boolean }) {
       if (Array.isArray(data)) {
         const html = data.map((p: unknown) => {
           const post = p as { tag: string; nick: string };
-          return `<div class="col-10 d-flex"><span class="cyan text-truncate" style="white-space:pre">${post.tag}</span></div><div class="col-2 text-right"><span class="lightpink">${post.nick}</span></div>`;
+          return `<div class="col-10 d-flex"><span class="text-truncate" style="white-space:pre">${ansiToHtml(post.tag)}</span></div><div class="col-2 text-right"><span class="lightpink">${post.nick}</span></div>`;
         }).join("");
         const el = document.getElementById(wallId);
         if (el) el.innerHTML = html;

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useId, useState } from "react";
+import { ansiToHtml } from "@/lib/ansi";
 
 interface WallPost { userName: string; comment: string; source: string }
 
@@ -16,9 +17,6 @@ export default function GlobalWall() {
       .catch(() => {});
   }, [uid]);
 
-  // Strip ANSI escape codes for display
-  const stripAnsi = (s: string) => s.replace(/\[[0-9;]*m/g, "").replace(/&#91;/g, "[");
-
   return (
     <div className="container-fluid m-0 p-0 apb-1">
       <div className="header col-12">
@@ -31,9 +29,11 @@ export default function GlobalWall() {
           {posts.map((p, i) => (
             <div key={i} className="col-12 d-flex">
               <div className="col-10">
-                <span className="cyan text-truncate" style={{ whiteSpace: "pre" }}>
-                  {stripAnsi(p.comment)}
-                </span>
+                <span
+                  className="text-truncate"
+                  style={{ whiteSpace: "pre" }}
+                  dangerouslySetInnerHTML={{ __html: ansiToHtml(p.comment) }}
+                />
               </div>
               <div className="col-2 text-right">
                 <span className="lightpink">{p.userName}</span>
