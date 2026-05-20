@@ -1,47 +1,36 @@
-FROM library/php:7.4-apache
+FROM node:20-alpine AS builder
 
-RUN apt-get -y update --allow-releaseinfo-change
+WORKDIR /app
 
-RUN mkdir -p /usr/share/man/man1
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
 
-RUN apt-get -y install jlha-utils xdms libonig-dev libmcrypt-dev
+COPY . .
 
-RUN docker-php-ext-install mbstring pdo pdo_mysql
-RUN pecl install mcrypt-1.0.4
-RUN docker-php-ext-enable mcrypt
+# Build requires DATABASE_URL — use a placeholder; real env is injected at runtime
+ARG DATABASE_URL="mysql://placeholder:placeholder@localhost:3306/placeholder"
+ARG NEXTAUTH_SECRET="build-time-secret"
+ENV DATABASE_URL=$DATABASE_URL
+ENV NEXTAUTH_SECRET=$NEXTAUTH_SECRET
 
-RUN echo 'PassEnv DBNAME DBHOST DBUSER DBPW' > /etc/apache2/conf-enabled/expose-env.conf 
+RUN npm run build
 
-COPY ./ /var/www/html/
+# ---- runtime ----
+FROM node:20-alpine AS runner
 
-RUN a2enmod rewrite
+WORKDIR /app
+ENV NODE_ENV=production
 
-RUN chmod 777 /tmp
-RUN chmod +t /tmp
-RUN apt-get update && apt-get -y install msmtp mailutils
+# Copy only what next start needs
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
 
-ARG MAILROOT
-ARG MAILHOST
-ARG MAILPORT
-ARG MAILUSER
-ARG MAILPASS
-ARG MAILROOT ${MAILROOT}
-ARG MAILHOST ${MAILHOST}
-ARG MAILPORT ${MAILPORT}
-ARG MAILUSER ${MAILUSER}
-ARG MAILPASS ${MAILPASS}
+# The collections/apps/mags dirs live on the host and are mounted as volumes
+# so we don't copy them into the image
 
-RUN echo "defaults" > /etc/msmtprc
-RUN echo "tls on" >> /etc/msmtprc
-RUN echo "tls_trust_file /etc/ssl/certs/ca-certificates.crt" >> /etc/msmtprc
-RUN echo "logfile -" >> /etc/msmtprc
-RUN echo "account email" >> /etc/msmtprc
-RUN echo "host ${MAILHOST}" >> /etc/msmtprc
-RUN echo "port ${MAILPORT}" >> /etc/msmtprc
-RUN echo "from ${MAILROOT}" >> /etc/msmtprc
-RUN echo "auth login" >> /etc/msmtprc
-RUN echo "user ${MAILUSER}" >> /etc/msmtprc
-RUN echo "password ${MAILPASS}" >> /etc/msmtprc
-RUN echo "account default : email" >> /etc/msmtprc
-RUN echo "sendmail_path=/usr/bin/msmtp -t" >> /usr/local/etc/php/conf.d/php-sendmail.ini
+EXPOSE 3000
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
+CMD ["node", "server.js"]
