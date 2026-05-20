@@ -2540,3 +2540,15 @@ input::file-selector-button {
 
 
 
+
+/* Bootstrap 5 compat: restore BS4 link decoration behaviour */
+:root {
+  --bs-link-decoration: none;
+  --bs-link-hover-decoration: underline;
+}
+a {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
