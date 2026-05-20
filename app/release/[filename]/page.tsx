@@ -352,12 +352,12 @@ export default async function ReleasePage({ params }: PageProps) {
       {type === "ASCII" && (
         <div
           className="row ml-0 mr-0 amb-1 p-0 justify-content-center align-items-center"
-          style={{ overflow: "auto", height: "100vh", backgroundColor: bgcolor }}
+          style={{ overflowY: "scroll", overflowX: "hidden", height: "100vh", backgroundColor: bgcolor }}
           id="colly-div"
         >
           <pre
             id="colly"
-            style={{ overflow: "visible", fontFamily: font, color: fgcolor, whiteSpace: "pre" }}
+            style={{ overflow: "hidden", fontFamily: font, color: fgcolor, whiteSpace: "pre" }}
             dangerouslySetInnerHTML={{ __html: "<br><br><br><br>" + fileContent + "<br><br><br><br>" }}
           />
         </div>
@@ -368,7 +368,7 @@ export default async function ReleasePage({ params }: PageProps) {
         <>
           <div
             className="row ml-0 mr-0 amb-1 p-0 justify-content-center align-items-center"
-            style={{ backgroundColor: "#000", overflowX: "auto" }}
+            style={{ backgroundColor: "#000", overflowX: "hidden" }}
             id="colly-div"
           >
             <span id="loading" style={{ animation: "blink 2s linear infinite" }}>.LOADiNG.</span>
