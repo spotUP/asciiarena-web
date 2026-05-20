@@ -145,36 +145,8 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
         </div>
       </div>
 
-      <Script id="switcharoo-init" strategy="afterInteractive">{`
-        window.switchers = window.switchers || [];
-        function switcharoo(selector, delay, idx, start) {
-          if (typeof idx === "undefined") idx = window.switchers.length;
-          if (typeof start === "undefined") start = 1;
-          window.switchers[idx] = [start, selector, delay || 3000];
-          window.switchers[idx][3] = setInterval(function() {
-            $(selector+":nth-child("+window.switchers[idx][0]+")").fadeOut(300, function() {
-              $(selector).css("display","none");
-              if (window.switchers[idx][0] === $(selector).length) { window.switchers[idx][0]=1; }
-              else { window.switchers[idx][0]++; }
-              $(selector+":nth-child("+window.switchers[idx][0]+")").fadeIn(300);
-            });
-          }, window.switchers[idx][2]);
-        }
-        document.addEventListener("visibilitychange", function() {
-          if (document.visibilityState === "visible") {
-            window.switchers.forEach(function(s, idx) {
-              var elements = $(s[1]).length;
-              var start = 1;
-              if (elements === 2 && s[0] !== 1) start = 2;
-              else if (elements !== s[0]) start = s[0]+1;
-              switcharoo(s[1], s[2], idx, start);
-            });
-          } else {
-            window.switchers.forEach(function(s) { clearInterval(s[3]); });
-          }
-        });
+      <Script id="site-init" strategy="afterInteractive">{`
         $(function() {
-          $(".select2").select2();
           $(document).keydown(function(e){
             if(e.keyCode == 27) {
               $("#colly").toggleClass("fullscreen");
@@ -183,14 +155,9 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
             }
           });
 
-          // Auto-init any page-header switchers already in the DOM
-          if ($('.switcher').length) {
-            switcharoo('.switcher > span', 2890);
-          }
-
           // Login form: fetch CSRF token then POST to NextAuth credentials
           function loginUser() {
-            var nick = $("#login-nick").val();
+            let nick = $("#login-nick").val();
             var pass = $("#login-password").val();
             $.getJSON("/api/auth/csrf", function(csrf) {
               $.ajax({

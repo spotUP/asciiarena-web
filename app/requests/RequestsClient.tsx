@@ -66,22 +66,15 @@ export default function RequestsClient() {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    fetch(
-      `/api/requests?page=${page}&sort=${sort}&asc=${asc}&pagesize=${PAGE_SIZE}&filter=${encodeURIComponent(filter)}&viewmode=${viewmode}`
-    )
-      .then((r) => r.json())
-      .then((rows: RequestRow[]) => {
-        if (!cancelled) {
-          setData(rows);
-          setLoading(false);
-        }
-      })
-      .catch(() => {
+    (async () => {
+      try {
+        const rows: RequestRow[] = await (await fetch(`/api/requests?page=${page}&sort=${sort}&asc=${asc}&pagesize=${PAGE_SIZE}&filter=${encodeURIComponent(filter)}&viewmode=${viewmode}`)).json();
+        if (!cancelled) { setData(rows); setLoading(false); }
+      } catch {
         if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
+      }
+    })();
+    return () => { cancelled = true; };
   }, [page, sort, asc, filter, viewmode]);
 
   function updateSort(newSort: string) {

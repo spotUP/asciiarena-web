@@ -29,22 +29,15 @@ export default function BBSClient({ initialSort, initialOrder }: BBSClientProps)
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    fetch(
-      `/api/bbs?page=${page}&sort=${sort}&asc=${asc}&pagesize=${PAGE_SIZE}&filter=${encodeURIComponent(filter)}`
-    )
-      .then((r) => r.json())
-      .then((rows: BbsRow[]) => {
-        if (!cancelled) {
-          setData(rows);
-          setLoading(false);
-        }
-      })
-      .catch(() => {
+    (async () => {
+      try {
+        const rows: BbsRow[] = await (await fetch(`/api/bbs?page=${page}&sort=${sort}&asc=${asc}&pagesize=${PAGE_SIZE}&filter=${encodeURIComponent(filter)}`)).json();
+        if (!cancelled) { setData(rows); setLoading(false); }
+      } catch {
         if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
+      }
+    })();
+    return () => { cancelled = true; };
   }, [page, sort, asc, filter]);
 
   function updateSort(newSort: string) {

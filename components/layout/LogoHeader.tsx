@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export type LogoHeaderProps = {
   logos: string[];
@@ -12,15 +12,13 @@ export default function LogoHeader({ logos }: LogoHeaderProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
+  const [current, setCurrent] = useState(0);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const w = window as unknown as { switcharoo?: (...args: unknown[]) => void };
-      if (typeof w.switcharoo === "function") {
-        w.switcharoo("#logoswitcher > div", 60000);
-      }
-    }
-  }, []);
+    if (shuffled.length < 2) return;
+    const id = setInterval(() => setCurrent((i) => (i + 1) % shuffled.length), 60000);
+    return () => clearInterval(id);
+  }, [shuffled.length]);
 
   return (
     <div className="overflow-hidden d-none d-lg-block mx-auto">
@@ -29,7 +27,7 @@ export default function LogoHeader({ logos }: LogoHeaderProps) {
           <div
             key={i}
             className="logo nolink"
-            style={i > 0 ? { display: "none", whiteSpace: "pre" } : { whiteSpace: "pre" }}
+            style={i !== current ? { display: "none", whiteSpace: "pre" } : { whiteSpace: "pre" }}
           >
             <a href="/" className="logo ascii">
               <pre style={{ overflow: "hidden" }}>

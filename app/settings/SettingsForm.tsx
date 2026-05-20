@@ -269,7 +269,7 @@ export default function SettingsForm() {
         <div className="row">
           <div className="col-xs-12 col-md-2 apt-1">
             <select
-              className="select2"
+              className="custom-select"
               value={settings.byear ?? ""}
               onChange={(e) => set("byear", e.target.value ? parseInt(e.target.value) : null)}
             >
@@ -285,7 +285,7 @@ export default function SettingsForm() {
           </div>
           <div className="col-xs-12 col-md-2 apt-1">
             <select
-              className="select2"
+              className="custom-select"
               value={settings.bmonth ?? ""}
               onChange={(e) => set("bmonth", e.target.value ? parseInt(e.target.value) : null)}
             >
@@ -299,7 +299,7 @@ export default function SettingsForm() {
           </div>
           <div className="col-xs-12 col-md-2 apt-1">
             <select
-              className="select2"
+              className="custom-select"
               value={settings.bday ?? ""}
               onChange={(e) => set("bday", e.target.value ? parseInt(e.target.value) : null)}
             >
@@ -437,7 +437,7 @@ export default function SettingsForm() {
         <div className="row amb-1">
           <div className="col-xs-12 col-md-6 apb-1">
             <select
-              className="select2 w-100"
+              className="custom-select w-100"
               value={settings.viewmode ?? 0}
               onChange={(e) => set("viewmode", parseInt(e.target.value))}
             >
@@ -491,7 +491,7 @@ export default function SettingsForm() {
         <div className="row amb-1">
           <div className="col-xs-12 col-md-6 apb-1">
             <select
-              className="select2 w-100"
+              className="custom-select w-100"
               value={settings.def_font ?? ""}
               onChange={(e) => set("def_font", e.target.value ? parseInt(e.target.value) : null)}
             >

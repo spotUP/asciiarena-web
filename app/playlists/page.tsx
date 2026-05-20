@@ -38,8 +38,8 @@ export default async function PlaylistsPage() {
       </div>
 
       <Script id="playlists-init" strategy="afterInteractive">{`
-        var plPage = 1, plSort = "uploaddate", plAsc = "D", plFilter = "", plMaxPage = 1;
-        var plPageSize = 120;
+        let plPage = 1, plSort = "uploaddate", plAsc = "D", plFilter = "", plMaxPage = 1;
+        let plPageSize = 120;
 
         function loadPlaylists() {
           var url = "/api/playlists?page=" + plPage + "&sort=" + plSort + "&asc=" + plAsc + "&pagesize=" + plPageSize;
@@ -48,7 +48,7 @@ export default async function PlaylistsPage() {
             var total = rows[0] ? rows[0].total_count : 0;
             plMaxPage = Math.max(1, Math.ceil(total / plPageSize));
             $("#pl-page-info").text(plPage + " of " + plMaxPage);
-            var html = "";
+            let html = "";
             rows.forEach(function(r) {
               html += '<div class="row amb-1">' +
                 '<div class="col-5 text-truncate"><a class="magenta" href="/assets/playlists/' + encodeURIComponent(r.filename) + '">' + $("<div>").text(r.title).html() + '</a></div>' +
@@ -76,7 +76,7 @@ export default async function PlaylistsPage() {
         $("#pl-next").on("click", function() { if (plPage < plMaxPage) { plPage++; loadPlaylists(); } });
         $("#pl-last").on("click", function() { plPage = plMaxPage; loadPlaylists(); });
 
-        var plFilterTimer;
+        let plFilterTimer;
         $("#pl-filter").on("input", function() {
           clearTimeout(plFilterTimer);
           var val = $(this).val();
@@ -84,7 +84,7 @@ export default async function PlaylistsPage() {
         });
 
         $(document).on("click", ".pl-delete", function() {
-          var id = $(this).data("id");
+          let id = $(this).data("id");
           if (!confirm("Delete this playlist?")) return;
           $.ajax({ type: "DELETE", url: "/api/playlists", contentType: "application/json",
             data: JSON.stringify({ id: id }),

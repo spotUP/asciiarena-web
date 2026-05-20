@@ -57,22 +57,15 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    fetch(
-      `/api/collys?page=${page}&sort=${sort}&asc=${asc}&pagesize=${pagesize}&filter=${encodeURIComponent(filter)}`
-    )
-      .then((r) => r.json())
-      .then((rows: CollyRow[]) => {
-        if (!cancelled) {
-          setData(rows);
-          setLoading(false);
-        }
-      })
-      .catch(() => {
+    (async () => {
+      try {
+        const rows: CollyRow[] = await (await fetch(`/api/collys?page=${page}&sort=${sort}&asc=${asc}&pagesize=${pagesize}&filter=${encodeURIComponent(filter)}`)).json();
+        if (!cancelled) { setData(rows); setLoading(false); }
+      } catch {
         if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
+      }
+    })();
+    return () => { cancelled = true; };
   }, [page, sort, asc, filter, pagesize]);
 
   function updateSort(newSort: string) {

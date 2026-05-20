@@ -344,7 +344,7 @@ export default async function ReleasePage({ params }: PageProps) {
                 </select>
               </span>
               <div className="col-2 amb-1 m-0 p-0">
-                <select className="select2" id="colly-font">
+                <select className="custom-select" id="colly-font">
                   {FONTS.map(f => (
                     <option key={f.value} value={f.value} selected={f.value === font}>{f.label}</option>
                   ))}

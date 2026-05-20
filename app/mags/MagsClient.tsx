@@ -32,22 +32,15 @@ export default function MagsClient({ initialSort, initialOrder }: MagsClientProp
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    fetch(
-      `/api/mags?page=${page}&sort=${sort}&asc=${asc}&pagesize=${PAGE_SIZE}&filter=${encodeURIComponent(filter)}`
-    )
-      .then((r) => r.json())
-      .then((rows: MagRow[]) => {
-        if (!cancelled) {
-          setData(rows);
-          setLoading(false);
-        }
-      })
-      .catch(() => {
+    (async () => {
+      try {
+        const rows: MagRow[] = await (await fetch(`/api/mags?page=${page}&sort=${sort}&asc=${asc}&pagesize=${PAGE_SIZE}&filter=${encodeURIComponent(filter)}`)).json();
+        if (!cancelled) { setData(rows); setLoading(false); }
+      } catch {
         if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
+      }
+    })();
+    return () => { cancelled = true; };
   }, [page, sort, asc, filter]);
 
   function updateSort(newSort: string) {
