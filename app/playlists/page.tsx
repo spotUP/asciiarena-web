@@ -26,10 +26,15 @@ export default async function PlaylistsPage() {
 
       <div id="playlist-list"></div>
 
-      <div className="apt-1">
-        <a href="/submit#playlist">
-          <input type="button" className="btn-big" value="Add Playlist" readOnly />
-        </a>
+      <div className="apt-1" style={{ display: "flex", gap: "8px", alignItems: "flex-start", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+          <input type="text" className="form-control" id="pl-new-title" style={{ width: "180px" }} placeholder="Title" />
+          <input type="text" className="form-control" id="pl-new-author" style={{ width: "130px" }} placeholder="Author" />
+          <input type="text" className="form-control" id="pl-new-genre" style={{ width: "120px" }} placeholder="Genre" />
+          <input type="text" className="form-control" id="pl-new-filename" style={{ width: "150px" }} placeholder="Filename (e.g. set.m3u)" />
+          <input type="button" className="btn-big" id="pl-add-btn" value="Add Playlist" />
+          <span id="pl-add-msg" className="apl-1"></span>
+        </div>
       </div>
 
       <Script id="playlists-init" strategy="afterInteractive">{`
@@ -46,9 +51,10 @@ export default async function PlaylistsPage() {
             var html = "";
             rows.forEach(function(r) {
               html += '<div class="row amb-1">' +
-                '<div class="col-6 text-truncate"><a class="magenta" href="/assets/playlists/' + encodeURIComponent(r.filename) + '">' + $("<div>").text(r.title).html() + '</a></div>' +
+                '<div class="col-5 text-truncate"><a class="magenta" href="/assets/playlists/' + encodeURIComponent(r.filename) + '">' + $("<div>").text(r.title).html() + '</a></div>' +
                 '<div class="col-3 text-truncate lightgrey">' + $("<div>").text(r.genre).html() + '</div>' +
-                '<div class="col-3 lightgrey">' + r.uploaddate + '</div>' +
+                '<div class="col-2 lightgrey">' + r.uploaddate + '</div>' +
+                '<div class="col-2"><input type="button" class="btn-big pl-delete" data-id="' + r.id + '" value="Delete" /></div>' +
                 '</div>';
             });
             $("#playlist-list").html(html || '<div class="lightgrey apt-1">No playlists found.</div>');
@@ -75,6 +81,33 @@ export default async function PlaylistsPage() {
           clearTimeout(plFilterTimer);
           var val = $(this).val();
           plFilterTimer = setTimeout(function() { plFilter = val; plPage = 1; loadPlaylists(); }, 300);
+        });
+
+        $(document).on("click", ".pl-delete", function() {
+          var id = $(this).data("id");
+          if (!confirm("Delete this playlist?")) return;
+          $.ajax({ type: "DELETE", url: "/api/playlists", contentType: "application/json",
+            data: JSON.stringify({ id: id }),
+            success: function() { loadPlaylists(); }
+          });
+        });
+
+        $("#pl-add-btn").on("click", function() {
+          var title = $("#pl-new-title").val();
+          var author = $("#pl-new-author").val();
+          var genre = $("#pl-new-genre").val();
+          var filename = $("#pl-new-filename").val();
+          if (!title || !filename) { $("#pl-add-msg").text("Title and filename required.").css("color","#ff5555"); setTimeout(function(){$("#pl-add-msg").text("");},3000); return; }
+          $.ajax({ type: "POST", url: "/api/playlists", contentType: "application/json",
+            data: JSON.stringify({ title: title, author: author, genre: genre, filename: filename }),
+            success: function() {
+              $("#pl-new-title, #pl-new-author, #pl-new-genre, #pl-new-filename").val("");
+              $("#pl-add-msg").text("Added!").css("color","#55ff55");
+              setTimeout(function(){$("#pl-add-msg").text("");},3000);
+              loadPlaylists();
+            },
+            error: function() { $("#pl-add-msg").text("Failed.").css("color","#ff5555"); setTimeout(function(){$("#pl-add-msg").text("");},3000); }
+          });
         });
 
         loadPlaylists();

@@ -121,7 +121,14 @@ export default async function AdminPage() {
 
       {/* Edit Requests */}
       <div id="tab-request" className="admin-tab" style={{ display: "none", padding: "8px" }}>
-        <a href="/requests"><input type="button" className="btn-big" value="Go to Requests" readOnly /></a>
+        <div style={{ marginBottom: "8px" }}>
+          <a href="/requests"><input type="button" className="btn-big" value="Browse Requests" readOnly /></a>
+        </div>
+        <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
+          <input type="text" className="form-control" id="req-search" style={{ maxWidth: "300px" }} placeholder="Search by title..." />
+          <input type="button" className="btn-big" id="req-search-btn" value="Search" />
+        </div>
+        <div id="req-results"></div>
       </div>
 
       {/* Edit Playlists */}
@@ -462,6 +469,34 @@ export default async function AdminPage() {
           if (!confirm("Delete this BBS?")) return;
           $.ajax({ type: "DELETE", url: "/api/admin/bbs", contentType: "application/json",
             data: JSON.stringify({ id: $(this).data("id") }),
+            success: function() { $(this).closest(".entity-row").remove(); }.bind(this)
+          });
+        });
+
+        // ── Requests ───────────────────────────────────────────────────
+        $("#req-search-btn").on("click", function() {
+          var q = $("#req-search").val();
+          if (!q) return;
+          $.getJSON("/api/requests?filter=" + encodeURIComponent(q) + "&pagesize=30&viewmode=4", function(rows) {
+            if (!rows.length) { $("#req-results").html('<div class="lightgrey">No results.</div>'); return; }
+            var html = "";
+            rows.forEach(function(r) {
+              html += '<div class="row amb-1 entity-row" data-id="' + r.id + '">' +
+                '<div class="col-5 text-truncate"><a class="magenta" href="/requests/' + r.id + '">' + $("<div>").text(r.title || "").html() + '</a></div>' +
+                '<div class="col-3 lightgrey">' + $("<div>").text(r.user || "").html() + '</div>' +
+                '<div class="col-2 lightgrey">' + (r.time || "") + '</div>' +
+                '<div class="col-2"><input type="button" class="btn-big req-delete" data-id="' + r.id + '" value="Delete" /></div>' +
+                '</div>';
+            });
+            $("#req-results").html(html);
+          });
+        });
+        $("#req-search").on("keydown", function(e) { if (e.which === 13) $("#req-search-btn").click(); });
+
+        $(document).on("click", ".req-delete", function() {
+          if (!confirm("Delete this request and all its comments?")) return;
+          $.ajax({ type: "DELETE", url: "/api/requests/" + $(this).data("id"), contentType: "application/json",
+            data: "{}",
             success: function() { $(this).closest(".entity-row").remove(); }.bind(this)
           });
         });
