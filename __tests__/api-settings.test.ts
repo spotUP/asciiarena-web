@@ -36,20 +36,20 @@ const mockSession = {
 
 describe("GET /api/settings", () => {
   it("returns 401 without auth", async () => {
-    vi.mocked(auth).mockResolvedValue(null);
-    const res = await GET();
+    vi.mocked(auth).mockResolvedValue(null as never);
+    const res = await GET(new Request("http://localhost/api/settings") as never);
     expect(res.status).toBe(401);
   });
 
   it("returns user settings when authenticated", async () => {
-    vi.mocked(auth).mockResolvedValue(mockSession);
+    vi.mocked(auth).mockResolvedValue(mockSession as never);
     vi.mocked(prisma.$queryRaw).mockResolvedValue([{
       nick: "spot", crew: "UR", byear: 1990, bmonth: 5, bday: 1,
       country: 0, mail: "test@test.com", webpage: "", upload_signature: "",
       list_view_mode: "Standard", def_bg_col: "#000", def_fg_col: "#fff",
       display_mail: "N", def_font: "mOsOul", crt_effect: "Y", anim_effect: "N",
     }]);
-    const res = await GET();
+    const res = await GET(new Request("http://localhost/api/settings") as never);
     expect(res.status).toBe(200);
     const data = await res.json() as { nick: string };
     expect(data.nick).toBe("spot");
@@ -58,7 +58,7 @@ describe("GET /api/settings", () => {
 
 describe("PATCH /api/settings — password change", () => {
   beforeEach(() => {
-    vi.mocked(auth).mockResolvedValue(mockSession);
+    vi.mocked(auth).mockResolvedValue(mockSession as never);
     vi.mocked(prisma.$queryRaw).mockResolvedValue([{ pwhash: "$2b$13$existinghash" }]);
     vi.mocked(prisma.$executeRaw).mockResolvedValue(1);
   });
@@ -70,7 +70,7 @@ describe("PATCH /api/settings — password change", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ oldpass: "OldPass1!", newpass: "tooweak" }),
     });
-    const res = await PATCH(req);
+    const res = await PATCH(req as never);
     expect(res.status).toBe(400);
     const data = await res.json() as { error: string };
     expect(data.error).toMatch(/password/i);
@@ -83,7 +83,7 @@ describe("PATCH /api/settings — password change", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ oldpass: "WrongPass1!", newpass: "NewPass123!" }),
     });
-    const res = await PATCH(req);
+    const res = await PATCH(req as never);
     expect(res.status).toBe(400);
     const data = await res.json() as { error: string };
     expect(data.error).toContain("incorrect");
@@ -103,7 +103,7 @@ describe("PATCH /api/settings — password change", () => {
         display_mail: "N", def_font: "mOsOul", crt_effect: "Y", anim_effect: "N",
       }),
     });
-    const res = await PATCH(req);
+    const res = await PATCH(req as never);
     expect(res.status).toBe(200);
     expect(bcrypt.hash).toHaveBeenCalledWith("NewPass123!", 13);
   });

@@ -50,7 +50,7 @@ describe("GET /api/collys/[id]/comments", () => {
 
 describe("POST /api/collys/[id]/comments", () => {
   it("rejects unauthenticated requests with 401", async () => {
-    vi.mocked(auth).mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null as never);
     const req = new Request("http://localhost/api/collys/1/comments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -64,7 +64,7 @@ describe("POST /api/collys/[id]/comments", () => {
     vi.mocked(auth).mockResolvedValue({
       user: { id: "42", name: "spot", rank: null, crew: null },
       expires: "2099-01-01",
-    });
+    } as never);
     vi.mocked(prisma.$executeRaw).mockResolvedValue(1);
 
     const req = new Request("http://localhost/api/collys/1/comments", {
