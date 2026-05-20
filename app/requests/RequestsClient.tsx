@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Paginator from "@/components/ui/Paginator";
 
 interface RequestRow {
@@ -36,13 +37,31 @@ const VIEW_BUTTONS: { label: string; viewmode: number }[] = [
 ];
 
 export default function RequestsClient() {
-  const [page, setPage] = useState(1);
-  const [sort, setSort] = useState("timestamp");
-  const [asc, setAsc] = useState<"A" | "D">("D");
-  const [filter, setFilter] = useState("");
-  const [viewmode, setViewmode] = useState(0);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const [page, setPage] = useState(() => parseInt(searchParams.get("page") ?? "1") || 1);
+  const [sort, setSort] = useState(() => searchParams.get("sort") ?? "timestamp");
+  const [asc, setAsc] = useState<"A" | "D">(() => searchParams.get("asc") === "A" ? "A" : "D");
+  const [filter, setFilter] = useState(() => searchParams.get("filter") ?? "");
+  const [viewmode, setViewmode] = useState(() => parseInt(searchParams.get("viewmode") ?? "0") || 0);
   const [data, setData] = useState<RequestRow[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const syncUrl = useCallback((p: number, s: string, a: string, f: string, v: number) => {
+    const params = new URLSearchParams();
+    if (p > 1) params.set("page", String(p));
+    if (s !== "timestamp") params.set("sort", s);
+    if (a !== "D") params.set("asc", a);
+    if (f) params.set("filter", f);
+    if (v !== 0) params.set("viewmode", String(v));
+    const qs = params.toString();
+    router.replace(qs ? `?${qs}` : "?", { scroll: false });
+  }, [router]);
+
+  useEffect(() => {
+    syncUrl(page, sort, asc, filter, viewmode);
+  }, [page, sort, asc, filter, viewmode, syncUrl]);
 
   useEffect(() => {
     let cancelled = false;

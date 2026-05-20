@@ -18,7 +18,7 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
   const [rawSession, logoRows] = await Promise.all([
     auth(),
     prisma.$queryRaw<Array<{ ascii: string }>>(
-      Prisma.sql`SELECT ascii FROM logos ORDER BY RAND() LIMIT 10`
+      Prisma.sql`SELECT ascii FROM logos ORDER BY id LIMIT 50`
     ),
   ]);
 
@@ -203,9 +203,8 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
             });
           }
           $("#login-submit-btn").on("click", loginUser);
-          $("#login-nick, #login-password").on("keyup", function(e) {
-            if (e.which === 13) loginUser();
-          });
+          $("#login-submit-btn").on("click", loginUser);
+          $("#login-form").on("submit", function(e) { e.preventDefault(); loginUser(); });
           $("#login").on("shown.bs.modal", function() { $("#login-nick").focus(); });
         });
       `}</Script>

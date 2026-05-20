@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
     status: r.status,
     time: formatTimestamp(r.timestamp),
     user: r.nick,
-    url: `info_requests.php?id=${r.id}`,
+    url: `/requests/${r.id}`,
     total_count: Number(r.total_count),
   }));
 

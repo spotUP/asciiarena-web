@@ -3,7 +3,7 @@ import { Prisma } from "@/lib/generated/prisma/client";
 
 type TopColly = { filename: string; rating: number };
 
-export default async function TopCollys() {
+export default async function TopCollys({ limit = 5 }: { limit?: number }) {
   const rows = await prisma.$queryRaw<TopColly[]>(
     Prisma.sql`
       SELECT filename, rating
@@ -12,14 +12,14 @@ export default async function TopCollys() {
         SELECT filename FROM comments GROUP BY filename HAVING COUNT(commentid) > 3
       )
       ORDER BY rating DESC
-      LIMIT 5
+      LIMIT ${limit}
     `
   );
 
   return (
     <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
       <div className="header col-lg-12 p-0">
-        <h2 className="ap-1 bg-header">TOP 5 COLLYS</h2>
+        <h2 className="ap-1 bg-header">TOP {limit} COLLYS</h2>
       </div>
       <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
         {rows.map((row) => {

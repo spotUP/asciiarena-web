@@ -8,7 +8,7 @@ export default async function StyleEditorPage() {
   return (
     <SiteLayout title="ASCII STYLE DESIGNER">
       {session?.user ? (
-        <StyleEditorClient userNick={session.user.name ?? ""} />
+        <StyleEditorClient userNick={session.user.name ?? ""} userId={parseInt(session.user.id ?? "0")} />
       ) : (
         <div className="col-lg-12">
           <div className="bs-component">

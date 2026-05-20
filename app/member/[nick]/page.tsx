@@ -23,6 +23,13 @@ interface CommentRow {
   filename: string | null;
 }
 
+interface CrewMembershipRow {
+  crew: string;
+  crewurl: string | null;
+  artist_nick: string;
+  artisturl: string;
+}
+
 interface CollyRow {
   name: string | null;
   filename: string | null;
@@ -63,9 +70,20 @@ export default async function MemberPage({
     SELECT id, nick, artisturl
     FROM artists
     WHERE user_id = ${member.id}
-    LIMIT 1
+    ORDER BY nick ASC
   `;
-  const artist = artists[0] ?? null;
+
+  // Crew memberships via linked artist handles
+  const crewMemberships = artists.length > 0
+    ? await prisma.$queryRaw<CrewMembershipRow[]>`
+        SELECT mo.crew, w.crewurl, a.nick AS artist_nick, a.artisturl
+        FROM member_of mo
+        JOIN artists a ON LOWER(a.nick) = LOWER(mo.nick)
+        LEFT JOIN crews w ON LOWER(w.name) = LOWER(mo.crew)
+        WHERE a.user_id = ${member.id}
+        ORDER BY mo.crew ASC, mo.nick ASC
+      `
+    : [];
 
   const comments = await prisma.$queryRaw<CommentRow[]>`
     SELECT comment, filename
@@ -149,13 +167,34 @@ export default async function MemberPage({
           </div>
         </div>
 
-        {artist && (
+        {artists.length > 0 && (
           <div className="row apt-1">
             <div className="col-sm-12">
-              <span className="white">Artist profile: </span>
-              <a className="magenta" href={`/artist/${artist.artisturl}`}>
-                {artist.nick}
-              </a>
+              <span className="white">Artist handle{artists.length > 1 ? "s" : ""}: </span>
+              {artists.map((a, i) => (
+                <span key={a.id}>
+                  {i > 0 && ", "}
+                  <a className="magenta" href={`/artist/${a.artisturl}`}>{a.nick}</a>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+        {crewMemberships.length > 0 && (
+          <div className="row apt-1">
+            <div className="col-sm-12">
+              <span className="white">Scene crews: </span>
+              {Array.from(new Set(crewMemberships.map(m => m.crew))).map((crewName, i) => {
+                const m = crewMemberships.find(x => x.crew === crewName)!;
+                return (
+                  <span key={crewName}>
+                    {i > 0 && ", "}
+                    {m.crewurl
+                      ? <a href={`/crew/${m.crewurl}`}>{crewName}</a>
+                      : <span>{crewName}</span>}
+                  </span>
+                );
+              })}
             </div>
           </div>
         )}

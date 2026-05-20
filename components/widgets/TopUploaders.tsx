@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/db";
 import { urlsafe, formatBytes } from "@/lib/utils";
 
-export default async function TopUploaders() {
+export default async function TopUploaders({ limit = 5 }: { limit?: number }) {
   const rows = await prisma.users.findMany({
     where: { uploaded: { gt: 0 } },
     orderBy: { uploaded: "desc" },
-    take: 5,
+    take: limit,
     select: { id: true, nick: true, uploaded: true },
   });
 

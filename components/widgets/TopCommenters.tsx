@@ -4,14 +4,14 @@ import { Prisma } from "@/lib/generated/prisma/client";
 
 type TopCommenter = { topcommentators: bigint; nick: string; user_id: number };
 
-export default async function TopCommenters() {
+export default async function TopCommenters({ limit = 5 }: { limit?: number }) {
   const rows = await prisma.$queryRaw<TopCommenter[]>(
     Prisma.sql`
       SELECT COUNT(user_id) AS topcommentators, nick, user_id
       FROM comments
       GROUP BY user_id, nick
       ORDER BY topcommentators DESC
-      LIMIT 5
+      LIMIT ${limit}
     `
   );
 

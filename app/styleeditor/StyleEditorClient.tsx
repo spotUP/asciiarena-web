@@ -1,15 +1,17 @@
 "use client";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import Script from "next/script";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface FontMeta { fontid: number; fontname: string; fontstatus: number }
+interface FontMeta { fontid: number; fontname: string; fontstatus: number; group_id: number | null }
+interface FontGroup { id: number; name: string; owner_id: number; is_owner: boolean; members: { user_id: number; nick: string }[] }
 
 interface FigFont {
   fontid: number;
   fontname: string;
   fontstatus: number;   // 1=private 2=public-view 3=public-edit
+  group_id: number | null;
   hardBlank: string;
   height: number;
   baseline: number;
@@ -26,7 +28,7 @@ interface FigFont {
 
 type HLayout = "Full" | "Fitted" | "Controlled Smushing" | "Universal Smushing";
 type VLayout = "Full" | "Fitted" | "Controlled Smushing" | "Universal Smushing";
-type Tab = "editor" | "preview" | "maker";
+type Tab = "editor" | "preview";
 
 const LAYOUTS: HLayout[] = ["Full", "Fitted", "Controlled Smushing", "Universal Smushing"];
 
@@ -41,7 +43,7 @@ function emptyFont(): FigFont {
   figChars[-1] = "Font Author: Enter your name here\n\nFIGFont created with: https://www.asciiarena.se";
   CHAR_ORDER.forEach(c => { figChars[c] = ""; });
   return {
-    fontid: 0, fontname: "", fontstatus: 1,
+    fontid: 0, fontname: "", fontstatus: 1, group_id: null,
     hardBlank: "$", height: 6, baseline: 6, maxLength: 10,
     printDirection: 0, caseInsensitive: false,
     horizontalLayout: "Fitted", verticalLayout: "Full",
@@ -183,19 +185,6 @@ function makeRuler(width: number): string {
   return r;
 }
 
-// Naive side-by-side character concatenation (no smushing) for inline preview
-function renderWord(word: string, figChars: Record<number, string>): string {
-  if (!word.trim()) return "";
-  const charArts = Array.from(word).map(c => {
-    const art = figChars[c.charCodeAt(0)] ?? "";
-    return art.replace(/\r\n/g, "\n").split("\n");
-  }).filter(rows => rows.some(r => r.trim()));
-  if (charArts.length === 0) return "";
-  const height = Math.max(...charArts.map(r => r.length));
-  return Array.from({ length: height }, (_, row) =>
-    charArts.map(rows => rows[row] ?? "").join("")
-  ).join("\n");
-}
 
 const H_RULE_TIPS: Record<number, string> = {
   1: "Equal chars merge into one.",
@@ -215,13 +204,13 @@ const V_RULE_TIPS: Record<number, string> = {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function StyleEditorClient({ userNick }: { userNick: string }) {
+export default function StyleEditorClient({ userId }: { userNick: string; userId: number }) {
   const [fonts, setFonts] = useState<FontMeta[]>([]);
   const [font, setFont] = useState<FigFont>(emptyFont());
   const [selectedChar, setSelectedChar] = useState<number>(65);
   const [tab, setTab] = useState<Tab>("editor");
-  const [testText, setTestText] = useState("Hello!");
-  const [testOutput, setTestOutput] = useState("");
+  const [previewText, setPreviewText] = useState("Hello!");
+  const [previewOutput, setPreviewOutput] = useState("");
   const [showHardBlanks, setShowHardBlanks] = useState(false);
   const [status, setStatus] = useState<{ msg: string; ok: boolean } | null>(null);
   const [importText, setImportText] = useState("");
@@ -231,9 +220,17 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
   const [figletReady, setFigletReady] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  // Groups state
+  const [groups, setGroups] = useState<FontGroup[]>([]);
+  const [showGroups, setShowGroups] = useState(false);
+  const [newGroupName, setNewGroupName] = useState("");
+  const [inviteNick, setInviteNick] = useState<Record<number, string>>({});
+  const [groupMsg, setGroupMsg] = useState<{ id: number | "new"; msg: string; ok: boolean } | null>(null);
+
   // Undo/redo stacks per character code
   const undoStacks = useRef<Map<number, { past: string[]; future: string[] }>>(new Map());
   const figletLoadedRef = useRef(false);
+  const previewDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   function getStack(code: number) {
@@ -241,7 +238,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
     return undoStacks.current.get(code)!;
   }
 
-  const [previewWord, setPreviewWord] = useState("Hello");
+  const [editorDark, setEditorDark] = useState(true);
   const dim = charDimensions(font.figChars[selectedChar] ?? "");
   const rulerStr = makeRuler(Math.max(dim.maxCols + 2, 40));
 
@@ -252,15 +249,21 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
     if (r.ok) setFonts(await r.json() as FontMeta[]);
   }, []);
 
+  const loadGroups = useCallback(async () => {
+    const r = await fetch("/api/font-groups");
+    if (r.ok) setGroups(await r.json() as FontGroup[]);
+  }, []);
+
   const loadFont = useCallback(async (id: number) => {
     if (id === 0) { setFont(emptyFont()); undoStacks.current.clear(); return; }
     const r = await fetch(`/api/fonts?id=${id}`);
     if (!r.ok) return;
-    const [data] = await r.json() as { fontid: number; fontname: string; fontstatus: number; fontdata: string }[];
+    const [data] = await r.json() as { fontid: number; fontname: string; fontstatus: number; fontdata: string; group_id: number | null }[];
     if (!data) return;
     const parsed = parseFigFont(data.fontname, data.fontdata);
     parsed.fontid = data.fontid;
     parsed.fontstatus = data.fontstatus;
+    parsed.group_id = data.group_id ?? null;
     setFont(parsed);
     undoStacks.current.clear();
     if (figletLoadedRef.current) {
@@ -271,7 +274,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
 
   const saveFont = useCallback(async () => {
     if (!font.fontname.trim()) { setStatus({ msg: "Fill in the font name first.", ok: false }); return; }
-    const body = { fontid: font.fontid || undefined, fontname: font.fontname, fontstatus: font.fontstatus, fontdata: createFigFileData(font) };
+    const body = { fontid: font.fontid || undefined, fontname: font.fontname, fontstatus: font.fontstatus, fontdata: createFigFileData(font), group_id: font.group_id };
     const r = await fetch("/api/fonts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     if (r.ok) { setStatus({ msg: "Font saved!", ok: true }); await loadFontList(); }
     else setStatus({ msg: "Save failed.", ok: false });
@@ -288,14 +291,30 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
 
   // ── Effects ───────────────────────────────────────────────────────────────
 
-  useEffect(() => { loadFontList(); }, [loadFontList]);
+  useEffect(() => { loadFontList(); loadGroups(); }, [loadFontList, loadGroups]);
   useEffect(() => { if (!status) return; const t = setTimeout(() => setStatus(null), 4000); return () => clearTimeout(t); }, [status]);
+  useEffect(() => { if (!groupMsg) return; const t = setTimeout(() => setGroupMsg(null), 3000); return () => clearTimeout(t); }, [groupMsg]);
 
+  // Debounced figlet re-parse + preview render whenever font data or preview text changes
+  const figletFontKey = font.fontname || "__preview__";
+  const figCharsSnapshot = useMemo(() => font.figChars, [font.figChars]); // stable ref for effect dep
   useEffect(() => {
-    if (!figletReady || tab !== "maker") return;
-    const w = window as { figlet?: { text: (t: string, opts: Record<string, unknown>, cb: (e: unknown, d: string) => void) => void } };
-    w.figlet?.text(testText, { font: font.fontname || "__FONT_IN_PROGRESS__", showHardBlanks }, (_e, d) => setTestOutput(d || "(Font not loaded - open Character Editor first)"));
-  }, [testText, showHardBlanks, font.fontname, figletReady, tab]);
+    if (!figletReady) return;
+    if (previewDebounceRef.current) clearTimeout(previewDebounceRef.current);
+    previewDebounceRef.current = setTimeout(() => {
+      const w = window as {
+        figlet?: {
+          parseFont: (n: string, d: string, cb: () => void) => void;
+          text: (t: string, opts: Record<string, unknown>, cb: (e: unknown, d: string) => void) => void;
+        };
+      };
+      const data = createFigFileData({ ...font, figChars: figCharsSnapshot });
+      w.figlet?.parseFont(figletFontKey, data, () => {
+        w.figlet?.text(previewText, { font: figletFontKey, showHardBlanks }, (_e, d) => setPreviewOutput(d || ""));
+      });
+    }, 300);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [figCharsSnapshot, previewText, showHardBlanks, figletFontKey, figletReady]);
 
   // Global keyboard shortcuts
   useEffect(() => {
@@ -415,21 +434,21 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
 
         {/* ── Top toolbar ── */}
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px", padding: "6px 8px", background: "#1a1a1a", borderBottom: "1px solid #333" }}>
-          <label className="white" style={{ fontSize: "12px", marginBottom: 0 }}>Style:</label>
-          <select className="custom-select custom-select-sm" style={{ width: "160px" }}
+          <label className="white" style={{ marginBottom: 0 }}>Style:</label>
+          <select className="custom-select" style={{ width: "160px" }}
             value={font.fontid}
             onChange={e => loadFont(parseInt(e.target.value))}>
             <option value={0}>-- New --</option>
             {fonts.map(f => <option key={f.fontid} value={f.fontid}>{f.fontname}</option>)}
           </select>
 
-          <label className="white" style={{ fontSize: "12px", marginBottom: 0 }}>Name:</label>
-          <input type="text" className="form-control form-control-sm" style={{ width: "140px" }}
+          <label className="white" style={{ marginBottom: 0 }}>Name:</label>
+          <input type="text" className="form-control" style={{ width: "140px" }}
             maxLength={20} value={font.fontname} placeholder="font name"
             onChange={e => setFont(f => ({ ...f, fontname: e.target.value }))} />
 
-          <label className="white" style={{ fontSize: "12px", marginBottom: 0 }}>Visibility:</label>
-          <select className="custom-select custom-select-sm" style={{ width: "155px" }}
+          <label className="white" style={{ marginBottom: 0 }}>Visibility:</label>
+          <select className="custom-select" style={{ width: "155px" }}
             value={font.fontstatus}
             onChange={e => setFont(f => ({ ...f, fontstatus: parseInt(e.target.value) }))}>
             <option value={1}>Private</option>
@@ -437,10 +456,19 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
             <option value={3}>Public (anyone can edit)</option>
           </select>
 
+          <label className="white" style={{ marginBottom: 0 }}>Group:</label>
+          <select className="custom-select" style={{ width: "140px" }}
+            value={font.group_id ?? 0}
+            onChange={e => setFont(f => ({ ...f, group_id: parseInt(e.target.value) || null }))}>
+            <option value={0}>No group</option>
+            {groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+          </select>
+
           <div style={{ display: "flex", gap: "4px", marginLeft: "auto", flexWrap: "wrap" }}>
             <input type="button" className="btn-big" value="New" onClick={() => { setFont(emptyFont()); undoStacks.current.clear(); }} />
             <input type="button" className="btn-big" value="Save" onClick={saveFont} />
             <input type="button" className="btn-big" value="Delete" onClick={deleteFont} />
+            <input type="button" className="btn-big" value="Groups" onClick={() => { loadGroups(); setShowGroups(true); }} />
             <input type="button" className="btn-big" value="Import" onClick={() => setShowImport(true)} />
             <input type="button" className="btn-big" value="Export" onClick={doExport} />
           </div>
@@ -448,12 +476,12 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
 
         {/* ── Tabs ── */}
         <ul className="nav nav-tabs bg-secondary" style={{ marginBottom: 0 }}>
-          {(["editor", "preview", "maker"] as Tab[]).map(t => (
+          {(["editor", "preview"] as Tab[]).map(t => (
             <li key={t} className="nav-item bg-secondary">
               <a className={`nav-link bg-secondary${tab === t ? " active" : ""}`}
-                style={{ cursor: "pointer", background: "#212121 !important", fontSize: "13px", padding: "6px 12px" }}
+                style={{ cursor: "pointer", background: "#212121 !important", padding: "6px 12px" }}
                 onClick={() => setTab(t)}>
-                {t === "editor" ? "Character Editor" : t === "preview" ? "All Characters" : "Logo Maker"}
+                {t === "editor" ? "Character Editor" : "All Characters"}
               </a>
             </li>
           ))}
@@ -490,65 +518,6 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
                 ))}
               </div>
 
-              <div style={{ borderTop: "1px solid #333", marginTop: "10px", paddingTop: "8px" }}>
-                <div className="white" style={{ fontWeight: "bold", fontSize: "12px", marginBottom: "6px" }}>Font Options</div>
-
-                <div style={{ fontSize: "11px", color: "#aaa", marginBottom: "4px" }}>H-Layout:</div>
-                <select className="custom-select custom-select-sm" style={{ width: "100%", marginBottom: "4px" }}
-                  value={font.horizontalLayout}
-                  onChange={e => setFont(f => ({ ...f, horizontalLayout: e.target.value as HLayout }))}>
-                  {LAYOUTS.map(l => <option key={l} value={l}>{l}</option>)}
-                </select>
-
-                {font.horizontalLayout === "Controlled Smushing" && (
-                  <div style={{ paddingLeft: "4px", fontSize: "11px", marginBottom: "4px" }}>
-                    {[1,2,3,4,5,6].map(n => (
-                      <div key={n} style={{ display: "flex", alignItems: "center", gap: "4px", marginBottom: "2px" }}>
-                        <input type="checkbox" id={`hrule${n}`} checked={!!font.hrule[n]}
-                          onChange={e => setFont(f => ({ ...f, hrule: { ...f.hrule, [n]: e.target.checked } }))} />
-                        <label htmlFor={`hrule${n}`} className="white" title={H_RULE_TIPS[n]} style={{ cursor: "help", fontSize: "11px" }}>H-Rule {n}</label>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div style={{ fontSize: "11px", color: "#aaa", marginBottom: "4px" }}>V-Layout:</div>
-                <select className="custom-select custom-select-sm" style={{ width: "100%", marginBottom: "4px" }}
-                  value={font.verticalLayout}
-                  onChange={e => setFont(f => ({ ...f, verticalLayout: e.target.value as VLayout }))}>
-                  {LAYOUTS.map(l => <option key={l} value={l}>{l}</option>)}
-                </select>
-
-                {font.verticalLayout === "Controlled Smushing" && (
-                  <div style={{ paddingLeft: "4px", fontSize: "11px", marginBottom: "4px" }}>
-                    {[1,2,3,4,5].map(n => (
-                      <div key={n} style={{ display: "flex", alignItems: "center", gap: "4px", marginBottom: "2px" }}>
-                        <input type="checkbox" id={`vrule${n}`} checked={!!font.vrule[n]}
-                          onChange={e => setFont(f => ({ ...f, vrule: { ...f.vrule, [n]: e.target.checked } }))} />
-                        <label htmlFor={`vrule${n}`} className="white" title={V_RULE_TIPS[n]} style={{ cursor: "help", fontSize: "11px" }}>V-Rule {n}</label>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div style={{ display: "flex", gap: "4px", marginBottom: "4px", alignItems: "center" }}>
-                  <span style={{ fontSize: "11px", color: "#aaa", width: "70px" }}>Hard blank:</span>
-                  <input type="text" maxLength={1} className="form-control form-control-sm" style={{ width: "40px" }}
-                    value={font.hardBlank}
-                    onChange={e => setFont(f => ({ ...f, hardBlank: e.target.value.slice(-1) || "$" }))} />
-                </div>
-                <div style={{ display: "flex", gap: "4px", marginBottom: "4px", alignItems: "center" }}>
-                  <span style={{ fontSize: "11px", color: "#aaa", width: "70px" }}>Baseline:</span>
-                  <input type="number" min={1} max={20} className="form-control form-control-sm" style={{ width: "60px" }}
-                    value={font.baseline}
-                    onChange={e => setFont(f => ({ ...f, baseline: parseInt(e.target.value) || f.height }))} />
-                </div>
-                <div style={{ display: "flex", gap: "4px", marginBottom: "4px", alignItems: "center" }}>
-                  <input type="checkbox" id="caseInsensitive" checked={font.caseInsensitive}
-                    onChange={e => setFont(f => ({ ...f, caseInsensitive: e.target.checked }))} />
-                  <label htmlFor="caseInsensitive" className="white" style={{ fontSize: "11px", cursor: "pointer" }}>Case insensitive</label>
-                </div>
-              </div>
             </div>
 
             {/* Center: editor */}
@@ -563,7 +532,28 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
                 <span style={{ fontSize: "11px", color: dim.maxCols > 0 ? "#55ff55" : "#555" }}>
                   {dim.maxCols > 0 ? `${dim.rows} rows x ${dim.maxCols} cols` : "empty"}
                 </span>
-                <div style={{ display: "flex", gap: "4px", marginLeft: "auto" }}>
+                <div style={{ display: "flex", gap: "4px", marginLeft: "auto", alignItems: "center" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: "4px", marginBottom: 0, cursor: "pointer", userSelect: "none" }}>
+                    <div
+                      onClick={() => setEditorDark(d => !d)}
+                      style={{
+                        width: "36px", height: "18px", borderRadius: "0", position: "relative",
+                        background: editorDark ? "#333" : "#ccc", border: "1px solid #555",
+                        cursor: "pointer", flexShrink: 0,
+                      }}
+                    >
+                      <div style={{
+                        position: "absolute", top: "2px",
+                        left: editorDark ? "2px" : "18px",
+                        width: "12px", height: "12px", borderRadius: "0",
+                        background: editorDark ? "#55ffff" : "#fff",
+                        transition: "left 0.15s",
+                      }} />
+                    </div>
+                    <span style={{ fontSize: "11px", color: editorDark ? "#55ffff" : "#aaa" }}>
+                      {editorDark ? "dark/cyan" : "light"}
+                    </span>
+                  </label>
                   <input type="button" className="btn-big" value="&lt; Prev" style={{ padding: "0 8px", minHeight: "28px", height: "28px" }}
                     onClick={() => { const i = CHAR_ORDER.indexOf(selectedChar); if (i > 0) setSelectedChar(CHAR_ORDER[i-1]); }} />
                   <input type="button" className="btn-big" value="Next &gt;" style={{ padding: "0 8px", minHeight: "28px", height: "28px" }}
@@ -600,7 +590,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
                   {/* Ruler — same font, size, padding as textarea */}
                   <div style={{
                     fontFamily: "TopazPlus_a1200, monospace", fontSize: "13px", lineHeight: "16px",
-                    color: "#444", background: "#0a0a0a", padding: "0 4px",
+                    color: editorDark ? "#444" : "#999", background: editorDark ? "#0a0a0a" : "#d8d8d8", padding: "0 4px",
                     borderLeft: "1px solid #333", borderRight: "1px solid #333",
                     borderTop: "1px solid #222",
                     flex: "1 1 0", overflowX: "hidden", whiteSpace: "pre",
@@ -613,7 +603,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
                 {/* Line numbers */}
                 <div style={{
                   fontFamily: "TopazPlus_a1200, monospace", fontSize: "13px", lineHeight: "16px",
-                  color: "#444", background: "#0a0a0a", padding: "2px 4px",
+                  color: editorDark ? "#444" : "#999", background: editorDark ? "#0a0a0a" : "#d8d8d8", padding: "2px 4px",
                   borderLeft: "1px solid #333", borderBottom: "1px solid #333",
                   minWidth: "32px", textAlign: "right", userSelect: "none",
                   overflowY: "hidden", whiteSpace: "pre",
@@ -623,7 +613,9 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
                 <textarea
                   ref={textareaRef}
                   style={{
-                    flex: "1 1 0", background: "#111", color: "#55ffff",
+                    flex: "1 1 0",
+                    background: editorDark ? "#111" : "#e8e8e8",
+                    color: editorDark ? "#55ffff" : "#000",
                     border: "1px solid #333", borderLeft: "none",
                     fontFamily: "TopazPlus_a1200, monospace",
                     fontSize: "13px", lineHeight: "16px",
@@ -653,34 +645,30 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
               </div>
             </div>
 
-            {/* Right panel: live preview */}
+            {/* Right panel: live figlet preview + stats */}
             <div style={{ width: "280px", minWidth: "200px", borderLeft: "1px solid #333", background: "#0d0d0d", padding: "6px 8px", overflowY: "auto" }}>
-              <div style={{ fontSize: "11px", color: "#888", marginBottom: "2px" }}>Char preview:</div>
-              <div style={{
-                fontFamily: "TopazPlus_a1200, monospace", fontSize: "13px", lineHeight: "16px",
-                color: "#55ffff", background: "#0a0a0a", padding: "4px",
-                border: "1px solid #222", minHeight: "60px", whiteSpace: "pre",
-                overflowX: "auto",
-              }}>
-                {font.figChars[selectedChar] || <span style={{ color: "#333" }}>(empty)</span>}
+              <div style={{ color: "#888", marginTop: "4px", marginBottom: "2px" }}>Preview:</div>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
+                <input
+                  type="text"
+                  className="form-control"
+                  style={{ flex: "1 1 0", fontFamily: "TopazPlus_a1200, monospace" }}
+                  value={previewText}
+                  placeholder="type something..."
+                  onChange={e => setPreviewText(e.target.value)}
+                />
+                <label style={{ display: "flex", alignItems: "center", gap: "3px", marginBottom: 0, cursor: "pointer", whiteSpace: "nowrap" }}>
+                  <input type="checkbox" checked={showHardBlanks} onChange={e => setShowHardBlanks(e.target.checked)} />
+                  <span style={{ color: "#888" }}>HB</span>
+                </label>
               </div>
-
-              <div style={{ fontSize: "11px", color: "#888", marginTop: "10px", marginBottom: "2px" }}>Word preview:</div>
-              <input
-                type="text"
-                className="form-control form-control-sm"
-                style={{ marginBottom: "4px", fontFamily: "TopazPlus_a1200, monospace" }}
-                value={previewWord}
-                placeholder="type a word..."
-                onChange={e => setPreviewWord(e.target.value)}
-              />
               <div style={{
                 fontFamily: "TopazPlus_a1200, monospace", fontSize: "11px", lineHeight: "14px",
                 color: "#55ffff", background: "#0a0a0a", padding: "4px",
                 border: "1px solid #222", minHeight: "60px", whiteSpace: "pre",
                 overflowX: "auto",
               }}>
-                {renderWord(previewWord, font.figChars) || <span style={{ color: "#333" }}>(define chars first)</span>}
+                {previewOutput || <span style={{ color: "#333" }}>(edit a character to see preview)</span>}
               </div>
 
               <div style={{ fontSize: "11px", color: "#888", marginTop: "12px", marginBottom: "4px" }}>Width info:</div>
@@ -712,6 +700,66 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
                   const filled = CHAR_ORDER.filter(c => (font.figChars[c] ?? "").trim().length > 0).length;
                   return <span style={{ color: "#55ff55" }}>{filled} / {CHAR_ORDER.length} chars defined</span>;
                 })()}
+              </div>
+
+              <div style={{ borderTop: "1px solid #333", marginTop: "12px", paddingTop: "8px" }}>
+                <div className="white" style={{ fontWeight: "bold", marginBottom: "6px" }}>Font Options</div>
+
+                <div style={{ color: "#aaa", marginBottom: "4px" }}>H-Layout:</div>
+                <select className="custom-select" style={{ width: "100%", marginBottom: "4px" }}
+                  value={font.horizontalLayout}
+                  onChange={e => setFont(f => ({ ...f, horizontalLayout: e.target.value as HLayout }))}>
+                  {LAYOUTS.map(l => <option key={l} value={l}>{l}</option>)}
+                </select>
+
+                {font.horizontalLayout === "Controlled Smushing" && (
+                  <div style={{ paddingLeft: "4px", marginBottom: "4px" }}>
+                    {[1,2,3,4,5,6].map(n => (
+                      <div key={n} style={{ display: "flex", alignItems: "center", gap: "4px", marginBottom: "2px" }}>
+                        <input type="checkbox" id={`hrule${n}`} checked={!!font.hrule[n]}
+                          onChange={e => setFont(f => ({ ...f, hrule: { ...f.hrule, [n]: e.target.checked } }))} />
+                        <label htmlFor={`hrule${n}`} className="white" title={H_RULE_TIPS[n]} style={{ cursor: "help" }}>H-Rule {n}</label>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div style={{ color: "#aaa", marginBottom: "4px" }}>V-Layout:</div>
+                <select className="custom-select" style={{ width: "100%", marginBottom: "4px" }}
+                  value={font.verticalLayout}
+                  onChange={e => setFont(f => ({ ...f, verticalLayout: e.target.value as VLayout }))}>
+                  {LAYOUTS.map(l => <option key={l} value={l}>{l}</option>)}
+                </select>
+
+                {font.verticalLayout === "Controlled Smushing" && (
+                  <div style={{ paddingLeft: "4px", marginBottom: "4px" }}>
+                    {[1,2,3,4,5].map(n => (
+                      <div key={n} style={{ display: "flex", alignItems: "center", gap: "4px", marginBottom: "2px" }}>
+                        <input type="checkbox" id={`vrule${n}`} checked={!!font.vrule[n]}
+                          onChange={e => setFont(f => ({ ...f, vrule: { ...f.vrule, [n]: e.target.checked } }))} />
+                        <label htmlFor={`vrule${n}`} className="white" title={V_RULE_TIPS[n]} style={{ cursor: "help" }}>V-Rule {n}</label>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div style={{ display: "flex", gap: "4px", marginBottom: "4px", alignItems: "center" }}>
+                  <span style={{ color: "#aaa", width: "80px" }}>Hard blank:</span>
+                  <input type="text" maxLength={1} className="form-control" style={{ width: "40px" }}
+                    value={font.hardBlank}
+                    onChange={e => setFont(f => ({ ...f, hardBlank: e.target.value.slice(-1) || "$" }))} />
+                </div>
+                <div style={{ display: "flex", gap: "4px", marginBottom: "4px", alignItems: "center" }}>
+                  <span style={{ color: "#aaa", width: "80px" }}>Baseline:</span>
+                  <input type="number" min={1} max={20} className="form-control" style={{ width: "60px" }}
+                    value={font.baseline}
+                    onChange={e => setFont(f => ({ ...f, baseline: parseInt(e.target.value) || f.height }))} />
+                </div>
+                <div style={{ display: "flex", gap: "4px", marginBottom: "4px", alignItems: "center" }}>
+                  <input type="checkbox" id="caseInsensitive" checked={font.caseInsensitive}
+                    onChange={e => setFont(f => ({ ...f, caseInsensitive: e.target.checked }))} />
+                  <label htmlFor="caseInsensitive" className="white" style={{ cursor: "pointer" }}>Case insensitive</label>
+                </div>
               </div>
             </div>
           </div>
@@ -751,28 +799,136 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
           </div>
         )}
 
-        {/* ── Logo Maker ── */}
-        {tab === "maker" && (
-          <div style={{ padding: "8px" }}>
-            <div style={{ display: "flex", gap: "12px", alignItems: "center", marginBottom: "8px" }}>
-              <input type="text" className="form-control" style={{ maxWidth: "400px" }}
-                placeholder="Type something..."
-                value={testText}
-                onChange={e => setTestText(e.target.value)}
-                autoFocus />
-              <label style={{ display: "flex", alignItems: "center", gap: "4px", color: "#aaa", fontSize: "12px" }}>
-                <input type="checkbox" checked={showHardBlanks} onChange={e => setShowHardBlanks(e.target.checked)} />
-                Show hard blanks
-              </label>
-            </div>
-            {!font.fontname && (
-              <div style={{ color: "#ffff55", fontSize: "12px", marginBottom: "8px" }}>
-                Load or create a font in the Character Editor tab first.
+
+        {/* ── Groups modal ── */}
+        {showGroups && (
+          <div className="modal fade show" style={{ display: "block" }} tabIndex={-1}>
+            <div className="modal-dialog modal-lg">
+              <div className="modal-content">
+                <div className="modal-header" style={{ background: "#333" }}>
+                  <span className="modal-title white" style={{ fontWeight: "bold" }}>Font Groups</span>
+                  <button type="button" className="close white" onClick={() => setShowGroups(false)}>x</button>
+                </div>
+                <div className="modal-body" style={{ background: "#1a1a1a", maxHeight: "70vh", overflowY: "auto" }}>
+
+                  {/* Create new group */}
+                  <div style={{ marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid #333" }}>
+                    <div className="white" style={{ fontWeight: "bold", marginBottom: "6px" }}>Create new group</div>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <input type="text" className="form-control" style={{ maxWidth: "260px" }}
+                        placeholder="Group name..."
+                        value={newGroupName}
+                        onChange={e => setNewGroupName(e.target.value)}
+                        onKeyDown={async e => {
+                          if (e.key !== "Enter") return;
+                          const name = newGroupName.trim();
+                          if (!name) return;
+                          const r = await fetch("/api/font-groups", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) });
+                          if (r.ok) { setNewGroupName(""); setGroupMsg({ id: "new", msg: "Group created!", ok: true }); await loadGroups(); }
+                          else setGroupMsg({ id: "new", msg: "Failed to create group.", ok: false });
+                        }}
+                      />
+                      <input type="button" className="btn-big" value="Create"
+                        onClick={async () => {
+                          const name = newGroupName.trim();
+                          if (!name) return;
+                          const r = await fetch("/api/font-groups", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) });
+                          if (r.ok) { setNewGroupName(""); setGroupMsg({ id: "new", msg: "Group created!", ok: true }); await loadGroups(); }
+                          else setGroupMsg({ id: "new", msg: "Failed to create group.", ok: false });
+                        }}
+                      />
+                    </div>
+                    {groupMsg?.id === "new" && (
+                      <div style={{ color: groupMsg.ok ? "#55ff55" : "#ff5555", marginTop: "4px" }}>{groupMsg.msg}</div>
+                    )}
+                  </div>
+
+                  {/* Existing groups */}
+                  {groups.length === 0 && <div style={{ color: "#555" }}>No groups yet.</div>}
+                  {groups.map(g => (
+                    <div key={g.id} style={{ marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid #222" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                        <span className="white" style={{ fontWeight: "bold" }}>{g.name}</span>
+                        <span style={{ color: "#555" }}>{g.is_owner ? "(owner)" : "(member)"}</span>
+                        {g.is_owner && (
+                          <input type="button" className="btn-big" value="Delete group"
+                            style={{ marginLeft: "auto" }}
+                            onClick={async () => {
+                              if (!confirm(`Delete group "${g.name}"?`)) return;
+                              await fetch(`/api/font-groups/${g.id}`, { method: "DELETE" });
+                              await loadGroups();
+                              if (font.group_id === g.id) setFont(f => ({ ...f, group_id: null }));
+                            }}
+                          />
+                        )}
+                        {!g.is_owner && (
+                          <input type="button" className="btn-big" value="Leave"
+                            style={{ marginLeft: "auto" }}
+                            onClick={async () => {
+                              await fetch(`/api/font-groups/${g.id}/members/${userId}`, { method: "DELETE" });
+                              await loadGroups();
+                            }}
+                          />
+                        )}
+                      </div>
+
+                      {/* Member list */}
+                      <div style={{ paddingLeft: "8px", marginBottom: "6px" }}>
+                        {g.members.length === 0
+                          ? <div style={{ color: "#555" }}>No members yet.</div>
+                          : g.members.map(m => (
+                            <div key={m.user_id} style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "2px" }}>
+                              <a href={`/member/${m.nick}`} style={{ color: "#aaa" }}>{m.nick}</a>
+                              {g.is_owner && (
+                                <input type="button" className="btn-big" value="Remove"
+                                  onClick={async () => {
+                                    await fetch(`/api/font-groups/${g.id}/members/${m.user_id}`, { method: "DELETE" });
+                                    await loadGroups();
+                                  }}
+                                />
+                              )}
+                            </div>
+                          ))}
+                      </div>
+
+                      {/* Invite (owner only) */}
+                      {g.is_owner && (
+                        <div style={{ display: "flex", gap: "8px", paddingLeft: "8px" }}>
+                          <input type="text" className="form-control" style={{ maxWidth: "200px" }}
+                            placeholder="Invite by nick..."
+                            value={inviteNick[g.id] ?? ""}
+                            onChange={e => setInviteNick(n => ({ ...n, [g.id]: e.target.value }))}
+                            onKeyDown={async e => {
+                              if (e.key !== "Enter") return;
+                              const nick = (inviteNick[g.id] ?? "").trim();
+                              if (!nick) return;
+                              const r = await fetch(`/api/font-groups/${g.id}/members`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nick }) });
+                              if (r.ok) { setInviteNick(n => ({ ...n, [g.id]: "" })); setGroupMsg({ id: g.id, msg: `${nick} added!`, ok: true }); await loadGroups(); }
+                              else { const err = await r.json() as { error?: string }; setGroupMsg({ id: g.id, msg: err.error ?? "Failed.", ok: false }); }
+                            }}
+                          />
+                          <input type="button" className="btn-big" value="Invite"
+                            onClick={async () => {
+                              const nick = (inviteNick[g.id] ?? "").trim();
+                              if (!nick) return;
+                              const r = await fetch(`/api/font-groups/${g.id}/members`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nick }) });
+                              if (r.ok) { setInviteNick(n => ({ ...n, [g.id]: "" })); setGroupMsg({ id: g.id, msg: `${nick} added!`, ok: true }); await loadGroups(); }
+                              else { const err = await r.json() as { error?: string }; setGroupMsg({ id: g.id, msg: err.error ?? "Failed.", ok: false }); }
+                            }}
+                          />
+                          {groupMsg?.id === g.id && (
+                            <span style={{ color: groupMsg.ok ? "#55ff55" : "#ff5555", alignSelf: "center" }}>{groupMsg.msg}</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="modal-footer" style={{ background: "#222" }}>
+                  <input type="button" className="btn-big" value="Close" onClick={() => setShowGroups(false)} />
+                </div>
               </div>
-            )}
-            <pre className="fig-test-output" style={{ minHeight: "200px", padding: "12px", border: "1px solid #333" }}>
-              {testOutput || "(output will appear here)"}
-            </pre>
+            </div>
           </div>
         )}
 

@@ -1,12 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 export type LogoHeaderProps = {
   logos: string[];
 };
 
 export default function LogoHeader({ logos }: LogoHeaderProps) {
+  const shuffled = useMemo(
+    () => [...logos].sort(() => Math.random() - 0.5).slice(0, 10),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const w = window as unknown as { switcharoo?: (...args: unknown[]) => void };
@@ -19,7 +25,7 @@ export default function LogoHeader({ logos }: LogoHeaderProps) {
   return (
     <div className="overflow-hidden d-none d-lg-block mx-auto">
       <div id="logoswitcher">
-        {logos.map((logo, i) => (
+        {shuffled.map((logo, i) => (
           <div
             key={i}
             className="logo nolink"
