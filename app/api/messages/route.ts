@@ -27,28 +27,21 @@ export async function GET(request: NextRequest) {
   const offset = (page - 1) * pagesize;
   const userId = parseInt(session.user.id);
 
-  let rows: unknown[];
-  if (box === 2) {
-    rows = await prisma.$queryRaw`
-      SELECT COUNT(DISTINCT thread) OVER() AS total_count,
-             id, thread, postedto, postername, subject, message, \`new\`, timestamp
+  // Get one row per thread (latest message) without triggering ONLY_FULL_GROUP_BY
+  const col = box === 2 ? Prisma.raw("from_id") : Prisma.raw("to_id");
+  const rows = await prisma.$queryRaw`
+    SELECT COUNT(*) OVER() AS total_count,
+           m.id, m.thread, m.postedto, m.postername, m.subject, m.message, m.\`new\`, m.timestamp
+    FROM messages m
+    INNER JOIN (
+      SELECT thread, MAX(id) AS max_id
       FROM messages
-      WHERE from_id = ${userId}
+      WHERE ${col} = ${userId}
       GROUP BY thread
-      ORDER BY timestamp DESC
-      LIMIT ${Prisma.raw(String(pagesize))} OFFSET ${Prisma.raw(String(offset))}
-    `;
-  } else {
-    rows = await prisma.$queryRaw`
-      SELECT COUNT(DISTINCT thread) OVER() AS total_count,
-             id, thread, postedto, postername, subject, message, \`new\`, timestamp
-      FROM messages
-      WHERE to_id = ${userId}
-      GROUP BY thread
-      ORDER BY timestamp DESC
-      LIMIT ${Prisma.raw(String(pagesize))} OFFSET ${Prisma.raw(String(offset))}
-    `;
-  }
+    ) t ON m.id = t.max_id
+    ORDER BY m.timestamp DESC
+    LIMIT ${Prisma.raw(String(pagesize))} OFFSET ${Prisma.raw(String(offset))}
+  `;
 
   const result = (rows as MessageRow[]).map((r) => ({
     total_count: Number(r.total_count),

@@ -60,7 +60,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   const result = rows.map((row) => ({
     url: `/artist/${urlsafe(row.nick)}`,
-    id: row.id,
+    id: Number(row.id),
     nick: row.nick,
     crews: row.crews ?? "",
     total_count,
