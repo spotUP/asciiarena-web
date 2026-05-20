@@ -170,6 +170,11 @@ export default function Navbar({ session }: NavbarProps) {
               </a>
             </li>
             <li className="nav-item">
+              <a className="nav-link ascii apr-1" href="/express">
+                eXPRESS
+              </a>
+            </li>
+            <li className="nav-item">
               <a className="nav-link ascii apr-1" href="/about">
                 ABOUT
               </a>
