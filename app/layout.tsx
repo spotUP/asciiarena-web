@@ -32,10 +32,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
         />
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css"
-        />
         {/* Load CSS in the exact same order as the PHP site */}
         <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
         <link rel="stylesheet" href="/assets/css/bootstrap-colorselector.css" />
@@ -52,10 +48,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <Script
           src="/assets/js/bootstrap.bundle.min.js"
-          strategy="afterInteractive"
-        />
-        <Script
-          src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"
           strategy="afterInteractive"
         />
         <Script

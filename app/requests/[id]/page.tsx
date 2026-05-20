@@ -138,12 +138,12 @@ export default async function RequestDetailPage({ params }: PageProps) {
       )}
 
       <Script id="request-detail-init" strategy="afterInteractive">{`
-        var requestId = ${requestId};
-        var currentUserId = ${userId ?? "null"};
+        let requestId = ${requestId};
+        let currentUserId = ${userId ?? "null"};
 
         function loadComments() {
           $.getJSON("/api/requests/" + requestId + "/comments", function(data) {
-            var html = "";
+            let html = "";
             if (!data || data.length === 0) {
               html = '<div class="lightgrey col-lg-12 pl-0">No comments yet.</div>';
             } else {

@@ -163,7 +163,7 @@ export default async function AdminPage() {
         function loadBroken() {
           $.getJSON("/api/admin/collys?broken=1", function(rows) {
             if (!rows.length) { $("#broken-list").html('<div class="lightgrey">No broken collys reported.</div>'); return; }
-            var html = "";
+            let html = "";
             rows.forEach(function(r) {
               html += '<div class="row amb-1" data-id="' + r.id + '">' +
                 '<div class="col-4 text-truncate"><a class="magenta" href="/release/' + encodeURIComponent(r.filename) + '">' + $("<div>").text(r.filename).html() + '</a></div>' +
@@ -178,14 +178,14 @@ export default async function AdminPage() {
           });
         }
         $(document).on("click", ".broken-fix", function() {
-          var id = $(this).data("id");
+          let id = $(this).data("id");
           $.ajax({ type: "PATCH", url: "/api/admin/collys", contentType: "application/json",
             data: JSON.stringify({ id: id, broken: 0, broken_comment: null }),
             success: function() { loadBroken(); }
           });
         });
         $(document).on("click", ".broken-delete", function() {
-          var id = $(this).data("id");
+          let id = $(this).data("id");
           if (!confirm("Delete this colly permanently?")) return;
           $.ajax({ type: "DELETE", url: "/api/admin/collys", contentType: "application/json",
             data: JSON.stringify({ id: id }),
@@ -215,7 +215,7 @@ export default async function AdminPage() {
         }
 
         $("#colly-search-btn").on("click", function() {
-          var q = $("#colly-search").val();
+          let q = $("#colly-search").val();
           if (!q) return;
           searchEntity("/api/admin/collys?q=" + encodeURIComponent(q), function(rows) {
             return rows.map(collyRow).join("");
@@ -224,15 +224,15 @@ export default async function AdminPage() {
         $("#colly-search").on("keydown", function(e) { if (e.which === 13) $("#colly-search-btn").click(); });
 
         $(document).on("click", ".colly-save", function() {
-          var row = $(this).closest(".entity-row");
-          var id = $(this).data("id");
+          let row = $(this).closest(".entity-row");
+          let id = $(this).data("id");
           $.ajax({ type: "PATCH", url: "/api/admin/collys", contentType: "application/json",
             data: JSON.stringify({ id: id, name: row.find(".edit-name").val(), year: parseInt(row.find(".edit-year").val()) || null, type: row.find(".edit-type").val() }),
             success: function() { adminMsg("#colly-results", "Saved!", true); }
           });
         });
         $(document).on("click", ".colly-delete", function() {
-          var id = $(this).data("id");
+          let id = $(this).data("id");
           if (!confirm("Delete this colly permanently? Files will be removed.")) return;
           $.ajax({ type: "DELETE", url: "/api/admin/collys", contentType: "application/json",
             data: JSON.stringify({ id: id }),
@@ -255,15 +255,15 @@ export default async function AdminPage() {
         }
 
         $("#artist-search-btn").on("click", function() {
-          var q = $("#artist-search").val();
+          let q = $("#artist-search").val();
           if (!q) return;
           searchEntity("/api/admin/artists?q=" + encodeURIComponent(q), function(rows) { return rows.map(artistRow).join(""); }, "artist-results");
         });
         $("#artist-search").on("keydown", function(e) { if (e.which === 13) $("#artist-search-btn").click(); });
 
         $(document).on("click", ".artist-save", function() {
-          var row = $(this).closest(".entity-row");
-          var id = $(this).data("id");
+          let row = $(this).closest(".entity-row");
+          let id = $(this).data("id");
           $.ajax({ type: "PATCH", url: "/api/admin/artists", contentType: "application/json",
             data: JSON.stringify({ id: id, active: row.find(".edit-active").val(), country: row.find(".edit-country").val(), www: row.find(".edit-www").val() }),
             success: function() { adminMsg("#artist-results", "Saved!", true); }
@@ -293,15 +293,15 @@ export default async function AdminPage() {
         }
 
         $("#crew-search-btn").on("click", function() {
-          var q = $("#crew-search").val();
+          let q = $("#crew-search").val();
           if (!q) return;
           searchEntity("/api/admin/crews?q=" + encodeURIComponent(q), function(rows) { return rows.map(crewRow).join(""); }, "crew-results");
         });
         $("#crew-search").on("keydown", function(e) { if (e.which === 13) $("#crew-search-btn").click(); });
 
         $(document).on("click", ".crew-save", function() {
-          var row = $(this).closest(".entity-row");
-          var id = $(this).data("id");
+          let row = $(this).closest(".entity-row");
+          let id = $(this).data("id");
           $.ajax({ type: "PATCH", url: "/api/admin/crews", contentType: "application/json",
             data: JSON.stringify({ id: id, name: row.find(".edit-name").val(), acronym: row.find(".edit-acronym").val(), active: row.find(".edit-active").val(), www: row.find(".edit-www").val() }),
             success: function() { adminMsg("#crew-results", "Saved!", true); }
@@ -333,15 +333,15 @@ export default async function AdminPage() {
         }
 
         $("#user-search-btn").on("click", function() {
-          var q = $("#user-search").val();
+          let q = $("#user-search").val();
           if (!q) return;
           searchEntity("/api/admin/users?q=" + encodeURIComponent(q), function(rows) { return rows.map(userRow).join(""); }, "user-results");
         });
         $("#user-search").on("keydown", function(e) { if (e.which === 13) $("#user-search-btn").click(); });
 
         $(document).on("click", ".user-save", function() {
-          var row = $(this).closest(".entity-row");
-          var id = $(this).data("id");
+          let row = $(this).closest(".entity-row");
+          let id = $(this).data("id");
           $.ajax({ type: "PATCH", url: "/api/admin/users", contentType: "application/json",
             data: JSON.stringify({ id: id, rank: row.find(".edit-rank").val(), crew: row.find(".edit-crew").val() }),
             success: function() { adminMsg("#user-results", "Saved!", true); }
@@ -358,7 +358,7 @@ export default async function AdminPage() {
         // ── Logos ──────────────────────────────────────────────────────
         function loadLogos() {
           $.getJSON("/api/admin/logos", function(rows) {
-            var html = "";
+            let html = "";
             rows.forEach(function(r) {
               html += '<div class="row amb-1 logo-row" data-id="' + r.id + '">' +
                 '<div class="col-10"><pre style="font-family:TopazPlus_a1200,monospace;font-size:11px;color:#ff55ff;white-space:pre;overflow:hidden;max-height:80px">' + $("<div>").text(r.ascii).html() + '</pre></div>' +
@@ -379,7 +379,7 @@ export default async function AdminPage() {
         });
 
         $(document).on("click", ".logo-delete", function() {
-          var id = $(this).data("id");
+          let id = $(this).data("id");
           if (!confirm("Delete this logo?")) return;
           $.ajax({ type: "DELETE", url: "/api/admin/logos", contentType: "application/json",
             data: JSON.stringify({ id: id }),
@@ -403,7 +403,7 @@ export default async function AdminPage() {
 
         function appMagSearch(searchId, btnId, resultsId, listApi, adminApi, detailPath) {
           $("#" + btnId).on("click", function() {
-            var q = $("#" + searchId).val();
+            let q = $("#" + searchId).val();
             if (!q) return;
             $.getJSON(listApi + "?filter=" + encodeURIComponent(q) + "&pagesize=30", function(rows) {
               if (!rows.length) { $("#" + resultsId).html('<div class="lightgrey">No results.</div>'); return; }
@@ -414,9 +414,9 @@ export default async function AdminPage() {
         }
 
         $(document).on("click", ".appmag-save", function() {
-          var row = $(this).closest(".entity-row");
-          var id = $(this).data("id");
-          var api = $(this).data("api");
+          let row = $(this).closest(".entity-row");
+          let id = $(this).data("id");
+          let api = $(this).data("api");
           $.ajax({ type: "PATCH", url: api, contentType: "application/json",
             data: JSON.stringify({ id: id, name: row.find(".edit-name").val(), author: row.find(".edit-author").val(), year: parseInt(row.find(".edit-year").val()) || null }),
             success: function() { adminMsg(row.closest("[id$=-results]"), "Saved!", true); }
@@ -448,7 +448,7 @@ export default async function AdminPage() {
         }
 
         $("#bbs-search-btn").on("click", function() {
-          var q = $("#bbs-search").val();
+          let q = $("#bbs-search").val();
           if (!q) return;
           $.getJSON("/api/admin/bbs?q=" + encodeURIComponent(q), function(rows) {
             if (!rows.length) { $("#bbs-results").html('<div class="lightgrey">No results.</div>'); return; }
@@ -458,8 +458,8 @@ export default async function AdminPage() {
         $("#bbs-search").on("keydown", function(e) { if (e.which === 13) $("#bbs-search-btn").click(); });
 
         $(document).on("click", ".bbs-save", function() {
-          var row = $(this).closest(".entity-row");
-          var id = $(this).data("id");
+          let row = $(this).closest(".entity-row");
+          let id = $(this).data("id");
           $.ajax({ type: "PATCH", url: "/api/admin/bbs", contentType: "application/json",
             data: JSON.stringify({ id: id, sysop: row.find(".edit-sysop").val(), address: row.find(".edit-address").val(), software: row.find(".edit-software").val() }),
             success: function() { adminMsg("#bbs-results", "Saved!", true); }
@@ -475,11 +475,11 @@ export default async function AdminPage() {
 
         // ── Requests ───────────────────────────────────────────────────
         $("#req-search-btn").on("click", function() {
-          var q = $("#req-search").val();
+          let q = $("#req-search").val();
           if (!q) return;
           $.getJSON("/api/requests?filter=" + encodeURIComponent(q) + "&pagesize=30&viewmode=4", function(rows) {
             if (!rows.length) { $("#req-results").html('<div class="lightgrey">No results.</div>'); return; }
-            var html = "";
+            let html = "";
             rows.forEach(function(r) {
               html += '<div class="row amb-1 entity-row" data-id="' + r.id + '">' +
                 '<div class="col-5 text-truncate"><a class="magenta" href="/requests/' + r.id + '">' + $("<div>").text(r.title || "").html() + '</a></div>' +
