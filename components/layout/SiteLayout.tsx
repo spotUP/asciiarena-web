@@ -185,19 +185,21 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
             switcharoo('.switcher > span', 2890);
           }
 
-          // Login form: POST to NextAuth credentials, reload on success
+          // Login form: fetch CSRF token then POST to NextAuth credentials
           function loginUser() {
             var nick = $("#login-nick").val();
             var pass = $("#login-password").val();
-            $.ajax({
-              type: "POST",
-              url: "/api/auth/callback/credentials",
-              data: { login: nick, password: pass, redirect: "false" },
-              success: function() { window.location.reload(); },
-              error: function() {
-                $("#login-results").html('<div class="alert alert-danger animate__animated animate__shakeX">authentication failed</div>');
-                setTimeout(function(){ $("#login-results").empty(); }, 3000);
-              }
+            $.getJSON("/api/auth/csrf", function(csrf) {
+              $.ajax({
+                type: "POST",
+                url: "/api/auth/callback/credentials",
+                data: { login: nick, password: pass, csrfToken: csrf.csrfToken, redirect: "false" },
+                success: function() { window.location.reload(); },
+                error: function() {
+                  $("#login-results").html('<div class="alert alert-danger animate__animated animate__shakeX">authentication failed</div>');
+                  setTimeout(function(){ $("#login-results").empty(); }, 3000);
+                }
+              });
             });
           }
           $("#login-submit-btn").on("click", loginUser);
