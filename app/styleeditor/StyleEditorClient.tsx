@@ -21,7 +21,7 @@ interface FigFont {
   hrule: Record<number, boolean>;
   vrule: Record<number, boolean>;
   codeTagCount: number;
-  figChars: Record<number, string>; // charCode → ascii art rows
+  figChars: Record<number, string>; // charCode -> ascii art rows
 }
 
 type HLayout = "Full" | "Fitted" | "Controlled Smushing" | "Universal Smushing";
@@ -71,7 +71,7 @@ function spacePad(n: number): string { return " ".repeat(n); }
 function fixFigChars(font: FigFont): FigFont {
   const f = { ...font, figChars: { ...font.figChars } };
 
-  // case insensitivity: copy uppercase → lowercase
+  // case insensitivity: copy uppercase -> lowercase
   if (f.caseInsensitive) {
     for (let i = 97; i <= 122; i++) f.figChars[i] = f.figChars[i - 32] ?? "";
   }
@@ -203,19 +203,19 @@ function parseFigFont(name: string, data: string): FigFont {
 
 // ─── Tooltips for smushing rules ──────────────────────────────────────────────
 const H_RULE_TIPS: Record<number, string> = {
-  1: "Equal Character Smushing — adjacent identical chars merge into one.",
-  2: "Underscore Smushing — underscores yield to |/\\[]{}()<>.",
-  3: "Hierarchy Smushing — six classes; later class wins.",
-  4: "Opposite Pair Smushing — [] {} () → |.",
-  5: "Big X Smushing — /\\ → | \\/ → Y >< → X.",
-  6: "Hard Blank Smushing — two hard blanks merge into one.",
+  1: "Equal Character Smushing - adjacent identical chars merge into one.",
+  2: "Underscore Smushing - underscores yield to |/\\[]{}()<>.",
+  3: "Hierarchy Smushing - six classes; later class wins.",
+  4: "Opposite Pair Smushing - [] {} () -> |.",
+  5: "Big X Smushing - /\\ -> | \\/ -> Y >< -> X.",
+  6: "Hard Blank Smushing - two hard blanks merge into one.",
 };
 const V_RULE_TIPS: Record<number, string> = {
   1: "Equal Character Smushing.",
   2: "Underscore Smushing.",
   3: "Hierarchy Smushing.",
-  4: "Horizontal Line Smushing — stacked - and _ → =.",
-  5: "Vertical Line Supersmushing — stacked | chars merge.",
+  4: "Horizontal Line Smushing - stacked - and _ -> =.",
+  5: "Vertical Line Supersmushing - stacked | chars merge.",
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -312,7 +312,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
       font: font.fontname || "__FONT_IN_PROGRESS__",
       showHardBlanks,
     }, (_err: unknown, data: string) => {
-      setTestOutput(data || "(Font not loaded — open Character Editor first)");
+      setTestOutput(data || "(Font not loaded - open Character Editor first)");
     });
   }, [testText, showHardBlanks, font.fontname, figletReady, tab]);
 
@@ -340,7 +340,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
       setImportText("");
       setStatus({ msg: "Font imported!", ok: true });
     } catch {
-      setStatus({ msg: "Could not parse that data — is it a valid .flf file?", ok: false });
+      setStatus({ msg: "Could not parse that data - is it a valid .flf file?", ok: false });
     }
   };
 
@@ -600,7 +600,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
                       if (idx > 0) setSelectedChar(CHAR_ORDER[idx - 1]);
                     }}
                   >
-                    ← Prev
+                    &lt; Prev
                   </button>
                   <button
                     className="btn-big"
@@ -610,7 +610,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
                       if (idx < CHAR_ORDER.length - 1) setSelectedChar(CHAR_ORDER[idx + 1]);
                     }}
                   >
-                    Next →
+                    Next &gt;
                   </button>
                 </div>
               </div>
@@ -628,7 +628,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
                 spellCheck={false}
                 value={font.figChars[selectedChar] ?? ""}
                 onChange={e => updateChar(selectedChar, e.target.value)}
-                placeholder={`Draw the ASCII art for '${charLabel(selectedChar)}' here…`}
+                placeholder={`Draw the ASCII art for '${charLabel(selectedChar)}' here...`}
               />
 
               {/* Live preview */}
@@ -669,7 +669,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
                 type="text"
                 className="form-control"
                 style={{ maxWidth: "400px" }}
-                placeholder="Type something…"
+                placeholder="Type something..."
                 value={testText}
                 onChange={e => setTestText(e.target.value)}
                 autoFocus
@@ -701,7 +701,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
               <div className="modal-content">
                 <div className="modal-header" style={{ background: "#333" }}>
                   <h4 className="modal-title white">Import FIGFont Data</h4>
-                  <button type="button" className="close white" onClick={() => setShowImport(false)}>×</button>
+                  <button type="button" className="close white" onClick={() => setShowImport(false)}>x</button>
                 </div>
                 <div className="modal-body" style={{ background: "#222" }}>
                   <textarea
@@ -709,7 +709,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
                     style={{ background: "#111", color: "#0ff", border: "1px solid #444", width: "100%", height: "200px" }}
                     value={importText}
                     onChange={e => setImportText(e.target.value)}
-                    placeholder="Paste .flf file contents here…"
+                    placeholder="Paste .flf file contents here..."
                   />
                   <p style={{ color: "#aaa", fontSize: "12px", marginTop: "8px" }}>
                     Copy the contents of a *.flf file and paste above, then press Import.
@@ -731,7 +731,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
               <div className="modal-content">
                 <div className="modal-header" style={{ background: "#333" }}>
                   <h4 className="modal-title white">Exported FIGFont Data</h4>
-                  <button type="button" className="close white" onClick={() => setShowExport(false)}>×</button>
+                  <button type="button" className="close white" onClick={() => setShowExport(false)}>x</button>
                 </div>
                 <div className="modal-body" style={{ background: "#222" }}>
                   <textarea
