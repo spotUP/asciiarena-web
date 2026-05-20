@@ -119,6 +119,13 @@ export async function POST(request: NextRequest) {
   const pwhash = await bcrypt.hash(password, 13);
   const nickurl = urlsafe(nick);
 
+  const existingNickurl = await prisma.$queryRaw<{ id: number }[]>`
+    SELECT id FROM users WHERE nickurl = ${nickurl} LIMIT 1
+  `;
+  if (existingNickurl.length > 0) {
+    return apiError("Nickname is too similar to an existing one. Please choose another.", 400);
+  }
+
   await prisma.$executeRaw`
     INSERT INTO users
       (nick, crew, pwhash, lastactive, current, mail, uploaded, \`rank\`, upload_signature, list_view_mode, display_mail, nickurl)

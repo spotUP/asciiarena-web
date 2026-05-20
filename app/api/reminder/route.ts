@@ -24,6 +24,9 @@ export async function POST(request: NextRequest) {
   if (!user) return apiError("Unknown e-mail address.", 404);
 
   const token = buildToken(user.id, email);
+  // Store a hash of the token so we can invalidate it after use
+  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+  await prisma.users.update({ where: { id: user.id }, data: { temp_pw_hash: tokenHash } });
   const siteRoot = process.env.NEXTAUTH_URL ?? "https://asciiarena.se";
   const resetLink = `${siteRoot}/reminder?reset=${token}`;
 

@@ -91,6 +91,11 @@ describe("PATCH /api/settings — password change", () => {
 
   it("accepts valid password change", async () => {
     vi.mocked(bcrypt.compare).mockResolvedValue(true as never);
+    // pwhash query first, then nick uniqueness → no conflict, nickurl uniqueness → no conflict
+    vi.mocked(prisma.$queryRaw)
+      .mockResolvedValueOnce([{ pwhash: "$2b$13$existinghash" }])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([]);
     const req = new Request("http://localhost/api/settings", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },

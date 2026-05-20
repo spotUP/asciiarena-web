@@ -337,7 +337,7 @@ export default async function ReleasePage({ params }: PageProps) {
               <button className="btn-primary">FG Color</button>
               <span className="amr-2">
                 <select className="custom-select" id="colorselector_2">
-                  <option id="selcol-2" selected value={fgcolor} data-color={fgcolor} />
+                  <option style={{ display: "none" }} id="selcol-2" selected value={fgcolor} data-color={fgcolor} />
                   {COLOR_OPTIONS.map(c => (
                     <option key={c.value} value={c.value} data-color={c.value}>{c.label}</option>
                   ))}
