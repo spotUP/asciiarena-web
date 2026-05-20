@@ -46,11 +46,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           strategy="beforeInteractive"
         />
         <Script
-          src="/assets/js/bootstrap.bundle.min.js"
+          src="/bootstrap5.bundle.min.js"
           strategy="beforeInteractive"
         />
         <Script
-          src="/assets/js/bootstrap-colorselector.js"
+          src="/bootstrap-colorselector-bs5.js"
           strategy="afterInteractive"
         />
         <Script
