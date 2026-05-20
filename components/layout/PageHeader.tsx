@@ -29,15 +29,13 @@ export default function PageHeader({ title }: PageHeaderProps) {
       </div>
       {isArray && (
         <Script id="page-header-switcher" strategy="afterInteractive">{`
-          if (typeof window.switcharoo === "function") {
-            window.switcharoo(".switcher > span", 2890);
-          } else {
-            document.addEventListener("DOMContentLoaded", function() {
-              if (typeof window.switcharoo === "function") {
-                window.switcharoo(".switcher > span", 2890);
-              }
-            });
-          }
+          (function poll() {
+            if (typeof window.switcharoo === "function") {
+              window.switcharoo(".switcher > span", 2890);
+            } else {
+              setTimeout(poll, 50);
+            }
+          })();
         `}</Script>
       )}
     </>

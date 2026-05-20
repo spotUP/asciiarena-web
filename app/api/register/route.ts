@@ -1,7 +1,52 @@
 import { NextRequest } from "next/server";
+import nodemailer from "nodemailer";
 import { prisma } from "@/lib/db";
 import { apiError, apiOk, urlsafe } from "@/lib/utils";
 import bcrypt from "bcryptjs";
+
+async function sendWelcomeMail(nick: string, mail: string) {
+  const mailHost = process.env.MAILHOST;
+  const mailPort = parseInt(process.env.MAILPORT ?? "465", 10);
+  const mailUser = process.env.MAILUSER;
+  const mailPass = process.env.MAILPASS;
+  const mailRoot = process.env.MAILROOT ?? mailUser;
+  const siteRoot = process.env.NEXTAUTH_URL ?? "https://asciiarena.se";
+
+  if (!mailHost || !mailUser || !mailPass) return;
+
+  const transporter = nodemailer.createTransport({
+    host: mailHost,
+    port: mailPort,
+    secure: mailPort === 465,
+    auth: { user: mailUser, pass: mailPass },
+  });
+
+  await transporter.sendMail({
+    from: `"ASCII Arena" <${mailRoot}>`,
+    to: mail,
+    subject: "Welcome to ASCII Arena",
+    text: [
+      `Hello ${nick},`,
+      "",
+      "Your ASCII Arena account has been created and is pending activation.",
+      "An admin will review your account shortly.",
+      "",
+      `In the meantime, visit us at: ${siteRoot}`,
+      "",
+      "- the aSCIIaRENA team",
+    ].join("\n"),
+  });
+
+  // Notify admin
+  if (mailRoot) {
+    await transporter.sendMail({
+      from: `"ASCII Arena" <${mailRoot}>`,
+      to: mailRoot,
+      subject: `New registration: ${nick}`,
+      text: `New user registered: ${nick} (${mail})\n\nActivate at: ${siteRoot}/admin#edituser`,
+    });
+  }
+}
 
 function isValidPassword(pw: string): boolean {
   return (
@@ -81,6 +126,9 @@ export async function POST(request: NextRequest) {
       (${nick}, 'Independent', ${pwhash}, UNIX_TIMESTAMP(), '', ${mail}, 0, 'Inactive',
        '- -- - aSCIIaRENa - ---- - aSCIIaRENa - -- -', 0, 0, ${nickurl})
   `;
+
+  // Fire-and-forget — don't fail registration if mail is misconfigured
+  sendWelcomeMail(nick, mail).catch(() => {});
 
   return apiOk({ status: true }, 201);
 }
