@@ -289,10 +289,17 @@ export default async function ReleasePage({ params }: PageProps) {
             Share{" "}
           </button>
           <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
-            <a className="dropdown-item" href={`mailto:?Subject=Check out ${colly.name ?? filename} at asciiarena.se&Body=Check%20out%20${encodeURIComponent(colly.name ?? filename)}%20at%20aSCIIaRENA!%20https://asciiarena.se/release/${filename}`}>Mail</a>
-            <a className="dropdown-item" href={`http://www.facebook.com/sharer.php?u=https://asciiarena.se/release/${filename}`} target="_blank" rel="noreferrer">Facebook</a>
-            <a className="dropdown-item" href={`http://reddit.com/submit?url=https://asciiarena.se/release/${filename}&title=Check+out+${encodeURIComponent(colly.name ?? filename)}+at+asciiarena.se`} target="_blank" rel="noreferrer">Reddit</a>
-            <a className="dropdown-item" href={`https://twitter.com/share?url=https://asciiarena.se/release/${filename}&text=${encodeURIComponent(`Check out ${colly.name ?? filename} at asciiarena.se`)}`} target="_blank" rel="noreferrer">Twitter</a>
+            {(() => {
+              const siteUrl = process.env.NEXTAUTH_URL ?? "https://asciiarena.se";
+              const releaseUrl = `${siteUrl}/release/${filename}`;
+              const title = colly.name ?? filename;
+              return (<>
+                <a className="dropdown-item" href={`mailto:?Subject=Check out ${title} at asciiarena.se&Body=Check%20out%20${encodeURIComponent(title)}%20at%20aSCIIaRENA!%20${encodeURIComponent(releaseUrl)}`}>Mail</a>
+                <a className="dropdown-item" href={`http://www.facebook.com/sharer.php?u=${encodeURIComponent(releaseUrl)}`} target="_blank" rel="noreferrer">Facebook</a>
+                <a className="dropdown-item" href={`http://reddit.com/submit?url=${encodeURIComponent(releaseUrl)}&title=Check+out+${encodeURIComponent(title)}+at+asciiarena.se`} target="_blank" rel="noreferrer">Reddit</a>
+                <a className="dropdown-item" href={`https://twitter.com/share?url=${encodeURIComponent(releaseUrl)}&text=${encodeURIComponent(`Check out ${title} at asciiarena.se`)}`} target="_blank" rel="noreferrer">Twitter</a>
+              </>);
+            })()}
           </div>
         </div>
 

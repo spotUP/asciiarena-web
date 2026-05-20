@@ -38,6 +38,12 @@ const nextConfig: NextConfig = {
       { source: "/messages.php",    destination: "/messages",         permanent: true },
       { source: "/submit.php",      destination: "/submit",           permanent: true },
       { source: "/rss.php",         destination: "/rss.xml",          permanent: true },
+      {
+        source: "/messages.php",
+        has: [{ type: "query", key: "sendmsg", value: "(?<sendmsg>.+)" }],
+        destination: "/messages?sendmsg=:sendmsg",
+        permanent: true,
+      },
 
       // Query-param PHP URLs → clean Next.js routes
       {

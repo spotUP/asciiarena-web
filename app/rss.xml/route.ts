@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 
-const BASE_URL = "https://asciiarena.se";
+const BASE_URL = process.env.NEXTAUTH_URL ?? "https://asciiarena.se";
 
 function escapeXml(s: string): string {
   return s
