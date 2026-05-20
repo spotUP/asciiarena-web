@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Paginator from "@/components/ui/Paginator";
+import { urlsafe } from "@/lib/utils";
 
 interface ArtistRow {
   url: string;
@@ -19,12 +21,29 @@ interface ArtistsClientProps {
 const PAGE_SIZE = 120;
 
 export default function ArtistsClient({ initialSort, initialOrder }: ArtistsClientProps) {
-  const [page, setPage] = useState(1);
-  const [sort, setSort] = useState(initialSort);
-  const [asc, setAsc] = useState<"A" | "D">(initialOrder === "D" ? "D" : "A");
-  const [filter, setFilter] = useState("");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const [page, setPage] = useState(() => parseInt(searchParams.get("page") ?? "1") || 1);
+  const [sort, setSort] = useState(() => searchParams.get("sort") ?? initialSort);
+  const [asc, setAsc] = useState<"A" | "D">(() => (searchParams.get("asc") ?? initialOrder) === "D" ? "D" : "A");
+  const [filter, setFilter] = useState(() => searchParams.get("filter") ?? "");
   const [data, setData] = useState<ArtistRow[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const syncUrl = useCallback((p: number, s: string, a: string, f: string) => {
+    const params = new URLSearchParams();
+    if (p > 1) params.set("page", String(p));
+    if (s !== initialSort) params.set("sort", s);
+    if (a !== "A") params.set("asc", a);
+    if (f) params.set("filter", f);
+    const qs = params.toString();
+    router.replace(qs ? `?${qs}` : "?", { scroll: false });
+  }, [router, initialSort]);
+
+  useEffect(() => {
+    syncUrl(page, sort, asc, filter);
+  }, [page, sort, asc, filter, syncUrl]);
 
   useEffect(() => {
     let cancelled = false;
@@ -94,10 +113,11 @@ export default function ArtistsClient({ initialSort, initialOrder }: ArtistsClie
               <div className="forum_nick col-2">
                 <a href={artist.url}>{artist.nick}</a>
               </div>
-              <div
-                className="artist_crew col-10"
-                dangerouslySetInnerHTML={{ __html: artist.crews ?? "" }}
-              />
+              <div className="artist_crew col-10">
+                {(artist.crews ?? "").split(",").filter(Boolean).map((crew, i) => (
+                  <span key={crew}>{i > 0 && ", "}<a href={`/crew/${urlsafe(crew.trim())}`}>{crew.trim()}</a></span>
+                ))}
+              </div>
             </div>
           ))}
       </div>

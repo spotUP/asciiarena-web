@@ -10,6 +10,7 @@ interface StyleRow {
   status: number | null;
   user: number | null;
   user_ids: number | null;
+  group_id: number | null;
 }
 
 export async function GET(request: NextRequest) {
@@ -25,11 +26,21 @@ export async function GET(request: NextRequest) {
   if (idParam) {
     const fontId = parseInt(idParam);
     rows = await prisma.$queryRaw<StyleRow[]>`
-      SELECT * FROM styles WHERE id = ${fontId} AND (user_ids = ${userId} OR status > 1)
+      SELECT s.* FROM styles s
+      WHERE s.id = ${fontId}
+        AND (
+          s.user_ids = ${userId}
+          OR s.status > 1
+          OR s.group_id IN (SELECT group_id FROM font_group_members WHERE user_id = ${userId})
+        )
     `;
   } else {
     rows = await prisma.$queryRaw<StyleRow[]>`
-      SELECT * FROM styles WHERE (user_ids = ${userId} OR status > 1) ORDER BY name
+      SELECT s.* FROM styles s
+      WHERE s.user_ids = ${userId}
+        OR s.status > 1
+        OR s.group_id IN (SELECT group_id FROM font_group_members WHERE user_id = ${userId})
+      ORDER BY s.name
     `;
   }
 
@@ -38,6 +49,7 @@ export async function GET(request: NextRequest) {
     fontstatus: r.status,
     fontname: r.name,
     fontdata: r.style,
+    group_id: r.group_id ?? null,
   }));
 
   return apiOk(result);
@@ -53,27 +65,35 @@ export async function POST(request: NextRequest) {
     fontname?: string;
     fontdata?: string;
     fontstatus?: number;
+    group_id?: number | null;
   };
-  const { fontid, fontname, fontdata, fontstatus } = body;
+  const { fontid, fontname, fontdata, fontstatus, group_id } = body;
 
   if (!fontname || !fontdata || fontstatus === undefined) {
     return apiError("fontname, fontdata and fontstatus are required", 400);
   }
 
+  const groupId = group_id ?? null;
+
   if (fontid) {
     await prisma.$executeRaw`
-      UPDATE styles SET name = ${fontname}, status = ${fontstatus}
+      UPDATE styles SET name = ${fontname}, status = ${fontstatus}, group_id = ${groupId}
       WHERE id = ${fontid} AND user_ids = ${userId}
     `;
     await prisma.$executeRaw`
       UPDATE styles SET style = ${fontdata}
-      WHERE id = ${fontid} AND (user_ids = ${userId} OR status = 3)
+      WHERE id = ${fontid}
+        AND (
+          user_ids = ${userId}
+          OR status = 3
+          OR group_id IN (SELECT group_id FROM font_group_members WHERE user_id = ${userId})
+        )
     `;
     return apiOk({ status: true });
   } else {
     await prisma.$executeRaw`
-      INSERT INTO styles (name, style, user, user_ids, status)
-      VALUES (${fontname}, ${fontdata}, ${userId}, ${userId}, ${fontstatus})
+      INSERT INTO styles (name, style, user, user_ids, status, group_id)
+      VALUES (${fontname}, ${fontdata}, ${userId}, ${userId}, ${fontstatus}, ${groupId})
     `;
     return apiOk({ status: true }, 201);
   }

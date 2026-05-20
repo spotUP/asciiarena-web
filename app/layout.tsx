@@ -19,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="icon" href="/favicon.ico" type="image/x-icon" />
         <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="alternate" type="application/rss+xml" href="/rss.xml" title="aSCIIaRENA Latest Releases" />
         <link
           rel="preload"
           href="/assets/fonts/TopazPlus_a1200.woff2"
@@ -46,19 +47,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           src="https://code.jquery.com/jquery-3.5.1.min.js"
           integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
           crossOrigin="anonymous"
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
         />
         <Script
           src="/assets/js/bootstrap.bundle.min.js"
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
         />
         <Script
           src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
         />
         <Script
           src="/assets/js/bootstrap-colorselector.js"
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
         />
       </body>
     </html>

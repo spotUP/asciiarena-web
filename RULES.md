@@ -62,6 +62,15 @@ ASCII art files are ISO-8859-1 / CP437, not UTF-8. When reading collection files
   `bootstrap-colorselector-bs5.js` (patched for BS4 data-toggle attrs)
 - `.env` on server at `/var/www/asciiarena.se/.env` — never commit secrets
 
+## Uniform font size (terminal aesthetic)
+
+The site emulates a text terminal. All visible text must render at the same fixed size.
+
+- **Never use Bootstrap size variants** that shrink text: no `form-control-sm`, `custom-select-sm`, `btn-sm`, `small`, `text-sm`, `font-size` overrides in inline styles or CSS classes.
+- **Never use different `fontSize` values** across the UI. If a component sets an explicit `fontSize`, it must match the site base size — not a smaller or larger value.
+- This applies to labels, inputs, selects, buttons, badges, tooltips, helper text, and any other visible element.
+- Exception: the style editor's internal ruler/line-number gutters may use matching sizes, but must not be visually smaller than the surrounding editor text.
+
 ## site.css heading animations (avoid heading tags in components)
 
 `site.css` applies animations to ALL heading elements globally:

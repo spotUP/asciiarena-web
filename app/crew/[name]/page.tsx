@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
@@ -14,6 +15,32 @@ interface ReleaseRow {
   year: number | null;
 }
 
+interface MemberRow {
+  id: number;
+  nick: string;
+  crew: string | null;
+  artisturl: string | null;
+  user_nickurl: string | null;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { name: crewurl } = await params;
+  const crew = await prisma.crews.findFirst({ where: { crewurl } });
+  if (!crew) return {};
+
+  const [memberCount, releaseCount] = await Promise.all([
+    prisma.member_of.count({ where: { crew: crew.name } }),
+    prisma.collys_crews.count({ where: { crew_id: crew.id } }),
+  ]);
+  const description = `${crew.name} ASCII crew - ${memberCount} member${memberCount !== 1 ? "s" : ""}, ${releaseCount} release${releaseCount !== 1 ? "s" : ""} on aSCIIaRENA`;
+
+  return {
+    title: `${crew.name} ASCII crew | aSCIIaRENA`,
+    description,
+    openGraph: { title: `${crew.name} ASCII crew | aSCIIaRENA`, url: `/crew/${crewurl}` },
+  };
+}
+
 export default async function CrewPage({ params }: PageProps) {
   const { name: crewurl } = await params;
 
@@ -22,11 +49,15 @@ export default async function CrewPage({ params }: PageProps) {
   });
   if (!crew) notFound();
 
-  // Members
-  const members = await prisma.member_of.findMany({
-    where: { crew: crew.name },
-    orderBy: { nick: "asc" },
-  });
+  // Members with optional user profile link
+  const members = await prisma.$queryRaw<MemberRow[]>`
+    SELECT mo.id, mo.nick, mo.crew, a.artisturl, u.nickurl AS user_nickurl
+    FROM member_of mo
+    LEFT JOIN artists a ON LOWER(a.nick) = LOWER(mo.nick)
+    LEFT JOIN users u ON u.id = a.user_id
+    WHERE mo.crew = ${crew.name}
+    ORDER BY mo.nick ASC
+  `;
 
   // Vote count for rating display
   const crewCollys = await prisma.collys_crews.findMany({
@@ -111,8 +142,13 @@ export default async function CrewPage({ params }: PageProps) {
       </div>
       {members.length > 0 ? (
         members.map((m) => (
-          <div key={m.id} className="col-lg-12 pl-0">
-            <a href={`/artist/${urlsafe(m.nick ?? "")}`}>{m.nick}</a>
+          <div key={m.id} className="col-lg-12 pl-0 d-flex" style={{ gap: "12px" }}>
+            {m.artisturl
+              ? <a href={`/artist/${m.artisturl}`}>{m.nick}</a>
+              : <span>{m.nick}</span>}
+            {m.user_nickurl && (
+              <a className="lightgrey" href={`/member/${m.user_nickurl}`}>[profile]</a>
+            )}
           </div>
         ))
       ) : (

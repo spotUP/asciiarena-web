@@ -2,6 +2,7 @@ import { readFileSync, existsSync } from "fs";
 import path from "path";
 import { notFound } from "next/navigation";
 import Script from "next/script";
+import type { Metadata } from "next";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
@@ -63,6 +64,29 @@ const FONTS = [
   { value: "Topaz_a1200", label: "A1200 Topaz" },
   { value: "TopazPlus_a1200", label: "A1200 Topaz+" },
 ];
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { filename: rawFilename } = await params;
+  const filename = rawFilename.replace(/\.\./g, "").replace(/[/\\]/g, "");
+
+  const colly = await prisma.collys.findFirst({ where: { filename } });
+  if (!colly) return {};
+
+  const artistRows = await prisma.artists_collys.findMany({
+    where: { colly_id: colly.id },
+    include: { artists: true },
+    orderBy: { sortorder: "asc" },
+  });
+  const artistNames = artistRows.map(r => r.artists?.nick).filter(Boolean).join(", ") || "unknown";
+  const year = colly.year ? ` (${colly.year})` : "";
+  const title = `${colly.name ?? filename} by ${artistNames}${year} | aSCIIaRENA`;
+
+  return {
+    title,
+    description: `ASCII art release: ${colly.name ?? filename} by ${artistNames}`,
+    openGraph: { title, url: `/release/${filename}` },
+  };
+}
 
 export default async function ReleasePage({ params }: PageProps) {
   const { filename: rawFilename } = await params;

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
@@ -25,12 +26,32 @@ interface ReleaseRow {
   crewurl: string | null;
 }
 
+export async function generateMetadata({ params }: { params: Promise<{ nick: string }> }): Promise<Metadata> {
+  const { nick } = await params;
+  const artist = await prisma.artists.findFirst({ where: { artisturl: nick } });
+  if (!artist) return {};
+
+  const [memberships, releaseCount] = await Promise.all([
+    prisma.member_of.findMany({ where: { nick: artist.nick } }),
+    prisma.artists_collys.count({ where: { artist_id: artist.id } }),
+  ]);
+  const crewNames = memberships.map(m => m.crew).filter(Boolean).join(", ");
+  const description = `ASCII artist ${artist.nick}${crewNames ? ` (${crewNames})` : ""} - ${releaseCount} release${releaseCount !== 1 ? "s" : ""} on aSCIIaRENA`;
+
+  return {
+    title: `${artist.nick} - ASCII artist | aSCIIaRENA`,
+    description,
+    openGraph: { title: `${artist.nick} - ASCII artist | aSCIIaRENA`, url: `/artist/${nick}` },
+  };
+}
+
 export default async function ArtistPage({ params, searchParams }: PageProps) {
   const { nick } = await params;
   const { sort_by: rawSortBy } = await searchParams;
 
   const artist = await prisma.artists.findFirst({
     where: { artisturl: nick },
+    include: { users: { select: { nickurl: true, nick: true } } },
   });
   if (!artist) notFound();
 
@@ -131,6 +152,12 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
         <span className="lightgrey">Status: </span>
         {artist.active ?? "-"}
       </div>
+      {artist.users && (
+        <div className="col-lg-12 pl-0">
+          <span className="lightgrey">Site profile: </span>
+          <a href={`/member/${artist.users.nickurl}`}>{artist.users.nick}</a>
+        </div>
+      )}
       <div className="col-lg-12 pl-0">
         <span className="lightgrey">Rating: </span>
         {ratingDisplay}

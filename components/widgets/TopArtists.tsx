@@ -1,17 +1,17 @@
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
 
-export default async function TopArtists() {
+export default async function TopArtists({ limit = 5 }: { limit?: number }) {
   const rows = await prisma.artists.findMany({
     orderBy: { rating: "desc" },
-    take: 5,
+    take: limit,
     select: { id: true, nick: true, rating: true },
   });
 
   return (
     <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
       <div className="header col-lg-12 p-0">
-        <h2 className="ap-1 bg-header">TOP 5 ARTISTS</h2>
+        <h2 className="ap-1 bg-header">TOP {limit} ARTISTS</h2>
       </div>
       <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
         {rows.map((row) => {

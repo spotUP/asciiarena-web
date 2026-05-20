@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useEffect, useState, FormEvent } from "react";
+import React, { useEffect, useState, useCallback, FormEvent } from "react";
+
+interface ArtistHandle {
+  id: number;
+  nick: string;
+  artisturl: string;
+}
 
 interface Settings {
   nick: string | null;
@@ -81,6 +87,21 @@ export default function SettingsForm() {
   const [saveDisabled, setSaveDisabled] = useState(true);
   const [loading, setLoading] = useState(true);
 
+  const [linkedArtists, setLinkedArtists] = useState<ArtistHandle[]>([]);
+  const [suggestedArtists, setSuggestedArtists] = useState<ArtistHandle[]>([]);
+  const [claimNick, setClaimNick] = useState("");
+  const [artistMsg, setArtistMsg] = useState<{ text: string; success: boolean } | null>(null);
+
+  const loadArtists = useCallback(() => {
+    fetch("/api/settings/artist")
+      .then((r) => r.json())
+      .then((d: { linked: ArtistHandle[]; suggested: ArtistHandle[] }) => {
+        setLinkedArtists(d.linked ?? []);
+        setSuggestedArtists(d.suggested ?? []);
+      })
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     fetch("/api/settings")
       .then((r) => r.json())
@@ -94,12 +115,35 @@ export default function SettingsForm() {
         setSaveDisabled(true);
         setLoading(false);
       });
-  }, []);
+    loadArtists();
+  }, [loadArtists]);
 
   function showAlert(text: string, success: boolean) {
     setAlertMsg({ text, success });
     setTimeout(() => setAlertMsg(null), 3000);
     window.scrollTo(0, 0);
+  }
+
+  function showArtistMsg(text: string, success: boolean) {
+    setArtistMsg({ text, success });
+    setTimeout(() => setArtistMsg(null), 3000);
+  }
+
+  async function claimArtist(nick: string) {
+    const r = await fetch("/api/settings/artist", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nick }),
+    });
+    const d = await r.json() as { error?: string };
+    if (r.ok) { showArtistMsg(`Claimed '${nick}'!`, true); setClaimNick(""); loadArtists(); }
+    else showArtistMsg(d.error ?? "Failed to claim.", false);
+  }
+
+  async function unclaimArtist(id: number, nick: string) {
+    const r = await fetch(`/api/settings/artist/${id}`, { method: "DELETE" });
+    if (r.ok) { showArtistMsg(`Unlinked '${nick}'.`, true); loadArtists(); }
+    else showArtistMsg("Failed to unlink.", false);
   }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -505,6 +549,107 @@ export default function SettingsForm() {
               className="btn-big bg-green white"
               value="Save"
               disabled={saveDisabled}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Artist Identity — separate from main form, no submit */}
+      <div className="container-fluid bg-secondary amb-1 apb-1 ap-1">
+        <div className="row amb-1">
+          <div className="col-xs-12 col-md-12 apt-1">
+            <span className="white">Artist Identity</span>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-xs-12 col-md-10">
+            Link your scene artist handle(s) to your site account. This connects
+            your releases and crew memberships to your profile.
+          </div>
+        </div>
+
+        {artistMsg && (
+          <div className={`row apt-1`}>
+            <div className={`col-12 ${artistMsg.success ? "green" : "red"}`}>
+              {artistMsg.text}
+            </div>
+          </div>
+        )}
+
+        {/* Suggested matches */}
+        {suggestedArtists.length > 0 && (
+          <>
+            <div className="row apt-1">
+              <div className="col-12">
+                <span className="yellow">Suggested match{suggestedArtists.length > 1 ? "es" : ""} found:</span>
+              </div>
+            </div>
+            {suggestedArtists.map(a => (
+              <div key={a.id} className="row apt-1 align-items-center">
+                <div className="col-xs-12 col-md-4">
+                  <a className="magenta" href={`/artist/${a.artisturl}`}>{a.nick}</a>
+                  <span className="lightgrey"> (artist page)</span>
+                </div>
+                <div className="col-xs-12 col-md-4">
+                  <input
+                    type="button"
+                    className="btn-big"
+                    value="Claim this handle"
+                    onClick={() => claimArtist(a.nick)}
+                  />
+                </div>
+              </div>
+            ))}
+          </>
+        )}
+
+        {/* Linked handles */}
+        {linkedArtists.length > 0 && (
+          <>
+            <div className="row apt-1">
+              <div className="col-12">
+                <span className="white">Linked handles:</span>
+              </div>
+            </div>
+            {linkedArtists.map(a => (
+              <div key={a.id} className="row apt-1 align-items-center">
+                <div className="col-xs-12 col-md-4">
+                  <a className="magenta" href={`/artist/${a.artisturl}`}>{a.nick}</a>
+                </div>
+                <div className="col-xs-12 col-md-4">
+                  <input
+                    type="button"
+                    className="btn-big"
+                    value="Unlink"
+                    onClick={() => unclaimArtist(a.id, a.nick)}
+                  />
+                </div>
+              </div>
+            ))}
+          </>
+        )}
+
+        {/* Manual claim */}
+        <div className="row apt-1">
+          <div className="col-12">Claim by artist nick:</div>
+        </div>
+        <div className="row apt-1">
+          <div className="col-xs-12 col-md-4 apb-1">
+            <input
+              type="text"
+              className="w-100"
+              placeholder="Enter artist nick..."
+              value={claimNick}
+              onChange={e => setClaimNick(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter" && claimNick.trim()) claimArtist(claimNick.trim()); }}
+            />
+          </div>
+          <div className="col-xs-12 col-md-4 apb-1">
+            <input
+              type="button"
+              className="btn-big"
+              value="Claim"
+              onClick={() => { if (claimNick.trim()) claimArtist(claimNick.trim()); }}
             />
           </div>
         </div>

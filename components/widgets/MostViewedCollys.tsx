@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/db";
 
-export default async function MostViewedCollys() {
+export default async function MostViewedCollys({ limit = 5 }: { limit?: number }) {
   const rows = await prisma.collys.findMany({
     orderBy: { view_counter: "desc" },
-    take: 5,
+    take: limit,
     select: { id: true, filename: true, view_counter: true },
   });
 

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Paginator from "@/components/ui/Paginator";
 
 interface CollyRow {
@@ -21,15 +22,36 @@ interface CollysClientProps {
 }
 
 export default function CollysClient({ initialSort, initialOrder }: CollysClientProps) {
-  const [page, setPage] = useState(1);
-  const [sort, setSort] = useState(initialSort);
-  const [asc, setAsc] = useState<"A" | "D">(initialOrder === "D" ? "D" : "A");
-  const [filter, setFilter] = useState("");
-  const [viewMode, setViewMode] = useState<1 | 2>(1);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const [page, setPage] = useState(() => parseInt(searchParams.get("page") ?? "1") || 1);
+  const [sort, setSort] = useState(() => searchParams.get("sort") ?? initialSort);
+  const [asc, setAsc] = useState<"A" | "D">(() => (searchParams.get("asc") ?? initialOrder) === "D" ? "D" : "A");
+  const [filter, setFilter] = useState(() => searchParams.get("filter") ?? "");
+  const [viewMode, setViewMode] = useState<1 | 2>(() => {
+    const v = parseInt(searchParams.get("view") ?? "1");
+    return v === 2 ? 2 : 1;
+  });
   const [data, setData] = useState<CollyRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   const pagesize = viewMode === 2 ? 6 : 120;
+
+  const syncUrl = useCallback((p: number, s: string, a: string, f: string, v: number) => {
+    const params = new URLSearchParams();
+    if (p > 1) params.set("page", String(p));
+    if (s !== initialSort) params.set("sort", s);
+    if (a !== "A") params.set("asc", a);
+    if (f) params.set("filter", f);
+    if (v !== 1) params.set("view", String(v));
+    const qs = params.toString();
+    router.replace(qs ? `?${qs}` : "?", { scroll: false });
+  }, [router, initialSort]);
+
+  useEffect(() => {
+    syncUrl(page, sort, asc, filter, viewMode);
+  }, [page, sort, asc, filter, viewMode, syncUrl]);
 
   useEffect(() => {
     let cancelled = false;

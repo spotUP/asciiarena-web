@@ -268,12 +268,30 @@ model requests {
 }
 
 model styles {
-  id       Int    @id @default(autoincrement())
+  id       Int  @id @default(autoincrement())
   name     String @db.MediumText
   user     String @db.MediumText
   user_ids Int
   style    String @db.MediumText
   status   Int
+  group_id Int?   @db.UnsignedInt
+}
+
+model font_groups {
+  id         Int                  @id @default(autoincrement()) @db.UnsignedInt
+  name       String               @db.VarChar(64)
+  owner_id   Int                  @db.UnsignedInt
+  created_at Int
+  members    font_group_members[]
+}
+
+model font_group_members {
+  id       Int         @id @default(autoincrement()) @db.UnsignedInt
+  group_id Int         @db.UnsignedInt
+  user_id  Int         @db.UnsignedInt
+  group    font_groups @relation(fields: [group_id], references: [id], onDelete: Cascade)
+
+  @@unique([group_id, user_id])
 }
 
 model users {
