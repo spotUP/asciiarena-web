@@ -21,21 +21,20 @@ interface FigFont {
   hrule: Record<number, boolean>;
   vrule: Record<number, boolean>;
   codeTagCount: number;
-  figChars: Record<number, string>; // charCode -> ascii art rows
+  figChars: Record<number, string>;
 }
 
 type HLayout = "Full" | "Fitted" | "Controlled Smushing" | "Universal Smushing";
 type VLayout = "Full" | "Fitted" | "Controlled Smushing" | "Universal Smushing";
-type Tab = "editor" | "maker";
+type Tab = "editor" | "preview" | "maker";
 
 const LAYOUTS: HLayout[] = ["Full", "Fitted", "Controlled Smushing", "Universal Smushing"];
 
-// chars 32–126 + German umlauts
 const CHAR_ORDER: number[] = [];
 for (let i = 32; i <= 126; i++) CHAR_ORDER.push(i);
 CHAR_ORDER.push(196, 214, 220, 228, 246, 252, 223);
 
-// ─── FIGfont utilities (ported from controllers.js) ────────────────────────
+// ─── FIGfont utilities ────────────────────────────────────────────────────────
 
 function emptyFont(): FigFont {
   const figChars: Record<number, string> = {};
@@ -52,33 +51,15 @@ function emptyFont(): FigFont {
   };
 }
 
-function layoutToNumber(l: string): number {
-  if (l === "Full") return 0;
-  if (l === "Fitted") return 1;
-  if (l === "Universal Smushing") return 2;
-  return 3; // Controlled Smushing
-}
-
-function numberToLayout(n: number): HLayout {
-  if (n === 0) return "Full";
-  if (n === 1) return "Fitted";
-  if (n === 2) return "Universal Smushing";
-  return "Controlled Smushing";
-}
-
-function spacePad(n: number): string { return " ".repeat(n); }
+function spacePad(n: number): string { return " ".repeat(Math.max(0, n)); }
 
 function fixFigChars(font: FigFont): FigFont {
   const f = { ...font, figChars: { ...font.figChars } };
-
-  // case insensitivity: copy uppercase -> lowercase
   if (f.caseInsensitive) {
     for (let i = 97; i <= 122; i++) f.figChars[i] = f.figChars[i - 32] ?? "";
   }
-
   let height = 0;
   const charWidth: Record<number, number> = {};
-
   for (const idx of Object.keys(f.figChars).map(Number)) {
     if (idx === -1) continue;
     const rows = (f.figChars[idx] ?? "").replace(/\r\n/g, "\n").split("\n");
@@ -90,17 +71,14 @@ function fixFigChars(font: FigFont): FigFont {
     charWidth[idx] = 0;
     rows.forEach(r => { charWidth[idx] = Math.max(charWidth[idx], r.length); });
   }
-
-  // Normalise widths and heights
   for (const idx of Object.keys(f.figChars).map(Number)) {
     if (idx === -1) continue;
     const rows = (f.figChars[idx] ?? "").replace(/\r\n/g, "\n").split("\n");
-    const padded = rows.map(r => r + spacePad(Math.max(0, charWidth[idx] - r.length)));
+    const padded = rows.map(r => r + spacePad(charWidth[idx] - r.length));
     while (padded.length > height) padded.pop();
     while (padded.length < height) padded.push(spacePad(charWidth[idx] ?? 0));
     f.figChars[idx] = padded.join("\n");
   }
-
   f.height = height;
   f.maxLength = Math.max(0, ...Object.values(charWidth)) + 2;
   return f;
@@ -142,7 +120,6 @@ function createFigFileData(fontIn: FigFont): string {
     getOldLayout(font), commentLines,
     font.printDirection, getFullLayout(font), font.codeTagCount,
   ].join(" ");
-
   let out = header + "\n";
   out += (font.figChars[-1] ?? "").replace(/\r\n/g, "\n") + "\n";
   for (const ch of CHAR_ORDER) {
@@ -155,67 +132,71 @@ function createFigFileData(fontIn: FigFont): string {
 function parseFigFont(name: string, data: string): FigFont {
   const font = emptyFont();
   font.fontname = name;
-
   const lines = data.replace(/\r\n/g, "\n").split("\n");
-  const headerParts = lines[0].split(" ");
-  font.hardBlank = (headerParts[0] ?? "flf2a$").slice(-1);
-  font.height = parseInt(headerParts[1] ?? "6") || 6;
-  font.baseline = parseInt(headerParts[2] ?? "6") || 6;
-  font.maxLength = parseInt(headerParts[3] ?? "10") || 10;
-  const oldLayout = parseInt(headerParts[4] ?? "0") || 0;
-  const commentCount = parseInt(headerParts[5] ?? "0") || 0;
-  font.printDirection = parseInt(headerParts[6] ?? "0") || 0;
-  const fullLayout = parseInt(headerParts[7] ?? "0") || 0;
-  font.codeTagCount = parseInt(headerParts[8] ?? "0") || 0;
-
-  // Decode layout
+  const hp = lines[0].split(" ");
+  font.hardBlank = (hp[0] ?? "flf2a$").slice(-1);
+  font.height = parseInt(hp[1] ?? "6") || 6;
+  font.baseline = parseInt(hp[2] ?? "6") || 6;
+  font.maxLength = parseInt(hp[3] ?? "10") || 10;
+  const oldLayout = parseInt(hp[4] ?? "0") || 0;
+  const commentCount = parseInt(hp[5] ?? "0") || 0;
+  font.printDirection = parseInt(hp[6] ?? "0") || 0;
+  const fullLayout = parseInt(hp[7] ?? "0") || 0;
+  font.codeTagCount = parseInt(hp[8] ?? "0") || 0;
   if (oldLayout === -1) { font.horizontalLayout = "Full"; }
   else if (fullLayout & 128) {
     font.horizontalLayout = "Controlled Smushing";
     for (let i = 1; i <= 6; i++) font.hrule[i] = !!(fullLayout & (1 << (i - 1)));
   } else if (fullLayout & 64) { font.horizontalLayout = "Fitted"; }
-  else { font.horizontalLayout = numberToLayout(layoutToNumber("Full")); }
-
   if (fullLayout & 16384) {
     font.verticalLayout = "Controlled Smushing";
     for (let i = 1; i <= 5; i++) font.vrule[i] = !!(fullLayout & (1 << (i + 7)));
   } else if (fullLayout & 8192) { font.verticalLayout = "Fitted"; }
-  else { font.verticalLayout = "Full"; }
-
-  // Comment block
   const commentLines = lines.slice(1, 1 + commentCount);
   font.figChars[-1] = commentLines.join("\n");
-
-  // Parse characters
   let lineIdx = 1 + commentCount;
   for (const ch of CHAR_ORDER) {
     if (lineIdx >= lines.length) break;
     const rows: string[] = [];
     for (let h = 0; h < font.height; h++) {
-      const row = lines[lineIdx++] ?? "";
-      rows.push(row.replace(/@+$/, "").replace(/\$$/, ""));
+      rows.push((lines[lineIdx++] ?? "").replace(/@+$/, "").replace(/\$$/, ""));
     }
     font.figChars[ch] = rows.join("\n");
   }
-
   return font;
 }
 
-// ─── Tooltips for smushing rules ──────────────────────────────────────────────
+function charDimensions(art: string): { rows: number; maxCols: number } {
+  if (!art.trim()) return { rows: 0, maxCols: 0 };
+  const lines = art.replace(/\r\n/g, "\n").split("\n");
+  return { rows: lines.length, maxCols: Math.max(0, ...lines.map(l => l.length)) };
+}
+
+// Ruler string: "    5    0    5    0" etc up to width
+function makeRuler(width: number): string {
+  let r = "";
+  for (let i = 1; i <= width; i++) {
+    if (i % 10 === 0) r += String(i % 100).slice(-1);
+    else if (i % 5 === 0) r += "5";
+    else r += ".";
+  }
+  return r;
+}
+
 const H_RULE_TIPS: Record<number, string> = {
-  1: "Equal Character Smushing - adjacent identical chars merge into one.",
-  2: "Underscore Smushing - underscores yield to |/\\[]{}()<>.",
-  3: "Hierarchy Smushing - six classes; later class wins.",
-  4: "Opposite Pair Smushing - [] {} () -> |.",
-  5: "Big X Smushing - /\\ -> | \\/ -> Y >< -> X.",
-  6: "Hard Blank Smushing - two hard blanks merge into one.",
+  1: "Equal chars merge into one.",
+  2: "Underscores yield to |/\\[]{}()<>.",
+  3: "Six classes; later class wins.",
+  4: "Opposing brackets/braces/parens -> |.",
+  5: "/\\ -> | \\/ -> Y >< -> X.",
+  6: "Two hard blanks merge into one.",
 };
 const V_RULE_TIPS: Record<number, string> = {
-  1: "Equal Character Smushing.",
-  2: "Underscore Smushing.",
-  3: "Hierarchy Smushing.",
-  4: "Horizontal Line Smushing - stacked - and _ -> =.",
-  5: "Vertical Line Supersmushing - stacked | chars merge.",
+  1: "Equal chars merge.",
+  2: "Underscores yield to |/\\[]{}()<>.",
+  3: "Six classes; later class wins.",
+  4: "Stacked - and _ -> =.",
+  5: "Stacked | chars supersmush.",
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -223,7 +204,7 @@ const V_RULE_TIPS: Record<number, string> = {
 export default function StyleEditorClient({ userNick }: { userNick: string }) {
   const [fonts, setFonts] = useState<FontMeta[]>([]);
   const [font, setFont] = useState<FigFont>(emptyFont());
-  const [selectedChar, setSelectedChar] = useState<number>(65); // 'A'
+  const [selectedChar, setSelectedChar] = useState<number>(65);
   const [tab, setTab] = useState<Tab>("editor");
   const [testText, setTestText] = useState("Hello!");
   const [testOutput, setTestOutput] = useState("");
@@ -234,7 +215,20 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
   const [showExport, setShowExport] = useState(false);
   const [exportText, setExportText] = useState("");
   const [figletReady, setFigletReady] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  // Undo/redo stacks per character code
+  const undoStacks = useRef<Map<number, { past: string[]; future: string[] }>>(new Map());
   const figletLoadedRef = useRef(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  function getStack(code: number) {
+    if (!undoStacks.current.has(code)) undoStacks.current.set(code, { past: [], future: [] });
+    return undoStacks.current.get(code)!;
+  }
+
+  const dim = charDimensions(font.figChars[selectedChar] ?? "");
+  const rulerStr = makeRuler(Math.max(dim.maxCols + 2, 40));
 
   // ── API ───────────────────────────────────────────────────────────────────
 
@@ -244,7 +238,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
   }, []);
 
   const loadFont = useCallback(async (id: number) => {
-    if (id === 0) { setFont(emptyFont()); return; }
+    if (id === 0) { setFont(emptyFont()); undoStacks.current.clear(); return; }
     const r = await fetch(`/api/fonts?id=${id}`);
     if (!r.ok) return;
     const [data] = await r.json() as { fontid: number; fontname: string; fontstatus: number; fontdata: string }[];
@@ -253,81 +247,108 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
     parsed.fontid = data.fontid;
     parsed.fontstatus = data.fontstatus;
     setFont(parsed);
-    // Register with figlet for Logo Maker
+    undoStacks.current.clear();
     if (figletLoadedRef.current) {
       (window as { figlet?: { parseFont: (n: string, d: string, cb: () => void) => void } })
         .figlet?.parseFont(data.fontname, data.fontdata, () => {});
     }
-  }, [figletLoadedRef]);
+  }, []);
 
   const saveFont = useCallback(async () => {
     if (!font.fontname.trim()) { setStatus({ msg: "Fill in the font name first.", ok: false }); return; }
-    const body = {
-      fontid: font.fontid || undefined,
-      fontname: font.fontname,
-      fontstatus: font.fontstatus,
-      fontdata: createFigFileData(font),
-    };
+    const body = { fontid: font.fontid || undefined, fontname: font.fontname, fontstatus: font.fontstatus, fontdata: createFigFileData(font) };
     const r = await fetch("/api/fonts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-    if (r.ok) {
-      setStatus({ msg: "Font saved!", ok: true });
-      await loadFontList();
-    } else {
-      setStatus({ msg: "Save failed.", ok: false });
-    }
+    if (r.ok) { setStatus({ msg: "Font saved!", ok: true }); await loadFontList(); }
+    else setStatus({ msg: "Save failed.", ok: false });
   }, [font, loadFontList]);
 
   const deleteFont = useCallback(async () => {
     if (font.fontid === 0) { setStatus({ msg: "No saved font to delete.", ok: false }); return; }
     if (!confirm("Delete this font? This cannot be undone.")) return;
     const r = await fetch(`/api/fonts/${font.fontid}`, { method: "DELETE" });
-    if (r.ok) {
-      setStatus({ msg: "Font deleted.", ok: true });
-      setFont(emptyFont());
-      await loadFontList();
-    } else if (r.status === 403) {
-      setStatus({ msg: "You do not own this font.", ok: false });
-    } else {
-      setStatus({ msg: "Delete failed.", ok: false });
-    }
+    if (r.ok) { setStatus({ msg: "Font deleted.", ok: true }); setFont(emptyFont()); undoStacks.current.clear(); await loadFontList(); }
+    else if (r.status === 403) setStatus({ msg: "You do not own this font.", ok: false });
+    else setStatus({ msg: "Delete failed.", ok: false });
   }, [font.fontid, loadFontList]);
 
   // ── Effects ───────────────────────────────────────────────────────────────
 
   useEffect(() => { loadFontList(); }, [loadFontList]);
+  useEffect(() => { if (!status) return; const t = setTimeout(() => setStatus(null), 4000); return () => clearTimeout(t); }, [status]);
 
-  // Auto-dismiss status
-  useEffect(() => {
-    if (!status) return;
-    const t = setTimeout(() => setStatus(null), 4000);
-    return () => clearTimeout(t);
-  }, [status]);
-
-  // Logo Maker: update output when text / font changes
   useEffect(() => {
     if (!figletReady || tab !== "maker") return;
     const w = window as { figlet?: { text: (t: string, opts: Record<string, unknown>, cb: (e: unknown, d: string) => void) => void } };
-    if (!w.figlet) return;
-    w.figlet.text(testText, {
-      font: font.fontname || "__FONT_IN_PROGRESS__",
-      showHardBlanks,
-    }, (_err: unknown, data: string) => {
-      setTestOutput(data || "(Font not loaded - open Character Editor first)");
-    });
+    w.figlet?.text(testText, { font: font.fontname || "__FONT_IN_PROGRESS__", showHardBlanks }, (_e, d) => setTestOutput(d || "(Font not loaded - open Character Editor first)"));
   }, [testText, showHardBlanks, font.fontname, figletReady, tab]);
 
-  // ── Char editing ──────────────────────────────────────────────────────────
+  // Global keyboard shortcuts
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      // Ctrl+S = save
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        saveFont();
+        return;
+      }
+      // Ctrl+Z = undo char, Ctrl+Y = redo char (when textarea focused)
+      if (document.activeElement === textareaRef.current) {
+        if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+          e.preventDefault();
+          const stack = getStack(selectedChar);
+          if (stack.past.length > 0) {
+            const prev = stack.past.pop()!;
+            stack.future.push(font.figChars[selectedChar] ?? "");
+            setFont(f => ({ ...f, figChars: { ...f.figChars, [selectedChar]: prev } }));
+          }
+          return;
+        }
+        if ((e.ctrlKey || e.metaKey) && (e.key === "y" || (e.shiftKey && e.key === "z"))) {
+          e.preventDefault();
+          const stack = getStack(selectedChar);
+          if (stack.future.length > 0) {
+            const next = stack.future.pop()!;
+            stack.past.push(font.figChars[selectedChar] ?? "");
+            setFont(f => ({ ...f, figChars: { ...f.figChars, [selectedChar]: next } }));
+          }
+          return;
+        }
+        return; // don't intercept other keys when editing
+      }
+      // Tab / Shift+Tab = cycle chars
+      if (e.key === "Tab" && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        const idx = CHAR_ORDER.indexOf(selectedChar);
+        if (e.shiftKey) { if (idx > 0) setSelectedChar(CHAR_ORDER[idx - 1]); }
+        else { if (idx < CHAR_ORDER.length - 1) setSelectedChar(CHAR_ORDER[idx + 1]); }
+      }
+      // Arrow keys to navigate char grid
+      if (e.key === "ArrowRight" && !e.ctrlKey) {
+        const idx = CHAR_ORDER.indexOf(selectedChar);
+        if (idx < CHAR_ORDER.length - 1) setSelectedChar(CHAR_ORDER[idx + 1]);
+      }
+      if (e.key === "ArrowLeft" && !e.ctrlKey) {
+        const idx = CHAR_ORDER.indexOf(selectedChar);
+        if (idx > 0) setSelectedChar(CHAR_ORDER[idx - 1]);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [saveFont, selectedChar, font.figChars]);
+
+  // ── Char editing with undo ────────────────────────────────────────────────
 
   const updateChar = (code: number, value: string) => {
+    const stack = getStack(code);
+    stack.past.push(font.figChars[code] ?? "");
+    if (stack.past.length > 100) stack.past.shift(); // cap history
+    stack.future = [];
     setFont(f => ({ ...f, figChars: { ...f.figChars, [code]: value } }));
   };
 
   // ── Import / Export ───────────────────────────────────────────────────────
 
-  const doExport = () => {
-    setExportText(createFigFileData(font));
-    setShowExport(true);
-  };
+  const doExport = () => { setExportText(createFigFileData(font)); setShowExport(true); };
 
   const doImport = () => {
     if (!importText.trim()) return;
@@ -336,6 +357,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
       parsed.fontid = font.fontid;
       parsed.fontstatus = font.fontstatus;
       setFont(parsed);
+      undoStacks.current.clear();
       setShowImport(false);
       setImportText("");
       setStatus({ msg: "Font imported!", ok: true });
@@ -344,7 +366,10 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
     }
   };
 
-  // ── Char display ──────────────────────────────────────────────────────────
+  const copyChar = () => {
+    const art = font.figChars[selectedChar] ?? "";
+    navigator.clipboard.writeText(art).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500); });
+  };
 
   const charLabel = (code: number) => {
     if (code === 32) return "SPC";
@@ -355,338 +380,352 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
   // Render
   // ─────────────────────────────────────────────────────────────────────────
 
+  const undoAvail = getStack(selectedChar).past.length > 0;
+  const redoAvail = getStack(selectedChar).future.length > 0;
+
   return (
     <>
-      {/* Load figlet.js for Logo Maker */}
-      <Script
-        src="/assets/js/fonteditor/vendor/figlet/lib/figlet.js"
-        strategy="afterInteractive"
-        onLoad={() => { figletLoadedRef.current = true; setFigletReady(true); }}
-      />
+      <Script src="/assets/js/fonteditor/vendor/figlet/lib/figlet.js" strategy="afterInteractive"
+        onLoad={() => { figletLoadedRef.current = true; setFigletReady(true); }} />
       <link rel="stylesheet" href="/assets/css/fonteditor.css" />
 
-      <div className="col-lg-12 bg-secondary" id="main">
+      <div className="col-lg-12 bg-secondary" id="main" style={{ padding: "0" }}>
 
         {/* Status bar */}
         {status && (
-          <div className={`alert alert-${status.ok ? "success" : "warning"} animate__animated animate__shakeX amt-1`}>
+          <div className={`alert alert-${status.ok ? "success" : "warning"} animate__animated animate__shakeX amt-1 aml-1 amr-1`} style={{ marginBottom: "4px" }}>
             {status.msg}
           </div>
         )}
 
         {/* ── Top toolbar ── */}
-        <div className="row apt-1 apb-1 apl-1 apr-1 bg-secondary" style={{ gap: "8px", display: "flex", flexWrap: "wrap", alignItems: "center" }}>
-          {/* Style selector */}
-          <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-            <label className="fig-draw-label white" style={{ marginRight: "4px" }}>Style:</label>
-            <select
-              id="fontSelect"
-              className="custom-select custom-select-sm"
-              style={{ width: "180px" }}
-              value={font.fontid}
-              onChange={e => loadFont(parseInt(e.target.value))}
-            >
-              <option value={0}>— New —</option>
-              {fonts.map(f => (
-                <option key={f.fontid} value={f.fontid}>{f.fontname}</option>
-              ))}
-            </select>
-          </div>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px", padding: "6px 8px", background: "#1a1a1a", borderBottom: "1px solid #333" }}>
+          <label className="white" style={{ fontSize: "12px", marginBottom: 0 }}>Style:</label>
+          <select className="custom-select custom-select-sm" style={{ width: "160px" }}
+            value={font.fontid}
+            onChange={e => loadFont(parseInt(e.target.value))}>
+            <option value={0}>-- New --</option>
+            {fonts.map(f => <option key={f.fontid} value={f.fontid}>{f.fontname}</option>)}
+          </select>
 
-          {/* Font name */}
-          <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-            <label className="fig-draw-label white" style={{ marginRight: "4px" }}>Name:</label>
-            <input
-              type="text"
-              className="form-control form-control-sm"
-              style={{ width: "160px" }}
-              maxLength={20}
-              value={font.fontname}
-              placeholder="font name"
-              onChange={e => setFont(f => ({ ...f, fontname: e.target.value }))}
-            />
-          </div>
+          <label className="white" style={{ fontSize: "12px", marginBottom: 0 }}>Name:</label>
+          <input type="text" className="form-control form-control-sm" style={{ width: "140px" }}
+            maxLength={20} value={font.fontname} placeholder="font name"
+            onChange={e => setFont(f => ({ ...f, fontname: e.target.value }))} />
 
-          {/* Visibility */}
-          <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-            <label className="fig-draw-label white" style={{ marginRight: "4px" }}>Visibility:</label>
-            <select
-              className="custom-select custom-select-sm"
-              style={{ width: "170px" }}
-              value={font.fontstatus}
-              onChange={e => setFont(f => ({ ...f, fontstatus: parseInt(e.target.value) }))}
-            >
-              <option value={1}>Private</option>
-              <option value={2}>Public (view only)</option>
-              <option value={3}>Public (anyone can edit)</option>
-            </select>
-          </div>
+          <label className="white" style={{ fontSize: "12px", marginBottom: 0 }}>Visibility:</label>
+          <select className="custom-select custom-select-sm" style={{ width: "155px" }}
+            value={font.fontstatus}
+            onChange={e => setFont(f => ({ ...f, fontstatus: parseInt(e.target.value) }))}>
+            <option value={1}>Private</option>
+            <option value={2}>Public (view only)</option>
+            <option value={3}>Public (anyone can edit)</option>
+          </select>
 
-          {/* Action buttons */}
-          <div style={{ display: "flex", gap: "4px", marginLeft: "auto" }}>
-            <button className="btn-big" onClick={() => setFont(emptyFont())}>New</button>
-            <button className="btn-big" onClick={saveFont}>Save</button>
-            <button className="btn-big" onClick={deleteFont}>Delete</button>
-            <button className="btn-big" onClick={doImport.bind(null)}>Import</button>
-            <button className="btn-big" onClick={doExport}>Export</button>
+          <div style={{ display: "flex", gap: "4px", marginLeft: "auto", flexWrap: "wrap" }}>
+            <input type="button" className="btn-big" value="New" onClick={() => { setFont(emptyFont()); undoStacks.current.clear(); }} />
+            <input type="button" className="btn-big" value="Save" onClick={saveFont} />
+            <input type="button" className="btn-big" value="Delete" onClick={deleteFont} />
+            <input type="button" className="btn-big" value="Import" onClick={() => setShowImport(true)} />
+            <input type="button" className="btn-big" value="Export" onClick={doExport} />
           </div>
         </div>
 
         {/* ── Tabs ── */}
-        <ul className="nav nav-tabs apt-1 bg-secondary">
-          <li className="nav-item bg-secondary">
-            <a
-              className={`nav-link bg-secondary${tab === "editor" ? " active" : ""}`}
-              style={{ background: "#212121 !important", cursor: "pointer" }}
-              onClick={() => setTab("editor")}
-            >
-              Character Editor
-            </a>
-          </li>
-          <li className="nav-item bg-secondary">
-            <a
-              className={`nav-link bg-secondary${tab === "maker" ? " active" : ""}`}
-              style={{ background: "#212121 !important", cursor: "pointer" }}
-              onClick={() => setTab("maker")}
-            >
-              Logo Maker
-            </a>
+        <ul className="nav nav-tabs bg-secondary" style={{ marginBottom: 0 }}>
+          {(["editor", "preview", "maker"] as Tab[]).map(t => (
+            <li key={t} className="nav-item bg-secondary">
+              <a className={`nav-link bg-secondary${tab === t ? " active" : ""}`}
+                style={{ cursor: "pointer", background: "#212121 !important", fontSize: "13px", padding: "6px 12px" }}
+                onClick={() => setTab(t)}>
+                {t === "editor" ? "Character Editor" : t === "preview" ? "All Characters" : "Logo Maker"}
+              </a>
+            </li>
+          ))}
+          <li style={{ marginLeft: "auto", display: "flex", alignItems: "center", paddingRight: "8px" }}>
+            <span style={{ color: "#555", fontSize: "11px" }}>Ctrl+S = save | Tab/Shift+Tab = cycle chars | Ctrl+Z/Y = undo/redo</span>
           </li>
         </ul>
 
         {/* ── Character Editor ── */}
         {tab === "editor" && (
-          <div className="row apt-1 apl-1 apr-1 apb-1">
+          <div style={{ display: "flex", gap: "0", height: "calc(100vh - 200px)", minHeight: "480px" }}>
 
-            {/* Left: character grid */}
-            <div className="col-lg-3 col-md-4">
-              <div style={{ marginBottom: "8px" }}>
-                <span className="white" style={{ fontSize: "12px" }}>Click a character to edit:</span>
-              </div>
+            {/* Left panel: char grid + font options */}
+            <div style={{ width: "200px", minWidth: "200px", overflowY: "auto", background: "#1a1a1a", borderRight: "1px solid #333", padding: "6px" }}>
+              <div style={{ fontSize: "11px", color: "#888", marginBottom: "4px" }}>Click or use arrow keys:</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "2px" }}>
                 {CHAR_ORDER.map(code => (
-                  <button
+                  <input
                     key={code}
-                    className={`fontbtn btn btn-lg${selectedChar === code ? " active" : ""}`}
+                    type="button"
+                    title={`U+${code.toString(16).toUpperCase().padStart(4,"0")} ${charLabel(code)}`}
+                    value={charLabel(code)}
                     style={{
-                      background: selectedChar === code ? "#555" : "#bbb",
-                      color: selectedChar === code ? "#fff" : "#000",
-                      border: selectedChar === code ? "1px solid #fff" : "1px solid #888",
-                      minWidth: "28px", padding: "4px 2px", fontSize: "11px", lineHeight: 1,
+                      background: selectedChar === code ? "#444" : "#222",
+                      color: selectedChar === code ? "#55ffff" : (font.figChars[code]?.trim() ? "#aaa" : "#555"),
+                      border: selectedChar === code ? "1px solid #55ffff" : "1px solid #333",
+                      width: "26px", height: "26px", padding: "0",
+                      fontSize: "11px", lineHeight: "26px",
+                      cursor: "pointer", fontFamily: "TopazPlus_a1200, monospace",
+                      textAlign: "center",
                     }}
-                    title={`U+${code.toString(16).toUpperCase().padStart(4, "0")} ${charLabel(code)}`}
                     onClick={() => setSelectedChar(code)}
-                  >
-                    {charLabel(code)}
-                  </button>
+                  />
                 ))}
               </div>
 
-              {/* Font options */}
-              <div style={{ marginTop: "16px" }}>
-                <div className="white" style={{ fontWeight: "bold", marginBottom: "4px" }}>Font Options</div>
+              <div style={{ borderTop: "1px solid #333", marginTop: "10px", paddingTop: "8px" }}>
+                <div className="white" style={{ fontWeight: "bold", fontSize: "12px", marginBottom: "6px" }}>Font Options</div>
 
-                <div className="row apt-1" style={{ fontSize: "12px" }}>
-                  <div className="col-5 white">H-Layout:</div>
-                  <div className="col-7">
-                    <select
-                      className="custom-select custom-select-sm"
-                      value={font.horizontalLayout}
-                      onChange={e => setFont(f => ({ ...f, horizontalLayout: e.target.value as HLayout }))}
-                    >
-                      {LAYOUTS.map(l => <option key={l} value={l}>{l}</option>)}
-                    </select>
-                  </div>
-                </div>
+                <div style={{ fontSize: "11px", color: "#aaa", marginBottom: "4px" }}>H-Layout:</div>
+                <select className="custom-select custom-select-sm" style={{ width: "100%", marginBottom: "4px" }}
+                  value={font.horizontalLayout}
+                  onChange={e => setFont(f => ({ ...f, horizontalLayout: e.target.value as HLayout }))}>
+                  {LAYOUTS.map(l => <option key={l} value={l}>{l}</option>)}
+                </select>
 
                 {font.horizontalLayout === "Controlled Smushing" && (
-                  <div style={{ paddingLeft: "8px", fontSize: "11px" }}>
-                    {[1, 2, 3, 4, 5, 6].map(n => (
-                      <div key={n} style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "2px" }}>
-                        <input
-                          type="checkbox"
-                          id={`hrule${n}`}
-                          checked={!!font.hrule[n]}
-                          onChange={e => setFont(f => ({ ...f, hrule: { ...f.hrule, [n]: e.target.checked } }))}
-                        />
-                        <label htmlFor={`hrule${n}`} className="white" title={H_RULE_TIPS[n]} style={{ cursor: "help" }}>
-                          H-Rule {n}
-                        </label>
+                  <div style={{ paddingLeft: "4px", fontSize: "11px", marginBottom: "4px" }}>
+                    {[1,2,3,4,5,6].map(n => (
+                      <div key={n} style={{ display: "flex", alignItems: "center", gap: "4px", marginBottom: "2px" }}>
+                        <input type="checkbox" id={`hrule${n}`} checked={!!font.hrule[n]}
+                          onChange={e => setFont(f => ({ ...f, hrule: { ...f.hrule, [n]: e.target.checked } }))} />
+                        <label htmlFor={`hrule${n}`} className="white" title={H_RULE_TIPS[n]} style={{ cursor: "help", fontSize: "11px" }}>H-Rule {n}</label>
                       </div>
                     ))}
                   </div>
                 )}
 
-                <div className="row apt-1" style={{ fontSize: "12px" }}>
-                  <div className="col-5 white">V-Layout:</div>
-                  <div className="col-7">
-                    <select
-                      className="custom-select custom-select-sm"
-                      value={font.verticalLayout}
-                      onChange={e => setFont(f => ({ ...f, verticalLayout: e.target.value as VLayout }))}
-                    >
-                      {LAYOUTS.map(l => <option key={l} value={l}>{l}</option>)}
-                    </select>
-                  </div>
-                </div>
+                <div style={{ fontSize: "11px", color: "#aaa", marginBottom: "4px" }}>V-Layout:</div>
+                <select className="custom-select custom-select-sm" style={{ width: "100%", marginBottom: "4px" }}
+                  value={font.verticalLayout}
+                  onChange={e => setFont(f => ({ ...f, verticalLayout: e.target.value as VLayout }))}>
+                  {LAYOUTS.map(l => <option key={l} value={l}>{l}</option>)}
+                </select>
 
                 {font.verticalLayout === "Controlled Smushing" && (
-                  <div style={{ paddingLeft: "8px", fontSize: "11px" }}>
-                    {[1, 2, 3, 4, 5].map(n => (
-                      <div key={n} style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "2px" }}>
-                        <input
-                          type="checkbox"
-                          id={`vrule${n}`}
-                          checked={!!font.vrule[n]}
-                          onChange={e => setFont(f => ({ ...f, vrule: { ...f.vrule, [n]: e.target.checked } }))}
-                        />
-                        <label htmlFor={`vrule${n}`} className="white" title={V_RULE_TIPS[n]} style={{ cursor: "help" }}>
-                          V-Rule {n}
-                        </label>
+                  <div style={{ paddingLeft: "4px", fontSize: "11px", marginBottom: "4px" }}>
+                    {[1,2,3,4,5].map(n => (
+                      <div key={n} style={{ display: "flex", alignItems: "center", gap: "4px", marginBottom: "2px" }}>
+                        <input type="checkbox" id={`vrule${n}`} checked={!!font.vrule[n]}
+                          onChange={e => setFont(f => ({ ...f, vrule: { ...f.vrule, [n]: e.target.checked } }))} />
+                        <label htmlFor={`vrule${n}`} className="white" title={V_RULE_TIPS[n]} style={{ cursor: "help", fontSize: "11px" }}>V-Rule {n}</label>
                       </div>
                     ))}
                   </div>
                 )}
 
-                <div className="row apt-1" style={{ fontSize: "12px" }}>
-                  <div className="col-5 white">Hard blank:</div>
-                  <div className="col-7">
-                    <input
-                      type="text" maxLength={1} className="form-control form-control-sm"
-                      value={font.hardBlank}
-                      onChange={e => setFont(f => ({ ...f, hardBlank: e.target.value.slice(-1) || "$" }))}
-                    />
-                  </div>
+                <div style={{ display: "flex", gap: "4px", marginBottom: "4px", alignItems: "center" }}>
+                  <span style={{ fontSize: "11px", color: "#aaa", width: "70px" }}>Hard blank:</span>
+                  <input type="text" maxLength={1} className="form-control form-control-sm" style={{ width: "40px" }}
+                    value={font.hardBlank}
+                    onChange={e => setFont(f => ({ ...f, hardBlank: e.target.value.slice(-1) || "$" }))} />
                 </div>
-
-                <div className="row apt-1" style={{ fontSize: "12px" }}>
-                  <div className="col-5 white">Baseline:</div>
-                  <div className="col-7">
-                    <input
-                      type="number" min={1} max={20} className="form-control form-control-sm"
-                      value={font.baseline}
-                      onChange={e => setFont(f => ({ ...f, baseline: parseInt(e.target.value) || f.height }))}
-                    />
-                  </div>
+                <div style={{ display: "flex", gap: "4px", marginBottom: "4px", alignItems: "center" }}>
+                  <span style={{ fontSize: "11px", color: "#aaa", width: "70px" }}>Baseline:</span>
+                  <input type="number" min={1} max={20} className="form-control form-control-sm" style={{ width: "60px" }}
+                    value={font.baseline}
+                    onChange={e => setFont(f => ({ ...f, baseline: parseInt(e.target.value) || f.height }))} />
                 </div>
-
-                <div className="row apt-1" style={{ fontSize: "12px" }}>
-                  <div className="col-5 white">Case insensitive:</div>
-                  <div className="col-7">
-                    <input
-                      type="checkbox"
-                      checked={font.caseInsensitive}
-                      onChange={e => setFont(f => ({ ...f, caseInsensitive: e.target.checked }))}
-                    />
-                  </div>
+                <div style={{ display: "flex", gap: "4px", marginBottom: "4px", alignItems: "center" }}>
+                  <input type="checkbox" id="caseInsensitive" checked={font.caseInsensitive}
+                    onChange={e => setFont(f => ({ ...f, caseInsensitive: e.target.checked }))} />
+                  <label htmlFor="caseInsensitive" className="white" style={{ fontSize: "11px", cursor: "pointer" }}>Case insensitive</label>
                 </div>
               </div>
             </div>
 
-            {/* Right: editor + preview */}
-            <div className="col-lg-9 col-md-8">
-              <div style={{ marginBottom: "4px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span className="white">
+            {/* Center: editor */}
+            <div style={{ flex: "1 1 0", display: "flex", flexDirection: "column", overflow: "hidden", padding: "6px 8px" }}>
+              {/* Char info + actions bar */}
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px", flexWrap: "wrap" }}>
+                <span className="white" style={{ fontSize: "13px" }}>
                   Editing: <strong style={{ color: "#55ffff" }}>
-                    {selectedChar === -1 ? "[Comment Header]" : `'${charLabel(selectedChar)}'  (U+${selectedChar.toString(16).toUpperCase().padStart(4, "0")})`}
+                    {selectedChar === -1 ? "[Comment]" : `'${charLabel(selectedChar)}' (U+${selectedChar.toString(16).toUpperCase().padStart(4,"0")})`}
                   </strong>
                 </span>
-                <div style={{ display: "flex", gap: "4px" }}>
-                  <button
-                    className="btn-big"
-                    style={{ fontSize: "11px" }}
+                <span style={{ fontSize: "11px", color: dim.maxCols > 0 ? "#55ff55" : "#555" }}>
+                  {dim.maxCols > 0 ? `${dim.rows} rows x ${dim.maxCols} cols` : "empty"}
+                </span>
+                <div style={{ display: "flex", gap: "4px", marginLeft: "auto" }}>
+                  <input type="button" className="btn-big" value="&lt; Prev" style={{ padding: "0 8px", minHeight: "28px", height: "28px" }}
+                    onClick={() => { const i = CHAR_ORDER.indexOf(selectedChar); if (i > 0) setSelectedChar(CHAR_ORDER[i-1]); }} />
+                  <input type="button" className="btn-big" value="Next &gt;" style={{ padding: "0 8px", minHeight: "28px", height: "28px" }}
+                    onClick={() => { const i = CHAR_ORDER.indexOf(selectedChar); if (i < CHAR_ORDER.length-1) setSelectedChar(CHAR_ORDER[i+1]); }} />
+                  <input type="button" className="btn-big" value={copied ? "Copied!" : "Copy"} style={{ padding: "0 8px", minHeight: "28px", height: "28px" }}
+                    onClick={copyChar} />
+                  <input type="button" className="btn-big" value="Undo" style={{ padding: "0 8px", minHeight: "28px", height: "28px", opacity: undoAvail ? 1 : 0.4 }}
                     onClick={() => {
-                      const idx = CHAR_ORDER.indexOf(selectedChar);
-                      if (idx > 0) setSelectedChar(CHAR_ORDER[idx - 1]);
-                    }}
-                  >
-                    &lt; Prev
-                  </button>
-                  <button
-                    className="btn-big"
-                    style={{ fontSize: "11px" }}
+                      const stack = getStack(selectedChar);
+                      if (stack.past.length > 0) {
+                        const prev = stack.past.pop()!;
+                        stack.future.push(font.figChars[selectedChar] ?? "");
+                        setFont(f => ({ ...f, figChars: { ...f.figChars, [selectedChar]: prev } }));
+                      }
+                    }} />
+                  <input type="button" className="btn-big" value="Redo" style={{ padding: "0 8px", minHeight: "28px", height: "28px", opacity: redoAvail ? 1 : 0.4 }}
                     onClick={() => {
-                      const idx = CHAR_ORDER.indexOf(selectedChar);
-                      if (idx < CHAR_ORDER.length - 1) setSelectedChar(CHAR_ORDER[idx + 1]);
-                    }}
-                  >
-                    Next &gt;
-                  </button>
+                      const stack = getStack(selectedChar);
+                      if (stack.future.length > 0) {
+                        const next = stack.future.pop()!;
+                        stack.past.push(font.figChars[selectedChar] ?? "");
+                        setFont(f => ({ ...f, figChars: { ...f.figChars, [selectedChar]: next } }));
+                      }
+                    }} />
                 </div>
               </div>
 
-              <textarea
-                className="fig-txt fig-font"
-                style={{
-                  height: "280px", width: "100%",
-                  background: "#111", color: "#55ffff",
-                  border: "1px solid #444", padding: "8px",
-                  fontFamily: "TopazPlus_a1200, monospace",
-                  fontSize: "14px", lineHeight: "16px",
-                  resize: "vertical", boxSizing: "border-box",
-                }}
-                spellCheck={false}
-                value={font.figChars[selectedChar] ?? ""}
-                onChange={e => updateChar(selectedChar, e.target.value)}
-                placeholder={`Draw the ASCII art for '${charLabel(selectedChar)}' here...`}
-              />
-
-              {/* Live preview */}
-              <div style={{ marginTop: "8px" }}>
-                <span className="white" style={{ fontSize: "12px" }}>Preview:</span>
-                <div
-                  className="fig-test-output"
-                  style={{ marginTop: "4px", minHeight: "60px", padding: "8px", background: "#0a0a0a", border: "1px solid #333" }}
-                >
-                  {font.figChars[selectedChar] || <span style={{ color: "#555" }}>(empty)</span>}
-                </div>
+              {/* Column ruler */}
+              <div style={{ fontFamily: "TopazPlus_a1200, monospace", fontSize: "13px", lineHeight: "16px",
+                color: "#444", background: "#0a0a0a", padding: "0 8px 0 8px",
+                borderTop: "1px solid #222", borderLeft: "1px solid #333", borderRight: "1px solid #333",
+                overflowX: "hidden", whiteSpace: "pre", letterSpacing: 0 }}>
+                {rulerStr}
               </div>
 
-              {/* Comment header editor */}
-              <div style={{ marginTop: "16px" }}>
-                <span className="white" style={{ fontSize: "12px" }}>Font comment header:</span>
+              {/* Main textarea + line numbers side-by-side */}
+              <div style={{ flex: "1 1 0", display: "flex", overflow: "hidden" }}>
+                {/* Line numbers */}
+                <div style={{
+                  fontFamily: "TopazPlus_a1200, monospace", fontSize: "13px", lineHeight: "16px",
+                  color: "#444", background: "#0a0a0a", padding: "2px 4px",
+                  borderLeft: "1px solid #333", borderBottom: "1px solid #333",
+                  minWidth: "28px", textAlign: "right", userSelect: "none",
+                  overflowY: "hidden", whiteSpace: "pre",
+                }}>
+                  {(font.figChars[selectedChar] ?? "").split("\n").map((_, i) => `${i + 1}\n`).join("")}
+                </div>
                 <textarea
-                  className="fig-font"
+                  ref={textareaRef}
                   style={{
-                    width: "100%", height: "80px", marginTop: "4px",
-                    background: "#111", color: "#aaa", border: "1px solid #333",
-                    fontFamily: "TopazPlus_a1200, monospace", fontSize: "12px", padding: "4px",
-                    boxSizing: "border-box", resize: "vertical",
+                    flex: "1 1 0", background: "#111", color: "#55ffff",
+                    border: "1px solid #333", borderLeft: "none",
+                    fontFamily: "TopazPlus_a1200, monospace",
+                    fontSize: "13px", lineHeight: "16px",
+                    resize: "none", padding: "2px 4px",
+                    outline: "none", tabSize: 1,
+                    overflowX: "auto", overflowY: "auto",
+                    whiteSpace: "pre",
                   }}
-                  value={font.figChars[-1] ?? ""}
-                  onChange={e => updateChar(-1, e.target.value)}
+                  spellCheck={false}
+                  value={font.figChars[selectedChar] ?? ""}
+                  onChange={e => updateChar(selectedChar, e.target.value)}
+                  placeholder={`Draw the ASCII art for '${charLabel(selectedChar)}' here...`}
                 />
               </div>
+
+              {/* Comment header */}
+              <div style={{ marginTop: "6px" }}>
+                <div style={{ fontSize: "11px", color: "#666", marginBottom: "2px" }}>Font comment header:</div>
+                <textarea style={{
+                  width: "100%", height: "56px", background: "#0d0d0d", color: "#666",
+                  border: "1px solid #2a2a2a", fontFamily: "TopazPlus_a1200, monospace",
+                  fontSize: "11px", padding: "2px 4px", resize: "vertical",
+                }}
+                  value={font.figChars[-1] ?? ""}
+                  onChange={e => updateChar(-1, e.target.value)} />
+              </div>
+            </div>
+
+            {/* Right panel: live preview */}
+            <div style={{ width: "280px", minWidth: "200px", borderLeft: "1px solid #333", background: "#0d0d0d", padding: "6px 8px", overflowY: "auto" }}>
+              <div style={{ fontSize: "11px", color: "#888", marginBottom: "4px" }}>Live preview:</div>
+              <div style={{
+                fontFamily: "TopazPlus_a1200, monospace", fontSize: "13px", lineHeight: "16px",
+                color: "#55ffff", background: "#0a0a0a", padding: "6px",
+                border: "1px solid #222", minHeight: "80px", whiteSpace: "pre",
+                wordBreak: "break-all",
+              }}>
+                {font.figChars[selectedChar] || <span style={{ color: "#333" }}>(empty)</span>}
+              </div>
+
+              <div style={{ fontSize: "11px", color: "#888", marginTop: "12px", marginBottom: "4px" }}>Width info:</div>
+              <div style={{ fontSize: "11px", color: "#aaa" }}>
+                {(() => {
+                  const current = charDimensions(font.figChars[selectedChar] ?? "");
+                  const allWidths = CHAR_ORDER.map(c => charDimensions(font.figChars[c] ?? "").maxCols).filter(w => w > 0);
+                  const maxW = allWidths.length > 0 ? Math.max(...allWidths) : 0;
+                  const minW = allWidths.length > 0 ? Math.min(...allWidths) : 0;
+                  const consistent = allWidths.every(w => w === maxW);
+                  return (
+                    <>
+                      <div>Current: {current.rows}h x {current.maxCols}w</div>
+                      {maxW > 0 && <>
+                        <div>Max across font: {maxW}</div>
+                        <div>Min across font: {minW}</div>
+                        <div style={{ color: consistent ? "#55ff55" : "#ffff55", marginTop: "2px" }}>
+                          {consistent ? "[OK] All chars same width" : "[!] Inconsistent widths"}
+                        </div>
+                      </>}
+                    </>
+                  );
+                })()}
+              </div>
+
+              <div style={{ fontSize: "11px", color: "#888", marginTop: "12px", marginBottom: "4px" }}>Char status:</div>
+              <div style={{ fontSize: "11px" }}>
+                {(() => {
+                  const filled = CHAR_ORDER.filter(c => (font.figChars[c] ?? "").trim().length > 0).length;
+                  return <span style={{ color: "#55ff55" }}>{filled} / {CHAR_ORDER.length} chars defined</span>;
+                })()}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── All Characters Preview ── */}
+        {tab === "preview" && (
+          <div style={{ padding: "8px", overflowY: "auto", maxHeight: "calc(100vh - 180px)" }}>
+            <div style={{ fontSize: "11px", color: "#888", marginBottom: "8px" }}>
+              Click any character to edit it. Green = defined, grey = empty.
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+              {CHAR_ORDER.map(code => {
+                const art = font.figChars[code] ?? "";
+                const hasContent = art.trim().length > 0;
+                return (
+                  <div key={code}
+                    onClick={() => { setSelectedChar(code); setTab("editor"); }}
+                    style={{
+                      cursor: "pointer", background: "#111", border: `1px solid ${code === selectedChar ? "#55ffff" : hasContent ? "#333" : "#222"}`,
+                      padding: "4px", minWidth: "60px",
+                    }}>
+                    <div style={{ fontSize: "9px", color: "#555", marginBottom: "2px", textAlign: "center" }}>
+                      {charLabel(code)}
+                    </div>
+                    <pre style={{
+                      fontFamily: "TopazPlus_a1200, monospace", fontSize: "6px", lineHeight: "7px",
+                      color: hasContent ? "#55ff55" : "#2a2a2a", margin: 0, overflow: "hidden",
+                      maxHeight: "56px", whiteSpace: "pre",
+                    }}>
+                      {hasContent ? art : "·\n·\n·\n·\n·\n·"}
+                    </pre>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
 
         {/* ── Logo Maker ── */}
         {tab === "maker" && (
-          <div className="apt-1 apl-1 apr-1 apb-1">
+          <div style={{ padding: "8px" }}>
             <div style={{ display: "flex", gap: "12px", alignItems: "center", marginBottom: "8px" }}>
-              <input
-                type="text"
-                className="form-control"
-                style={{ maxWidth: "400px" }}
+              <input type="text" className="form-control" style={{ maxWidth: "400px" }}
                 placeholder="Type something..."
                 value={testText}
                 onChange={e => setTestText(e.target.value)}
-                autoFocus
-              />
+                autoFocus />
               <label style={{ display: "flex", alignItems: "center", gap: "4px", color: "#aaa", fontSize: "12px" }}>
-                <input
-                  type="checkbox"
-                  checked={showHardBlanks}
-                  onChange={e => setShowHardBlanks(e.target.checked)}
-                />
+                <input type="checkbox" checked={showHardBlanks} onChange={e => setShowHardBlanks(e.target.checked)} />
                 Show hard blanks
               </label>
             </div>
             {!font.fontname && (
-              <p style={{ color: "#ffff55", fontSize: "12px" }}>
+              <div style={{ color: "#ffff55", fontSize: "12px", marginBottom: "8px" }}>
                 Load or create a font in the Character Editor tab first.
-              </p>
+              </div>
             )}
             <pre className="fig-test-output" style={{ minHeight: "200px", padding: "12px", border: "1px solid #333" }}>
               {testOutput || "(output will appear here)"}
@@ -700,24 +739,22 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
             <div className="modal-dialog">
               <div className="modal-content">
                 <div className="modal-header" style={{ background: "#333" }}>
-                  <span className="modal-title white" style={{fontWeight:"bold",fontSize:"18px"}}>Import FIGFont Data</span>
+                  <span className="modal-title white" style={{ fontWeight: "bold" }}>Import FIGFont Data</span>
                   <button type="button" className="close white" onClick={() => setShowImport(false)}>x</button>
                 </div>
                 <div className="modal-body" style={{ background: "#222" }}>
-                  <textarea
-                    className="fig-data-txt fig-font"
+                  <textarea className="fig-data-txt fig-font"
                     style={{ background: "#111", color: "#0ff", border: "1px solid #444", width: "100%", height: "200px" }}
                     value={importText}
                     onChange={e => setImportText(e.target.value)}
-                    placeholder="Paste .flf file contents here..."
-                  />
+                    placeholder="Paste .flf file contents here..." />
                   <p style={{ color: "#aaa", fontSize: "12px", marginTop: "8px" }}>
                     Copy the contents of a *.flf file and paste above, then press Import.
                   </p>
                 </div>
                 <div className="modal-footer" style={{ background: "#222" }}>
-                  <button className="btn-big" onClick={doImport}>Import</button>
-                  <button className="btn-big" onClick={() => setShowImport(false)}>Cancel</button>
+                  <input type="button" className="btn-big" value="Import" onClick={doImport} />
+                  <input type="button" className="btn-big" value="Cancel" onClick={() => setShowImport(false)} />
                 </div>
               </div>
             </div>
@@ -730,26 +767,23 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
             <div className="modal-dialog">
               <div className="modal-content">
                 <div className="modal-header" style={{ background: "#333" }}>
-                  <span className="modal-title white" style={{fontWeight:"bold",fontSize:"18px"}}>Exported FIGFont Data</span>
+                  <span className="modal-title white" style={{ fontWeight: "bold" }}>Exported FIGFont Data</span>
                   <button type="button" className="close white" onClick={() => setShowExport(false)}>x</button>
                 </div>
                 <div className="modal-body" style={{ background: "#222" }}>
-                  <textarea
-                    className="fig-data-txt fig-font"
+                  <textarea className="fig-data-txt fig-font"
                     style={{ background: "#111", color: "#0ff", border: "1px solid #444", width: "100%", height: "200px" }}
-                    readOnly
-                    value={exportText}
-                    onClick={e => (e.target as HTMLTextAreaElement).select()}
-                  />
+                    readOnly value={exportText}
+                    onClick={e => (e.target as HTMLTextAreaElement).select()} />
                   <p style={{ color: "#aaa", fontSize: "12px", marginTop: "8px" }}>
                     Copy the text above into a *.flf file for use with FIGlet.
                   </p>
                 </div>
                 <div className="modal-footer" style={{ background: "#222" }}>
-                  <button className="btn-big" onClick={() => {
-                    navigator.clipboard.writeText(exportText).then(() => setStatus({ msg: "Copied to clipboard!", ok: true }));
-                  }}>Copy All</button>
-                  <button className="btn-big" onClick={() => setShowExport(false)}>Close</button>
+                  <input type="button" className="btn-big" value={copied ? "Copied!" : "Copy All"} onClick={() => {
+                    navigator.clipboard.writeText(exportText).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500); });
+                  }} />
+                  <input type="button" className="btn-big" value="Close" onClick={() => setShowExport(false)} />
                 </div>
               </div>
             </div>
