@@ -62,6 +62,15 @@ ASCII art files are ISO-8859-1 / CP437, not UTF-8. When reading collection files
   `bootstrap-colorselector-bs5.js` (patched for BS4 data-toggle attrs)
 - `.env` on server at `/var/www/asciiarena.se/.env` — never commit secrets
 
+## site.css heading animations (avoid heading tags in components)
+
+`site.css` applies animations to ALL heading elements globally:
+- `h1, h2, h3` -> `textglowwhite` (glowing text, 2s infinite)
+- `h5, h6` -> `blinkingText` (blinking, 1.2s infinite)
+
+**Never use h5 or h6 in components** — use `<div>` or `<span>` with inline `fontWeight: bold` instead.
+Only use h1/h2/h3 when the glowing header style is deliberately wanted (e.g., widget titles with `bg-header` class).
+
 ## Key paths on server
 
 - Deploy dir: `/var/www/asciiarena.se/nextjs-current/`
