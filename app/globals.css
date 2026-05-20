@@ -2,3 +2,23 @@
 a, a:hover {
   text-decoration: none;
 }
+
+/* Hover-to-open dropdowns on desktop */
+@media (min-width: 992px) {
+  .navbar .dropdown:hover > .dropdown-menu {
+    display: block;
+    margin-top: 0;
+  }
+}
+
+/* Dropdown item padding spans must not inherit the Topaz font glyph rendering */
+.dropdown-item span {
+  font-family: Monaco, monospace;
+  font-size: 16px;
+}
+
+/* Keep nav-link text white when its dropdown is open */
+.navbar .dropdown:hover > .dropdown-toggle,
+.navbar .dropdown.show > .dropdown-toggle {
+  color: inherit !important;
+}
