@@ -98,11 +98,11 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
         </div>
       </div>
 
-      <div className="col-lg-12 ps-0">
+      <div className="col-lg-12 pl-0">
         <span className="lightgrey">Nick: </span>
         {artist.nick}
       </div>
-      <div className="col-lg-12 ps-0">
+      <div className="col-lg-12 pl-0">
         <span className="lightgrey">Crew(s): </span>
         {memberships.length > 0
           ? memberships.map((m, i) => (
@@ -114,7 +114,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
           : "-"}
       </div>
       {artist.www && (
-        <div className="col-lg-12 ps-0">
+        <div className="col-lg-12 pl-0">
           <span className="lightgrey">Webpage: </span>
           <a href={artist.www} target="_blank" rel="noopener noreferrer">
             {artist.www}
@@ -122,16 +122,16 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
         </div>
       )}
       {artist.country && (
-        <div className="col-lg-12 ps-0">
+        <div className="col-lg-12 pl-0">
           <span className="lightgrey">Country: </span>
           {artist.country}
         </div>
       )}
-      <div className="col-lg-12 ps-0">
+      <div className="col-lg-12 pl-0">
         <span className="lightgrey">Status: </span>
         {artist.active ?? "-"}
       </div>
-      <div className="col-lg-12 ps-0">
+      <div className="col-lg-12 pl-0">
         <span className="lightgrey">Rating: </span>
         {ratingDisplay}
       </div>
@@ -142,21 +142,21 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
           <div className="row apt-1">
             <h2 className="ap-1 bg-header">Latest Release</h2>
           </div>
-          <div className="col-lg-12 ps-0 d-flex justify-content-between">
-            <div className="col-lg-4 ps-0">
+          <div className="col-lg-12 pl-0 d-flex justify-content-between">
+            <div className="col-lg-4 pl-0">
               <a className="magenta" href={`/release/${latestRelease.filename}`}>
                 {latestRelease.filename.slice(0, 20)}
               </a>
             </div>
-            <div className="col-lg-4 ps-0">
+            <div className="col-lg-4 pl-0">
               {latestRelease.name?.slice(0, 35) ?? "-"}
             </div>
             {latestRelease.crew && latestRelease.crewurl && (
-              <div className="col-lg-2 ps-0">
+              <div className="col-lg-2 pl-0">
                 <a href={`/crew/${latestRelease.crewurl}`}>{latestRelease.crew}</a>
               </div>
             )}
-            <div className="col-lg-2 ps-0">
+            <div className="col-lg-2 pl-0">
               <span className="lightgrey">{latestRelease.year}</span>
             </div>
           </div>
@@ -167,7 +167,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
       <div className="row apt-1 apb-1">
         <h2 className="bg-header">All {acronym} Releases</h2>
       </div>
-      <div className="col-lg-12 d-flex justify-content-between ps-0">
+      <div className="col-lg-12 d-flex justify-content-between pl-0">
         <a href={`?sort_by=c.filename`}>Filename</a>
         <a href={`?sort_by=a.nick`}>Name</a>
         <a href={`?sort_by=w.name`}>Crew</a>
@@ -178,26 +178,26 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
       {releasesRaw.map((r) => (
         <div
           key={r.colly_id}
-          className="col-lg-12 d-flex justify-content-between ps-0"
+          className="col-lg-12 d-flex justify-content-between pl-0"
         >
-          <div className="col-lg-3 ps-0">
+          <div className="col-lg-3 pl-0">
             <a className="magenta" href={`/release/${r.filename}`}>
               {r.filename.slice(0, 12)}
             </a>
           </div>
-          <div className="col-lg-3 ps-0">
+          <div className="col-lg-3 pl-0">
             <a className="magenta" href={`/release/${r.filename}`}>
               {r.name?.slice(0, 35) ?? r.filename}
             </a>
           </div>
-          <div className="col-lg-3 ps-0">
+          <div className="col-lg-3 pl-0">
             {r.crew && r.crewurl ? (
               <a href={`/crew/${r.crewurl}`}>{r.crew}</a>
             ) : (
               r.crew ?? "-"
             )}
           </div>
-          <div className="col-lg-3 ps-0">
+          <div className="col-lg-3 pl-0">
             <span className="lightgrey">{r.year ?? "-"}</span>
           </div>
         </div>

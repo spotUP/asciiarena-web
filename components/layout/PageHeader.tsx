@@ -10,7 +10,7 @@ export default function PageHeader({ title }: PageHeaderProps) {
   return (
     <>
       <div className="page-header">
-        <div className="row ms-0 ps-0 me-0 pe-0">
+        <div className="row ml-0 pl-0 mr-0 pr-0">
           <div className="col-12">
             <h1
               className={`bg-header ap-1${isArray ? " switcher" : ""}`}

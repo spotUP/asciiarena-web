@@ -16,7 +16,7 @@ export default async function TopCommenters() {
   );
 
   return (
-    <div className="container fluid col-12 p-0 ps-lg-2 pe-lg-2">
+    <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
       <div className="header col-lg-12 p-0">
         <h2 className="ap-1 bg-header">TOP COMMENTERS</h2>
       </div>
@@ -24,7 +24,7 @@ export default async function TopCommenters() {
         {rows.map((row) => (
           <div
             key={row.user_id}
-            className="col-lg-12 p-0 ps-lg-2 pe-lg-2 d-flex justify-content-between"
+            className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between"
           >
             <a className="yellow text-truncate" href={`/member/${urlsafe(row.nick)}`}>
               {row.nick}

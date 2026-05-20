@@ -20,7 +20,7 @@ export default async function UsersOnline() {
   const anonymousOnline = Number(anonymousResult[0]?.online ?? 0);
 
   return (
-    <div className="container fluid col-12 p-0 ps-lg-2 pe-lg-2" style={{ minHeight: "160px" }}>
+    <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2" style={{ minHeight: "160px" }}>
       <div className="header col-lg-12 p-0">
         <h2 className="ap-1 bg-header">USERS ONLINE</h2>
       </div>
@@ -35,7 +35,7 @@ export default async function UsersOnline() {
             </a>
           </div>
         ))}
-        <div className="col-lg-12 apt-1 p-0 ps-lg-2 pe-lg-2">
+        <div className="col-lg-12 apt-1 p-0 pl-lg-2 pr-lg-2">
           <span>{anonymousOnline} anonymous online</span>
         </div>
       </div>

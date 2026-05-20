@@ -13,7 +13,7 @@ export default async function LatestApps({ limit = 5 }: LatestAppsProps) {
   });
 
   return (
-    <div className="container fluid col-12 p-0 ps-lg-2 pe-lg-2">
+    <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
       <div className="header col-lg-12 p-0">
         <h2 className="ap-1 bg-header text-truncate lightgreen">
           <a className="lightgreen" href="/apps?sort_by=timestamp&sort_order=D">
@@ -34,7 +34,7 @@ export default async function LatestApps({ limit = 5 }: LatestAppsProps) {
           return (
             <div
               key={row.id}
-              className="col-lg-12 p-0 ps-lg-2 pe-lg-2 d-flex justify-content-between"
+              className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between"
             >
               <a className="magenta text-truncate" href={`/application/${filename}`}>
                 {truncated}

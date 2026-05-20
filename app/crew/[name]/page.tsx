@@ -68,18 +68,18 @@ export default async function CrewPage({ params }: PageProps) {
         </div>
       </div>
 
-      <div className="col-lg-12 ps-0">
+      <div className="col-lg-12 pl-0">
         <span className="lightgrey">Name: </span>
         {crew.name}
       </div>
       {crew.acronym && (
-        <div className="col-lg-12 ps-0">
+        <div className="col-lg-12 pl-0">
           <span className="lightgrey">Acronym: </span>
           {crew.acronym}
         </div>
       )}
       {crew.www && (
-        <div className="col-lg-12 ps-0">
+        <div className="col-lg-12 pl-0">
           <span className="lightgrey">Website: </span>
           <a href={crew.www} target="_blank" rel="noopener noreferrer">
             {crew.www}
@@ -87,20 +87,20 @@ export default async function CrewPage({ params }: PageProps) {
         </div>
       )}
       {crew.contact && (
-        <div className="col-lg-12 ps-0">
+        <div className="col-lg-12 pl-0">
           <span className="lightgrey">Contact: </span>
           {crew.contact}
         </div>
       )}
-      <div className="col-lg-12 ps-0">
+      <div className="col-lg-12 pl-0">
         <span className="lightgrey">Status: </span>
         {crew.active}
       </div>
-      <div className="col-lg-12 ps-0">
+      <div className="col-lg-12 pl-0">
         <span className="lightgrey">Rating: </span>
         {ratingDisplay}
       </div>
-      <div className="col-lg-12 ps-0">
+      <div className="col-lg-12 pl-0">
         <span className="lightgrey">Releases: </span>
         {releases.length}
       </div>
@@ -111,12 +111,12 @@ export default async function CrewPage({ params }: PageProps) {
       </div>
       {members.length > 0 ? (
         members.map((m) => (
-          <div key={m.id} className="col-lg-12 ps-0">
+          <div key={m.id} className="col-lg-12 pl-0">
             <a href={`/artist/${urlsafe(m.nick ?? "")}`}>{m.nick}</a>
           </div>
         ))
       ) : (
-        <div className="col-lg-12 ps-0 lightgrey">No members listed.</div>
+        <div className="col-lg-12 pl-0 lightgrey">No members listed.</div>
       )}
 
       {/* Releases */}
@@ -125,22 +125,22 @@ export default async function CrewPage({ params }: PageProps) {
       </div>
       {releases.length > 0 ? (
         releases.map((r) => (
-          <div key={r.colly_id} className="col-lg-12 d-flex justify-content-between ps-0">
-            <div className="col-lg-6 ps-0">
+          <div key={r.colly_id} className="col-lg-12 d-flex justify-content-between pl-0">
+            <div className="col-lg-6 pl-0">
               <a className="magenta" href={`/release/${r.filename}`}>
                 {r.filename}
               </a>
             </div>
-            <div className="col-lg-3 ps-0 lightgrey">
+            <div className="col-lg-3 pl-0 lightgrey">
               {r.name?.slice(0, 40) ?? ""}
             </div>
-            <div className="col-lg-3 ps-0">
+            <div className="col-lg-3 pl-0">
               <span className="lightgrey">{r.year ?? "-"}</span>
             </div>
           </div>
         ))
       ) : (
-        <div className="col-lg-12 ps-0 lightgrey">No releases found.</div>
+        <div className="col-lg-12 pl-0 lightgrey">No releases found.</div>
       )}
     </SiteLayout>
   );
