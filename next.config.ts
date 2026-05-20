@@ -29,6 +29,10 @@ const nextConfig: NextConfig = {
       { source: "/express.php",     destination: "/express",     permanent: true },
       { source: "/uhcsearch.php",   destination: "/api/uhcsearch",    permanent: true },
       { source: "/uhcplaylists.php",destination: "/api/uhcplaylists", permanent: true },
+      { source: "/logoeditor.php",  destination: "/logoeditor",       permanent: true },
+      { source: "/accounting.php",  destination: "/accounting",       permanent: true },
+      { source: "/dialogues.php",   destination: "/dialogues",        permanent: true },
+      { source: "/members.php",     destination: "/",                 permanent: true },
 
       // Query-param PHP URLs → clean Next.js routes
       {

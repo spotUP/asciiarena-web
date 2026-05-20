@@ -16,6 +16,7 @@ export default async function AdminPage() {
     { id: "sitelogo", label: "Edit Logo" },
     { id: "app",      label: "Edit App" },
     { id: "ascii_mag",label: "Edit Mag" },
+    { id: "bbs",       label: "Edit BBS" },
     { id: "request",  label: "Edit Requests" },
     { id: "playlist", label: "Edit Playlists" },
   ];
@@ -107,6 +108,15 @@ export default async function AdminPage() {
           <input type="button" className="btn-big" id="mag-search-btn" value="Search" />
         </div>
         <div id="mag-results"></div>
+      </div>
+
+      {/* Edit BBS */}
+      <div id="tab-bbs" className="admin-tab" style={{ display: "none", padding: "8px" }}>
+        <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
+          <input type="text" className="form-control" id="bbs-search" style={{ maxWidth: "300px" }} placeholder="Search by name or sysop..." />
+          <input type="button" className="btn-big" id="bbs-search-btn" value="Search" />
+        </div>
+        <div id="bbs-results"></div>
       </div>
 
       {/* Edit Requests */}
@@ -370,29 +380,91 @@ export default async function AdminPage() {
           });
         });
 
-        // ── Apps / Mags search ─────────────────────────────────────────
-        function appMagFilterSearch(searchId, btnId, resultsId, apiPath, detailPath) {
+        // ── Apps / Mags ────────────────────────────────────────────────
+        function appMagRow(r, adminApi, detailPath) {
+          return '<div class="row amb-1 entity-row" data-id="' + r.id + '">' +
+            '<div class="col-2 text-truncate"><a class="magenta" href="' + detailPath + '/' + encodeURIComponent(r.filename) + '">' + $("<div>").text(r.filename).html() + '</a></div>' +
+            '<div class="col-3"><input type="text" class="form-control edit-name" value="' + $("<div>").text(r.name || "").html() + '" placeholder="Name" /></div>' +
+            '<div class="col-2"><input type="text" class="form-control edit-author" value="' + $("<div>").text(r.author || "").html() + '" placeholder="Author" /></div>' +
+            '<div class="col-1"><input type="number" class="form-control edit-year" value="' + (r.year || "") + '" placeholder="Year" /></div>' +
+            '<div class="col-2" style="display:flex;gap:4px">' +
+              '<input type="button" class="btn-big appmag-save" data-id="' + r.id + '" data-api="' + adminApi + '" value="Save" />' +
+              '<input type="button" class="btn-big appmag-delete" data-id="' + r.id + '" data-api="' + adminApi + '" value="Del" />' +
+            '</div>' +
+            '</div>';
+        }
+
+        function appMagSearch(searchId, btnId, resultsId, listApi, adminApi, detailPath) {
           $("#" + btnId).on("click", function() {
             var q = $("#" + searchId).val();
             if (!q) return;
-            $.getJSON(apiPath + "?filter=" + encodeURIComponent(q) + "&pagesize=30", function(rows) {
+            $.getJSON(listApi + "?filter=" + encodeURIComponent(q) + "&pagesize=30", function(rows) {
               if (!rows.length) { $("#" + resultsId).html('<div class="lightgrey">No results.</div>'); return; }
-              var html = "";
-              rows.forEach(function(r) {
-                html += '<div class="row amb-1">' +
-                  '<div class="col-4 text-truncate"><a class="magenta" href="' + detailPath + '/' + encodeURIComponent(r.filename) + '">' + $("<div>").text(r.filename).html() + '</a></div>' +
-                  '<div class="col-4">' + $("<div>").text(r.name || "").html() + '</div>' +
-                  '<div class="col-4 lightgrey">' + $("<div>").text(r.author || "").html() + '</div>' +
-                  '</div>';
-              });
-              $("#" + resultsId).html(html);
+              $("#" + resultsId).html(rows.map(function(r) { return appMagRow(r, adminApi, detailPath); }).join(""));
             });
           });
           $("#" + searchId).on("keydown", function(e) { if (e.which === 13) $("#" + btnId).click(); });
         }
 
-        appMagFilterSearch("app-search", "app-search-btn", "app-results", "/api/apps", "/application");
-        appMagFilterSearch("mag-search", "mag-search-btn", "mag-results", "/api/mags", "/magazine");
+        $(document).on("click", ".appmag-save", function() {
+          var row = $(this).closest(".entity-row");
+          var id = $(this).data("id");
+          var api = $(this).data("api");
+          $.ajax({ type: "PATCH", url: api, contentType: "application/json",
+            data: JSON.stringify({ id: id, name: row.find(".edit-name").val(), author: row.find(".edit-author").val(), year: parseInt(row.find(".edit-year").val()) || null }),
+            success: function() { adminMsg(row.closest("[id$=-results]"), "Saved!", true); }
+          });
+        });
+        $(document).on("click", ".appmag-delete", function() {
+          if (!confirm("Delete this entry?")) return;
+          $.ajax({ type: "DELETE", url: $(this).data("api"), contentType: "application/json",
+            data: JSON.stringify({ id: $(this).data("id") }),
+            success: function() { $(this).closest(".entity-row").remove(); }.bind(this)
+          });
+        });
+
+        appMagSearch("app-search", "app-search-btn", "app-results", "/api/apps", "/api/admin/apps", "/application");
+        appMagSearch("mag-search", "mag-search-btn", "mag-results", "/api/mags", "/api/admin/mags", "/magazine");
+
+        // ── BBS ────────────────────────────────────────────────────────
+        function bbsRow(r) {
+          return '<div class="row amb-1 entity-row" data-id="' + r.id + '">' +
+            '<div class="col-2 text-truncate white">' + $("<div>").text(r.name || "").html() + '</div>' +
+            '<div class="col-2"><input type="text" class="form-control edit-sysop" value="' + $("<div>").text(r.sysop || "").html() + '" placeholder="Sysop" /></div>' +
+            '<div class="col-3"><input type="text" class="form-control edit-address" value="' + $("<div>").text(r.address || "").html() + '" placeholder="Address" /></div>' +
+            '<div class="col-2"><input type="text" class="form-control edit-software" value="' + $("<div>").text(r.software || "").html() + '" placeholder="Software" /></div>' +
+            '<div class="col-2" style="display:flex;gap:4px">' +
+              '<input type="button" class="btn-big bbs-save" value="Save" data-id="' + r.id + '" />' +
+              '<input type="button" class="btn-big bbs-delete" value="Del" data-id="' + r.id + '" />' +
+            '</div>' +
+            '</div>';
+        }
+
+        $("#bbs-search-btn").on("click", function() {
+          var q = $("#bbs-search").val();
+          if (!q) return;
+          $.getJSON("/api/admin/bbs?q=" + encodeURIComponent(q), function(rows) {
+            if (!rows.length) { $("#bbs-results").html('<div class="lightgrey">No results.</div>'); return; }
+            $("#bbs-results").html(rows.map(bbsRow).join(""));
+          });
+        });
+        $("#bbs-search").on("keydown", function(e) { if (e.which === 13) $("#bbs-search-btn").click(); });
+
+        $(document).on("click", ".bbs-save", function() {
+          var row = $(this).closest(".entity-row");
+          var id = $(this).data("id");
+          $.ajax({ type: "PATCH", url: "/api/admin/bbs", contentType: "application/json",
+            data: JSON.stringify({ id: id, sysop: row.find(".edit-sysop").val(), address: row.find(".edit-address").val(), software: row.find(".edit-software").val() }),
+            success: function() { adminMsg("#bbs-results", "Saved!", true); }
+          });
+        });
+        $(document).on("click", ".bbs-delete", function() {
+          if (!confirm("Delete this BBS?")) return;
+          $.ajax({ type: "DELETE", url: "/api/admin/bbs", contentType: "application/json",
+            data: JSON.stringify({ id: $(this).data("id") }),
+            success: function() { $(this).closest(".entity-row").remove(); }.bind(this)
+          });
+        });
       `}</Script>
     </SiteLayout>
   );
