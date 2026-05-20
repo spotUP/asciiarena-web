@@ -75,7 +75,7 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
 
         {title && <PageHeader title={title} />}
 
-        <div className="row amb-1">
+        <div className="row m-0 p-0 amb-1">
           <div className="col-lg-12">
             <div className="bs-component aml-1 apl-1 apr-1 apt-1"></div>
           </div>
@@ -179,6 +179,11 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
               $("#spotclose").toggleClass("show");
             }
           });
+
+          // Auto-init any page-header switchers already in the DOM
+          if ($('.switcher').length) {
+            switcharoo('.switcher > span', 2890);
+          }
 
           // Login form: POST to NextAuth credentials, reload on success
           function loginUser() {

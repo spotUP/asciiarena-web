@@ -8,20 +8,18 @@ export default function SiteWall({ isLoggedIn }: { isLoggedIn: boolean }) {
   const tagId = `tag_${uid}`;
 
   useEffect(() => {
-    // Load existing wall posts
-    const load = () => {
-      (window as { $?: (s: string) => { get: (url: string, cb: (d: unknown[]) => void) => void } }).$?.(`#${wallId}`)?.get("/api/wall?wall_id=1", (data: unknown[]) => {
-        if (!Array.isArray(data)) return;
-        const html = data.map((p: unknown) => {
-          const post = p as { tag: string; nick: string };
-          return `<div class="col-10 d-flex"><span class="cyan text-truncate" style="white-space:pre">${post.tag}</span></div><div class="col-2 text-right"><span class="lightpink">${post.nick}</span></div>`;
-        }).join("");
-        const el = document.getElementById(wallId);
-        if (el) el.innerHTML = html;
-      });
+    const renderPosts = (data: { tag: string | null; nick: string | null }[]) => {
+      const html = data.map(p =>
+        `<div class="col-10 d-flex"><span class="cyan text-truncate" style="white-space:pre">${p.tag ?? ""}</span></div><div class="col-2 text-right"><span class="lightpink">${p.nick ?? ""}</span></div>`
+      ).join("");
+      const el = document.getElementById(wallId);
+      if (el) el.innerHTML = html;
     };
-    const t = setTimeout(load, 300);
-    return () => clearTimeout(t);
+
+    fetch("/api/wall?wall_id=1")
+      .then(r => r.json())
+      .then((d: unknown) => { if (Array.isArray(d)) renderPosts(d as { tag: string | null; nick: string | null }[]); })
+      .catch(() => {});
   }, [wallId]);
 
   const handleSubmit = (e: React.FormEvent) => {

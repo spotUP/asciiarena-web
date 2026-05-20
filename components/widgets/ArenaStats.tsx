@@ -15,7 +15,7 @@ export default async function ArenaStats() {
   const bytes = Number(bytesResult[0]?.bytes ?? 0);
 
   return (
-    <div className="container-fluid col-12 p-0" style={{ minHeight: "160px" }}>
+    <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2" style={{ minHeight: "160px" }}>
       <div className="header col-lg-12 p-0">
         <h2 className="ap-1 bg-header">aSCIIaRENA STATS</h2>
       </div>
