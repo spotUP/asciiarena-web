@@ -270,6 +270,9 @@ export default async function ReleasePage({ params }: PageProps) {
         {!isArchive && (
           <input type="button" id="fsbutton" onClick={undefined} className="btn-big amb-1" value="Fullscreen" />
         )}
+        {!isArchive && (
+          <input type="button" id="fitbutton" onClick={undefined} className="btn-big amb-1" value="Fit to screen" />
+        )}
         <input type="button" onClick={undefined} className="btn-big amb-1" value="Download" id="download-btn" />
         <input type="hidden" id="collyid" data-id={collyId} />
 
@@ -349,12 +352,12 @@ export default async function ReleasePage({ params }: PageProps) {
       {type === "ASCII" && (
         <div
           className="row ml-0 mr-0 amb-1 p-0 justify-content-center align-items-center"
-          style={{ overflowY: "scroll", height: "100vh", backgroundColor: bgcolor }}
+          style={{ overflow: "auto", height: "100vh", backgroundColor: bgcolor }}
           id="colly-div"
         >
           <pre
             id="colly"
-            style={{ overflow: "hidden", fontFamily: font, color: fgcolor, whiteSpace: "pre" }}
+            style={{ overflow: "visible", fontFamily: font, color: fgcolor, whiteSpace: "pre" }}
             dangerouslySetInnerHTML={{ __html: "<br><br><br><br>" + fileContent + "<br><br><br><br>" }}
           />
         </div>
@@ -365,7 +368,7 @@ export default async function ReleasePage({ params }: PageProps) {
         <>
           <div
             className="row ml-0 mr-0 amb-1 p-0 justify-content-center align-items-center"
-            style={{ backgroundColor: "#000" }}
+            style={{ backgroundColor: "#000", overflowX: "auto" }}
             id="colly-div"
           >
             <span id="loading" style={{ animation: "blink 2s linear infinite" }}>.LOADiNG.</span>
@@ -621,7 +624,38 @@ export default async function ReleasePage({ params }: PageProps) {
           $('#colly-font').on('change',function(){ $('#colly').css('font-family',$(this).val()); });
 
           // Button handlers
+          // Fit-to-screen toggle
+          function fitColly() {
+            var pre = document.getElementById('colly');
+            var container = document.getElementById('colly-div');
+            if (!pre || !container) return;
+            if (pre.getAttribute('data-fitted') === '1') {
+              pre.style.fontSize = '';
+              pre.setAttribute('data-fitted', '0');
+              $('#fitbutton').val('Fit to screen');
+            } else {
+              var cw = container.clientWidth - 16;
+              var pw = pre.scrollWidth;
+              if (pw > cw) {
+                pre.style.fontSize = Math.floor((cw / pw) * 100) + '%';
+              }
+              pre.setAttribute('data-fitted', '1');
+              $('#fitbutton').val('Reset size');
+            }
+          }
+          // Auto-fit on mobile portrait
+          if (window.innerWidth < 768) { fitColly(); }
+          window.addEventListener('resize', function() {
+            var pre = document.getElementById('colly');
+            if (pre && pre.getAttribute('data-fitted') === '1') {
+              pre.style.fontSize = '';
+              pre.setAttribute('data-fitted', '0');
+              fitColly();
+            }
+          });
+
           $('#viewbutton').on('click', toggleColly);
+          $('#fitbutton').on('click', fitColly);
           $('#fsbutton').on('click', showFullscreen);
           $('#download-btn').on('click', downloadfile);
           $('#addcomment-btn').on('click', addComment);
