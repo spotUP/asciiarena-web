@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/db";
 
-const BASE_URL = "https://asciiarena.se";
+const BASE_URL = process.env.NEXTAUTH_URL ?? "https://asciiarena.se";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [collys, artists, crews] = await Promise.all([

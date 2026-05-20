@@ -3,13 +3,14 @@ import Script from "next/script";
 import "@/app/globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXTAUTH_URL ?? "https://asciiarena.se"),
   title: "aSCIIaRENA",
   description: "A community for ascii artists by Up Rough and Divine Stylers",
   openGraph: {
     title: "aSCIIaRENA.se",
     description: "A community for ascii artists",
-    images: ["https://www.asciiarena.se/assets/data/socialmedia.png"],
-    url: "https://www.asciiarena.se",
+    images: ["/assets/data/socialmedia.png"],
+    url: "/",
   },
 };
 

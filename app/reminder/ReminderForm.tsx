@@ -111,8 +111,9 @@ export default function ReminderForm({ resetToken }: Props) {
                 type="password"
                 className="form-control w-100"
                 value={password}
+                minLength={8}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="New password"
+                placeholder="New password (8+ chars)"
                 autoComplete="new-password"
               />
             </div>
@@ -121,6 +122,7 @@ export default function ReminderForm({ resetToken }: Props) {
                 type="password"
                 className="form-control w-100"
                 value={repeatPassword}
+                minLength={8}
                 onChange={(e) => setRepeatPassword(e.target.value)}
                 placeholder="Repeat new password"
                 autoComplete="new-password"
