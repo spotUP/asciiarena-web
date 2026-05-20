@@ -316,7 +316,7 @@ export default async function AdminPage() {
         });
 
         // ── Users ──────────────────────────────────────────────────────
-        var RANKS = ["","Member","Senior Member","Uploader","Admin"];
+        var RANKS = ["","Inactive","Member","Senior Member","Uploader","Admin"];
         function userRow(r) {
           var rankOpts = RANKS.map(function(rk) {
             return '<option value="' + rk + '"' + (r.rank === rk ? " selected" : "") + '>' + (rk || "(none)") + '</option>';

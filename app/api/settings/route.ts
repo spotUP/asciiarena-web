@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
-import { apiError, apiOk } from "@/lib/utils";
+import { apiError, apiOk, urlsafe } from "@/lib/utils";
 import bcrypt from "bcryptjs";
 import { createHash } from "crypto";
 
@@ -135,9 +135,12 @@ export async function PATCH(request: NextRequest) {
     `;
   }
 
+  const nickurl = nick ? urlsafe(nick) : null;
+
   await prisma.$executeRaw`
     UPDATE users SET
       nick = ${nick ?? null},
+      nickurl = COALESCE(${nickurl}, nickurl),
       crew = ${crew ?? null},
       byear = ${byear ?? null},
       bmonth = ${bmonth ?? null},

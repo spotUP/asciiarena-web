@@ -42,10 +42,11 @@ function formatDate(ts: number | null): string {
 interface Props {
   userId: string;
   userNick: string;
+  initialReceiverId?: number | null;
 }
 
-export default function MessagesClient({ userNick }: Props) {
-  const [activeTab, setActiveTab] = useState<ActiveTab>("inbox");
+export default function MessagesClient({ userNick, initialReceiverId }: Props) {
+  const [activeTab, setActiveTab] = useState<ActiveTab>(initialReceiverId ? "new" : "inbox");
   const [messages, setMessages] = useState<MessageSummary[]>([]);
   const [currentThread, setCurrentThread] = useState<ThreadMessage[]>([]);
   const [selectedThreadId, setSelectedThreadId] = useState<number | null>(null);
@@ -54,7 +55,11 @@ export default function MessagesClient({ userNick }: Props) {
   const [loadingMsgs, setLoadingMsgs] = useState(false);
   const [loadingThread, setLoadingThread] = useState(false);
   const [statusMsg, setStatusMsg] = useState<string>("");
-  const [newMsg, setNewMsg] = useState<NewMsg>({ receiver: "", subject: "", msgtext: "" });
+  const [newMsg, setNewMsg] = useState<NewMsg>({
+    receiver: initialReceiverId ? String(initialReceiverId) : "",
+    subject: "",
+    msgtext: "",
+  });
   const replyRef = useRef<HTMLTextAreaElement>(null);
 
   async function loadBox(box: 1 | 2) {
@@ -74,8 +79,8 @@ export default function MessagesClient({ userNick }: Props) {
   }
 
   useEffect(() => {
-    loadBox(1);
-  }, []);
+    if (!initialReceiverId) loadBox(1);
+  }, [initialReceiverId]);
 
   function handleTabClick(tab: ActiveTab) {
     setActiveTab(tab);
