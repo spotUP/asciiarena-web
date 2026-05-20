@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@/styles/site.css";
+import "@/app/globals.css";
 
 export const metadata: Metadata = {
   title: "aSCIIaRENA",
