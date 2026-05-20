@@ -75,6 +75,54 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
         </div>
       </div>
 
+      {/* Login modal — BS5 attributes, action posts to NextAuth credentials endpoint */}
+      <div className="modal" id="login" tabIndex={-1} role="dialog" aria-hidden="true">
+        <div className="modal-dialog animate__animated animate__backInLeft" role="document">
+          <div className="modal-content">
+            <div className="modal-header" style={{ backgroundColor: "#444444" }}>
+              <span className="modal-title">LOGiN</span>
+              <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div className="modal-body bg-primary">
+              {!session?.user ? (
+                <form action="/api/auth/callback/credentials" method="post" id="login-form">
+                  <input type="hidden" name="csrfToken" value="" id="csrf-token" />
+                  <div className="container-fluid">
+                    <div className="row">
+                      <div className="col-12 col-sm-6">
+                        <div className="form-group">
+                          <input type="text" className="form-control" name="login" id="login-nick" autoComplete="username" placeholder="Enter your handle" />
+                        </div>
+                        <div className="form-group">
+                          <input type="password" name="password" id="login-password" className="form-control" autoComplete="current-password" placeholder="Prove it" />
+                        </div>
+                      </div>
+                      <div className="col-12 col-sm-6">
+                        <div className="form-group">
+                          <div className="form-check form-switch lightgrey">
+                            <input className="form-check-input" type="checkbox" id="rememberme" name="rememberme" value="1" defaultChecked />
+                            <label className="form-check-label" htmlFor="rememberme">Remember me</label>
+                          </div>
+                        </div>
+                        <a href="/register">Register</a> <span style={{ color: "#999999" }}>new account!</span><br /><br />
+                        <a href="/reminder">Help!</a> <span style={{ color: "#999999" }}>forgot your password?</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="login-results"></div>
+                </form>
+              ) : (
+                <span>You&apos;re already logged in</span>
+              )}
+            </div>
+            <div className="modal-footer bg-primary">
+              <button type="button" className="btn-secondary bg-transparent amr-1 apr-1" data-bs-dismiss="modal">CLOSE</button>
+              <button type="button" className="btn-primary black bg-lightgrey" id="login-submit-btn">LOG IN</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <Script id="switcharoo-init" strategy="afterInteractive">{`
         window.switchers = window.switchers || [];
         function switcharoo(selector, delay, idx, start) {
@@ -112,6 +160,27 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
               $("#spotclose").toggleClass("show");
             }
           });
+
+          // Login form: POST to NextAuth credentials, reload on success
+          function loginUser() {
+            var nick = $("#login-nick").val();
+            var pass = $("#login-password").val();
+            $.ajax({
+              type: "POST",
+              url: "/api/auth/callback/credentials",
+              data: { login: nick, password: pass, redirect: "false" },
+              success: function() { window.location.reload(); },
+              error: function() {
+                $("#login-results").html('<div class="alert alert-danger animate__animated animate__shakeX">authentication failed</div>');
+                setTimeout(function(){ $("#login-results").empty(); }, 3000);
+              }
+            });
+          }
+          $("#login-submit-btn").on("click", loginUser);
+          $("#login-nick, #login-password").on("keyup", function(e) {
+            if (e.which === 13) loginUser();
+          });
+          $("#login").on("shown.bs.modal", function() { $("#login-nick").focus(); });
         });
       `}</Script>
     </>
