@@ -80,10 +80,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   const result = rows.map((row) => ({
     url: `/release/${row.filename}`,
-    id: row.id,
+    id: Number(row.id),
     name: row.name,
     filename: row.filename,
-    filesize: row.filesize,
+    filesize: row.filesize !== null ? Number(row.filesize) : null,
     artists: row.artists,
     crews: row.crews,
     cdate: row.cdate,

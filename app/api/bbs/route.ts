@@ -50,7 +50,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   const result = rows.map((row) => ({
     url: `/bbs/${row.id}`,
-    id: row.id,
+    id: Number(row.id),
     name: row.name,
     sysop: row.sysop,
     total_count,

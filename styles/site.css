@@ -142,7 +142,7 @@
 }
 
 * {
-  cursor:url(../data/mousepointer.png), auto !important;
+  cursor:url(/assets/data/mousepointer.png), auto !important;
   font-smooth: never !important;
   -webkit-font-smooth : none !important;
   -webkit-font-smoothing: none !important;

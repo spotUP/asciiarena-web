@@ -56,7 +56,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   const result = rows.map((row) => ({
     url: `/crew/${urlsafe(row.name ?? "")}`,
-    id: row.id,
+    id: Number(row.id),
     name: row.name,
     acronym: row.acronym,
     members_cnt: Number(row.members_cnt),

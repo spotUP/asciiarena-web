@@ -67,9 +67,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   const result = rows.map((row) => ({
     url: `/magazine/${row.filename ?? ""}`,
-    id: row.id,
+    id: Number(row.id),
     name: row.name,
-    filesize: row.filesize,
+    filesize: row.filesize !== null ? Number(row.filesize) : null,
     filename: row.filename,
     author: row.author,
     timestamp: formatTimestamp(row.timestamp),
