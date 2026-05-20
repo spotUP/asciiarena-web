@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
+import { urlsafe } from "@/lib/utils";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -13,6 +14,14 @@ export default async function BbsPage({ params }: PageProps) {
 
   const bbs = await prisma.bbses.findUnique({ where: { id } });
   if (!bbs) notFound();
+
+  const affiliatedCrews = await prisma.$queryRaw<{ crew: string; crewurl: string | null }[]>`
+    SELECT bo.crew, c.crewurl
+    FROM bbs_of bo
+    LEFT JOIN crews c ON LOWER(c.name) = LOWER(bo.crew)
+    WHERE bo.name = ${bbs.name}
+    ORDER BY bo.crew ASC
+  `;
 
   return (
     <SiteLayout title="BBS iNFO">
@@ -60,6 +69,21 @@ export default async function BbsPage({ params }: PageProps) {
         <span className="lightgrey">Status: </span>
         {bbs.online ? "Online" : "Offline"}
       </div>
+
+      {affiliatedCrews.length > 0 && (
+        <>
+          <div className="row apt-1 apb-1">
+            <h2 className="bg-header">Affiliated Groups</h2>
+          </div>
+          {affiliatedCrews.map((c) => (
+            <div key={c.crew} className="col-lg-12 pl-0">
+              {c.crewurl
+                ? <a href={`/crew/${c.crewurl}`}>{c.crew}</a>
+                : <a href={`/crew/${urlsafe(c.crew)}`}>{c.crew}</a>}
+            </div>
+          ))}
+        </>
+      )}
     </SiteLayout>
   );
 }

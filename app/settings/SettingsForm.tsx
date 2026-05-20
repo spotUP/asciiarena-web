@@ -342,6 +342,21 @@ export default function SettingsForm() {
         </div>
 
         <div className="row amb-1 apt-1">
+          <div className="col-xs-12 col-md-6 apt-1">Webpage</div>
+        </div>
+        <div className="row amb-1">
+          <div className="col-xs-12 col-md-6">
+            <input
+              type="url"
+              className="w-100"
+              value={settings.webpage ?? ""}
+              onChange={(e) => set("webpage", e.target.value)}
+              placeholder="https://..."
+            />
+          </div>
+        </div>
+
+        <div className="row amb-1 apt-1">
           <div className="col-xs-12 col-md-6">
             <div className="custom-control custom-switch">
               Show E-Mail

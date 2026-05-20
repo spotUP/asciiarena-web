@@ -1,5 +1,7 @@
+import Script from "next/script";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
+import { auth } from "@/lib/auth";
 import { notFound } from "next/navigation";
 
 interface MemberRow {
@@ -10,6 +12,8 @@ interface MemberRow {
   rank: string | null;
   joined: number | null;
   uploaded: number | null;
+  mail: string | null;
+  display_mail: number | null;
 }
 
 interface ArtistRow {
@@ -38,6 +42,7 @@ interface CollyRow {
 }
 
 interface FaveRow {
+  colly_id: number;
   name: string | null;
   filename: string | null;
   artists: string | null;
@@ -57,12 +62,13 @@ export default async function MemberPage({
 }) {
   const { nick } = await params;
 
-  const members = await prisma.$queryRaw<MemberRow[]>`
-    SELECT id, nick, crew, country, \`rank\`, joined, uploaded
-    FROM users
-    WHERE nickurl = ${nick}
-    LIMIT 1
-  `;
+  const [session, members] = await Promise.all([
+    auth(),
+    prisma.$queryRaw<MemberRow[]>`
+      SELECT id, nick, crew, country, \`rank\`, joined, uploaded, mail, display_mail
+      FROM users WHERE nickurl = ${nick} LIMIT 1
+    `,
+  ]);
   const member = members[0];
   if (!member) notFound();
 
@@ -114,7 +120,7 @@ export default async function MemberPage({
   `;
 
   const faves = await prisma.$queryRaw<FaveRow[]>`
-    SELECT c.filename, c.name,
+    SELECT f.colly_id, c.filename, c.name,
            GROUP_CONCAT(DISTINCT a.nick) AS artists,
            GROUP_CONCAT(DISTINCT w.name) AS crews
     FROM favourites f
@@ -124,22 +130,31 @@ export default async function MemberPage({
     LEFT JOIN artists_collys ac ON f.colly_id = ac.colly_id
     LEFT JOIN artists a ON a.id = ac.artist_id
     WHERE f.user_id = ${member.id}
-    GROUP BY c.filename
+    GROUP BY f.colly_id, c.filename
   `;
 
   const kb = Math.round((member.uploaded ?? 0) / 1000);
+  const isOwnProfile = session?.user?.id ? Number(session.user.id) === member.id : false;
+  const isAdmin = member.rank === "Admin";
+  const isPumper = (member.uploaded ?? 0) >= 20_000_000;
+  const isSupporter = totalComments >= 300;
 
   return (
     <SiteLayout title="MEMBER">
       <div className="container-fluid apb-1">
-        <div className="row">
+        <div className="row align-items-center">
           <div className="col-sm-4">
             <span className="white">Nick: </span>
             <span className="yellow">{member.nick}</span>
           </div>
-          <div className="col-sm-8">
+          <div className="col-sm-4">
             <span className="white">Status: </span>
             <span className="yellow">{member.rank}</span>
+          </div>
+          <div className="col-sm-4" style={{ display: "flex", gap: "4px" }}>
+            {isAdmin && <img src="/assets/data/sticker_king.png" alt="Admin" title="Admin" style={{ height: "24px" }} />}
+            {isPumper && <img src="/assets/data/sticker_pumper.png" alt="Pumper" title="Top Uploader" style={{ height: "24px" }} />}
+            {isSupporter && <img src="/assets/data/sticker_supporter.png" alt="Supporter" title="Active Commenter" style={{ height: "24px" }} />}
           </div>
         </div>
 
@@ -208,11 +223,22 @@ export default async function MemberPage({
           </div>
         )}
 
-        <div className="row apt-1">
-          <a href={`/messages?sendmsg=${member.id}`}>
-            <input type="button" className="btn-big" value="Send Message" readOnly />
-          </a>
-        </div>
+        {member.display_mail === 1 && member.mail && (
+          <div className="row apt-1">
+            <div className="col-sm-12">
+              <span className="white">Email: </span>
+              <a href={`mailto:${member.mail}`}>{member.mail}</a>
+            </div>
+          </div>
+        )}
+
+        {!isOwnProfile && (
+          <div className="row apt-1">
+            <a href={`/messages?sendmsg=${member.id}`}>
+              <input type="button" className="btn-big" value="Send Message" readOnly />
+            </a>
+          </div>
+        )}
 
         {totalComments > 0 && (
           <>
@@ -281,7 +307,7 @@ export default async function MemberPage({
               </div>
             </div>
             <div className="row apb-1">
-              <div className="col-sm-4 apb-1 d-none d-sm-block">
+              <div className={`${isOwnProfile ? "col-sm-3" : "col-sm-4"} apb-1 d-none d-sm-block`}>
                 <span className="white">NAME</span>
               </div>
               <div className="col-sm-4 apb-1 d-none d-sm-block">
@@ -292,8 +318,8 @@ export default async function MemberPage({
               </div>
             </div>
             {faves.map((f, i) => (
-              <div key={i} className="row">
-                <div className="col-12 col-sm-4">
+              <div key={i} className="row amb-1">
+                <div className={`col-12 ${isOwnProfile ? "col-sm-3" : "col-sm-4"}`}>
                   <a className="magenta" href={`/release/${f.filename}`}>
                     {f.name}
                   </a>
@@ -303,11 +329,37 @@ export default async function MemberPage({
                 <div className="col-12 apb-1 d-block d-sm-none">
                   by {f.artists ?? "-"} of {f.crews ?? "-"}
                 </div>
+                {isOwnProfile && (
+                  <div className="col-12 col-sm-1">
+                    <button
+                      className="btn-big"
+                      data-colly-id={f.colly_id}
+                      onClick={undefined}
+                      id={`unfave-${f.colly_id}`}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </>
         )}
       </div>
+
+      {isOwnProfile && faves.length > 0 && (
+        <Script id="member-unfave" strategy="afterInteractive">{`
+          $("[id^='unfave-']").on("click", function() {
+            var collyId = $(this).data("colly-id");
+            var btn = $(this);
+            fetch("/api/collys/" + collyId + "/favourites", { method: "DELETE" })
+              .then(function(r) { return r.json(); })
+              .then(function(d) {
+                if (d.status === true) btn.closest(".row").fadeOut(300);
+              });
+          });
+        `}</Script>
+      )}
     </SiteLayout>
   );
 }

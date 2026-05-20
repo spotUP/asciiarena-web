@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Paginator from "@/components/ui/Paginator";
+import { urlsafe } from "@/lib/utils";
 
 interface CollyRow {
   url: string;
@@ -199,10 +200,14 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
                   </a>
                 </div>
                 <div className="col green text-truncate">
-                  <span className="yellow">{colly.artists}</span>
+                  {(colly.artists ?? "").split(",").filter(Boolean).map((a, i) => (
+                    <span key={a}>{i > 0 && ","}<a className="yellow" href={`/artist/${urlsafe(a.trim())}`}>{a.trim()}</a></span>
+                  ))}
                 </div>
                 <div className="col green text-truncate">
-                  <span className="yellow">{colly.crews}</span>
+                  {(colly.crews ?? "").split(",").filter(Boolean).map((c, i) => (
+                    <span key={c}>{i > 0 && ","}<a className="yellow" href={`/crew/${urlsafe(c.trim())}`}>{c.trim()}</a></span>
+                  ))}
                 </div>
                 <div className="col text-truncate d-none d-md-block">{colly.cdate}</div>
               </div>
