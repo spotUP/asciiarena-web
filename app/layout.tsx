@@ -53,12 +53,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           strategy="beforeInteractive"
         />
         <Script
-          src="/assets/js/bootstrap-colorselector.js"
-          strategy="afterInteractive"
+          src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"
+          strategy="beforeInteractive"
         />
         <Script
-          src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"
-          strategy="afterInteractive"
+          src="/assets/js/bootstrap-colorselector.js"
+          strategy="beforeInteractive"
         />
       </body>
     </html>
