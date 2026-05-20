@@ -2552,14 +2552,3 @@ a {
 a:hover {
   text-decoration: underline;
 }
-
-/* Bootstrap 4 override: ensure no underlines on links (was default in BS4) */
-:root {
-  --bs-link-decoration: none;
-}
-a {
-  text-decoration: none;
-}
-a:hover {
-  text-decoration: underline;
-}

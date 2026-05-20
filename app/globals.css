@@ -1,7 +1,7 @@
-/* global overrides beyond site.css go here */
+/* Loaded last — overrides Bootstrap 4 defaults that site.css doesn't cover */
 
-/* Bootstrap 5 changed link decoration default from none to underline.
-   The site was designed without underlines — restore BS4 behaviour. */
+/* Bootstrap 4 doesn't underline links by default; some browsers do.
+   Restore exact BS4 link behaviour. */
 a {
   text-decoration: none;
 }
