@@ -42,7 +42,7 @@ export async function GET(
   const start = Math.max(0, (maxpage - page) * pagesize);
 
   await prisma.$executeRaw`
-    UPDATE messages SET \`new\` = 0 WHERE thread = ${thread} AND to_id = ${userId}
+    UPDATE messages SET \`new\` = 0, unread = 0 WHERE thread = ${thread} AND to_id = ${userId}
   `;
 
   const rows = await prisma.$queryRaw<ThreadMessageRow[]>`

@@ -34,6 +34,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           email: user.mail ?? undefined,
           rank: user.rank,
           crew: user.crew,
+          crt_effect: user.crt_effect,
+          anim_effect: user.anim_effect,
         };
       },
     }),
@@ -44,6 +46,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.id = user.id;
         token.rank = user.rank ?? null;
         token.crew = user.crew ?? null;
+        token.crt_effect = (user as { crt_effect?: string }).crt_effect ?? "N";
+        token.anim_effect = (user as { anim_effect?: string }).anim_effect ?? "N";
       }
       return token;
     },
@@ -52,6 +56,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = token.id as string;
         session.user.rank = (token.rank as string | null | undefined) ?? null;
         session.user.crew = (token.crew as string | null | undefined) ?? null;
+        (session.user as { crt_effect?: string }).crt_effect = (token.crt_effect as string) ?? "N";
+        (session.user as { anim_effect?: string }).anim_effect = (token.anim_effect as string) ?? "N";
       }
       return session;
     },

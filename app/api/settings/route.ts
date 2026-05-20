@@ -20,8 +20,8 @@ interface UserRow {
   def_fg_col: string | null;
   display_mail: number | null;
   def_font: number | null;
-  crt_effect: number | null;
-  anim_effect: number | null;
+  crt_effect: string | null;
+  anim_effect: string | null;
   pwhash: string | null;
 }
 
@@ -65,8 +65,8 @@ export async function GET(_request: NextRequest) {
     def_fg_col: row.def_fg_col,
     display_mail: row.display_mail,
     def_font: row.def_font,
-    crt_effect: row.crt_effect,
-    anim_effect: row.anim_effect,
+    crt_effect: row.crt_effect === "Y" ? 1 : 0,
+    anim_effect: row.anim_effect === "Y" ? 1 : 0,
   });
 }
 
@@ -137,6 +137,23 @@ export async function PATCH(request: NextRequest) {
 
   const nickurl = nick ? urlsafe(nick) : null;
 
+  // Validate nick uniqueness if changing nick
+  if (nick) {
+    const existing = await prisma.$queryRaw<{ id: number }[]>`
+      SELECT id FROM users WHERE nick = ${nick} AND id != ${userId} LIMIT 1
+    `;
+    if (existing.length > 0) return apiError("Nickname is already in use.", 409);
+    if (nickurl) {
+      const existingUrl = await prisma.$queryRaw<{ id: number }[]>`
+        SELECT id FROM users WHERE nickurl = ${nickurl} AND id != ${userId} LIMIT 1
+      `;
+      if (existingUrl.length > 0) return apiError("Nickname conflicts with an existing profile URL.", 409);
+    }
+  }
+
+  const crtVal = crt_effect != null ? (crt_effect === 1 ? "Y" : "N") : null;
+  const animVal = anim_effect != null ? (anim_effect === 1 ? "Y" : "N") : null;
+
   await prisma.$executeRaw`
     UPDATE users SET
       nick = ${nick ?? null},
@@ -154,8 +171,8 @@ export async function PATCH(request: NextRequest) {
       def_fg_col = ${def_fg_col ?? null},
       display_mail = ${display_mail ?? null},
       def_font = ${def_font ?? null},
-      crt_effect = ${crt_effect ?? null},
-      anim_effect = ${anim_effect ?? null}
+      crt_effect = COALESCE(${crtVal}, crt_effect),
+      anim_effect = COALESCE(${animVal}, anim_effect)
     WHERE id = ${userId}
   `;
 

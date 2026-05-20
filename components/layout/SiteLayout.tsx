@@ -26,10 +26,9 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
   const session = rawSession as Session | null;
   const logos = logoRows.map((r) => r.ascii);
 
-  // Show CRT scanlines unless the user has explicitly disabled them
-  const showCrt =
-    !session?.user ||
-    (session.user as { crt_effect?: string }).crt_effect !== "N";
+  const userPrefs = session?.user as { crt_effect?: string; anim_effect?: string } | undefined;
+  const showCrt = !session?.user || userPrefs?.crt_effect !== "N";
+  const showAnim = !session?.user || userPrefs?.anim_effect !== "N";
 
   return (
     <>
@@ -48,18 +47,22 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
         });
       `}</Script>
 
-      {/* 386 boot animation — 386.css sets body{visibility:hidden} until init runs */}
-      <script
-        type="module"
-        dangerouslySetInnerHTML={{ __html: `
-          try {
-            const { default: init386 } = await import('/assets/js/386-animation/index.js');
-            init386({ fastLoad: true, onePass: true, speedFactor: 4, background: '#000000', cursorColor: '#ff0000' });
-          } catch(e) {
-            document.body.style.visibility = 'visible';
-          }
-        `}}
-      />
+      {/* 386 boot animation — only shown when anim_effect is enabled */}
+      {showAnim ? (
+        <script
+          type="module"
+          dangerouslySetInnerHTML={{ __html: `
+            try {
+              const { default: init386 } = await import('/assets/js/386-animation/index.js');
+              init386({ fastLoad: true, onePass: true, speedFactor: 4, background: '#000000', cursorColor: '#ff0000' });
+            } catch(e) {
+              document.body.style.visibility = 'visible';
+            }
+          `}}
+        />
+      ) : (
+        <script dangerouslySetInnerHTML={{ __html: "document.body.style.visibility='visible';" }} />
+      )}
 
       {showCrt && <div className="scanlines"></div>}
       <div className="vignette"></div>
