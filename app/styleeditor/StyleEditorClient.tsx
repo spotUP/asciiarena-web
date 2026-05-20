@@ -183,6 +183,20 @@ function makeRuler(width: number): string {
   return r;
 }
 
+// Naive side-by-side character concatenation (no smushing) for inline preview
+function renderWord(word: string, figChars: Record<number, string>): string {
+  if (!word.trim()) return "";
+  const charArts = Array.from(word).map(c => {
+    const art = figChars[c.charCodeAt(0)] ?? "";
+    return art.replace(/\r\n/g, "\n").split("\n");
+  }).filter(rows => rows.some(r => r.trim()));
+  if (charArts.length === 0) return "";
+  const height = Math.max(...charArts.map(r => r.length));
+  return Array.from({ length: height }, (_, row) =>
+    charArts.map(rows => rows[row] ?? "").join("")
+  ).join("\n");
+}
+
 const H_RULE_TIPS: Record<number, string> = {
   1: "Equal chars merge into one.",
   2: "Underscores yield to |/\\[]{}()<>.",
@@ -227,6 +241,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
     return undoStacks.current.get(code)!;
   }
 
+  const [previewWord, setPreviewWord] = useState("Hello");
   const dim = charDimensions(font.figChars[selectedChar] ?? "");
   const rulerStr = makeRuler(Math.max(dim.maxCols + 2, 40));
 
@@ -576,22 +591,31 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
                 </div>
               </div>
 
-              {/* Column ruler */}
-              <div style={{ fontFamily: "TopazPlus_a1200, monospace", fontSize: "13px", lineHeight: "16px",
-                color: "#444", background: "#0a0a0a", padding: "0 8px 0 8px",
-                borderTop: "1px solid #222", borderLeft: "1px solid #333", borderRight: "1px solid #333",
-                overflowX: "hidden", whiteSpace: "pre", letterSpacing: 0 }}>
-                {rulerStr}
-              </div>
-
               {/* Main textarea + line numbers side-by-side */}
-              <div style={{ flex: "1 1 0", display: "flex", overflow: "hidden" }}>
+              <div style={{ flex: "1 1 0", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                {/* Ruler row: spacer matches line-numbers width, then ruler aligned to textarea */}
+                <div style={{ display: "flex", flexShrink: 0 }}>
+                  {/* Spacer for line-number column */}
+                  <div style={{ minWidth: "32px", background: "#0a0a0a", borderLeft: "1px solid #333" }} />
+                  {/* Ruler — same font, size, padding as textarea */}
+                  <div style={{
+                    fontFamily: "TopazPlus_a1200, monospace", fontSize: "13px", lineHeight: "16px",
+                    color: "#444", background: "#0a0a0a", padding: "0 4px",
+                    borderLeft: "1px solid #333", borderRight: "1px solid #333",
+                    borderTop: "1px solid #222",
+                    flex: "1 1 0", overflowX: "hidden", whiteSpace: "pre",
+                  }}>
+                    {rulerStr}
+                  </div>
+                </div>
+
+                <div style={{ flex: "1 1 0", display: "flex", overflow: "hidden" }}>
                 {/* Line numbers */}
                 <div style={{
                   fontFamily: "TopazPlus_a1200, monospace", fontSize: "13px", lineHeight: "16px",
                   color: "#444", background: "#0a0a0a", padding: "2px 4px",
                   borderLeft: "1px solid #333", borderBottom: "1px solid #333",
-                  minWidth: "28px", textAlign: "right", userSelect: "none",
+                  minWidth: "32px", textAlign: "right", userSelect: "none",
                   overflowY: "hidden", whiteSpace: "pre",
                 }}>
                   {(font.figChars[selectedChar] ?? "").split("\n").map((_, i) => `${i + 1}\n`).join("")}
@@ -614,6 +638,7 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
                   placeholder={`Draw the ASCII art for '${charLabel(selectedChar)}' here...`}
                 />
               </div>
+              </div>
 
               {/* Comment header */}
               <div style={{ marginTop: "6px" }}>
@@ -630,14 +655,32 @@ export default function StyleEditorClient({ userNick }: { userNick: string }) {
 
             {/* Right panel: live preview */}
             <div style={{ width: "280px", minWidth: "200px", borderLeft: "1px solid #333", background: "#0d0d0d", padding: "6px 8px", overflowY: "auto" }}>
-              <div style={{ fontSize: "11px", color: "#888", marginBottom: "4px" }}>Live preview:</div>
+              <div style={{ fontSize: "11px", color: "#888", marginBottom: "2px" }}>Char preview:</div>
               <div style={{
                 fontFamily: "TopazPlus_a1200, monospace", fontSize: "13px", lineHeight: "16px",
-                color: "#55ffff", background: "#0a0a0a", padding: "6px",
-                border: "1px solid #222", minHeight: "80px", whiteSpace: "pre",
-                wordBreak: "break-all",
+                color: "#55ffff", background: "#0a0a0a", padding: "4px",
+                border: "1px solid #222", minHeight: "60px", whiteSpace: "pre",
+                overflowX: "auto",
               }}>
                 {font.figChars[selectedChar] || <span style={{ color: "#333" }}>(empty)</span>}
+              </div>
+
+              <div style={{ fontSize: "11px", color: "#888", marginTop: "10px", marginBottom: "2px" }}>Word preview:</div>
+              <input
+                type="text"
+                className="form-control form-control-sm"
+                style={{ marginBottom: "4px", fontFamily: "TopazPlus_a1200, monospace" }}
+                value={previewWord}
+                placeholder="type a word..."
+                onChange={e => setPreviewWord(e.target.value)}
+              />
+              <div style={{
+                fontFamily: "TopazPlus_a1200, monospace", fontSize: "11px", lineHeight: "14px",
+                color: "#55ffff", background: "#0a0a0a", padding: "4px",
+                border: "1px solid #222", minHeight: "60px", whiteSpace: "pre",
+                overflowX: "auto",
+              }}>
+                {renderWord(previewWord, font.figChars) || <span style={{ color: "#333" }}>(define chars first)</span>}
               </div>
 
               <div style={{ fontSize: "11px", color: "#888", marginTop: "12px", marginBottom: "4px" }}>Width info:</div>
