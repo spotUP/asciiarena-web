@@ -48,6 +48,19 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
         });
       `}</Script>
 
+      {/* 386 boot animation — 386.css sets body{visibility:hidden} until init runs */}
+      <script
+        type="module"
+        dangerouslySetInnerHTML={{ __html: `
+          try {
+            const { default: init386 } = await import('/assets/js/386-animation/index.js');
+            init386({ fastLoad: true, onePass: true, speedFactor: 4, background: '#000000', cursorColor: '#ff0000' });
+          } catch(e) {
+            document.body.style.visibility = 'visible';
+          }
+        `}}
+      />
+
       {showCrt && <div className="scanlines"></div>}
       <div className="vignette"></div>
 
