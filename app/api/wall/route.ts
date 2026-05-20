@@ -15,6 +15,15 @@ function stripHtml(input: string): string {
   return input.replace(/<[^>]*>/g, "");
 }
 
+export async function GET(request: NextRequest) {
+  const wallId = parseInt(request.nextUrl.searchParams.get("wall_id") ?? "1");
+  const rows = await prisma.$queryRaw<WallPostRow[]>`
+    SELECT * FROM wallposts WHERE wall_id = ${wallId}
+    ORDER BY id DESC LIMIT 13
+  `;
+  return apiOk(rows.reverse().map((r) => ({ tag: r.tag, nick: r.nick })));
+}
+
 export async function POST(request: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) return apiError("Unauthorized", 401);
