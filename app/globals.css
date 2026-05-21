@@ -1,6 +1,89 @@
-/* Loaded last — overrides Bootstrap 4 link hover underline */
-a, a:hover {
-  text-decoration: none;
+/* ── Bootstrap 5 regression fixes ──────────────────────────────────────── */
+
+/* Links: BS5 adds underline by default */
+a, a:hover, a:focus, a:visited {
+  text-decoration: none !important;
+}
+
+/* BS5 CSS variables — restore site's colour palette */
+:root {
+  --bs-link-color: #aaaaaa;
+  --bs-link-hover-color: #ffffff;
+  --bs-link-color-rgb: 170,170,170;
+  --bs-link-hover-color-rgb: 255,255,255;
+  /* Dropdown */
+  --bs-dropdown-bg: #aaaaaa;
+  --bs-dropdown-color: #111111;
+  --bs-dropdown-border-color: #888;
+  --bs-dropdown-border-radius: 0;
+  --bs-dropdown-box-shadow: none;
+  --bs-dropdown-link-color: #111111;
+  --bs-dropdown-link-hover-color: #111111;
+  --bs-dropdown-link-hover-bg: #888888;
+  --bs-dropdown-link-active-color: #111111;
+  --bs-dropdown-link-active-bg: #666666;
+  --bs-dropdown-padding-y: 0;
+  /* Navbar */
+  --bs-navbar-color: #aaaaaa;
+  --bs-navbar-hover-color: #ffffff;
+  --bs-navbar-active-color: #ffffff;
+  --bs-navbar-brand-color: #ffffff;
+  --bs-navbar-brand-hover-color: #ffffff;
+  --bs-navbar-toggler-border-color: transparent;
+  /* Body */
+  --bs-body-bg: #111111;
+  --bs-body-color: rgba(255,255,255,0.70);
+  /* Form */
+  --bs-border-color: #555555;
+}
+
+/* Dropdown menu: remove BS5's border-radius and shadow */
+.dropdown-menu {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Dropdown items: keep font */
+.dropdown-item {
+  font-family: TopazPlus_a1200, Monaco, monospace;
+  font-size: 16px;
+  line-height: 16px;
+  padding: 4px 8px;
+}
+.dropdown-item span {
+  font-family: Monaco, monospace;
+  font-size: 16px;
+}
+
+/* Navbar toggler: hide BS5's default icon, show site's mENU text */
+.navbar-toggler {
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+.navbar-toggler-icon { display: none !important; }
+
+/* Form controls: dark background */
+.form-control, .form-select {
+  background-color: #212121 !important;
+  color: rgba(255,255,255,0.7) !important;
+  border-color: #555555 !important;
+  border-radius: 0 !important;
+}
+.form-control:focus, .form-select:focus {
+  background-color: #212121 !important;
+  color: rgba(255,255,255,0.7) !important;
+  box-shadow: none !important;
+}
+
+/* Form switch/check */
+.form-check-input {
+  background-color: #444 !important;
+  border-color: #666 !important;
+}
+.form-check-input:checked {
+  background-color: #ff55ff !important;
+  border-color: #ff55ff !important;
 }
 
 /* Hover-to-open dropdowns on desktop */
@@ -11,13 +94,7 @@ a, a:hover {
   }
 }
 
-/* Dropdown item padding spans must not inherit the Topaz font glyph rendering */
-.dropdown-item span {
-  font-family: Monaco, monospace;
-  font-size: 16px;
-}
-
-/* Keep nav-link text white when its dropdown is open */
+/* Keep nav-link text colour when its dropdown is open */
 .navbar .dropdown:hover > .dropdown-toggle,
 .navbar .dropdown.show > .dropdown-toggle {
   color: inherit !important;
