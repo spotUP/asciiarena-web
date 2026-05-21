@@ -1,7 +1,14 @@
+import { z } from "zod";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
+
+const postSchema = z.object({
+  comment: z.string().min(1).max(5000),
+  filename: z.string().max(255).optional(),
+  filedata: z.string().optional(),
+});
 
 interface CommentRow {
   comment_id: number;
@@ -64,14 +71,10 @@ export async function POST(
   const requestId = parseInt(id);
   const userId = parseInt(session.user.id);
 
-  const body = await request.json() as {
-    comment?: string;
-    filename?: string;
-    filedata?: string;
-  };
-  const { comment, filename, filedata } = body;
-
-  if (!comment) return apiError("comment is required", 400);
+  const rawBody = await request.json().catch(() => ({}));
+  const parsed = postSchema.safeParse(rawBody);
+  if (!parsed.success) return apiError("Invalid request: " + parsed.error.issues[0]?.message, 400);
+  const { comment, filename, filedata } = parsed.data;
 
   await prisma.$executeRaw`
     INSERT INTO request_comments

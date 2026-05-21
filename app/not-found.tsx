@@ -1,15 +1,30 @@
-import SiteLayout from "@/components/layout/SiteLayout";
+import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <SiteLayout>
-      <div className="row">
-        <div className="col-lg-12">
-          <div className="bs-component aml-1 amb-1">
-            <div className="alert alert-danger">404 - Page not found</div>
-          </div>
-        </div>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "var(--color-bg)",
+        color: "var(--color-grey)",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: "TopazPlus_a1200, monospace",
+        padding: "32px",
+        textAlign: "center",
+      }}
+    >
+      <div style={{ color: "var(--color-magenta)", fontSize: "1.4rem", marginBottom: "16px" }}>
+        404 - NOT FOUND
       </div>
-    </SiteLayout>
+      <div style={{ color: "var(--color-grey)", marginBottom: "24px" }}>
+        The page you are looking for does not exist.
+      </div>
+      <Link href="/collys" style={{ color: "var(--color-cyan)", textDecoration: "none" }}>
+        &lt; back to collys
+      </Link>
+    </div>
   );
 }

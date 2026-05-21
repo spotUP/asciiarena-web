@@ -1,0 +1,12 @@
+{
+  "name": "aSCIIaRENA",
+  "short_name": "aSCIIaRENA",
+  "description": "A community for ASCII artists",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#ff55ff",
+  "icons": [
+    { "src": "/assets/data/socialmedia.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

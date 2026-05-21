@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { urlsafe, formatBytes } from "@/lib/utils";
 
@@ -23,9 +24,9 @@ export default async function TopUploaders({ limit = 5 }: { limit?: number }) {
               key={row.id}
               className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between"
             >
-              <a href={`/member/${urlsafe(nick)}`} className="text-truncate">
+              <Link href={`/member/${urlsafe(nick)}`} className="text-truncate">
                 {nick}
-              </a>
+              </Link>
               <span className="text-truncate">{kb}</span>
             </div>
           );

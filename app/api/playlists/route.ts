@@ -1,8 +1,21 @@
+import { z } from "zod";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
+
+const postSchema = z.object({
+  title: z.string().min(1).max(500),
+  filename: z.string().min(1).max(255),
+  author: z.string().max(255).optional(),
+  genre: z.string().max(255).optional(),
+  filedata: z.string().optional(),
+});
+
+const deleteSchema = z.object({
+  id: z.number().int().positive(),
+});
 
 const SORT_COLS: Record<string, string> = {
   title: "title",
@@ -75,16 +88,10 @@ export async function POST(request: NextRequest) {
   const session = await auth();
   if ((session?.user as { rank?: string } | undefined)?.rank !== "Admin") return apiError("Forbidden", 403);
 
-  const body = await request.json() as {
-    title?: string;
-    author?: string;
-    genre?: string;
-    filename?: string;
-    filedata?: string;
-  };
-
-  const { title, author, genre, filename, filedata } = body;
-  if (!title || !filename) return apiError("title and filename are required", 400);
+  const rawBody = await request.json().catch(() => ({}));
+  const parsed = postSchema.safeParse(rawBody);
+  if (!parsed.success) return apiError("Invalid request: " + parsed.error.issues[0]?.message, 400);
+  const { title, author, genre, filename, filedata } = parsed.data;
 
   await prisma.$executeRaw`
     INSERT INTO hippo_playlists (title, author, genre, filename, filedata, uploaddate)
@@ -98,9 +105,10 @@ export async function DELETE(request: NextRequest) {
   const session = await auth();
   if ((session?.user as { rank?: string } | undefined)?.rank !== "Admin") return apiError("Forbidden", 403);
 
-  const body = await request.json() as { id: number };
-  if (!body.id) return apiError("id required", 400);
+  const rawDeleteBody = await request.json().catch(() => ({}));
+  const parsedDelete = deleteSchema.safeParse(rawDeleteBody);
+  if (!parsedDelete.success) return apiError("Invalid request: " + parsedDelete.error.issues[0]?.message, 400);
 
-  await prisma.$executeRaw`DELETE FROM hippo_playlists WHERE id = ${body.id}`;
+  await prisma.$executeRaw`DELETE FROM hippo_playlists WHERE id = ${parsedDelete.data.id}`;
   return apiOk({ status: true });
 }

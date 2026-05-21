@@ -1,8 +1,14 @@
-import { NextRequest } from "next/server";
+import { z } from "zod";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk, notifyDiscord, REQUEST_WEBHOOK, REQ_SORT_COLS, safeSort } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
+
+const postSchema = z.object({
+  title: z.string().min(1).max(500),
+  description: z.string().min(1).max(5000),
+});
 
 interface RequestRow {
   id: number;
@@ -87,19 +93,17 @@ export async function GET(request: NextRequest) {
     total_count: Number(r.total_count),
   }));
 
-  return apiOk(result);
+  return NextResponse.json(result, { headers: { 'Cache-Control': 'public, max-age=60, stale-while-revalidate=300' } });
 }
 
 export async function POST(request: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) return apiError("Unauthorized", 401);
 
-  const body = await request.json() as { title?: string; description?: string };
-  const { title, description } = body;
-
-  if (!title || !description) {
-    return apiError("title and description are required", 400);
-  }
+  const rawBody = await request.json().catch(() => ({}));
+  const parsed = postSchema.safeParse(rawBody);
+  if (!parsed.success) return apiError("Invalid request: " + parsed.error.issues[0]?.message, 400);
+  const { title, description } = parsed.data;
 
   const userId = parseInt(session.user.id);
 

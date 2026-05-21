@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/db";
 
 export type LatestCollysProps = {
@@ -60,9 +61,9 @@ export default async function LatestCollys({ type, limit = 8 }: LatestCollysProp
     <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
       <div className="header col-lg-12 p-0">
         <h2 className={headerClass}>
-          <a href={headerHref} className={headerLinkClass ?? undefined}>
+          <Link href={headerHref} className={headerLinkClass ?? undefined}>
             {headerText}
-          </a>
+          </Link>
         </h2>
       </div>
       <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
@@ -81,9 +82,9 @@ export default async function LatestCollys({ type, limit = 8 }: LatestCollysProp
                 className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between"
               >
                 <span>
-                  <a className="magenta text-truncate" href={`/release/${filename}`}>
+                  <Link className="magenta text-truncate" href={`/release/${filename}`}>
                     {truncated}
-                  </a>
+                  </Link>
                 </span>
                 <span className="text-truncate">
                   {yr}-{mo}-{dy}
@@ -102,9 +103,9 @@ export default async function LatestCollys({ type, limit = 8 }: LatestCollysProp
                 key={row.id}
                 className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between"
               >
-                <a className="magenta text-truncate" href={`/release/${filename}`}>
+                <Link className="magenta text-truncate" href={`/release/${filename}`}>
                   {truncated}
-                </a>
+                </Link>
                 <span className="text-truncate">{uploadDate}</span>
               </div>
             );

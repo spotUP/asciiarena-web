@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Script from "next/script";
-import { auth } from "@/lib/auth";
+import { getSession as auth } from "@/lib/session";
 import SiteLayout from "@/components/layout/SiteLayout";
 
 export default async function LogoEditorPage() {
@@ -18,13 +18,13 @@ export default async function LogoEditorPage() {
       <div className="col-lg-12" style={{ marginTop: "16px" }}>
         <span>
           <label htmlFor="fontList">Font:</label>
-          <select className="custom-select" id="fontList" style={{ width: "160px", marginLeft: "8px" }}>
+          <select className="form-select" id="fontList" style={{ width: "160px", marginLeft: "8px" }}>
             <option value="Graffiti.flf">Graffiti</option>
           </select>
         </span>
         <span style={{ marginLeft: "16px" }}>
           <label htmlFor="taagCharWidth">Character Width:</label>
-          <select className="custom-select" id="taagCharWidth" style={{ width: "180px", marginLeft: "8px" }}>
+          <select className="form-select" id="taagCharWidth" style={{ width: "180px", marginLeft: "8px" }}>
             <option value="full">Full</option>
             <option value="fitted">Fitted</option>
             <option value="controlled smushing">Smush (R)</option>
@@ -34,7 +34,7 @@ export default async function LogoEditorPage() {
         </span>
         <span style={{ marginLeft: "16px" }}>
           <label htmlFor="taagCharHeight">Character Height:</label>
-          <select className="custom-select" id="taagCharHeight" style={{ width: "180px", marginLeft: "8px" }}>
+          <select className="form-select" id="taagCharHeight" style={{ width: "180px", marginLeft: "8px" }}>
             <option value="full">Full</option>
             <option value="fitted">Fitted</option>
             <option value="controlled smushing">Smush (R)</option>

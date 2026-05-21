@@ -41,13 +41,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.rank = user.rank ?? null;
         token.crew = user.crew ?? null;
         token.crt_effect = (user as { crt_effect?: string }).crt_effect ?? "N";
         token.anim_effect = (user as { anim_effect?: string }).anim_effect ?? "N";
+      }
+      // Re-read rank from DB on every token refresh so stale tokens self-heal
+      if (token.id && !token.rank) {
+        const fresh = await prisma.users.findFirst({
+          where: { id: parseInt(token.id as string) },
+          select: { rank: true, crew: true },
+        });
+        if (fresh) {
+          token.rank = fresh.rank ?? null;
+          token.crew = fresh.crew ?? null;
+        }
       }
       return token;
     },

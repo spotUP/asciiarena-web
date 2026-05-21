@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Link from "next/link";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
@@ -79,17 +80,17 @@ export default async function CrewPage({ params }: PageProps) {
       : `${crew.rating.toFixed(1)} (${voteCount} votes)`;
 
   // All releases for this crew
-  const releases = await prisma.$queryRawUnsafe<ReleaseRow[]>(`
-    SELECT
-      cc.colly_id,
-      c.filename,
-      c.name,
-      c.year
-    FROM collys_crews cc
-    JOIN collys c ON c.id = cc.colly_id
-    WHERE cc.crew_id = ${crew.id}
-    ORDER BY c.filename ASC
-  `);
+  const releaseRows = await prisma.collys_crews.findMany({
+    where: { crew_id: crew.id },
+    include: { collys: { select: { id: true, filename: true, name: true, year: true } } },
+    orderBy: { collys: { filename: "asc" } },
+  });
+  const releases: ReleaseRow[] = releaseRows.map(r => ({
+    colly_id: r.colly_id,
+    filename: r.collys.filename,
+    name: r.collys.name,
+    year: r.collys.year,
+  }));
 
   return (
     <SiteLayout title="CREW iNFO">
@@ -144,10 +145,10 @@ export default async function CrewPage({ params }: PageProps) {
         members.map((m) => (
           <div key={m.id} className="col-lg-12 pl-0 d-flex" style={{ gap: "12px" }}>
             {m.artisturl
-              ? <a href={`/artist/${m.artisturl}`}>{m.nick}</a>
+              ? <Link href={`/artist/${m.artisturl}`}>{m.nick}</Link>
               : <span>{m.nick}</span>}
             {m.user_nickurl && (
-              <a className="lightgrey" href={`/member/${m.user_nickurl}`}>[profile]</a>
+              <Link className="lightgrey" href={`/member/${m.user_nickurl}`}>[profile]</Link>
             )}
           </div>
         ))
@@ -163,9 +164,9 @@ export default async function CrewPage({ params }: PageProps) {
         releases.map((r) => (
           <div key={r.colly_id} className="col-lg-12 d-flex justify-content-between pl-0">
             <div className="col-lg-6 pl-0">
-              <a className="magenta" href={`/release/${r.filename}`}>
+              <Link className="magenta" href={`/release/${r.filename}`}>
                 {r.filename}
-              </a>
+              </Link>
             </div>
             <div className="col-lg-3 pl-0 lightgrey">
               {r.name?.slice(0, 40) ?? ""}

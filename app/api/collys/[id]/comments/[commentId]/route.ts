@@ -1,7 +1,12 @@
+import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
+
+const patchSchema = z.object({
+  comment: z.string().min(1).max(5000),
+});
 
 export async function PATCH(
   req: Request,
@@ -13,8 +18,10 @@ export async function PATCH(
   const { commentId } = await params;
   const commentIdNum = Number(commentId);
 
-  const body = (await req.json()) as { comment: string };
-  const { comment } = body;
+  const rawBody = await req.json().catch(() => ({}));
+  const parsed = patchSchema.safeParse(rawBody);
+  if (!parsed.success) return apiError("Invalid request: " + parsed.error.issues[0]?.message, 400);
+  const { comment } = parsed.data;
 
   const nick = session.user.name ?? "";
   const isAdmin = session.user.rank === "Admin" ? 1 : 0;

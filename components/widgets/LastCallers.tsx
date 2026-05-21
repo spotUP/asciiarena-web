@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
 import Script from "next/script";
@@ -30,12 +31,12 @@ export default async function LastCallers({ limit = 5 }: LastCallersProps) {
                 key={row.id}
                 className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between"
               >
-                <a
+                <Link
                   className="yellow text-truncate"
                   href={`/member/${urlsafe(row.nick)}`}
                 >
                   {row.nick}
-                </a>
+                </Link>
                 <span className="lastcall-time text-truncate" data-utc={utc}>
                   {fallbackTime}
                 </span>

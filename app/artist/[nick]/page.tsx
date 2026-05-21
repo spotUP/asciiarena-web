@@ -1,8 +1,12 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Link from "next/link";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
+import { Prisma } from "@/lib/generated/prisma/client";
+import { getSession as auth } from "@/lib/session";
 import { urlsafe } from "@/lib/utils";
+import ClaimArtistButton from "./ClaimArtistButton";
 
 interface PageProps {
   params: Promise<{ nick: string }>;
@@ -49,11 +53,18 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
   const { nick } = await params;
   const { sort_by: rawSortBy } = await searchParams;
 
-  const artist = await prisma.artists.findFirst({
-    where: { artisturl: nick },
-    include: { users: { select: { nickurl: true, nick: true } } },
-  });
+  const [session, artist] = await Promise.all([
+    auth(),
+    prisma.artists.findFirst({
+      where: { artisturl: nick },
+      include: { users: { select: { nickurl: true, nick: true } } },
+    }),
+  ]);
   if (!artist) notFound();
+
+  const userId = session?.user?.id ? Number(session.user.id) : null;
+  const isUnclaimed = artist.user_id === null;
+  const canClaim = !!userId && isUnclaimed;
 
   // Crew memberships
   const memberships = await prisma.member_of.findMany({
@@ -79,11 +90,17 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
       ? `Awaiting ${Math.max(0, 3 - voteCount)} votes`
       : `${artist.rating.toFixed(1)} (${voteCount} votes)`;
 
-  // All releases for this artist via raw SQL for the sort flexibility
-  const sortBy = rawSortBy && VALID_SORT_COLS.has(rawSortBy) ? rawSortBy : "c.filename";
+  // Map validated sort keys to safe Prisma.sql fragments — never interpolates user input
+  const SORT_SQL: Record<string, Prisma.Sql> = {
+    "c.filename":       Prisma.sql`c.filename`,
+    "a.nick":           Prisma.sql`a.nick`,
+    "w.name":           Prisma.sql`w.name`,
+    "c.year":           Prisma.sql`c.year`,
+    "c.year, c.month":  Prisma.sql`c.year, c.month`,
+  };
+  const sortSql = (rawSortBy && SORT_SQL[rawSortBy]) ?? Prisma.sql`c.filename`;
 
-  // Fetch releases with crew info
-  const releasesRaw = await prisma.$queryRawUnsafe<ReleaseRow[]>(`
+  const releasesRaw = await prisma.$queryRaw<ReleaseRow[]>`
     SELECT
       ac.colly_id,
       c.filename,
@@ -99,8 +116,8 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
     LEFT JOIN crews w ON w.id = cc.crew_id
     LEFT JOIN artists a ON a.id = ac.artist_id
     WHERE ac.artist_id = ${artist.id}
-    ORDER BY ${sortBy} ASC
-  `);
+    ORDER BY ${sortSql} ASC
+  `;
 
   // Latest release is the most recent by year/month
   const latestRelease = releasesRaw.reduce<ReleaseRow | null>((best, r) => {
@@ -129,7 +146,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
           ? memberships.map((m, i) => (
               <span key={m.id}>
                 {i > 0 && ", "}
-                <a href={`/crew/${urlsafe(m.crew ?? "")}`}>{m.crew}</a>
+                <Link href={`/crew/${urlsafe(m.crew ?? "")}`}>{m.crew}</Link>
               </span>
             ))
           : "-"}
@@ -155,7 +172,12 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
       {artist.users && (
         <div className="col-lg-12 pl-0">
           <span className="lightgrey">Site profile: </span>
-          <a href={`/member/${artist.users.nickurl}`}>{artist.users.nick}</a>
+          <Link href={`/member/${artist.users.nickurl}`}>{artist.users.nick}</Link>
+        </div>
+      )}
+      {canClaim && (
+        <div className="col-lg-12 pl-0 apt-1">
+          <ClaimArtistButton artistNick={artist.nick ?? ""} />
         </div>
       )}
       <div className="col-lg-12 pl-0">
@@ -171,16 +193,16 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
           </div>
           <div className="col-lg-12 pl-0 d-flex justify-content-between">
             <div className="col-lg-4 pl-0">
-              <a className="magenta" href={`/release/${latestRelease.filename}`}>
+              <Link className="magenta" href={`/release/${latestRelease.filename}`}>
                 {latestRelease.filename.slice(0, 20)}
-              </a>
+              </Link>
             </div>
             <div className="col-lg-4 pl-0">
               {latestRelease.name?.slice(0, 35) ?? "-"}
             </div>
             {latestRelease.crew && latestRelease.crewurl && (
               <div className="col-lg-2 pl-0">
-                <a href={`/crew/${latestRelease.crewurl}`}>{latestRelease.crew}</a>
+                <Link href={`/crew/${latestRelease.crewurl}`}>{latestRelease.crew}</Link>
               </div>
             )}
             <div className="col-lg-2 pl-0">
@@ -195,10 +217,10 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
         <h2 className="bg-header">All {acronym} Releases</h2>
       </div>
       <div className="col-lg-12 d-flex justify-content-between pl-0">
-        <a href={`?sort_by=c.filename`}>Filename</a>
-        <a href={`?sort_by=a.nick`}>Name</a>
-        <a href={`?sort_by=w.name`}>Crew</a>
-        <a href={`?sort_by=c.year`}>Release Date</a>
+        <Link href={`?sort_by=c.filename`}>Filename</Link>
+        <Link href={`?sort_by=a.nick`}>Name</Link>
+        <Link href={`?sort_by=w.name`}>Crew</Link>
+        <Link href={`?sort_by=c.year`}>Release Date</Link>
       </div>
 
       {/* All releases */}
@@ -208,18 +230,18 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
           className="col-lg-12 d-flex justify-content-between pl-0"
         >
           <div className="col-lg-3 pl-0">
-            <a className="magenta" href={`/release/${r.filename}`}>
+            <Link className="magenta" href={`/release/${r.filename}`}>
               {r.filename.slice(0, 12)}
-            </a>
+            </Link>
           </div>
           <div className="col-lg-3 pl-0">
-            <a className="magenta" href={`/release/${r.filename}`}>
+            <Link className="magenta" href={`/release/${r.filename}`}>
               {r.name?.slice(0, 35) ?? r.filename}
-            </a>
+            </Link>
           </div>
           <div className="col-lg-3 pl-0">
             {r.crew && r.crewurl ? (
-              <a href={`/crew/${r.crewurl}`}>{r.crew}</a>
+              <Link href={`/crew/${r.crewurl}`}>{r.crew}</Link>
             ) : (
               r.crew ?? "-"
             )}

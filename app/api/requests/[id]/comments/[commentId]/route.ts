@@ -1,7 +1,12 @@
+import { z } from "zod";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
+
+const patchSchema = z.object({
+  comment: z.string().min(1).max(5000),
+});
 
 interface AttachmentRow {
   attach_filename: string | null;
@@ -42,10 +47,10 @@ export async function PATCH(
   const userId = parseInt(session.user.id);
   const isAdmin = (session.user as { rank?: string | null }).rank === "Admin" ? 1 : 0;
 
-  const body = await request.json() as { comment?: string };
-  const { comment } = body;
-
-  if (!comment) return apiError("comment is required", 400);
+  const rawBody = await request.json().catch(() => ({}));
+  const parsed = patchSchema.safeParse(rawBody);
+  if (!parsed.success) return apiError("Invalid request: " + parsed.error.issues[0]?.message, 400);
+  const { comment } = parsed.data;
 
   await prisma.$executeRaw`
     UPDATE request_comments

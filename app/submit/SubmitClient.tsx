@@ -434,7 +434,7 @@ export default function SubmitClient({
           <li key={tab} className="nav-item">
             <a
               className={`nav-link${activeTab === tab ? " active" : ""}`}
-              data-toggle="tab"
+              data-bs-toggle="tab"
               style={{ cursor: "pointer" }}
               onClick={() => setActiveTab(tab)}
             >
@@ -516,7 +516,7 @@ export default function SubmitClient({
               {collyArtists.map((val, i) => (
                 <div key={i} style={{ display: "flex", gap: "6px", marginBottom: "4px" }}>
                   <select
-                    className="custom-select"
+                    className="form-select"
                     value={val}
                     onChange={(e) =>
                       setCollyArtists(updateField(collyArtists, i, e.target.value))
@@ -555,7 +555,7 @@ export default function SubmitClient({
               {collyCrews.map((val, i) => (
                 <div key={i} style={{ display: "flex", gap: "6px", marginBottom: "4px" }}>
                   <select
-                    className="custom-select"
+                    className="form-select"
                     value={val}
                     onChange={(e) =>
                       setCollyCrews(updateField(collyCrews, i, e.target.value))
@@ -655,7 +655,7 @@ export default function SubmitClient({
               {crewBbses.map((val, i) => (
                 <div key={i} style={{ display: "flex", gap: "6px", marginBottom: "4px" }}>
                   <select
-                    className="custom-select"
+                    className="form-select"
                     value={val}
                     onChange={(e) =>
                       setCrewBbses(updateField(crewBbses, i, e.target.value))
@@ -755,7 +755,7 @@ export default function SubmitClient({
               {artistCrews.map((val, i) => (
                 <div key={i} style={{ display: "flex", gap: "6px", marginBottom: "4px" }}>
                   <select
-                    className="custom-select"
+                    className="form-select"
                     value={val}
                     onChange={(e) =>
                       setArtistCrews(updateField(artistCrews, i, e.target.value))

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Paginator from "@/components/ui/Paginator";
+import React, { useEffect, useState, useRef } from "react";
+import Link from "next/link";
 
 interface AppRow {
   url: string;
@@ -26,87 +26,111 @@ export default function AppsClient({ initialSort, initialOrder }: AppsClientProp
   const [sort, setSort] = useState(initialSort);
   const [asc, setAsc] = useState<"A" | "D">(initialOrder === "D" ? "D" : "A");
   const [filter, setFilter] = useState("");
-  const [data, setData] = useState<AppRow[]>([]);
+  const [allRows, setAllRows] = useState<AppRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // Effect 1: reset list when sort/filter changes
+  useEffect(() => {
+    setAllRows([]);
+    setPage(1);
+    setHasMore(true);
+  }, [sort, asc, filter]);
+
+  // Effect 2: fetch current page
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
+    if (page === 1) setLoading(true);
+    else setLoadingMore(true);
     (async () => {
       try {
         const rows: AppRow[] = await (await fetch(`/api/apps?page=${page}&sort=${sort}&asc=${asc}&pagesize=${PAGE_SIZE}&filter=${encodeURIComponent(filter)}`)).json();
-        if (!cancelled) { setData(rows); setLoading(false); }
+        if (!cancelled) {
+          const total = rows[0]?.total_count ?? 0;
+          setAllRows(prev => page === 1 ? rows : [...prev, ...rows]);
+          setHasMore(rows.length > 0 && page * PAGE_SIZE < total);
+          setLoading(false);
+          setLoadingMore(false);
+        }
       } catch {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) { setLoading(false); setLoadingMore(false); }
       }
     })();
     return () => { cancelled = true; };
   }, [page, sort, asc, filter]);
 
+  // Effect 3: IntersectionObserver
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || !hasMore || loadingMore || loading) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setPage(p => p + 1); },
+      { rootMargin: "200px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasMore, loadingMore, loading]);
+
   function updateSort(newSort: string) {
     const newAsc = sort === newSort ? (asc === "A" ? "D" : "A") : "A";
     setSort(newSort);
     setAsc(newAsc);
-    setPage(1);
   }
-
-  const totalCount = data[0]?.total_count ?? 0;
-  const maxPage = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
     <>
-      <Paginator
-        page={page}
-        maxPage={maxPage}
-        onFirst={() => setPage(1)}
-        onPrev={() => setPage((p) => Math.max(1, p - 1))}
-        onNext={() => setPage((p) => Math.min(maxPage, p + 1))}
-        onLast={() => setPage(maxPage)}
-        onFilter={(v) => {
-          setFilter(v);
-          setPage(1);
-        }}
-        filterValue={filter}
-      />
+      <div className="row">
+        <div className="col-6 m-0 apt-1 apb-1 d-flex">
+          <div className="bg-secondary apb-1 w-100">
+            <input
+              id="filter"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="pl-1 w-100"
+              placeholder="Search..."
+              type="text"
+              autoComplete="off"
+            />
+          </div>
+        </div>
+      </div>
 
       <div className="row amb-1">
         <div className="col-3 white">
-          <a onClick={() => updateSort("name")} style={{ cursor: "pointer" }}>
-            NAME
-          </a>
+          <button className="sort-btn" onClick={() => updateSort("name")}>NAME</button>
         </div>
         <div className="col-3 white">
-          <a onClick={() => updateSort("filename")} style={{ cursor: "pointer" }}>
-            FILENAME
-          </a>
+          <button className="sort-btn" onClick={() => updateSort("filename")}>FILENAME</button>
         </div>
         <div className="col-3 white">
-          <a onClick={() => updateSort("author")} style={{ cursor: "pointer" }}>
-            AUTHOR
-          </a>
+          <button className="sort-btn" onClick={() => updateSort("author")}>AUTHOR</button>
         </div>
         <div className="col-3 white">
-          <a onClick={() => updateSort("timestamp")} style={{ cursor: "pointer" }}>
-            DATE
-          </a>
+          <button className="sort-btn" onClick={() => updateSort("timestamp")}>DATE</button>
         </div>
       </div>
 
       <div id="appList">
         {loading && <div className="row apt-1"><div className="col">Loading...</div></div>}
         {!loading &&
-          data.map((app) => (
+          allRows.map((app) => (
             <div key={app.id} className="row">
               <div className="col-3 text-truncate">
-                <a href={app.url}>{app.name}</a>
+                <Link href={app.url}>{app.name}</Link>
               </div>
               <div className="col-3 text-truncate">
-                <a href={app.url}>{app.filename}</a>
+                <Link href={app.url}>{app.filename}</Link>
               </div>
               <div className="col-3 text-truncate">{app.author}</div>
               <div className="col-3 text-truncate">{app.timestamp}</div>
             </div>
           ))}
+        {loadingMore && <div className="row apt-1"><div className="col lightgrey">Loading...</div></div>}
+        {!hasMore && allRows.length > 0 && <div className="row apt-1"><div className="col lightgrey">--- end of results ---</div></div>}
+        <div ref={sentinelRef} style={{ height: "1px" }} />
       </div>
     </>
   );

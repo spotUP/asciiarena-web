@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-export default function GlobalError({
+export default function Error({
   error,
   reset,
 }: {
@@ -14,42 +14,48 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "#0a0a0a",
-      color: "#ff5555",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      fontFamily: "TopazPlus_a1200, monospace",
-      padding: "32px",
-      textAlign: "center",
-    }}>
-      <div style={{ color: "#ff5555", marginBottom: "16px" }}>
-        [ERROR] Something went wrong.
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "var(--color-bg)",
+        color: "var(--color-red)",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: "TopazPlus_a1200, monospace",
+        padding: "32px",
+        textAlign: "center",
+      }}
+    >
+      <div style={{ color: "var(--color-magenta)", fontSize: "1.4rem", marginBottom: "16px" }}>
+        [ERROR]
+      </div>
+      <div style={{ color: "var(--color-red)", marginBottom: "8px" }}>
+        {error.message || "Something went wrong."}
       </div>
       {error.digest && (
-        <div style={{ color: "#555", marginBottom: "16px" }}>
-          {error.digest}
+        <div style={{ color: "#555", marginBottom: "16px", fontSize: "0.85rem" }}>
+          digest: {error.digest}
         </div>
       )}
-      <div style={{ display: "flex", gap: "16px" }}>
+      <div style={{ marginTop: "24px", display: "flex", gap: "16px", alignItems: "center" }}>
         <button
           onClick={reset}
           style={{
             background: "none",
-            border: "1px solid #555",
-            color: "#aaa",
-            fontFamily: "inherit",
-            padding: "4px 12px",
+            border: "1px solid #ff55ff",
+            color: "var(--color-magenta)",
+            fontFamily: "TopazPlus_a1200, monospace",
+            padding: "6px 16px",
             cursor: "pointer",
+            letterSpacing: "0.05em",
           }}
         >
-          Try again
+          TRY AGAIN
         </button>
-        <a href="/" style={{ color: "#55ffff", textDecoration: "none" }}>
-          Go home
+        <a href="/" style={{ color: "var(--color-cyan)", textDecoration: "none" }}>
+          go home
         </a>
       </div>
     </div>

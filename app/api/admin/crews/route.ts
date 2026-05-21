@@ -1,7 +1,20 @@
+import { z } from "zod";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
+
+const patchSchema = z.object({
+  id: z.number().int().positive(),
+  name: z.string().max(200).optional(),
+  active: z.string().max(10).optional(),
+  www: z.string().max(500).optional(),
+  acronym: z.string().max(50).optional(),
+});
+
+const deleteSchema = z.object({
+  id: z.number().int().positive(),
+});
 
 
 export async function GET(request: NextRequest) {
@@ -23,8 +36,10 @@ export async function PATCH(request: NextRequest) {
   const session = await auth();
   if ((session?.user as { rank?: string } | undefined)?.rank !== "Admin") return apiError("Forbidden", 403);
 
-  const body = await request.json() as { id: number; name?: string; active?: string; www?: string; acronym?: string };
-  if (!body.id) return apiError("id required", 400);
+  const rawPatchBody = await request.json().catch(() => ({}));
+  const patchParsed = patchSchema.safeParse(rawPatchBody);
+  if (!patchParsed.success) return apiError("Invalid request: " + patchParsed.error.issues[0]?.message, 400);
+  const body = patchParsed.data;
 
   await prisma.$executeRaw`
     UPDATE crews SET
@@ -41,8 +56,10 @@ export async function DELETE(request: NextRequest) {
   const session = await auth();
   if ((session?.user as { rank?: string } | undefined)?.rank !== "Admin") return apiError("Forbidden", 403);
 
-  const body = await request.json() as { id: number };
-  if (!body.id) return apiError("id required", 400);
+  const rawDeleteBody = await request.json().catch(() => ({}));
+  const deleteParsed = deleteSchema.safeParse(rawDeleteBody);
+  if (!deleteParsed.success) return apiError("Invalid request: " + deleteParsed.error.issues[0]?.message, 400);
+  const body = deleteParsed.data;
 
   await prisma.$executeRaw`DELETE FROM collys_crews WHERE crew_id = ${body.id}`;
   await prisma.$executeRaw`DELETE FROM crews WHERE id = ${body.id}`;

@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getSession as auth } from "@/lib/session";
 import { redirect } from "next/navigation";
 import SiteLayout from "@/components/layout/SiteLayout";
 import MessagesClient from "./MessagesClient";

@@ -33,25 +33,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
         />
         {/* Load CSS in the exact same order as the PHP site */}
-        <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="/assets/css/bootstrap-colorselector.css" />
+        <link rel="stylesheet" href="/assets/css/bootstrap5.min.css" />
         <link rel="stylesheet" href="/assets/css/site.css" />
         <link rel="stylesheet" href="/assets/css/386.css" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#ff55ff" />
       </head>
       <body>
         {children}
         <Script
-          src="https://code.jquery.com/jquery-3.5.1.min.js"
-          integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
-        <Script
-          src="/assets/js/bootstrap.bundle.min.js"
-          strategy="afterInteractive"
-        />
-        <Script
-          src="/assets/js/bootstrap-colorselector.js"
+          src="/assets/js/bootstrap5.bundle.min.js"
           strategy="afterInteractive"
         />
       </body>
