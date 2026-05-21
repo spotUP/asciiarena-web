@@ -76,7 +76,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     total_count,
   }));
 
-  return NextResponse.json(result);
+  return NextResponse.json(result, { headers: { 'Cache-Control': 'public, max-age=60, stale-while-revalidate=300' } });
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { getSession as auth } from "@/lib/session";
 import SiteLayout from "@/components/layout/SiteLayout";
 import TopArtists from "@/components/widgets/TopArtists";
 import TopCollys from "@/components/widgets/TopCollys";

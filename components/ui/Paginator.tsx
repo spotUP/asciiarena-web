@@ -61,7 +61,7 @@ export default function Paginator({
           <div className="btn-group">
             <button
               className="btn btn-primary dropdown-toggle"
-              data-toggle="dropdown"
+              data-bs-toggle="dropdown"
               aria-expanded="false"
             >
               View Mode:

@@ -1,7 +1,12 @@
+import { z } from "zod";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
+
+const patchSchema = z.object({
+  status: z.number().int(),
+});
 
 export async function PATCH(
   request: NextRequest,
@@ -15,10 +20,10 @@ export async function PATCH(
   const userId = parseInt(session.user.id);
   const isAdmin = (session.user as { rank?: string | null }).rank === "Admin" ? 1 : 0;
 
-  const body = await request.json() as { status?: number };
-  const { status } = body;
-
-  if (status === undefined) return apiError("status is required", 400);
+  const rawBody = await request.json().catch(() => ({}));
+  const parsed = patchSchema.safeParse(rawBody);
+  if (!parsed.success) return apiError("Invalid request: " + parsed.error.issues[0]?.message, 400);
+  const { status } = parsed.data;
 
   await prisma.$executeRaw`
     UPDATE requests

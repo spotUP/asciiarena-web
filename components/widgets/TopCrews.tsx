@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
 
@@ -22,9 +23,9 @@ export default async function TopCrews({ limit = 5 }: { limit?: number }) {
               key={row.id}
               className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between"
             >
-              <a className="text-truncate" href={`/crew/${urlsafe(name)}/`}>
+              <Link className="text-truncate" href={`/crew/${urlsafe(name)}/`}>
                 {name}
-              </a>
+              </Link>
               <span className="text-truncate">{rating} PTS</span>
             </div>
           );

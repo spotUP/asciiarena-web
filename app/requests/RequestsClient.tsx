@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import Paginator from "@/components/ui/Paginator";
+import Link from "next/link";
 
 interface RequestRow {
   id: number;
@@ -40,17 +40,20 @@ export default function RequestsClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [page, setPage] = useState(() => parseInt(searchParams.get("page") ?? "1") || 1);
+  const [page, setPage] = useState(1);
   const [sort, setSort] = useState(() => searchParams.get("sort") ?? "timestamp");
   const [asc, setAsc] = useState<"A" | "D">(() => searchParams.get("asc") === "A" ? "A" : "D");
   const [filter, setFilter] = useState(() => searchParams.get("filter") ?? "");
   const [viewmode, setViewmode] = useState(() => parseInt(searchParams.get("viewmode") ?? "0") || 0);
-  const [data, setData] = useState<RequestRow[]>([]);
+  const [allRows, setAllRows] = useState<RequestRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
-  const syncUrl = useCallback((p: number, s: string, a: string, f: string, v: number) => {
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  const syncUrl = useCallback((s: string, a: string, f: string, v: number) => {
     const params = new URLSearchParams();
-    if (p > 1) params.set("page", String(p));
     if (s !== "timestamp") params.set("sort", s);
     if (a !== "D") params.set("asc", a);
     if (f) params.set("filter", f);
@@ -60,53 +63,77 @@ export default function RequestsClient() {
   }, [router]);
 
   useEffect(() => {
-    syncUrl(page, sort, asc, filter, viewmode);
-  }, [page, sort, asc, filter, viewmode, syncUrl]);
+    syncUrl(sort, asc, filter, viewmode);
+  }, [sort, asc, filter, viewmode, syncUrl]);
 
+  // Effect 1: reset list when sort/filter/viewmode changes
+  useEffect(() => {
+    setAllRows([]);
+    setPage(1);
+    setHasMore(true);
+  }, [sort, asc, filter, viewmode]);
+
+  // Effect 2: fetch current page
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
+    if (page === 1) setLoading(true);
+    else setLoadingMore(true);
     (async () => {
       try {
         const rows: RequestRow[] = await (await fetch(`/api/requests?page=${page}&sort=${sort}&asc=${asc}&pagesize=${PAGE_SIZE}&filter=${encodeURIComponent(filter)}&viewmode=${viewmode}`)).json();
-        if (!cancelled) { setData(rows); setLoading(false); }
+        if (!cancelled) {
+          const total = rows[0]?.total_count ?? 0;
+          setAllRows(prev => page === 1 ? rows : [...prev, ...rows]);
+          setHasMore(rows.length > 0 && page * PAGE_SIZE < total);
+          setLoading(false);
+          setLoadingMore(false);
+        }
       } catch {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) { setLoading(false); setLoadingMore(false); }
       }
     })();
     return () => { cancelled = true; };
   }, [page, sort, asc, filter, viewmode]);
 
+  // Effect 3: IntersectionObserver
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || !hasMore || loadingMore || loading) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setPage(p => p + 1); },
+      { rootMargin: "200px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasMore, loadingMore, loading]);
+
   function updateSort(newSort: string) {
     const newAsc = sort === newSort ? (asc === "A" ? "D" : "A") : "A";
     setSort(newSort);
     setAsc(newAsc);
-    setPage(1);
   }
 
   function handleViewmode(v: number) {
     setViewmode(v);
-    setPage(1);
   }
-
-  const totalCount = data[0]?.total_count ?? 0;
-  const maxPage = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
     <>
-      <Paginator
-        page={page}
-        maxPage={maxPage}
-        onFirst={() => setPage(1)}
-        onPrev={() => setPage((p) => Math.max(1, p - 1))}
-        onNext={() => setPage((p) => Math.min(maxPage, p + 1))}
-        onLast={() => setPage(maxPage)}
-        onFilter={(v) => {
-          setFilter(v);
-          setPage(1);
-        }}
-        filterValue={filter}
-      />
+      <div className="row">
+        <div className="col-6 m-0 apt-1 apb-1 d-flex">
+          <div className="bg-secondary apb-1 w-100">
+            <input
+              id="filter"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="pl-1 w-100"
+              placeholder="Search..."
+              type="text"
+              autoComplete="off"
+            />
+          </div>
+        </div>
+      </div>
 
       <div className="apt-1 apb-1">
         <div className="btn-group" role="group" aria-label="Filter by status">
@@ -125,34 +152,16 @@ export default function RequestsClient() {
 
       <div className="row amb-1">
         <div className="col-3">
-          <a
-            className="white"
-            onClick={() => updateSort("title")}
-            style={{ cursor: "pointer" }}
-          >
-            Title
-          </a>
+          <button className="sort-btn white" onClick={() => updateSort("title")}>Title</button>
         </div>
         <div className="col-3">
-          <a
-            className="white"
-            onClick={() => updateSort("status")}
-            style={{ cursor: "pointer" }}
-          >
-            Status
-          </a>
+          <button className="sort-btn white" onClick={() => updateSort("status")}>Status</button>
         </div>
         <div className="col-3">
           <span className="white">Requested By</span>
         </div>
         <div className="col-3">
-          <a
-            className="white"
-            onClick={() => updateSort("timestamp")}
-            style={{ cursor: "pointer" }}
-          >
-            Date
-          </a>
+          <button className="sort-btn white" onClick={() => updateSort("timestamp")}>Date</button>
         </div>
       </div>
 
@@ -163,12 +172,12 @@ export default function RequestsClient() {
           </div>
         )}
         {!loading &&
-          data.map((req) => (
+          allRows.map((req) => (
             <div key={req.id} className="row amb-1">
               <div className="col-3 text-truncate">
-                <a className="magenta" href={req.url}>
+                <Link className="magenta" href={req.url}>
                   {req.title}
-                </a>
+                </Link>
               </div>
               <div className="col-3 text-truncate">
                 <span
@@ -185,12 +194,15 @@ export default function RequestsClient() {
               </div>
             </div>
           ))}
+        {loadingMore && <div className="row apt-1"><div className="col lightgrey">Loading...</div></div>}
+        {!hasMore && allRows.length > 0 && <div className="row apt-1"><div className="col lightgrey">--- end of results ---</div></div>}
+        <div ref={sentinelRef} style={{ height: "1px" }} />
       </div>
 
       <div className="apt-1">
-        <a href="/submit#request">
+        <Link href="/submit#request">
           <input type="submit" className="btn-big" value="Add Request" readOnly />
-        </a>
+        </Link>
       </div>
     </>
   );

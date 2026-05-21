@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
@@ -26,9 +27,9 @@ export default async function TopCommenters({ limit = 5 }: { limit?: number }) {
             key={row.user_id}
             className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between"
           >
-            <a className="yellow text-truncate" href={`/member/${urlsafe(row.nick)}`}>
+            <Link className="yellow text-truncate" href={`/member/${urlsafe(row.nick)}`}>
               {row.nick}
-            </a>
+            </Link>
             <span className="text-truncate">{Number(row.topcommentators)}</span>
           </div>
         ))}

@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import Paginator from "@/components/ui/Paginator";
+import Link from "next/link";
 import { urlsafe } from "@/lib/utils";
 
 interface CollyRow {
@@ -26,7 +26,7 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [page, setPage] = useState(() => parseInt(searchParams.get("page") ?? "1") || 1);
+  const [page, setPage] = useState(1);
   const [sort, setSort] = useState(() => searchParams.get("sort") ?? initialSort);
   const [asc, setAsc] = useState<"A" | "D">(() => (searchParams.get("asc") ?? initialOrder) === "D" ? "D" : "A");
   const [filter, setFilter] = useState(() => searchParams.get("filter") ?? "");
@@ -34,14 +34,17 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
     const v = parseInt(searchParams.get("view") ?? "1");
     return v === 2 ? 2 : 1;
   });
-  const [data, setData] = useState<CollyRow[]>([]);
+  const [allRows, setAllRows] = useState<CollyRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
   const pagesize = viewMode === 2 ? 6 : 120;
 
-  const syncUrl = useCallback((p: number, s: string, a: string, f: string, v: number) => {
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  const syncUrl = useCallback((s: string, a: string, f: string, v: number) => {
     const params = new URLSearchParams();
-    if (p > 1) params.set("page", String(p));
     if (s !== initialSort) params.set("sort", s);
     if (a !== "A") params.set("asc", a);
     if (f) params.set("filter", f);
@@ -51,37 +54,59 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
   }, [router, initialSort]);
 
   useEffect(() => {
-    syncUrl(page, sort, asc, filter, viewMode);
-  }, [page, sort, asc, filter, viewMode, syncUrl]);
+    syncUrl(sort, asc, filter, viewMode);
+  }, [sort, asc, filter, viewMode, syncUrl]);
 
+  // Effect 1: reset list when sort/filter/viewMode changes
+  useEffect(() => {
+    setAllRows([]);
+    setPage(1);
+    setHasMore(true);
+  }, [sort, asc, filter, viewMode]);
+
+  // Effect 2: fetch current page
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
+    if (page === 1) setLoading(true);
+    else setLoadingMore(true);
     (async () => {
       try {
         const rows: CollyRow[] = await (await fetch(`/api/collys?page=${page}&sort=${sort}&asc=${asc}&pagesize=${pagesize}&filter=${encodeURIComponent(filter)}`)).json();
-        if (!cancelled) { setData(rows); setLoading(false); }
+        if (!cancelled) {
+          const total = rows[0]?.total_count ?? 0;
+          setAllRows(prev => page === 1 ? rows : [...prev, ...rows]);
+          setHasMore(rows.length > 0 && page * pagesize < total);
+          setLoading(false);
+          setLoadingMore(false);
+        }
       } catch {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) { setLoading(false); setLoadingMore(false); }
       }
     })();
     return () => { cancelled = true; };
   }, [page, sort, asc, filter, pagesize]);
 
+  // Effect 3: IntersectionObserver
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || !hasMore || loadingMore || loading) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setPage(p => p + 1); },
+      { rootMargin: "200px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasMore, loadingMore, loading]);
+
   function updateSort(newSort: string) {
     const newAsc = sort === newSort ? (asc === "A" ? "D" : "A") : "A";
     setSort(newSort);
     setAsc(newAsc);
-    setPage(1);
   }
 
   function handleViewMode(v: number) {
     setViewMode(v as 1 | 2);
-    setPage(1);
   }
-
-  const totalCount = data[0]?.total_count ?? 0;
-  const maxPage = Math.max(1, Math.ceil(totalCount / pagesize));
 
   const currentDate = new Date().toLocaleDateString("en-GB", {
     weekday: "short",
@@ -92,21 +117,48 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
 
   return (
     <>
-      <Paginator
-        page={page}
-        maxPage={maxPage}
-        onFirst={() => setPage(1)}
-        onPrev={() => setPage((p) => Math.max(1, p - 1))}
-        onNext={() => setPage((p) => Math.min(maxPage, p + 1))}
-        onLast={() => setPage(maxPage)}
-        onFilter={(v) => {
-          setFilter(v);
-          setPage(1);
-        }}
-        filterValue={filter}
-        viewMode={viewMode}
-        onViewMode={handleViewMode}
-      />
+      <div className="row">
+        <div className="col-6 m-0 apt-1 apb-1">
+          <div className="btn-group">
+            <button
+              className="btn btn-primary dropdown-toggle"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              View Mode:
+            </button>
+            <div className="dropdown-menu">
+              <a
+                className="dropdown-item"
+                href="#"
+                onClick={(e) => { e.preventDefault(); handleViewMode(1); }}
+              >
+                Standard
+              </a>
+              <a
+                className="dropdown-item"
+                href="#"
+                onClick={(e) => { e.preventDefault(); handleViewMode(2); }}
+              >
+                BBS
+              </a>
+            </div>
+          </div>
+        </div>
+        <div className="col-6 m-0 apt-1 apb-1 d-flex">
+          <div className="bg-secondary apb-1 w-100">
+            <input
+              id="filter"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="pl-1 w-100"
+              placeholder="Search..."
+              type="text"
+              autoComplete="off"
+            />
+          </div>
+        </div>
+      </div>
 
       <div className="container-fluid bg-secondary apb-1">
         <div className="d-none d-sm-block text-truncate text-center">
@@ -126,29 +178,19 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
         style={viewMode === 2 ? { display: "none" } : {}}
       >
         <div className="col-md-7 text-truncate d-none d-md-block">
-          <a onClick={() => updateSort("name")} style={{ cursor: "pointer" }}>
-            NAME
-          </a>
+          <button className="sort-btn" onClick={() => updateSort("name")}>NAME</button>
         </div>
         <div className="col text-truncate">
-          <a onClick={() => updateSort("filename")} style={{ cursor: "pointer" }}>
-            FILENAME
-          </a>
+          <button className="sort-btn" onClick={() => updateSort("filename")}>FILENAME</button>
         </div>
         <div className="col white text-truncate">
-          <a onClick={() => updateSort("artists")} style={{ cursor: "pointer" }}>
-            ARTiST
-          </a>
+          <button className="sort-btn" onClick={() => updateSort("artists")}>ARTiST</button>
         </div>
         <div className="col white text-truncate">
-          <a onClick={() => updateSort("crews")} style={{ cursor: "pointer" }}>
-            CREW
-          </a>
+          <button className="sort-btn" onClick={() => updateSort("crews")}>CREW</button>
         </div>
         <div className="col text-truncate d-none d-md-block">
-          <a onClick={() => updateSort("cdate")} style={{ cursor: "pointer" }}>
-            DATE
-          </a>
+          <button className="sort-btn" onClick={() => updateSort("cdate")}>DATE</button>
         </div>
       </div>
 
@@ -158,20 +200,14 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
         style={viewMode === 1 ? { display: "none" } : {}}
       >
         <span className="col-2 white">
-          <a onClick={() => updateSort("filename")} style={{ cursor: "pointer" }}>
-            FILENAME
-          </a>
+          <button className="sort-btn" onClick={() => updateSort("filename")}>FILENAME</button>
         </span>
         <span className="col-1 white">FLAGS</span>
         <span className="col-1 white">
-          <a onClick={() => updateSort("filesize")} style={{ cursor: "pointer" }}>
-            FILESIZE
-          </a>
+          <button className="sort-btn" onClick={() => updateSort("filesize")}>FILESIZE</button>
         </span>
         <span className="col-2 white">
-          <a onClick={() => updateSort("cdate")} style={{ cursor: "pointer" }}>
-            DATE
-          </a>
+          <button className="sort-btn" onClick={() => updateSort("cdate")}>DATE</button>
         </span>
         <span className="white">DESCRIPTION</span>
       </div>
@@ -179,27 +215,27 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
       <div id="collyList">
         {loading && <div className="row apt-1"><div className="col">Loading...</div></div>}
         {!loading &&
-          data.map((colly) =>
+          allRows.map((colly) =>
             viewMode === 1 ? (
               <div key={colly.id} className="row mb-4 mb-sm-0">
                 <div className="col-md-7 text-truncate">
-                  <a className="magenta" href={colly.url}>
+                  <Link className="magenta" href={colly.url}>
                     {colly.name}
-                  </a>
+                  </Link>
                 </div>
                 <div className="col text-truncate">
-                  <a className="magenta" href={colly.url}>
+                  <Link className="magenta" href={colly.url}>
                     {colly.filename}
-                  </a>
+                  </Link>
                 </div>
                 <div className="col green text-truncate">
                   {(colly.artists ?? "").split(",").filter(Boolean).map((a, i) => (
-                    <span key={a}>{i > 0 && ","}<a className="yellow" href={`/artist/${urlsafe(a.trim())}`}>{a.trim()}</a></span>
+                    <span key={a}>{i > 0 && ","}<Link className="yellow" href={`/artist/${urlsafe(a.trim())}`}>{a.trim()}</Link></span>
                   ))}
                 </div>
                 <div className="col green text-truncate">
                   {(colly.crews ?? "").split(",").filter(Boolean).map((c, i) => (
-                    <span key={c}>{i > 0 && ","}<a className="yellow" href={`/crew/${urlsafe(c.trim())}`}>{c.trim()}</a></span>
+                    <span key={c}>{i > 0 && ","}<Link className="yellow" href={`/crew/${urlsafe(c.trim())}`}>{c.trim()}</Link></span>
                   ))}
                 </div>
                 <div className="col text-truncate d-none d-md-block">{colly.cdate}</div>
@@ -207,9 +243,9 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
             ) : (
               <div key={colly.id} className="row apt-1 text-center text-md-start">
                 <span className="col-2">
-                  <a className="cyan" href={colly.url}>
+                  <Link className="cyan" href={colly.url}>
                     {colly.filename}
-                  </a>
+                  </Link>
                 </span>
                 <span className="col-1 green">PF--</span>
                 <span className="col-1 yellow">{colly.filesize}</span>
@@ -222,6 +258,9 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
               </div>
             )
           )}
+        {loadingMore && <div className="row apt-1"><div className="col lightgrey">Loading...</div></div>}
+        {!hasMore && allRows.length > 0 && <div className="row apt-1"><div className="col lightgrey">--- end of results ---</div></div>}
+        <div ref={sentinelRef} style={{ height: "1px" }} />
       </div>
     </>
   );

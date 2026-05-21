@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getSession as auth } from "@/lib/session";
 import SiteLayout from "@/components/layout/SiteLayout";
 import StyleEditorClient from "./StyleEditorClient";
 
@@ -13,9 +13,9 @@ export default async function StyleEditorPage() {
         <div className="col-lg-12">
           <div className="bs-component">
             <div className="animate__animated animate__shakeX alert alert-dismissible alert-primary">
-              <button type="button" className="close" data-dismiss="alert">x</button>
+              <button type="button" className="btn-close" data-bs-dismiss="alert"></button>
               You need to be{" "}
-              <a className="ascii" data-toggle="modal" style={{ paddingRight: "8px" }} href="#login">
+              <a className="ascii" data-bs-toggle="modal" style={{ paddingRight: "8px" }} href="#login">
                 logged in
               </a>
               to use this feature.

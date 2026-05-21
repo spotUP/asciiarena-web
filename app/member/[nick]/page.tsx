@@ -1,7 +1,8 @@
-import Script from "next/script";
+import Link from "next/link";
 import SiteLayout from "@/components/layout/SiteLayout";
+import UnfaveButton from "./UnfaveButton";
 import { prisma } from "@/lib/db";
-import { auth } from "@/lib/auth";
+import { getSession as auth } from "@/lib/session";
 import { notFound } from "next/navigation";
 
 interface MemberRow {
@@ -189,7 +190,7 @@ export default async function MemberPage({
               {artists.map((a, i) => (
                 <span key={a.id}>
                   {i > 0 && ", "}
-                  <a className="magenta" href={`/artist/${a.artisturl}`}>{a.nick}</a>
+                  <Link className="magenta" href={`/artist/${a.artisturl}`}>{a.nick}</Link>
                 </span>
               ))}
             </div>
@@ -205,7 +206,7 @@ export default async function MemberPage({
                   <span key={crewName}>
                     {i > 0 && ", "}
                     {m.crewurl
-                      ? <a href={`/crew/${m.crewurl}`}>{crewName}</a>
+                      ? <Link href={`/crew/${m.crewurl}`}>{crewName}</Link>
                       : <span>{crewName}</span>}
                   </span>
                 );
@@ -234,9 +235,9 @@ export default async function MemberPage({
 
         {!isOwnProfile && (
           <div className="row apt-1">
-            <a href={`/messages?sendmsg=${member.id}`}>
+            <Link href={`/messages?sendmsg=${member.id}`}>
               <input type="button" className="btn-big" value="Send Message" readOnly />
-            </a>
+            </Link>
           </div>
         )}
 
@@ -251,9 +252,9 @@ export default async function MemberPage({
               <div key={i} className="row">
                 <div className="col-sm-10 amb-1 cyan">{c.comment}</div>
                 <div className="col-sm-2 amb-1 text-truncate">
-                  <a className="magenta" href={`/release/${c.filename}`}>
+                  <Link className="magenta" href={`/release/${c.filename}`}>
                     {c.filename}
-                  </a>
+                  </Link>
                 </div>
               </div>
             ))}
@@ -281,9 +282,9 @@ export default async function MemberPage({
             {collys.map((c, i) => (
               <div key={i} className="row">
                 <div className="col-12 col-sm-4 text-truncate">
-                  <a className="magenta" href={`/release/${c.filename}`}>
+                  <Link className="magenta" href={`/release/${c.filename}`}>
                     {c.name}
-                  </a>
+                  </Link>
                 </div>
                 <div className="col-12 d-block d-sm-none text-truncate apb-1">
                   by {c.artists ?? "-"} of {c.crews ?? "-"}
@@ -320,9 +321,9 @@ export default async function MemberPage({
             {faves.map((f, i) => (
               <div key={i} className="row amb-1">
                 <div className={`col-12 ${isOwnProfile ? "col-sm-3" : "col-sm-4"}`}>
-                  <a className="magenta" href={`/release/${f.filename}`}>
+                  <Link className="magenta" href={`/release/${f.filename}`}>
                     {f.name}
-                  </a>
+                  </Link>
                 </div>
                 <div className="col-sm-4 d-none d-sm-block">{f.artists ?? "-"}</div>
                 <div className="col-sm-4 d-none d-sm-block">{f.crews ?? "-"}</div>
@@ -331,14 +332,7 @@ export default async function MemberPage({
                 </div>
                 {isOwnProfile && (
                   <div className="col-12 col-sm-1">
-                    <button
-                      className="btn-big"
-                      data-colly-id={f.colly_id}
-                      onClick={undefined}
-                      id={`unfave-${f.colly_id}`}
-                    >
-                      Remove
-                    </button>
+                    <UnfaveButton collyId={f.colly_id} />
                   </div>
                 )}
               </div>
@@ -347,19 +341,6 @@ export default async function MemberPage({
         )}
       </div>
 
-      {isOwnProfile && faves.length > 0 && (
-        <Script id="member-unfave" strategy="afterInteractive">{`
-          $("[id^='unfave-']").on("click", function() {
-            var collyId = $(this).data("colly-id");
-            var btn = $(this);
-            fetch("/api/collys/" + collyId + "/favourites", { method: "DELETE" })
-              .then(function(r) { return r.json(); })
-              .then(function(d) {
-                if (d.status === true) btn.closest(".row").fadeOut(300);
-              });
-          });
-        `}</Script>
-      )}
     </SiteLayout>
   );
 }

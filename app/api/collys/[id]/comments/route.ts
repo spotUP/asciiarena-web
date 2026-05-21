@@ -1,7 +1,13 @@
+import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
+
+const postSchema = z.object({
+  comment: z.string().min(1).max(5000),
+  rating: z.number().nullable().optional(),
+});
 
 interface CommentRow {
   commentid: number;
@@ -45,14 +51,12 @@ export async function POST(
   const { id } = await params;
   const collyId = Number(id);
 
-  const body = (await req.json()) as {
-    colly_id?: number;
-    comment: string;
-    rating?: number;
-  };
+  const rawBody = await req.json().catch(() => ({}));
+  const parsed = postSchema.safeParse(rawBody);
+  if (!parsed.success) return apiError("Invalid request: " + parsed.error.issues[0]?.message, 400);
 
-  const comment = body.comment;
-  const rating = body.rating ?? null;
+  const comment = parsed.data.comment;
+  const rating = parsed.data.rating ?? null;
   const userId = session.user.id;
   const nick = session.user.name ?? "";
   const timestamp = Math.floor(Date.now() / 1000);

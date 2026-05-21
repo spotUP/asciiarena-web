@@ -1,8 +1,15 @@
+import { z } from "zod";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
+
+const postSchema = z.object({
+  subject: z.string().min(1).max(500),
+  msgtext: z.string().min(1).max(10000),
+  receiver: z.number().int().positive(),
+});
 
 interface MessageRow {
   total_count: bigint | number;
@@ -62,12 +69,10 @@ export async function POST(request: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) return apiError("Unauthorized", 401);
 
-  const body = await request.json() as { subject?: string; msgtext?: string; receiver?: number };
-  const { subject, msgtext, receiver } = body;
-
-  if (!subject || !msgtext || !receiver) {
-    return apiError("subject, msgtext and receiver are required", 400);
-  }
+  const rawBody = await request.json().catch(() => ({}));
+  const parsed = postSchema.safeParse(rawBody);
+  if (!parsed.success) return apiError("Invalid request: " + parsed.error.issues[0]?.message, 400);
+  const { subject, msgtext, receiver } = parsed.data;
 
   const fromId = parseInt(session.user.id);
 

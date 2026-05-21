@@ -1,30 +1,12 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, FormEvent } from "react";
+import React, { useEffect, useState, useCallback, useActionState } from "react";
+import { saveSettings, changePassword, type Settings } from "@/app/actions/settings";
 
 interface ArtistHandle {
   id: number;
   nick: string;
   artisturl: string;
-}
-
-interface Settings {
-  nick: string | null;
-  crew: string | null;
-  byear: number | null;
-  bmonth: number | null;
-  bday: number | null;
-  country: string | null;
-  mail: string | null;
-  webpage: string | null;
-  upload_signature: string | null;
-  viewmode: number | null;
-  def_bg_col: string | null;
-  def_fg_col: string | null;
-  display_mail: number | null;
-  def_font: number | null;
-  crt_effect: number | null;
-  anim_effect: number | null;
 }
 
 const COLOR_OPTIONS: { value: string; label: string }[] = [
@@ -60,63 +42,71 @@ const FONT_OPTIONS: { value: string; label: string }[] = [
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-export default function SettingsForm() {
-  const [settings, setSettings] = useState<Settings>({
-    nick: "",
-    crew: "",
-    byear: null,
-    bmonth: null,
-    bday: null,
-    country: "",
-    mail: "",
-    webpage: "",
-    upload_signature: "",
-    viewmode: 0,
-    def_bg_col: "",
-    def_fg_col: "",
-    display_mail: 0,
-    def_font: null,
-    crt_effect: 0,
-    anim_effect: 0,
-  });
+const EMPTY_SETTINGS: Settings = {
+  nick: "",
+  crew: "",
+  byear: null,
+  bmonth: null,
+  bday: null,
+  country: "",
+  mail: "",
+  webpage: "",
+  upload_signature: "",
+  viewmode: 0,
+  def_bg_col: "",
+  def_fg_col: "",
+  display_mail: 0,
+  def_font: null,
+  crt_effect: 0,
+  anim_effect: 0,
+};
 
-  const [oldpass, setOldpass] = useState("");
-  const [newpass, setNewpass] = useState("");
-  const [repeatpass, setRepeatpass] = useState("");
+interface SettingsFormProps {
+  initialSettings: Settings | null;
+}
+
+export default function SettingsForm({ initialSettings }: SettingsFormProps) {
+  const [settings, setSettings] = useState<Settings>(initialSettings ?? EMPTY_SETTINGS);
+
+  const [saveState, saveAction, savePending] = useActionState(saveSettings, { success: false });
+  const [pwState, pwAction, pwPending] = useActionState(changePassword, { success: false });
+
   const [alertMsg, setAlertMsg] = useState<{ text: string; success: boolean } | null>(null);
-  const [saveDisabled, setSaveDisabled] = useState(true);
-  const [loading, setLoading] = useState(true);
 
   const [linkedArtists, setLinkedArtists] = useState<ArtistHandle[]>([]);
   const [suggestedArtists, setSuggestedArtists] = useState<ArtistHandle[]>([]);
   const [claimNick, setClaimNick] = useState("");
   const [artistMsg, setArtistMsg] = useState<{ text: string; success: boolean } | null>(null);
 
-  const loadArtists = useCallback(() => {
-    fetch("/api/settings/artist")
-      .then((r) => r.json())
-      .then((d: { linked: ArtistHandle[]; suggested: ArtistHandle[] }) => {
-        setLinkedArtists(d.linked ?? []);
-        setSuggestedArtists(d.suggested ?? []);
-      })
-      .catch(() => {});
+  const loadArtists = useCallback(async () => {
+    try {
+      const d = await (await fetch("/api/settings/artist")).json() as { linked: ArtistHandle[]; suggested: ArtistHandle[] };
+      setLinkedArtists(d.linked ?? []);
+      setSuggestedArtists(d.suggested ?? []);
+    } catch {}
   }, []);
 
   useEffect(() => {
-    fetch("/api/settings")
-      .then((r) => r.json())
-      .then((data: Settings) => {
-        setSettings(data);
-        setSaveDisabled(false);
-        setLoading(false);
-      })
-      .catch(() => {
-        showAlert("An error occurred loading your settings.", false);
-        setSaveDisabled(true);
-        setLoading(false);
-      });
     loadArtists();
   }, [loadArtists]);
+
+  // Show alert when saveState changes
+  useEffect(() => {
+    if (saveState.success) {
+      showAlert("Settings saved successfully!", true);
+    } else if (saveState.error) {
+      showAlert(saveState.error, false);
+    }
+  }, [saveState]);
+
+  // Show alert when pwState changes
+  useEffect(() => {
+    if (pwState.success) {
+      showAlert("Password changed successfully!", true);
+    } else if (pwState.error) {
+      showAlert(pwState.error, false);
+    }
+  }, [pwState]);
 
   function showAlert(text: string, success: boolean) {
     setAlertMsg({ text, success });
@@ -146,317 +136,259 @@ export default function SettingsForm() {
     else showArtistMsg("Failed to unlink.", false);
   }
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    if (oldpass && !newpass) {
-      showAlert("You have not specified a new password.", false);
-      return;
-    }
-    if ((newpass || repeatpass) && newpass !== repeatpass) {
-      showAlert("New passwords do not match.", false);
-      return;
-    }
-    if (!oldpass && newpass) {
-      showAlert("You must enter your old password to change it.", false);
-      return;
-    }
-    if (newpass) {
-      if (
-        !/[A-Z]/.test(newpass) ||
-        !/[a-z]/.test(newpass) ||
-        !/[0-9]/.test(newpass) ||
-        !/[^A-Za-z0-9]/.test(newpass)
-      ) {
-        showAlert(
-          "Password must include uppercase, lowercase, a number, and a special character.",
-          false
-        );
-        return;
-      }
-    }
-
-    const body: Record<string, unknown> = { ...settings };
-    if (newpass) {
-      body.oldpass = oldpass;
-      body.newpass = newpass;
-    }
-
-    try {
-      const res = await fetch("/api/settings", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const data = (await res.json()) as { status?: boolean; error?: string };
-      if (res.ok && data.status) {
-        showAlert("Settings saved successfully!", true);
-        setOldpass("");
-        setNewpass("");
-        setRepeatpass("");
-      } else {
-        showAlert(data.error ?? "An error occurred saving the settings.", false);
-      }
-    } catch {
-      showAlert("An unexpected error occurred.", false);
-    }
-  }
-
   function set<K extends keyof Settings>(key: K, value: Settings[K]) {
     setSettings((prev) => ({ ...prev, [key]: value }));
   }
 
-  if (loading) {
-    return (
-      <div className="container-fluid bg-secondary amb-1 apb-1 ap-1">
-        Loading settings...
-      </div>
-    );
-  }
-
   return (
-    <form autoComplete="off" onSubmit={handleSubmit}>
-      <div className="container-fluid bg-secondary amb-1 apb-1 ap-1">
-        {alertMsg && (
-          <div
-            className={`bs-component quick-alert animate__animated ${
-              alertMsg.success ? "animate__bounceIn alert alert-success" : "animate__shakeX alert alert-warning"
-            }`}
-          >
-            {alertMsg.text}
-          </div>
-        )}
+    <>
+      <form autoComplete="off" action={saveAction}>
+        {/* Hidden fields carry controlled state into FormData */}
+        <input type="hidden" name="nick" value={settings.nick ?? ""} />
+        <input type="hidden" name="crew" value={settings.crew ?? ""} />
+        <input type="hidden" name="byear" value={settings.byear ?? ""} />
+        <input type="hidden" name="bmonth" value={settings.bmonth ?? ""} />
+        <input type="hidden" name="bday" value={settings.bday ?? ""} />
+        <input type="hidden" name="country" value={settings.country ?? ""} />
+        <input type="hidden" name="mail" value={settings.mail ?? ""} />
+        <input type="hidden" name="webpage" value={settings.webpage ?? ""} />
+        <input type="hidden" name="upload_signature" value={settings.upload_signature ?? ""} />
+        <input type="hidden" name="viewmode" value={settings.viewmode ?? 0} />
+        <input type="hidden" name="def_bg_col" value={settings.def_bg_col ?? ""} />
+        <input type="hidden" name="def_fg_col" value={settings.def_fg_col ?? ""} />
+        <input type="hidden" name="display_mail" value={settings.display_mail ?? 0} />
+        <input type="hidden" name="def_font" value={settings.def_font ?? ""} />
+        <input type="hidden" name="crt_effect" value={settings.crt_effect ?? 0} />
+        <input type="hidden" name="anim_effect" value={settings.anim_effect ?? 0} />
 
-        {/* User Settings */}
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6">
-            <span className="white">User Settings</span>
-          </div>
-        </div>
-
-        <div className="row apt-1">
-          <div className="col-xs-12 col-md-6">Nick</div>
-        </div>
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6 apb-1 apt-1">
-            <input
-              type="text"
-              className="w-100"
-              maxLength={14}
-              value={settings.nick ?? ""}
-              onChange={(e) => set("nick", e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6">Crew</div>
-        </div>
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6">
-            <input
-              type="text"
-              className="w-100"
-              value={settings.crew ?? ""}
-              onChange={(e) => set("crew", e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="row">
-          <div className="col-xs-12 col-md-6 apt-1">Birth</div>
-        </div>
-        <div className="row">
-          <div className="col-xs-12 col-md-2 apt-1">
-            <select
-              className="custom-select"
-              value={settings.byear ?? ""}
-              onChange={(e) => set("byear", e.target.value ? parseInt(e.target.value) : null)}
+        <div className="container-fluid bg-secondary amb-1 apb-1 ap-1">
+          {alertMsg && (
+            <div
+              className={`bs-component quick-alert animate__animated ${
+                alertMsg.success ? "animate__bounceIn alert alert-success" : "animate__shakeX alert alert-warning"
+              }`}
             >
-              <option value="">Year</option>
-              {Array.from({ length: CURRENT_YEAR - 5 - 1920 + 1 }, (_, i) => 1920 + i).map(
-                (y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                )
-              )}
-            </select>
-          </div>
-          <div className="col-xs-12 col-md-2 apt-1">
-            <select
-              className="custom-select"
-              value={settings.bmonth ?? ""}
-              onChange={(e) => set("bmonth", e.target.value ? parseInt(e.target.value) : null)}
-            >
-              <option value="">Month</option>
-              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                <option key={m} value={m}>
-                  {m}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="col-xs-12 col-md-2 apt-1">
-            <select
-              className="custom-select"
-              value={settings.bday ?? ""}
-              onChange={(e) => set("bday", e.target.value ? parseInt(e.target.value) : null)}
-            >
-              <option value="">Day</option>
-              {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+              {alertMsg.text}
+            </div>
+          )}
 
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6 apt-1">Country</div>
-        </div>
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6">
-            <input
-              type="text"
-              className="w-100"
-              value={settings.country ?? ""}
-              onChange={(e) => set("country", e.target.value)}
-            />
+          {/* User Settings */}
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6">
+              <span className="white">User Settings</span>
+            </div>
           </div>
-        </div>
 
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6 apt-1">Mail</div>
-        </div>
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6">
-            <input
-              type="email"
-              className="w-100"
-              value={settings.mail ?? ""}
-              onChange={(e) => set("mail", e.target.value)}
-            />
+          <div className="row apt-1">
+            <div className="col-xs-12 col-md-6">Nick</div>
           </div>
-        </div>
-
-        <div className="row amb-1 apt-1">
-          <div className="col-xs-12 col-md-6 apt-1">Webpage</div>
-        </div>
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6">
-            <input
-              type="url"
-              className="w-100"
-              value={settings.webpage ?? ""}
-              onChange={(e) => set("webpage", e.target.value)}
-              placeholder="https://..."
-            />
-          </div>
-        </div>
-
-        <div className="row amb-1 apt-1">
-          <div className="col-xs-12 col-md-6">
-            <div className="custom-control custom-switch">
-              Show E-Mail
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6 apb-1 apt-1">
               <input
-                type="checkbox"
-                className="custom-control-input"
-                id="display_mail"
-                checked={(settings.display_mail ?? 0) === 1}
-                onChange={(e) => set("display_mail", e.target.checked ? 1 : 0)}
+                type="text"
+                className="w-100"
+                maxLength={14}
+                value={settings.nick ?? ""}
+                onChange={(e) => set("nick", e.target.value)}
               />
-              <label className="custom-control-label" htmlFor="display_mail" />
             </div>
           </div>
-        </div>
 
-        {/* Password Settings */}
-        <div className="row amb-1 apt-1">
-          <div className="col-xs-12 col-md-12 apt-1">
-            <span className="white">Password Settings</span>
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6">Crew</div>
           </div>
-        </div>
-
-        <div className="row amb-1 apt-1">
-          <div className="col-xs-12 col-md-6">Old password</div>
-        </div>
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6">
-            <input
-              type="password"
-              className="w-100"
-              autoComplete="new-password"
-              value={oldpass}
-              onChange={(e) => setOldpass(e.target.value)}
-            />
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6">
+              <input
+                type="text"
+                className="w-100"
+                value={settings.crew ?? ""}
+                onChange={(e) => set("crew", e.target.value)}
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="row amb-1 apt-1">
-          <div className="col-xs-12 col-md-6">New password</div>
-        </div>
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6">
-            <input
-              type="password"
-              className="w-100"
-              autoComplete="new-password"
-              value={newpass}
-              onChange={(e) => setNewpass(e.target.value)}
-            />
+          <div className="row">
+            <div className="col-xs-12 col-md-6 apt-1">Birth</div>
           </div>
-        </div>
-
-        <div className="row amb-1 apt-1">
-          <div className="col-xs-12 col-md-6">New password again</div>
-        </div>
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6">
-            <input
-              type="password"
-              className="w-100"
-              autoComplete="new-password"
-              value={repeatpass}
-              onChange={(e) => setRepeatpass(e.target.value)}
-            />
-          </div>
-        </div>
-
-        {/* Site Settings */}
-        <div className="row amb-1 apt-1">
-          <div className="col-xs-12 col-md-6 apt-1">
-            <span className="white">Site Settings</span>
-          </div>
-        </div>
-
-        <div className="row amb-1 apt-1">
-          <div className="col-xs-12 col-md-6">File list mode</div>
-        </div>
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6 apb-1">
-            <select
-              className="custom-select w-100"
-              value={settings.viewmode ?? 0}
-              onChange={(e) => set("viewmode", parseInt(e.target.value))}
-            >
-              <option value={0}>Standard</option>
-              <option value={1}>BBS</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6 d-flex">
-            <div className="apr-1">Default Colly Background</div>
-            <div>
+          <div className="row">
+            <div className="col-xs-12 col-md-2 apt-1">
               <select
-                className="custom-select"
-                value={settings.def_bg_col ?? ""}
-                onChange={(e) => set("def_bg_col", e.target.value)}
+                className="form-select"
+                value={settings.byear ?? ""}
+                onChange={(e) => set("byear", e.target.value ? parseInt(e.target.value) : null)}
               >
-                {COLOR_OPTIONS.map((o) => (
+                <option value="">Year</option>
+                {Array.from({ length: CURRENT_YEAR - 5 - 1920 + 1 }, (_, i) => 1920 + i).map(
+                  (y) => (
+                    <option key={y} value={y}>
+                      {y}
+                    </option>
+                  )
+                )}
+              </select>
+            </div>
+            <div className="col-xs-12 col-md-2 apt-1">
+              <select
+                className="form-select"
+                value={settings.bmonth ?? ""}
+                onChange={(e) => set("bmonth", e.target.value ? parseInt(e.target.value) : null)}
+              >
+                <option value="">Month</option>
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="col-xs-12 col-md-2 apt-1">
+              <select
+                className="form-select"
+                value={settings.bday ?? ""}
+                onChange={(e) => set("bday", e.target.value ? parseInt(e.target.value) : null)}
+              >
+                <option value="">Day</option>
+                {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6 apt-1">Country</div>
+          </div>
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6">
+              <input
+                type="text"
+                className="w-100"
+                value={settings.country ?? ""}
+                onChange={(e) => set("country", e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6 apt-1">Mail</div>
+          </div>
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6">
+              <input
+                type="email"
+                className="w-100"
+                value={settings.mail ?? ""}
+                onChange={(e) => set("mail", e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="row amb-1 apt-1">
+            <div className="col-xs-12 col-md-6 apt-1">Webpage</div>
+          </div>
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6">
+              <input
+                type="url"
+                className="w-100"
+                value={settings.webpage ?? ""}
+                onChange={(e) => set("webpage", e.target.value)}
+                placeholder="https://..."
+              />
+            </div>
+          </div>
+
+          <div className="row amb-1 apt-1">
+            <div className="col-xs-12 col-md-6">
+              <div className="form-check form-switch">
+                Show E-Mail
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id="display_mail"
+                  checked={(settings.display_mail ?? 0) === 1}
+                  onChange={(e) => set("display_mail", e.target.checked ? 1 : 0)}
+                />
+                <label className="form-check-label" htmlFor="display_mail" />
+              </div>
+            </div>
+          </div>
+
+          {/* Site Settings */}
+          <div className="row amb-1 apt-1">
+            <div className="col-xs-12 col-md-6 apt-1">
+              <span className="white">Site Settings</span>
+            </div>
+          </div>
+
+          <div className="row amb-1 apt-1">
+            <div className="col-xs-12 col-md-6">File list mode</div>
+          </div>
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6 apb-1">
+              <select
+                className="form-select w-100"
+                value={settings.viewmode ?? 0}
+                onChange={(e) => set("viewmode", parseInt(e.target.value))}
+              >
+                <option value={0}>Standard</option>
+                <option value={1}>BBS</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6 d-flex">
+              <div className="apr-1">Default Colly Background</div>
+              <div>
+                <select
+                  className="form-select"
+                  value={settings.def_bg_col ?? ""}
+                  onChange={(e) => set("def_bg_col", e.target.value)}
+                >
+                  {COLOR_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-5 d-flex">
+              <div className="apr-1">Default Colly Foreground</div>
+              <div>
+                <select
+                  className="form-select"
+                  value={settings.def_fg_col ?? ""}
+                  onChange={(e) => set("def_fg_col", e.target.value)}
+                >
+                  {COLOR_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6 apt-1">Default Colly Font</div>
+          </div>
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6 apb-1">
+              <select
+                className="form-select w-100"
+                value={settings.def_font ?? ""}
+                onChange={(e) => set("def_font", e.target.value ? parseInt(e.target.value) : null)}
+              >
+                {FONT_OPTIONS.map((o) => (
                   <option key={o.value} value={o.value}>
                     {o.label}
                   </option>
@@ -464,110 +396,136 @@ export default function SettingsForm() {
               </select>
             </div>
           </div>
-        </div>
 
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-5 d-flex">
-            <div className="apr-1">Default Colly Foreground</div>
-            <div>
-              <select
-                className="custom-select"
-                value={settings.def_fg_col ?? ""}
-                onChange={(e) => set("def_fg_col", e.target.value)}
-              >
-                {COLOR_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6 apt-1">Default Colly Font</div>
-        </div>
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6 apb-1">
-            <select
-              className="custom-select w-100"
-              value={settings.def_font ?? ""}
-              onChange={(e) => set("def_font", e.target.value ? parseInt(e.target.value) : null)}
-            >
-              {FONT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6">
-            <div className="form-group">
-              <div className="custom-control custom-switch">
-                CRT screen effect
-                <input
-                  type="checkbox"
-                  className="custom-control-input"
-                  id="crt_effect"
-                  checked={(settings.crt_effect ?? 0) === 1}
-                  onChange={(e) => set("crt_effect", e.target.checked ? 1 : 0)}
-                />
-                <label className="custom-control-label" htmlFor="crt_effect" />
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6">
+              <div className="form-group">
+                <div className="form-check form-switch">
+                  CRT screen effect
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    id="crt_effect"
+                    checked={(settings.crt_effect ?? 0) === 1}
+                    onChange={(e) => set("crt_effect", e.target.checked ? 1 : 0)}
+                  />
+                  <label className="form-check-label" htmlFor="crt_effect" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6">
-            <div className="form-group">
-              <div className="custom-control custom-switch">
-                Modem animation effect
-                <input
-                  type="checkbox"
-                  className="custom-control-input"
-                  id="anim_effect"
-                  checked={(settings.anim_effect ?? 0) === 1}
-                  onChange={(e) => set("anim_effect", e.target.checked ? 1 : 0)}
-                />
-                <label className="custom-control-label" htmlFor="anim_effect" />
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6">
+              <div className="form-group">
+                <div className="form-check form-switch">
+                  Modem animation effect
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    id="anim_effect"
+                    checked={(settings.anim_effect ?? 0) === 1}
+                    onChange={(e) => set("anim_effect", e.target.checked ? 1 : 0)}
+                  />
+                  <label className="form-check-label" htmlFor="anim_effect" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6">
-            <span className="white">Upload Signature</span>
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6">
+              <span className="white">Upload Signature</span>
+            </div>
           </div>
-        </div>
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-6 apb-1">
-            <input
-              type="text"
-              className="w-100"
-              maxLength={44}
-              value={settings.upload_signature ?? ""}
-              onChange={(e) => set("upload_signature", e.target.value)}
-            />
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6 apb-1">
+              <input
+                type="text"
+                className="w-100"
+                maxLength={44}
+                value={settings.upload_signature ?? ""}
+                onChange={(e) => set("upload_signature", e.target.value)}
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="row amb-1">
-          <div className="col-12 apt-1">
-            <input
-              type="submit"
-              className="btn-big bg-green white"
-              value="Save"
-              disabled={saveDisabled}
-            />
+          <div className="row amb-1">
+            <div className="col-12 apt-1">
+              <input
+                type="submit"
+                className="btn-big bg-green white"
+                value="Save"
+                disabled={savePending}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </form>
+
+      {/* Password — separate form with its own action */}
+      <form autoComplete="off" action={pwAction}>
+        <div className="container-fluid bg-secondary amb-1 apb-1 ap-1">
+          <div className="row amb-1 apt-1">
+            <div className="col-xs-12 col-md-12 apt-1">
+              <span className="white">Password Settings</span>
+            </div>
+          </div>
+
+          <div className="row amb-1 apt-1">
+            <div className="col-xs-12 col-md-6">Old password</div>
+          </div>
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6">
+              <input
+                type="password"
+                className="w-100"
+                autoComplete="new-password"
+                name="oldpass"
+              />
+            </div>
+          </div>
+
+          <div className="row amb-1 apt-1">
+            <div className="col-xs-12 col-md-6">New password</div>
+          </div>
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6">
+              <input
+                type="password"
+                className="w-100"
+                autoComplete="new-password"
+                name="newpass"
+              />
+            </div>
+          </div>
+
+          <div className="row amb-1 apt-1">
+            <div className="col-xs-12 col-md-6">New password again</div>
+          </div>
+          <div className="row amb-1">
+            <div className="col-xs-12 col-md-6">
+              <input
+                type="password"
+                className="w-100"
+                autoComplete="new-password"
+                name="repeatpass"
+              />
+            </div>
+          </div>
+
+          <div className="row amb-1">
+            <div className="col-12 apt-1">
+              <input
+                type="submit"
+                className="btn-big bg-green white"
+                value="Change Password"
+                disabled={pwPending}
+              />
+            </div>
+          </div>
+        </div>
+      </form>
 
       {/* Artist Identity — separate from main form, no submit */}
       <div className="container-fluid bg-secondary amb-1 apb-1 ap-1">
@@ -669,6 +627,6 @@ export default function SettingsForm() {
           </div>
         </div>
       </div>
-    </form>
+    </>
   );
 }

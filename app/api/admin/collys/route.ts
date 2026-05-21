@@ -1,9 +1,24 @@
+import { z } from "zod";
 import { NextRequest } from "next/server";
 import { unlinkSync, existsSync } from "fs";
 import path from "path";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
+
+const patchSchema = z.object({
+  id: z.number().int().positive(),
+  name: z.string().max(500).optional(),
+  year: z.number().int().nullable().optional(),
+  month: z.number().int().nullable().optional(),
+  type: z.string().max(50).optional(),
+  broken: z.number().int().optional(),
+  broken_comment: z.string().max(1000).nullable().optional(),
+});
+
+const deleteSchema = z.object({
+  id: z.number().int().positive(),
+});
 
 
 interface CollyRow {
@@ -54,18 +69,10 @@ export async function PATCH(request: NextRequest) {
   const session = await auth();
   if ((session?.user as { rank?: string } | undefined)?.rank !== "Admin") return apiError("Forbidden", 403);
 
-  const body = await request.json() as {
-    id: number;
-    name?: string;
-    year?: number | null;
-    month?: number | null;
-    type?: string;
-    broken?: number;
-    broken_comment?: string | null;
-  };
-
-  const { id, name, year, month, type, broken, broken_comment } = body;
-  if (!id) return apiError("id required", 400);
+  const rawPatchBody = await request.json().catch(() => ({}));
+  const patchParsed = patchSchema.safeParse(rawPatchBody);
+  if (!patchParsed.success) return apiError("Invalid request: " + patchParsed.error.issues[0]?.message, 400);
+  const { id, name, year, month, type, broken, broken_comment } = patchParsed.data;
 
   await prisma.$executeRaw`
     UPDATE collys SET
@@ -85,8 +92,10 @@ export async function DELETE(request: NextRequest) {
   const session = await auth();
   if ((session?.user as { rank?: string } | undefined)?.rank !== "Admin") return apiError("Forbidden", 403);
 
-  const body = await request.json() as { id: number };
-  if (!body.id) return apiError("id required", 400);
+  const rawDeleteBody = await request.json().catch(() => ({}));
+  const deleteParsed = deleteSchema.safeParse(rawDeleteBody);
+  if (!deleteParsed.success) return apiError("Invalid request: " + deleteParsed.error.issues[0]?.message, 400);
+  const body = deleteParsed.data;
 
   const rows = await prisma.$queryRaw<{ filename: string; uploader_id: number | null; filesize: number | null }[]>`
     SELECT filename, uploader_id, filesize FROM collys WHERE id = ${body.id}

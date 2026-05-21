@@ -199,7 +199,7 @@ export default function MessagesClient({ userNick, initialReceiverId }: Props) {
         <li className="nav-item">
           <a
             className={`nav-link${activeTab === "inbox" ? " active" : ""}`}
-            data-toggle="tab"
+            data-bs-toggle="tab"
             href="#"
             onClick={(e) => { e.preventDefault(); handleTabClick("inbox"); }}
           >
@@ -209,7 +209,7 @@ export default function MessagesClient({ userNick, initialReceiverId }: Props) {
         <li className="nav-item">
           <a
             className={`nav-link${activeTab === "outbox" ? " active" : ""}`}
-            data-toggle="tab"
+            data-bs-toggle="tab"
             href="#"
             onClick={(e) => { e.preventDefault(); handleTabClick("outbox"); }}
           >
@@ -219,7 +219,7 @@ export default function MessagesClient({ userNick, initialReceiverId }: Props) {
         <li className="nav-item">
           <a
             className={`nav-link${activeTab === "new" ? " active" : ""}`}
-            data-toggle="tab"
+            data-bs-toggle="tab"
             href="#"
             onClick={(e) => { e.preventDefault(); handleTabClick("new"); }}
           >

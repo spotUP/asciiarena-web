@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 const BASE_URL = process.env.NEXTAUTH_URL ?? "https://asciiarena.se";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -34,7 +36,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: BASE_URL, priority: 1.0 },
     { url: `${BASE_URL}/collys`, priority: 0.9 },
     { url: `${BASE_URL}/artists`, priority: 0.7 },
-    { url: `${BASE_URL}/express`, priority: 0.7 },
     { url: `${BASE_URL}/requests`, priority: 0.5 },
   ];
 

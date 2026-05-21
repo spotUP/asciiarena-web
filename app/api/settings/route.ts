@@ -1,9 +1,31 @@
+import { z } from "zod";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk, urlsafe } from "@/lib/utils";
 import bcrypt from "bcryptjs";
 import { createHash } from "crypto";
+
+const patchSchema = z.object({
+  nick: z.string().min(1).max(50).optional(),
+  crew: z.string().max(100).optional(),
+  byear: z.number().int().nullable().optional(),
+  bmonth: z.number().int().nullable().optional(),
+  bday: z.number().int().nullable().optional(),
+  country: z.string().max(100).optional(),
+  mail: z.string().max(255).optional(),
+  webpage: z.string().max(500).optional(),
+  upload_signature: z.string().max(1000).optional(),
+  viewmode: z.number().int().optional(),
+  def_bg_col: z.string().max(20).optional(),
+  def_fg_col: z.string().max(20).optional(),
+  display_mail: z.number().int().optional(),
+  def_font: z.number().int().optional(),
+  crt_effect: z.number().int().optional(),
+  anim_effect: z.number().int().optional(),
+  oldpass: z.string().optional(),
+  newpass: z.string().optional(),
+});
 
 interface UserRow {
   nick: string | null;
@@ -75,33 +97,16 @@ export async function PATCH(request: NextRequest) {
   if (!session?.user?.id) return apiError("Unauthorized", 401);
 
   const userId = parseInt(session.user.id);
-  const body = await request.json() as {
-    nick?: string;
-    crew?: string;
-    byear?: number | null;
-    bmonth?: number | null;
-    bday?: number | null;
-    country?: string;
-    mail?: string;
-    webpage?: string;
-    upload_signature?: string;
-    viewmode?: number;
-    def_bg_col?: string;
-    def_fg_col?: string;
-    display_mail?: number;
-    def_font?: number;
-    crt_effect?: number;
-    anim_effect?: number;
-    oldpass?: string;
-    newpass?: string;
-  };
+  const rawBody = await request.json().catch(() => ({}));
+  const parsed = patchSchema.safeParse(rawBody);
+  if (!parsed.success) return apiError("Invalid request: " + parsed.error.issues[0]?.message, 400);
 
   const {
     nick, crew, byear, bmonth, bday, country, mail, webpage,
     upload_signature, viewmode, def_bg_col, def_fg_col,
     display_mail, def_font, crt_effect, anim_effect,
     oldpass, newpass,
-  } = body;
+  } = parsed.data;
 
   if (newpass) {
     if (!oldpass) return apiError("Old password required to set new password", 400);

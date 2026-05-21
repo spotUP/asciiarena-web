@@ -1,7 +1,21 @@
+import { z } from "zod";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
+
+const patchSchema = z.object({
+  id: z.number().int().positive(),
+  name: z.string().max(200).optional(),
+  sysop: z.string().max(200).optional(),
+  address: z.string().max(500).optional(),
+  software: z.string().max(200).optional(),
+  online: z.boolean().optional(),
+});
+
+const deleteSchema = z.object({
+  id: z.number().int().positive(),
+});
 
 export async function GET(request: NextRequest) {
   const session = await auth();
@@ -22,8 +36,10 @@ export async function PATCH(request: NextRequest) {
   const session = await auth();
   if ((session?.user as { rank?: string } | undefined)?.rank !== "Admin") return apiError("Forbidden", 403);
 
-  const body = await request.json() as { id: number; name?: string; sysop?: string; address?: string; software?: string; online?: boolean };
-  if (!body.id) return apiError("id required", 400);
+  const rawPatchBody = await request.json().catch(() => ({}));
+  const patchParsed = patchSchema.safeParse(rawPatchBody);
+  if (!patchParsed.success) return apiError("Invalid request: " + patchParsed.error.issues[0]?.message, 400);
+  const body = patchParsed.data;
 
   await prisma.$executeRaw`
     UPDATE bbses SET
@@ -41,8 +57,10 @@ export async function DELETE(request: NextRequest) {
   const session = await auth();
   if ((session?.user as { rank?: string } | undefined)?.rank !== "Admin") return apiError("Forbidden", 403);
 
-  const body = await request.json() as { id: number };
-  if (!body.id) return apiError("id required", 400);
+  const rawDeleteBody = await request.json().catch(() => ({}));
+  const deleteParsed = deleteSchema.safeParse(rawDeleteBody);
+  if (!deleteParsed.success) return apiError("Invalid request: " + deleteParsed.error.issues[0]?.message, 400);
+  const body = deleteParsed.data;
 
   await prisma.$executeRaw`DELETE FROM bbs_of WHERE name = (SELECT name FROM bbses WHERE id = ${body.id})`;
   await prisma.$executeRaw`DELETE FROM bbses WHERE id = ${body.id}`;

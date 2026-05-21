@@ -1,7 +1,12 @@
+import { z } from "zod";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
+
+const postSchema = z.object({
+  nick: z.string().min(1).max(100),
+});
 
 interface ArtistRow {
   id: number;
@@ -36,8 +41,10 @@ export async function POST(request: NextRequest) {
   if (!session?.user?.id) return apiError("Unauthorized", 401);
   const userId = parseInt(session.user.id);
 
-  const body = await request.json() as { nick?: string };
-  const nick = (body.nick ?? "").trim();
+  const rawBody = await request.json().catch(() => ({}));
+  const parsed = postSchema.safeParse(rawBody);
+  if (!parsed.success) return apiError("Invalid request: " + parsed.error.issues[0]?.message, 400);
+  const nick = parsed.data.nick.trim();
   if (!nick) return apiError("nick is required", 400);
 
   const rows = await prisma.$queryRaw<ArtistRow[]>`

@@ -2,7 +2,7 @@ import Script from "next/script";
 import type { Session } from "next-auth";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/db";
-import { auth } from "@/lib/auth";
+import { getSession as auth } from "@/lib/session";
 import Navbar from "./Navbar";
 import LogoHeader from "./LogoHeader";
 import PageHeader from "./PageHeader";
@@ -18,7 +18,7 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
   const [rawSession, logoRows] = await Promise.all([
     auth(),
     prisma.$queryRaw<Array<{ ascii: string }>>(
-      Prisma.sql`SELECT ascii FROM logos ORDER BY id LIMIT 50`
+      Prisma.sql`SELECT ascii FROM logos ORDER BY logo_id LIMIT 50`
     ),
   ]);
 
@@ -103,7 +103,7 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
           <div className="modal-content">
             <div className="modal-header" style={{ backgroundColor: "#444444" }}>
               <span className="modal-title">LOGiN</span>
-              <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div className="modal-body bg-primary">
               {!session?.user ? (
@@ -121,9 +121,9 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
                       </div>
                       <div className="col-12 col-sm-6">
                         <div className="form-group">
-                          <div className="custom-control custom-switch lightgrey">
-                            <input className="custom-control-input" type="checkbox" id="rememberme" name="rememberme" value="1" defaultChecked />
-                            <label className="custom-control-label" htmlFor="rememberme">Remember me</label>
+                          <div className="form-check form-switch lightgrey">
+                            <input className="form-check-input" type="checkbox" id="rememberme" name="rememberme" value="1" defaultChecked />
+                            <label className="form-check-label" htmlFor="rememberme">Remember me</label>
                           </div>
                         </div>
                         <a href="/register">Register</a> <span style={{ color: "#999999" }}>new account!</span><br /><br />
@@ -138,7 +138,7 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
               )}
             </div>
             <div className="modal-footer bg-primary">
-              <button type="button" className="btn-secondary bg-transparent amr-1 apr-1" data-dismiss="modal">CLOSE</button>
+              <button type="button" className="btn-secondary bg-transparent amr-1 apr-1" data-bs-dismiss="modal">CLOSE</button>
               <button type="button" className="btn-primary black bg-lightgrey" id="login-submit-btn">LOG IN</button>
             </div>
           </div>
@@ -146,36 +146,37 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
       </div>
 
       <Script id="site-init" strategy="afterInteractive">{`
-        $(function() {
-          $(document).keydown(function(e){
-            if(e.keyCode == 27) {
-              $("#colly").toggleClass("fullscreen");
-              $("#blacker").toggleClass("show");
-              $("#spotclose").toggleClass("show");
-            }
-          });
-
-          // Login form: fetch CSRF token then POST to NextAuth credentials
-          function loginUser() {
-            let nick = $("#login-nick").val();
-            var pass = $("#login-password").val();
-            $.getJSON("/api/auth/csrf", function(csrf) {
-              $.ajax({
-                type: "POST",
-                url: "/api/auth/callback/credentials",
-                data: { login: nick, password: pass, csrfToken: csrf.csrfToken, redirect: "false" },
-                success: function() { window.location.reload(); },
-                error: function() {
-                  $("#login-results").html('<div class="alert alert-danger animate__animated animate__shakeX">authentication failed</div>');
-                  setTimeout(function(){ $("#login-results").empty(); }, 3000);
-                }
-              });
-            });
+        document.addEventListener("keydown", function(e) {
+          if (e.key === "Escape") {
+            document.getElementById("colly")?.classList.toggle("fullscreen");
+            document.getElementById("blacker")?.classList.toggle("show");
+            document.getElementById("spotclose")?.classList.toggle("show");
           }
-          $("#login-submit-btn").on("click", loginUser);
-          $("#login-submit-btn").on("click", loginUser);
-          $("#login-form").on("submit", function(e) { e.preventDefault(); loginUser(); });
-          $("#login").on("shown.bs.modal", function() { $("#login-nick").focus(); });
+        });
+
+        async function loginUser() {
+          const nick = document.getElementById("login-nick").value;
+          const pass = document.getElementById("login-password").value;
+          try {
+            const { csrfToken } = await (await fetch("/api/auth/csrf")).json();
+            const res = await fetch("/api/auth/callback/credentials", {
+              method: "POST",
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              body: new URLSearchParams({ login: nick, password: pass, csrfToken, redirect: "false" }),
+            });
+            if (res.ok) {
+              window.location.reload();
+            } else {
+              const el = document.getElementById("login-results");
+              el.innerHTML = '<div class="alert alert-danger animate__animated animate__shakeX">authentication failed</div>';
+              setTimeout(function() { el.innerHTML = ""; }, 3000);
+            }
+          } catch {}
+        }
+        document.getElementById("login-submit-btn")?.addEventListener("click", loginUser);
+        document.getElementById("login-form")?.addEventListener("submit", function(e) { e.preventDefault(); loginUser(); });
+        document.getElementById("login")?.addEventListener("shown.bs.modal", function() {
+          document.getElementById("login-nick")?.focus();
         });
       `}</Script>
     </>

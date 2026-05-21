@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import TopCollys from "@/components/widgets/TopCollys";
 import MostViewedCollys from "@/components/widgets/MostViewedCollys";
 import TopArtists from "@/components/widgets/TopArtists";
@@ -10,14 +11,14 @@ import BBSWeektop from "@/components/widgets/BBSWeektop";
 export default function RightSidebar() {
   return (
     <>
-      <TopCollys />
-      <MostViewedCollys />
-      <TopArtists />
-      <TopCrews />
-      <TopUploaders />
-      <TopCommenters />
-      <ArenaStats />
-      <BBSWeektop />
+      <Suspense><TopCollys /></Suspense>
+      <Suspense><MostViewedCollys /></Suspense>
+      <Suspense><TopArtists /></Suspense>
+      <Suspense><TopCrews /></Suspense>
+      <Suspense><TopUploaders /></Suspense>
+      <Suspense><TopCommenters /></Suspense>
+      <Suspense><ArenaStats /></Suspense>
+      <Suspense><BBSWeektop /></Suspense>
     </>
   );
 }

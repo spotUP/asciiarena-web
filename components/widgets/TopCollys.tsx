@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/generated/prisma/client";
 
@@ -30,9 +31,9 @@ export default async function TopCollys({ limit = 5 }: { limit?: number }) {
               key={filename}
               className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between"
             >
-              <a className="magenta text-truncate" href={`/release/${filename}`}>
+              <Link className="magenta text-truncate" href={`/release/${filename}`}>
                 {filename}
-              </a>
+              </Link>
               <span className="text-truncate">{rating} PTS</span>
             </div>
           );

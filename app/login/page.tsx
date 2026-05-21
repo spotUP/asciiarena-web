@@ -8,10 +8,7 @@ export default function LoginPage() {
         <p>Please log in to continue.</p>
       </div>
       <Script id="open-login-modal" strategy="afterInteractive">{`
-        $(function() {
-          var modal = new bootstrap.Modal(document.getElementById('login'));
-          modal.show();
-        });
+        new bootstrap.Modal(document.getElementById('login')).show();
       `}</Script>
     </SiteLayout>
   );

@@ -435,7 +435,7 @@ export default function StyleEditorClient({ userId }: { userNick: string; userId
         {/* ── Top toolbar ── */}
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px", padding: "6px 8px", background: "#1a1a1a", borderBottom: "1px solid #333" }}>
           <label className="white" style={{ marginBottom: 0 }}>Style:</label>
-          <select className="custom-select" style={{ width: "160px" }}
+          <select className="form-select" style={{ width: "160px" }}
             value={font.fontid}
             onChange={e => loadFont(parseInt(e.target.value))}>
             <option value={0}>-- New --</option>
@@ -448,7 +448,7 @@ export default function StyleEditorClient({ userId }: { userNick: string; userId
             onChange={e => setFont(f => ({ ...f, fontname: e.target.value }))} />
 
           <label className="white" style={{ marginBottom: 0 }}>Visibility:</label>
-          <select className="custom-select" style={{ width: "155px" }}
+          <select className="form-select" style={{ width: "155px" }}
             value={font.fontstatus}
             onChange={e => setFont(f => ({ ...f, fontstatus: parseInt(e.target.value) }))}>
             <option value={1}>Private</option>
@@ -457,7 +457,7 @@ export default function StyleEditorClient({ userId }: { userNick: string; userId
           </select>
 
           <label className="white" style={{ marginBottom: 0 }}>Group:</label>
-          <select className="custom-select" style={{ width: "140px" }}
+          <select className="form-select" style={{ width: "140px" }}
             value={font.group_id ?? 0}
             onChange={e => setFont(f => ({ ...f, group_id: parseInt(e.target.value) || null }))}>
             <option value={0}>No group</option>
@@ -706,7 +706,7 @@ export default function StyleEditorClient({ userId }: { userNick: string; userId
                 <div className="white" style={{ fontWeight: "bold", marginBottom: "6px" }}>Font Options</div>
 
                 <div style={{ color: "#aaa", marginBottom: "4px" }}>H-Layout:</div>
-                <select className="custom-select" style={{ width: "100%", marginBottom: "4px" }}
+                <select className="form-select" style={{ width: "100%", marginBottom: "4px" }}
                   value={font.horizontalLayout}
                   onChange={e => setFont(f => ({ ...f, horizontalLayout: e.target.value as HLayout }))}>
                   {LAYOUTS.map(l => <option key={l} value={l}>{l}</option>)}
@@ -725,7 +725,7 @@ export default function StyleEditorClient({ userId }: { userNick: string; userId
                 )}
 
                 <div style={{ color: "#aaa", marginBottom: "4px" }}>V-Layout:</div>
-                <select className="custom-select" style={{ width: "100%", marginBottom: "4px" }}
+                <select className="form-select" style={{ width: "100%", marginBottom: "4px" }}
                   value={font.verticalLayout}
                   onChange={e => setFont(f => ({ ...f, verticalLayout: e.target.value as VLayout }))}>
                   {LAYOUTS.map(l => <option key={l} value={l}>{l}</option>)}

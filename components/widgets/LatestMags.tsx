@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/db";
 
 export type LatestMagsProps = {
@@ -15,9 +16,9 @@ export default async function LatestMags({ limit = 5 }: LatestMagsProps) {
     <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
       <div className="header col-lg-12 p-0">
         <h2 className="ap-1 bg-header text-truncate lightgreen">
-          <a className="lightgreen" href="/mags?sort_by=timestamp&sort_order=D">
+          <Link className="lightgreen" href="/mags?sort_by=timestamp&sort_order=D">
             LATEST ADDED MAGS
-          </a>
+          </Link>
         </h2>
       </div>
       <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
@@ -35,9 +36,9 @@ export default async function LatestMags({ limit = 5 }: LatestMagsProps) {
               key={row.id}
               className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between"
             >
-              <a className="magenta text-truncate" href={`/magazine/${filename}`}>
+              <Link className="magenta text-truncate" href={`/magazine/${filename}`}>
                 {truncated}
-              </a>
+              </Link>
               <span className="text-truncate">{uploadDate}</span>
             </div>
           );
