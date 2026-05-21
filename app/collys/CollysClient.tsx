@@ -108,12 +108,12 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
     setViewMode(v as 1 | 2);
   }
 
-  const currentDate = new Date().toLocaleDateString("en-GB", {
-    weekday: "short",
-    day: "2-digit",
-    month: "2-digit",
-    year: "2-digit",
-  });
+  const [currentDate, setCurrentDate] = useState("");
+  useEffect(() => {
+    setCurrentDate(new Date().toLocaleDateString("en-GB", {
+      weekday: "short", day: "2-digit", month: "2-digit", year: "2-digit",
+    }));
+  }, []);
 
   return (
     <>

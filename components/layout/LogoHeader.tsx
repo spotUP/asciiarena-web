@@ -7,12 +7,15 @@ export type LogoHeaderProps = {
 };
 
 export default function LogoHeader({ logos }: LogoHeaderProps) {
-  const shuffled = useMemo(
-    () => [...logos].sort(() => Math.random() - 0.5).slice(0, 10),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+  // Shuffle client-side only — useMemo with Math.random() runs on server too,
+  // producing a different order and causing a hydration mismatch.
+  const [shuffled, setShuffled] = useState<string[]>([]);
   const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    setShuffled([...logos].sort(() => Math.random() - 0.5).slice(0, 10));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (shuffled.length < 2) return;
