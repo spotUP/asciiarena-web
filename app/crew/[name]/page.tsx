@@ -50,41 +50,32 @@ export default async function CrewPage({ params }: PageProps) {
   });
   if (!crew) notFound();
 
-  // Members with optional user profile link
-  const members = await prisma.$queryRaw<MemberRow[]>`
-    SELECT mo.id, mo.nick, mo.crew, a.artisturl, u.nickurl AS user_nickurl
-    FROM member_of mo
-    LEFT JOIN artists a ON LOWER(a.nick) = LOWER(mo.nick)
-    LEFT JOIN users u ON u.id = a.user_id
-    WHERE mo.crew = ${crew.name}
-    ORDER BY mo.nick ASC
-  `;
+  const [members, crewCollys, releaseRows] = await Promise.all([
+    prisma.$queryRaw<MemberRow[]>`
+      SELECT mo.id, mo.nick, mo.crew, a.artisturl, u.nickurl AS user_nickurl
+      FROM member_of mo
+      LEFT JOIN artists a ON LOWER(a.nick) = LOWER(mo.nick)
+      LEFT JOIN users u ON u.id = a.user_id
+      WHERE mo.crew = ${crew.name}
+      ORDER BY mo.nick ASC
+    `,
+    prisma.collys_crews.findMany({ where: { crew_id: crew.id }, select: { colly_id: true } }),
+    prisma.collys_crews.findMany({
+      where: { crew_id: crew.id },
+      include: { collys: { select: { id: true, filename: true, name: true, year: true } } },
+      orderBy: { collys: { filename: "asc" } },
+    }),
+  ]);
 
-  // Vote count for rating display
-  const crewCollys = await prisma.collys_crews.findMany({
-    where: { crew_id: crew.id },
-    select: { colly_id: true },
-  });
   const collyIds = crewCollys.map((r) => r.colly_id);
-
-  let voteCount = 0;
-  if (collyIds.length > 0) {
-    voteCount = await prisma.comments.count({
-      where: { colly_id: { in: collyIds }, rating: { gt: 0 } },
-    });
-  }
+  const voteCount = collyIds.length > 0
+    ? await prisma.comments.count({ where: { colly_id: { in: collyIds }, rating: { gt: 0 } } })
+    : 0;
 
   const ratingDisplay =
     !crew.rating || crew.rating === 0
       ? `Awaiting ${Math.max(0, 3 - voteCount)} votes`
       : `${crew.rating.toFixed(1)} (${voteCount} votes)`;
-
-  // All releases for this crew
-  const releaseRows = await prisma.collys_crews.findMany({
-    where: { crew_id: crew.id },
-    include: { collys: { select: { id: true, filename: true, name: true, year: true } } },
-    orderBy: { collys: { filename: "asc" } },
-  });
   const releases: ReleaseRow[] = releaseRows.map(r => ({
     colly_id: r.colly_id,
     filename: r.collys.filename,

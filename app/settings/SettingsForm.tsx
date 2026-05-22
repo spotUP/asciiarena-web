@@ -40,8 +40,6 @@ const FONT_OPTIONS: { value: string; label: string }[] = [
   { value: "TopazPlus_a1200", label: "A1200 Topaz+" },
 ];
 
-const CURRENT_YEAR = new Date().getFullYear();
-
 const EMPTY_SETTINGS: Settings = {
   nick: "",
   crew: "",
@@ -67,6 +65,9 @@ interface SettingsFormProps {
 
 export default function SettingsForm({ initialSettings }: SettingsFormProps) {
   const [settings, setSettings] = useState<Settings>(initialSettings ?? EMPTY_SETTINGS);
+
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  useEffect(() => { setCurrentYear(new Date().getFullYear()); }, []);
 
   const [saveState, saveAction, savePending] = useActionState(saveSettings, { success: false });
   const [pwState, pwAction, pwPending] = useActionState(changePassword, { success: false });
@@ -219,7 +220,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
                 onChange={(e) => set("byear", e.target.value ? parseInt(e.target.value) : null)}
               >
                 <option value="">Year</option>
-                {Array.from({ length: CURRENT_YEAR - 5 - 1920 + 1 }, (_, i) => 1920 + i).map(
+                {Array.from({ length: currentYear - 5 - 1920 + 1 }, (_, i) => 1920 + i).map(
                   (y) => (
                     <option key={y} value={y}>
                       {y}

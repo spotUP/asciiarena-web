@@ -9,13 +9,15 @@ export async function GET() {
 
   const userId = parseInt(session.user.id);
 
-  const rows = await prisma.$queryRaw<[{ count: bigint }]>`
-    SELECT COUNT(*) AS count
-    FROM messages
-    WHERE to_id = ${userId}
-      AND \`new\` = 1
-  `;
-
-  const count = Number(rows[0]?.count ?? 0);
-  return apiOk({ count });
+  try {
+    const rows = await prisma.$queryRaw<[{ count: bigint }]>`
+      SELECT COUNT(*) AS count
+      FROM messages
+      WHERE to_id = ${userId}
+        AND \`new\` = 1
+    `;
+    return apiOk({ count: Number(rows[0]?.count ?? 0) });
+  } catch {
+    return apiOk({ count: 0 });
+  }
 }

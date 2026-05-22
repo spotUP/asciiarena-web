@@ -45,38 +45,72 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const orderDir = Prisma.raw(ascending ? "ASC" : "DESC");
   const orderCol = Prisma.raw(sortCol);
 
-  const likeParam = filter ? `%${filter}%` : "%";
+  const likeParam = filter ? `%${filter}%` : null;
 
-  const filterClause = Prisma.sql`HAVING name LIKE ${likeParam} OR filename LIKE ${likeParam} OR crews LIKE ${likeParam} OR artists LIKE ${likeParam}`;
+  let rows: CollyRow[];
+  let total_count: number;
 
-  const rows = await prisma.$queryRaw<CollyRow[]>`
-    SELECT
-      c.id,
-      c.name,
-      c.filename,
-      c.filesize,
-      concat(lpad(c.year,4,0),'-',lpad(c.month,2,0),'-',lpad(c.day,2,0)) AS cdate,
-      (SELECT coalesce(GROUP_CONCAT(a.nick),'') FROM artists_collys ac LEFT JOIN artists a ON a.id = ac.artist_id WHERE ac.colly_id = c.id) AS artists,
-      (SELECT coalesce(GROUP_CONCAT(cr.name),'') FROM collys_crews cc LEFT JOIN crews cr ON cr.id = cc.crew_id WHERE cc.colly_id = c.id) AS crews
-    FROM collys c
-    ${filterClause}
-    ORDER BY ${orderCol} ${orderDir}
-    LIMIT ${Prisma.raw(String(pagesizeInt))} OFFSET ${Prisma.raw(String(startInt))}
-  `;
-
-  const countRows = await prisma.$queryRaw<CountRow[]>`
-    SELECT count(c.id) AS cnt
-    FROM (
-      SELECT
-        c.*,
-        (SELECT coalesce(GROUP_CONCAT(a.nick),'') FROM artists_collys ac LEFT JOIN artists a ON a.id = ac.artist_id WHERE ac.colly_id = c.id) AS artists,
-        (SELECT coalesce(GROUP_CONCAT(cr.name),'') FROM collys_crews cc LEFT JOIN crews cr ON cr.id = cc.crew_id WHERE cc.colly_id = c.id) AS crews
-      FROM collys c
-      HAVING name LIKE ${likeParam} OR filename LIKE ${likeParam} OR crews LIKE ${likeParam} OR artists LIKE ${likeParam}
-    ) c
-  `;
-
-  const total_count = Number(countRows[0]?.cnt ?? 0);
+  if (!likeParam) {
+    // No filter: use fast direct query + indexed count (no GROUP BY needed)
+    const [dataRows, [countRow]] = await Promise.all([
+      prisma.$queryRaw<CollyRow[]>`
+        SELECT
+          c.id, c.name, c.filename, c.filesize,
+          CONCAT(LPAD(c.year,4,0),'-',LPAD(c.month,2,0),'-',LPAD(c.day,2,0)) AS cdate,
+          COALESCE((SELECT GROUP_CONCAT(a.nick ORDER BY a.nick SEPARATOR ',')
+                    FROM artists_collys ac JOIN artists a ON a.id = ac.artist_id
+                    WHERE ac.colly_id = c.id), '') AS artists,
+          COALESCE((SELECT GROUP_CONCAT(cr.name ORDER BY cr.name SEPARATOR ',')
+                    FROM collys_crews cc JOIN crews cr ON cr.id = cc.crew_id
+                    WHERE cc.colly_id = c.id), '') AS crews
+        FROM collys c
+        ORDER BY ${orderCol} ${orderDir}
+        LIMIT ${Prisma.raw(String(pagesizeInt))} OFFSET ${Prisma.raw(String(startInt))}
+      `,
+      prisma.$queryRaw<[{ cnt: bigint }]>`SELECT COUNT(*) AS cnt FROM collys`,
+    ]);
+    rows = dataRows;
+    total_count = Number(countRow?.cnt ?? 0);
+  } else {
+    // Filtered: GROUP BY + HAVING to match against aggregated artists/crews
+    const like = likeParam;
+    const [dataRows, countRows] = await Promise.all([
+      prisma.$queryRaw<CollyRow[]>`
+        SELECT
+          c.id, c.name, c.filename, c.filesize,
+          CONCAT(LPAD(c.year,4,0),'-',LPAD(c.month,2,0),'-',LPAD(c.day,2,0)) AS cdate,
+          COALESCE(GROUP_CONCAT(DISTINCT a.nick ORDER BY a.nick SEPARATOR ','),'') AS artists,
+          COALESCE(GROUP_CONCAT(DISTINCT cr.name ORDER BY cr.name SEPARATOR ','),'') AS crews
+        FROM collys c
+        LEFT JOIN artists_collys ac ON ac.colly_id = c.id
+        LEFT JOIN artists a ON a.id = ac.artist_id
+        LEFT JOIN collys_crews cc ON cc.colly_id = c.id
+        LEFT JOIN crews cr ON cr.id = cc.crew_id
+        GROUP BY c.id, c.name, c.filename, c.filesize, c.year, c.month, c.day
+        HAVING c.name LIKE ${like} OR c.filename LIKE ${like}
+            OR GROUP_CONCAT(DISTINCT cr.name ORDER BY cr.name SEPARATOR ',') LIKE ${like}
+            OR GROUP_CONCAT(DISTINCT a.nick ORDER BY a.nick SEPARATOR ',') LIKE ${like}
+        ORDER BY ${orderCol} ${orderDir}
+        LIMIT ${Prisma.raw(String(pagesizeInt))} OFFSET ${Prisma.raw(String(startInt))}
+      `,
+      prisma.$queryRaw<CountRow[]>`
+        SELECT COUNT(*) AS cnt FROM (
+          SELECT c.id
+          FROM collys c
+          LEFT JOIN artists_collys ac ON ac.colly_id = c.id
+          LEFT JOIN artists a ON a.id = ac.artist_id
+          LEFT JOIN collys_crews cc ON cc.colly_id = c.id
+          LEFT JOIN crews cr ON cr.id = cc.crew_id
+          GROUP BY c.id, c.name, c.filename
+          HAVING c.name LIKE ${like} OR c.filename LIKE ${like}
+              OR GROUP_CONCAT(DISTINCT cr.name) LIKE ${like}
+              OR GROUP_CONCAT(DISTINCT a.nick) LIKE ${like}
+        ) sub
+      `,
+    ]);
+    rows = dataRows;
+    total_count = Number(countRows[0]?.cnt ?? 0);
+  }
 
   const result = rows.map((row) => ({
     url: `/release/${row.filename}`,

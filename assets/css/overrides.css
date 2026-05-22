@@ -1,0 +1,387 @@
+/* ── Loads last — overrides bootstrap5, site.css, 386.css ── */
+
+/* Links */
+a, a:hover, a:focus, a:visited { text-decoration: none !important; }
+
+/* Sidebar widget containers: clip overflow and constrain inner container widths */
+.col-lg-2 { overflow: hidden; }
+.col-lg-2 .container { max-width: 100% !important; width: 100% !important; margin: 0 !important; }
+
+/* Widget header bars: no overflow, no margin */
+h2.bg-header { margin: 0 !important; max-width: 100%; overflow: hidden; }
+
+/* Navbar: fix Bootstrap 5 regression, zero padding for 21px compact bar */
+.navbar {
+  --bs-navbar-padding-y: 0;
+  --bs-nav-link-padding-y: 0;
+  overflow: visible;
+}
+.navbar-nav { margin-left: 0 !important; }
+
+/* Force the collapse and its container to stay inside the 21px bar */
+.navbar > .container-fluid,
+.navbar > .container {
+  height: 100%;
+  overflow: visible;
+}
+.navbar-expand-lg .navbar-collapse {
+  height: 21px !important;
+  overflow: visible !important;
+  align-items: center;
+}
+
+.navbar .nav-link, .navbar .navbar-brand {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  line-height: 21px !important;
+  height: 21px;
+}
+.navbar .nav-item {
+  height: 21px;
+  display: flex;
+  align-items: center;
+}
+
+/* Navbar toggler: site uses text "mENU", hide BS5 icon */
+.navbar-toggler { border: none !important; padding: 0 !important; box-shadow: none !important; }
+.navbar-toggler-icon { display: none !important; }
+
+/* Dropdowns */
+.dropdown-menu {
+  --bs-dropdown-bg: #aaaaaa;
+  --bs-dropdown-color: #111111;
+  --bs-dropdown-link-color: #111111;
+  --bs-dropdown-link-hover-bg: #888888;
+  --bs-dropdown-link-hover-color: #111111;
+  --bs-dropdown-link-active-bg: #666666;
+  --bs-dropdown-link-active-color: #111111;
+  background-color: #aaaaaa !important;
+  color: #111111 !important;
+}
+.dropdown-item { color: #111111 !important; }
+/* Buttons used as dropdown items must not inherit the global 48px min-height */
+button.dropdown-item {
+  min-height: 0 !important;
+  max-height: none !important;
+  height: auto !important;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+}
+.dropdown-item span { font-family: Monaco, monospace; font-size: 16px; }
+
+/* Hover-to-open on desktop */
+@media (min-width: 992px) {
+  .navbar .dropdown:hover > .dropdown-menu { display: block; margin-top: 0; }
+}
+.navbar .dropdown:hover > .dropdown-toggle,
+.navbar .dropdown.show > .dropdown-toggle { color: inherit !important; }
+
+/* Form controls */
+.form-control, .form-select {
+  background-color: #212121 !important;
+  color: rgba(255,255,255,0.7) !important;
+  border-color: #555555 !important;
+  border-radius: 0 !important;
+}
+.form-control:focus, .form-select:focus {
+  background-color: #212121 !important;
+  color: rgba(255,255,255,0.7) !important;
+  box-shadow: none !important;
+}
+.form-check-input { background-color: #444 !important; border-color: #666 !important; }
+.form-check-input:checked { background-color: #ff55ff !important; border-color: #ff55ff !important; }
+
+/* Sort buttons */
+.sort-btn { background: none; border: none; color: inherit; cursor: pointer; font: inherit; padding: 0; }
+.sort-btn:hover { text-decoration: underline; }
+
+/* Bootstrap 5 adds ::after caret to dropdown-toggle; we use explicit <span class="caret"> */
+
+
+/* The caret span itself must not add extra line height */
+.navbar .caret { line-height: 1; vertical-align: middle; }
+
+/* Dropdown menus: override Popper.js inline transform, position below navbar */
+.navbar .dropdown-menu {
+  position: absolute !important;
+  top: 21px !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  margin-top: 0 !important;
+  background-color: #aaaaaa !important;
+}
+
+/* Right-aligned dropdowns (account, admin) — align to right edge */
+.navbar .dropdown-menu.dropdown-menu-end {
+  right: 0 !important;
+  left: auto !important;
+}
+
+/* Hide BS5 ::after caret globally — all dropdowns use text indicators instead */
+.dropdown-toggle::after { display: none !important; }
+
+/* Fix dropdown-toggle padding in navbar */
+.navbar .dropdown-toggle { padding-top: 0 !important; }
+
+/* Navbar search input: constrain to fit within 21px bar */
+.navbar .form-control {
+  height: 21px !important;
+  min-height: 0 !important;
+  padding: 0 4px !important;
+  line-height: 16px !important;
+  width: 80px !important;
+}
+
+/* form-switch: retro block-character toggle matching BS4 BOOTSTRA.386 custom-switch
+   Unchecked: █░░ (solid-light-light)  Checked: ░░█ (light-light-solid) */
+.form-switch .form-check-input {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: absolute !important;
+}
+.form-switch .form-check-label { cursor: pointer; }
+.form-switch .form-check-label::before {
+  content: '\2588\2591\2591';
+  color: #aaaaaa;
+  margin-right: 6px;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, monospace;
+  font-size: 16px;
+  line-height: 16px;
+}
+.form-switch .form-check-input:checked + .form-check-label::before {
+  content: '\2591\2591\2588';
+  color: #55ff55;
+}
+
+/* ── BS4→BS5 component parity ── */
+
+/* Buttons */
+.btn {
+  color: #000000;
+  background-color: #bbbbbb;
+  border: none;
+  padding: 0 16px;
+  font-size: 16px !important;
+  line-height: 16px !important;
+  border-radius: 0 !important;
+}
+
+.btn-primary,
+.btn-secondary {
+  color: #000000 !important;
+  background-color: #bbbbbb !important;
+  border-color: #000000;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+  color: #fff !important;
+  background-color: #bbbbbb !important;
+  border-color: #fff;
+}
+
+.btn-primary:not(:disabled):not(.disabled):active,
+.btn-secondary:not(:disabled):not(.disabled):active {
+  color: #bbbbbb !important;
+  background-color: #000000 !important;
+}
+
+.btn-lg {
+  background-color: #bbbbbb !important;
+  border: 0.875px solid #000000 !important;
+  margin-top: 7px;
+  padding-top: 6.125px !important;
+  padding-bottom: 7px !important;
+  margin-bottom: 6.125px;
+  border-left-width: 2px !important;
+  border-right-width: 2px !important;
+  margin-left: 3.5px;
+  padding-left: 10.5px !important;
+  padding-right: 11.5px !important;
+  margin-right: 10.5px;
+  box-shadow: -3.5px -7px 0 0 #bbbbbb, 2.5px 6.125px 0 0 #bbbbbb, -3.5px 6.125px 0 0 #bbbbbb, 2.5px -7px 0 0 #bbbbbb !important;
+  filter: drop-shadow(7px 8px 0 black);
+}
+
+.btn-lg:hover {
+  box-shadow: -3.5px -7px 0 0 #555555, 2.5px 6.125px 0 0 #555555, -3.5px 6.125px 0 0 #555555, 2.5px -7px 0 0 #555555 !important;
+  color: #fff !important;
+  background-color: #555555 !important;
+}
+
+.btn-lg:not(:disabled):not(.disabled):active {
+  box-shadow: -3.5px -7px 0 0 #555555, 2.5px 6.125px 0 0 #555555, -3.5px 6.125px 0 0 #555555, 2.5px -7px 0 0 #555555 !important;
+  color: #fff !important;
+  background-color: #555555 !important;
+  filter: none;
+  position: relative;
+  top: 14px;
+  left: 8px;
+}
+
+/* Badges with bracket decorations */
+.badge {
+  padding: 0 8px;
+  font-size: 16px !important;
+  background-color: transparent;
+  border-radius: 0 !important;
+}
+
+.badge-primary::before, .bg-primary.badge::before,
+.badge-secondary::before, .bg-secondary.badge::before { color: #bbbbbb; content: "["; }
+.badge-primary::after, .bg-primary.badge::after,
+.badge-secondary::after, .bg-secondary.badge::after { color: #bbbbbb; content: "]"; }
+.badge-success::before, .bg-success.badge::before { color: #00aa00; content: "["; }
+.badge-success::after, .bg-success.badge::after { color: #00aa00; content: "]"; }
+.badge-info::before, .bg-info.badge::before { color: #00aaaa; content: "["; }
+.badge-info::after, .bg-info.badge::after { color: #00aaaa; content: "]"; }
+.badge-warning::before, .bg-warning.badge::before { color: #aa5500; content: "["; }
+.badge-warning::after, .bg-warning.badge::after { color: #aa5500; content: "]"; }
+.badge-danger::before, .bg-danger.badge::before { color: #aa0000; content: "["; }
+.badge-danger::after, .bg-danger.badge::after { color: #aa0000; content: "]"; }
+.badge-light::before, .bg-light.badge::before { color: #fff; content: "["; }
+.badge-light::after, .bg-light.badge::after { color: #fff; content: "]"; }
+.badge-dark::before, .bg-dark.badge::before { color: #000000; content: "["; }
+.badge-dark::after, .bg-dark.badge::after { color: #000000; content: "]"; }
+
+.badge-pill::before, .rounded-pill.badge::before { content: "("; }
+.badge-pill::after, .rounded-pill.badge::after { content: ")"; }
+
+/* Alerts with colored header bars */
+.alert {
+  position: relative;
+  padding: 0 8px 14px;
+  border: 0 solid transparent;
+  background: #bbbbbb !important;
+  color: black !important;
+  font-size: 16px !important;
+  border-radius: 0 !important;
+}
+
+.alert-primary::before { background: #555555; content: "Alert"; color: #fff; margin: 0 -8px 14px; padding: 0 8px; display: block; }
+.alert-secondary::before { background: #555555; content: "Alert"; color: #fff; margin: 0 -8px 14px; padding: 0 8px; display: block; }
+.alert-success::before { background: #00aa00; content: "success"; color: #fff; margin: 0 -8px 14px; padding: 0 8px; display: block; }
+.alert-info::before { background: #00aaaa; content: "info"; color: #fff; margin: 0 -8px 14px; padding: 0 8px; display: block; }
+.alert-warning::before { background: #aa5500; content: "warning"; color: #fff; margin: 0 -8px 14px; padding: 0 8px; display: block; }
+.alert-danger::before { background: #aa0000; content: "danger"; color: #fff; margin: 0 -8px 14px; padding: 0 8px; display: block; }
+.alert-light::before { background: #aa00aa; content: "Alert"; color: #fff; margin: 0 -8px 14px; padding: 0 8px; display: block; }
+.alert-dark::before { background: #000000; content: "dark"; color: #fff; margin: 0 -8px 14px; padding: 0 8px; display: block; }
+
+/* Form controls: dark blue terminal look */
+.form-control, .form-select {
+  height: 16px !important;
+  padding: 0 !important;
+  font-size: 16px !important;
+  line-height: 16px !important;
+  color: #fff !important;
+  background-color: #000084 !important;
+  border: 0 solid #555555 !important;
+  border-radius: 0 !important;
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: #000084 !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  border-color: #555555 !important;
+}
+
+.form-control::placeholder { color: #bbbbbb; opacity: 1; }
+
+.form-control:disabled, .form-control[readonly] {
+  background-color: #555555 !important;
+  color: #bbbbbb !important;
+}
+
+/* Selects: uniform retro look, no extra margins (inline-safe) */
+select.form-select, select.form-control {
+  background: #444444 !important;
+  color: #ffffff !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  padding: 0 4px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  width: auto !important;
+}
+
+/* Textareas: dark blue terminal look with 3D border */
+textarea.form-control {
+  height: auto !important;
+  background-color: #000084 !important;
+  color: #fff !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 4px 8px !important;
+}
+
+/* Cards */
+.card {
+  background-color: #bbbbbb !important;
+  border-radius: 0 !important;
+  color: #000000;
+}
+
+.card-body { color: #000000; font-size: 16px !important; }
+.card-header { color: #fff; background-color: #aa00aa !important; font-size: 16px !important; padding: 0 16px; }
+.card-footer { background-color: #aa00aa !important; font-size: 16px !important; padding: 0 16px; }
+
+/* Headings */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-size: 16px !important;
+  line-height: 16px !important;
+}
+
+h4, .h4 {
+  color: #fff;
+  border: 1px solid #fff;
+  padding: 0;
+  margin: 0;
+}
+
+/* Tables */
+.table { color: #bbbbbb; font-size: 16px !important; }
+.table th, .table td { padding: 0; font-size: 16px !important; }
+.table-striped tbody tr:nth-of-type(odd) { background-color: #000000; }
+.table .thead-dark th { color: #fff; background-color: #bbbbbb; font-size: 16px !important; }
+.table .thead-light th { color: #bbbbbb; background-color: #555555; font-size: 16px !important; }
+
+/* Progress bars */
+.progress { height: 16px !important; }
+.progress-bar { background-color: yellow !important; font-size: 16px !important; }
+
+/* Modals */
+.modal { filter: drop-shadow(7px 8px 0 black); }
+.modal-content { background-color: #bbbbbb !important; color: #000000; border-radius: 0 !important; font-size: 16px !important; }
+.modal-header { background: #aa00aa !important; color: #fff; padding: 0 8px; font-size: 16px !important; }
+.modal-header h1, .modal-header h2, .modal-header h3,
+.modal-header h4, .modal-header h5, .modal-header h6 { border: 0; padding: 0; margin: 0; font-size: 16px !important; }
+.modal-body { font-size: 16px !important; }
+.modal-footer { border-top: 0; font-size: 16px !important; }
+.modal .btn { filter: drop-shadow(7px 8px 0 black); background: #fff; }
+.modal .btn::first-letter { color: #f55; }
+
+/* Navbar search override: keep terminal blue bg */
+.navbar .form-control {
+  background-color: #212121 !important;
+  color: rgba(255,255,255,0.7) !important;
+  height: 21px !important;
+  min-height: 0 !important;
+  padding: 0 4px !important;
+  line-height: 16px !important;
+  width: 80px !important;
+}

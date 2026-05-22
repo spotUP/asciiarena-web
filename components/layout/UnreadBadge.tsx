@@ -18,17 +18,8 @@ export default function UnreadBadge() {
   if (count <= 0) return null;
 
   return (
-    <span
-      style={{
-        background: "var(--color-magenta)",
-        color: "#000",
-        borderRadius: "50%",
-        padding: "0 4px",
-        fontSize: "0.7em",
-        marginLeft: "4px",
-      }}
-    >
-      {count}
+    <span className="magenta" style={{ fontFamily: "TopazPlus_a1200, Monaco, Menlo, Consolas, monospace", marginLeft: "4px" }}>
+      [{count}]
     </span>
   );
 }

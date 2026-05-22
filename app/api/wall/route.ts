@@ -17,11 +17,15 @@ function stripHtml(input: string): string {
 
 export async function GET(request: NextRequest) {
   const wallId = parseInt(request.nextUrl.searchParams.get("wall_id") ?? "1");
-  const rows = await prisma.$queryRaw<WallPostRow[]>`
-    SELECT * FROM wallposts WHERE wall_id = ${wallId}
-    ORDER BY id DESC LIMIT 13
-  `;
-  return apiOk(rows.reverse().map((r) => ({ tag: r.tag, nick: r.nick })));
+  try {
+    const rows = await prisma.$queryRaw<WallPostRow[]>`
+      SELECT * FROM wallposts WHERE wall_id = ${wallId}
+      ORDER BY id DESC LIMIT 13
+    `;
+    return apiOk(rows.reverse().map((r) => ({ tag: r.tag, nick: r.nick })));
+  } catch {
+    return apiOk([]);
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -29,11 +33,13 @@ export async function POST(request: NextRequest) {
   if (!session?.user?.id) return apiError("Unauthorized", 401);
 
   const body = await request.json() as { tagtext?: string; wall_id?: number };
-  const { tagtext, wall_id = 1 } = body;
+  const tagtext = typeof body.tagtext === "string" ? body.tagtext.trim() : "";
+  const wall_id = Number.isInteger(body.wall_id) ? (body.wall_id as number) : 1;
 
   if (!tagtext) return apiError("tagtext is required", 400);
+  if (tagtext.length > 120) return apiError("Tag is too long (max 120 characters).", 400);
 
-  const cleanTag = stripHtml(tagtext);
+  const cleanTag = stripHtml(tagtext).slice(0, 120);
   const userId = parseInt(session.user.id);
   const nick = session.user.name ?? "";
 

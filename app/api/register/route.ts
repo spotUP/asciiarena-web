@@ -94,35 +94,24 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Check nick not already taken in artists or users tables
-  const existingNickInArtists = await prisma.$queryRaw<{ id: number }[]>`
-    SELECT id FROM artists WHERE nick = ${nick} LIMIT 1
-  `;
-  if (existingNickInArtists.length > 0) {
-    return apiError("Nickname is already in use.", 400);
-  }
-
-  const existingNickInUsers = await prisma.$queryRaw<{ id: number }[]>`
-    SELECT id FROM users WHERE nick = ${nick} LIMIT 1
-  `;
-  if (existingNickInUsers.length > 0) {
-    return apiError("Nickname is already in use.", 400);
-  }
-
-  const existingMail = await prisma.$queryRaw<{ id: number }[]>`
-    SELECT id FROM users WHERE mail = ${mail} LIMIT 1
-  `;
-  if (existingMail.length > 0) {
-    return apiError("E-mail address is already in use.", 400);
-  }
-
-  const pwhash = await bcrypt.hash(password, 13);
   const nickurl = urlsafe(nick);
 
-  const existingNickurl = await prisma.$queryRaw<{ id: number }[]>`
-    SELECT id FROM users WHERE nickurl = ${nickurl} LIMIT 1
-  `;
-  if (existingNickurl.length > 0) {
+  // Run all uniqueness checks + bcrypt in parallel before writing anything
+  const [nickInArtists, nickInUsers, mailInUsers, nickurlInUsers, pwhash] = await Promise.all([
+    prisma.$queryRaw<{ id: number }[]>`SELECT id FROM artists WHERE nick = ${nick} LIMIT 1`,
+    prisma.$queryRaw<{ id: number }[]>`SELECT id FROM users WHERE nick = ${nick} LIMIT 1`,
+    prisma.$queryRaw<{ id: number }[]>`SELECT id FROM users WHERE mail = ${mail} LIMIT 1`,
+    prisma.$queryRaw<{ id: number }[]>`SELECT id FROM users WHERE nickurl = ${nickurl} LIMIT 1`,
+    bcrypt.hash(password, 13),
+  ]);
+
+  if (nickInArtists.length > 0 || nickInUsers.length > 0) {
+    return apiError("Nickname is already in use.", 400);
+  }
+  if (mailInUsers.length > 0) {
+    return apiError("E-mail address is already in use.", 400);
+  }
+  if (nickurlInUsers.length > 0) {
     return apiError("Nickname is too similar to an existing one. Please choose another.", 400);
   }
 

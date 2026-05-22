@@ -524,7 +524,7 @@ export default function StyleEditorClient({ userId }: { userNick: string; userId
             <div style={{ flex: "1 1 0", display: "flex", flexDirection: "column", overflow: "hidden", padding: "6px 8px" }}>
               {/* Char info + actions bar */}
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px", flexWrap: "wrap" }}>
-                <span className="white" style={{ fontSize: "13px" }}>
+                <span className="white">
                   Editing: <strong style={{ color: "#55ffff" }}>
                     {selectedChar === -1 ? "[Comment]" : `'${charLabel(selectedChar)}' (U+${selectedChar.toString(16).toUpperCase().padStart(4,"0")})`}
                   </strong>
@@ -790,7 +790,7 @@ export default function StyleEditorClient({ userId }: { userNick: string; userId
                       color: hasContent ? "#55ff55" : "#2a2a2a", margin: 0, overflow: "hidden",
                       maxHeight: "56px", whiteSpace: "pre",
                     }}>
-                      {hasContent ? art : "·\n·\n·\n·\n·\n·"}
+                      {hasContent ? art : ".\n.\n.\n.\n.\n."}
                     </pre>
                   </div>
                 );
@@ -947,7 +947,7 @@ export default function StyleEditorClient({ userId }: { userNick: string; userId
                     value={importText}
                     onChange={e => setImportText(e.target.value)}
                     placeholder="Paste .flf file contents here..." />
-                  <p style={{ color: "#aaa", fontSize: "12px", marginTop: "8px" }}>
+                  <p style={{ color: "#aaa", marginTop: "8px" }}>
                     Copy the contents of a *.flf file and paste above, then press Import.
                   </p>
                 </div>
@@ -974,7 +974,7 @@ export default function StyleEditorClient({ userId }: { userNick: string; userId
                     style={{ background: "#111", color: "#0ff", border: "1px solid #444", width: "100%", height: "200px" }}
                     readOnly value={exportText}
                     onClick={e => (e.target as HTMLTextAreaElement).select()} />
-                  <p style={{ color: "#aaa", fontSize: "12px", marginTop: "8px" }}>
+                  <p style={{ color: "#aaa", marginTop: "8px" }}>
                     Copy the text above into a *.flf file for use with FIGlet.
                   </p>
                 </div>

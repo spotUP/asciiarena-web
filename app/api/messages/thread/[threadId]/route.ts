@@ -34,6 +34,13 @@ export async function GET(
   const { searchParams } = request.nextUrl;
   const page = Math.max(1, parseInt(searchParams.get("page") ?? "1") || 1);
 
+  // Verify user is a participant before exposing the thread
+  const participation = await prisma.$queryRaw<{ cnt: bigint }[]>`
+    SELECT COUNT(*) AS cnt FROM messages
+    WHERE thread = ${thread} AND (to_id = ${userId} OR from_id = ${userId})
+  `;
+  if (Number(participation[0]?.cnt ?? 0) === 0) return apiError("Forbidden", 403);
+
   const countRows = await prisma.$queryRaw<CountRow[]>`
     SELECT COUNT(*) AS cnt FROM messages WHERE thread = ${thread}
   `;

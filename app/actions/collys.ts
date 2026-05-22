@@ -6,34 +6,42 @@ import { Prisma } from "@/lib/generated/prisma/client";
 import { revalidatePath } from "next/cache";
 
 export async function trackView(collyId: number) {
-  await prisma.collys.updateMany({
-    where: { id: collyId },
-    data: { view_counter: { increment: 1 } },
-  });
+  try {
+    await prisma.collys.updateMany({ where: { id: collyId }, data: { view_counter: { increment: 1 } } });
+  } catch { /* fire-and-forget */ }
 }
 
 export async function trackDownload(collyId: number) {
-  await prisma.collys.updateMany({
-    where: { id: collyId },
-    data: { downloads: { increment: 1 } },
-  });
+  try {
+    await prisma.collys.updateMany({ where: { id: collyId }, data: { downloads: { increment: 1 } } });
+  } catch { /* fire-and-forget */ }
 }
 
 export async function addFavourite(collyId: number): Promise<{ success: boolean; error?: string }> {
   const session = await getSession();
   if (!session?.user?.id) return { success: false, error: "Not logged in" };
   const userId = Number(session.user.id);
-  const exists = await prisma.favourites.count({ where: { user_id: userId, colly_id: collyId } });
-  if (!exists) await prisma.favourites.create({ data: { user_id: userId, colly_id: collyId } });
-  return { success: true };
+  try {
+    const exists = await prisma.favourites.count({ where: { user_id: userId, colly_id: collyId } });
+    if (!exists) await prisma.favourites.create({ data: { user_id: userId, colly_id: collyId } });
+    const colly = await prisma.collys.findUnique({ where: { id: collyId }, select: { filename: true } });
+    if (colly?.filename) revalidatePath(`/release/${colly.filename}`);
+    revalidatePath(`/member`);
+    return { success: true };
+  } catch { return { success: false, error: "Failed" }; }
 }
 
 export async function removeFavourite(collyId: number): Promise<{ success: boolean; error?: string }> {
   const session = await getSession();
   if (!session?.user?.id) return { success: false, error: "Not logged in" };
   const userId = Number(session.user.id);
-  await prisma.favourites.deleteMany({ where: { user_id: userId, colly_id: collyId } });
-  return { success: true };
+  try {
+    await prisma.favourites.deleteMany({ where: { user_id: userId, colly_id: collyId } });
+    const colly = await prisma.collys.findUnique({ where: { id: collyId }, select: { filename: true } });
+    if (colly?.filename) revalidatePath(`/release/${colly.filename}`);
+    revalidatePath(`/member`);
+    return { success: true };
+  } catch { return { success: false, error: "Failed" }; }
 }
 
 export async function reportBroken(collyId: number, comment: string): Promise<{ success: boolean; error?: string }> {
@@ -69,12 +77,13 @@ export async function postComment(
   const session = await getSession();
   if (!session?.user?.id) return { success: false, error: "Not logged in" };
   const userId = Number(session.user.id);
+  const nick = session.user.name ?? null;
   const ratingNum = rating ? parseInt(rating) : null;
-  await prisma.$executeRaw`
-    INSERT INTO comments (colly_id, user_id, comment, rating, timestamp)
-    VALUES (${collyId}, ${userId}, ${comment}, ${ratingNum}, ${Math.floor(Date.now() / 1000)})
-  `;
   const colly = await prisma.collys.findUnique({ where: { id: collyId }, select: { filename: true } });
+  await prisma.$executeRaw`
+    INSERT INTO comments (colly_id, user_id, comment, rating, timestamp, filename, nick)
+    VALUES (${collyId}, ${userId}, ${comment}, ${ratingNum}, ${Math.floor(Date.now() / 1000)}, ${colly?.filename ?? null}, ${nick})
+  `;
   if (colly?.filename) revalidatePath('/release/' + colly.filename);
   return { success: true };
 }

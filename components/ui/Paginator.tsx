@@ -64,7 +64,7 @@ export default function Paginator({
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              View Mode:
+              View Mode: v
             </button>
             <div className="dropdown-menu">
               <a

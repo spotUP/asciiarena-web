@@ -47,12 +47,10 @@ export default async function RequestDetailPage({ params }: PageProps) {
   const req = await prisma.requests.findUnique({ where: { id: requestId } });
   if (!req) notFound();
 
-  const requester = await prisma.users.findUnique({
-    where: { id: req.requestedby },
-    select: { nick: true },
-  });
-
-  const session = await auth();
+  const [requester, session] = await Promise.all([
+    prisma.users.findUnique({ where: { id: req.requestedby }, select: { nick: true } }),
+    auth(),
+  ]);
   const userId = session?.user?.id ? parseInt(session.user.id) : null;
   const isAdmin = (session?.user as { rank?: string | null })?.rank === "Admin";
   const isOwner = userId !== null && userId === req.requestedby;

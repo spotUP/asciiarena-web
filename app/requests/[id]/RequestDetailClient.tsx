@@ -93,7 +93,7 @@ export default function RequestDetailClient({ requestId, canChangeStatus, isLogg
       </div>
 
       <div>
-        {!commentsLoaded && <div className="lightgrey col-lg-12 pl-0">Loading…</div>}
+        {!commentsLoaded && <div className="lightgrey col-lg-12 pl-0">Loading...</div>}
         {commentsLoaded && comments.length === 0 && (
           <div className="lightgrey col-lg-12 pl-0">No comments yet.</div>
         )}

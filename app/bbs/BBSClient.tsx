@@ -97,14 +97,14 @@ export default function BBSClient({ initialSort, initialOrder }: BBSClientProps)
 
       <div className="row amb-1">
         <div className="col-6 white">
-          <a onClick={() => updateSort("name")} style={{ cursor: "pointer" }}>
+          <button className="sort-btn" onClick={() => updateSort("name")}>
             NAME
-          </a>
+          </button>
         </div>
         <div className="col-6 white">
-          <a onClick={() => updateSort("sysop")} style={{ cursor: "pointer" }}>
+          <button className="sort-btn" onClick={() => updateSort("sysop")}>
             SYSOP
-          </a>
+          </button>
         </div>
       </div>
 

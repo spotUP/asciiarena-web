@@ -320,7 +320,7 @@ export default function ReleaseClient({
             <input type="button" className="btn-big" value={fitted ? "Reset size" : "Fit to screen"} onClick={fitColly} />
           )}
           <input type="button" className="btn-big" value="Download" onClick={doDownload} />
-          <span className="lightgrey" style={{ fontSize: "0.85em", padding: "0 4px" }}>{viewCount} views</span>
+          <span className="lightgrey" style={{ padding: "0 4px" }}>{viewCount} views</span>
 
           {type === "ASCII" && collyVisible && (
             <input type="button" className="btn-big" value={copyImageLabel} onClick={doCopyImage} />

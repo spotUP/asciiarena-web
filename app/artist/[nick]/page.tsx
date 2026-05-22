@@ -66,30 +66,6 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
   const isUnclaimed = artist.user_id === null;
   const canClaim = !!userId && isUnclaimed;
 
-  // Crew memberships
-  const memberships = await prisma.member_of.findMany({
-    where: { nick: artist.nick },
-  });
-
-  // Vote count from comments — count comments with rating > 0 for any colly by this artist
-  const artistCollys = await prisma.artists_collys.findMany({
-    where: { artist_id: artist.id },
-    select: { colly_id: true },
-  });
-  const collyIds = artistCollys.map((r) => r.colly_id);
-
-  let voteCount = 0;
-  if (collyIds.length > 0) {
-    voteCount = await prisma.comments.count({
-      where: { colly_id: { in: collyIds }, rating: { gt: 0 } },
-    });
-  }
-
-  const ratingDisplay =
-    !artist.rating || artist.rating === 0
-      ? `Awaiting ${Math.max(0, 3 - voteCount)} votes`
-      : `${artist.rating.toFixed(1)} (${voteCount} votes)`;
-
   // Map validated sort keys to safe Prisma.sql fragments — never interpolates user input
   const SORT_SQL: Record<string, Prisma.Sql> = {
     "c.filename":       Prisma.sql`c.filename`,
@@ -100,24 +76,32 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
   };
   const sortSql = (rawSortBy && SORT_SQL[rawSortBy]) ?? Prisma.sql`c.filename`;
 
-  const releasesRaw = await prisma.$queryRaw<ReleaseRow[]>`
-    SELECT
-      ac.colly_id,
-      c.filename,
-      c.name,
-      c.year,
-      w.name AS crew,
-      w.crewurl
-    FROM artists_collys ac
-    JOIN collys c ON c.id = ac.colly_id
-    LEFT JOIN collys_crews cc ON cc.colly_id = c.id AND cc.sortorder = (
-      SELECT MIN(sortorder) FROM collys_crews WHERE colly_id = c.id
-    )
-    LEFT JOIN crews w ON w.id = cc.crew_id
-    LEFT JOIN artists a ON a.id = ac.artist_id
-    WHERE ac.artist_id = ${artist.id}
-    ORDER BY ${sortSql} ASC
-  `;
+  const [memberships, artistCollys, releasesRaw] = await Promise.all([
+    prisma.member_of.findMany({ where: { nick: artist.nick } }),
+    prisma.artists_collys.findMany({ where: { artist_id: artist.id }, select: { colly_id: true } }),
+    prisma.$queryRaw<ReleaseRow[]>`
+      SELECT ac.colly_id, c.filename, c.name, c.year, w.name AS crew, w.crewurl
+      FROM artists_collys ac
+      JOIN collys c ON c.id = ac.colly_id
+      LEFT JOIN collys_crews cc ON cc.colly_id = c.id AND cc.sortorder = (
+        SELECT MIN(sortorder) FROM collys_crews WHERE colly_id = c.id
+      )
+      LEFT JOIN crews w ON w.id = cc.crew_id
+      LEFT JOIN artists a ON a.id = ac.artist_id
+      WHERE ac.artist_id = ${artist.id}
+      ORDER BY ${sortSql} ASC
+    `,
+  ]);
+
+  const collyIds = artistCollys.map((r) => r.colly_id);
+  const voteCount = collyIds.length > 0
+    ? await prisma.comments.count({ where: { colly_id: { in: collyIds }, rating: { gt: 0 } } })
+    : 0;
+
+  const ratingDisplay =
+    !artist.rating || artist.rating === 0
+      ? `Awaiting ${Math.max(0, 3 - voteCount)} votes`
+      : `${artist.rating.toFixed(1)} (${voteCount} votes)`;
 
   // Latest release is the most recent by year/month
   const latestRelease = releasesRaw.reduce<ReleaseRow | null>((best, r) => {

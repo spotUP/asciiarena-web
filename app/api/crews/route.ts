@@ -35,23 +35,21 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   const likeParam = filter ? `%${filter}%` : "%";
 
-  const rows = await prisma.$queryRaw<CrewRow[]>`
-    SELECT
-      c.*,
-      (SELECT count(id) FROM collys_crews cc WHERE cc.crew_id = c.id) AS releases_cnt,
-      (SELECT count(id) FROM member_of mo WHERE mo.crew = c.name) AS members_cnt
-    FROM crews c
-    WHERE name LIKE ${likeParam}
-    ORDER BY ${orderCol} ${orderDir}
-    LIMIT ${Prisma.raw(String(pagesizeInt))} OFFSET ${Prisma.raw(String(startInt))}
-  `;
-
-  const countRows = await prisma.$queryRaw<CountRow[]>`
-    SELECT COUNT(*) AS cnt
-    FROM crews c
-    WHERE name LIKE ${likeParam}
-  `;
-
+  const [rows, countRows] = await Promise.all([
+    prisma.$queryRaw<CrewRow[]>`
+      SELECT
+        c.*,
+        (SELECT count(id) FROM collys_crews cc WHERE cc.crew_id = c.id) AS releases_cnt,
+        (SELECT count(id) FROM member_of mo WHERE mo.crew = c.name) AS members_cnt
+      FROM crews c
+      WHERE name LIKE ${likeParam}
+      ORDER BY ${orderCol} ${orderDir}
+      LIMIT ${Prisma.raw(String(pagesizeInt))} OFFSET ${Prisma.raw(String(startInt))}
+    `,
+    prisma.$queryRaw<CountRow[]>`
+      SELECT COUNT(*) AS cnt FROM crews c WHERE name LIKE ${likeParam}
+    `,
+  ]);
   const total_count = Number(countRows[0]?.cnt ?? 0);
 
   const result = rows.map((row) => ({

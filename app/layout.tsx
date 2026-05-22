@@ -18,8 +18,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.png" type="image/png" />
+        <link rel="shortcut icon" href="/favicon.png" />
         <link rel="alternate" type="application/rss+xml" href="/rss.xml" title="aSCIIaRENA Latest Releases" />
         <link
           rel="preload"
@@ -36,10 +36,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="stylesheet" href="/assets/css/bootstrap5.min.css" />
         <link rel="stylesheet" href="/assets/css/site.css" />
         <link rel="stylesheet" href="/assets/css/386.css" />
+        <link rel="stylesheet" href="/assets/css/overrides.css" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#ff55ff" />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         {children}
         <Script
           src="/assets/js/bootstrap5.bundle.min.js"

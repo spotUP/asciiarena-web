@@ -16,7 +16,7 @@ export default function Navbar({ session }: NavbarProps) {
       style={{ height: "21px" }}
     >
       <div className="container-fluid m-md-0 p-md-0">
-        <Link href="/" style={{ color: "#fff" }} className="navbar-brand ascii">
+        <Link href="/" className="navbar-brand ascii white">
           aSCIIaRENA
         </Link>
         <a
@@ -41,7 +41,7 @@ export default function Navbar({ session }: NavbarProps) {
                 href="/collys"
                 id="collys-dropdown"
               >
-                COLLYS<span className="caret" style={{ paddingRight: "8px" }}></span>
+                COLLYS v
               </a>
               <div className="dropdown-menu ascii" aria-labelledby="collys-dropdown">
                 <Link className="dropdown-item ascii" href="/collys?sort_by=name">By Name</Link>
@@ -61,7 +61,7 @@ export default function Navbar({ session }: NavbarProps) {
                 href="/mags"
                 id="mags-dropdown"
               >
-                MAGS<span className="caret" style={{ paddingRight: "8px" }}></span>
+                MAGS v
               </a>
               <div className="dropdown-menu ascii" aria-labelledby="mags-dropdown">
                 <Link className="dropdown-item ascii" href="/mags?sort_by=name">By Name</Link>
@@ -77,7 +77,7 @@ export default function Navbar({ session }: NavbarProps) {
                 href="/apps"
                 id="apps-dropdown"
               >
-                APPS<span className="caret" style={{ paddingRight: "8px" }}></span>
+                APPS v
               </a>
               <div className="dropdown-menu ascii" aria-labelledby="apps-dropdown">
                 <Link className="dropdown-item ascii" href="/apps?sort_by=name">By Name</Link>
@@ -102,7 +102,7 @@ export default function Navbar({ session }: NavbarProps) {
                 href="/submit"
                 id="submit-dropdown"
               >
-                SUBMiT<span className="caret" style={{ paddingRight: "8px" }}></span>
+                SUBMiT v
               </a>
               <div className="dropdown-menu ascii" aria-labelledby="submit-dropdown">
                 <Link className="dropdown-item ascii" href="/submit">Colly</Link>
@@ -116,74 +116,76 @@ export default function Navbar({ session }: NavbarProps) {
               </div>
             </li>
 
-            <form action="/search" method="GET" className="d-none d-lg-inline-flex" style={{ alignItems: "center", gap: "4px", marginLeft: "8px" }}>
-              <input name="q" className="form-control" style={{ width: "120px", height: "18px", padding: "0 4px", fontSize: "12px" }} placeholder="search..." />
-            </form>
+          </ul>
 
-            <ul className="nav navbar-nav menu-right">
-              {!isLoggedIn && (
-                <li className="nav-item">
-                  <a
-                    className="nav-link ascii yellow apr-1"
-                    data-bs-toggle="modal"
-                    style={{ paddingRight: "8px" }}
-                    href="#login"
-                  >
-                    LOGiN
-                  </a>
-                </li>
-              )}
+          {/* Right-side items — menu-right gives position:absolute;right:0 from site.css */}
+          <ul className="navbar-nav menu-right">
+            <li className="nav-item d-none d-lg-block">
+              <form action="/search" method="GET">
+                <input name="q" className="form-control ascii" style={{ width: "80px", height: "21px", padding: "0 4px", border: "none" }} placeholder="search..." />
+              </form>
+            </li>
 
-              {isLoggedIn && (
-                <li className="nav-item dropdown">
-                  <a
-                    className="nav-link dropdown-toggle ascii yellow"
-                    style={{ paddingRight: "8px" }}
-                    data-bs-toggle="dropdown"
-                    href="#"
-                    id="account-dropdown"
-                  >
-                    ACCOUNT<span className="caret" style={{ paddingRight: "8px" }}></span>
-                  </a>
-                  <div className="dropdown-menu ascii" aria-labelledby="account-dropdown">
-                    <Link className="dropdown-item ascii" href="/messages">Messages<UnreadBadge /></Link>
-                    <Link className="dropdown-item ascii" href="/settings">Settings</Link>
-                    <form action="/api/auth/signout" method="POST">
-                      <button type="submit" className="dropdown-item ascii">
-                        Logout
-                      </button>
-                    </form>
-                  </div>
-                </li>
-              )}
+            {!isLoggedIn && (
+              <li className="nav-item">
+                <a
+                  className="nav-link ascii yellow apr-1"
+                  data-bs-toggle="modal"
+                  style={{ paddingRight: "8px" }}
+                  href="#login"
+                >
+                  LOGiN
+                </a>
+              </li>
+            )}
 
-              {isLoggedIn && isAdmin && (
-                <li className="nav-item dropdown">
-                  <a
-                    className="nav-link dropdown-toggle ascii yellow"
-                    style={{ paddingRight: "8px" }}
-                    data-bs-toggle="dropdown"
-                    href="/admin"
-                    id="admin-dropdown"
-                  >
-                    ADMiN<span className="caret" style={{ paddingRight: "8px" }}></span>
-                  </a>
-                  <div className="dropdown-menu dropdown-menu-fix bg-red ascii" aria-labelledby="admin-dropdown">
-                    <Link className="dropdown-item ascii" href="/admin#colly">Edit Colly</Link>
-                    <Link className="dropdown-item ascii" href="/admin#app">Edit App</Link>
-                    <Link className="dropdown-item ascii" href="/admin#ascii_mag">Edit Mag</Link>
-                    <Link className="dropdown-item ascii" href="/admin#crew">Edit Crew</Link>
-                    <Link className="dropdown-item ascii" href="/admin#artist">Edit Artist</Link>
-                    <Link className="dropdown-item ascii" href="/admin#edituser">Edit User</Link>
-                    <Link className="dropdown-item ascii" href="/admin#sitelogo">Edit Logo</Link>
-                    <Link className="dropdown-item ascii" href="/admin#bbs">Edit BBS</Link>
-                    <Link className="dropdown-item ascii" href="/admin#request">Edit Requests</Link>
-                    <Link className="dropdown-item ascii" href="/admin#playlist">Edit Playlists</Link>
-                    <Link className="dropdown-item ascii" href="/admin#broken">Broken Collys</Link>
-                  </div>
-                </li>
-              )}
-            </ul>
+            {isLoggedIn && (
+              <li className="nav-item dropdown">
+                <a
+                  className="nav-link dropdown-toggle ascii yellow"
+                  style={{ paddingRight: "8px" }}
+                  data-bs-toggle="dropdown"
+                  href="#"
+                  id="account-dropdown"
+                >
+                  ACCOUNT v
+                </a>
+                <div className="dropdown-menu dropdown-menu-end ascii" aria-labelledby="account-dropdown">
+                  <Link className="dropdown-item ascii" href="/messages">Messages<UnreadBadge /></Link>
+                  <Link className="dropdown-item ascii" href="/settings">Settings</Link>
+                  <form action="/api/auth/signout" method="POST">
+                    <button type="submit" className="dropdown-item ascii">Logout</button>
+                  </form>
+                </div>
+              </li>
+            )}
+
+            {isLoggedIn && isAdmin && (
+              <li className="nav-item dropdown">
+                <a
+                  className="nav-link dropdown-toggle ascii yellow"
+                  style={{ paddingRight: "8px" }}
+                  data-bs-toggle="dropdown"
+                  href="/admin"
+                  id="admin-dropdown"
+                >
+                  ADMiN v
+                </a>
+                <div className="dropdown-menu dropdown-menu-end dropdown-menu-fix bg-red ascii" aria-labelledby="admin-dropdown">
+                  <Link className="dropdown-item ascii" href="/admin#colly">Edit Colly</Link>
+                  <Link className="dropdown-item ascii" href="/admin#app">Edit App</Link>
+                  <Link className="dropdown-item ascii" href="/admin#ascii_mag">Edit Mag</Link>
+                  <Link className="dropdown-item ascii" href="/admin#crew">Edit Crew</Link>
+                  <Link className="dropdown-item ascii" href="/admin#artist">Edit Artist</Link>
+                  <Link className="dropdown-item ascii" href="/admin#edituser">Edit User</Link>
+                  <Link className="dropdown-item ascii" href="/admin#sitelogo">Edit Logo</Link>
+                  <Link className="dropdown-item ascii" href="/admin#bbs">Edit BBS</Link>
+                  <Link className="dropdown-item ascii" href="/admin#request">Edit Requests</Link>
+                  <Link className="dropdown-item ascii" href="/admin#playlist">Edit Playlists</Link>
+                  <Link className="dropdown-item ascii" href="/admin#broken">Broken Collys</Link>
+                </div>
+              </li>
+            )}
           </ul>
         </div>
       </div>

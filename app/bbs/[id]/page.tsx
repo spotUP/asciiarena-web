@@ -1,7 +1,18 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const id = Number((await params).id);
+  const bbs = await prisma.bbses.findUnique({ where: { id }, select: { name: true, sysop: true } });
+  if (!bbs) return {};
+  return {
+    title: `${bbs.name} | aSCIIaRENA BBS`,
+    description: bbs.sysop ? `BBS operated by ${bbs.sysop}.` : `${bbs.name} BBS listing on aSCIIaRENA.`,
+  };
+}
 
 interface PageProps {
   params: Promise<{ id: string }>;

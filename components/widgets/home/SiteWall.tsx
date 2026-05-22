@@ -47,10 +47,10 @@ export default function SiteWall({ isLoggedIn }: { isLoggedIn: boolean }) {
 
   return (
     <div className="container-fluid m-0 p-0 apb-1">
-      <div className="header col-12">
+      <div className="header col-12 p-0">
         <h2 className="apt-1 apb-1 bg-header">TAG THE aSCIIaRENA WALL</h2>
       </div>
-      <div className="container-fluid m-0">
+      <div className="container-fluid m-0 p-0">
         <div className="row m-0 p-0 bg-secondary apt-1 apb-1" id={wallId}></div>
         {isLoggedIn && (
           <form id={formId} onSubmit={handleSubmit} className="w-100">
@@ -58,7 +58,6 @@ export default function SiteWall({ isLoggedIn }: { isLoggedIn: boolean }) {
               <div className="col-10 col-lg-11 pr-0 pl-0">
                 <input
                   className="form-control w-100"
-                  style={{ color: "white" }}
                   type="text"
                   maxLength={60}
                   name="tagtext"
