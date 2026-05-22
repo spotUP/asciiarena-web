@@ -1,6 +1,12 @@
 import { PrismaClient } from "./generated/prisma/client";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 
+// unstable_cache uses JSON.stringify; BigInt from $queryRaw would throw without this.
+// Convert BigInt to Number — safe for all values in this codebase (counts, IDs, timestamps).
+(BigInt.prototype as unknown as { toJSON: () => number }).toJSON = function () {
+  return Number(this);
+};
+
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
 function createPrismaClient() {

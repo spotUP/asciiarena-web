@@ -1,5 +1,37 @@
 /* ── Loads last — overrides bootstrap5, site.css, 386.css ── */
 
+/* Bootstrap 4 spacing class aliases — BS5 renamed pl-*/pr-*/ml-*/mr-* to ps-*/pe-*/ms-*/me-*
+   Re-define the old names so existing component markup keeps working unchanged. */
+.pl-0  { padding-left:  0      !important; }
+.pr-0  { padding-right: 0      !important; }
+.pl-1  { padding-left:  .25rem !important; }
+.pr-1  { padding-right: .25rem !important; }
+.pl-2  { padding-left:  .5rem  !important; }
+.pr-2  { padding-right: .5rem  !important; }
+.pl-3  { padding-left:  1rem   !important; }
+.pr-3  { padding-right: 1rem   !important; }
+.ml-0  { margin-left:   0      !important; }
+.mr-0  { margin-right:  0      !important; }
+.ml-1  { margin-left:   .25rem !important; }
+.mr-1  { margin-right:  .25rem !important; }
+
+@media (min-width: 576px) {
+  .pl-sm-2 { padding-left:  .5rem !important; }
+  .pr-sm-2 { padding-right: .5rem !important; }
+}
+@media (min-width: 768px) {
+  .pl-md-2 { padding-left:  .5rem !important; }
+  .pr-md-2 { padding-right: .5rem !important; }
+}
+@media (min-width: 992px) {
+  .pl-lg-0 { padding-left:  0      !important; }
+  .pr-lg-0 { padding-right: 0      !important; }
+  .pl-lg-2 { padding-left:  .5rem  !important; }
+  .pr-lg-2 { padding-right: .5rem  !important; }
+  .pl-lg-3 { padding-left:  1rem   !important; }
+  .pr-lg-3 { padding-right: 1rem   !important; }
+}
+
 /* Links */
 a, a:hover, a:focus, a:visited { text-decoration: none !important; }
 
