@@ -28,14 +28,14 @@ export default function Error({
         textAlign: "center",
       }}
     >
-      <div style={{ color: "var(--color-magenta)", fontSize: "1.4rem", marginBottom: "16px" }}>
+      <div style={{ color: "var(--color-magenta)", fontSize: "1rem", marginBottom: "16px" }}>
         [ERROR]
       </div>
       <div style={{ color: "var(--color-red)", marginBottom: "8px" }}>
         {error.message || "Something went wrong."}
       </div>
       {error.digest && (
-        <div style={{ color: "#555", marginBottom: "16px", fontSize: "0.85rem" }}>
+        <div style={{ color: "#555", marginBottom: "16px", fontSize: "1rem" }}>
           digest: {error.digest}
         </div>
       )}

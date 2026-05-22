@@ -65,55 +65,60 @@ export default async function ReleasePage({ params }: PageProps) {
   const { filename: rawFilename } = await params;
   const filename = rawFilename.replace(/\.\./g, "").replace(/[/\\]/g, "");
 
-  const colly = await prisma.collys.findFirst({ where: { filename } });
+  const [colly, session] = await Promise.all([
+    prisma.collys.findFirst({ where: { filename } }),
+    auth(),
+  ]);
   if (!colly) notFound();
 
-  const session = await auth();
   const userId = session?.user?.id ? Number(session.user.id) : null;
   const userNick = session?.user?.name ?? "";
   const isAdmin = session?.user?.rank === "Admin";
 
-  // Check favourite
-  let isFavourited = false;
-  if (userId) {
-    isFavourited = await prisma.favourites.count({
-      where: { user_id: userId, colly_id: colly.id },
-    }) > 0;
-  }
+  // Batch 2: everything that only needs colly.id / userId
+  const [artistRows, crewRows, voteCount, isFavouritedCount, userPrefs] = await Promise.all([
+    prisma.artists_collys.findMany({
+      where: { colly_id: colly.id },
+      include: { artists: true },
+      orderBy: { sortorder: "asc" },
+    }),
+    prisma.collys_crews.findMany({
+      where: { colly_id: colly.id },
+      include: { crews: true },
+      orderBy: { sortorder: "asc" },
+    }),
+    prisma.comments.count({ where: { colly_id: colly.id, rating: { gt: 0 } } }),
+    userId
+      ? prisma.favourites.count({ where: { user_id: userId, colly_id: colly.id } })
+      : Promise.resolve(0),
+    userId
+      ? prisma.users.findFirst({
+          where: { id: userId },
+          select: { def_font: true, def_fg_col: true, def_bg_col: true },
+        })
+      : Promise.resolve(null),
+  ]);
 
-  // Artists and crews
-  const artistRows = await prisma.artists_collys.findMany({
-    where: { colly_id: colly.id },
-    include: { artists: true },
-    orderBy: { sortorder: "asc" },
-  });
   const artists = artistRows.map(r => r.artists).filter(Boolean);
-
-  const crewRows = await prisma.collys_crews.findMany({
-    where: { colly_id: colly.id },
-    include: { crews: true },
-    orderBy: { sortorder: "asc" },
-  });
   const crews = crewRows.map(r => r.crews).filter(Boolean);
+  const isFavourited = isFavouritedCount > 0;
 
-  // More by primary artist (first artist only, up to 6 other releases)
-  const moreByArtist = artists[0] ? await prisma.artists_collys.findMany({
-    where: { artist_id: artists[0].id, NOT: { colly_id: colly.id } },
-    include: { collys: { select: { filename: true, name: true } } },
-    take: 6,
-    orderBy: { colly_id: "desc" },
-  }) : [];
+  // Batch 3: "more from" — depend on artists[0] / crews[0]
+  const [moreByArtist, moreFromCrew] = await Promise.all([
+    artists[0] ? prisma.artists_collys.findMany({
+      where: { artist_id: artists[0].id, NOT: { colly_id: colly.id } },
+      include: { collys: { select: { filename: true, name: true } } },
+      take: 6,
+      orderBy: { colly_id: "desc" },
+    }) : Promise.resolve([]),
+    crews[0] ? prisma.collys_crews.findMany({
+      where: { crew_id: crews[0].id, NOT: { colly_id: colly.id } },
+      include: { collys: { select: { filename: true, name: true } } },
+      take: 6,
+      orderBy: { colly_id: "desc" },
+    }) : Promise.resolve([]),
+  ]);
 
-  // More from primary crew (first crew only, up to 6 other releases)
-  const moreFromCrew = crews[0] ? await prisma.collys_crews.findMany({
-    where: { crew_id: crews[0].id, NOT: { colly_id: colly.id } },
-    include: { collys: { select: { filename: true, name: true } } },
-    take: 6,
-    orderBy: { colly_id: "desc" },
-  }) : [];
-
-  // Rating
-  const voteCount = await prisma.comments.count({ where: { colly_id: colly.id, rating: { gt: 0 } } });
   const ratingDisplay = (colly.rating && colly.rating > 0)
     ? `${Number(colly.rating).toFixed(1)} (${voteCount} votes)`
     : `Awaiting ${Math.max(0, 3 - voteCount)} vote${Math.max(0, 3 - voteCount) !== 1 ? "s" : ""}`;
@@ -140,20 +145,14 @@ export default async function ReleasePage({ params }: PageProps) {
     try { fileContent = encodeFileText(filePath); } catch { fileContent = ""; }
   }
 
-  // User viewer preferences
+  // User viewer preferences (fetched in batch 2 as userPrefs)
   let font = "mOsOul";
   let fgcolor = "#FF55FF";
   let bgcolor = "#111111";
-  if (userId) {
-    const prefs = await prisma.users.findFirst({
-      where: { id: userId },
-      select: { def_font: true, def_fg_col: true, def_bg_col: true },
-    });
-    if (prefs) {
-      if (prefs.def_font && prefs.def_font.length > 1) font = prefs.def_font;
-      if (prefs.def_fg_col && prefs.def_fg_col.length > 1) fgcolor = prefs.def_fg_col;
-      if (prefs.def_bg_col && prefs.def_bg_col.length > 1) bgcolor = prefs.def_bg_col;
-    }
+  if (userPrefs) {
+    if (userPrefs.def_font && userPrefs.def_font.length > 1) font = userPrefs.def_font;
+    if (userPrefs.def_fg_col && userPrefs.def_fg_col.length > 1) fgcolor = userPrefs.def_fg_col;
+    if (userPrefs.def_bg_col && userPrefs.def_bg_col.length > 1) bgcolor = userPrefs.def_bg_col;
   }
 
   const isArchive = type === "ARCHIVE";

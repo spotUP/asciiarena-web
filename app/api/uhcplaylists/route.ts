@@ -34,9 +34,9 @@ export async function GET(request: NextRequest) {
   }
 
   const rows = limit > 0
-    ? await prisma.$queryRawUnsafe<PlaylistRow[]>(
-        `SELECT filename, title, author, genre FROM hippo_playlists ORDER BY id DESC LIMIT ${limit}`
-      )
+    ? await prisma.$queryRaw<PlaylistRow[]>`
+        SELECT filename, title, author, genre FROM hippo_playlists ORDER BY id DESC LIMIT ${limit}
+      `
     : await prisma.$queryRaw<PlaylistRow[]>`
         SELECT filename, title, author, genre FROM hippo_playlists ORDER BY id DESC
       `;

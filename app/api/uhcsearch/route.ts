@@ -15,12 +15,12 @@ export async function GET(request: NextRequest) {
   const collectionsPath = process.env.COLLECTIONS_PATH ?? path.join(process.cwd(), "collections");
 
   const rows = limit > 0
-    ? await prisma.$queryRawUnsafe<CollyRow[]>(`
+    ? await prisma.$queryRaw<CollyRow[]>`
         SELECT co.filename, co.name,
           (SELECT GROUP_CONCAT(a.nick) FROM artists_collys ac JOIN artists a ON a.id = ac.artist_id WHERE ac.colly_id = co.id) AS artists,
           (SELECT GROUP_CONCAT(c.name) FROM collys_crews cc JOIN crews c ON c.id = cc.crew_id WHERE cc.colly_id = co.id) AS crews
         FROM collys co ORDER BY co.id DESC LIMIT ${limit}
-      `)
+      `
     : await prisma.$queryRaw<CollyRow[]>`
         SELECT co.filename, co.name,
           (SELECT GROUP_CONCAT(a.nick) FROM artists_collys ac JOIN artists a ON a.id = ac.artist_id WHERE ac.colly_id = co.id) AS artists,
@@ -44,6 +44,9 @@ export async function GET(request: NextRequest) {
   }
 
   return new Response(lines.join(NL) + NL, {
-    headers: { "Content-Type": "text/plain; charset=utf-8" },
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "public, max-age=300, stale-while-revalidate=3600",
+    },
   });
 }

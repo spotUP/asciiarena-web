@@ -16,7 +16,7 @@ export default function NotFound() {
         textAlign: "center",
       }}
     >
-      <div style={{ color: "var(--color-magenta)", fontSize: "1.4rem", marginBottom: "16px" }}>
+      <div style={{ color: "var(--color-magenta)", fontSize: "1rem", marginBottom: "16px" }}>
         404 - NOT FOUND
       </div>
       <div style={{ color: "var(--color-grey)", marginBottom: "24px" }}>

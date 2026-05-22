@@ -25,9 +25,12 @@ export async function GET(
   const collyId = Number(id);
 
   const rows = await prisma.$queryRaw<CommentRow[]>(
-    Prisma.sql`SELECT commentid, timestamp, nick, IFNULL(rating, '') AS rating, comment
-               FROM comments
-               WHERE colly_id = ${collyId}`
+    Prisma.sql`SELECT c.commentid, c.timestamp,
+               COALESCE(c.nick, u.nick, 'unknown') AS nick,
+               IFNULL(c.rating, '') AS rating, c.comment
+               FROM comments c
+               LEFT JOIN users u ON u.id = c.user_id
+               WHERE c.colly_id = ${collyId}`
   );
 
   const comments = rows.map((row) => ({

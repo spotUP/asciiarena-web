@@ -25,5 +25,7 @@ export async function GET(request: NextRequest) {
       orderBy: { name: "asc" },
     }),
   ]);
-  return NextResponse.json({ collys, artists, crews });
+  return NextResponse.json({ collys, artists, crews }, {
+    headers: { "Cache-Control": "public, max-age=30, stale-while-revalidate=120" },
+  });
 }

@@ -24,22 +24,22 @@ export default async function LogoEditorPage() {
         </span>
         <span style={{ marginLeft: "16px" }}>
           <label htmlFor="taagCharWidth">Character Width:</label>
-          <select className="form-select" id="taagCharWidth" style={{ width: "180px", marginLeft: "8px" }}>
+          <select className="form-select" id="taagCharWidth" defaultValue="default" style={{ width: "180px", marginLeft: "8px" }}>
             <option value="full">Full</option>
             <option value="fitted">Fitted</option>
             <option value="controlled smushing">Smush (R)</option>
             <option value="universal smushing">Smush (U)</option>
-            <option value="default" selected>Default</option>
+            <option value="default">Default</option>
           </select>
         </span>
         <span style={{ marginLeft: "16px" }}>
           <label htmlFor="taagCharHeight">Character Height:</label>
-          <select className="form-select" id="taagCharHeight" style={{ width: "180px", marginLeft: "8px" }}>
+          <select className="form-select" id="taagCharHeight" defaultValue="default" style={{ width: "180px", marginLeft: "8px" }}>
             <option value="full">Full</option>
             <option value="fitted">Fitted</option>
             <option value="controlled smushing">Smush (R)</option>
             <option value="universal smushing">Smush (U)</option>
-            <option value="default" selected>Default</option>
+            <option value="default">Default</option>
           </select>
         </span>
       </div>
@@ -62,10 +62,10 @@ export default async function LogoEditorPage() {
       <Script src="/assets/js/logoeditor/main.js" strategy="afterInteractive" />
       <Script id="logoeditor-copy" strategy="afterInteractive">{`
         document.getElementById("copy-logo").addEventListener("click", function() {
-          var text = document.getElementById("outputFigDisplay").innerText;
-          navigator.clipboard.writeText(text).then(function() {
+          const text = document.getElementById("outputFigDisplay").innerText;
+          navigator.clipboard.writeText(text).then(() => {
             document.getElementById("copy-logo").value = "Copied!";
-            setTimeout(function() { document.getElementById("copy-logo").value = "Copy to clipboard"; }, 1500);
+            setTimeout(() => { document.getElementById("copy-logo").value = "Copy to clipboard"; }, 1500);
           });
         });
       `}</Script>

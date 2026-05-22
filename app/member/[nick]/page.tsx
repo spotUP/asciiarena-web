@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import SiteLayout from "@/components/layout/SiteLayout";
 import UnfaveButton from "./UnfaveButton";
 import { prisma } from "@/lib/db";
@@ -56,6 +57,16 @@ function formatJoined(ts: number | null): string {
   return d.toISOString().slice(0, 10);
 }
 
+export async function generateMetadata({ params }: { params: Promise<{ nick: string }> }): Promise<Metadata> {
+  const { nick } = await params;
+  const rows = await prisma.$queryRaw<{ nick: string }[]>`SELECT nick FROM users WHERE nickurl = ${nick} LIMIT 1`;
+  if (!rows[0]) return {};
+  return {
+    title: `${rows[0].nick} | aSCIIaRENA`,
+    description: `aSCIIaRENA member profile for ${rows[0].nick}.`,
+  };
+}
+
 export default async function MemberPage({
   params,
 }: {
@@ -73,12 +84,53 @@ export default async function MemberPage({
   const member = members[0];
   if (!member) notFound();
 
-  const artists = await prisma.$queryRaw<ArtistRow[]>`
-    SELECT id, nick, artisturl
-    FROM artists
-    WHERE user_id = ${member.id}
-    ORDER BY nick ASC
-  `;
+  const [artists, comments, commentCount, collys, faves] = await Promise.all([
+    prisma.$queryRaw<ArtistRow[]>`
+      SELECT id, nick, artisturl
+      FROM artists
+      WHERE user_id = ${member.id}
+      ORDER BY nick ASC
+    `,
+    prisma.$queryRaw<CommentRow[]>`
+      SELECT comment, filename
+      FROM comments
+      WHERE user_id = ${member.id}
+      ORDER BY timestamp DESC
+      LIMIT 10
+    `,
+    prisma.$queryRaw<{ total: bigint }[]>`
+      SELECT COUNT(*) AS total FROM comments WHERE user_id = ${member.id}
+    `,
+    prisma.$queryRaw<CollyRow[]>`
+      SELECT c.name, c.filename,
+             GROUP_CONCAT(DISTINCT a.nick) AS artists,
+             GROUP_CONCAT(DISTINCT w.name) AS crews
+      FROM collys c
+      LEFT JOIN artists_collys ac ON c.id = ac.colly_id
+      LEFT JOIN artists a ON ac.artist_id = a.id
+      LEFT JOIN collys_crews cc ON c.id = cc.colly_id
+      LEFT JOIN crews w ON w.id = cc.crew_id
+      WHERE c.uploader_id = ${member.id}
+      GROUP BY c.filename
+      ORDER BY MAX(c.timestamp) DESC
+      LIMIT 10
+    `,
+    prisma.$queryRaw<FaveRow[]>`
+      SELECT f.colly_id, c.filename, c.name,
+             GROUP_CONCAT(DISTINCT a.nick) AS artists,
+             GROUP_CONCAT(DISTINCT w.name) AS crews
+      FROM favourites f
+      LEFT JOIN collys c ON f.colly_id = c.id
+      LEFT JOIN collys_crews cc ON f.colly_id = cc.colly_id
+      LEFT JOIN crews w ON cc.crew_id = w.id
+      LEFT JOIN artists_collys ac ON f.colly_id = ac.colly_id
+      LEFT JOIN artists a ON a.id = ac.artist_id
+      WHERE f.user_id = ${member.id}
+      GROUP BY f.colly_id, c.filename
+    `,
+  ]);
+
+  const totalComments = Number(commentCount[0]?.total ?? 0);
 
   // Crew memberships via linked artist handles
   const crewMemberships = artists.length > 0
@@ -91,48 +143,6 @@ export default async function MemberPage({
         ORDER BY mo.crew ASC, mo.nick ASC
       `
     : [];
-
-  const comments = await prisma.$queryRaw<CommentRow[]>`
-    SELECT comment, filename
-    FROM comments
-    WHERE user_id = ${member.id}
-    ORDER BY timestamp DESC
-    LIMIT 10
-  `;
-
-  const commentCount = await prisma.$queryRaw<{ total: bigint }[]>`
-    SELECT COUNT(*) AS total FROM comments WHERE user_id = ${member.id}
-  `;
-  const totalComments = Number(commentCount[0]?.total ?? 0);
-
-  const collys = await prisma.$queryRaw<CollyRow[]>`
-    SELECT c.name, c.filename,
-           GROUP_CONCAT(DISTINCT a.nick) AS artists,
-           GROUP_CONCAT(DISTINCT w.name) AS crews
-    FROM collys c
-    LEFT JOIN artists_collys ac ON c.id = ac.colly_id
-    LEFT JOIN artists a ON ac.artist_id = a.id
-    LEFT JOIN collys_crews cc ON c.id = cc.colly_id
-    LEFT JOIN crews w ON w.id = cc.crew_id
-    WHERE c.uploader_id = ${member.id}
-    GROUP BY c.filename
-    ORDER BY MAX(c.timestamp) DESC
-    LIMIT 10
-  `;
-
-  const faves = await prisma.$queryRaw<FaveRow[]>`
-    SELECT f.colly_id, c.filename, c.name,
-           GROUP_CONCAT(DISTINCT a.nick) AS artists,
-           GROUP_CONCAT(DISTINCT w.name) AS crews
-    FROM favourites f
-    LEFT JOIN collys c ON f.colly_id = c.id
-    LEFT JOIN collys_crews cc ON f.colly_id = cc.colly_id
-    LEFT JOIN crews w ON cc.crew_id = w.id
-    LEFT JOIN artists_collys ac ON f.colly_id = ac.colly_id
-    LEFT JOIN artists a ON a.id = ac.artist_id
-    WHERE f.user_id = ${member.id}
-    GROUP BY f.colly_id, c.filename
-  `;
 
   const kb = Math.round((member.uploaded ?? 0) / 1000);
   const isOwnProfile = session?.user?.id ? Number(session.user.id) === member.id : false;

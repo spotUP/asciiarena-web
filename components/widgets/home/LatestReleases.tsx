@@ -37,23 +37,28 @@ export default async function LatestReleases({ columns = 2, random = false, head
     ? Prisma.raw("ORDER BY RAND()")
     : Prisma.raw("ORDER BY a.fyear DESC, a.fmonth DESC, a.fday DESC");
 
-  const rows = await prisma.$queryRaw<ReleaseRow[]>(Prisma.sql`
-    SELECT * FROM (
-      SELECT 'C' AS type, filename,
-        year AS fyear, month AS fmonth, day AS fday
-      FROM collys
+  let rows: ReleaseRow[] = [];
+  try {
+    rows = await prisma.$queryRaw<ReleaseRow[]>(Prisma.sql`
+      SELECT * FROM (
+        SELECT 'C' AS type, filename,
+          year AS fyear, month AS fmonth, day AS fday
+        FROM collys
+        LIMIT 20
+      ) a
+      ${orderClause}
       LIMIT 20
-    ) a
-    ${orderClause}
-    LIMIT 20
-  `);
+    `);
+  } catch {
+    // DB unavailable — render the header with no releases
+  }
 
   const releases: { url: string; content: string }[] = [];
 
   for (const row of rows) {
     if (releases.length >= columns) break;
     const filename = String(row.filename);
-    const dirname = filename.split(".")[0];
+    const dirname = filename.replace(/\.[^.]+$/, "");
     let dizPath = "";
     let url = "";
 

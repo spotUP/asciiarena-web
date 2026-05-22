@@ -20,7 +20,7 @@ export default function DialoguesPage() {
               <div className="req-button-container">
                 <button className="hip-3-button">General</button>
                 <button className="hip-3-button">Display</button>
-                <button className="hip-3-button" style={{ color: "#ffffff" }}>Playback</button>
+                <button className="hip-3-button white">Playback</button>
               </div>
               <div className="hip-header">
                 <div className="req-button-container">
@@ -46,7 +46,7 @@ export default function DialoguesPage() {
             <div className="req-content nobottomborder">
               <div className="req-button-container">
                 <button className="hip-3-button">General</button>
-                <button className="hip-3-button" style={{ color: "#ffffff" }}>Display</button>
+                <button className="hip-3-button white">Display</button>
                 <button className="hip-3-button">Playback</button>
               </div>
               <div className="hip-header">
@@ -78,7 +78,7 @@ export default function DialoguesPage() {
           <div className="req-border-3"><div className="req-border-2"><div className="req-border-1">
             <div className="req-content nobottomborder">
               <div className="req-button-container">
-                <button className="hip-3-button" style={{ color: "#ffffff" }}>General</button>
+                <button className="hip-3-button white">General</button>
                 <button className="hip-3-button">Display</button>
                 <button className="hip-3-button">Playback</button>
               </div>

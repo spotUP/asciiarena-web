@@ -32,20 +32,18 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   const likeParam = filter ? `%${filter}%` : "%";
 
-  const rows = await prisma.$queryRaw<BbsRow[]>`
-    SELECT *
-    FROM bbses
-    WHERE name LIKE ${likeParam} OR sysop LIKE ${likeParam}
-    ORDER BY ${orderCol} ${orderDir}
-    LIMIT ${Prisma.raw(String(pagesizeInt))} OFFSET ${Prisma.raw(String(startInt))}
-  `;
-
-  const countRows = await prisma.$queryRaw<CountRow[]>`
-    SELECT COUNT(*) AS cnt
-    FROM bbses
-    WHERE name LIKE ${likeParam} OR sysop LIKE ${likeParam}
-  `;
-
+  const [rows, countRows] = await Promise.all([
+    prisma.$queryRaw<BbsRow[]>`
+      SELECT * FROM bbses
+      WHERE name LIKE ${likeParam} OR sysop LIKE ${likeParam}
+      ORDER BY ${orderCol} ${orderDir}
+      LIMIT ${Prisma.raw(String(pagesizeInt))} OFFSET ${Prisma.raw(String(startInt))}
+    `,
+    prisma.$queryRaw<CountRow[]>`
+      SELECT COUNT(*) AS cnt FROM bbses
+      WHERE name LIKE ${likeParam} OR sysop LIKE ${likeParam}
+    `,
+  ]);
   const total_count = Number(countRows[0]?.cnt ?? 0);
 
   const result = rows.map((row) => ({

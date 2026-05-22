@@ -19,9 +19,11 @@ export async function POST(request: NextRequest) {
 
   if (!email) return apiError("E-Mail address is required.", 400);
   if (spam !== "iamnotarobot") return apiError("Spam check failed.", 400);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return apiError("Invalid e-mail address.", 400);
 
   const user = await prisma.users.findFirst({ where: { mail: email } });
-  if (!user) return apiError("Unknown e-mail address.", 404);
+  // Always return success — never reveal whether the address exists
+  if (!user) return apiOk({ status: true });
 
   const token = buildToken(user.id, email);
   // Store a hash of the token so we can invalidate it after use

@@ -13,7 +13,11 @@ export async function claimArtist(nick: string): Promise<{ success: boolean; err
   if (!artist) return { success: false, error: `Artist '${nick}' not found` };
   if (artist.user_id !== null) return { success: false, error: "Already claimed" };
 
-  await prisma.artists.update({ where: { id: artist.id }, data: { user_id: userId } });
+  try {
+    await prisma.artists.update({ where: { id: artist.id }, data: { user_id: userId } });
+  } catch {
+    return { success: false, error: "Failed" };
+  }
   revalidatePath('/artist', 'layout');
   return { success: true };
 }

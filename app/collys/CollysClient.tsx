@@ -125,7 +125,7 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              View Mode:
+              View Mode: v
             </button>
             <div className="dropdown-menu">
               <a

@@ -161,7 +161,7 @@ export default function SubmitClient({
 
   // ── Submit handlers ────────────────────────────────────────────────────────
 
-  async function handleCollySubmit(e: React.FormEvent) {
+  async function handleCollySubmit(e: React.SyntheticEvent) {
     e.preventDefault();
     const fileInput = collyFileRef.current;
     if (!fileInput?.files?.[0]) {
@@ -199,7 +199,7 @@ export default function SubmitClient({
     }
   }
 
-  async function handleCrewSubmit(e: React.FormEvent) {
+  async function handleCrewSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
     const r = await fetch("/api/crews", {
       method: "POST",
@@ -229,7 +229,7 @@ export default function SubmitClient({
     }
   }
 
-  async function handleArtistSubmit(e: React.FormEvent) {
+  async function handleArtistSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
     const r = await fetch("/api/artists", {
       method: "POST",
@@ -259,7 +259,7 @@ export default function SubmitClient({
     }
   }
 
-  async function handleBbsSubmit(e: React.FormEvent) {
+  async function handleBbsSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
     const r = await fetch("/api/bbs", {
       method: "POST",
@@ -291,7 +291,7 @@ export default function SubmitClient({
     }
   }
 
-  async function handleAppSubmit(e: React.FormEvent) {
+  async function handleAppSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
     const fileInput = appFileRef.current;
     if (!fileInput?.files?.[0]) {
@@ -323,7 +323,7 @@ export default function SubmitClient({
     }
   }
 
-  async function handleMagSubmit(e: React.FormEvent) {
+  async function handleMagSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
     const fileInput = magFileRef.current;
     if (!fileInput?.files?.[0]) {
@@ -355,7 +355,7 @@ export default function SubmitClient({
     }
   }
 
-  async function handleRequestSubmit(e: React.FormEvent) {
+  async function handleRequestSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
     if (!requestTitle.trim()) {
       setStatus({ msg: "Title is required.", ok: false });
@@ -379,7 +379,7 @@ export default function SubmitClient({
     }
   }
 
-  async function handleLogoSubmit(e: React.FormEvent) {
+  async function handleLogoSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
     if (!logoAscii.trim()) {
       setStatus({ msg: "ASCII art is required.", ok: false });
@@ -587,7 +587,7 @@ export default function SubmitClient({
             </div>
 
             <div style={{ marginTop: "12px" }}>
-              <input type="button" className="btn-big" value="Upload Colly" onClick={handleCollySubmit as unknown as React.MouseEventHandler} />
+              <input type="button" className="btn-big" value="Upload Colly" onClick={handleCollySubmit} />
             </div>
           </form>
         )}
@@ -687,7 +687,7 @@ export default function SubmitClient({
             </div>
 
             <div style={{ marginTop: "12px" }}>
-              <input type="button" className="btn-big" value="Submit Crew" onClick={handleCrewSubmit as unknown as React.MouseEventHandler} />
+              <input type="button" className="btn-big" value="Submit Crew" onClick={handleCrewSubmit} />
             </div>
           </form>
         )}
@@ -787,7 +787,7 @@ export default function SubmitClient({
             </div>
 
             <div style={{ marginTop: "12px" }}>
-              <input type="button" className="btn-big" value="Submit Artist" onClick={handleArtistSubmit as unknown as React.MouseEventHandler} />
+              <input type="button" className="btn-big" value="Submit Artist" onClick={handleArtistSubmit} />
             </div>
           </form>
         )}
@@ -869,7 +869,7 @@ export default function SubmitClient({
             </div>
 
             <div style={{ marginTop: "12px" }}>
-              <input type="button" className="btn-big" value="Submit BBS" onClick={handleBbsSubmit as unknown as React.MouseEventHandler} />
+              <input type="button" className="btn-big" value="Submit BBS" onClick={handleBbsSubmit} />
             </div>
           </form>
         )}
@@ -947,7 +947,7 @@ export default function SubmitClient({
             </div>
 
             <div style={{ marginTop: "12px" }}>
-              <input type="button" className="btn-big" value="Upload App" onClick={handleAppSubmit as unknown as React.MouseEventHandler} />
+              <input type="button" className="btn-big" value="Upload App" onClick={handleAppSubmit} />
             </div>
           </form>
         )}
@@ -1025,7 +1025,7 @@ export default function SubmitClient({
             </div>
 
             <div style={{ marginTop: "12px" }}>
-              <input type="button" className="btn-big" value="Upload Mag" onClick={handleMagSubmit as unknown as React.MouseEventHandler} />
+              <input type="button" className="btn-big" value="Upload Mag" onClick={handleMagSubmit} />
             </div>
           </form>
         )}
@@ -1056,7 +1056,7 @@ export default function SubmitClient({
             </div>
 
             <div style={{ marginTop: "12px" }}>
-              <input type="button" className="btn-big" value="Submit Request" onClick={handleRequestSubmit as unknown as React.MouseEventHandler} />
+              <input type="button" className="btn-big" value="Submit Request" onClick={handleRequestSubmit} />
             </div>
           </form>
         )}
@@ -1087,7 +1087,7 @@ export default function SubmitClient({
             </div>
 
             <div style={{ marginTop: "12px" }}>
-              <input type="button" className="btn-big" value="Submit Logo" onClick={handleLogoSubmit as unknown as React.MouseEventHandler} />
+              <input type="button" className="btn-big" value="Submit Logo" onClick={handleLogoSubmit} />
             </div>
           </form>
         )}

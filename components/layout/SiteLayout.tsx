@@ -1,5 +1,6 @@
 import Script from "next/script";
 import type { Session } from "next-auth";
+import { unstable_cache } from "next/cache";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/db";
 import { getSession as auth } from "@/lib/session";
@@ -14,17 +15,29 @@ export type SiteLayoutProps = {
   children: React.ReactNode;
 };
 
+const getLogos = unstable_cache(
+  async () => {
+    try {
+      const rows = await prisma.$queryRaw<Array<{ ascii: string }>>(
+        Prisma.sql`SELECT ascii FROM logos ORDER BY logo_id LIMIT 50`
+      );
+      return rows.map((r) => r.ascii);
+    } catch {
+      return [];
+    }
+  },
+  ["logos"],
+  { revalidate: 120 }
+);
+
 export default async function SiteLayout({ title, children }: SiteLayoutProps) {
-  const [rawSession, logoRows] = await Promise.all([
-    auth(),
-    prisma.$queryRaw<Array<{ ascii: string }>>(
-      Prisma.sql`SELECT ascii FROM logos ORDER BY logo_id LIMIT 50`
-    ),
+  const [rawSession, logos] = await Promise.all([
+    auth().catch(() => null),
+    getLogos(),
   ]);
 
   // auth() is overloaded; cast to the Session | null variant
   const session = rawSession as Session | null;
-  const logos = logoRows.map((r) => r.ascii);
 
   const userPrefs = session?.user as { crt_effect?: string; anim_effect?: string } | undefined;
   const showCrt = !session?.user || userPrefs?.crt_effect !== "N";
@@ -35,16 +48,14 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
       <div id="spotclose" className="spotclose" suppressHydrationWarning>
         <div className="noevents">x</div>
       </div>
-      <Script id="fullscreen-toggle" strategy="beforeInteractive">{`
+      <Script id="fullscreen-toggle" strategy="afterInteractive">{`
         function showFullscreen() {
           document.getElementById('colly')?.classList.toggle('fullscreen');
           document.getElementById('blacker')?.classList.toggle('show');
           document.getElementById('spotclose')?.classList.toggle('show');
         }
-        document.addEventListener('DOMContentLoaded', function() {
-          var el = document.getElementById('spotclose');
-          if (el) el.onclick = showFullscreen;
-        });
+        var el = document.getElementById('spotclose');
+        if (el) el.onclick = showFullscreen;
       `}</Script>
 
       {/* 386 boot animation — only shown when anim_effect is enabled */}
@@ -157,21 +168,33 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
         async function loginUser() {
           const nick = document.getElementById("login-nick").value;
           const pass = document.getElementById("login-password").value;
+          const resultsEl = document.getElementById("login-results");
+          function showError(msg) {
+            if (resultsEl) {
+              resultsEl.innerHTML = '<div class="alert alert-danger animate__animated animate__shakeX">' + msg + '</div>';
+              setTimeout(function() { resultsEl.innerHTML = ""; }, 4000);
+            }
+          }
           try {
-            const { csrfToken } = await (await fetch("/api/auth/csrf")).json();
+            const csrfRes = await fetch("/api/auth/csrf", { credentials: "include" });
+            if (!csrfRes.ok) { showError("csrf error " + csrfRes.status); return; }
+            const { csrfToken } = await csrfRes.json();
             const res = await fetch("/api/auth/callback/credentials", {
               method: "POST",
               headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              credentials: "include",
               body: new URLSearchParams({ login: nick, password: pass, csrfToken, redirect: "false" }),
             });
-            if (res.ok) {
-              window.location.reload();
+            // NextAuth v5 redirects on both success (/callback/credentials → /) and failure (→ /login?error=...)
+            // fetch follows the redirect, so check the final URL
+            if (res.url && res.url.includes("error=")) {
+              showError("authentication failed");
             } else {
-              const el = document.getElementById("login-results");
-              el.innerHTML = '<div class="alert alert-danger animate__animated animate__shakeX">authentication failed</div>';
-              setTimeout(function() { el.innerHTML = ""; }, 3000);
+              window.location.reload();
             }
-          } catch {}
+          } catch(err) {
+            showError("error: " + (err && err.message ? err.message : String(err)));
+          }
         }
         document.getElementById("login-submit-btn")?.addEventListener("click", loginUser);
         document.getElementById("login-form")?.addEventListener("submit", function(e) { e.preventDefault(); loginUser(); });

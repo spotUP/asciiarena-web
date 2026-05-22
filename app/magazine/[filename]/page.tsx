@@ -70,7 +70,7 @@ export default async function MagazinePage({ params }: PageProps) {
       <div className="row">
         <div className="col-lg-8">
           {dizContent ? (
-            <pre style={{ fontFamily: "TopazPlus_a1200, monospace", color: "#ff55ff", whiteSpace: "pre", overflowX: "auto" }}
+            <pre className="magenta apt-1" style={{ overflowX: "auto" }}
               dangerouslySetInnerHTML={{ __html: dizContent }} />
           ) : (
             <div className="lightgrey">No description available.</div>

@@ -30,22 +30,23 @@ Code comments and TypeScript source may use Unicode freely.
 ## Stack
 
 - **Runtime**: Node 20, Next.js 16 App Router, TypeScript strict
-- **CSS**: Bootstrap 4.4.1 (local `/assets/css/bootstrap.min.css` served by Apache) + custom `site.css`
-- **JS**: jQuery 3.5.1 + Bootstrap 4 bundle (loaded via Script tags, NOT npm)
+- **CSS**: BOOTSTRA.386 v5.3.1 (Bootstrap 5 retro theme, `/assets/css/bootstrap5.min.css`) + `site.css` + `overrides.css`
+- **JS**: Bootstrap 5 bundle (`/public/assets/js/bootstrap5.bundle.min.js`, NOT npm)
 - **DB**: MySQL 8 via Prisma 7 + `@prisma/adapter-mariadb`
 - **Auth**: NextAuth v5 with credentials provider (bcrypt, trustHost: true)
 - **Deploy**: Apache reverse proxy -> Next.js on port 3001, systemd service `asciiarena-next`
 
 ## CSS load order (critical)
 
-Must load in this exact order or Bootstrap overrides the theme:
-1. `/assets/css/bootstrap.min.css` (Bootstrap 4 — the theme is designed for BS4)
-2. `/assets/css/bootstrap-colorselector.css`
-3. `/assets/css/site.css` (theme overrides Bootstrap)
-4. `/assets/css/386.css`
-5. `globals.css` (minimal Next.js overrides)
+Must load in this exact order — Next.js injects globals.css first (before link tags), so overrides.css wins cascade by loading last:
+1. `globals.css` (Next.js injects this — keep it minimal: only CSS custom properties)
+2. `/assets/css/bootstrap5.min.css` (BOOTSTRA.386 v5.3.1 retro theme)
+3. `/assets/css/bootstrap-colorselector.css`
+4. `/assets/css/site.css` (site-specific overrides)
+5. `/assets/css/386.css`
+6. `/assets/css/overrides.css` (Bootstrap 5 regression fixes + BS4->BS5 component parity — must load LAST)
 
-Importing Bootstrap from npm breaks the theme. Always load it as a `<link>` tag via Apache.
+Importing Bootstrap from npm breaks the theme. Always load it as a `<link>` tag.
 
 ## File encoding
 
@@ -58,8 +59,8 @@ ASCII art files are ISO-8859-1 / CP437, not UTF-8. When reading collection files
 
 - Static assets (`/assets/`, `/fonts/`, `/collections/`, `/apps/`, `/mags/`) served
   directly by Apache — do NOT try to serve them from Next.js `public/`
-- `public/` only holds: `favicon.ico`, `favicon.png`, `bootstrap5.bundle.min.js`,
-  `bootstrap-colorselector-bs5.js` (patched for BS4 data-toggle attrs)
+- `public/` holds: `favicon.ico`, `favicon.png`, `manifest.json`, `assets/css/overrides.css`,
+  `assets/js/bootstrap5.bundle.min.js`, `assets/js/bootstrap-colorselector-bs5.js`
 - `.env` on server at `/var/www/asciiarena.se/.env` — never commit secrets
 
 ## Uniform font size (terminal aesthetic)

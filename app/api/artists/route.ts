@@ -30,33 +30,51 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const orderDir = Prisma.raw(ascending ? "ASC" : "DESC");
   const orderCol = Prisma.raw(sortCol);
 
-  const likeParam = filter ? `%${filter}%` : "%";
+  const likeParam = filter ? `%${filter}%` : null;
 
-  const rows = await prisma.$queryRaw<ArtistRow[]>`
-    SELECT s.id, s.nick, s.crews
-    FROM (
-      SELECT a.id, a.nick, GROUP_CONCAT(m.crew) AS crews
-      FROM artists a
-      LEFT JOIN member_of m ON a.nick = m.nick
-      GROUP BY a.id
-    ) s
-    WHERE s.nick LIKE ${likeParam} OR s.crews LIKE ${likeParam}
-    ORDER BY ${orderCol} ${orderDir}
-    LIMIT ${Prisma.raw(String(pagesizeInt))} OFFSET ${Prisma.raw(String(startInt))}
-  `;
+  let rows: ArtistRow[];
+  let total_count: number;
 
-  const countRows = await prisma.$queryRaw<CountRow[]>`
-    SELECT COUNT(*) AS cnt
-    FROM (
-      SELECT a.id, a.nick, GROUP_CONCAT(m.crew) AS crews
-      FROM artists a
-      LEFT JOIN member_of m ON a.nick = m.nick
-      GROUP BY a.id
-    ) s
-    WHERE s.nick LIKE ${likeParam} OR s.crews LIKE ${likeParam}
-  `;
-
-  const total_count = Number(countRows[0]?.cnt ?? 0);
+  if (!likeParam) {
+    // No filter: fast direct count + correlated subquery only for visible page rows
+    const [dataRows, [countRow]] = await Promise.all([
+      prisma.$queryRaw<ArtistRow[]>`
+        SELECT a.id, a.nick,
+          COALESCE((SELECT GROUP_CONCAT(m.crew ORDER BY m.crew SEPARATOR ',')
+                    FROM member_of m WHERE m.nick = a.nick), '') AS crews
+        FROM artists a
+        ORDER BY ${orderCol} ${orderDir}
+        LIMIT ${Prisma.raw(String(pagesizeInt))} OFFSET ${Prisma.raw(String(startInt))}
+      `,
+      prisma.$queryRaw<[{ cnt: bigint }]>`SELECT COUNT(*) AS cnt FROM artists`,
+    ]);
+    rows = dataRows;
+    total_count = Number(countRow?.cnt ?? 0);
+  } else {
+    const like = likeParam;
+    const [dataRows, countRows] = await Promise.all([
+      prisma.$queryRaw<ArtistRow[]>`
+        SELECT s.id, s.nick, s.crews FROM (
+          SELECT a.id, a.nick,
+            COALESCE(GROUP_CONCAT(m.crew ORDER BY m.crew SEPARATOR ','), '') AS crews
+          FROM artists a LEFT JOIN member_of m ON a.nick = m.nick
+          GROUP BY a.id, a.nick
+        ) s
+        WHERE s.nick LIKE ${like} OR s.crews LIKE ${like}
+        ORDER BY ${orderCol} ${orderDir}
+        LIMIT ${Prisma.raw(String(pagesizeInt))} OFFSET ${Prisma.raw(String(startInt))}
+      `,
+      prisma.$queryRaw<CountRow[]>`
+        SELECT COUNT(*) AS cnt FROM (
+          SELECT a.id FROM artists a LEFT JOIN member_of m ON a.nick = m.nick
+          GROUP BY a.id, a.nick
+          HAVING a.nick LIKE ${like} OR GROUP_CONCAT(m.crew) LIKE ${like}
+        ) sub
+      `,
+    ]);
+    rows = dataRows;
+    total_count = Number(countRows[0]?.cnt ?? 0);
+  }
 
   const result = rows.map((row) => ({
     url: `/artist/${urlsafe(row.nick)}`,

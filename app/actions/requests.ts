@@ -11,10 +11,14 @@ export async function postRequestComment(
   const session = await getSession();
   if (!session?.user?.id) return { success: false, error: "Not logged in" };
   const userId = Number(session.user.id);
-  await prisma.$executeRaw`
-    INSERT INTO request_comments (request_id, user_id, comment, timestamp)
-    VALUES (${requestId}, ${userId}, ${comment}, ${Math.floor(Date.now() / 1000)})
-  `;
+  try {
+    await prisma.$executeRaw`
+      INSERT INTO request_comments (request_id, user_id, comment, timestamp)
+      VALUES (${requestId}, ${userId}, ${comment}, ${Math.floor(Date.now() / 1000)})
+    `;
+  } catch {
+    return { success: false, error: "Failed" };
+  }
   revalidatePath('/requests/' + requestId);
   return { success: true };
 }
@@ -30,7 +34,11 @@ export async function updateRequestStatus(
   const req = await prisma.requests.findUnique({ where: { id: requestId } });
   if (!req) return { success: false, error: "Not found" };
   if (!isAdmin && req.requestedby !== userId) return { success: false, error: "Forbidden" };
-  await prisma.requests.update({ where: { id: requestId }, data: { status } });
+  try {
+    await prisma.requests.update({ where: { id: requestId }, data: { status } });
+  } catch {
+    return { success: false, error: "Failed" };
+  }
   revalidatePath('/requests');
   revalidatePath('/requests/' + requestId);
   return { success: true };

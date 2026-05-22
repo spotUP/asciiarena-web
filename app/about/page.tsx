@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import SiteLayout from "@/components/layout/SiteLayout";
+
+export const metadata: Metadata = {
+  title: "About | aSCIIaRENA",
+  description: "The aSCIIaRENA ASCII art archive — built by the scene, for the scene.",
+};
 
 export default function AboutPage() {
   return (
