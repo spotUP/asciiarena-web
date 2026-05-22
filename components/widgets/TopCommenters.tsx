@@ -4,18 +4,21 @@ import { urlsafe } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { unstable_cache } from "next/cache";
 
-type TopCommenter = { topcommentators: bigint; nick: string; user_id: number };
+type TopCommenter = { topcommentators: number; nick: string; user_id: number };
 
 const getTopCommenters = unstable_cache(
-  async (limit: number) => prisma.$queryRaw<TopCommenter[]>(
-    Prisma.sql`
-      SELECT COUNT(user_id) AS topcommentators, nick, user_id
-      FROM comments
-      GROUP BY user_id, nick
-      ORDER BY topcommentators DESC
-      LIMIT ${limit}
-    `
-  ),
+  async (limit: number) => {
+    const rows = await prisma.$queryRaw<{ topcommentators: bigint; nick: string; user_id: number }[]>(
+      Prisma.sql`
+        SELECT COUNT(user_id) AS topcommentators, nick, user_id
+        FROM comments
+        GROUP BY user_id, nick
+        ORDER BY topcommentators DESC
+        LIMIT ${limit}
+      `
+    );
+    return rows.map(r => ({ ...r, topcommentators: Number(r.topcommentators) }));
+  },
   ["top-commenters"],
   { revalidate: 600 }
 );
