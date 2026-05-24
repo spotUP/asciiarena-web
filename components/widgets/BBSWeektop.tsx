@@ -23,7 +23,7 @@ export default function BBSWeektop() {
   }, []);
 
   return (
-    <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
+    <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2 apt-1">
       <div className="header col-lg-12 p-0">
         <h2 className="ap-1 bg-header">WEEKTOP - BBS:ES</h2>
       </div>
