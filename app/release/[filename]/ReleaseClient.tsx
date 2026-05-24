@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, useTransition } from "react";
+import { useState, useEffect, useCallback, useRef, useTransition, useMemo } from "react";
 import {
   trackView, trackDownload,
   addFavourite, removeFavourite,
@@ -69,6 +69,41 @@ interface Props {
 
 type Section = null | "add-comment" | "edit-comment" | "broken";
 
+interface LogoSection { startLine: number; endLine: number; lineCount: number }
+
+function detectLogoSections(html: string): LogoSection[] {
+  const text = html.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+  const lines = text.split("\n");
+  const sections: LogoSection[] = [];
+  let i = 0;
+  while (i < lines.length) {
+    while (i < lines.length && lines[i].trim() === "") i++;
+    if (i >= lines.length) break;
+    const start = i;
+    while (i < lines.length && lines[i].trim() !== "") i++;
+    const lineCount = i - start;
+    if (lineCount >= 5) sections.push({ startLine: start, endLine: i - 1, lineCount });
+  }
+  return sections;
+}
+
+function animateScroll(
+  el: HTMLElement, target: number, duration: number, onComplete?: () => void
+): number {
+  const from = el.scrollTop;
+  const delta = target - from;
+  const t0 = performance.now();
+  const ease = (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  let raf: number;
+  const tick = (now: number) => {
+    const p = Math.min((now - t0) / duration, 1);
+    el.scrollTop = from + delta * ease(p);
+    if (p < 1) { raf = requestAnimationFrame(tick); } else { onComplete?.(); }
+  };
+  raf = requestAnimationFrame(tick);
+  return raf;
+}
+
 function ColorSwatch({ current, onChange }: { current: string; onChange: (v: string) => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -132,6 +167,14 @@ export default function ReleaseClient({
   const [viewCount, setViewCount] = useState(initialViewCount);
   const [copyImageLabel, setCopyImageLabel] = useState("Copy as image");
   const [, startTransition] = useTransition();
+
+  const [autoplay, setAutoplay] = useState(false);
+  const [autoplayIndex, setAutoplayIndex] = useState(0);
+  const autoplayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoplayRafRef   = useRef<number | null>(null);
+  const isAutoScrolling  = useRef(false);
+
+  const sections = useMemo(() => detectLogoSections(fileContent), [fileContent]);
 
   const [commentText, setCommentText] = useState("");
   const [rating, setRating] = useState("");
@@ -200,6 +243,14 @@ export default function ReleaseClient({
     return () => document.removeEventListener("keydown", handler);
   }, [isFullscreen]);
 
+  const stopAutoplay = useCallback(() => {
+    setAutoplay(false);
+    setAutoplayIndex(0);
+    if (autoplayTimerRef.current) { clearTimeout(autoplayTimerRef.current); autoplayTimerRef.current = null; }
+    if (autoplayRafRef.current)   { cancelAnimationFrame(autoplayRafRef.current); autoplayRafRef.current = null; }
+    isAutoScrolling.current = false;
+  }, []);
+
   // Keyboard shortcuts
   useEffect(() => {
     if (!collyVisible || type !== "ASCII") return;
@@ -207,6 +258,7 @@ export default function ReleaseClient({
       if (section !== null) return;
       if (e.key === "f") { setIsFullscreen(f => !f); }
       else if (e.key === "d") { doDownload(); }
+      else if (e.key === "p") { autoplay ? stopAutoplay() : (setAutoplayIndex(0), setAutoplay(true)); }
       else if (e.key === "ArrowUp") {
         e.preventDefault();
         collyDivRef.current?.scrollBy({ top: -200, behavior: "smooth" });
@@ -218,7 +270,61 @@ export default function ReleaseClient({
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [collyVisible, type, section]);
+  }, [collyVisible, type, section, autoplay, stopAutoplay]);
+
+  useEffect(() => {
+    if (!autoplay || !collyVisible) return;
+    if (autoplayIndex >= sections.length) { stopAutoplay(); return; }
+
+    const logoSection = sections[autoplayIndex];
+    const container   = collyDivRef.current;
+    const pre         = collyRef.current as HTMLElement | null;
+    if (!container || !pre) return;
+
+    const lineHeight = parseFloat(getComputedStyle(pre).lineHeight) || 16;
+    const SPACERS    = 4;
+    const sectionTop = (SPACERS + logoSection.startLine) * lineHeight;
+    const sectionH   = logoSection.lineCount * lineHeight;
+    const viewH      = container.clientHeight;
+    const rawTarget  = sectionTop - (viewH - sectionH) / 2;
+    const target     = Math.max(0, Math.min(rawTarget, container.scrollHeight - viewH));
+
+    const hold     = Math.min(4000 + Math.max(0, logoSection.lineCount - 20) * 15, 8000);
+    const scrollMs = 700;
+
+    if (autoplayRafRef.current)   cancelAnimationFrame(autoplayRafRef.current);
+    if (autoplayTimerRef.current) clearTimeout(autoplayTimerRef.current);
+
+    isAutoScrolling.current = true;
+    autoplayRafRef.current = animateScroll(container, target, scrollMs, () => {
+      isAutoScrolling.current = false;
+      autoplayRafRef.current  = null;
+    });
+
+    autoplayTimerRef.current = setTimeout(() => {
+      autoplayTimerRef.current = null;
+      setAutoplayIndex(i => i + 1);
+    }, scrollMs + hold);
+
+    return () => {
+      if (autoplayTimerRef.current) clearTimeout(autoplayTimerRef.current);
+      if (autoplayRafRef.current)   cancelAnimationFrame(autoplayRafRef.current);
+      isAutoScrolling.current = false;
+    };
+  }, [autoplay, autoplayIndex, collyVisible, sections, stopAutoplay]);
+
+  useEffect(() => {
+    if (!autoplay) return;
+    const container = collyDivRef.current;
+    if (!container) return;
+    const onScroll = () => { if (!isAutoScrolling.current) stopAutoplay(); };
+    container.addEventListener("scroll", onScroll, { passive: true });
+    return () => container.removeEventListener("scroll", onScroll);
+  }, [autoplay, stopAutoplay]);
+
+  useEffect(() => {
+    if (!collyVisible && autoplay) stopAutoplay();
+  }, [collyVisible, autoplay, stopAutoplay]);
 
   const fitColly = () => {
     const pre = collyRef.current;
@@ -346,6 +452,17 @@ export default function ReleaseClient({
 
           {type === "ASCII" && collyVisible && (
             <input type="button" className="btn-big" value={copyImageLabel} onClick={doCopyImage} />
+          )}
+
+          {!isArchive && type === "ASCII" && collyVisible && (
+            <>
+              <input type="button" className="btn-big"
+                value={autoplay ? "Stop" : "Autoplay"}
+                onClick={() => autoplay ? stopAutoplay() : (setAutoplayIndex(0), setAutoplay(true))} />
+              {autoplay && (
+                <span className="lightgrey">{autoplayIndex + 1} / {sections.length}</span>
+              )}
+            </>
           )}
 
           {/* Share dropdown */}
