@@ -103,9 +103,9 @@ describe("PATCH /api/settings — password change", () => {
         oldpass: "OldPass1!",
         newpass: "NewPass123!",
         nick: "spot", crew: "", byear: 1990, bmonth: 5, bday: 1,
-        country: 0, mail: "", webpage: "", upload_signature: "",
-        viewmode: "Standard", def_bg_col: "#000", def_fg_col: "#fff",
-        display_mail: "N", def_font: "mOsOul", crt_effect: "Y", anim_effect: "N",
+        country: "0", mail: "", webpage: "", upload_signature: "",
+        viewmode: 0, def_bg_col: "#000", def_fg_col: "#fff",
+        display_mail: 0, def_font: 0, crt_effect: 1, anim_effect: 0,
       }),
     });
     const res = await PATCH(req as never);

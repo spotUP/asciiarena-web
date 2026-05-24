@@ -13,7 +13,7 @@ export async function addPlaylist(data: {
   const session = await getSession();
   if (session?.user?.rank !== "Admin") return { success: false, error: "Forbidden" };
   await prisma.$executeRaw`
-    INSERT INTO playlists (title, author, genre, filename, uploaddate)
+    INSERT INTO hippo_playlists (title, author, genre, filename, uploaddate)
     VALUES (${data.title}, ${data.author ?? ""}, ${data.genre ?? ""}, ${data.filename}, CURDATE())
   `;
   revalidatePath('/playlists');
@@ -23,7 +23,7 @@ export async function addPlaylist(data: {
 export async function deletePlaylist(id: number): Promise<{ success: boolean }> {
   const session = await getSession();
   if (session?.user?.rank !== "Admin") return { success: false };
-  await prisma.$executeRaw`DELETE FROM playlists WHERE id = ${id}`;
+  await prisma.$executeRaw`DELETE FROM hippo_playlists WHERE id = ${id}`;
   revalidatePath('/playlists');
   return { success: true };
 }
