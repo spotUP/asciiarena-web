@@ -98,8 +98,8 @@ export async function editComment(
   const userId = Number(session.user.id);
   const isAdmin = session.user.rank === "Admin";
   const where = isAdmin
-    ? Prisma.sql`WHERE id = ${commentId} AND colly_id = ${collyId}`
-    : Prisma.sql`WHERE id = ${commentId} AND colly_id = ${collyId} AND user_id = ${userId}`;
+    ? Prisma.sql`WHERE commentid = ${commentId} AND colly_id = ${collyId}`
+    : Prisma.sql`WHERE commentid = ${commentId} AND colly_id = ${collyId} AND user_id = ${userId}`;
   await prisma.$executeRaw`UPDATE comments SET comment = ${comment} ${where}`;
   const colly = await prisma.collys.findUnique({ where: { id: collyId }, select: { filename: true } });
   if (colly?.filename) revalidatePath('/release/' + colly.filename);
@@ -115,8 +115,8 @@ export async function deleteComment(
   const userId = Number(session.user.id);
   const isAdmin = session.user.rank === "Admin";
   const where = isAdmin
-    ? Prisma.sql`WHERE id = ${commentId} AND colly_id = ${collyId}`
-    : Prisma.sql`WHERE id = ${commentId} AND colly_id = ${collyId} AND user_id = ${userId}`;
+    ? Prisma.sql`WHERE commentid = ${commentId} AND colly_id = ${collyId}`
+    : Prisma.sql`WHERE commentid = ${commentId} AND colly_id = ${collyId} AND user_id = ${userId}`;
   await prisma.$executeRaw`DELETE FROM comments ${where}`;
   const colly = await prisma.collys.findUnique({ where: { id: collyId }, select: { filename: true } });
   if (colly?.filename) revalidatePath('/release/' + colly.filename);
