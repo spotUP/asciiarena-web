@@ -24,12 +24,9 @@ export default async function NewUsers() {
         </div>
         <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
           {rows.map((row) => {
-            const joinDate =
-              typeof row.joined === "number"
-                ? new Date(row.joined * 1000).toISOString().substring(2, 10)
-                : row.joined
-                ? String(row.joined).substring(0, 8)
-                : "";
+            const joinDate = row.joined
+              ? new Date(Number(row.joined) * 1000).toISOString().substring(2, 10)
+              : "";
             return (
               <div
                 key={row.id}
