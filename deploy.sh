@@ -15,7 +15,7 @@ rsync -a --delete --exclude='cache' \
   spot@97.75.89.139:/var/www/asciiarena.se/nextjs-current/.next/
 
 echo "Deploying public/..."
-rsync -a \
+rsync -aL \
   public/ \
   spot@97.75.89.139:/var/www/asciiarena.se/nextjs-current/public/
 
