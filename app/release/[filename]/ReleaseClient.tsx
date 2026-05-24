@@ -74,7 +74,12 @@ interface LogoSection { startLine: number; endLine: number; lineCount: number }
 function detectLogoSections(html: string): LogoSection[] {
   const text = html.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
   const lines = text.split("\n");
-  const sections: LogoSection[] = [];
+  // Normalize a line to its shape: replace every non-space char with '#', trim trailing spaces.
+  // Two lines with the same frame art produce the same fingerprint regardless of interior text.
+  const norm = (s: string) => s.replace(/[^\s]/g, "#").trimEnd();
+
+  interface Island { startLine: number; endLine: number; lineCount: number; fp: string }
+  const islands: Island[] = [];
   let i = 0;
   while (i < lines.length) {
     while (i < lines.length && lines[i].trim() === "") i++;
@@ -82,9 +87,59 @@ function detectLogoSections(html: string): LogoSection[] {
     const start = i;
     while (i < lines.length && lines[i].trim() !== "") i++;
     const lineCount = i - start;
-    if (lineCount >= 5) sections.push({ startLine: start, endLine: i - 1, lineCount });
+    if (lineCount >= 5) {
+      // Fingerprint = normalized first + last line. Divider frames repeat across the colly;
+      // logos are each unique, so unique fingerprint → logo, repeated fingerprint → divider.
+      const fp = norm(lines[start]) + "|" + norm(lines[i - 1]);
+      islands.push({ startLine: start, endLine: i - 1, lineCount, fp });
+    }
   }
-  return sections;
+
+  // Count fingerprint occurrences — any that appear 2+ times are the repeating divider template.
+  const fpCount = new Map<string, number>();
+  islands.forEach(isl => fpCount.set(isl.fp, (fpCount.get(isl.fp) ?? 0) + 1));
+
+  return islands
+    .filter(isl => (fpCount.get(isl.fp) ?? 0) < 2)
+    .map(({ startLine, endLine, lineCount }) => ({ startLine, endLine, lineCount }));
+}
+
+interface LogoIndexEntry { section: LogoSection; label: string }
+
+function extractDividerLabel(divLines: string[]): string {
+  const contentLines = divLines.filter(l => (l.match(/\w/g) ?? []).length >= 3);
+  if (!contentLines.length) return "";
+  for (const line of contentLines) {
+    const stripped = line.replace(/^[^\w]+/, "").replace(/[^\w]+$/, "").trim();
+    if (stripped.length >= 2) return stripped.slice(0, 36);
+  }
+  return "";
+}
+
+function buildLogoIndex(html: string, sections: LogoSection[]): LogoIndexEntry[] {
+  if (!sections.length) return [];
+  const text = html.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+  const lines = text.split("\n");
+
+  interface RawIsland { startLine: number; endLine: number }
+  const all: RawIsland[] = [];
+  let i = 0;
+  while (i < lines.length) {
+    while (i < lines.length && lines[i].trim() === "") i++;
+    if (i >= lines.length) break;
+    const start = i;
+    while (i < lines.length && lines[i].trim() !== "") i++;
+    all.push({ startLine: start, endLine: i - 1 });
+  }
+
+  return sections.map((section, n) => {
+    const preceding = all
+      .filter(isl => isl.endLine < section.startLine)
+      .sort((a, b) => b.endLine - a.endLine)[0];
+    let label = "";
+    if (preceding) label = extractDividerLabel(lines.slice(preceding.startLine, preceding.endLine + 1));
+    return { section, label: label || `Logo ${n + 1}` };
+  });
 }
 
 function animateScroll(
@@ -174,7 +229,9 @@ export default function ReleaseClient({
   const autoplayRafRef   = useRef<number | null>(null);
   const isAutoScrolling  = useRef(false);
 
-  const sections = useMemo(() => detectLogoSections(fileContent), [fileContent]);
+  const sections  = useMemo(() => detectLogoSections(fileContent), [fileContent]);
+  const logoIndex = useMemo(() => buildLogoIndex(fileContent, sections), [fileContent, sections]);
+  const [indexOpen, setIndexOpen] = useState(false);
 
   const [commentText, setCommentText] = useState("");
   const [rating, setRating] = useState("");
@@ -251,6 +308,20 @@ export default function ReleaseClient({
     isAutoScrolling.current = false;
   }, []);
 
+  const scrollToSection = useCallback((section: LogoSection) => {
+    const container = collyDivRef.current;
+    const pre = collyRef.current as HTMLElement | null;
+    if (!container || !pre) return;
+    const lineHeight = parseFloat(getComputedStyle(pre).lineHeight) || 16;
+    const SPACERS = 4;
+    const sectionTop = (SPACERS + section.startLine) * lineHeight;
+    const sectionH   = section.lineCount * lineHeight;
+    const viewH      = container.clientHeight;
+    const raw        = sectionTop - (viewH - sectionH) / 2;
+    const target     = Math.max(0, Math.min(raw, container.scrollHeight - viewH));
+    animateScroll(container, target, 500);
+  }, []);
+
   // Keyboard shortcuts
   useEffect(() => {
     if (!collyVisible || type !== "ASCII") return;
@@ -259,6 +330,7 @@ export default function ReleaseClient({
       if (e.key === "f") { setIsFullscreen(f => !f); }
       else if (e.key === "d") { doDownload(); }
       else if (e.key === "p") { autoplay ? stopAutoplay() : (setAutoplayIndex(0), setAutoplay(true)); }
+      else if (e.key === "i") { setIndexOpen(o => !o); }
       else if (e.key === "ArrowUp") {
         e.preventDefault();
         collyDivRef.current?.scrollBy({ top: -200, behavior: "smooth" });
@@ -270,7 +342,7 @@ export default function ReleaseClient({
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [collyVisible, type, section, autoplay, stopAutoplay]);
+  }, [collyVisible, type, section, autoplay, stopAutoplay, setIndexOpen]);
 
   useEffect(() => {
     if (!autoplay || !collyVisible) return;
@@ -462,6 +534,11 @@ export default function ReleaseClient({
               {autoplay && (
                 <span className="lightgrey">{autoplayIndex + 1} / {sections.length}</span>
               )}
+              {sections.length > 1 && (
+                <input type="button" className="btn-big"
+                  value={indexOpen ? "Close Index" : "Index"}
+                  onClick={() => setIndexOpen(o => !o)} />
+              )}
             </>
           )}
 
@@ -526,6 +603,33 @@ export default function ReleaseClient({
           id="colly-div"
           style={{ display: "flex", justifyContent: "center", alignItems: "flex-start", overflowY: "scroll", overflowX: "hidden", height: "100vh", backgroundColor: bgColor, margin: 0, padding: 0 }}
         >
+          {indexOpen && logoIndex.length > 0 && (
+            <div style={{
+              position: "sticky", top: 0, alignSelf: "flex-start",
+              zIndex: 100, overflowY: "auto", maxHeight: "100vh",
+              background: "rgba(17,17,17,0.93)", minWidth: "200px",
+              borderRight: "1px solid #333", padding: "8px 0", flexShrink: 0,
+            }}>
+              {logoIndex.map((entry, n) => (
+                <div
+                  key={n}
+                  onClick={() => { scrollToSection(entry.section); setIndexOpen(false); }}
+                  style={{
+                    padding: "4px 12px",
+                    cursor: "pointer",
+                    color: autoplay && autoplayIndex === n ? "#ff55ff" : "#aaaaaa",
+                    background: autoplay && autoplayIndex === n ? "#222" : "transparent",
+                    fontFamily: "monospace", fontSize: "13px", whiteSpace: "nowrap",
+                    overflow: "hidden", textOverflow: "ellipsis",
+                  }}
+                  title={entry.label}
+                >
+                  <span style={{ color: "#555", marginRight: "8px" }}>{n + 1}</span>
+                  {entry.label}
+                </div>
+              ))}
+            </div>
+          )}
           <pre
             ref={collyRef as React.RefObject<HTMLPreElement>}
             id="colly"
