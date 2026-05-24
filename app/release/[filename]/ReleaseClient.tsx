@@ -360,7 +360,7 @@ export default function ReleaseClient({
               <input type="button" className="btn-big" value={fav ? "Remove favourite" : "Favourite"} onClick={toggleFav} />
               <input type="button" className="btn-big" value="Report Broken" onClick={() => { setSection("broken"); setCollyVisible(false); }} />
               {isAdmin && (
-                <button className="btn-big" onClick={() => { window.location.href = `/admin#colly?getcollyname=${filename}`; }}>Edit</button>
+                <input type="button" className="btn-big" value="Edit" onClick={() => { window.location.href = `/admin#colly?getcollyname=${filename}`; }} />
               )}
             </>
           )}
