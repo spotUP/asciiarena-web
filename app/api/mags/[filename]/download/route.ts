@@ -7,10 +7,10 @@ export async function POST(
   { params }: { params: Promise<{ filename: string }> }
 ) {
   const { filename } = await params;
-  const safe = filename.replace(/\.\./g, "").replace(/[/\\]/g, "");
+  if (!/^[A-Za-z0-9._-]+$/.test(filename)) return apiError("Invalid filename", 400);
 
   const rows = await prisma.$queryRaw<{ id: number }[]>`
-    SELECT id FROM mags WHERE filename = ${safe} LIMIT 1
+    SELECT id FROM mags WHERE filename = ${filename} LIMIT 1
   `;
   if (!rows[0]) return apiError("Not found", 404);
 

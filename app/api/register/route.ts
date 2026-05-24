@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import nodemailer from "nodemailer";
 import { prisma } from "@/lib/db";
 import { apiError, apiOk, urlsafe } from "@/lib/utils";
+import { checkRateLimit } from "@/lib/rateLimit";
 import bcrypt from "bcryptjs";
 
 async function sendWelcomeMail(nick: string, mail: string) {
@@ -58,6 +59,11 @@ function isValidPassword(pw: string): boolean {
 }
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+  if (!checkRateLimit(`register:${ip}`, 3, 60 * 60 * 1000)) {
+    return apiError("Too many registration attempts. Try again later.", 429);
+  }
+
   const body = (await request.json()) as {
     nick?: string;
     mail?: string;

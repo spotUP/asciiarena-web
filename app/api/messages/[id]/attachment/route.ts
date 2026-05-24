@@ -17,9 +17,11 @@ export async function GET(
 
   const { id } = await params;
   const messageId = parseInt(id);
+  const userId = parseInt(session.user.id);
 
   const rows = await prisma.$queryRaw<AttachmentRow[]>`
-    SELECT attach_filename, attach_filedata FROM messages WHERE id = ${messageId}
+    SELECT attach_filename, attach_filedata FROM messages
+    WHERE id = ${messageId} AND (from_id = ${userId} OR to_id = ${userId})
   `;
 
   const row = rows[0];
