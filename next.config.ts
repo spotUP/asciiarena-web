@@ -10,6 +10,12 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  async rewrites() {
+    return [
+      { source: "/playlist/:filename", destination: "/api/uhcplaylists?file=:filename" },
+    ];
+  },
+
   async redirects() {
     return [
       // Simple .php → clean URL
