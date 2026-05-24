@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Session } from "next-auth";
 import UnreadBadge from "@/components/layout/UnreadBadge";
+import LogoutButton from "@/components/layout/LogoutButton";
 
 export type NavbarProps = {
   session: Session | null;
@@ -153,9 +154,7 @@ export default function Navbar({ session }: NavbarProps) {
                 <div className="dropdown-menu dropdown-menu-end ascii" aria-labelledby="account-dropdown">
                   <Link className="dropdown-item ascii" href="/messages">Messages<UnreadBadge /></Link>
                   <Link className="dropdown-item ascii" href="/settings">Settings</Link>
-                  <form action="/api/auth/signout" method="POST">
-                    <button type="submit" className="dropdown-item ascii">Logout</button>
-                  </form>
+                  <LogoutButton />
                 </div>
               </li>
             )}

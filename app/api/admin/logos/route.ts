@@ -18,7 +18,7 @@ export async function GET() {
   if ((session?.user as { rank?: string } | undefined)?.rank !== "Admin") return apiError("Forbidden", 403);
 
   const rows = await prisma.$queryRaw<{ id: number; ascii: string }[]>`
-    SELECT id, ascii FROM logos ORDER BY id DESC LIMIT 100
+    SELECT logo_id AS id, ascii FROM logos ORDER BY logo_id DESC LIMIT 100
   `;
   return apiOk(rows);
 }
@@ -44,6 +44,6 @@ export async function DELETE(request: NextRequest) {
   const deleteParsed = deleteSchema.safeParse(rawDeleteBody);
   if (!deleteParsed.success) return apiError("Invalid request: " + deleteParsed.error.issues[0]?.message, 400);
 
-  await prisma.$executeRaw`DELETE FROM logos WHERE id = ${deleteParsed.data.id}`;
+  await prisma.$executeRaw`DELETE FROM logos WHERE logo_id = ${deleteParsed.data.id}`;
   return apiOk({ status: true });
 }
