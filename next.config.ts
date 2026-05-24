@@ -57,6 +57,7 @@ const nextConfig: NextConfig = {
       { source: "/messages.php",    destination: "/messages",         permanent: true },
       { source: "/submit.php",      destination: "/submit",           permanent: true },
       { source: "/rss.php",         destination: "/rss.xml",          permanent: true },
+      { source: "/release",         destination: "/collys",           permanent: false },
       {
         source: "/messages.php",
         has: [{ type: "query", key: "sendmsg", value: "(?<sendmsg>.+)" }],
