@@ -46,7 +46,11 @@ export async function GET(request: NextRequest) {
     lines.push([r.filename, "playlist", r.title, r.author, r.genre].join("\t"));
   }
 
-  return new Response(lines.join("\n") + "\n", {
-    headers: { "Content-Type": "text/plain; charset=utf-8" },
+  // HippoPlayer expects ISO-8859-1. Buffer.from(str, "latin1") maps each char's
+  // code point directly to a single byte — equivalent to PHP's utf8_decode().
+  const buf = Buffer.from(lines.join("\n") + "\n", "latin1");
+
+  return new Response(buf, {
+    headers: { "Content-Type": "text/plain; charset=ISO-8859-1" },
   });
 }
