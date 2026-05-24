@@ -1276,7 +1276,7 @@ button.btn.btn-primary{
   min-height: 48px !important;
   padding-left: 16px !important;
   padding-right: 16px !important;
-  margin-right: 8px;
+  margin-right: 0;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
 }
 
