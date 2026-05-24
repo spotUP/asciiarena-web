@@ -60,7 +60,7 @@ interface Comment { id: number; nick: string; time: string; comment: string | nu
 
 export async function getComments(collyId: number): Promise<Comment[]> {
   return prisma.$queryRaw<Comment[]>`
-    SELECT c.id, u.nick, DATE_FORMAT(FROM_UNIXTIME(c.timestamp), '%Y-%m-%d') AS time,
+    SELECT c.commentid AS id, u.nick, DATE_FORMAT(FROM_UNIXTIME(c.timestamp), '%Y-%m-%d') AS time,
            c.comment, c.rating
     FROM comments c
     LEFT JOIN users u ON u.id = c.user_id
