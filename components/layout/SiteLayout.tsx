@@ -45,19 +45,6 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
 
   return (
     <>
-      <div id="spotclose" className="spotclose" suppressHydrationWarning>
-        <div className="noevents">x</div>
-      </div>
-      <Script id="fullscreen-toggle" strategy="afterInteractive">{`
-        function showFullscreen() {
-          document.getElementById('colly')?.classList.toggle('fullscreen');
-          document.getElementById('blacker')?.classList.toggle('show');
-          document.getElementById('spotclose')?.classList.toggle('show');
-        }
-        var el = document.getElementById('spotclose');
-        if (el) el.onclick = showFullscreen;
-      `}</Script>
-
       {/* 386 boot animation — only shown when anim_effect is enabled */}
       {showAnim ? (
         <script
@@ -157,14 +144,6 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
       </div>
 
       <Script id="site-init" strategy="afterInteractive">{`
-        document.addEventListener("keydown", function(e) {
-          if (e.key === "Escape") {
-            document.getElementById("colly")?.classList.toggle("fullscreen");
-            document.getElementById("blacker")?.classList.toggle("show");
-            document.getElementById("spotclose")?.classList.toggle("show");
-          }
-        });
-
         async function loginUser() {
           const nick = document.getElementById("login-nick").value;
           const pass = document.getElementById("login-password").value;

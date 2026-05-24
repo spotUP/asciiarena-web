@@ -69,7 +69,7 @@ interface Props {
 
 type Section = null | "add-comment" | "edit-comment" | "broken";
 
-function ColorSwatch({ label, current, onChange }: { label: string; current: string; onChange: (v: string) => void }) {
+function ColorSwatch({ current, onChange }: { current: string; onChange: (v: string) => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -84,10 +84,10 @@ function ColorSwatch({ label, current, onChange }: { label: string; current: str
 
   return (
     <div ref={ref} style={{ position: "relative" }}>
-      <button className="btn-big bg-header grey-text" onClick={() => setOpen(o => !o)} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-        {label}
-        <span style={{ width: "12px", height: "12px", background: current, border: "1px solid #888", display: "inline-block", flexShrink: 0 }} />
-      </button>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{ width: "8px", height: "16px", background: current, border: "none", padding: 0, cursor: "pointer", display: "block" }}
+      />
       {open && (
         <div style={{
           position: "absolute", top: "100%", left: 0, zIndex: 100,
@@ -118,6 +118,7 @@ export default function ReleaseClient({
   initialViewCount,
 }: Props) {
   const [collyVisible, setCollyVisible] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [bgColor, setBgColor] = useState(initBgColor);
   const [fgColor, setFgColor] = useState(initFgColor);
   const [font, setFont] = useState(initFont);
@@ -189,12 +190,22 @@ export default function ReleaseClient({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Exit fullscreen on Escape — only when active
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsFullscreen(false);
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [isFullscreen]);
+
   // Keyboard shortcuts
   useEffect(() => {
     if (!collyVisible || type !== "ASCII") return;
     const handler = (e: KeyboardEvent) => {
       if (section !== null) return;
-      if (e.key === "f") { doFullscreen(); }
+      if (e.key === "f") { setIsFullscreen(f => !f); }
       else if (e.key === "d") { doDownload(); }
       else if (e.key === "ArrowUp") {
         e.preventDefault();
@@ -230,9 +241,7 @@ export default function ReleaseClient({
     loadComments();
   };
 
-  const doFullscreen = () => {
-    (window as Window & { showFullscreen?: () => void }).showFullscreen?.();
-  };
+  const toggleFullscreen = () => setIsFullscreen(f => !f);
 
   const doDownload = () => {
     startTransition(() => { trackDownload(collyId); });
@@ -314,22 +323,26 @@ export default function ReleaseClient({
 
   return (
     <>
-      <div id="blacker" style={{ backgroundColor: bgColor }} />
+      <div id="blacker" className={isFullscreen ? "show" : undefined} style={{ backgroundColor: bgColor }} />
+      {isFullscreen && (
+        <div className="spotclose show" onClick={toggleFullscreen}>
+          <div className="noevents">x</div>
+        </div>
+      )}
 
       {/* Controls bar */}
-      <div className="bg-secondary amb-1 p-0" style={{ marginTop: "36px" }}>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "4px", padding: "4px 8px" }}>
+      <div className="bg-secondary amb-1 p-0" style={{ marginTop: "32px" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px", padding: "0 8px" }}>
           {!isArchive && (
             <input type="button" className="btn-big" value={collyVisible ? "Hide Colly" : "View Colly"} onClick={toggleColly} />
           )}
           {!isArchive && collyVisible && (
-            <input type="button" className="btn-big" id="fsbutton" value="Fullscreen" onClick={doFullscreen} />
+            <input type="button" className="btn-big" id="fsbutton" value={isFullscreen ? "Exit Fullscreen" : "Fullscreen"} onClick={toggleFullscreen} />
           )}
           {!isArchive && collyVisible && (
             <input type="button" className="btn-big" value={fitted ? "Reset size" : "Fit to screen"} onClick={fitColly} />
           )}
           <input type="button" className="btn-big" value="Download" onClick={doDownload} />
-          <span className="lightgrey" style={{ padding: "0 4px" }}>{viewCount} views</span>
 
           {type === "ASCII" && collyVisible && (
             <input type="button" className="btn-big" value={copyImageLabel} onClick={doCopyImage} />
@@ -368,9 +381,9 @@ export default function ReleaseClient({
 
         {/* Color / font controls */}
         {!isArchive && (
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px", padding: "4px 8px 8px" }}>
-            <ColorSwatch label="BG Color" current={bgColor} onChange={setBgColor} />
-            <ColorSwatch label="FG Color" current={fgColor} onChange={setFgColor} />
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px", padding: "0 8px 8px" }}>
+            <ColorSwatch current={bgColor} onChange={setBgColor} />
+            <ColorSwatch current={fgColor} onChange={setFgColor} />
             <div ref={fontRef} style={{ position: "relative" }}>
               <button className="btn-big bg-header grey-text" onClick={() => setFontOpen(o => !o)}>
                 {FONTS.find(f => f.value === font)?.label ?? font} v
@@ -399,6 +412,7 @@ export default function ReleaseClient({
           <pre
             ref={collyRef as React.RefObject<HTMLPreElement>}
             id="colly"
+            className={isFullscreen ? "fullscreen" : undefined}
             style={{ overflow: "hidden", fontFamily: font, color: fgColor, whiteSpace: "pre" }}
             dangerouslySetInnerHTML={{ __html: "<br><br><br><br>" + fileContent + "<br><br><br><br>" }}
           />
@@ -416,6 +430,7 @@ export default function ReleaseClient({
           <div
             ref={collyRef as React.RefObject<HTMLDivElement>}
             id="colly"
+            className={isFullscreen ? "fullscreen" : undefined}
             style={{ paddingTop: "64px" }}
           />
         </div>
