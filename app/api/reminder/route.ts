@@ -3,6 +3,7 @@ import crypto from "crypto";
 import nodemailer from "nodemailer";
 import { prisma } from "@/lib/db";
 import { apiError, apiOk } from "@/lib/utils";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 function buildToken(userId: number, email: string): string {
   const expiry = Date.now() + 4 * 60 * 60 * 1000;
@@ -14,6 +15,11 @@ function buildToken(userId: number, email: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+  if (!checkRateLimit(`reminder:${ip}`, 5, 60 * 60 * 1000)) {
+    return apiError("Too many requests. Try again later.", 429);
+  }
+
   const body = (await request.json()) as { email?: string; spam?: string };
   const { email, spam } = body;
 
