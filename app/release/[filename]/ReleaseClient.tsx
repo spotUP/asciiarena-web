@@ -379,8 +379,7 @@ export default function ReleaseClient({
         <div
           ref={collyDivRef}
           id="colly-div"
-          className="row ml-0 mr-0 amb-1 p-0 justify-content-center align-items-center"
-          style={{ overflowY: "scroll", overflowX: "hidden", height: "100vh", backgroundColor: bgColor }}
+          style={{ display: "flex", justifyContent: "center", alignItems: "flex-start", overflowY: "scroll", overflowX: "hidden", height: "100vh", backgroundColor: bgColor, margin: 0, padding: 0 }}
         >
           <pre
             ref={collyRef as React.RefObject<HTMLPreElement>}
@@ -396,8 +395,7 @@ export default function ReleaseClient({
         <div
           ref={collyDivRef}
           id="colly-div"
-          className="row ml-0 mr-0 amb-1 p-0 justify-content-center align-items-center"
-          style={{ backgroundColor: "#000", overflowX: "hidden" }}
+          style={{ display: "flex", justifyContent: "center", alignItems: "flex-start", backgroundColor: "#000", overflowX: "hidden", margin: 0, padding: 0 }}
         >
           <span id="loading" style={{ animation: "blink 2s linear infinite" }}>.LOADiNG.</span>
           <div
