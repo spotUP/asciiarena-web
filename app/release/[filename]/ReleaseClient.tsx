@@ -83,12 +83,11 @@ function ColorSwatch({ label, current, onChange }: { label: string; current: str
   }, [open]);
 
   return (
-    <div ref={ref} style={{ position: "relative", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-      <button className="btn-big" onClick={() => setOpen(o => !o)}>{label}</button>
-      <div
-        style={{ width: "20px", height: "20px", background: current, border: "1px solid #666", cursor: "pointer", flexShrink: 0 }}
-        onClick={() => setOpen(o => !o)}
-      />
+    <div ref={ref} style={{ position: "relative" }}>
+      <button className="btn-big bg-header grey-text" onClick={() => setOpen(o => !o)} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+        {label}
+        <span style={{ width: "12px", height: "12px", background: current, border: "1px solid #888", display: "inline-block", flexShrink: 0 }} />
+      </button>
       {open && (
         <div style={{
           position: "absolute", top: "100%", left: 0, zIndex: 100,
@@ -361,7 +360,7 @@ export default function ReleaseClient({
               <input type="button" className="btn-big" value={fav ? "Remove favourite" : "Favourite"} onClick={toggleFav} />
               <input type="button" className="btn-big" value="Report Broken" onClick={() => { setSection("broken"); setCollyVisible(false); }} />
               {isAdmin && (
-                <a className="btn-big" href={`/admin#colly?getcollyname=${filename}`}>Edit</a>
+                <button className="btn-big" onClick={() => { window.location.href = `/admin#colly?getcollyname=${filename}`; }}>Edit</button>
               )}
             </>
           )}
