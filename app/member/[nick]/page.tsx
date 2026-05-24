@@ -12,7 +12,7 @@ interface MemberRow {
   crew: string | null;
   country: string | null;
   rank: string | null;
-  joined: number | null;
+  joined: number | bigint | null;
   uploaded: number | null;
   mail: string | null;
   display_mail: number | null;
@@ -51,9 +51,9 @@ interface FaveRow {
   crews: string | null;
 }
 
-function formatJoined(ts: number | null): string {
+function formatJoined(ts: number | bigint | null): string {
   if (!ts) return "Unknown";
-  const d = new Date(ts * 1000);
+  const d = new Date(Number(ts) * 1000);
   return d.toISOString().slice(0, 10);
 }
 
