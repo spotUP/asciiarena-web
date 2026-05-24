@@ -186,7 +186,7 @@ export default async function ReleasePage({ params }: PageProps) {
           </div>
 
           {/* Right: metadata */}
-          <div className="col-lg-4">
+          <div className="col-lg-4 apb-1">
             <div>
               <span className="white">Artist(s): </span>
               {artists.length > 0
