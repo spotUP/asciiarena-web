@@ -229,7 +229,7 @@ export default async function ReleasePage({ params }: PageProps) {
               <h2 className="ap-1 bg-header">More by {artists[0]?.nick}</h2>
             </div>
           </div>
-          <div className="row apt-1">
+          <div className="row apt-1 bg-secondary">
             {moreByArtist.map(r => (
               <div key={r.colly_id} className="col-12 col-sm-6 col-md-4 text-truncate">
                 <Link className="magenta" href={`/release/${r.collys?.filename}`}>
@@ -248,7 +248,7 @@ export default async function ReleasePage({ params }: PageProps) {
               <h2 className="ap-1 bg-header">More from {crews[0]?.name}</h2>
             </div>
           </div>
-          <div className="row apt-1">
+          <div className="row apt-1 bg-secondary">
             {moreFromCrew.map(r => (
               <div key={r.colly_id} className="col-12 col-sm-6 col-md-4 text-truncate">
                 <Link className="magenta" href={`/release/${r.collys?.filename}`}>
