@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
       allowedOrigins: ["localhost:3000", "asciiarena.se", "www.asciiarena.se"],
     },
   },
+  turbopack: {
+    root: __dirname,
+  },
   async headers() {
     return [
       {
