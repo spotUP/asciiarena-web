@@ -7,7 +7,7 @@ import { Prisma } from "@/lib/generated/prisma/client";
 
 const postSchema = z.object({
   title: z.string().min(1).max(500),
-  description: z.string().min(1).max(5000),
+  description: z.string().max(5000).default(""),
 });
 
 interface RequestRow {
