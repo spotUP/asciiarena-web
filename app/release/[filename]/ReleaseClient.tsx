@@ -332,7 +332,7 @@ export default function ReleaseClient({
 
       {/* Controls bar */}
       <div className="bg-secondary amb-1 p-0" style={{ marginTop: "32px" }}>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px", padding: "16px 8px 0" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", columnGap: "8px", rowGap: "16px", padding: "16px 8px 0" }}>
           {!isArchive && (
             <input type="button" className="btn-big" value={collyVisible ? "Hide Colly" : "View Colly"} onClick={toggleColly} />
           )}
@@ -381,7 +381,7 @@ export default function ReleaseClient({
 
         {/* Color / font controls */}
         {!isArchive && (
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px", padding: "16px 8px 16px" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", columnGap: "8px", rowGap: "16px", padding: "16px 8px 16px" }}>
             <ColorSwatch current={bgColor} onChange={setBgColor} />
             <ColorSwatch current={fgColor} onChange={setFgColor} />
             <div ref={fontRef} style={{ position: "relative" }}>
