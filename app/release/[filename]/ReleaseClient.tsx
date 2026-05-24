@@ -128,6 +128,7 @@ export default function ReleaseClient({
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentsLoaded, setCommentsLoaded] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [fontOpen, setFontOpen] = useState(false);
   const [viewCount, setViewCount] = useState(initialViewCount);
   const [copyImageLabel, setCopyImageLabel] = useState("Copy as image");
   const [, startTransition] = useTransition();
@@ -141,6 +142,7 @@ export default function ReleaseClient({
   const collyRef = useRef<HTMLPreElement | HTMLDivElement | null>(null);
   const collyDivRef = useRef<HTMLDivElement>(null);
   const shareRef = useRef<HTMLDivElement>(null);
+  const fontRef = useRef<HTMLDivElement>(null);
 
   const releaseUrl = `${siteUrl}/release/${filename}`;
 
@@ -173,6 +175,14 @@ export default function ReleaseClient({
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
   }, [shareOpen]);
+
+  // Close font dropdown on outside click
+  useEffect(() => {
+    if (!fontOpen) return;
+    const h = (e: MouseEvent) => { if (fontRef.current && !fontRef.current.contains(e.target as Node)) setFontOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, [fontOpen]);
 
   // Auto-fit on mobile
   useEffect(() => {
@@ -362,14 +372,20 @@ export default function ReleaseClient({
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px", padding: "4px 8px 8px" }}>
             <ColorSwatch label="BG Color" current={bgColor} onChange={setBgColor} />
             <ColorSwatch label="FG Color" current={fgColor} onChange={setFgColor} />
-            <select
-              className="form-select"
-              style={{ width: "auto" }}
-              value={font}
-              onChange={e => setFont(e.target.value)}
-            >
-              {FONTS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
-            </select>
+            <div ref={fontRef} style={{ position: "relative" }}>
+              <button className="btn-big bg-header grey-text" onClick={() => setFontOpen(o => !o)}>
+                {FONTS.find(f => f.value === font)?.label ?? font} v
+              </button>
+              {fontOpen && (
+                <div className="dropdown-menu ascii" style={{ display: "block", position: "absolute", zIndex: 200, top: "100%" }}>
+                  {FONTS.map(f => (
+                    <button key={f.value} className="dropdown-item ascii" onClick={() => { setFont(f.value); setFontOpen(false); }}>
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
