@@ -17,7 +17,6 @@ if (!empty($file)) {
     header('Cache-Control: must-revalidate');
     header('Pragma: public');
     header('Content-Length: ' . strlen($filedata));
-    ob_clean();
     flush();
     echo $filedata;
   }  
