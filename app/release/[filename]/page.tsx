@@ -187,62 +187,37 @@ export default async function ReleasePage({ params }: PageProps) {
 
           {/* Right: metadata */}
           <div className="col-lg-4">
-            <div className="row d-flex justify-content-between">
-              <span>Artist(s):</span>
-              <span>
-                {artists.length > 0
-                  ? artists.map((a, i) => (
-                    <span key={a?.id ?? i}>
-                      {i > 0 && " & "}
-                      <Link className="green" href={`/artist/${urlsafe(a?.nick ?? "")}`}>{a?.nick}</Link>
-                    </span>
-                  ))
-                  : "-"}
-              </span>
+            <div>
+              <span className="white">Artist(s): </span>
+              {artists.length > 0
+                ? artists.map((a, i) => (
+                  <span key={a?.id ?? i}>
+                    {i > 0 && " & "}
+                    <Link className="green" href={`/artist/${urlsafe(a?.nick ?? "")}`}>{a?.nick}</Link>
+                  </span>
+                ))
+                : "-"}
             </div>
             {crews.length > 0 && (
-              <div className="row d-flex justify-content-between">
-                <span>Crew(s):</span>
-                <span>
-                  {crews.map((c, i) => (
-                    <span key={c?.id ?? i}>
-                      {i > 0 && " & "}
-                      <Link href={`/crew/${urlsafe(c?.name ?? "")}`}>{c?.name}</Link>
-                    </span>
-                  ))}
-                </span>
+              <div>
+                <span className="white">Crew(s): </span>
+                {crews.map((c, i) => (
+                  <span key={c?.id ?? i}>
+                    {i > 0 && " & "}
+                    <Link href={`/crew/${urlsafe(c?.name ?? "")}`}>{c?.name}</Link>
+                  </span>
+                ))}
               </div>
             )}
-            <div className="row d-flex justify-content-between">
-              <span>Filename:</span>
-              <span>{colly.filename}</span>
-            </div>
-            <div className="row d-flex justify-content-between">
-              <span>Size:</span>
-              <span>{colly.filesize != null ? formatBytes(Number(colly.filesize)) : "-"}</span>
-            </div>
+            <div><span className="white">Filename: </span>{colly.filename}</div>
+            <div><span className="white">Size: </span>{colly.filesize != null ? formatBytes(Number(colly.filesize)) : "-"}</div>
             {showDate && (
-              <div className="row d-flex justify-content-between">
-                <span>Released:</span>
-                <span>{[day, month, year].filter(Boolean).join(" ")}</span>
-              </div>
+              <div><span className="white">Released: </span>{[day, month, year].filter(Boolean).join(" ")}</div>
             )}
-            <div className="row d-flex justify-content-between">
-              <span>Rating:</span>
-              <span>{ratingDisplay}</span>
-            </div>
-            <div className="row d-flex justify-content-between">
-              <span>Added by:</span>
-              <span><Link href={`/member/${urlsafe(colly.uploader ?? "")}`}>{colly.uploader}</Link></span>
-            </div>
-            <div className="row d-flex justify-content-between">
-              <span>Viewed:</span>
-              <span>{colly.view_counter ?? 0} times</span>
-            </div>
-            <div className="row d-flex justify-content-between">
-              <span>Downloaded:</span>
-              <span>{downloads} Time{downloads !== 1 ? "s" : ""}</span>
-            </div>
+            <div><span className="white">Rating: </span>{ratingDisplay}</div>
+            <div><span className="white">Added by: </span><Link href={`/member/${urlsafe(colly.uploader ?? "")}`}>{colly.uploader}</Link></div>
+            <div><span className="white">Viewed: </span>{colly.view_counter ?? 0} times</div>
+            <div><span className="white">Downloaded: </span>{downloads} Time{downloads !== 1 ? "s" : ""}</div>
           </div>
         </div>
       </div>
