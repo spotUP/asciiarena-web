@@ -248,33 +248,41 @@ export default async function ReleasePage({ params }: PageProps) {
       </div>
 
       {moreByArtist.length > 0 && (
-        <div className="row apt-1 apb-1">
-          <div className="col-12">
-            <h2 className="ap-1 bg-header">More by {artists[0]?.nick}</h2>
-          </div>
-          {moreByArtist.map(r => (
-            <div key={r.colly_id} className="col-12 col-sm-6 col-md-4 text-truncate amb-1">
-              <Link className="magenta" href={`/release/${r.collys?.filename}`}>
-                {r.collys?.name ?? r.collys?.filename}
-              </Link>
+        <>
+          <div className="row apt-1">
+            <div className="col-12">
+              <h2 className="ap-1 bg-header">More by {artists[0]?.nick}</h2>
             </div>
-          ))}
-        </div>
+          </div>
+          <div className="row apt-1">
+            {moreByArtist.map(r => (
+              <div key={r.colly_id} className="col-12 col-sm-6 col-md-4 text-truncate">
+                <Link className="magenta" href={`/release/${r.collys?.filename}`}>
+                  {r.collys?.name ?? r.collys?.filename}
+                </Link>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       {moreFromCrew.length > 0 && (
-        <div className="row apt-1 apb-1">
-          <div className="col-12">
-            <h2 className="ap-1 bg-header">More from {crews[0]?.name}</h2>
-          </div>
-          {moreFromCrew.map(r => (
-            <div key={r.colly_id} className="col-12 col-sm-6 col-md-4 text-truncate amb-1">
-              <Link className="magenta" href={`/release/${r.collys?.filename}`}>
-                {r.collys?.name ?? r.collys?.filename}
-              </Link>
+        <>
+          <div className="row apt-1">
+            <div className="col-12">
+              <h2 className="ap-1 bg-header">More from {crews[0]?.name}</h2>
             </div>
-          ))}
-        </div>
+          </div>
+          <div className="row apt-1">
+            {moreFromCrew.map(r => (
+              <div key={r.colly_id} className="col-12 col-sm-6 col-md-4 text-truncate">
+                <Link className="magenta" href={`/release/${r.collys?.filename}`}>
+                  {r.collys?.name ?? r.collys?.filename}
+                </Link>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       <Suspense>
