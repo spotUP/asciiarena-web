@@ -34,12 +34,12 @@ export default function Weektop() {
   }, []);
 
   return (
-    <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2 apt-1">
+    <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2" style={{ paddingTop: "16px" }}>
       <div className="header col-lg-12 p-0 bg">
         <h2 className="ap-1 bg-header">WEEKTOP - BBS UPLOADERS</h2>
       </div>
       <div className="container-fluid p-0 pl-lg-2 pr-lg-2 bg-secondary">
-        <div className="row m-0 p-0 bg-secondary apb-1">
+        <div className="row m-0 p-0 bg-secondary apb-1" style={{ paddingTop: "16px" }}>
           {items === null && (
             <div className="col-lg-12 p-0 pl-lg-2 pr-lg-2" style={{ paddingTop: "16px" }}><DotsLoader /></div>
           )}
