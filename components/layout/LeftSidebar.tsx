@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import UsersOnline from "@/components/widgets/UsersOnline";
+import UsersOnlineLive from "@/components/widgets/UsersOnlineLive";
+import CedSessions from "@/components/widgets/CedSessions";
 import LastCallers from "@/components/widgets/LastCallers";
 import LatestCollys from "@/components/widgets/LatestCollys";
 import LatestMags from "@/components/widgets/LatestMags";
@@ -10,7 +11,8 @@ import Weektop from "@/components/widgets/Weektop";
 export default function LeftSidebar() {
   return (
     <>
-      <Suspense fallback={null}><UsersOnline /></Suspense>
+      <UsersOnlineLive />
+      <CedSessions />
       <Suspense fallback={null}><LastCallers limit={5} /></Suspense>
       <Suspense fallback={null}><LatestCollys type="released" limit={8} /></Suspense>
       <Suspense fallback={null}><LatestCollys type="added" limit={5} /></Suspense>
