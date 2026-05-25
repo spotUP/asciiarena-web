@@ -12,14 +12,23 @@ export async function GET(request: NextRequest) {
   if (!channel) return new Response("channel required", { status: 400 });
 
   let unsubscribe: (() => void) | undefined;
+  let pingInterval: ReturnType<typeof setInterval> | undefined;
 
   const stream = new ReadableStream<Uint8Array>({
     start(ctrl) {
       ctrl.enqueue(encoder.encode(": keepalive\n\n"));
       unsubscribe = subscribe(channel, ctrl);
       broadcast(channel, { type: "watching", count: subscriberCount(channel) });
+      pingInterval = setInterval(() => {
+        try {
+          ctrl.enqueue(encoder.encode(": keepalive\n\n"));
+        } catch {
+          clearInterval(pingInterval);
+        }
+      }, 25000);
     },
     cancel() {
+      clearInterval(pingInterval);
       unsubscribe?.();
       broadcast(channel, { type: "watching", count: subscriberCount(channel) });
     },
