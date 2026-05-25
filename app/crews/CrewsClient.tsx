@@ -124,7 +124,7 @@ export default function CrewsClient({ initialSort, initialOrder }: CrewsClientPr
               </div>
               <div className="col-2">{crew.members_cnt}</div>
               <div className="col-2">{crew.releases_cnt}</div>
-              <div className="col-2">{crew.rating ?? "-"}</div>
+              <div className="col-2">{crew.rating != null ? Number(crew.rating).toFixed(1) : "-"}</div>
             </div>
           ))}
         {loadingMore && <div className="row apt-1"><div className="col lightgrey">Loading...</div></div>}
