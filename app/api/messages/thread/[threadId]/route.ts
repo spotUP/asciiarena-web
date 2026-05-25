@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
+import { broadcast } from "@/lib/live";
 
 interface ThreadMessageRow {
   id: number;
@@ -95,6 +96,7 @@ export async function POST(
   }
 
   const fromId = parseInt(session.user.id);
+  const fromNick = session.user.name ?? "";
 
   await prisma.$executeRaw`
     INSERT INTO messages (thread, from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
@@ -111,6 +113,9 @@ export async function POST(
       1
     )
   `;
+
+  broadcast(`thread:${thread}`, { type: "message" });
+  broadcast(`user:${receiver}:messages`, { type: "message", fromId, fromNick, threadId: thread });
 
   return apiOk({ status: true });
 }

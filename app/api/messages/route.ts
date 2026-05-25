@@ -16,6 +16,8 @@ interface MessageRow {
   total_count: bigint | number;
   id: number;
   thread: number;
+  from_id: number | null;
+  to_id: number | null;
   postedto: string | null;
   postername: string | null;
   subject: string | null;
@@ -55,6 +57,8 @@ export async function GET(request: NextRequest) {
     total_count: Number(r.total_count),
     id: r.id,
     thread: r.thread,
+    from_id: r.from_id,
+    to_id: r.to_id,
     postedto: r.postedto,
     postername: r.postername,
     subject: r.subject,
@@ -88,7 +92,13 @@ export async function POST(request: NextRequest) {
     )
   `;
 
-  broadcast(`user:${receiver}:messages`, { type: "message" });
+  const inserted = await prisma.$queryRaw<[{ threadId: number }]>`
+    SELECT thread AS threadId FROM messages WHERE id = LAST_INSERT_ID()
+  `;
+  const threadId = inserted[0]?.threadId;
+  const fromNick = session.user.name ?? "";
 
-  return apiOk({ status: true });
+  broadcast(`user:${receiver}:messages`, { type: "message", fromId, fromNick, threadId });
+
+  return apiOk({ status: true, threadId });
 }
