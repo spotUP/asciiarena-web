@@ -60,6 +60,7 @@ export async function POST(request: NextRequest) {
   }));
 
   broadcast(`wall:${wall_id}`, { type: "posted", nick, tag: cleanTag });
+  broadcast("site:activity", { type: "wall", nick, target: cleanTag, targetUrl: "/", timestamp: Math.floor(Date.now() / 1000) });
 
   return apiOk(result);
 }
