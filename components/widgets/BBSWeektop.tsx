@@ -12,14 +12,25 @@ function formatBytes(bytes: number): string {
   return bytes + " KB";
 }
 
+const FRAMES = ["...", ".. ", ".  ", ".. "];
+
+function DotsLoader() {
+  const [frame, setFrame] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setFrame(f => (f + 1) % FRAMES.length), 350);
+    return () => clearInterval(t);
+  }, []);
+  return <span className="lightgrey" style={{ fontFamily: "monospace", whiteSpace: "pre" }}>{FRAMES[frame]}</span>;
+}
+
 export default function BBSWeektop() {
-  const [items, setItems] = useState<StatItem[]>([]);
+  const [items, setItems] = useState<StatItem[] | null>(null);
 
   useEffect(() => {
     fetch("https://scenewall.bbs.io:1543/GlobalLastCallers/api/GlobalLastCallers/Stats?StatType=26&Count=5")
       .then(r => r.json())
-      .then((data: { stats: StatItem[] }) => { if (Array.isArray(data?.stats)) setItems(data.stats); })
-      .catch(() => {});
+      .then((data: { stats: StatItem[] }) => setItems(Array.isArray(data?.stats) ? data.stats : []))
+      .catch(() => setItems([]));
   }, []);
 
   return (
@@ -29,7 +40,10 @@ export default function BBSWeektop() {
       </div>
       <div className="container-fluid p-0 pl-lg-2 pr-lg-2 bg-secondary">
         <div className="row m-0 p-0 bg-secondary apb-1">
-          {items.map((item, i) => (
+          {items === null && (
+            <div className="col-lg-12 p-0 pl-lg-2 pr-lg-2 apt-1"><DotsLoader /></div>
+          )}
+          {items?.map((item, i) => (
             <div key={i} className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
               <span className="yellow text-truncate">{item.name}</span>
               <span className="text-truncate">{formatBytes(item.count)}</span>
