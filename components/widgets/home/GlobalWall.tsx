@@ -70,8 +70,8 @@ export default function GlobalWall({ isLoggedIn }: { isLoggedIn?: boolean }) {
 
         {isLoggedIn && (
           <form onSubmit={handleSubmit} className="w-100">
-            <div className="row m-0" style={{ paddingLeft: "8px" }}>
-              <div className="col-10 col-lg-11 pr-0 pl-0">
+            <div className="row m-0">
+              <div className="col-10 col-lg-11 pr-0" style={{ paddingLeft: "8px" }}>
                 <input
                   ref={inputRef}
                   className="form-control w-100"
