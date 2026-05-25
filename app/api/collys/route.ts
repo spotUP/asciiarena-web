@@ -14,6 +14,7 @@ import { Prisma } from "@/lib/generated/prisma/client";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { existsSync } from "fs";
+import { broadcast } from "@/lib/live";
 
 interface CollyRow {
   id: number;
@@ -227,6 +228,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   await prisma.$executeRaw(
     Prisma.sql`UPDATE users SET uploaded = uploaded + ${filesize} WHERE id = ${uploaderId}`
   );
+
+  broadcast("site:releases", { type: "posted" });
 
   // Discord notification
   const releaseUrl = `https://asciiarena.se/release/${urlsafe(filename)}`;
