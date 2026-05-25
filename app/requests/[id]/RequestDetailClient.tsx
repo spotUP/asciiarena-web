@@ -166,7 +166,7 @@ export default function RequestDetailClient({ requestId, canChangeStatus, isLogg
               <span className="lightgrey">{d.nick} <span className="lightgrey">(typing...)</span></span>
             </div>
             <div style={{ whiteSpace: "pre-wrap", marginTop: "4px" }} className="lightgrey">
-              {d.text}<span className="blink">_</span>
+              {d.text}<span className="cursor-block" />
             </div>
           </div>
         ))}

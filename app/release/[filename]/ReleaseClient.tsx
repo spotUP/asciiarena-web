@@ -812,7 +812,7 @@ export default function ReleaseClient({
           </div>
           <div className="bg-secondary col-12 ap-1 amb-1">
             <span className="lightgrey" style={{ whiteSpace: "pre-wrap", opacity: 0.7 }}>
-              {d.text}<span className="blink">_</span>
+              {d.text}<span className="cursor-block" />
             </span>
           </div>
         </div>
