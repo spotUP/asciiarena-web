@@ -230,6 +230,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   );
 
   broadcast("site:releases", { type: "posted" });
+  broadcast("site:activity", { type: "upload", nick: uploaderNick, target: filename, targetUrl: `/release/${filename}`, timestamp: Math.floor(Date.now() / 1000) });
 
   // Discord notification
   const releaseUrl = `https://asciiarena.se/release/${urlsafe(filename)}`;

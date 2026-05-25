@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { revalidatePath } from "next/cache";
+import { broadcast } from "@/lib/live";
 
 export async function trackView(collyId: number) {
   try {
@@ -25,7 +26,10 @@ export async function addFavourite(collyId: number): Promise<{ success: boolean;
     const exists = await prisma.favourites.count({ where: { user_id: userId, colly_id: collyId } });
     if (!exists) await prisma.favourites.create({ data: { user_id: userId, colly_id: collyId } });
     const colly = await prisma.collys.findUnique({ where: { id: collyId }, select: { filename: true } });
-    if (colly?.filename) revalidatePath(`/release/${colly.filename}`);
+    if (colly?.filename) {
+      revalidatePath(`/release/${colly.filename}`);
+      broadcast("site:activity", { type: "fav", nick: session.user.name ?? "", target: colly.filename, targetUrl: `/release/${colly.filename}`, timestamp: Math.floor(Date.now() / 1000) });
+    }
     revalidatePath(`/member`);
     return { success: true };
   } catch { return { success: false, error: "Failed" }; }
@@ -38,7 +42,10 @@ export async function removeFavourite(collyId: number): Promise<{ success: boole
   try {
     await prisma.favourites.deleteMany({ where: { user_id: userId, colly_id: collyId } });
     const colly = await prisma.collys.findUnique({ where: { id: collyId }, select: { filename: true } });
-    if (colly?.filename) revalidatePath(`/release/${colly.filename}`);
+    if (colly?.filename) {
+      revalidatePath(`/release/${colly.filename}`);
+      broadcast("site:activity", { type: "unfav", nick: session.user.name ?? "", target: colly.filename, targetUrl: `/release/${colly.filename}`, timestamp: Math.floor(Date.now() / 1000) });
+    }
     revalidatePath(`/member`);
     return { success: true };
   } catch { return { success: false, error: "Failed" }; }
