@@ -286,15 +286,18 @@ export default async function ReleasePage({ params }: PageProps) {
         <>
           <Script src="/assets/js/ansilove.js" strategy="afterInteractive" />
           <Script id="ansi-render" strategy="afterInteractive">{`
-            AnsiLove.splitRender("${collyFileUrl}", function(canvases) {
-              canvases.forEach(function(canvas) {
-                canvas.style.verticalAlign = "bottom";
-                canvas.style.margin = "0 auto";
-                canvas.style.display = "block";
-                document.getElementById("colly").appendChild(canvas);
-              });
-              document.getElementById("loading").style.display = "none";
-            }, 100, {"font": "mosoul", "bits": "8", "icecolors": 1, "columns": 80, "thumbnail": 0, "filetype": "ans"});
+            (function run() {
+              if (typeof AnsiLove === 'undefined') { setTimeout(run, 50); return; }
+              AnsiLove.splitRender("${collyFileUrl}", function(canvases) {
+                canvases.forEach(function(canvas) {
+                  canvas.style.verticalAlign = "bottom";
+                  canvas.style.margin = "0 auto";
+                  canvas.style.display = "block";
+                  document.getElementById("colly").appendChild(canvas);
+                });
+                document.getElementById("loading").style.display = "none";
+              }, 100, {"font": "mosoul", "bits": "8", "icecolors": 1, "columns": 80, "thumbnail": 0, "filetype": "ans"});
+            })();
           `}</Script>
         </>
       )}
