@@ -28,7 +28,7 @@ export default function LatestComments() {
       <div className="header w-100 col-12">
         <h2 className="ap-1 am-0 bg-header">LATEST COMMENTS</h2>
       </div>
-      <div className="col-12 bg-secondary apb-1">
+      <div className="col-12 bg-secondary apb-1" style={{ paddingLeft: "8px" }}>
         <div className="row">
           <div className="col-6 col-sm-7 text-truncate apb-1 apt-1">
             <span className="white">COMMENT</span>

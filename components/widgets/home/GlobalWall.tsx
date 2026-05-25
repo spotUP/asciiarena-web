@@ -51,7 +51,7 @@ export default function GlobalWall({ isLoggedIn }: { isLoggedIn?: boolean }) {
         </h2>
       </div>
       <div className="container-fluid m-0 p-0">
-        <div className="row m-0 p-0 bg-secondary apt-1 apb-1 apl-1">
+        <div className="row m-0 p-0 bg-secondary apt-1 apb-1" style={{ paddingLeft: "8px" }}>
           {posts.map((p, i) => (
             <React.Fragment key={i}>
               <div className="col-10 d-flex">
@@ -70,7 +70,7 @@ export default function GlobalWall({ isLoggedIn }: { isLoggedIn?: boolean }) {
 
         {isLoggedIn && (
           <form onSubmit={handleSubmit} className="w-100">
-            <div className="row col-12 m-0">
+            <div className="row col-12 m-0" style={{ paddingLeft: "8px" }}>
               <div className="col-10 col-lg-11 pr-0 pl-0">
                 <input
                   ref={inputRef}
