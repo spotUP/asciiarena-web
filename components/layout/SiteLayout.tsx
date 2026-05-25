@@ -185,7 +185,13 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
               document.body.style.paddingRight = "";
               const backdrop = document.querySelector(".modal-backdrop");
               if (backdrop) backdrop.parentNode.removeChild(backdrop);
-              window.location.reload();
+              if (window.location.pathname === "/login") {
+                const params = new URLSearchParams(window.location.search);
+                const cb = params.get("callbackUrl");
+                window.location.href = (cb && cb.startsWith("/")) ? cb : "/";
+              } else {
+                window.location.reload();
+              }
             }
           } catch(err) {
             showError("error: " + (err && err.message ? err.message : String(err)));

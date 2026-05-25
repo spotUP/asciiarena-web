@@ -1,7 +1,20 @@
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import SiteLayout from "@/components/layout/SiteLayout";
 import Script from "next/script";
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ callbackUrl?: string }>;
+}) {
+  const session = await auth();
+  if (session?.user) {
+    const { callbackUrl } = await searchParams;
+    const dest = callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/";
+    redirect(dest);
+  }
+
   return (
     <SiteLayout title="LOGiN">
       <div className="col-lg-12 apt-1 text-center">
