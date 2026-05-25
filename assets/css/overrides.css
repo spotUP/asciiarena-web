@@ -1,5 +1,7 @@
 /* ── Loads last — overrides bootstrap5, site.css, 386.css ── */
 
+.blink { animation: blink 1s step-end infinite; }
+
 /* Bootstrap 4 spacing class aliases — BS5 renamed pl-*/pr-*/ml-*/mr-* to ps-*/pe-*/ms-*/me-*
    Re-define the old names so existing component markup keeps working unchanged. */
 .pl-0  { padding-left:  0      !important; }

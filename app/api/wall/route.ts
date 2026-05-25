@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
+import { broadcast } from "@/lib/live";
 
 interface WallPostRow {
   id: number;
@@ -57,6 +58,8 @@ export async function POST(request: NextRequest) {
     tag: r.tag,
     nick: r.nick,
   }));
+
+  broadcast(`wall:${wall_id}`, { type: "posted", nick, tag: cleanTag });
 
   return apiOk(result);
 }
