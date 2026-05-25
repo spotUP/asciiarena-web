@@ -137,7 +137,7 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
             </div>
             <div className="modal-footer bg-primary">
               <button type="button" className="btn-secondary bg-transparent amr-1 apr-1" data-bs-dismiss="modal">CLOSE</button>
-              <button type="button" className="btn-primary black bg-lightgrey" id="login-submit-btn">LOG IN</button>
+              <button type="button" className="btn-secondary bg-transparent aml-1 apl-1" id="login-submit-btn">LOG iN</button>
             </div>
           </div>
         </div>
@@ -169,11 +169,18 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
             if (res.url && res.url.includes("error=")) {
               showError("authentication failed");
             } else {
-              try {
-                const el = document.getElementById("login");
-                const modal = el ? bootstrap.Modal.getInstance(el) : null;
-                if (modal) modal.hide();
-              } catch(e) {}
+              const loginEl = document.getElementById("login");
+              if (loginEl) {
+                loginEl.classList.remove("show");
+                loginEl.style.display = "none";
+                loginEl.setAttribute("aria-hidden", "true");
+                loginEl.removeAttribute("aria-modal");
+              }
+              document.body.classList.remove("modal-open");
+              document.body.style.overflow = "";
+              document.body.style.paddingRight = "";
+              const backdrop = document.querySelector(".modal-backdrop");
+              if (backdrop) backdrop.parentNode.removeChild(backdrop);
               window.location.reload();
             }
           } catch(err) {
