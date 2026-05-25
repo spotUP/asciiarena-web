@@ -91,6 +91,7 @@ export default function Navbar({ session }: NavbarProps) {
             <li className="nav-item"><Link className="nav-link ascii apr-1" href="/crews">CREWS</Link></li>
             <li className="nav-item"><Link className="nav-link ascii apr-1" href="/bbs">BOARDS</Link></li>
             <li className="nav-item"><Link className="nav-link ascii apr-1" href="/requests">REQUESTS</Link></li>
+            <li className="nav-item"><Link className="nav-link ascii apr-1" href="/stats">STATS</Link></li>
             <li className="nav-item"><Link className="nav-link ascii apr-1" href="/about">ABOUT</Link></li>
             <li className="nav-item"><Link className="nav-link ascii apr-1" href="/styleeditor">ASCII STYLE DESIGNER</Link></li>
             <li className="nav-item"><a className="nav-link ascii apr-1" href="https://hippoplayer.se">WORKBENCH</a></li>
