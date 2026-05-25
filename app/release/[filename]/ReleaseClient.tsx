@@ -581,7 +581,6 @@ export default function ReleaseClient({
     const r = await postCommentAction(collyId, commentText, rating || null);
     if (r.success) {
       setCommentText(""); setRating("");
-      setSection(null);
       loadComments();
       fetch("/api/live", {
         method: "POST",
@@ -680,7 +679,6 @@ export default function ReleaseClient({
 
           {userNick && (
             <>
-              <input type="button" className="btn-big" value="Add Comment" onClick={() => { setSection("add-comment"); setCollyVisible(false); }} />
               <input type="button" className="btn-big" value={fav ? "Remove favourite" : "Favourite"} onClick={toggleFav} />
               <input type="button" className="btn-big" value="Report Broken" onClick={() => { setSection("broken"); setCollyVisible(false); }} />
               {isAdmin && (
@@ -776,6 +774,39 @@ export default function ReleaseClient({
 
       {/* Comments list */}
       <div id="comments">
+        {/* Add comment form — always visible for logged-in users */}
+        {userNick && (
+          <div className="amb-1">
+            <div className="row apl-1 apr-1">
+              <div className="header bg-header col-12 ap-1">ENTER YOUR COMMENT</div>
+            </div>
+            <div className="row">
+              <div className="col-12 aml-1 amr-1">
+                <textarea
+                  style={{ height: "128px", width: "100%" }}
+                  className="bg-secondary cyan ap-1"
+                  value={commentText}
+                  onChange={e => { setCommentText(e.target.value); broadcastTyping(e.target.value); }}
+                />
+              </div>
+            </div>
+            <div className="row aml-1 apl-1 apr-1">
+              <div className="col-12 apl-1 apr-1 apb-1 apt-1 bg-secondary">
+                <div className="col-2 d-flex justify-content-between">
+                  <label className="apr-1" htmlFor="user_rating">RATING</label>
+                  <select id="user_rating" className="form-select" value={rating} onChange={e => setRating(e.target.value)}>
+                    <option value="">Blank</option>
+                    {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
+                  </select>
+                </div>
+                <div className="col-12 p-0 m-0 apt-1">
+                  <input type="button" className="btn-big" value="Comment" onClick={sendComment} />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {commentsLoaded && comments.length > 0 && comments.map(c => (
           <div key={c.id}>
             <div className="header bg-header col-12 ap-1 text-truncate">
@@ -817,39 +848,6 @@ export default function ReleaseClient({
           </div>
         </div>
       ))}
-
-      {/* Add comment form */}
-      {section === "add-comment" && (
-        <div>
-          <div className="row apl-1 apr-1">
-            <div className="header bg-header col-12 ap-1">ENTER YOUR COMMENT</div>
-          </div>
-          <div className="row">
-            <div className="col-12 aml-1 amr-1">
-              <textarea
-                style={{ height: "128px", width: "100%" }}
-                className="bg-secondary cyan ap-1"
-                value={commentText}
-                onChange={e => { setCommentText(e.target.value); broadcastTyping(e.target.value); }}
-              />
-            </div>
-          </div>
-          <div className="row aml-1 apl-1 apr-1">
-            <div className="col-12 apl-1 apr-1 apb-1 apt-1 bg-secondary">
-              <div className="col-2 d-flex justify-content-between">
-                <label className="apr-1" htmlFor="user_rating">RATING</label>
-                <select id="user_rating" className="form-select" value={rating} onChange={e => setRating(e.target.value)}>
-                  <option value="">Blank</option>
-                  {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
-                </select>
-              </div>
-              <div className="col-12 p-0 m-0 apt-1">
-                <input type="button" className="btn-big" value="Comment" onClick={sendComment} />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Edit comment form */}
       {section === "edit-comment" && (
