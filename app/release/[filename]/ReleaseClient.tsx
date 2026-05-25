@@ -106,12 +106,38 @@ function detectLogoSections(html: string): LogoSection[] {
 
 interface LogoIndexEntry { section: LogoSection; label: string }
 
+// Frame lines use ≤2 distinct non-space chars (e.g. "mmMMMMMMMMMMMMMmm" = {m,M}).
+// Content lines have ≥3 distinct non-space chars.
 function extractDividerLabel(divLines: string[]): string {
-  const contentLines = divLines.filter(l => (l.match(/\w/g) ?? []).length >= 3);
+  const contentLines = divLines.filter(l => {
+    const nonSpace = l.replace(/\s/g, "");
+    return nonSpace.length >= 2 && new Set(nonSpace).size >= 3;
+  });
   if (!contentLines.length) return "";
+
+  // Collapse spaced-letter sequences: "s u b l i m e" -> "sublime"
+  const compact = (s: string) => {
+    s = s.replace(/ {2,}/g, " ");
+    let prev: string;
+    do { prev = s; s = s.replace(/([a-zA-Z0-9_]) ([a-zA-Z0-9_])/g, "$1$2"); } while (s !== prev);
+    return s.trim();
+  };
+  const strip = (s: string) =>
+    s.replace(/^[^a-zA-Z0-9]+/, "").replace(/[^a-zA-Z0-9]+$/, "").trim();
+
+  // Prefer colon lines: "logo_name : sublime" or "|: ..domination.. :|"
   for (const line of contentLines) {
-    const stripped = line.replace(/^[^\w]+/, "").replace(/[^\w]+$/, "").trim();
-    if (stripped.length >= 2) return stripped.slice(0, 36);
+    let idx = -1;
+    while ((idx = line.indexOf(":", idx + 1)) >= 0) {
+      const label = compact(strip(line.slice(idx + 1)));
+      if (label.replace(/[^a-zA-Z]/g, "").length >= 2) return label.slice(0, 36);
+    }
+  }
+
+  // Fallback: first content line with actual letters
+  for (const line of contentLines) {
+    const label = compact(strip(line));
+    if (label.replace(/[^a-zA-Z]/g, "").length >= 2) return label.slice(0, 36);
   }
   return "";
 }
@@ -308,19 +334,31 @@ export default function ReleaseClient({
     isAutoScrolling.current = false;
   }, []);
 
+  const startAutoplay = useCallback(() => {
+    setIsFullscreen(true);
+    setAutoplayIndex(0);
+    setAutoplay(true);
+  }, []);
+
   const scrollToSection = useCallback((section: LogoSection) => {
-    const container = collyDivRef.current;
     const pre = collyRef.current as HTMLElement | null;
-    if (!container || !pre) return;
+    if (!pre) return;
     const lineHeight = parseFloat(getComputedStyle(pre).lineHeight) || 16;
-    const SPACERS = 4;
+    const SPACERS    = 4;
     const sectionTop = (SPACERS + section.startLine) * lineHeight;
     const sectionH   = section.lineCount * lineHeight;
-    const viewH      = container.clientHeight;
-    const raw        = sectionTop - (viewH - sectionH) / 2;
-    const target     = Math.max(0, Math.min(raw, container.scrollHeight - viewH));
-    animateScroll(container, target, 500);
-  }, []);
+    if (isFullscreen) {
+      const viewH  = window.innerHeight;
+      const target = Math.max(0, Math.min(sectionTop - (viewH - sectionH) / 2, document.documentElement.scrollHeight - viewH));
+      animateScroll(document.documentElement, target, 500);
+    } else {
+      const container = collyDivRef.current;
+      if (!container) return;
+      const viewH  = container.clientHeight;
+      const target = Math.max(0, Math.min(sectionTop - (viewH - sectionH) / 2, container.scrollHeight - viewH));
+      animateScroll(container, target, 500);
+    }
+  }, [isFullscreen]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -329,7 +367,7 @@ export default function ReleaseClient({
       if (section !== null) return;
       if (e.key === "f") { setIsFullscreen(f => !f); }
       else if (e.key === "d") { doDownload(); }
-      else if (e.key === "p") { autoplay ? stopAutoplay() : (setAutoplayIndex(0), setAutoplay(true)); }
+      else if (e.key === "p") { autoplay ? stopAutoplay() : (startAutoplay()); }
       else if (e.key === "i") { setIndexOpen(o => !o); }
       else if (e.key === "ArrowUp") {
         e.preventDefault();
@@ -342,25 +380,37 @@ export default function ReleaseClient({
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [collyVisible, type, section, autoplay, stopAutoplay, setIndexOpen]);
+  }, [collyVisible, type, section, autoplay, stopAutoplay, startAutoplay, setIndexOpen]);
 
   useEffect(() => {
     if (!autoplay || !collyVisible) return;
     if (autoplayIndex >= sections.length) { stopAutoplay(); return; }
 
     const logoSection = sections[autoplayIndex];
-    const container   = collyDivRef.current;
     const pre         = collyRef.current as HTMLElement | null;
-    if (!container || !pre) return;
+    if (!pre) return;
 
     const lineHeight = parseFloat(getComputedStyle(pre).lineHeight) || 16;
     const SPACERS    = 4;
     const sectionTop = (SPACERS + logoSection.startLine) * lineHeight;
     const sectionH   = logoSection.lineCount * lineHeight;
-    const viewH      = container.clientHeight;
-    const rawTarget  = sectionTop - (viewH - sectionH) / 2;
-    const target     = Math.max(0, Math.min(rawTarget, container.scrollHeight - viewH));
 
+    let scrollEl: HTMLElement;
+    let viewH: number;
+    let maxScroll: number;
+    if (isFullscreen) {
+      scrollEl  = document.documentElement;
+      viewH     = window.innerHeight;
+      maxScroll = document.documentElement.scrollHeight - viewH;
+    } else {
+      const container = collyDivRef.current;
+      if (!container) return;
+      scrollEl  = container;
+      viewH     = container.clientHeight;
+      maxScroll = container.scrollHeight - viewH;
+    }
+
+    const target   = Math.max(0, Math.min(sectionTop - (viewH - sectionH) / 2, maxScroll));
     const hold     = Math.min(4000 + Math.max(0, logoSection.lineCount - 20) * 15, 8000);
     const scrollMs = 700;
 
@@ -368,7 +418,7 @@ export default function ReleaseClient({
     if (autoplayTimerRef.current) clearTimeout(autoplayTimerRef.current);
 
     isAutoScrolling.current = true;
-    autoplayRafRef.current = animateScroll(container, target, scrollMs, () => {
+    autoplayRafRef.current = animateScroll(scrollEl, target, scrollMs, () => {
       isAutoScrolling.current = false;
       autoplayRafRef.current  = null;
     });
@@ -383,16 +433,20 @@ export default function ReleaseClient({
       if (autoplayRafRef.current)   cancelAnimationFrame(autoplayRafRef.current);
       isAutoScrolling.current = false;
     };
-  }, [autoplay, autoplayIndex, collyVisible, sections, stopAutoplay]);
+  }, [autoplay, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen]);
 
   useEffect(() => {
     if (!autoplay) return;
+    const onScroll = () => { if (!isAutoScrolling.current) stopAutoplay(); };
+    if (isFullscreen) {
+      window.addEventListener("scroll", onScroll, { passive: true });
+      return () => window.removeEventListener("scroll", onScroll);
+    }
     const container = collyDivRef.current;
     if (!container) return;
-    const onScroll = () => { if (!isAutoScrolling.current) stopAutoplay(); };
     container.addEventListener("scroll", onScroll, { passive: true });
     return () => container.removeEventListener("scroll", onScroll);
-  }, [autoplay, stopAutoplay]);
+  }, [autoplay, stopAutoplay, isFullscreen]);
 
   useEffect(() => {
     if (!collyVisible && autoplay) stopAutoplay();
@@ -530,7 +584,7 @@ export default function ReleaseClient({
             <>
               <input type="button" className="btn-big"
                 value={autoplay ? "Stop" : "Autoplay"}
-                onClick={() => autoplay ? stopAutoplay() : (setAutoplayIndex(0), setAutoplay(true))} />
+                onClick={() => autoplay ? stopAutoplay() : (startAutoplay())} />
               {autoplay && (
                 <span className="lightgrey">{autoplayIndex + 1} / {sections.length}</span>
               )}
