@@ -17,7 +17,7 @@ export default async function HomePage() {
       <LatestComments />
       <RecentlyViewed />
       <SiteWall isLoggedIn={isLoggedIn} />
-      <GlobalWall />
+      <GlobalWall isLoggedIn={isLoggedIn} />
     </SiteLayout>
   );
 }
