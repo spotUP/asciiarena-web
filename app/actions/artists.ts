@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/db";
+import { Prisma } from "@/lib/generated/prisma/client";
 import { getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 
@@ -13,11 +14,10 @@ export async function claimArtist(nick: string): Promise<{ success: boolean; err
   if (!artist) return { success: false, error: `Artist '${nick}' not found` };
   if (artist.user_id !== null) return { success: false, error: "Already claimed" };
 
-  try {
-    await prisma.artists.update({ where: { id: artist.id }, data: { user_id: userId } });
-  } catch {
-    return { success: false, error: "Failed" };
-  }
+  const affected = await prisma.$executeRaw(
+    Prisma.sql`UPDATE artists SET user_id = ${userId} WHERE id = ${artist.id} AND user_id IS NULL`
+  );
+  if (Number(affected) === 0) return { success: false, error: "Already claimed" };
   revalidatePath('/artist', 'layout');
   return { success: true };
 }

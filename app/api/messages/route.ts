@@ -78,11 +78,13 @@ export async function POST(request: NextRequest) {
 
   await prisma.$executeRaw`
     INSERT INTO messages (thread, from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
-    SELECT IFNULL(MAX(thread) + 1, 1), ${fromId}, ${receiver},
-           (SELECT nick FROM users WHERE id = ${receiver}),
-           (SELECT nick FROM users WHERE id = ${fromId}),
-           UNIX_TIMESTAMP(), ${subject}, ${msgtext}, 1, 1
-    FROM messages
+    VALUES (
+      UNIX_TIMESTAMP() * 10000 + ${fromId},
+      ${fromId}, ${receiver},
+      (SELECT nick FROM users WHERE id = ${receiver}),
+      (SELECT nick FROM users WHERE id = ${fromId}),
+      UNIX_TIMESTAMP(), ${subject}, ${msgtext}, 1, 1
+    )
   `;
 
   return apiOk({ status: true });
