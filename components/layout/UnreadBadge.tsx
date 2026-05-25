@@ -2,18 +2,23 @@
 
 import { useEffect, useState } from "react";
 
-export default function UnreadBadge() {
+function fetchUnread(set: (n: number) => void) {
+  fetch("/api/messages/unread")
+    .then(r => r.json())
+    .then((d: { count?: number }) => set(d?.count ?? 0))
+    .catch(() => {});
+}
+
+export default function UnreadBadge({ userId }: { userId?: string }) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    fetch("/api/messages/unread")
-      .then((res) => res.json())
-      .then((data: { count?: number }) => {
-        const c = data?.count ?? 0;
-        setCount(c);
-      })
-      .catch(() => {});
-  }, []);
+    fetchUnread(setCount);
+    if (!userId) return;
+    const es = new EventSource(`/api/live?channel=user:${userId}:messages`);
+    es.onmessage = () => fetchUnread(setCount);
+    return () => es.close();
+  }, [userId]);
 
   if (count <= 0) return null;
 

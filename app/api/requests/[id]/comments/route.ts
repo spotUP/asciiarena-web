@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
+import { broadcast } from "@/lib/live";
 
 const postSchema = z.object({
   comment: z.string().min(1).max(5000),
@@ -104,6 +105,8 @@ export async function POST(
       `;
     }
   }
+
+  broadcast(`requests:${requestId}`, { type: "posted" });
 
   return apiOk({ status: true });
 }
