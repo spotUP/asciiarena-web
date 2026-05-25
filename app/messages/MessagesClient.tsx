@@ -45,7 +45,7 @@ interface Props {
   initialReceiverId?: number | null;
 }
 
-export default function MessagesClient({ userNick, initialReceiverId }: Props) {
+export default function MessagesClient({ userId, userNick, initialReceiverId }: Props) {
   const [activeTab, setActiveTab] = useState<ActiveTab>(initialReceiverId ? "new" : "inbox");
   const [messages, setMessages] = useState<MessageSummary[]>([]);
   const [currentThread, setCurrentThread] = useState<ThreadMessage[]>([]);
@@ -81,6 +81,17 @@ export default function MessagesClient({ userNick, initialReceiverId }: Props) {
   useEffect(() => {
     if (!initialReceiverId) loadBox(1);
   }, [initialReceiverId]);
+
+  useEffect(() => {
+    if (!userId) return;
+    const es = new EventSource(`/api/live?channel=user:${userId}:messages`);
+    es.onmessage = () => {
+      if (activeTab === "inbox") loadBox(1);
+    };
+    return () => es.close();
+  // loadBox captured at mount is fine — it only uses setState
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, activeTab]);
 
   function handleTabClick(tab: ActiveTab) {
     setActiveTab(tab);

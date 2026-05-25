@@ -11,19 +11,28 @@ interface Comment {
   filename: string | null;
 }
 
+interface Draft { nick: string; text: string }
+interface LiveEvent { type: string; nick?: string; draft?: string }
+
 interface Props {
   requestId: number;
   canChangeStatus: boolean;
   isLoggedIn: boolean;
+  userNick?: string | null;
 }
 
-export default function RequestDetailClient({ requestId, canChangeStatus, isLoggedIn }: Props) {
+export default function RequestDetailClient({ requestId, canChangeStatus, isLoggedIn, userNick }: Props) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentsLoaded, setCommentsLoaded] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [postResult, setPostResult] = useState("");
   const [statusResult, setStatusResult] = useState("");
+  const [drafts, setDrafts] = useState<Record<string, Draft>>({});
   const resultTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const draftTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const channel = `requests:${requestId}`;
 
   const flash = (msg: string, setter: (s: string) => void) => {
     setter(msg);
@@ -43,6 +52,39 @@ export default function RequestDetailClient({ requestId, canChangeStatus, isLogg
 
   useEffect(() => { loadComments(); }, [loadComments]);
 
+  useEffect(() => {
+    const es = new EventSource(`/api/live?channel=${channel}`);
+    es.onmessage = (e: MessageEvent<string>) => {
+      const event = JSON.parse(e.data) as LiveEvent;
+      if (event.type === "typing" && event.nick) {
+        const nick = event.nick;
+        setDrafts(prev => ({ ...prev, [nick]: { nick, text: event.draft ?? "" } }));
+        clearTimeout(draftTimers.current[nick]);
+        draftTimers.current[nick] = setTimeout(() => {
+          setDrafts(prev => { const next = { ...prev }; delete next[nick]; return next; });
+        }, 4000);
+      } else if (event.type === "clear" && event.nick) {
+        const nick = event.nick;
+        clearTimeout(draftTimers.current[nick]);
+        setDrafts(prev => { const next = { ...prev }; delete next[nick]; return next; });
+      } else if (event.type === "posted") {
+        loadComments();
+      }
+    };
+    return () => es.close();
+  }, [channel, loadComments]);
+
+  const broadcastTyping = (text: string) => {
+    if (typingTimer.current) clearTimeout(typingTimer.current);
+    typingTimer.current = setTimeout(() => {
+      fetch("/api/live", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ channel, type: text ? "typing" : "clear", draft: text }),
+      }).catch(() => {});
+    }, 50);
+  };
+
   const postComment = async () => {
     const text = commentText.trim();
     if (!text) return;
@@ -51,6 +93,11 @@ export default function RequestDetailClient({ requestId, canChangeStatus, isLogg
       setCommentText("");
       flash("Comment posted.", setPostResult);
       loadComments();
+      fetch("/api/live", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ channel, type: "clear" }),
+      }).catch(() => {});
     } else {
       flash(r.error ?? "Failed to post comment.", setPostResult);
     }
@@ -64,6 +111,8 @@ export default function RequestDetailClient({ requestId, canChangeStatus, isLogg
       flash(r.error ?? "Failed to update status.", setStatusResult);
     }
   };
+
+  const activeDrafts = Object.values(drafts).filter(d => d.text && d.nick !== userNick);
 
   return (
     <>
@@ -94,7 +143,7 @@ export default function RequestDetailClient({ requestId, canChangeStatus, isLogg
 
       <div>
         {!commentsLoaded && <div className="lightgrey col-lg-12 pl-0">Loading...</div>}
-        {commentsLoaded && comments.length === 0 && (
+        {commentsLoaded && comments.length === 0 && activeDrafts.length === 0 && (
           <div className="lightgrey col-lg-12 pl-0">No comments yet.</div>
         )}
         {comments.map((c, i) => (
@@ -111,6 +160,16 @@ export default function RequestDetailClient({ requestId, canChangeStatus, isLogg
             )}
           </div>
         ))}
+        {activeDrafts.map(d => (
+          <div key={d.nick} className="col-lg-12 pl-0 apb-1 bg-secondary ap-1" style={{ marginBottom: "4px", opacity: 0.7 }}>
+            <div className="d-flex justify-content-between">
+              <span className="lightgrey">{d.nick} <span className="lightgrey">(typing...)</span></span>
+            </div>
+            <div style={{ whiteSpace: "pre-wrap", marginTop: "4px" }} className="lightgrey">
+              {d.text}<span className="blink">_</span>
+            </div>
+          </div>
+        ))}
       </div>
 
       {isLoggedIn && (
@@ -123,7 +182,7 @@ export default function RequestDetailClient({ requestId, canChangeStatus, isLogg
                 placeholder="Add a comment..."
                 style={{ resize: "vertical" }}
                 value={commentText}
-                onChange={e => setCommentText(e.target.value)}
+                onChange={e => { setCommentText(e.target.value); broadcastTyping(e.target.value); }}
               />
             </div>
           </div>

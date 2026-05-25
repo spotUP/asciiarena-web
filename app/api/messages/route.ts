@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
+import { broadcast } from "@/lib/live";
 
 const postSchema = z.object({
   subject: z.string().min(1).max(500),
@@ -86,6 +87,8 @@ export async function POST(request: NextRequest) {
       UNIX_TIMESTAMP(), ${subject}, ${msgtext}, 1, 1
     )
   `;
+
+  broadcast(`user:${receiver}:messages`, { type: "message" });
 
   return apiOk({ status: true });
 }

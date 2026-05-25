@@ -84,6 +84,7 @@ export default async function RequestDetailPage({ params }: PageProps) {
         requestId={requestId}
         canChangeStatus={canChangeStatus}
         isLoggedIn={!!session?.user}
+        userNick={session?.user?.name ?? null}
       />
     </SiteLayout>
   );
