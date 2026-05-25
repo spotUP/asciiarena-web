@@ -169,6 +169,11 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
             if (res.url && res.url.includes("error=")) {
               showError("authentication failed");
             } else {
+              try {
+                const el = document.getElementById("login");
+                const modal = el ? bootstrap.Modal.getInstance(el) : null;
+                if (modal) modal.hide();
+              } catch(e) {}
               window.location.reload();
             }
           } catch(err) {
