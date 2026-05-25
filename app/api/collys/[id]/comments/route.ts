@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
+import { broadcast } from "@/lib/live";
 
 const postSchema = z.object({
   comment: z.string().min(1).max(5000),
@@ -147,6 +148,9 @@ export async function POST(
                SET cr.rating = (sub.v / (sub.v + 5.0)) * sub.R
                              + (5.0 / (sub.v + 5.0)) * (SELECT AVG(rating) FROM comments WHERE rating > 0)`
   );
+
+  broadcast(`comments:${collyId}`, { type: "posted", nick });
+  broadcast("site:comments", { type: "posted" });
 
   return apiOk({ status: true });
 }

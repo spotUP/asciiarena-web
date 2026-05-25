@@ -265,6 +265,11 @@ export default function ReleaseClient({
   const [editText, setEditText] = useState("");
   const [brokenText, setBrokenText] = useState("");
 
+  interface Draft { nick: string; text: string }
+  const [drafts, setDrafts] = useState<Record<string, Draft>>({});
+  const draftTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const collyRef = useRef<HTMLPreElement | HTMLDivElement | null>(null);
   const collyDivRef = useRef<HTMLDivElement>(null);
   const shareRef = useRef<HTMLDivElement>(null);
@@ -279,6 +284,41 @@ export default function ReleaseClient({
       setCommentsLoaded(true);
     } catch { setCommentsLoaded(true); }
   }, [collyId]);
+
+  const channel = `comments:${collyId}`;
+
+  useEffect(() => {
+    const es = new EventSource(`/api/live?channel=${channel}`);
+    es.onmessage = (e: MessageEvent<string>) => {
+      const event = JSON.parse(e.data) as { type: string; nick?: string; draft?: string };
+      if (event.type === "typing" && event.nick) {
+        const nick = event.nick;
+        setDrafts(prev => ({ ...prev, [nick]: { nick, text: event.draft ?? "" } }));
+        clearTimeout(draftTimers.current[nick]);
+        draftTimers.current[nick] = setTimeout(() => {
+          setDrafts(prev => { const next = { ...prev }; delete next[nick]; return next; });
+        }, 4000);
+      } else if (event.type === "clear" && event.nick) {
+        const nick = event.nick;
+        clearTimeout(draftTimers.current[nick]);
+        setDrafts(prev => { const next = { ...prev }; delete next[nick]; return next; });
+      } else if (event.type === "posted") {
+        loadComments();
+      }
+    };
+    return () => es.close();
+  }, [channel, loadComments]);
+
+  const broadcastTyping = useCallback((text: string) => {
+    if (typingTimer.current) clearTimeout(typingTimer.current);
+    typingTimer.current = setTimeout(() => {
+      fetch("/api/live", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ channel, type: text ? "typing" : "clear", draft: text }),
+      }).catch(() => {});
+    }, 50);
+  }, [channel]);
 
   useEffect(() => {
     trackView(collyId).then(() => {
@@ -538,6 +578,11 @@ export default function ReleaseClient({
       setCommentText(""); setRating("");
       setSection(null);
       loadComments();
+      fetch("/api/live", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ channel, type: "clear" }),
+      }).catch(() => {});
     }
   };
 
@@ -550,6 +595,11 @@ export default function ReleaseClient({
     setSection(null);
     setCollyVisible(true);
     loadComments();
+    fetch("/api/live", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ channel, type: "clear" }),
+    }).catch(() => {});
   };
 
   const isAnsi = type === "ANSI";
@@ -741,6 +791,21 @@ export default function ReleaseClient({
         ))}
       </div>
 
+      {/* Live drafts — other users currently typing a comment */}
+      {Object.values(drafts).filter(d => d.text && d.nick !== userNick).map(d => (
+        <div key={d.nick}>
+          <div className="header bg-header col-12 ap-1 text-truncate">
+            <span> BY:</span><span className="yellow">{d.nick}</span>
+            <span className="lightgrey"> (typing...)</span>
+          </div>
+          <div className="bg-secondary col-12 ap-1 amb-1">
+            <span className="lightgrey" style={{ whiteSpace: "pre-wrap", opacity: 0.7 }}>
+              {d.text}<span className="blink">_</span>
+            </span>
+          </div>
+        </div>
+      ))}
+
       {/* Add comment form */}
       {section === "add-comment" && (
         <div>
@@ -753,7 +818,7 @@ export default function ReleaseClient({
                 style={{ height: "128px", width: "100%" }}
                 className="bg-secondary cyan ap-1"
                 value={commentText}
-                onChange={e => setCommentText(e.target.value)}
+                onChange={e => { setCommentText(e.target.value); broadcastTyping(e.target.value); }}
               />
             </div>
           </div>
