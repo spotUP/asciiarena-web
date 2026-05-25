@@ -2,7 +2,6 @@ import { readFileSync, existsSync } from "fs";
 import path from "path";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import Script from "next/script";
 import type { Metadata } from "next";
 import Link from "next/link";
 import SiteLayout from "@/components/layout/SiteLayout";
@@ -281,26 +280,6 @@ export default async function ReleasePage({ params }: PageProps) {
 
       </Suspense>
 
-      {/* ANSI renderer — runs after ReleaseClient mounts the #colly div */}
-      {type === "ANSI" && (
-        <>
-          <Script src="/assets/js/ansilove.js" strategy="afterInteractive" />
-          <Script id="ansi-render" strategy="afterInteractive">{`
-            (function run() {
-              if (typeof AnsiLove === 'undefined') { setTimeout(run, 50); return; }
-              AnsiLove.splitRender("${collyFileUrl}", function(canvases) {
-                canvases.forEach(function(canvas) {
-                  canvas.style.verticalAlign = "bottom";
-                  canvas.style.margin = "0 auto";
-                  canvas.style.display = "block";
-                  document.getElementById("colly").appendChild(canvas);
-                });
-                document.getElementById("loading").style.display = "none";
-              }, 100, {"font": "mosoul", "bits": "8", "icecolors": 1, "columns": 80, "thumbnail": 0, "filetype": "ans"});
-            })();
-          `}</Script>
-        </>
-      )}
     </SiteLayout>
   );
 }

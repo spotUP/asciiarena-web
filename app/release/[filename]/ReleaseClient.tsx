@@ -41,6 +41,17 @@ const FONTS = [
   { value: "TopazPlus_a1200", label: "A1200 Topaz+" },
 ];
 
+const ANSI_FONT_MAP: Record<string, string> = {
+  "MicroKnight": "microknight",
+  "MicroKnightPlus": "microknight+",
+  "mOsOul": "mosoul",
+  "P0T-NOoDLE": "pot-noodle",
+  "Topaz_a500": "topaz500",
+  "TopazPlus_a500": "topaz500+",
+  "Topaz_a1200": "topaz",
+  "TopazPlus_a1200": "topaz+",
+};
+
 interface Comment {
   id: number;
   nick: string;
@@ -354,6 +365,47 @@ export default function ReleaseClient({
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
   }, [fontOpen]);
+
+  // ANSI renderer — re-fires when font changes
+  useEffect(() => {
+    if (type !== "ANSI" || !collyVisible) return;
+    let cancelled = false;
+
+    const collyElOrNull = collyRef.current as HTMLElement | null;
+    if (!collyElOrNull) return;
+    const collyEl: HTMLElement = collyElOrNull;
+    collyEl.innerHTML = "";
+    const loadingEl = document.getElementById("loading") as HTMLElement | null;
+    if (loadingEl) loadingEl.style.display = "";
+
+    const ansiFont = ANSI_FONT_MAP[font] ?? "mosoul";
+
+    function doRender() {
+      if (cancelled) return;
+      const w = window as Window & { AnsiLove?: { splitRender: (url: string, cb: (canvases: HTMLCanvasElement[]) => void, chunkSize: number, opts: Record<string, unknown>) => void } };
+      if (!w.AnsiLove) { setTimeout(doRender, 50); return; }
+      w.AnsiLove.splitRender(collyFileUrl, (canvases: HTMLCanvasElement[]) => {
+        if (cancelled) return;
+        canvases.forEach(canvas => {
+          canvas.style.verticalAlign = "bottom";
+          canvas.style.margin = "0 auto";
+          canvas.style.display = "block";
+          collyEl.appendChild(canvas);
+        });
+        if (loadingEl) loadingEl.style.display = "none";
+      }, 100, { font: ansiFont, bits: "8", icecolors: 1, columns: 80, thumbnail: 0, filetype: "ans" });
+    }
+
+    if (!document.querySelector('script[src="/assets/js/ansilove.js"]')) {
+      const script = document.createElement("script");
+      script.src = "/assets/js/ansilove.js";
+      document.head.appendChild(script);
+    }
+    doRender();
+
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [type, collyVisible, font, collyFileUrl]);
 
   // Auto-fit on mobile
   useEffect(() => {
