@@ -30,6 +30,11 @@ interface ReleaseRow {
   crewurl: string | null;
 }
 
+interface HandleRow {
+  nick: string;
+  artisturl: string;
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ nick: string }> }): Promise<Metadata> {
   const { nick } = await params;
   const artist = await prisma.artists.findFirst({ where: { artisturl: nick } });
@@ -57,7 +62,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
     auth(),
     prisma.artists.findFirst({
       where: { artisturl: nick },
-      include: { users: { select: { nickurl: true, nick: true } } },
+      include: { users: { select: { nickurl: true, nick: true, joined: true } } },
     }),
   ]);
   if (!artist) notFound();
@@ -76,7 +81,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
   };
   const sortSql = (rawSortBy && SORT_SQL[rawSortBy]) ?? Prisma.sql`c.filename`;
 
-  const [memberships, artistCollys, releasesRaw] = await Promise.all([
+  const [memberships, artistCollys, releasesRaw, otherHandles] = await Promise.all([
     prisma.member_of.findMany({ where: { nick: artist.nick } }),
     prisma.artists_collys.findMany({ where: { artist_id: artist.id }, select: { colly_id: true } }),
     prisma.$queryRaw<ReleaseRow[]>`
@@ -91,6 +96,13 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
       WHERE ac.artist_id = ${artist.id}
       ORDER BY ${sortSql} ASC
     `,
+    artist.user_id !== null
+      ? prisma.$queryRaw<HandleRow[]>`
+          SELECT nick, artisturl FROM artists
+          WHERE user_id = ${artist.user_id} AND id != ${artist.id}
+          ORDER BY nick ASC
+        `
+      : Promise.resolve([] as HandleRow[]),
   ]);
 
   const collyIds = artistCollys.map((r) => r.colly_id);
@@ -157,6 +169,23 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
         <div className="col-lg-12 pl-0">
           <span className="lightgrey">Site profile: </span>
           <Link href={`/member/${artist.users.nickurl}`}>{artist.users.nick}</Link>
+        </div>
+      )}
+      {artist.users?.joined && (
+        <div className="col-lg-12 pl-0">
+          <span className="lightgrey">Member since: </span>
+          {artist.users.joined}
+        </div>
+      )}
+      {otherHandles.length > 0 && (
+        <div className="col-lg-12 pl-0">
+          <span className="lightgrey">Also known as: </span>
+          {otherHandles.map((h, i) => (
+            <span key={h.artisturl}>
+              {i > 0 && ", "}
+              <Link href={`/artist/${h.artisturl}`}>{h.nick}</Link>
+            </span>
+          ))}
         </div>
       )}
       {canClaim && (
