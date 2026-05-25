@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import ChatProvider from "@/components/chat/ChatProvider";
+import { ChatContextProvider } from "@/components/chat/ChatContext";
 import "@/app/globals.css";
 
 export const metadata: Metadata = {
@@ -41,7 +43,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="theme-color" content="#ff55ff" />
       </head>
       <body suppressHydrationWarning>
-        {children}
+        <ChatContextProvider>
+          {children}
+          <ChatProvider />
+        </ChatContextProvider>
         <Script
           src="/assets/js/bootstrap5.bundle.min.js"
           strategy="beforeInteractive"

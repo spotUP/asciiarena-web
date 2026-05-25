@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import SiteLayout from "@/components/layout/SiteLayout";
 import UnfaveButton from "./UnfaveButton";
+import ChatButton from "./ChatButton";
 import { prisma } from "@/lib/db";
 import { getSession as auth } from "@/lib/session";
 import { notFound } from "next/navigation";
@@ -244,7 +245,8 @@ export default async function MemberPage({
         )}
 
         {!isOwnProfile && (
-          <div className="row apt-1">
+          <div className="row apt-1" style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            <ChatButton peerId={member.id} peerNick={member.nick ?? ""} />
             <Link href={`/messages?sendmsg=${member.id}`}>
               <input type="button" className="btn-big" value="Send Message" readOnly />
             </Link>

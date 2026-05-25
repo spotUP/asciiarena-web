@@ -1,10 +1,13 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { useChatContext } from "@/components/chat/ChatContext";
 
 interface MessageSummary {
   id: number;
   thread: number;
+  from_id: number | null;
+  to_id: number | null;
   postedto: string | null;
   postername: string | null;
   subject: string | null;
@@ -46,6 +49,7 @@ interface Props {
 }
 
 export default function MessagesClient({ userId, userNick, initialReceiverId }: Props) {
+  const { openChat } = useChatContext();
   const [activeTab, setActiveTab] = useState<ActiveTab>(initialReceiverId ? "new" : "inbox");
   const [messages, setMessages] = useState<MessageSummary[]>([]);
   const [currentThread, setCurrentThread] = useState<ThreadMessage[]>([]);
@@ -261,6 +265,7 @@ export default function MessagesClient({ userId, userNick, initialReceiverId }: 
           {messages.map((msg) => {
             const nick = isInbox ? (msg.postername ?? "") : (msg.postedto ?? "");
             const label = isInbox ? "From" : "To";
+            const peerId = isInbox ? msg.from_id : msg.to_id;
             return (
               <div
                 key={msg.id}
@@ -278,6 +283,17 @@ export default function MessagesClient({ userId, userNick, initialReceiverId }: 
                     onClick={() => viewThread(msg.thread, msg.subject ?? "", msg)}
                   />
                   {" "}
+                  {peerId && nick && (
+                    <>
+                      <input
+                        type="button"
+                        className="btn-big"
+                        value="Chat"
+                        onClick={() => openChat(peerId, nick, msg.thread)}
+                      />
+                      {" "}
+                    </>
+                  )}
                   <input
                     type="button"
                     className="btn-big"
