@@ -41,7 +41,7 @@ export default function BBSWeektop() {
       <div className="container-fluid p-0 pl-lg-2 pr-lg-2 bg-secondary">
         <div className="row m-0 p-0 bg-secondary apb-1">
           {items === null && (
-            <div className="col-lg-12 p-0 pl-lg-2 pr-lg-2 apt-1"><DotsLoader /></div>
+            <div className="col-lg-12 p-0 pl-lg-2 pr-lg-2" style={{ paddingTop: "16px" }}><DotsLoader /></div>
           )}
           {items?.map((item, i) => (
             <div key={i} className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
