@@ -51,7 +51,7 @@ export default function GlobalWall({ isLoggedIn }: { isLoggedIn?: boolean }) {
         </h2>
       </div>
       <div className="container-fluid m-0 p-0">
-        <div className="row m-0 p-0 bg-secondary apt-1 apb-1">
+        <div className="row m-0 p-0 bg-secondary apt-1 apb-1 apl-1">
           {posts.map((p, i) => (
             <React.Fragment key={i}>
               <div className="col-10 d-flex">
