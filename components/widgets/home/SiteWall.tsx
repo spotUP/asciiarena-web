@@ -106,24 +106,19 @@ export default function SiteWall({ isLoggedIn }: { isLoggedIn: boolean }) {
               </div>
             </React.Fragment>
           ))}
+          {activeDrafts.map(d => (
+            <React.Fragment key={d.nick}>
+              <div className="col-10 d-flex">
+                <span className="text-truncate lightgrey" style={{ whiteSpace: "pre" }}>
+                  {d.text}<span className="cursor-block" />
+                </span>
+              </div>
+              <div className="col-2 text-right">
+                <span className="lightpink">{d.nick}</span>
+              </div>
+            </React.Fragment>
+          ))}
         </div>
-
-        {activeDrafts.length > 0 && (
-          <div className="row m-0 p-0 bg-secondary">
-            {activeDrafts.map(d => (
-              <React.Fragment key={d.nick}>
-                <div className="col-10 d-flex">
-                  <span className="text-truncate lightgrey" style={{ whiteSpace: "pre" }}>
-                    {d.text}<span className="blink">_</span>
-                  </span>
-                </div>
-                <div className="col-2 text-right">
-                  <span className="lightpink">{d.nick}</span>
-                </div>
-              </React.Fragment>
-            ))}
-          </div>
-        )}
 
         {isLoggedIn && (
           <form onSubmit={handleSubmit} className="w-100">
