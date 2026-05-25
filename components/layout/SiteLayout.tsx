@@ -158,15 +158,19 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
             const csrfRes = await fetch("/api/auth/csrf", { credentials: "include" });
             if (!csrfRes.ok) { showError("csrf error " + csrfRes.status); return; }
             const { csrfToken } = await csrfRes.json();
-            const res = await fetch("/api/auth/callback/credentials", {
+            // POST credentials — use redirect:"manual" so we never follow the redirect
+            // (NextAuth redirects to localhost:3001 behind this proxy, causing CORS/SSL errors).
+            // Instead, check the session endpoint to determine success.
+            await fetch("/api/auth/callback/credentials", {
               method: "POST",
               headers: { "Content-Type": "application/x-www-form-urlencoded" },
               credentials: "include",
-              body: new URLSearchParams({ login: nick, password: pass, csrfToken, redirect: "false" }),
-            });
-            // NextAuth v5 redirects on both success (/callback/credentials → /) and failure (→ /login?error=...)
-            // fetch follows the redirect, so check the final URL
-            if (res.url && res.url.includes("error=")) {
+              redirect: "manual",
+              body: new URLSearchParams({ login: nick, password: pass, csrfToken }),
+            }).catch(function() {});
+            const sessionRes = await fetch("/api/auth/session", { credentials: "include" });
+            const session = sessionRes.ok ? await sessionRes.json().catch(function() { return null; }) : null;
+            if (!session || !session.user) {
               showError("authentication failed");
             } else {
               const loginEl = document.getElementById("login");
