@@ -335,6 +335,7 @@ export default function ReleaseClient({
   }, []);
 
   const startAutoplay = useCallback(() => {
+    document.documentElement.scrollTop = 0;
     setIsFullscreen(true);
     setAutoplayIndex(0);
     setAutoplay(true);
