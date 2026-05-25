@@ -26,7 +26,7 @@ export default async function TopArtists({ limit = 5 }: { limit?: number }) {
         <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
           {rows.map((row) => {
             const nick = row.nick ?? "";
-            const rating = Number(row.rating ?? 0).toFixed(2);
+            const rating = Number(row.rating ?? 0).toFixed(1);
             return (
               <div
                 key={row.id}

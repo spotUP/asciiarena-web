@@ -719,7 +719,7 @@ export default function ReleaseClient({
             <div className="header bg-header col-12 ap-1 text-truncate">
               <span> BY:</span><span className="yellow">{c.nick}</span>
               <span> DATE:</span><span className="white">{c.time}</span>
-              {c.rating != null && <><span className="yellow"> RATING:</span><span className="white"> {c.rating}</span></>}
+              {c.rating != null && <><span className="yellow"> RATING:</span><span className="white"> {Number(c.rating).toFixed(1)}</span></>}
             </div>
             <div className="bg-secondary col-12 ap-1 amb-1">
               <span className="cyan" style={{ whiteSpace: "pre-wrap" }}>
