@@ -267,6 +267,7 @@ export default function ReleaseClient({
 
   interface Draft { nick: string; text: string }
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
+  const [watching, setWatching] = useState(0);
   const draftTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -290,8 +291,12 @@ export default function ReleaseClient({
   useEffect(() => {
     const es = new EventSource(`/api/live?channel=${channel}`);
     es.onmessage = (e: MessageEvent<string>) => {
-      const event = JSON.parse(e.data) as { type: string; nick?: string; draft?: string };
-      if (event.type === "typing" && event.nick) {
+      const event = JSON.parse(e.data) as { type: string; nick?: string; draft?: string; count?: number };
+      if (event.type === "watching") {
+        setWatching(event.count ?? 0);
+      } else if (event.type === "viewed") {
+        setViewCount(v => v + 1);
+      } else if (event.type === "typing" && event.nick) {
         const nick = event.nick;
         setDrafts(prev => ({ ...prev, [nick]: { nick, text: event.draft ?? "" } }));
         clearTimeout(draftTimers.current[nick]);
@@ -661,6 +666,13 @@ export default function ReleaseClient({
               </div>
             )}
           </div>
+
+          {viewCount > 0 && (
+            <span className="lightgrey">{viewCount} {viewCount === 1 ? "view" : "views"}</span>
+          )}
+          {watching > 1 && (
+            <span className="lightgrey">{watching} watching</span>
+          )}
 
           {commentsLoaded && comments.length > 0 && (
             <a href="#comments" className="btn-big bg-header apt-1 apb-1 grey-text" role="button">View Comments</a>
