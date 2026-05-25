@@ -1,49 +1,89 @@
 "use client";
-import { useEffect, useId, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ansiToHtml } from "@/lib/ansi";
 
+interface WallPost { tag: string | null; nick: string | null }
+interface Draft { nick: string; text: string }
+interface LiveEvent { type: string; nick?: string; draft?: string; tag?: string }
+
+const WALL_ID = 1;
+const CHANNEL = `wall:${WALL_ID}`;
+const DRAFT_TTL = 4000;
+
 export default function SiteWall({ isLoggedIn }: { isLoggedIn: boolean }) {
-  const uid = useId().replace(/:/g, "");
-  const wallId = `wall_${uid}`;
-  const formId = `form_${uid}`;
-  const tagId = `tag_${uid}`;
+  const [posts, setPosts] = useState<WallPost[]>([]);
+  const [drafts, setDrafts] = useState<Record<string, Draft>>({});
+  const inputRef = useRef<HTMLInputElement>(null);
+  const draftTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const renderPosts = (data: { tag: string | null; nick: string | null }[]) => {
-      const html = data.map(p =>
-        `<div class="col-10 d-flex"><span class="text-truncate" style="white-space:pre">${ansiToHtml(p.tag ?? "")}</span></div><div class="col-2 text-right"><span class="lightpink">${p.nick ?? ""}</span></div>`
-      ).join("");
-      const el = document.getElementById(wallId);
-      if (el) el.innerHTML = html;
-    };
-
-    fetch("/api/wall?wall_id=1")
+    fetch(`/api/wall?wall_id=${WALL_ID}`)
       .then(r => r.json())
-      .then((d: unknown) => { if (Array.isArray(d)) renderPosts(d as { tag: string | null; nick: string | null }[]); })
+      .then((d: unknown) => { if (Array.isArray(d)) setPosts(d as WallPost[]); })
       .catch(() => {});
-  }, [wallId]);
+  }, []);
+
+  useEffect(() => {
+    const es = new EventSource(`/api/live?channel=${CHANNEL}`);
+    es.onmessage = (e: MessageEvent<string>) => {
+      const event = JSON.parse(e.data) as LiveEvent;
+      if (event.type === "typing" && event.nick) {
+        const nick = event.nick;
+        setDrafts(prev => ({ ...prev, [nick]: { nick, text: event.draft ?? "" } }));
+        clearTimeout(draftTimers.current[nick]);
+        draftTimers.current[nick] = setTimeout(() => {
+          setDrafts(prev => { const next = { ...prev }; delete next[nick]; return next; });
+        }, DRAFT_TTL);
+      } else if (event.type === "clear" && event.nick) {
+        const nick = event.nick;
+        clearTimeout(draftTimers.current[nick]);
+        setDrafts(prev => { const next = { ...prev }; delete next[nick]; return next; });
+      } else if (event.type === "posted") {
+        fetch(`/api/wall?wall_id=${WALL_ID}`)
+          .then(r => r.json())
+          .then((d: unknown) => { if (Array.isArray(d)) setPosts(d as WallPost[]); })
+          .catch(() => {});
+      }
+    };
+    return () => es.close();
+  }, []);
+
+  const broadcastTyping = (text: string) => {
+    if (typingTimer.current) clearTimeout(typingTimer.current);
+    typingTimer.current = setTimeout(() => {
+      fetch("/api/live", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ channel: CHANNEL, type: text ? "typing" : "clear", draft: text }),
+      }).catch(() => {});
+    }, 50);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const input = document.getElementById(tagId) as HTMLInputElement;
+    const input = inputRef.current;
     const text = input?.value?.trim();
     if (!text) return;
     fetch("/api/wall", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tagtext: text, wall_id: 1 }),
-    }).then(r => r.json()).then((data: unknown[]) => {
-      if (Array.isArray(data)) {
-        const html = data.map((p: unknown) => {
-          const post = p as { tag: string; nick: string };
-          return `<div class="col-10 d-flex"><span class="text-truncate" style="white-space:pre">${ansiToHtml(post.tag)}</span></div><div class="col-2 text-right"><span class="lightpink">${post.nick}</span></div>`;
-        }).join("");
-        const el = document.getElementById(wallId);
-        if (el) el.innerHTML = html;
-      }
-      if (input) input.value = "";
-    });
+      body: JSON.stringify({ tagtext: text, wall_id: WALL_ID }),
+    })
+      .then(r => r.json())
+      .then((data: unknown) => {
+        if (Array.isArray(data)) setPosts(data as WallPost[]);
+        if (input) input.value = "";
+        fetch("/api/live", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ channel: CHANNEL, type: "clear" }),
+        }).catch(() => {});
+      })
+      .catch(() => {});
   };
+
+  const activeDrafts = Object.values(drafts).filter(d => d.text.length > 0);
 
   return (
     <div className="container-fluid m-0 p-0 apb-1">
@@ -51,20 +91,54 @@ export default function SiteWall({ isLoggedIn }: { isLoggedIn: boolean }) {
         <h2 className="apt-1 apb-1 bg-header">TAG THE aSCIIaRENA WALL</h2>
       </div>
       <div className="container-fluid m-0 p-0">
-        <div className="row m-0 p-0 bg-secondary apt-1 apb-1" id={wallId}></div>
+        <div className="row m-0 p-0 bg-secondary apt-1 apb-1">
+          {posts.map((p, i) => (
+            <React.Fragment key={i}>
+              <div className="col-10 d-flex">
+                <span
+                  className="text-truncate"
+                  style={{ whiteSpace: "pre" }}
+                  dangerouslySetInnerHTML={{ __html: ansiToHtml(p.tag ?? "") }}
+                />
+              </div>
+              <div className="col-2 text-right">
+                <span className="lightpink">{p.nick ?? ""}</span>
+              </div>
+            </React.Fragment>
+          ))}
+        </div>
+
+        {activeDrafts.length > 0 && (
+          <div className="row m-0 p-0 bg-secondary">
+            {activeDrafts.map(d => (
+              <React.Fragment key={d.nick}>
+                <div className="col-10 d-flex">
+                  <span className="text-truncate lightgrey" style={{ whiteSpace: "pre" }}>
+                    {d.text}<span className="blink">_</span>
+                  </span>
+                </div>
+                <div className="col-2 text-right">
+                  <span className="lightpink">{d.nick}</span>
+                </div>
+              </React.Fragment>
+            ))}
+          </div>
+        )}
+
         {isLoggedIn && (
-          <form id={formId} onSubmit={handleSubmit} className="w-100">
+          <form onSubmit={handleSubmit} className="w-100">
             <div className="row col-12 m-0">
               <div className="col-10 col-lg-11 pr-0 pl-0">
                 <input
+                  ref={inputRef}
                   className="form-control w-100"
                   type="text"
                   maxLength={60}
                   name="tagtext"
                   placeholder="Tag the wall"
-                  id={tagId}
                   required
                   autoComplete="off"
+                  onChange={e => broadcastTyping(e.target.value)}
                 />
               </div>
               <div className="col-2 col-lg-1 bg-secondary m-0 p-0">
