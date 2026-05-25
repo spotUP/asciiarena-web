@@ -31,7 +31,7 @@ export default async function TopCollys({ limit = 5 }: { limit?: number }) {
         <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
           {rows.map((row) => {
             const filename = row.filename ?? "";
-            const rating = Number(row.rating).toFixed(2);
+            const rating = Number(row.rating).toFixed(1);
             return (
               <div key={filename} className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
                 <Link className="magenta text-truncate" href={`/release/${filename}`}>{filename}</Link>
