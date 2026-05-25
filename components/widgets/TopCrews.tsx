@@ -5,6 +5,7 @@ import { unstable_cache } from "next/cache";
 
 const getTopCrews = unstable_cache(
   async (limit: number) => prisma.crews.findMany({
+      where: { rating: { gt: 0 } },
       orderBy: { rating: "desc" },
       take: limit,
       select: { id: true, name: true, rating: true },

@@ -5,6 +5,7 @@ import { unstable_cache } from "next/cache";
 
 const getTopArtists = unstable_cache(
   async (limit: number) => prisma.artists.findMany({
+      where: { rating: { gt: 0 } },
       orderBy: { rating: "desc" },
       take: limit,
       select: { id: true, nick: true, rating: true },
