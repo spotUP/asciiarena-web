@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { subscribe, broadcast } from "@/lib/live";
+import { subscribe, broadcast, subscriberCount } from "@/lib/live";
 import { auth } from "@/lib/auth";
 import { apiError } from "@/lib/utils";
 
@@ -17,9 +17,11 @@ export async function GET(request: NextRequest) {
     start(ctrl) {
       ctrl.enqueue(encoder.encode(": keepalive\n\n"));
       unsubscribe = subscribe(channel, ctrl);
+      broadcast(channel, { type: "watching", count: subscriberCount(channel) });
     },
     cancel() {
       unsubscribe?.();
+      broadcast(channel, { type: "watching", count: subscriberCount(channel) });
     },
   });
 

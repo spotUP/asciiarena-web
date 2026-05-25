@@ -19,6 +19,10 @@ export function subscribe(channel: string, ctrl: SSEController): () => void {
   };
 }
 
+export function subscriberCount(channel: string): number {
+  return channels.get(channel)?.size ?? 0;
+}
+
 export function broadcast(channel: string, event: LiveEvent): void {
   const subs = channels.get(channel);
   if (!subs || subs.size === 0) return;
