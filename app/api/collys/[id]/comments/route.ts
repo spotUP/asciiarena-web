@@ -88,7 +88,11 @@ export async function POST(
 
   await prisma.$executeRaw(
     Prisma.sql`UPDATE collys
-               SET rating = (SELECT AVG(rating) FROM comments WHERE colly_id = ${collyId} AND rating > 0)
+               SET rating = (
+                 SELECT (COUNT(rating) / (COUNT(rating) + 5.0)) * AVG(rating)
+                      + (5.0 / (COUNT(rating) + 5.0)) * (SELECT AVG(rating) FROM comments WHERE rating > 0)
+                 FROM comments WHERE colly_id = ${collyId} AND rating > 0
+               )
                WHERE id = ${collyId}`
   );
 
