@@ -112,7 +112,7 @@ export async function DELETE(request: NextRequest) {
     try { if (existsSync(f)) unlinkSync(f); } catch { /* ignore */ }
   }
 
-  await prisma.$executeRaw`DELETE FROM comments WHERE filename = ${filename}`;
+  await prisma.$executeRaw`DELETE FROM comments WHERE colly_id = ${body.id}`;
   await prisma.$executeRaw`DELETE FROM artists_collys WHERE colly_id = ${body.id}`;
   await prisma.$executeRaw`DELETE FROM collys_crews WHERE colly_id = ${body.id}`;
   await prisma.$executeRaw`DELETE FROM favourites WHERE colly_id = ${body.id}`;

@@ -23,6 +23,7 @@ export async function GET(
 ) {
   const { id } = await params;
   const collyId = Number(id);
+  if (!Number.isFinite(collyId)) return apiError("Invalid id", 400);
 
   const rows = await prisma.$queryRaw<CommentRow[]>(
     Prisma.sql`SELECT c.commentid, c.timestamp,
@@ -53,6 +54,7 @@ export async function POST(
 
   const { id } = await params;
   const collyId = Number(id);
+  if (!Number.isFinite(collyId)) return apiError("Invalid id", 400);
 
   const rawBody = await req.json().catch(() => ({}));
   const parsed = postSchema.safeParse(rawBody);
