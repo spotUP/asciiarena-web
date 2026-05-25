@@ -4,6 +4,7 @@ import { urlsafe } from "@/lib/utils";
 import type { CedDocument, CedSessionsData } from "@/app/api/ced-sessions/route";
 
 const POLL_MS = 30_000;
+const SPECTATE_BASE = "https://hippoplayer.se/?spectate=";
 
 function load(set: (d: CedDocument[]) => void) {
   fetch("/api/ced-sessions")
@@ -32,17 +33,27 @@ export default function CedSessions() {
       <div className="header col-lg-12 p-0">
         <h2 className="ap-1 bg-header">EDITING IN CED</h2>
       </div>
-      <div className="container col-12 p-0 m-0 apt-1 bg-secondary">
+      <div className="container col-12 apt-1 apb-1 m-0 p-0 bg-secondary">
         {documents.map(doc => (
-          <div key={doc.id} className="col-lg-12" style={{ paddingLeft: "8px", paddingBottom: "4px" }}>
-            <div style={{ color: "#aaaaaa", fontSize: "0.85em" }}>{doc.name}</div>
-            {doc.users.map(u => (
-              <div key={u.nick} style={{ paddingLeft: "8px" }}>
-                <a className="yellow" href={`/member/${urlsafe(u.nick)}`} style={{ color: u.color || undefined }}>
-                  {u.nick}
-                </a>
-              </div>
-            ))}
+          <div key={doc.id} className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
+            <a
+              href={SPECTATE_BASE + encodeURIComponent(doc.id)}
+              className="text-truncate"
+              style={{ color: "#aaaaaa" }}
+              title={doc.name}
+            >
+              {doc.name}
+            </a>
+            <span className="text-truncate" style={{ paddingLeft: "8px", flexShrink: 0 }}>
+              {doc.users.map((u, i) => (
+                <span key={u.nick}>
+                  {i > 0 && <span style={{ color: "#aaaaaa" }}>, </span>}
+                  <a href={`/member/${urlsafe(u.nick)}`} style={{ color: u.color || undefined }}>
+                    {u.nick}
+                  </a>
+                </span>
+              ))}
+            </span>
           </div>
         ))}
       </div>

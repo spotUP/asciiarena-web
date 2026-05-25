@@ -39,7 +39,7 @@ export default function BBSWeektop() {
         <h2 className="ap-1 bg-header">WEEKTOP - BBS:ES</h2>
       </div>
       <div className="container-fluid p-0 pl-lg-2 pr-lg-2 bg-secondary">
-        <div className="row m-0 p-0 bg-secondary apb-1" style={{ paddingTop: "16px" }}>
+        <div className="row m-0 px-0 bg-secondary apb-1" style={{ paddingTop: "16px" }}>
           {items === null && (
             <div className="col-lg-12 p-0 pl-lg-2 pr-lg-2" style={{ paddingTop: "16px" }}><DotsLoader /></div>
           )}

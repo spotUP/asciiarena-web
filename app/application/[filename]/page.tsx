@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { formatBytes } from "@/lib/utils";
+import DownloadButton from "@/components/ui/DownloadButton";
 
 interface PageProps {
   params: Promise<{ filename: string }>;
@@ -57,8 +58,11 @@ export default async function ApplicationPage({ params }: PageProps) {
     : null;
 
   const appsPath = process.env.APPS_PATH ?? path.join(process.cwd(), "apps");
-  const dizPath = path.join(appsPath, `${filename}.diz`);
+  const basenameNoExt = filename.replace(/\.[^.]+$/, "");
+  const dizPath = path.join(appsPath, `${basenameNoExt}.diz`);
+  const dizPngPath = path.join(appsPath, `${filename}.diz.png`);
   const dizContent = existsSync(dizPath) ? encodeFileText(dizPath) : "";
+  const hasDizPng = !dizContent && existsSync(dizPngPath);
 
   const downloadUrl = `/apps/${filename}`;
 
@@ -75,15 +79,19 @@ export default async function ApplicationPage({ params }: PageProps) {
           {dizContent ? (
             <pre className="magenta apt-1" style={{ overflowX: "auto" }}
               dangerouslySetInnerHTML={{ __html: dizContent }} />
+          ) : hasDizPng ? (
+            <img src={`/apps/${filename}.diz.png`} alt="description" className="apt-1" />
           ) : (
             <div className="lightgrey">No description available.</div>
           )}
 
           <div className="row apt-1">
             <div className="col-12">
-              <a href={downloadUrl}>
-                <input type="button" className="btn-big" value="Download" readOnly />
-              </a>
+              <DownloadButton
+                fileUrl={downloadUrl}
+                filename={filename}
+                apiUrl={`/api/apps/${filename}/download`}
+              />
             </div>
           </div>
         </div>
