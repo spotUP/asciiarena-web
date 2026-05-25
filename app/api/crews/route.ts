@@ -38,11 +38,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const [rows, countRows] = await Promise.all([
     prisma.$queryRaw<CrewRow[]>`
       SELECT
-        c.*,
-        (SELECT count(id) FROM collys_crews cc WHERE cc.crew_id = c.id) AS releases_cnt,
-        (SELECT count(id) FROM member_of mo WHERE mo.crew = c.name) AS members_cnt
+        c.id, c.name, c.acronym, c.rating,
+        COUNT(DISTINCT cc.colly_id) AS releases_cnt,
+        COUNT(DISTINCT mo.nick)     AS members_cnt
       FROM crews c
-      WHERE name LIKE ${likeParam}
+      LEFT JOIN collys_crews cc ON cc.crew_id = c.id
+      LEFT JOIN member_of mo     ON mo.crew = c.name
+      WHERE c.name LIKE ${likeParam}
+      GROUP BY c.id, c.name, c.acronym, c.rating
       ORDER BY ${orderCol} ${orderDir}
       LIMIT ${Prisma.raw(String(pagesizeInt))} OFFSET ${Prisma.raw(String(startInt))}
     `,

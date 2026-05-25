@@ -1,6 +1,13 @@
 interface Entry { count: number; reset: number }
 const store = new Map<string, Entry>();
 
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, v] of store) {
+    if (now > v.reset) store.delete(k);
+  }
+}, 60_000);
+
 export function checkRateLimit(key: string, max: number, windowMs: number): boolean {
   const now = Date.now();
   const entry = store.get(key);

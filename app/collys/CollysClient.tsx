@@ -38,6 +38,7 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState(false);
 
   const pagesize = viewMode === 2 ? 6 : 120;
 
@@ -62,6 +63,7 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
     setAllRows([]);
     setPage(1);
     setHasMore(true);
+    setError(false);
   }, [sort, asc, filter, viewMode]);
 
   // Effect 2: fetch current page
@@ -80,7 +82,7 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
           setLoadingMore(false);
         }
       } catch {
-        if (!cancelled) { setLoading(false); setLoadingMore(false); }
+        if (!cancelled) { setLoading(false); setLoadingMore(false); setError(true); }
       }
     })();
     return () => { cancelled = true; };
@@ -213,6 +215,7 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
       </div>
 
       <div id="collyList">
+        {error && <div className="row apt-1"><div className="col" style={{ color: "#ff5555" }}>Failed to load — please try again.</div></div>}
         {loading && <div className="row apt-1"><div className="col">Loading...</div></div>}
         {!loading &&
           allRows.map((colly) =>

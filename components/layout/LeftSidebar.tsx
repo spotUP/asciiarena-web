@@ -10,14 +10,14 @@ import Weektop from "@/components/widgets/Weektop";
 export default function LeftSidebar() {
   return (
     <>
-      <Suspense><UsersOnline /></Suspense>
-      <Suspense><LastCallers limit={5} /></Suspense>
-      <Suspense><LatestCollys type="released" limit={8} /></Suspense>
-      <Suspense><LatestCollys type="added" limit={5} /></Suspense>
-      <Suspense><LatestMags limit={5} /></Suspense>
-      <Suspense><LatestApps limit={5} /></Suspense>
-      <Suspense><NewUsers /></Suspense>
-      <Suspense><Weektop /></Suspense>
+      <Suspense fallback={null}><UsersOnline /></Suspense>
+      <Suspense fallback={null}><LastCallers limit={5} /></Suspense>
+      <Suspense fallback={null}><LatestCollys type="released" limit={8} /></Suspense>
+      <Suspense fallback={null}><LatestCollys type="added" limit={5} /></Suspense>
+      <Suspense fallback={null}><LatestMags limit={5} /></Suspense>
+      <Suspense fallback={null}><LatestApps limit={5} /></Suspense>
+      <Suspense fallback={null}><NewUsers /></Suspense>
+      <Suspense fallback={null}><Weektop /></Suspense>
     </>
   );
 }
