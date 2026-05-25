@@ -366,6 +366,18 @@ export default function ReleaseClient({
     return () => document.removeEventListener("mousedown", h);
   }, [fontOpen]);
 
+  // Broadcast view activity for logged-in users
+  useEffect(() => {
+    if (!userNick || !collyVisible) return;
+    fetch("/api/activity", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "view", target: filename, targetUrl: `/release/${filename}` }),
+    }).catch(() => {});
+  // fire only when visibility transitions to true, not on every render
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [collyVisible]);
+
   // ANSI renderer — re-fires when font changes
   useEffect(() => {
     if (type !== "ANSI" || !collyVisible) return;
@@ -639,6 +651,13 @@ export default function ReleaseClient({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ channel, type: "clear" }),
       }).catch(() => {});
+      if (userNick) {
+        fetch("/api/activity", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "comment", target: filename, targetUrl: `/release/${filename}` }),
+        }).catch(() => {});
+      }
     }
   };
 
