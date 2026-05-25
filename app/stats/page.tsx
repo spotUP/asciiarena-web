@@ -8,13 +8,20 @@ const COUNTS = [5, 10, 20, 50] as const;
 type Count = (typeof COUNTS)[number];
 
 async function getArenaStats() {
-  const [collysCount, bytesResult, usersCount, commentsCount] = await Promise.all([
+  const [collysCount, bytesResult, downloadsResult, usersCount, commentsCount] = await Promise.all([
     prisma.collys.count(),
     prisma.$queryRaw<[{ bytes: bigint }]>(Prisma.sql`SELECT SUM(filesize) AS bytes FROM collys`),
+    prisma.$queryRaw<[{ total: bigint }]>(Prisma.sql`SELECT SUM(downloads) AS total FROM collys`),
     prisma.users.count(),
     prisma.comments.count(),
   ]);
-  return { collysCount, bytes: Number(bytesResult[0]?.bytes ?? 0), usersCount, commentsCount };
+  return {
+    collysCount,
+    bytes: Number(bytesResult[0]?.bytes ?? 0),
+    downloads: Number(downloadsResult[0]?.total ?? 0),
+    usersCount,
+    commentsCount,
+  };
 }
 
 async function getTopArtists(n: number) {
@@ -147,6 +154,7 @@ export default async function StatsPage({
       <Section title="aSCIIaRENA STATS">
         <Row left={<span className="white">Collys Online:</span>} right={arena.collysCount} />
         <Row left={<span className="white">Pumped Bytes:</span>} right={formatBytes(arena.bytes)} />
+        <Row left={<span className="white">Total Downloads:</span>} right={arena.downloads.toLocaleString("en-US")} />
         <Row left={<span className="white">Users:</span>} right={arena.usersCount} />
         <Row left={<span className="white">Comments:</span>} right={arena.commentsCount} />
       </Section>

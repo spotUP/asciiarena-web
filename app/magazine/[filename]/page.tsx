@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { formatBytes } from "@/lib/utils";
+import DownloadButton from "@/components/ui/DownloadButton";
 
 interface PageProps {
   params: Promise<{ filename: string }>;
@@ -78,9 +79,11 @@ export default async function MagazinePage({ params }: PageProps) {
 
           <div className="row apt-1">
             <div className="col-12">
-              <a href={downloadUrl}>
-                <input type="button" className="btn-big" value="Download" readOnly />
-              </a>
+              <DownloadButton
+                fileUrl={downloadUrl}
+                filename={filename}
+                apiUrl={`/api/mags/${filename}/download`}
+              />
             </div>
           </div>
         </div>
