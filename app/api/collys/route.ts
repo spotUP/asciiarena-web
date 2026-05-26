@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import {
@@ -246,6 +247,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     Prisma.sql`UPDATE users SET uploaded = uploaded + ${filesize} WHERE id = ${uploaderId}`
   );
 
+  revalidateTag("latest-collys", "default");
   broadcast("site:releases", { type: "posted" });
   broadcast("site:activity", { type: "upload", nick: uploaderNick, target: filename, targetUrl: `/release/${filename}`, timestamp: Math.floor(Date.now() / 1000) });
 

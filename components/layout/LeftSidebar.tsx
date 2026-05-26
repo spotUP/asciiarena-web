@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { getSession as auth } from "@/lib/session";
 import UsersOnlineLive from "@/components/widgets/UsersOnlineLive";
 import CedSessions from "@/components/widgets/CedSessions";
 import ActivityFeed from "@/components/widgets/ActivityFeed";
@@ -9,10 +10,12 @@ import LatestApps from "@/components/widgets/LatestApps";
 import NewUsers from "@/components/widgets/NewUsers";
 import Weektop from "@/components/widgets/Weektop";
 
-export default function LeftSidebar() {
+export default async function LeftSidebar() {
+  const session = await auth().catch(() => null);
+  const isLoggedIn = !!(session as { user?: unknown } | null)?.user;
   return (
     <>
-      <UsersOnlineLive />
+      <UsersOnlineLive isLoggedIn={isLoggedIn} />
       <ActivityFeed />
       <CedSessions />
       <Suspense fallback={null}><LastCallers limit={5} /></Suspense>

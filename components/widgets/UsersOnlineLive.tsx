@@ -33,7 +33,7 @@ function load(set: (d: OnlineData) => void) {
     .catch(() => {});
 }
 
-export default function UsersOnlineLive() {
+export default function UsersOnlineLive({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
   const [entries, setEntries] = useState<UserEntry[]>([]);
   const [anonCount, setAnonCount] = useState(0);
   const [anonFlash, setAnonFlash] = useState(false);
@@ -131,7 +131,7 @@ export default function UsersOnlineLive() {
             <a className="yellow" href={`/member/${urlsafe(entry.nick)}`}>
               <ScrambleText text={entry.nick} mode={entry.state} />
             </a>
-            {entry.id > 0 && (
+            {isLoggedIn && entry.id > 0 && (
               <button
                 onClick={() => openChat(entry.id, entry.nick)}
                 className="lightgrey"

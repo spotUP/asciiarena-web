@@ -12,3 +12,15 @@
   --color-bg-mid:  #222222;
   --color-bg-light:#444444;
 }
+
+/* ── Red block caret on every input/textarea ─────────────────
+   Matches the SiteWall's cursor-block aesthetic. caret-color is
+   universally supported (red caret everywhere). caret-shape is
+   a draft spec; browsers that don't support it ignore it and
+   fall back to the standard thin-line caret. */
+input,
+textarea,
+[contenteditable="true"] {
+  caret-color: #ff5555;
+  caret-shape: block;
+}
