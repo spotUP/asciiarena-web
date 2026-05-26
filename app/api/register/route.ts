@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { apiError, apiOk, urlsafe } from "@/lib/utils";
 import { checkRateLimit } from "@/lib/rateLimit";
 import bcrypt from "bcryptjs";
+import { ACTIVITY_TYPES, type ActivityType } from "@/lib/activity-types";
 
 async function sendWelcomeMail(nick: string, mail: string) {
   const mailHost = process.env.MAILHOST;
@@ -69,9 +70,17 @@ export async function POST(request: NextRequest) {
     mail?: string;
     password?: string;
     password2?: string;
+    activityOptIn?: string[];
   };
 
   const { nick, mail, password, password2 } = body;
+
+  const optInSet = new Set(
+    (body.activityOptIn ?? []).filter((t): t is ActivityType =>
+      (ACTIVITY_TYPES as readonly string[]).includes(t)
+    )
+  );
+  const activityHiddenTypes = ACTIVITY_TYPES.filter((t) => !optInSet.has(t)).join(",");
 
   if (!nick || !mail || !password) {
     return apiError("Nick, email and password are required.", 400);
@@ -123,10 +132,10 @@ export async function POST(request: NextRequest) {
 
   await prisma.$executeRaw`
     INSERT INTO users
-      (nick, crew, pwhash, lastactive, current, mail, uploaded, \`rank\`, upload_signature, list_view_mode, display_mail, nickurl)
+      (nick, crew, pwhash, lastactive, current, mail, uploaded, \`rank\`, upload_signature, list_view_mode, display_mail, nickurl, activity_hidden_types)
     VALUES
       (${nick}, 'Independent', ${pwhash}, UNIX_TIMESTAMP(), '', ${mail}, 0, 'Inactive',
-       '- -- - aSCIIaRENa - ---- - aSCIIaRENa - -- -', 0, 0, ${nickurl})
+       '- -- - aSCIIaRENa - ---- - aSCIIaRENa - -- -', 0, 0, ${nickurl}, ${activityHiddenTypes})
   `;
 
   // Fire-and-forget — don't fail registration if mail is misconfigured

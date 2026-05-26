@@ -1,15 +1,30 @@
 "use client";
 
 import React, { useState, FormEvent } from "react";
+import {
+  ACTIVITY_TYPES,
+  ACTIVITY_LABELS,
+  type ActivityType,
+} from "@/lib/activity-types";
 
 export default function RegisterForm() {
   const [nick, setNick] = useState("");
   const [mail, setMail] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
+  const [activityOptIn, setActivityOptIn] = useState<Set<ActivityType>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  const toggleOptIn = (type: ActivityType) => {
+    setActivityOptIn((prev) => {
+      const next = new Set(prev);
+      if (next.has(type)) next.delete(type);
+      else next.add(type);
+      return next;
+    });
+  };
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -25,7 +40,13 @@ export default function RegisterForm() {
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nick, mail, password, password2 }),
+        body: JSON.stringify({
+          nick,
+          mail,
+          password,
+          password2,
+          activityOptIn: Array.from(activityOptIn),
+        }),
       });
       const data = (await res.json()) as { status?: boolean; error?: string };
       if (res.ok && data.status) {
@@ -140,6 +161,40 @@ export default function RegisterForm() {
             <small className="form-text">
               Password must include uppercase, lowercase, a number, and a special character.
             </small>
+          </div>
+        </div>
+
+        <div className="row apb-1">
+          <div className="col-12">
+            <h3 className="white amt-1 amb-0" style={{ fontSize: "14px" }}>
+              Live Feed Privacy
+            </h3>
+            <small className="form-text lightgrey">
+              By default, none of your actions appear in the site live feed. Tick the
+              ones you would like to broadcast — you can change this any time in your
+              settings.
+            </small>
+            <div className="apt-1">
+              {ACTIVITY_TYPES.map((type) => (
+                <label
+                  key={type}
+                  style={{
+                    display: "block",
+                    padding: "2px 0",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={activityOptIn.has(type)}
+                    onChange={() => toggleOptIn(type)}
+                    style={{ marginRight: "8px", verticalAlign: "middle" }}
+                  />
+                  Broadcast <span className="yellow">{ACTIVITY_LABELS[type]}</span>
+                </label>
+              ))}
+            </div>
           </div>
         </div>
 

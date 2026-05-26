@@ -40,8 +40,9 @@ export default function LiveFeedSettings() {
         <h2 className="ap-1 bg-header">LIVE FEED PRIVACY</h2>
       </div>
       <div className="col-lg-12 p-0 apt-1 lightgrey" style={{ fontSize: "13px" }}>
-        Pick which of your actions get broadcast to the site live feed. Boxes you
-        tick are <span className="yellow">hidden</span> from others — your action still happens, just no live feed entry.
+        By default, none of your actions are broadcast — you opt in here per action.
+        A ticked box means that action stays <span className="yellow">hidden</span> from
+        the live feed. Untick a box to share that action with others.
       </div>
       <div className="col-lg-12 p-0 apt-1">
         {ACTIVITY_TYPES.map(type => (
