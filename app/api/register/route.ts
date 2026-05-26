@@ -5,6 +5,7 @@ import { apiError, apiOk, urlsafe } from "@/lib/utils";
 import { checkRateLimit } from "@/lib/rateLimit";
 import bcrypt from "bcryptjs";
 import { ACTIVITY_TYPES, type ActivityType } from "@/lib/activity-types";
+import { broadcast } from "@/lib/live";
 
 async function sendWelcomeMail(nick: string, mail: string) {
   const mailHost = process.env.MAILHOST;
@@ -140,6 +141,8 @@ export async function POST(request: NextRequest) {
 
   // Fire-and-forget — don't fail registration if mail is misconfigured
   sendWelcomeMail(nick, mail).catch(() => {});
+
+  broadcast("site:users", { type: "joined", nick });
 
   return apiOk({ status: true }, 201);
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
-import { unstable_cache } from "next/cache";
+import LiveRefresh from "@/components/widgets/LiveRefresh";
 
 export type LatestCollysProps = {
   type: "released" | "added";
@@ -12,22 +12,19 @@ function padPart(val: number | null | undefined, fallback: string): string {
   return String(val).padStart(2, "0");
 }
 
-const getLatestCollys = unstable_cache(
-  async (type: "released" | "added", limit: number) =>
-    type === "released"
-      ? prisma.collys.findMany({
-          orderBy: [{ year: "desc" }, { month: "desc" }, { day: "desc" }, { timestamp: "desc" }],
-          take: limit,
-          select: { id: true, filename: true, year: true, month: true, day: true, timestamp: true },
-        })
-      : prisma.collys.findMany({
-          orderBy: { timestamp: "desc" },
-          take: limit,
-          select: { id: true, filename: true, year: true, month: true, day: true, timestamp: true },
-        }),
-  ["latest-collys"],
-  { revalidate: 120 }
-);
+async function getLatestCollys(type: "released" | "added", limit: number) {
+  return type === "released"
+    ? prisma.collys.findMany({
+        orderBy: [{ year: "desc" }, { month: "desc" }, { day: "desc" }, { timestamp: "desc" }],
+        take: limit,
+        select: { id: true, filename: true, year: true, month: true, day: true, timestamp: true },
+      })
+    : prisma.collys.findMany({
+        orderBy: { timestamp: "desc" },
+        take: limit,
+        select: { id: true, filename: true, year: true, month: true, day: true, timestamp: true },
+      });
+}
 
 export default async function LatestCollys({ type, limit = 8 }: LatestCollysProps) {
   try {
@@ -44,6 +41,7 @@ export default async function LatestCollys({ type, limit = 8 }: LatestCollysProp
 
     return (
       <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
+        <LiveRefresh channel="site:releases" />
         <div className="header col-lg-12 p-0">
           <h2 className={headerClass}>
             <Link href={headerHref} className={isReleased ? undefined : "lightgreen"}>{headerText}</Link>

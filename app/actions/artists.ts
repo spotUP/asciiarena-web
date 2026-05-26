@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
-import { broadcast } from "@/lib/live";
+import { broadcastActivityIfAllowed } from "@/lib/activity";
 
 export async function claimArtist(nick: string): Promise<{ success: boolean; error?: string }> {
   const session = await getSession();
@@ -21,6 +21,6 @@ export async function claimArtist(nick: string): Promise<{ success: boolean; err
   if (Number(affected) === 0) return { success: false, error: "Already claimed" };
   revalidatePath('/artist', 'layout');
   const claimerNick = session.user.name ?? String(session.user.id);
-  broadcast("site:activity", { type: "claim", nick: claimerNick, target: nick, targetUrl: `/artist/${nick}`, timestamp: Math.floor(Date.now() / 1000) });
+  await broadcastActivityIfAllowed(userId, "claim", { type: "claim", nick: claimerNick, target: nick, targetUrl: `/artist/${nick}`, timestamp: Math.floor(Date.now() / 1000) });
   return { success: true };
 }

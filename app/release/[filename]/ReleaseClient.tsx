@@ -743,9 +743,12 @@ export default function ReleaseClient({
           {watching > 1 && (
             <span className="lightgrey">{watching} watching</span>
           )}
+          {commentsLoaded && comments.length > 0 && (
+            <span className="lightgrey">{comments.length} {comments.length === 1 ? "comment" : "comments"}</span>
+          )}
 
           {commentsLoaded && comments.length > 0 && (
-            <a href="#comments" className="btn-big bg-header apt-1 apb-1 grey-text" role="button">View Comments</a>
+            <a href="#comments" className="btn-big bg-header apt-1 apb-1 grey-text" role="button">View Comments ({comments.length})</a>
           )}
 
           {userNick && (

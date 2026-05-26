@@ -1,24 +1,19 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
-import { unstable_cache } from "next/cache";
-
-const getNewUsers = unstable_cache(
-  async () => prisma.users.findMany({
-    orderBy: { joined: "desc" },
-    take: 5,
-    select: { id: true, nick: true, joined: true },
-  }),
-  ["new-users"],
-  { revalidate: 300 }
-);
+import LiveRefresh from "@/components/widgets/LiveRefresh";
 
 export default async function NewUsers() {
   try {
-    const rows = await getNewUsers();
-  
+    const rows = await prisma.users.findMany({
+      orderBy: { joined: "desc" },
+      take: 5,
+      select: { id: true, nick: true, joined: true },
+    });
+
     return (
       <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
+        <LiveRefresh channel="site:users" />
         <div className="header col-lg-12 p-0">
           <h2 className="ap-1 bg-header">NEW USERS</h2>
         </div>
