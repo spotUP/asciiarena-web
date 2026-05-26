@@ -269,8 +269,8 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
             <button onClick={(e) => { e.stopPropagation(); openPopout(); }}
               title="Pop out to a separate window"
               style={{ background: "none", border: "none", color: "#aaa", cursor: "pointer", padding: "0 2px", fontFamily: "inherit" }}>
-              {/* up-right arrow glyph (works in Topaz; falls back gracefully) */}
-              &#x2197;
+              {/* Plain ASCII caret — Amiga / Topaz charset only, matches _ and X. */}
+              ^
             </button>
           )}
           {!popout && (

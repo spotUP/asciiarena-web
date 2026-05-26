@@ -18,6 +18,22 @@ interface Props {
 export default function PopoutClient({ peerId, peerNick, userId, userNick }: Props) {
   useEffect(() => {
     document.title = `[${peerNick}] chat — aSCIIaRENA`;
+    // 386.css starts the body invisible; the normal site has a SiteLayout
+    // bootstrap script that flips it visible. Popouts don't use SiteLayout,
+    // so we have to undo it ourselves or the window renders blank.
+    document.body.style.visibility = "visible";
+    // The popout window is sized exactly for one ChatWindow at 100vw×100vh.
+    // Default body margin/padding would make the content overflow and show
+    // OS scrollbars; reset margin and pin overflow:hidden on html+body.
+    document.documentElement.style.margin = "0";
+    document.documentElement.style.padding = "0";
+    document.documentElement.style.height = "100%";
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.margin = "0";
+    document.body.style.padding = "0";
+    document.body.style.height = "100%";
+    document.body.style.overflow = "hidden";
+    document.body.style.backgroundColor = "#111";
   }, [peerNick]);
 
   return (
