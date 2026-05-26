@@ -6,6 +6,7 @@ import ChatButton from "./ChatButton";
 import OnlineDot from "@/components/ui/OnlineDot";
 import { prisma } from "@/lib/db";
 import { getSession as auth } from "@/lib/session";
+import { decodeParam } from "@/lib/utils";
 import { notFound } from "next/navigation";
 
 interface MemberRow {
@@ -60,7 +61,8 @@ function formatJoined(ts: number | bigint | null): string {
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ nick: string }> }): Promise<Metadata> {
-  const { nick } = await params;
+  const { nick: rawNick } = await params;
+  const nick = decodeParam(rawNick);
   const rows = await prisma.$queryRaw<{ nick: string }[]>`SELECT nick FROM users WHERE nickurl = ${nick} LIMIT 1`;
   if (!rows[0]) return {};
   return {
@@ -74,7 +76,8 @@ export default async function MemberPage({
 }: {
   params: Promise<{ nick: string }>;
 }) {
-  const { nick } = await params;
+  const { nick: rawNick } = await params;
+  const nick = decodeParam(rawNick);
 
   const [session, members] = await Promise.all([
     auth(),

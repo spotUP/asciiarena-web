@@ -7,7 +7,7 @@ import Link from "next/link";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { getSession as auth } from "@/lib/session";
-import { urlsafe, formatBytes } from "@/lib/utils";
+import { urlsafe, formatBytes, decodeParam } from "@/lib/utils";
 import ReleaseClient from "./ReleaseClient";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
 
@@ -40,11 +40,7 @@ const MONTHS = [
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { filename: rawFilename } = await params;
-  // Some filenames contain characters Next.js leaves URL-encoded in params (e.g. ^ → %5E).
-  // Decode defensively, then strip path-traversal characters.
-  let decoded = rawFilename;
-  try { decoded = decodeURIComponent(rawFilename); } catch { /* fall back to raw */ }
-  const filename = decoded.replace(/\.\./g, "").replace(/[/\\]/g, "");
+  const filename = decodeParam(rawFilename).replace(/\.\./g, "").replace(/[/\\]/g, "");
 
   const colly = await prisma.collys.findFirst({ where: { filename } });
   if (!colly) return {};
@@ -67,11 +63,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ReleasePage({ params }: PageProps) {
   const { filename: rawFilename } = await params;
-  // Some filenames contain characters Next.js leaves URL-encoded in params (e.g. ^ → %5E).
-  // Decode defensively, then strip path-traversal characters.
-  let decoded = rawFilename;
-  try { decoded = decodeURIComponent(rawFilename); } catch { /* fall back to raw */ }
-  const filename = decoded.replace(/\.\./g, "").replace(/[/\\]/g, "");
+  const filename = decodeParam(rawFilename).replace(/\.\./g, "").replace(/[/\\]/g, "");
 
   const [colly, session] = await Promise.all([
     prisma.collys.findFirst({ where: { filename } }),

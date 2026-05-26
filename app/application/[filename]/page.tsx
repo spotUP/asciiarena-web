@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
-import { formatBytes } from "@/lib/utils";
+import { formatBytes, decodeParam } from "@/lib/utils";
 import DownloadButton from "@/components/ui/DownloadButton";
 
 interface PageProps {
@@ -37,7 +37,7 @@ function formatTimestamp(ts: number | null): string {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { filename: raw } = await params;
-  const filename = raw.replace(/\.\./g, "").replace(/[/\\]/g, "");
+  const filename = decodeParam(raw).replace(/\.\./g, "").replace(/[/\\]/g, "");
   const app = await prisma.apps.findFirst({ where: { filename } });
   if (!app) return {};
   return {
@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ApplicationPage({ params }: PageProps) {
   const { filename: raw } = await params;
-  const filename = raw.replace(/\.\./g, "").replace(/[/\\]/g, "");
+  const filename = decodeParam(raw).replace(/\.\./g, "").replace(/[/\\]/g, "");
 
   const app = await prisma.apps.findFirst({ where: { filename } });
   if (!app) notFound();

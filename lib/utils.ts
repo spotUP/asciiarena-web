@@ -1,5 +1,17 @@
 import { NextResponse } from "next/server";
 
+/**
+ * Decode a dynamic route param defensively. Next.js 16 leaves some special
+ * characters URL-encoded inside `params` (e.g. `^` → `%5E`) but our database
+ * stores the decoded form, so a raw findFirst against the param misses the
+ * row and notFound() fires for any nick/filename/name that contains one.
+ * Safe to call on already-decoded input — decodeURIComponent is idempotent
+ * for inputs without `%XX` sequences.
+ */
+export function decodeParam(raw: string): string {
+  try { return decodeURIComponent(raw); } catch { return raw; }
+}
+
 export function urlsafe(s: string): string {
   return s
     .toLowerCase()

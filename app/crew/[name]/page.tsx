@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
-import { urlsafe } from "@/lib/utils";
+import { urlsafe, decodeParam } from "@/lib/utils";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
 
 interface PageProps {
@@ -26,7 +26,8 @@ interface MemberRow {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { name: crewurl } = await params;
+  const { name: rawCrewurl } = await params;
+  const crewurl = decodeParam(rawCrewurl);
   const crew = await prisma.crews.findFirst({ where: { crewurl } });
   if (!crew) return {};
 
@@ -44,7 +45,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function CrewPage({ params }: PageProps) {
-  const { name: crewurl } = await params;
+  const { name: rawCrewurl } = await params;
+  const crewurl = decodeParam(rawCrewurl);
 
   const crew = await prisma.crews.findFirst({
     where: { crewurl },

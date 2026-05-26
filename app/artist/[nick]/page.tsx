@@ -5,7 +5,7 @@ import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { getSession as auth } from "@/lib/session";
-import { urlsafe } from "@/lib/utils";
+import { urlsafe, decodeParam } from "@/lib/utils";
 import ClaimArtistButton from "./ClaimArtistButton";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
 
@@ -43,7 +43,8 @@ function formatJoined(ts: string | null): string {
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ nick: string }> }): Promise<Metadata> {
-  const { nick } = await params;
+  const { nick: rawNick } = await params;
+  const nick = decodeParam(rawNick);
   const artist = await prisma.artists.findFirst({ where: { artisturl: nick } });
   if (!artist) return {};
 
@@ -62,7 +63,8 @@ export async function generateMetadata({ params }: { params: Promise<{ nick: str
 }
 
 export default async function ArtistPage({ params, searchParams }: PageProps) {
-  const { nick } = await params;
+  const { nick: rawNick } = await params;
+  const nick = decodeParam(rawNick);
   const { sort_by: rawSortBy } = await searchParams;
 
   const [session, artist] = await Promise.all([
