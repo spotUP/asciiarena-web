@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import ChatProvider from "@/components/chat/ChatProvider";
 import { ChatContextProvider } from "@/components/chat/ChatContext";
 import "@/app/globals.css";
@@ -41,16 +40,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="stylesheet" href="/assets/css/overrides.css" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#ff55ff" />
+        {/* Bootstrap JS — plain <script> in <head> so it loads before any
+            hydration, independent of Next.js Script strategy quirks. defer
+            lets the DOM parse first; Bootstrap then attaches its global
+            click listeners for dropdowns/modals before user interaction. */}
+        <script src="/assets/js/bootstrap5.bundle.min.js" defer />
       </head>
       <body suppressHydrationWarning>
         <ChatContextProvider>
           {children}
           <ChatProvider />
         </ChatContextProvider>
-        <Script
-          src="/assets/js/bootstrap5.bundle.min.js"
-          strategy="beforeInteractive"
-        />
       </body>
     </html>
   );

@@ -172,17 +172,16 @@ export default function Navbar({ session }: NavbarProps) {
                   ADMiN v
                 </a>
                 <div className="dropdown-menu dropdown-menu-end dropdown-menu-fix bg-red ascii" aria-labelledby="admin-dropdown">
-                  <Link className="dropdown-item ascii" href="/admin#colly">Edit Colly</Link>
-                  <Link className="dropdown-item ascii" href="/admin#app">Edit App</Link>
-                  <Link className="dropdown-item ascii" href="/admin#ascii_mag">Edit Mag</Link>
-                  <Link className="dropdown-item ascii" href="/admin#crew">Edit Crew</Link>
-                  <Link className="dropdown-item ascii" href="/admin#artist">Edit Artist</Link>
-                  <Link className="dropdown-item ascii" href="/admin#edituser">Edit User</Link>
-                  <Link className="dropdown-item ascii" href="/admin#sitelogo">Edit Logo</Link>
-                  <Link className="dropdown-item ascii" href="/admin#bbs">Edit BBS</Link>
-                  <Link className="dropdown-item ascii" href="/admin#request">Edit Requests</Link>
-                  <Link className="dropdown-item ascii" href="/admin#playlist">Edit Playlists</Link>
-                  <Link className="dropdown-item ascii" href="/admin#broken">Broken Collys</Link>
+                  <Link className="dropdown-item ascii" href="/admin">Dashboard</Link>
+                  <Link className="dropdown-item ascii" href="/admin/collys">Collys (incl. broken)</Link>
+                  <Link className="dropdown-item ascii" href="/admin/users">Users</Link>
+                  <Link className="dropdown-item ascii" href="/admin/users/inactive">Inactive Users</Link>
+                  <Link className="dropdown-item ascii" href="/admin/artists">Artists</Link>
+                  <Link className="dropdown-item ascii" href="/admin/crews">Crews</Link>
+                  <Link className="dropdown-item ascii" href="/admin/logos">Logos</Link>
+                  <Link className="dropdown-item ascii" href="/admin/content">Apps &amp; Mags</Link>
+                  <Link className="dropdown-item ascii" href="/admin/bbs">BBS</Link>
+                  <Link className="dropdown-item ascii" href="/admin/requests">Requests</Link>
                 </div>
               </li>
             )}
