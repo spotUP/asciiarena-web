@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import SiteLayout from "@/components/layout/SiteLayout";
 import UnfaveButton from "./UnfaveButton";
 import ChatButton from "./ChatButton";
+import OnlineDot from "@/components/ui/OnlineDot";
 import { prisma } from "@/lib/db";
 import { getSession as auth } from "@/lib/session";
 import { notFound } from "next/navigation";
@@ -158,6 +159,7 @@ export default async function MemberPage({
           <div className="col-sm-4">
             <span className="white">Nick: </span>
             <span className="yellow">{member.nick}</span>
+            <OnlineDot nick={member.nick ?? ""} />
           </div>
           <div className="col-sm-4">
             <span className="white">Status: </span>

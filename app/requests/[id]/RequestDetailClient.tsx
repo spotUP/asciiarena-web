@@ -28,6 +28,7 @@ export default function RequestDetailClient({ requestId, canChangeStatus, isLogg
   const [postResult, setPostResult] = useState("");
   const [statusResult, setStatusResult] = useState("");
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
+  const [watching, setWatching] = useState(0);
   const resultTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const draftTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -56,7 +57,9 @@ export default function RequestDetailClient({ requestId, canChangeStatus, isLogg
     const es = new EventSource(`/api/live?channel=${channel}`);
     es.onmessage = (e: MessageEvent<string>) => {
       const event = JSON.parse(e.data) as LiveEvent;
-      if (event.type === "typing" && event.nick) {
+      if (event.type === "watching") {
+        setWatching((event as { count?: number }).count ?? 0);
+      } else if (event.type === "typing" && event.nick) {
         const nick = event.nick;
         setDrafts(prev => ({ ...prev, [nick]: { nick, text: event.draft ?? "" } }));
         clearTimeout(draftTimers.current[nick]);
@@ -138,7 +141,14 @@ export default function RequestDetailClient({ requestId, canChangeStatus, isLogg
       )}
 
       <div className="row apt-1 apb-1">
-        <h2 className="bg-header">Comments</h2>
+        <h2 className="bg-header">
+          Comments
+          {watching > 1 && (
+            <span className="lightgrey" style={{ fontSize: "13px", marginLeft: "12px" }}>
+              {watching} viewing
+            </span>
+          )}
+        </h2>
       </div>
 
       <div>
