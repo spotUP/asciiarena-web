@@ -40,7 +40,11 @@ const MONTHS = [
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { filename: rawFilename } = await params;
-  const filename = rawFilename.replace(/\.\./g, "").replace(/[/\\]/g, "");
+  // Some filenames contain characters Next.js leaves URL-encoded in params (e.g. ^ → %5E).
+  // Decode defensively, then strip path-traversal characters.
+  let decoded = rawFilename;
+  try { decoded = decodeURIComponent(rawFilename); } catch { /* fall back to raw */ }
+  const filename = decoded.replace(/\.\./g, "").replace(/[/\\]/g, "");
 
   const colly = await prisma.collys.findFirst({ where: { filename } });
   if (!colly) return {};
@@ -63,7 +67,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ReleasePage({ params }: PageProps) {
   const { filename: rawFilename } = await params;
-  const filename = rawFilename.replace(/\.\./g, "").replace(/[/\\]/g, "");
+  // Some filenames contain characters Next.js leaves URL-encoded in params (e.g. ^ → %5E).
+  // Decode defensively, then strip path-traversal characters.
+  let decoded = rawFilename;
+  try { decoded = decodeURIComponent(rawFilename); } catch { /* fall back to raw */ }
+  const filename = decoded.replace(/\.\./g, "").replace(/[/\\]/g, "");
 
   const [colly, session] = await Promise.all([
     prisma.collys.findFirst({ where: { filename } }),
