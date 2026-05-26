@@ -151,7 +151,7 @@ export default function MessagesClient({ userId, userNick, initialReceiverId }: 
   }
 
   async function sendReply() {
-    if (!selectedThreadId || !selectedReceiverId) return;
+    if (!selectedThreadId) return;
     const text = replyRef.current?.value.trim() ?? "";
     if (!text) {
       setStatusMsg("Reply text is required.");
@@ -162,9 +162,9 @@ export default function MessagesClient({ userId, userNick, initialReceiverId }: 
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         thread: selectedThreadId,
-        subject: selectedSubject,
+        subject: selectedSubject || "Re:",
         msgtext: text,
-        receiver: selectedReceiverId,
+        receiver: selectedReceiverId, // server falls back to thread lookup if null
       }),
     });
     if (res.ok) {
@@ -177,7 +177,8 @@ export default function MessagesClient({ userId, userNick, initialReceiverId }: 
       }
       setStatusMsg("Reply sent.");
     } else {
-      setStatusMsg("Failed to send reply.");
+      const err = await res.json().catch(() => ({} as { error?: string }));
+      setStatusMsg(err.error ?? "Failed to send reply.");
     }
   }
 
@@ -249,8 +250,8 @@ export default function MessagesClient({ userId, userNick, initialReceiverId }: 
         </div>
       )}
 
-      {/* Inbox / Outbox list */}
-      {(activeTab === "inbox" || activeTab === "outbox") && (
+      {/* Inbox / Outbox list — hidden while viewing a thread */}
+      {(activeTab === "inbox" || activeTab === "outbox") && selectedThreadId === null && (
         <div className="aml-1 amr-1">
           {loadingMsgs && (
             <div className="row bg-secondary apt-1 apb-1 apl-1">
@@ -308,9 +309,12 @@ export default function MessagesClient({ userId, userNick, initialReceiverId }: 
       )}
 
       {/* Thread view */}
-      {selectedThreadId !== null && currentThread.length > 0 && (
+      {selectedThreadId !== null && (
         <div className="container-fluid bg-secondary aml-1 amr-1 apb-1 amt-1">
-          <div className="header col-12 bg-header ap-1">{selectedSubject}</div>
+          <div className="header col-12 bg-header ap-1 d-flex justify-content-between align-items-center">
+            <span>{selectedSubject || "(no subject)"}</span>
+            <input type="button" className="btn-big" value="Back to inbox" onClick={closeThread} />
+          </div>
           {loadingThread && (
             <div className="row apl-1 apt-1">
               <div className="col-12 lightgrey">Loading thread...</div>

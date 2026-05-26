@@ -18,6 +18,11 @@ interface Props {
   minimized: boolean;
   userId: string;
   userNick: string;
+  // When true: rendering as a standalone popped-out window. Hides minimize and
+  // popout buttons, fills the viewport instead of a fixed 240×~300 dock window,
+  // and the close button closes the OS window via window.close() rather than
+  // mutating the parent's ChatContext.
+  popout?: boolean;
 }
 
 function formatTime(ts: number | null): string {
@@ -26,7 +31,7 @@ function formatTime(ts: number | null): string {
   return d.getHours().toString().padStart(2, "0") + ":" + d.getMinutes().toString().padStart(2, "0");
 }
 
-export default function ChatWindow({ peerId, peerNick, threadId, minimized, userId, userNick }: Props) {
+export default function ChatWindow({ peerId, peerNick, threadId, minimized, userId, userNick, popout = false }: Props) {
   const { closeChat, minimizeChat, setThreadId, markRead, incrementUnread } = useChatContext();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -142,11 +147,13 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
     }
   }, [minimized, peerId, markRead, markReadIfVisible]);
 
-  // Auto-scroll to bottom on new messages
+  // Auto-scroll to bottom on new messages AND when the peer's draft grows,
+  // so the live-typing line stays visible instead of being clipped under
+  // the input row.
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [messages]);
+  }, [messages, peerDraft]);
 
   const broadcastTyping = (text: string) => {
     const tid = threadIdRef.current;
@@ -178,7 +185,9 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
 
     try {
       const body: { peerId: number; message: string; threadId?: number } = { peerId, message: text };
-      if (tid !== null) body.threadId = tid;
+      // Only pass a positive thread id; the server's Zod schema requires
+      // .int().positive(), so threadId=0 (legacy rows) would 400.
+      if (tid && tid > 0) body.threadId = tid;
       const res = await fetch("/api/chat/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -188,11 +197,12 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
       if (data?.ok) {
         setInput("");
         const newThreadId = data.threadId;
-        if (!tid && newThreadId) {
+        if ((!tid || tid <= 0) && newThreadId) {
           setThreadId(peerId, newThreadId);
           subscribeToThread(newThreadId);
         }
-        loadMessages(newThreadId ?? tid!);
+        const reloadId = newThreadId ?? (tid && tid > 0 ? tid : null);
+        if (reloadId) loadMessages(reloadId);
       }
     } catch { /* ignore */ } finally {
       setSending(false);
@@ -208,10 +218,30 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
 
   const myId = parseInt(userId);
 
+  const openPopout = () => {
+    const w = window.open(
+      `/chat/window/${peerId}`,
+      `chat_${peerId}`,
+      "width=340,height=500,resizable=yes,scrollbars=no,menubar=no,toolbar=no,location=no,status=no"
+    );
+    if (w) closeChat(peerId);
+  };
+
   if (minimized) return null; // ChatBar renders the tab; window is hidden
 
   return (
-    <div style={{
+    <div style={popout ? {
+      // Popout: fill the OS window
+      width: "100vw",
+      height: "100vh",
+      display: "flex",
+      flexDirection: "column",
+      backgroundColor: "#111",
+      fontFamily: "TopazPlus_a1200, monospace",
+      fontSize: "13px",
+      lineHeight: "16px",
+    } : {
+      // Inline dock
       width: "240px",
       display: "flex",
       flexDirection: "column",
@@ -228,18 +258,34 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        cursor: "pointer",
+        cursor: popout ? "default" : "pointer",
         userSelect: "none",
-      }} onClick={() => minimizeChat(peerId, true)}>
+      }} onClick={popout ? undefined : () => minimizeChat(peerId, true)}>
         <span className="yellow" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           [{peerNick}]
         </span>
         <span style={{ display: "flex", gap: "4px", flexShrink: 0 }}>
-          <button onClick={(e) => { e.stopPropagation(); minimizeChat(peerId, true); }}
-            style={{ background: "none", border: "none", color: "#aaa", cursor: "pointer", padding: "0 2px", fontFamily: "inherit" }}>
-            _
-          </button>
-          <button onClick={(e) => { e.stopPropagation(); closeChat(peerId); }}
+          {!popout && (
+            <button onClick={(e) => { e.stopPropagation(); openPopout(); }}
+              title="Pop out to a separate window"
+              style={{ background: "none", border: "none", color: "#aaa", cursor: "pointer", padding: "0 2px", fontFamily: "inherit" }}>
+              {/* up-right arrow glyph (works in Topaz; falls back gracefully) */}
+              &#x2197;
+            </button>
+          )}
+          {!popout && (
+            <button onClick={(e) => { e.stopPropagation(); minimizeChat(peerId, true); }}
+              title="Minimise"
+              style={{ background: "none", border: "none", color: "#aaa", cursor: "pointer", padding: "0 2px", fontFamily: "inherit" }}>
+              _
+            </button>
+          )}
+          <button onClick={(e) => {
+            e.stopPropagation();
+            if (popout) window.close();
+            else closeChat(peerId);
+          }}
+            title={popout ? "Close window" : "Close"}
             style={{ background: "none", border: "none", color: "#aaa", cursor: "pointer", padding: "0 2px", fontFamily: "inherit" }}>
             X
           </button>
@@ -248,7 +294,7 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
 
       {/* Messages */}
       <div ref={scrollRef} style={{
-        height: "220px",
+        ...(popout ? { flex: 1, minHeight: 0 } : { height: "220px" }),
         overflowY: "auto",
         overflowX: "hidden",
         backgroundColor: "#212121",

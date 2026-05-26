@@ -32,14 +32,17 @@ export function ChatContextProvider({ children }: { children: ReactNode }) {
   const [windows, setWindows] = useState<ChatWindowState[]>([]);
 
   const openChat = useCallback((peerId: number, peerNick: string, threadId?: number) => {
+    // Legacy messages have thread=0; treat that as "no real thread yet" so the
+    // window falls through to /api/chat/thread lookup or new-thread creation.
+    const tid = threadId && threadId > 0 ? threadId : null;
     setWindows(prev => {
       const exists = prev.find(w => w.peerId === peerId);
       if (exists) {
         return prev.map(w =>
-          w.peerId === peerId ? { ...w, minimized: false, unread: 0, threadId: threadId ?? w.threadId } : w
+          w.peerId === peerId ? { ...w, minimized: false, unread: 0, threadId: tid ?? w.threadId } : w
         );
       }
-      const next = [...prev, { peerId, peerNick, threadId: threadId ?? null, minimized: false, unread: 0 }];
+      const next = [...prev, { peerId, peerNick, threadId: tid, minimized: false, unread: 0 }];
       if (next.length > 4) {
         // Drop oldest minimized window to stay at max 4
         const minIdx = next.findIndex(w => w.minimized);

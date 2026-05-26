@@ -14,10 +14,12 @@ export async function GET(request: NextRequest) {
 
   const myId = parseInt(session.user.id);
 
+  // Prefer rows that have a proper thread id; ignore legacy rows where thread = 0.
   const rows = await prisma.$queryRaw<[{ thread: number }?]>`
     SELECT thread FROM messages
-    WHERE (from_id = ${myId} AND to_id = ${peerId})
-       OR (from_id = ${peerId} AND to_id = ${myId})
+    WHERE ((from_id = ${myId} AND to_id = ${peerId})
+        OR (from_id = ${peerId} AND to_id = ${myId}))
+      AND thread > 0
     ORDER BY id DESC LIMIT 1
   `;
 

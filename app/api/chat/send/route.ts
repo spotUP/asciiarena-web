@@ -41,23 +41,26 @@ export async function POST(request: NextRequest) {
     return apiOk({ ok: true, threadId: existingThreadId });
   }
 
-  // First message — insert without thread, then set thread = message id
-  await prisma.$executeRaw`
-    INSERT INTO messages (from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
-    VALUES (
-      ${fromId}, ${peerId},
-      (SELECT nick FROM users WHERE id = ${peerId}),
-      (SELECT nick FROM users WHERE id = ${fromId}),
-      UNIX_TIMESTAMP(), 'Chat', ${message}, 1, 1
-    )
-  `;
-
-  const inserted = await prisma.$queryRaw<[{ msgId: number }]>`
-    SELECT LAST_INSERT_ID() AS msgId
-  `;
-  const msgId = inserted[0]?.msgId;
-  await prisma.$executeRaw`UPDATE messages SET thread = ${msgId} WHERE id = ${msgId}`;
-  const threadId = msgId;
+  // First message — INSERT, then SELECT LAST_INSERT_ID(), then UPDATE thread = id.
+  // These three queries MUST share one MySQL connection or LAST_INSERT_ID() returns 0
+  // (it's connection-scoped). Without the transaction, Prisma's pool can hand each
+  // query a different connection and the thread id silently becomes 0.
+  const threadId = await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`
+      INSERT INTO messages (from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
+      VALUES (
+        ${fromId}, ${peerId},
+        (SELECT nick FROM users WHERE id = ${peerId}),
+        (SELECT nick FROM users WHERE id = ${fromId}),
+        UNIX_TIMESTAMP(), 'Chat', ${message}, 1, 1
+      )
+    `;
+    const inserted = await tx.$queryRaw<[{ msgId: number }]>`SELECT LAST_INSERT_ID() AS msgId`;
+    const msgId = Number(inserted[0]?.msgId ?? 0);
+    if (!msgId) throw new Error("LAST_INSERT_ID returned 0");
+    await tx.$executeRaw`UPDATE messages SET thread = ${msgId} WHERE id = ${msgId}`;
+    return msgId;
+  });
 
   broadcast(`thread:${threadId}`, { type: "message" });
   broadcast(`user:${peerId}:messages`, { type: "message", fromId, fromNick, threadId });

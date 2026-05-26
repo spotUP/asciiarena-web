@@ -89,14 +89,29 @@ export async function POST(
   };
 
   const thread = body.thread ?? parseInt(threadId);
-  const { subject, msgtext, receiver } = body;
+  const { msgtext } = body;
+  const subject = body.subject?.trim() || "Re:";
 
-  if (!subject || !msgtext || !receiver) {
-    return apiError("subject, msgtext and receiver are required", 400);
-  }
+  if (!msgtext) return apiError("msgtext required", 400);
 
   const fromId = parseInt(session.user.id);
   const fromNick = session.user.name ?? "";
+
+  // Determine receiver: prefer the value supplied by the client; otherwise look up
+  // the other participant from the thread itself. This makes Reply work even when
+  // replyid was missing or never resolved on the client side.
+  let receiver = body.receiver ?? null;
+  if (!receiver) {
+    const rows = await prisma.$queryRaw<{ from_id: number | null; to_id: number | null }[]>`
+      SELECT from_id, to_id FROM messages
+      WHERE thread = ${thread}
+        AND (from_id = ${fromId} OR to_id = ${fromId})
+      ORDER BY id DESC LIMIT 1
+    `;
+    const row = rows[0];
+    if (row) receiver = row.to_id === fromId ? row.from_id : row.to_id;
+  }
+  if (!receiver) return apiError("could not determine receiver", 400);
 
   await prisma.$executeRaw`
     INSERT INTO messages (thread, from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
