@@ -41,11 +41,10 @@ export async function POST(request: NextRequest) {
     return apiOk({ ok: true, threadId: existingThreadId });
   }
 
-  // First message — create new thread
+  // First message — insert without thread, then set thread = message id
   await prisma.$executeRaw`
-    INSERT INTO messages (thread, from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
+    INSERT INTO messages (from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
     VALUES (
-      UNIX_TIMESTAMP() * 10000 + ${fromId},
       ${fromId}, ${peerId},
       (SELECT nick FROM users WHERE id = ${peerId}),
       (SELECT nick FROM users WHERE id = ${fromId}),
@@ -53,10 +52,12 @@ export async function POST(request: NextRequest) {
     )
   `;
 
-  const inserted = await prisma.$queryRaw<[{ threadId: number }]>`
-    SELECT thread AS threadId FROM messages WHERE id = LAST_INSERT_ID()
+  const inserted = await prisma.$queryRaw<[{ msgId: number }]>`
+    SELECT LAST_INSERT_ID() AS msgId
   `;
-  const threadId = inserted[0]?.threadId;
+  const msgId = inserted[0]?.msgId;
+  await prisma.$executeRaw`UPDATE messages SET thread = ${msgId} WHERE id = ${msgId}`;
+  const threadId = msgId;
 
   broadcast(`thread:${threadId}`, { type: "message" });
   broadcast(`user:${peerId}:messages`, { type: "message", fromId, fromNick, threadId });
