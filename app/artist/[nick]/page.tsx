@@ -7,6 +7,7 @@ import { Prisma } from "@/lib/generated/prisma/client";
 import { getSession as auth } from "@/lib/session";
 import { urlsafe } from "@/lib/utils";
 import ClaimArtistButton from "./ClaimArtistButton";
+import LiveRefresh from "@/components/widgets/LiveRefresh";
 
 interface PageProps {
   params: Promise<{ nick: string }>;
@@ -132,6 +133,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
 
   return (
     <SiteLayout title="aRTIST iNFO">
+      <LiveRefresh channel="site:votes" />
       <div className="row apb-1">
         <div className="header col-lg-12">
           <h2 className="ap-1 bg-header">{artist.nick}</h2>

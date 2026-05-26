@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { revalidatePath } from "next/cache";
+import { broadcast } from "@/lib/live";
 import { broadcastActivityIfAllowed } from "@/lib/activity";
 
 export async function trackView(collyId: number) {
@@ -92,6 +93,16 @@ export async function postComment(
     VALUES (${collyId}, ${userId}, ${comment}, ${ratingNum}, ${Math.floor(Date.now() / 1000)}, ${colly?.filename ?? null}, ${nick})
   `;
   if (colly?.filename) revalidatePath('/release/' + colly.filename);
+  broadcast(`comments:${collyId}`, { type: "posted", nick });
+  broadcast("site:comments", { type: "posted" });
+  if (ratingNum !== null) {
+    broadcast("site:votes", {
+      type: "vote",
+      collyId,
+      filename: colly?.filename ?? null,
+      rating: ratingNum,
+    });
+  }
   return { success: true };
 }
 

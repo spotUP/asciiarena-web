@@ -1,25 +1,24 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
-import { unstable_cache } from "next/cache";
+import LiveRefresh from "@/components/widgets/LiveRefresh";
 
-const getTopArtists = unstable_cache(
-  async (limit: number) => prisma.artists.findMany({
-      where: { rating: { gt: 0 } },
-      orderBy: { rating: "desc" },
-      take: limit,
-      select: { id: true, nick: true, rating: true },
-    }),
-  ["top-artists"],
-  { revalidate: 600 }
-);
+async function getTopArtists(limit: number) {
+  return prisma.artists.findMany({
+    where: { rating: { gt: 0 } },
+    orderBy: { rating: "desc" },
+    take: limit,
+    select: { id: true, nick: true, rating: true },
+  });
+}
 
 export default async function TopArtists({ limit = 5 }: { limit?: number }) {
   try {
     const rows = await getTopArtists(limit);
-  
+
     return (
       <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
+        <LiveRefresh channel="site:votes" />
         <div className="header col-lg-12 p-0">
           <h2 className="ap-1 bg-header">TOP {limit} ARTISTS</h2>
         </div>

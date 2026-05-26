@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/generated/prisma/client";
+import LiveRefresh from "@/components/widgets/LiveRefresh";
 
 type TopColly = { filename: string; rating: number };
 
-const getTopCollys = unstable_cache(
-  async (limit: number) => prisma.$queryRaw<TopColly[]>(Prisma.sql`
+async function getTopCollys(limit: number) {
+  return prisma.$queryRaw<TopColly[]>(Prisma.sql`
     SELECT c.filename, c.rating
     FROM collys c
     INNER JOIN (
@@ -15,16 +15,15 @@ const getTopCollys = unstable_cache(
     ) v ON v.colly_id = c.id
     ORDER BY c.rating DESC
     LIMIT ${limit}
-  `),
-  ["top-collys"],
-  { revalidate: 600 }
-);
+  `);
+}
 
 export default async function TopCollys({ limit = 5 }: { limit?: number }) {
   try {
     const rows = await getTopCollys(limit);
     return (
       <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
+        <LiveRefresh channel="site:votes" />
         <div className="header col-lg-12 p-0">
           <h2 className="ap-1 bg-header">TOP {limit} COLLYS</h2>
         </div>

@@ -1,25 +1,24 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
-import { unstable_cache } from "next/cache";
+import LiveRefresh from "@/components/widgets/LiveRefresh";
 
-const getTopCrews = unstable_cache(
-  async (limit: number) => prisma.crews.findMany({
-      where: { rating: { gt: 0 } },
-      orderBy: { rating: "desc" },
-      take: limit,
-      select: { id: true, name: true, rating: true },
-    }),
-  ["top-crews"],
-  { revalidate: 600 }
-);
+async function getTopCrews(limit: number) {
+  return prisma.crews.findMany({
+    where: { rating: { gt: 0 } },
+    orderBy: { rating: "desc" },
+    take: limit,
+    select: { id: true, name: true, rating: true },
+  });
+}
 
 export default async function TopCrews({ limit = 5 }: { limit?: number }) {
   try {
     const rows = await getTopCrews(limit);
-  
+
     return (
       <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
+        <LiveRefresh channel="site:votes" />
         <div className="header col-lg-12 p-0">
           <h2 className="ap-1 bg-header">TOP {limit} CREWS</h2>
         </div>

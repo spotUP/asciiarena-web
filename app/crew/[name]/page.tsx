@@ -4,6 +4,7 @@ import Link from "next/link";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
+import LiveRefresh from "@/components/widgets/LiveRefresh";
 
 interface PageProps {
   params: Promise<{ name: string }>;
@@ -85,6 +86,7 @@ export default async function CrewPage({ params }: PageProps) {
 
   return (
     <SiteLayout title="CREW iNFO">
+      <LiveRefresh channel="site:votes" />
       <div className="row apb-1">
         <div className="header col-lg-12">
           <h2 className="ap-1 bg-header">{crew.name}</h2>
