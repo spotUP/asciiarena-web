@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ChatProvider from "@/components/chat/ChatProvider";
 import { ChatContextProvider } from "@/components/chat/ChatContext";
+import CaretOverlay from "@/components/ui/CaretOverlay";
 import "@/app/globals.css";
 
 export const metadata: Metadata = {
@@ -51,6 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
           <ChatProvider />
         </ChatContextProvider>
+        <CaretOverlay />
       </body>
     </html>
   );

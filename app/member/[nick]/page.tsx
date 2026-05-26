@@ -244,7 +244,7 @@ export default async function MemberPage({
           </div>
         )}
 
-        {!isOwnProfile && (
+        {session?.user && !isOwnProfile && (
           <div className="row apt-1">
             <ChatButton peerId={member.id} peerNick={member.nick ?? ""} />
           </div>
