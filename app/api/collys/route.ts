@@ -16,6 +16,7 @@ import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { existsSync } from "fs";
 import { broadcast } from "@/lib/live";
+import { broadcastActivityIfAllowed } from "@/lib/activity";
 
 interface CollyRow {
   id: number;
@@ -249,7 +250,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   revalidateTag("latest-collys", "default");
   broadcast("site:releases", { type: "posted" });
-  broadcast("site:activity", { type: "upload", nick: uploaderNick, target: filename, targetUrl: `/release/${filename}`, timestamp: Math.floor(Date.now() / 1000) });
+  await broadcastActivityIfAllowed(uploaderId, "upload", { type: "upload", nick: uploaderNick, target: filename, targetUrl: `/release/${filename}`, timestamp: Math.floor(Date.now() / 1000) });
 
   // Discord notification
   const releaseUrl = `https://asciiarena.se/release/${urlsafe(filename)}`;

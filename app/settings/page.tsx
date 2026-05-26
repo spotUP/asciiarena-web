@@ -1,5 +1,7 @@
 import SiteLayout from "@/components/layout/SiteLayout";
 import SettingsForm from "./SettingsForm";
+import LiveFeedSettings from "./LiveFeedSettings";
+import WidgetSettings from "./WidgetSettings";
 import { getSession as auth } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { getInitialSettings } from "@/app/actions/settings";
@@ -11,6 +13,8 @@ export default async function SettingsPage() {
   return (
     <SiteLayout title="SETTiNGS">
       <SettingsForm initialSettings={initialSettings} />
+      <LiveFeedSettings />
+      <WidgetSettings />
     </SiteLayout>
   );
 }

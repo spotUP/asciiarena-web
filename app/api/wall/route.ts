@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { broadcast } from "@/lib/live";
+import { broadcastActivityIfAllowed } from "@/lib/activity";
 
 interface WallPostRow {
   id: number;
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
   }));
 
   broadcast(`wall:${wall_id}`, { type: "posted", nick, tag: cleanTag });
-  broadcast("site:activity", { type: "wall", nick, target: cleanTag, targetUrl: "/", timestamp: Math.floor(Date.now() / 1000) });
+  await broadcastActivityIfAllowed(userId, "wall", { type: "wall", nick, target: cleanTag, targetUrl: "/", timestamp: Math.floor(Date.now() / 1000) });
 
   return apiOk(result);
 }

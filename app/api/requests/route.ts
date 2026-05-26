@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { apiError, apiOk, notifyDiscord, REQUEST_WEBHOOK, REQ_SORT_COLS, safeSort } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { broadcast } from "@/lib/live";
+import { broadcastActivityIfAllowed } from "@/lib/activity";
 
 const postSchema = z.object({
   title: z.string().min(1).max(500),
@@ -121,7 +122,7 @@ export async function POST(request: NextRequest) {
 
   const inserted = await prisma.$queryRaw<[{ id: number }]>`SELECT LAST_INSERT_ID() AS id`;
   const reqId = inserted[0]?.id;
-  broadcast("site:activity", { type: "request", nick, target: title, targetUrl: reqId ? `/requests/${reqId}` : "/requests", timestamp: Math.floor(Date.now() / 1000) });
+  await broadcastActivityIfAllowed(userId, "request", { type: "request", nick, target: title, targetUrl: reqId ? `/requests/${reqId}` : "/requests", timestamp: Math.floor(Date.now() / 1000) });
 
   return apiOk({ status: true }, 201);
 }

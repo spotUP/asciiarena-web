@@ -321,6 +321,16 @@ model users {
   nickurl                          String            @db.Char(60)
   crt_effect                       users_crt_effect  @default(N)
   anim_effect                      users_anim_effect @default(N)
+  // Comma-separated list of activity-feed event types the user has opted out
+  // of broadcasting. Examples of types: "wall", "upload", "request", "view",
+  // "comment". NULL or "" means everything is broadcast as normal. Stored as
+  // text rather than a boolean per type so future event types don't require
+  // a schema change.
+  activity_hidden_types            String?           @db.VarChar(255)
+  // Comma-separated list of widget keys the user wants hidden from their
+  // own view. See lib/widgets-types.ts for the canonical key list. NULL
+  // means show all widgets (the default).
+  hidden_widgets                   String?           @db.VarChar(500)
   artists                          artists[]
   messages_messages_from_idTousers messages[]        @relation("messages_from_idTousers")
   messages_messages_to_idTousers   messages[]        @relation("messages_to_idTousers")

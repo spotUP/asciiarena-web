@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
-import { broadcast } from "@/lib/live";
+import { broadcastActivityIfAllowed } from "@/lib/activity";
 
 export const dynamic = "force-dynamic";
 
@@ -22,8 +22,9 @@ export async function POST(request: NextRequest) {
 
   const { type, target, targetUrl } = parsed.data;
   const nick = session.user.name;
+  const userId = parseInt(session.user.id);
 
-  broadcast("site:activity", {
+  await broadcastActivityIfAllowed(userId, type, {
     type,
     nick,
     target,
