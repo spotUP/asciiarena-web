@@ -1,0 +1,12 @@
+[   10992ms] [WARNING] Blocked aria-hidden on an element because its descendant retained focus. The focus must not be hidden from assistive technology users. Avoid using aria-hidden on a focused element or its ancestor. Consider using the inert attribute instead, which will also prevent focus. For more details, see the aria-hidden section of the WAI-ARIA specification at https://w3c.github.io/aria/#aria-hidden.
+Element with focus: <input.form-control#login-password>
+Ancestor with aria-hidden: <div.modal#login> @ https://dev.asciiarena.se/login:0
+[   15727ms] [WARNING] The resource https://dev.asciiarena.se/assets/fonts/TopazPlus_a1200.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://dev.asciiarena.se/:0
+[   20707ms] TypeError: Cannot read properties of null (reading 'value')
+    at HTMLButtonElement.loginUser (<anonymous>:3:61)
+    at eval (eval at <anonymous> (eval at evaluate (:302:30)), <anonymous>:1:54)
+    at eval (eval at evaluate (:302:30), <anonymous>:4:50)
+    at UtilityScript.evaluate (<anonymous>:304:16)
+    at UtilityScript.<anonymous> (<anonymous>:1:44)
+[   25309ms] [WARNING] The resource https://dev.asciiarena.se/assets/fonts/TopazPlus_a1200.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://dev.asciiarena.se/:0
+[   29097ms] [WARNING] The resource https://dev.asciiarena.se/assets/fonts/TopazPlus_a1200.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://dev.asciiarena.se/:0

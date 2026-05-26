@@ -1,0 +1,13 @@
+[    1127ms] ReferenceError: bootstrap is not defined
+    at <anonymous>:2:9
+    at m (https://asciiarena.se/_next/static/chunks/10ydbr_3mc3zi.js:1:13645)
+    at https://asciiarena.se/_next/static/chunks/10ydbr_3mc3zi.js:1:14459
+    at iv (https://asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:102010)
+    at up (https://asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:126049)
+    at ud (https://asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:125711)
+    at up (https://asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:126094)
+    at ud (https://asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:125711)
+    at up (https://asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:126094)
+    at ud (https://asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:125711)
+[    1416ms] [WARNING] Error while trying to use the following icon from the Manifest: https://asciiarena.se/assets/data/socialmedia.png (Resource size is not correct - typo in the Manifest?) @ https://asciiarena.se/login:0
+[   16464ms] [WARNING] Error while trying to use the following icon from the Manifest: https://asciiarena.se/assets/data/socialmedia.png (Resource size is not correct - typo in the Manifest?) @ https://asciiarena.se/:0

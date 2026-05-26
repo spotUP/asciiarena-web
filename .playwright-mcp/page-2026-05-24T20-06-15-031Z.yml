@@ -1,0 +1,1735 @@
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - link "aSCIIaRENA" [ref=e4]:
+      - /url: /
+    - generic [ref=e5]:
+      - list [ref=e6]:
+        - listitem [ref=e7]:
+          - link "COLLYS v" [ref=e8]:
+            - /url: /collys
+        - listitem [ref=e9]:
+          - link "MAGS v" [ref=e10]:
+            - /url: /mags
+        - listitem [ref=e11]:
+          - link "APPS v" [ref=e12]:
+            - /url: /apps
+        - listitem [ref=e13]:
+          - link "ARTiSTS" [ref=e14]:
+            - /url: /artists
+        - listitem [ref=e15]:
+          - link "CREWS" [ref=e16]:
+            - /url: /crews
+        - listitem [ref=e17]:
+          - link "BOARDS" [ref=e18]:
+            - /url: /bbs
+        - listitem [ref=e19]:
+          - link "REQUESTS" [ref=e20]:
+            - /url: /requests
+        - listitem [ref=e21]:
+          - link "ABOUT" [ref=e22]:
+            - /url: /about
+        - listitem [ref=e23]:
+          - link "ASCII STYLE DESIGNER" [ref=e24]:
+            - /url: /styleeditor
+        - listitem [ref=e25]:
+          - link "WORKBENCH" [ref=e26]:
+            - /url: https://hippoplayer.se
+        - listitem [ref=e27]:
+          - link "SUBMiT v" [ref=e28]:
+            - /url: /submit
+      - list [ref=e29]:
+        - listitem [ref=e30]:
+          - textbox "search..." [ref=e32]
+        - listitem [ref=e33]:
+          - link "ACCOUNT v" [ref=e34]:
+            - /url: "#"
+        - listitem [ref=e35]:
+          - link "ADMiN v" [ref=e36]:
+            - /url: /admin
+  - generic [ref=e37]:
+    - link "__ __ _____ neRV ___|\\ /|___ / / \\ aSCIIaRENa \\\\ aEROSol /\\ | \\ /___ \\ / \\ ____ ________ ____ ________ ____ \\ \\| / \\| / \\ ______|\\ / |/ / / __\\__ / |\\ \\ ______|\\ \\ \\ \\ \\ / \\| / |\\ \\ / _____/ | \\ \\ / \\| \\ \\ \\ \\ \\ \\ | \\ / / \\ | \\ / \\ \\ \\ \\ \\ \\ | \\ \\ \\ | \\ \\ \\ _____/______\\______\\______\\/________\\| _ \\____\\_________\\| __ \\___\\_________\\__" [ref=e43]:
+      - /url: /
+      - generic [ref=e44]: __ __ _____ neRV ___|\ /|___ / / \ aSCIIaRENa \\ aEROSol /\ | \ /___ \ / \ ____ ________ ____ ________ ____ \ \| / \| / \ ______|\ / |/ / / __\__ / |\ \ ______|\ \ \ \ \ / \| / |\ \ / _____/ | \ \ / \| \ \ \ \ \ \ | \ / / \ | \ / \ \ \ \ \ \ | \ \ \ | \ \ \ _____/______\______\______\/________\| _ \____\_________\| __ \___\_________\__
+    - heading "SUBMIT" [level=1] [ref=e48]
+    - generic [ref=e52]:
+      - generic [ref=e54]:
+        - tablist [ref=e55]:
+          - tab "Colly" [selected] [ref=e56]
+          - tab "Crew" [ref=e57]
+          - tab "Artist" [ref=e58]
+          - tab "Bbs" [ref=e59]
+          - tab "App" [ref=e60]
+          - tab "Mag" [ref=e61]
+          - tab "Request" [ref=e62]
+          - tab "Logo" [ref=e63]
+        - generic [ref=e65]:
+          - generic [ref=e66]:
+            - generic [ref=e67]: File (required)
+            - button "Choose File" [active] [ref=e68]
+          - generic [ref=e69]:
+            - generic [ref=e70]: Name
+            - textbox "Collection name" [ref=e71]
+          - generic [ref=e72]:
+            - generic [ref=e73]:
+              - generic [ref=e74]: Year
+              - spinbutton [ref=e75]
+            - generic [ref=e76]:
+              - generic [ref=e77]: Month
+              - spinbutton [ref=e78]
+            - generic [ref=e79]:
+              - generic [ref=e80]: Day
+              - spinbutton [ref=e81]
+          - generic [ref=e82]:
+            - generic [ref=e83]: Artist(s)
+            - combobox [ref=e85]:
+              - option "-- Unknown --" [selected]
+              - option "(uSt0"
+              - option "[V!R]"
+              - option "=zEn="
+              - option "$LaB"
+              - option "0hm37k"
+              - option "2 sTONED"
+              - option "2fAST"
+              - option "501"
+              - option "610"
+              - option "7RaNZiiE"
+              - option "911"
+              - option "Abhorrence"
+              - option "abstrakt"
+              - option "AcE"
+              - option "Acen"
+              - option "Acid"
+              - option "Acid Brain"
+              - option "Acid Kid"
+              - option "Acidflash"
+              - option "Acorn"
+              - option "Adon"
+              - option "aDRoCk"
+              - option "Aguila"
+              - option "AKM"
+              - option "alcatraz"
+              - option "Alex"
+              - option "Alirion"
+              - option "Allanon"
+              - option "AmalGamAte"
+              - option "Amblin"
+              - option "AnF"
+              - option "ånGeST"
+              - option "Annie"
+              - option "Ansichrist"
+              - option "aNToPhELEs"
+              - option "ApC"
+              - option "Apu"
+              - option "aQua"
+              - option "ARAGON"
+              - option "Arlequin"
+              - option "arrogance"
+              - option "Arschpupser"
+              - option "Arson"
+              - option "Aryan"
+              - option "aSPHIXIA"
+              - option "Asphynx"
+              - option "Astrocreep"
+              - option "atlantic"
+              - option "Aveng3r"
+              - option "Avenger"
+              - option "Axe"
+              - option "AxebLade"
+              - option "aXY"
+              - option "Azoore"
+              - option "Azzaro"
+              - option "BÂ¿BøPP"
+              - option "bad spirit"
+              - option "baGGeN"
+              - option "bANDiDO"
+              - option "Barium"
+              - option "Bart"
+              - option "Bashguard"
+              - option "Bastard"
+              - option "BC"
+              - option "BeAvIs"
+              - option "Befeater"
+              - option "Behemoth"
+              - option "bELZEBUB"
+              - option "BeTTY BoY"
+              - option "bEYOND"
+              - option "BhUddA"
+              - option "BiG W^TsN"
+              - option "Biogenesis"
+              - option "bird"
+              - option "BiSCRoK"
+              - option "bJÃ–RNE"
+              - option "Black Dragon"
+              - option "bLACK pANTHER"
+              - option "Blaze"
+              - option "Blazer"
+              - option "Blindman"
+              - option "blockman"
+              - option "Blood Shot"
+              - option "Blue"
+              - option "bLUNT"
+              - option "bOhEmE"
+              - option "bOO-yA"
+              - option "boobba"
+              - option "Boomer"
+              - option "Boone"
+              - option "Boozo"
+              - option "Bøøth"
+              - option "Brainless Team Work"
+              - option "Brane"
+              - option "breeze"
+              - option "bRIAN"
+              - option "brow"
+              - option "Budgie"
+              - option "Bugge"
+              - option "bUGmAN"
+              - option "bugsy"
+              - option "Bull"
+              - option "Buzz Wipe"
+              - option "c-real"
+              - option "c.I.P."
+              - option "cain"
+              - option "Cake"
+              - option "Calkster"
+              - option "cAPTAiN cAVEMaN"
+              - option "CARbONÂ²"
+              - option "Cardinal"
+              - option "CarLoS"
+              - option "Carnage"
+              - option "Case"
+              - option "Case 78"
+              - option "Cateye"
+              - option "cEE JAY"
+              - option "Celsius"
+              - option "Cenobite"
+              - option "Chill"
+              - option "Choize"
+              - option "Chosen"
+              - option "Chrombacher"
+              - option "chrome"
+              - option "cINZAN0"
+              - option "CiTADEL"
+              - option "Clairvoyant"
+              - option "Clasp"
+              - option "Cleaner"
+              - option "cLONE"
+              - option "CNR"
+              - option "CoaXCable"
+              - option "cOCO pOPS"
+              - option "cOLa"
+              - option "concept"
+              - option "Cool96"
+              - option "cORRUPT"
+              - option "cOUNT dAN"
+              - option "Counterpoint"
+              - option "CountZero"
+              - option "cP!"
+              - option "Crack"
+              - option "CRaY"
+              - option "Crazy"
+              - option "crL"
+              - option "CRoCAT"
+              - option "Cru"
+              - option "crus"
+              - option "Crusader"
+              - option "cRYPtOR"
+              - option "Ctp"
+              - option "Cube"
+              - option "Cubon"
+              - option "CuZ"
+              - option "Cyber Kid"
+              - option "Cybergod"
+              - option "CyberPunk"
+              - option "Cyclone"
+              - option "Czar"
+              - option "D0n"
+              - option "d2MACCY"
+              - option "Daeron"
+              - option "DaFreak"
+              - option "Danny"
+              - option "Danzig"
+              - option "DARKHOLDER"
+              - option "DarkSpirit"
+              - option "Darkus"
+              - option "Dartagnan"
+              - option "dASh"
+              - option "dASHZERO"
+              - option "Data"
+              - option "dAtAfLOW"
+              - option "Dave"
+              - option "dAYTONA"
+              - option "dDay"
+              - option "Dead Brain"
+              - option "dEAMO"
+              - option "dEATHLORd"
+              - option "Dedchylde"
+              - option "Def Base"
+              - option "DELiTE"
+              - option "Delta TX"
+              - option "Demax"
+              - option "DeOne"
+              - option "Desert"
+              - option "Desoto"
+              - option "dEThCRUSh"
+              - option "Devil"
+              - option "Devistator"
+              - option "Dew"
+              - option "Dexter"
+              - option "Dezibel"
+              - option "dHARMA"
+              - option "dHM"
+              - option "diESEL"
+              - option "Dino"
+              - option "dIP RomP"
+              - option "Diplomat"
+              - option "Dipswitch"
+              - option "DiRK!"
+              - option "dIZY"
+              - option "dmD"
+              - option "dMG"
+              - option "DOCTOR SHIZUMA"
+              - option "Don Rapello"
+              - option "DoS"
+              - option "Dr Feelgood"
+              - option "DR.AnAL FrEsER"
+              - option "Dr.Avalanche"
+              - option "Dragon"
+              - option "Drakar"
+              - option "drastic"
+              - option "Draw"
+              - option "dRUID"
+              - option "dual"
+              - option "dVIZE"
+              - option "Dwarf"
+              - option "Dweeb"
+              - option "Dyonisos"
+              - option "e"
+              - option "eASY"
+              - option "eclipse"
+              - option "el bruto"
+              - option "El Nino"
+              - option "Elend"
+              - option "Elfin!"
+              - option "ellus"
+              - option "Elric"
+              - option "Elric?"
+              - option "Elvis"
+              - option "Enforcer"
+              - option "epitaphic"
+              - option "Erick Sermon"
+              - option "Erupt"
+              - option "Escuma"
+              - option "Everlast"
+              - option "eVRiMSSON"
+              - option "eXCITER"
+              - option "Exile"
+              - option "Exocet"
+              - option "F.n.M"
+              - option "Fahrenheit"
+              - option "Fake!"
+              - option "Far"
+              - option "fATAL"
+              - option "Fate"
+              - option "Fazwonga"
+              - option "fear"
+              - option "Fenriz"
+              - option "Fighter for Future"
+              - option "Fitzroy"
+              - option "fLASH"
+              - option "fLEXOR"
+              - option "Fli7e"
+              - option "Flower"
+              - option "Flux"
+              - option "Folar"
+              - option "Foss"
+              - option "Frame"
+              - option "FRB"
+              - option "fRED"
+              - option "FReUD^TySoN"
+              - option "fUNKi"
+              - option "FuZioN"
+              - option "Gangsta"
+              - option "GarFlozzy"
+              - option "gdm"
+              - option "Gemini"
+              - option "GEN"
+              - option "geoid"
+              - option "Ghandy"
+              - option "gloomy"
+              - option "God"
+              - option "GODFATHER"
+              - option "Godhead"
+              - option "Goonie"
+              - option "Goto80"
+              - option "Gozz"
+              - option "Grandmaster Mojo"
+              - option "Gravedancer"
+              - option "Green Eyed Monster"
+              - option "GriBBeT"
+              - option "gridworks1"
+              - option "Grief"
+              - option "Grimlock"
+              - option "grinder"
+              - option "grindy"
+              - option "grmmxi"
+              - option "Groove"
+              - option "Gulp"
+              - option "gUNSMITH"
+              - option "H2o"
+              - option "h7"
+              - option "haliphax"
+              - option "Hammerfist"
+              - option "hARPOON!"
+              - option "HarrisonBergeron"
+              - option "Hasslan"
+              - option "Hausfrau"
+              - option "Hawkwind"
+              - option "Hazh"
+              - option "heLix"
+              - option "Hijack"
+              - option "HillBillyWillie"
+              - option "Hiro Protagonist"
+              - option "Hitech"
+              - option "Holmez"
+              - option "holojamm"
+              - option "HOMiCIDE"
+              - option "Hooligan"
+              - option "hORiZON"
+              - option "Hotstepper"
+              - option "Hotwire"
+              - option "hudini"
+              - option "hUMANOid"
+              - option "Ibanez"
+              - option "iCARUS"
+              - option "iCE"
+              - option "Incognito"
+              - option "iNDiE"
+              - option "iNDY"
+              - option "iNFERNO"
+              - option "iNFUSiON"
+              - option "INSANe MAdMAn"
+              - option "intruder"
+              - option "irokos"
+              - option "iSAAc"
+              - option "iSO"
+              - option "Jabba The Hutt"
+              - option "Jam"
+              - option "jANIT[]R"
+              - option "jAVA"
+              - option "Javis"
+              - option "Jaw"
+              - option "Jaxxe"
+              - option "Jazz"
+              - option "Jedi"
+              - option "Jedi Knight"
+              - option "jESS"
+              - option "Jesse James"
+              - option "jhh"
+              - option "JOE"
+              - option "John Dow"
+              - option "Jonson"
+              - option "Jordan"
+              - option "jOYCe"
+              - option "jUAN"
+              - option "Juen"
+              - option "Juice"
+              - option "JuNk"
+              - option "Justice"
+              - option "Kane"
+              - option "Kaneda"
+              - option "Karlos"
+              - option "Karma"
+              - option "kASPER"
+              - option "Kayozz"
+              - option "Kelarak"
+              - option "Keldon"
+              - option "Kempy"
+              - option "KId"
+              - option "KIDney"
+              - option "Killersmurf"
+              - option "kpone"
+              - option "Krash"
+              - option "Krepel"
+              - option "Kresile"
+              - option "Kris"
+              - option "KRS"
+              - option "Krusty"
+              - option "kRYPToNiTE"
+              - option "kure4kancer"
+              - option "Kybernetic"
+              - option "La Shawn"
+              - option "LAGERS"
+              - option "lAHVE"
+              - option "Lathspell"
+              - option "Letharic"
+              - option "LEUNAM"
+              - option "LiNus"
+              - option "Locutus"
+              - option "Lord Chaos"
+              - option "Lord Nikon"
+              - option "Lord Nitro"
+              - option "Lotek Style"
+              - option "Lover"
+              - option "LoW SpIRiT"
+              - option "lucky strike"
+              - option "Luftmysza"
+              - option "Luk"
+              - option "Lunix"
+              - option "M/\\STER B/\\RD"
+              - option "m0lo"
+              - option "macaw"
+              - option "MaD FøRcE"
+              - option "madman"
+              - option "mAF!"
+              - option "magz"
+              - option "Malacai"
+              - option "Malcom"
+              - option "Malcom-X"
+              - option "Malmix"
+              - option "Mammoth"
+              - option "mANtA"
+              - option "Mark"
+              - option "Mark Ryder"
+              - option "Markus"
+              - option "marky"
+              - option "Mass"
+              - option "Maverick"
+              - option "mAX oNE"
+              - option "Maxim"
+              - option "Maz"
+              - option "MC Laser"
+              - option "mcloud"
+              - option "mcx"
+              - option "Megga Hertz"
+              - option "Melfis"
+              - option "Menace"
+              - option "MENtAL"
+              - option "mephisto"
+              - option "Merlin"
+              - option "Mess"
+              - option "Metalbasher"
+              - option "MeTaLLiKaT"
+              - option "mEXX"
+              - option "miasma"
+              - option "Mice"
+              - option "Mike Edwards"
+              - option "MINDEX"
+              - option "MindPhaseR"
+              - option "MiNdSCApE"
+              - option "Miracle"
+              - option "miSFiT"
+              - option "Mjay"
+              - option "Mjolnir"
+              - option "Model8"
+              - option "Mogue"
+              - option "Monzter"
+              - option "mORPH"
+              - option "Mortimer Twang"
+              - option "Mother"
+              - option "MOTIV8"
+              - option "Mov4x"
+              - option "Mr. Vain"
+              - option "Mr.Fish"
+              - option "Mr.Splif"
+              - option "MR.Yo"
+              - option "Mroova"
+              - option "mSO"
+              - option "mSW"
+              - option "mUDPECKER"
+              - option "Mukumdi"
+              - option "mULTI-PLEX"
+              - option "MURdERAh"
+              - option "Mute"
+              - option "Na7asio"
+              - option "Nail"
+              - option "nasOne"
+              - option "Native"
+              - option "ne7"
+              - option "nebraska"
+              - option "nECRITE"
+              - option "necromancer"
+              - option "Nekro"
+              - option "Nemesis"
+              - option "Nemo Nobody"
+              - option "Neptune"
+              - option "Nerv"
+              - option "Neurodancer"
+              - option "Neurotrance"
+              - option "Nevermind"
+              - option "Nicko"
+              - option "Night Sniper"
+              - option "NiK"
+              - option "nIKE"
+              - option "Nitrogen"
+              - option "nO$TRO"
+              - option "no2pencil"
+              - option "Noches"
+              - option "Noise"
+              - option "nONAME"
+              - option "Nop"
+              - option "Nope Dope"
+              - option "NoS"
+              - option "Nosanity"
+              - option "NoSTRoMo"
+              - option "nSN"
+              - option "nUP!"
+              - option "Odium"
+              - option "Odyssey"
+              - option "Ohseven"
+              - option "Omar"
+              - option "Omicron"
+              - option "One eyed pirate"
+              - option "oR!On"
+              - option "Orlingo"
+              - option "oRTHEX"
+              - option "Overlord"
+              - option "Ozzeth"
+              - option "ozzy"
+              - option "pACE"
+              - option "PAd"
+              - option "Paragon"
+              - option "pasha"
+              - option "Passenger"
+              - option "Paszczak"
+              - option "pAy"
+              - option "Peacelock"
+              - option "Perplexer"
+              - option "pesho"
+              - option "pH0ENiX"
+              - option "pHASE"
+              - option "Phobia"
+              - option "Photon"
+              - option "Phreak Klass"
+              - option "Pigeon"
+              - option "PiNoKiO"
+              - option "piS"
+              - option "Pix"
+              - option "Pizza ASCII Factory"
+              - option "plajer1"
+              - option "plur"
+              - option "Podsi"
+              - option "pOGUE"
+              - option "Point"
+              - option "Poise"
+              - option "pOlo"
+              - option "Poskgubbe"
+              - option "Potzkoten"
+              - option "ppX"
+              - option "pR!DE"
+              - option "Pr1mus"
+              - option "PraYeR"
+              - option "pREsENCE"
+              - option "Pride"
+              - option "PRINCE"
+              - option "pRIZM"
+              - option "PrODiGy"
+              - option "Progenitor"
+              - option "Prosthesis"
+              - option "pSYCHE"
+              - option "pSYCHIc sANTa"
+              - option "pSYCHO"
+              - option "Ptashnik"
+              - option "Punk!"
+              - option "pYke"
+              - option "qBA"
+              - option "Qki"
+              - option "qUARTz"
+              - option "quizone"
+              - option "R-Some"
+              - option "r3Ã¥C7"
+              - option "Ra!st"
+              - option "rAD!"
+              - option "Radavi"
+              - option "Radix"
+              - option "rAmOn"
+              - option "Randy"
+              - option "Ranx"
+              - option "rAPe"
+              - option "Rapid"
+              - option "Rasta"
+              - option "Rat"
+              - option "rATTLESNAKe"
+              - option "Rave"
+              - option "ReAL"
+              - option "Rebel"
+              - option "REcAll"
+              - option "Red Demon"
+              - option "Red Devil"
+              - option "RED.R"
+              - option "rEDD"
+              - option "Redskin!"
+              - option "Reflex"
+              - option "rELiEf"
+              - option "Renton"
+              - option "Repe"
+              - option "rETARd0"
+              - option "reti"
+              - option "Revi"
+              - option "RiCk"
+              - option "rINCEWiND"
+              - option "RiNNANbONdEN!"
+              - option "Rip"
+              - option "River"
+              - option "rompelikker"
+              - option "Ronny"
+              - option "roodolph"
+              - option "roon"
+              - option "Rooster"
+              - option "Rotox"
+              - option "Rotox (NL)"
+              - option "rUBYX"
+              - option "runo"
+              - option "rUSKEN!"
+              - option "rusty"
+              - option "Sal-One"
+              - option "SaLaMAnDeR"
+              - option "San"
+              - option "Sandman"
+              - option "Sane2"
+              - option "sANTACRUZ"
+              - option "Satan"
+              - option "sATAN'S FIRe"
+              - option "Satan&#39;s Fire"
+              - option "Scab"
+              - option "sCAN"
+              - option "Scarface"
+              - option "Scavy"
+              - option "Scot"
+              - option "Scottie"
+              - option "Scour"
+              - option "sEgOY!"
+              - option "senser"
+              - option "serial toon"
+              - option "Serpentor"
+              - option "Seti"
+              - option "Seven M"
+              - option "Shadow"
+              - option "Shai Hulud"
+              - option "shank"
+              - option "Shaolin"
+              - option "Shapechanger"
+              - option "Sharp"
+              - option "Shelter"
+              - option "shi7e!"
+              - option "Shichi-Do / Ohseven"
+              - option "Shine"
+              - option "shiveem"
+              - option "Shock G"
+              - option "Silversurfer"
+              - option "Simba"
+              - option "Simon Jansen"
+              - option "Sin Fame"
+              - option "sinister 6000"
+              - option "Sixx"
+              - option "Skautch"
+              - option "Skin"
+              - option "sKIZE"
+              - option "Skope"
+              - option "Skyfox"
+              - option "Sla\\/er"
+              - option "slab"
+              - option "Slaver"
+              - option "Slowrider"
+              - option "Sma1!"
+              - option "SmoZZeBoS"
+              - option "Snabel-harry"
+              - option "sNAFu"
+              - option "SNEABER"
+              - option "sNiPE"
+              - option "Snow"
+              - option "sNUFFy"
+              - option "sonikk"
+              - option "Soxius"
+              - option "Speed Devil"
+              - option "sPEED rACER"
+              - option "Spermwhale"
+              - option "spice1"
+              - option "Spinn"
+              - option "spinn<spn>"
+              - option "Spinsane"
+              - option "Splat"
+              - option "sPLATTEr"
+              - option "SPLONK"
+              - option "Spoonman"
+              - option "Spot"
+              - option "Spøk"
+              - option "Sqlim"
+              - option "Squale"
+              - option "Squarepusher"
+              - option "SQUiSH"
+              - option "Stab"
+              - option "sTASH"
+              - option "sTEEL"
+              - option "Steve McStretch"
+              - option "Stezotehic"
+              - option "sTING"
+              - option "Stone Angel"
+              - option "Stone Golem"
+              - option "sTORM"
+              - option "STRANGER"
+              - option "stRAtOS"
+              - option "sTRAUSS"
+              - option "Strife"
+              - option "strode"
+              - option "Style"
+              - option "sTYLEwARS"
+              - option "Stylez"
+              - option "subsonic"
+              - option "suffer"
+              - option "Sundance"
+              - option "SuNSCREAM"
+              - option "Supertouch"
+              - option "Sy-Klone"
+              - option "Sys"
+              - option "Szwagier"
+              - option "Talo"
+              - option "TANGo"
+              - option "tArot"
+              - option "Taxi"
+              - option "Tb-303"
+              - option "tbM"
+              - option "TDMF"
+              - option "Tekk"
+              - option "tERM!NATOr"
+              - option "Terminal Silence"
+              - option "Terminator"
+              - option "The Crow"
+              - option "The Founder"
+              - option "tHE goDFATHER"
+              - option "tHE kESTREL"
+              - option "The Magician"
+              - option "The Midnight Judge"
+              - option "tHE mIDWifE"
+              - option "THe PLaYeR"
+              - option "The Prophet"
+              - option "The Risk"
+              - option "The Shepherd"
+              - option "Threaz"
+              - option "Thung"
+              - option "tHURLOG"
+              - option "Tim Drake"
+              - option "Timer"
+              - option "Tinyz"
+              - option "Todi"
+              - option "Tommy"
+              - option "ToXX!c"
+              - option "Tranziie"
+              - option "Trash"
+              - option "Traveller"
+              - option "Treach"
+              - option "Trespass"
+              - option "Tribe"
+              - option "TRiFiXiON"
+              - option "tRINITY"
+              - option "Trip"
+              - option "tRiViAL"
+              - option "Trix"
+              - option "Trooper"
+              - option "Trueman Starr"
+              - option "tsar1"
+              - option "Turbo"
+              - option "Twister"
+              - option "U-Man"
+              - option "unceen"
+              - option "Unique"
+              - option "Unreal"
+              - option "Unsane"
+              - option "V-Cut"
+              - option "V!ad"
+              - option "v!RTU"
+              - option "vACE"
+              - option "Various"
+              - option "Vega"
+              - option "Venturus"
+              - option "vIETCONg"
+              - option "Vinzi"
+              - option "ViOLENCE"
+              - option "VLAD"
+              - option "Voicer"
+              - option "Volatile"
+              - option "vOLTAGE"
+              - option "Vouck"
+              - option "Wacko"
+              - option "warhawk"
+              - option "Wayne"
+              - option "WeA"
+              - option "weaponx"
+              - option "Webster"
+              - option "WEDLOCK"
+              - option "WHIRLWIND"
+              - option "Whitesnake"
+              - option "Whodini"
+              - option "Wildstyle"
+              - option "WindRider"
+              - option "WISE-K"
+              - option "wiShbRinGeR"
+              - option "Woober"
+              - option "wrecker98"
+              - option "x-mODUS"
+              - option "Xball"
+              - option "xClUZiWe"
+              - option "xCz"
+              - option "xor"
+              - option "xzip"
+              - option "Yacuzi"
+              - option "yAneq"
+              - option "Yojimbo"
+              - option "Yoki"
+              - option "Yop"
+              - option "Zabora"
+              - option "Zack"
+              - option "zAN-oNE"
+              - option "zANEr"
+              - option "Zaphod"
+              - option "Zarkof"
+              - option "Zcandaler"
+              - option "Zed"
+              - option "Zeeball"
+              - option "zefyros"
+              - option "Zemra"
+              - option "zEn"
+              - option "zEUS"
+              - option "Zin!"
+              - option "Zinko"
+              - option "zito"
+              - option "Zok"
+              - option "ZoMbiE"
+              - option "zorn"
+              - option "Zorro"
+              - option "zOu^zOu!"
+              - option "ZYGoTE"
+            - button "+ Add Artist" [ref=e86]
+          - generic [ref=e87]:
+            - generic [ref=e88]: Crew(s)
+            - combobox [ref=e90]:
+              - option "-- None --" [selected]
+              - option "1oo%"
+              - option "2000 AD"
+              - option "5TH DYNASTY"
+              - option "6crew"
+              - option "9 Design"
+              - option "A-RATED"
+              - option "Aalto"
+              - option "Abnormal"
+              - option "Abomination"
+              - option "Access"
+              - option "Accession"
+              - option "aCiD!aSCII"
+              - option "Addonic"
+              - option "Aerosol"
+              - option "Afluence Design"
+              - option "AgU4RD"
+              - option "Alcatrash"
+              - option "Aldi"
+              - option "Alien Technology"
+              - option "Alkaholiks"
+              - option "Alpha Flight"
+              - option "Altern"
+              - option "AmigaNest"
+              - option "Anadune"
+              - option "Analog"
+              - option "Anarchy"
+              - option "Anathema"
+              - option "aNNo2081"
+              - option "Anthrox"
+              - option "Apathy"
+              - option "Aphro Klan"
+              - option "Arcade"
+              - option "Arclite"
+              - option "Arid Weed"
+              - option "Art"
+              - option "aRT-mANiA"
+              - option "Artcore"
+              - option "Arte"
+              - option "aRTEC"
+              - option "Artwork"
+              - option "Ascii legion"
+              - option "Ascii Makers Federation"
+              - option "Ascii Norge"
+              - option "Assault"
+              - option "Atlantis"
+              - option "aTOMIC"
+              - option "Atre"
+              - option "Aurinko"
+              - option "azkberries"
+              - option "Azkiness"
+              - option "backlash"
+              - option "Bad Karma"
+              - option "bANANA dEZIGn"
+              - option "Basement"
+              - option "basic ascii"
+              - option "Bitch"
+              - option "Bizzare Arts"
+              - option "Black Ark"
+              - option "Black Maiden"
+              - option "BLACK SiSTA"
+              - option "Blackout Design"
+              - option "Blood Brothers"
+              - option "Bluna"
+              - option "BlUNt"
+              - option "BOB"
+              - option "Bodyworks"
+              - option "bOMB sQUAD"
+              - option "bONZAI bROS"
+              - option "BRAINLESS TEAM WORK"
+              - option "Brainlez Coders"
+              - option "Breathe"
+              - option "Brilliance"
+              - option "Bronx"
+              - option "Brutal"
+              - option "Butthole Burgerz"
+              - option "C&C Design"
+              - option "Caffeine"
+              - option "Canadian Pirates Inc"
+              - option "Capital"
+              - option "Caps lock alliance"
+              - option "Castle Of Illusion"
+              - option "cAUSTIC sTYLE"
+              - option "Cax"
+              - option "cELLBLOCK4"
+              - option "Century"
+              - option "Chryseis"
+              - option "Circe"
+              - option "Civitas"
+              - option "Clasp"
+              - option "Classic"
+              - option "cLIQUE"
+              - option "Comax"
+              - option "comic!ascii"
+              - option "Complex"
+              - option "Conspiracy"
+              - option "Contra"
+              - option "CoolPHat"
+              - option "CoRRoSioN"
+              - option "cORRUPT"
+              - option "Crap Inc."
+              - option "Crew"
+              - option "Crosspoint"
+              - option "Crude"
+              - option "Cyberdream"
+              - option "Cybertronix"
+              - option "Darkage"
+              - option "Dask"
+              - option "Data Division"
+              - option "DDStyle"
+              - option "dEAdLY dREAMS sAtiSFACtiON"
+              - option "dECENt"
+              - option "Deez'nuts"
+              - option "Defiance"
+              - option "Define"
+              - option "Degeneration65"
+              - option "dEitY"
+              - option "Deja Vu"
+              - option "Dekadence"
+              - option "Delight"
+              - option "Depth"
+              - option "Desire"
+              - option "Destiny"
+              - option "dEVIOUS dEZIGNS"
+              - option "DeZign"
+              - option "Diamonds & Rust"
+              - option "Die Kranken Bomber"
+              - option "Digital"
+              - option "Digital Graffiti"
+              - option "Dione"
+              - option "Divine"
+              - option "Divine Stylers"
+              - option "DNT"
+              - option "Doggystyle"
+              - option "Dream Design"
+              - option "Dream Theatre"
+              - option "dREAMPHASE"
+              - option "Drop Dead Produktions"
+              - option "Dual Crew Shining"
+              - option "dUPE"
+              - option "Duplo"
+              - option "DuTCH DReaMZ"
+              - option "Dytec"
+              - option "Dzain"
+              - option "Earthbound"
+              - option "EcStAsY"
+              - option "EDGE"
+              - option "eFFECT"
+              - option "Element"
+              - option "Epsilon Design"
+              - option "Esquire"
+              - option "Eternal"
+              - option "euphoria"
+              - option "eXcept"
+              - option "Extended Play"
+              - option "Faction"
+              - option "fACTOR"
+              - option "Faith"
+              - option "Fake!"
+              - option "Fantasy Project"
+              - option "Fatal Unity"
+              - option "Fear"
+              - option "Federation Against Axe"
+              - option "fiNE ARtS"
+              - option "FiNe DeZiGN"
+              - option "Finesse"
+              - option "Fire & Ice"
+              - option "Fishbone Crew"
+              - option "Flatline"
+              - option "fLoOD"
+              - option "FReaX WiTh aTTiTuDe"
+              - option "fREEZERS"
+              - option "fUCk oFF oR DiE"
+              - option "Futura"
+              - option "G-INcorporated"
+              - option "G-Style"
+              - option "Galm"
+              - option "Galza"
+              - option "Gezeitenreiter"
+              - option "ghost riders"
+              - option "Giants"
+              - option "Gods"
+              - option "Goose"
+              - option "Grand Royal"
+              - option "Grotesticle"
+              - option "Gu@rrilla"
+              - option "Hack n´ Trade"
+              - option "hacme"
+              - option "Hang On"
+              - option "Hardcore Design"
+              - option "HARDLiNE NZ"
+              - option "Haresis"
+              - option "Haujobb"
+              - option "Head"
+              - option "Headshop Boyz Inc."
+              - option "Hemoraiders"
+              - option "Highlanders"
+              - option "Holocaust"
+              - option "Holy Crew"
+              - option "Honey"
+              - option "Honoo"
+              - option "Hoodlum"
+              - option "Hostile Graphical Entertainment"
+              - option "Hotline"
+              - option "House of Style"
+              - option "Human Target"
+              - option "Humane"
+              - option "HuMaNe & VaNiTy"
+              - option "Icarus"
+              - option "Illusion"
+              - option "Immortal Art"
+              - option "Impure ASCII 1940"
+              - option "Independent"
+              - option "Infect"
+              - option "iNFERNO d-LIGHT"
+              - option "Inferno Grafitti"
+              - option "Inhale"
+              - option "iNhUMaNs"
+              - option "Innate"
+              - option "Insane"
+              - option "Intellect"
+              - option "Iris"
+              - option "Ixion"
+              - option "Jam 1811"
+              - option "Jedi Arts"
+              - option "Juice"
+              - option "K0re"
+              - option "Karma"
+              - option "Katharsis!Ascii"
+              - option "kEKS dESiGN"
+              - option "Killkrazed"
+              - option "kObOLt"
+              - option "Korea, Republic of"
+              - option "Krafted"
+              - option "Krishna"
+              - option "kts!ascii"
+              - option "KURWAAMIGASCHEISSERS"
+              - option "Lapiz de Perro Lanoso"
+              - option "Latex"
+              - option "latitude"
+              - option "Layout"
+              - option "Legend"
+              - option "Lego"
+              - option "Limbo"
+              - option "Limited Edition"
+              - option "Linear"
+              - option "Lingo"
+              - option "Link124"
+              - option "Lisence"
+              - option "Looker House"
+              - option "Low Profile"
+              - option "LPS"
+              - option "LSD"
+              - option "LTC"
+              - option "Majic 12"
+              - option "Malen Nach Zahlen"
+              - option "Mantra"
+              - option "Matrix"
+              - option "Medicine"
+              - option "mEGAStYLE"
+              - option "Menace"
+              - option "MeTAMoRPh"
+              - option "Miasma"
+              - option "Mimic"
+              - option "miNdLESS"
+              - option "Mo'Soul"
+              - option "Moods Plateau"
+              - option "Moon Design"
+              - option "Morbid"
+              - option "Movement"
+              - option "MROTW"
+              - option "Mystic"
+              - option "mYTh"
+              - option "N-Ice"
+              - option "N-Joy"
+              - option "Nature"
+              - option "Neo"
+              - option "NEo!"
+              - option "NeoKorteX"
+              - option "Neon"
+              - option "Nettwerk"
+              - option "Neutron"
+              - option "New Deal"
+              - option "New Order"
+              - option "NEX"
+              - option "Nine Design"
+              - option "NiRVANA"
+              - option "Noname"
+              - option "Nonsense"
+              - option "Nordanvind"
+              - option "Nukleus"
+              - option "oBSCENE"
+              - option "Obsession"
+              - option "Odelay"
+              - option "Off World"
+              - option "Offspring"
+              - option "Okie Ascii"
+              - option "Old Bulls"
+              - option "OldSkool"
+              - option "oOPS"
+              - option "Organization of Might Hungry Ascii Artists"
+              - option "Origin"
+              - option "Outlaws"
+              - option "Over The Top"
+              - option "Oxygen"
+              - option "Paradox"
+              - option "Paranorm"
+              - option "Partners & Criminals"
+              - option "PePe Studios"
+              - option "Peter Punk"
+              - option "Phase Distortion"
+              - option "Phase Truce"
+              - option "Phunk"
+              - option "pHUTURE 3o3"
+              - option "PiMOK"
+              - option "Pioneer Design"
+              - option "Pleasure"
+              - option "Poison"
+              - option "Prana"
+              - option "Prelude"
+              - option "Primal Delusions"
+              - option "Primezoft"
+              - option "Pro Arts"
+              - option "PRoFiLE"
+              - option "Progress"
+              - option "Prologic Design"
+              - option "Prospect"
+              - option "Protest"
+              - option "PSYCHO SQUAD"
+              - option "Puma"
+              - option "Pure Phun"
+              - option "PUZZLE"
+              - option "Quad-P"
+              - option "Radiator"
+              - option "RAiN"
+              - option "Ram Jam"
+              - option "RAVE DESIGN"
+              - option "Real"
+              - option "Real Ansi Designers"
+              - option "Reality"
+              - option "Reason"
+              - option "rEBELS"
+              - option "rEflEcTiOns"
+              - option "Rektum"
+              - option "RELIGION"
+              - option "Remedy"
+              - option "Remorse 1981"
+              - option "Resistance"
+              - option "Riot Act"
+              - option "rOadhOgz"
+              - option "rOYAL"
+              - option "rUTHLESS"
+              - option "sA7URNE"
+              - option "sAPPHIRE"
+              - option "Sardonyx"
+              - option "Satanic"
+              - option "Satanic Surfers"
+              - option "Sative Mea"
+              - option "Save Da Artists"
+              - option "Save Our Souls"
+              - option "Scalaris"
+              - option "Sceptic"
+              - option "SCONTRAX"
+              - option "Scoopex"
+              - option "Score"
+              - option "Scum"
+              - option "Secular"
+              - option "sELFeSTEEM"
+              - option "Sense Ascii"
+              - option "Serial"
+              - option "SERiOUS!"
+              - option "Session"
+              - option "SEVEN UP"
+              - option "Shadow"
+              - option "Shelter"
+              - option "Shining 8"
+              - option "Shoot"
+              - option "Shrimps Design"
+              - option "SINNsitiv"
+              - option "smegma"
+              - option "Smokey"
+              - option "sMOS ARt"
+              - option "Spaceballs"
+              - option "Spiris"
+              - option "SPiX"
+              - option "Stellar"
+              - option "Stellar 7"
+              - option "sTOOPID"
+              - option "Style"
+              - option "Subcult"
+              - option "Subject"
+              - option "sUKMAS"
+              - option "Superior Art Creations"
+              - option "superiors"
+              - option "Supplex"
+              - option "sUPREMACY"
+              - option "Supreme!"
+              - option "SUSPECT"
+              - option "Sweet Poison"
+              - option "Symptoms Of Czarnobyl"
+              - option "synaptic"
+              - option "Syndicate"
+              - option "Syndrome"
+              - option "TAF ASCII Design"
+              - option "tAi"
+              - option "Tehdas"
+              - option "Telepathy"
+              - option "Tension"
+              - option "test"
+              - option "The Binary Foundation"
+              - option "The Black Lotus"
+              - option "The Legacy"
+              - option "The Lightforce"
+              - option "The Lowlifes"
+              - option "the Magic Friends"
+              - option "The OMEN"
+              - option "The Orb"
+              - option "the sign"
+              - option "The Sirius Cybernetics Corporation"
+              - option "thelo0p"
+              - option "tHERAPY"
+              - option "Thieves' Guild"
+              - option "Titan"
+              - option "Titans"
+              - option "Tombstone"
+              - option "Torment"
+              - option "trance inc."
+              - option "Trank!Ascii"
+              - option "Tribe"
+              - option "Triton"
+              - option "TRONIX"
+              - option "Tropic Ascii"
+              - option "TRSI"
+              - option "True School"
+              - option "Tuffezt Men Alive"
+              - option "Tulou"
+              - option "Turbulence"
+              - option "Twilight"
+              - option "Twisted"
+              - option "Tz-Design"
+              - option "u'RACe"
+              - option "Ultima"
+              - option "Ultimo Imperio"
+              - option "ULTRA SONIX"
+              - option "UNDERGROUND POSSE"
+              - option "Union"
+              - option "uNiQUE"
+              - option "uNiQUE!ARtS"
+              - option "United Arts"
+              - option "Unlimited"
+              - option "Unreal"
+              - option "UNT"
+              - option "Up Rough"
+              - option "Upperclass"
+              - option "Vandals"
+              - option "Vanity"
+              - option "Virtual Dreams"
+              - option "Vision"
+              - option "vLVlND"
+              - option "Voltage"
+              - option "Vortex"
+              - option "Warp Zeero"
+              - option "WARRIORS OF ART"
+              - option "Waterfalls"
+              - option "Wetworks"
+              - option "Whale"
+              - option "Wild Style"
+              - option "Wizzcat"
+              - option "Woozy"
+              - option "WTC"
+              - option "X-Trade"
+              - option "X-ZONE"
+              - option "XL Recordings"
+              - option "zEiTGEiST!aSCii"
+              - option "Zenith"
+              - option "Zetec"
+            - button "+ Add Crew" [ref=e91]
+          - button "Upload Colly" [ref=e93]
+      - generic [ref=e94]:
+        - generic [ref=e95]:
+          - heading "USERS ONLINE" [level=2] [ref=e97]
+          - generic [ref=e100]: 99 anonymous online
+        - generic [ref=e101]:
+          - heading "LAST CALLERS" [level=2] [ref=e103]
+          - generic [ref=e104]:
+            - generic [ref=e105]:
+              - link "chrome" [ref=e106]:
+                - /url: /member/chrome
+              - generic [ref=e107]: 17:50
+            - generic [ref=e108]:
+              - link "JasonGrant" [ref=e109]:
+                - /url: /member/jasongrant
+              - generic [ref=e110]: 15:58
+            - generic [ref=e111]:
+              - link "nxnguyen" [ref=e112]:
+                - /url: /member/nxnguyen
+              - generic [ref=e113]: 19:37
+            - generic [ref=e114]:
+              - link "dipswitch" [ref=e115]:
+                - /url: /member/dipswitch
+              - generic [ref=e116]: 19:10
+            - generic [ref=e117]:
+              - link "dipswitch" [ref=e118]:
+                - /url: /member/dipswitch
+              - generic [ref=e119]: 19:10
+        - generic [ref=e120]:
+          - heading "NEW COLLYS" [level=2] [ref=e122]:
+            - link "NEW COLLYS" [ref=e123]:
+              - /url: /collys?sort_by=cdate&sort_order=D
+          - generic [ref=e124]:
+            - generic [ref=e125]:
+              - link "chr-checkmat" [ref=e127]:
+                - /url: /release/chr-checkmate.ans
+              - generic [ref=e128]: 26-05-16
+            - generic [ref=e129]:
+              - link "gZR-lEAP.tXt" [ref=e131]:
+                - /url: /release/gZR-lEAP.tXt
+              - generic [ref=e132]: 26-04-21
+            - generic [ref=e133]:
+              - link "ht-hc2.txt" [ref=e135]:
+                - /url: /release/ht-hc2.txt
+              - generic [ref=e136]: 26-04-04
+            - generic [ref=e137]:
+              - link "ht-hc1.txt" [ref=e139]:
+                - /url: /release/ht-hc1.txt
+              - generic [ref=e140]: 26-03-22
+            - generic [ref=e141]:
+              - link "SE-WNDR.txt" [ref=e143]:
+                - /url: /release/SE-WNDR.txt
+              - generic [ref=e144]: 26-02-23
+            - generic [ref=e145]:
+              - link "spn-russ.txt" [ref=e147]:
+                - /url: /release/spn-russ.txt
+              - generic [ref=e148]: 26-02-15
+            - generic [ref=e149]:
+              - link "asl-exe.txt" [ref=e151]:
+                - /url: /release/asl-exe.txt
+              - generic [ref=e152]: 26-02-15
+            - generic [ref=e153]:
+              - link "-g-2ooo.txt" [ref=e155]:
+                - /url: /release/-g-2ooo.txt
+              - generic [ref=e156]: 26-02-15
+        - generic [ref=e157]:
+          - heading "LATEST ADDED COLLYS" [level=2] [ref=e159]:
+            - link "LATEST ADDED COLLYS" [ref=e160]:
+              - /url: /collys?sort_by=timestamp&sort_order=D
+          - generic [ref=e161]:
+            - generic [ref=e162]:
+              - link "chr-checkmat" [ref=e163]:
+                - /url: /release/chr-checkmate.ans
+              - generic [ref=e164]: 26-05-16
+            - generic [ref=e165]:
+              - link "gZR-lEAP.tXt" [ref=e166]:
+                - /url: /release/gZR-lEAP.tXt
+              - generic [ref=e167]: 26-04-19
+            - generic [ref=e168]:
+              - link "wpx-boys.txt" [ref=e169]:
+                - /url: /release/wpx-boys.txt
+              - generic [ref=e170]: 26-04-14
+            - generic [ref=e171]:
+              - link "KKZ-BLU.TXT" [ref=e172]:
+                - /url: /release/KKZ-BLU.TXT
+              - generic [ref=e173]: 26-04-14
+            - generic [ref=e174]:
+              - link "kkz-awd.txt" [ref=e175]:
+                - /url: /release/kkz-awd.txt
+              - generic [ref=e176]: 26-04-14
+        - generic [ref=e177]:
+          - heading "LATEST ADDED MAGS" [level=2] [ref=e179]:
+            - link "LATEST ADDED MAGS" [ref=e180]:
+              - /url: /mags?sort_by=timestamp&sort_order=D
+          - generic [ref=e181]:
+            - generic [ref=e182]:
+              - link "OBS-AT03.DMS" [ref=e183]:
+                - /url: /magazine/OBS-AT03.DMS
+              - generic [ref=e184]: 24-02-08
+            - generic [ref=e185]:
+              - link "ART^MAG3.LHA" [ref=e186]:
+                - /url: /magazine/ART^MAG3.LHA
+              - generic [ref=e187]: 22-10-07
+            - generic [ref=e188]:
+              - link "ART^MAG4.LHA" [ref=e189]:
+                - /url: /magazine/ART^MAG4.LHA
+              - generic [ref=e190]: 22-10-07
+            - generic [ref=e191]:
+              - link "ART^MAG5.LHA" [ref=e192]:
+                - /url: /magazine/ART^MAG5.LHA
+              - generic [ref=e193]: 22-10-07
+            - generic [ref=e194]:
+              - link "ART^MAG2.LHA" [ref=e195]:
+                - /url: /magazine/ART^MAG2.LHA
+              - generic [ref=e196]: 22-10-07
+        - generic [ref=e197]:
+          - heading "LATEST ADDED APPS" [level=2] [ref=e199]:
+            - link "LATEST ADDED APPS" [ref=e200]:
+              - /url: /apps?sort_by=timestamp&sort_order=D
+          - generic [ref=e201]:
+            - generic [ref=e202]:
+              - link "Yq!-Crazy.lh" [ref=e203]:
+                - /url: /application/Yq!-Crazy.lha
+              - generic [ref=e204]: 11-03-14
+            - generic [ref=e205]:
+              - link "FRX-I2A15.lh" [ref=e206]:
+                - /url: /application/FRX-I2A15.lha
+              - generic [ref=e207]: 10-11-25
+            - generic [ref=e208]:
+              - link "ladraw-1.zip" [ref=e209]:
+                - /url: /application/ladraw-1.zip
+              - generic [ref=e210]: 10-11-08
+            - generic [ref=e211]:
+              - link "t!s-af10.zip" [ref=e212]:
+                - /url: /application/t!s-af10.zip
+              - generic [ref=e213]: 09-12-22
+            - generic [ref=e214]:
+              - link "kansi10.lha" [ref=e215]:
+                - /url: /application/kansi10.lha
+              - generic [ref=e216]: 09-11-13
+        - generic [ref=e217]:
+          - heading "NEW USERS" [level=2] [ref=e219]
+          - generic [ref=e220]:
+            - generic [ref=e221]:
+              - link "JasonGrant" [ref=e222]:
+                - /url: /member/jasongrant
+              - generic [ref=e223]: "17195900"
+            - generic [ref=e224]:
+              - link "RobertSwift" [ref=e225]:
+                - /url: /member/robertswift
+              - generic [ref=e226]: "17189118"
+            - generic [ref=e227]:
+              - link "LewisPah" [ref=e228]:
+                - /url: /member/lewispah
+              - generic [ref=e229]: "17183826"
+            - generic [ref=e230]:
+              - link "Reneetus" [ref=e231]:
+                - /url: /member/reneetus
+              - generic [ref=e232]: "17183766"
+            - generic [ref=e233]:
+              - link "Develotoist" [ref=e234]:
+                - /url: /member/develotoist
+              - generic [ref=e235]: "17180883"
+        - generic [ref=e236]:
+          - heading "WEEKTOP - BBS UPLOADERS" [level=2] [ref=e238]
+          - generic [ref=e240]:
+            - generic [ref=e379]:
+              - generic [ref=e380]: EALL/HT
+              - generic [ref=e381]: 1.59 GB
+            - generic [ref=e382]:
+              - generic [ref=e383]: sLASH
+              - generic [ref=e384]: 1.02 GB
+            - generic [ref=e385]:
+              - generic [ref=e386]: sLASH_
+              - generic [ref=e387]: 129 MB
+            - generic [ref=e388]:
+              - generic [ref=e389]: jUDGE dREDD
+              - generic [ref=e390]: 71 MB
+            - generic [ref=e391]:
+              - generic [ref=e392]: dENiZEn
+              - generic [ref=e393]: 52 MB
+      - generic [ref=e241]:
+        - generic [ref=e242]:
+          - heading "TOP 5 COLLYS" [level=2] [ref=e244]
+          - generic [ref=e245]:
+            - generic [ref=e246]:
+              - link "dS!-GRFF.txt" [ref=e247]:
+                - /url: /release/dS!-GRFF.txt
+              - generic [ref=e248]: 9.83 PTS
+            - generic [ref=e249]:
+              - link "dS!-USAW.txt" [ref=e250]:
+                - /url: /release/dS!-USAW.txt
+              - generic [ref=e251]: 9.83 PTS
+            - generic [ref=e252]:
+              - link "hos-afro.txt" [ref=e253]:
+                - /url: /release/hos-afro.txt
+              - generic [ref=e254]: 9.61 PTS
+            - generic [ref=e255]:
+              - link "DZ-TAOS2.TXT" [ref=e256]:
+                - /url: /release/DZ-TAOS2.TXT
+              - generic [ref=e257]: 9.60 PTS
+            - generic [ref=e258]:
+              - link "nup-tptp.txt" [ref=e259]:
+                - /url: /release/nup-tptp.txt
+              - generic [ref=e260]: 9.54 PTS
+        - generic [ref=e261]:
+          - heading "MOST VIEWED COLLYS" [level=2] [ref=e263]
+          - generic [ref=e264]:
+            - generic [ref=e265]:
+              - link "hos-afro.txt" [ref=e266]:
+                - /url: /release/hos-afro.txt
+              - generic [ref=e267]: "3115"
+            - generic [ref=e268]:
+              - link "dS!-GRFF.txt" [ref=e269]:
+                - /url: /release/dS!-GRFF.txt
+              - generic [ref=e270]: "1336"
+            - generic [ref=e271]:
+              - link "se-men.txt" [ref=e272]:
+                - /url: /release/se-men.txt
+              - generic [ref=e273]: "972"
+            - generic [ref=e274]:
+              - link "LP!-HATE.TXT" [ref=e275]:
+                - /url: /release/LP!-HATE.TXT
+              - generic [ref=e276]: "839"
+            - generic [ref=e277]:
+              - link "r-hl.txt" [ref=e278]:
+                - /url: /release/r-hl.txt
+              - generic [ref=e279]: "691"
+        - generic [ref=e280]:
+          - heading "TOP 5 ARTISTS" [level=2] [ref=e282]
+          - generic [ref=e283]:
+            - generic [ref=e284]:
+              - link "Skin" [ref=e285]:
+                - /url: /artist/skin
+              - generic [ref=e286]: 9.05 PTS
+            - generic [ref=e287]:
+              - link "Desoto" [ref=e288]:
+                - /url: /artist/desoto
+              - generic [ref=e289]: 9.00 PTS
+            - generic [ref=e290]:
+              - link "Stylez" [ref=e291]:
+                - /url: /artist/stylez
+              - generic [ref=e292]: 8.86 PTS
+            - generic [ref=e293]:
+              - link "Enforcer" [ref=e294]:
+                - /url: /artist/enforcer
+              - generic [ref=e295]: 8.86 PTS
+            - generic [ref=e296]:
+              - link "nUP!" [ref=e297]:
+                - /url: /artist/nup
+              - generic [ref=e298]: 8.80 PTS
+        - generic [ref=e299]:
+          - heading "TOP 5 CREWS" [level=2] [ref=e301]
+          - generic [ref=e302]:
+            - generic [ref=e303]:
+              - link "Fantasy Project" [ref=e304]:
+                - /url: /crew/fantasy-project
+              - generic [ref=e305]: 9.00 PTS
+            - generic [ref=e306]:
+              - link "HuMaNe & VaNiTy" [ref=e307]:
+                - /url: /crew/humane-vanity
+              - generic [ref=e308]: 8.75 PTS
+            - generic [ref=e309]:
+              - link "Low Profile" [ref=e310]:
+                - /url: /crew/low-profile
+              - generic [ref=e311]: 8.56 PTS
+            - generic [ref=e312]:
+              - link "Arclite" [ref=e313]:
+                - /url: /crew/arclite
+              - generic [ref=e314]: 8.53 PTS
+            - generic [ref=e315]:
+              - link "G-Style" [ref=e316]:
+                - /url: /crew/g-style
+              - generic [ref=e317]: 8.53 PTS
+        - generic [ref=e318]:
+          - heading "TOP UPLOADERS" [level=2] [ref=e320]
+          - generic [ref=e321]:
+            - generic [ref=e322]:
+              - link "hAkR!" [ref=e323]:
+                - /url: /member/hakr
+              - generic [ref=e324]: 70.8 MB
+            - generic [ref=e325]:
+              - link "dipswitch" [ref=e326]:
+                - /url: /member/dipswitch
+              - generic [ref=e327]: 51.8 MB
+            - generic [ref=e328]:
+              - link "Spot" [ref=e329]:
+                - /url: /member/spot
+              - generic [ref=e330]: 42.4 MB
+            - generic [ref=e331]:
+              - link "dMG" [ref=e332]:
+                - /url: /member/dmg
+              - generic [ref=e333]: 37.5 MB
+            - generic [ref=e334]:
+              - link "z!o" [ref=e335]:
+                - /url: /member/z-o
+              - generic [ref=e336]: 31.8 MB
+        - generic [ref=e337]:
+          - heading "TOP COMMENTERS" [level=2] [ref=e339]
+          - generic [ref=e340]:
+            - generic [ref=e341]:
+              - link "z!o" [ref=e342]:
+                - /url: /member/z-o
+              - generic [ref=e343]: "665"
+            - generic [ref=e344]:
+              - link "dipswitch" [ref=e345]:
+                - /url: /member/dipswitch
+              - generic [ref=e346]: "529"
+            - generic [ref=e347]:
+              - link "spot" [ref=e348]:
+                - /url: /member/spot
+              - generic [ref=e349]: "450"
+            - generic [ref=e350]:
+              - link "zefyros" [ref=e351]:
+                - /url: /member/zefyros
+              - generic [ref=e352]: "349"
+            - generic [ref=e353]:
+              - link "hARRiSONbERGEROn" [ref=e354]:
+                - /url: /member/harrisonbergeron
+              - generic [ref=e355]: "311"
+        - generic [ref=e356]:
+          - heading "aSCIIaRENA STATS" [level=2] [ref=e358]
+          - generic [ref=e359]:
+            - generic [ref=e360]:
+              - generic [ref=e361]: "Collys Online:"
+              - generic [ref=e362]: "3983"
+            - generic [ref=e363]:
+              - generic [ref=e364]: "Pumped Bytes:"
+              - generic [ref=e365]: 277.2 MB
+            - generic [ref=e366]:
+              - generic [ref=e367]: "Users:"
+              - generic [ref=e368]: "656"
+            - generic [ref=e369]:
+              - generic [ref=e370]: "Comments:"
+              - generic [ref=e371]: "4389"
+        - generic [ref=e372]:
+          - heading "WEEKTOP - BBS:ES" [level=2] [ref=e374]
+          - generic [ref=e376]:
+            - generic [ref=e394]:
+              - generic [ref=e395]: Fastline
+              - generic [ref=e396]: 310 MB
+            - generic [ref=e397]:
+              - generic [ref=e398]: Death Row
+              - generic [ref=e399]: 310 MB
+            - generic [ref=e400]:
+              - generic [ref=e401]: Sanctuary
+              - generic [ref=e402]: 310 MB
+            - generic [ref=e403]:
+              - generic [ref=e404]: METAL iMPACT
+              - generic [ref=e405]: 310 MB
+            - generic [ref=e406]:
+              - generic [ref=e407]: AmigaUnderground
+              - generic [ref=e408]: 309 MB
+  - alert [ref=e377]

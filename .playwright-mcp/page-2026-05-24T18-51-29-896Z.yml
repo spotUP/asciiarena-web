@@ -1,0 +1,183 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - link "aSCIIaRENA" [ref=e4]:
+      - /url: /
+    - generic [ref=e5]:
+      - list [ref=e6]:
+        - listitem [ref=e7]:
+          - link "COLLYS v" [ref=e8]:
+            - /url: /collys
+        - listitem [ref=e9]:
+          - link "MAGS v" [ref=e10]:
+            - /url: /mags
+        - listitem [ref=e11]:
+          - link "APPS v" [ref=e12]:
+            - /url: /apps
+        - listitem [ref=e13]:
+          - link "ARTiSTS" [ref=e14]:
+            - /url: /artists
+        - listitem [ref=e15]:
+          - link "CREWS" [ref=e16]:
+            - /url: /crews
+        - listitem [ref=e17]:
+          - link "BOARDS" [ref=e18]:
+            - /url: /bbs
+        - listitem [ref=e19]:
+          - link "REQUESTS" [ref=e20]:
+            - /url: /requests
+        - listitem [ref=e21]:
+          - link "ABOUT" [ref=e22]:
+            - /url: /about
+        - listitem [ref=e23]:
+          - link "ASCII STYLE DESIGNER" [ref=e24]:
+            - /url: /styleeditor
+        - listitem [ref=e25]:
+          - link "WORKBENCH" [ref=e26]:
+            - /url: https://hippoplayer.se
+        - listitem [ref=e27]:
+          - link "SUBMiT v" [ref=e28]:
+            - /url: /submit
+      - list [ref=e29]:
+        - listitem [ref=e30]:
+          - textbox "search..." [ref=e32]
+        - listitem [ref=e33]:
+          - link "LOGiN" [ref=e34]:
+            - /url: "#login"
+  - generic [ref=e35]:
+    - link "___________________________________________________ ______ ________________ \\ ___ / ___ _ ___ /\\ __/\\ __/\\ ___ /\\ ___ \\ __ / \\ __ \\ ___ / \\__ \\ \\ \\____/ / __/ / \\ / \\ \\__ \\ \\/ \\_ __/ \\__/_ / \\ \\__ \\ \\ / \\/ _ \\____ \\ \\/ \\/ \\/ \\ / \\/ _ / _ \\ \\/ / / \\/ \\ / _/ / _/ / \\_ \\/ / / / / / _ / / / / \\______\\_______/\\_______/\\___/\\___/\\_______/_/____/\\______\\__/_____________/zfr==" [ref=e41]:
+      - /url: /
+      - generic [ref=e42]: ___________________________________________________ ______ ________________ \ ___ / ___ _ ___ /\ __/\ __/\ ___ /\ ___ \ __ / \ __ \ ___ / \__ \ \ \____/ / __/ / \ / \ \__ \ \/ \_ __/ \__/_ / \ \__ \ \ / \/ _ \____ \ \/ \/ \/ \ / \/ _ / _ \ \/ / / \/ \ / _/ / _/ / \_ \/ / / / / / _ / / / / \______\_______/\_______/\___/\___/\_______/_/____/\______\__/_____________/zfr==
+    - heading "wELCOME tO aSCIIaRENA" [level=1] [ref=e46]
+    - generic [ref=e50]:
+      - generic [ref=e51]:
+        - generic [ref=e52]:
+          - heading "LATEST RELEASES" [level=2] [ref=e54]
+          - generic [ref=e55]:
+            - link "First azkii kolly by ZaBoRa!/pT^tNg^cL" [ref=e59]:
+              - /url: /release/zb-grass.txt
+            - 'link "_____________ ____________ · \\ ___ _// /\\ \\\\_____ / · _¦____\\ __/ ¬\\_ ¯¯ / \\| _/______¦_ | \\_ \\______/ ¯¯¯¯/ \\ ¬\\_ | ¦ _/ \\_ _/ _____// ¦ )---\\\\_______/-------\\______/-----------( | ¦ | · zEUs/mYStiC/pRO^aRtS: gROUP-lOGOS · | _|_______________________________________|_ ¦ ¦" [ref=e63]':
+              - /url: /release/zs!-blgs.txt
+        - generic [ref=e64]:
+          - heading "RANDOM RELEASES" [level=2] [ref=e66]
+          - generic [ref=e67]:
+            - 'link "_________ _ _________________ \\______ ¬\\______ / __ ¬\\ · ··::: | ____/ _l/ _/ l/ \\ bURIED :: |_____| \\____\\ ¬\\__________/ mERMAID 2 : ::·___________\\_____/___________________ :·/ ____________ /_ __/ _____/ _/ \\_ ¬\\/ _l/ _/ | |_____ ¬\\_ · \\______/ \\___\\ ¬\\_|_____| _____/ :: ::. l_____/ \\_____/·zS!·\\_____/ . ..:::" [ref=e71]':
+              - /url: /release/zs!^bmii.txt
+            - 'link ".------------------------------------------. | <e> _ ____________ ____________! !____________ ___ / · / __________ ________ / \\______/_ ¦___\\_______ \\ |/ ______/ ·___ / | __ /_____/ /____\\ ¦ \\____ / | \\____/ | | \\_______| \\___________/ | )------------------------------------------( | (zEUs) · aSCII fOR eVERY wARE!! · (zEUs) | `------------------------------------------''" [ref=e75]':
+              - /url: /release/zs!^ware.txt
+        - generic [ref=e76]:
+          - heading "LATEST COMMENTS" [level=2] [ref=e78]
+          - generic [ref=e79]:
+            - generic [ref=e80]:
+              - generic [ref=e81]: COMMENT
+              - generic [ref=e82]: COLLY
+              - generic [ref=e83]: NiCK
+            - generic [ref=e84]:
+              - link "thx guys, appreciate it! The missing file_id is kinda embarrassing yes haha, but already figured out how to embed it next time. Agree that there is still a lot of room to improve on the letter styles, im sure it will come with time, ill keep practicing for sure!" [ref=e86]:
+                - /url: /release/chr-checkmate.ans
+              - link "chr-checkmate.ans" [ref=e88]:
+                - /url: /release/chr-checkmate.ans
+              - link "chrome" [ref=e90]:
+                - /url: /member/chrome
+            - generic [ref=e91]:
+              - link "in fact, after watching it again, i have to pull the score one up. some really nifty design ideas in there!" [ref=e93]:
+                - /url: /release/chr-checkmate.ans
+              - link "chr-checkmate.ans" [ref=e95]:
+                - /url: /release/chr-checkmate.ans
+              - link "dipswitch" [ref=e97]:
+                - /url: /member/dipswitch
+            - generic [ref=e98]:
+              - link "the letter styles are a bit underwhelming (but then again, my first tries were much, much worse), but the whole design & concept easily makes up for it. and it's really cool to see someone finding one's way into the artform in this time & age! next time please don't forget to add an embedded file_id.diz (look at other amiga collies to see how it's done), so that the colly can be spread on boards." [ref=e100]:
+                - /url: /release/chr-checkmate.ans
+              - link "chr-checkmate.ans" [ref=e102]:
+                - /url: /release/chr-checkmate.ans
+              - link "dipswitch" [ref=e104]:
+                - /url: /member/dipswitch
+            - generic [ref=e105]:
+              - link "Very nice to see this! Great designs, i enjoyed this ansi collection very much! Hope to see more soon <<33" [ref=e107]:
+                - /url: /release/chr-checkmate.ans
+              - link "chr-checkmate.ans" [ref=e109]:
+                - /url: /release/chr-checkmate.ans
+              - link "diNO" [ref=e111]:
+                - /url: /member/dino
+            - generic [ref=e112]:
+              - 'link "Its a nice colly indeed, I like the styles a lot, somewhat hard to read sometimes, but over time i got used to it, stylish never less ! was hoping to find logos for myself in it, but i missed out that :-P please add: divine stylers uptown (bbs ad) up rough and dino/ds! to the next one :))" [ref=e114]':
+                - /url: /release/gZR-lEAP.tXt
+              - link "gZR-lEAP.tXt" [ref=e116]:
+                - /url: /release/gZR-lEAP.tXt
+              - link "diNO" [ref=e118]:
+                - /url: /member/dino
+            - generic [ref=e119]:
+              - link "HoS releases just land differently, don't they? Love a Ramon logo." [ref=e121]:
+                - /url: /release/hos-jim.txt
+              - link "hos-jim.txt" [ref=e123]:
+                - /url: /release/hos-jim.txt
+              - link "TANGo" [ref=e125]:
+                - /url: /member/tango
+            - generic [ref=e126]:
+              - link "Finnish hippos are best hippos. This is great." [ref=e128]:
+                - /url: /release/hos-jim.txt
+              - link "hos-jim.txt" [ref=e130]:
+                - /url: /release/hos-jim.txt
+              - link "TANGo" [ref=e132]:
+                - /url: /member/tango
+            - generic [ref=e133]:
+              - link "A challenging read but I love the complexity of the style, even if some of the letters work against it." [ref=e135]:
+                - /url: /release/k0-kmleo.txt
+              - link "k0-kmleo.txt" [ref=e137]:
+                - /url: /release/k0-kmleo.txt
+              - link "TANGo" [ref=e139]:
+                - /url: /member/tango
+            - generic [ref=e140]:
+              - link "So consistent, and so good." [ref=e142]:
+                - /url: /release/c!-br6.txt
+              - link "c!-br6.txt" [ref=e144]:
+                - /url: /release/c!-br6.txt
+              - link "TANGo" [ref=e146]:
+                - /url: /member/tango
+            - generic [ref=e147]:
+              - link "Enjoyed that." [ref=e149]:
+                - /url: /release/gZR-lEAP.tXt
+              - link "gZR-lEAP.tXt" [ref=e151]:
+                - /url: /release/gZR-lEAP.tXt
+              - link "TANGo" [ref=e153]:
+                - /url: /member/tango
+        - generic [ref=e154]:
+          - heading "TAG THE aSCIIaRENA WALL" [level=2] [ref=e156]
+          - generic [ref=e158]:
+            - generic [ref=e160]: and the word couple together? Non-logical, I dont think you would have said spam, if i gave out 10's Smells like somebody insulted
+            - generic [ref=e161]: Stratos
+            - generic [ref=e163]: insulted by my personal opinion.
+            - generic [ref=e164]: Stratos
+            - generic [ref=e166]: stratos, mate, with all due respect, amiga ascii artists have been colouring their logos since the very beginning, including your groupmates mogue, 2fast, h2o etc.
+            - generic [ref=e167]: dipswitch
+            - generic [ref=e169]: you may not like it, but giving a colly bad rating just because it is "not ascii" due to some ansi codes, is not really nice, to put it mildly.
+            - generic [ref=e170]: dipswitch
+            - generic [ref=e172]: ansi codes in a colly does not make it not an ascii colly - technically maybe yes, but not in terms of established scene culture.
+            - generic [ref=e173]: dipswitch
+            - generic [ref=e175]: Stratos er en sjokolade med bobler
+            - generic [ref=e176]: tFt
+            - generic [ref=e178]: tag tag tag
+            - generic [ref=e179]: hARRiSONbERGEROn
+            - generic [ref=e181]: YO!
+            - generic [ref=e182]: Sixx
+            - generic [ref=e184]: oops! dont open more than one tab with asciiarena.se or the script buggs...
+            - generic [ref=e185]: hARRiSONbERGEROn
+            - generic [ref=e187]: still working on that comeback...
+            - generic [ref=e188]: oRLINGO
+            - generic [ref=e190]: Check out the new tANGo colly!
+            - generic [ref=e191]: Spot
+            - generic [ref=e193]: is thzere more bthan top5 only stats available?
+            - generic [ref=e194]: hARRiSONbERGEROn
+            - generic [ref=e196]: aNNo2o81 iS bACk! - "a lEAP oF fAitH" - eNjOy & rEqUESt, lAdS. (hAo!&nEMo&zItO)
+            - generic [ref=e197]: hARRiSONbERGEROn
+        - heading "TAG THE GLOBAL BBS WALL" [level=2] [ref=e200]:
+          - link "TAG THE GLOBAL BBS WALL" [ref=e201]:
+            - /url: https://scenewall.bbs.io?wall
+      - generic [ref=e204]:
+        - generic [ref=e205]:
+          - heading "USERS ONLINE" [level=2] [ref=e207]
+          - generic [ref=e210]: 99 anonymous online
+        - heading "WEEKTOP - BBS UPLOADERS" [level=2] [ref=e213]
+      - heading "WEEKTOP - BBS:ES" [level=2] [ref=e219]
+  - text: ░░█
+  - alert [ref=e222]

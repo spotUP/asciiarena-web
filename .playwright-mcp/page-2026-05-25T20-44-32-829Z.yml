@@ -1,0 +1,9 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]: "[ERROR]"
+    - generic [ref=e4]: useChatContext used outside ChatProvider
+    - generic [ref=e5]:
+      - button "TRY AGAIN" [ref=e6] [cursor=pointer]
+      - link "go home" [ref=e7] [cursor=pointer]:
+        - /url: /
+  - alert [ref=e8]

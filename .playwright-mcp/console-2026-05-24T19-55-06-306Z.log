@@ -1,0 +1,2 @@
+[    1055ms] [VERBOSE] [DOM] Password forms should have (optionally hidden) username fields for accessibility: (More info: https://goo.gl/9p2vKq) %o @ https://asciiarena.se/settings:0
+[    1400ms] [WARNING] Error while trying to use the following icon from the Manifest: https://asciiarena.se/assets/data/socialmedia.png (Resource size is not correct - typo in the Manifest?) @ https://asciiarena.se/settings:0

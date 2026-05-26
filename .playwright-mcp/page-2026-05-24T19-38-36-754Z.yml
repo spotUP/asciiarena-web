@@ -1,0 +1,386 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - link "aSCIIaRENA" [ref=e4]:
+      - /url: /
+    - generic [ref=e5]:
+      - list [ref=e6]:
+        - listitem [ref=e7]:
+          - link "COLLYS v" [ref=e8]:
+            - /url: /collys
+        - listitem [ref=e9]:
+          - link "MAGS v" [ref=e10]:
+            - /url: /mags
+        - listitem [ref=e11]:
+          - link "APPS v" [ref=e12]:
+            - /url: /apps
+        - listitem [ref=e13]:
+          - link "ARTiSTS" [ref=e14]:
+            - /url: /artists
+        - listitem [ref=e15]:
+          - link "CREWS" [ref=e16]:
+            - /url: /crews
+        - listitem [ref=e17]:
+          - link "BOARDS" [ref=e18]:
+            - /url: /bbs
+        - listitem [ref=e19]:
+          - link "REQUESTS" [ref=e20]:
+            - /url: /requests
+        - listitem [ref=e21]:
+          - link "ABOUT" [ref=e22]:
+            - /url: /about
+        - listitem [ref=e23]:
+          - link "ASCII STYLE DESIGNER" [ref=e24]:
+            - /url: /styleeditor
+        - listitem [ref=e25]:
+          - link "WORKBENCH" [ref=e26]:
+            - /url: https://hippoplayer.se
+        - listitem [ref=e27]:
+          - link "SUBMiT v" [ref=e28]:
+            - /url: /submit
+      - list [ref=e29]:
+        - listitem [ref=e30]:
+          - textbox "search..." [ref=e32]
+        - listitem [ref=e33]:
+          - link "LOGiN" [ref=e34]:
+            - /url: "#login"
+  - generic [ref=e35]:
+    - 'link "__ _ . _____ ____: ____ ____ . _ _____ _____ : ____ _ __ /_ __: \\:___\\ \\_\\ !\\ \\ .:\\ ::__: \\ ___\\ . \\_\\ . \\_! \\ :_: \\ _\\ / / . | ! \\ \\ \\--+---\\ :| \\ |! | \\ \\ : \\ \\ : --+--- | | \\.\\ \\ _/ /: --+---(_) _./ __!_/___!|___--+--- \\. (_)!__/ !__/! : .| : \\_ / ! (_) ! \\__ : __/:_ |\\ \\! (_) : --+--- _||_ : \\ :|(_) !\\ ---+--_ : \\(_) !\\ . \\ --+--- : _ !\\( )! \\---+--\\\\ !| _ --+--- / ! ( ) . \\ ---+-- hAkR!\\ ! \\ .\\( )---+--: : \\ ! \\:---+-- ) ! \\ \\___:__|______/____:_/______/__:__/____/_|____:_/|_____/__:___/!\\__:|_|___:__/" [ref=e41]':
+      - /url: /
+      - generic [ref=e42]: "__ _ . _____ ____: ____ ____ . _ _____ _____ : ____ _ __ /_ __: \\:___\\ \\_\\ !\\ \\ .:\\ ::__: \\ ___\\ . \\_\\ . \\_! \\ :_: \\ _\\ / / . | ! \\ \\ \\--+---\\ :| \\ |! | \\ \\ : \\ \\ : --+--- | | \\.\\ \\ _/ /: --+---(_) _./ __!_/___!|___--+--- \\. (_)!__/ !__/! : .| : \\_ / ! (_) ! \\__ : __/:_ |\\ \\! (_) : --+--- _||_ : \\ :|(_) !\\ ---+--_ : \\(_) !\\ . \\ --+--- : _ !\\( )! \\---+--\\\\ !| _ --+--- / ! ( ) . \\ ---+-- hAkR!\\ ! \\ .\\( )---+--: : \\ ! \\:---+-- ) ! \\ \\___:__|______/____:_/______/__:__/____/_|____:_/|_____/__:___/!\\__:|_|___:__/"
+    - heading "REGiSTER" [level=1] [ref=e46]
+    - generic [ref=e50]:
+      - generic [ref=e53]:
+        - generic [ref=e54]:
+          - generic [ref=e55]: Nick
+          - generic [ref=e56]: Password
+        - generic [ref=e57]:
+          - 'textbox "2-60 characters: letters, digits, - . # _ ! ^" [ref=e59]'
+          - textbox [ref=e61]
+        - generic [ref=e62]:
+          - generic [ref=e63]: E-Mail
+          - generic [ref=e64]: Repeat Password
+        - generic [ref=e65]:
+          - textbox [ref=e67]
+          - textbox [ref=e69]
+        - generic [ref=e71]: Password must include uppercase, lowercase, a number, and a special character.
+        - button "Join!" [ref=e75]
+      - generic [ref=e76]:
+        - generic [ref=e77]:
+          - heading "USERS ONLINE" [level=2] [ref=e79]
+          - generic [ref=e82]: 99 anonymous online
+        - generic [ref=e83]:
+          - heading "LAST CALLERS" [level=2] [ref=e85]
+          - generic [ref=e86]:
+            - generic [ref=e87]:
+              - link "chrome" [ref=e88]:
+                - /url: /member/chrome
+              - generic [ref=e89]: 17:50
+            - generic [ref=e90]:
+              - link "JasonGrant" [ref=e91]:
+                - /url: /member/jasongrant
+              - generic [ref=e92]: 15:58
+            - generic [ref=e93]:
+              - link "nxnguyen" [ref=e94]:
+                - /url: /member/nxnguyen
+              - generic [ref=e95]: 19:37
+            - generic [ref=e96]:
+              - link "dipswitch" [ref=e97]:
+                - /url: /member/dipswitch
+              - generic [ref=e98]: 19:10
+            - generic [ref=e99]:
+              - link "dipswitch" [ref=e100]:
+                - /url: /member/dipswitch
+              - generic [ref=e101]: 19:10
+        - generic [ref=e102]:
+          - heading "NEW COLLYS" [level=2] [ref=e104]:
+            - link "NEW COLLYS" [ref=e105]:
+              - /url: /collys?sort_by=cdate&sort_order=D
+          - generic [ref=e106]:
+            - generic [ref=e107]:
+              - link "chr-checkmat" [ref=e109]:
+                - /url: /release/chr-checkmate.ans
+              - generic [ref=e110]: 26-05-16
+            - generic [ref=e111]:
+              - link "gZR-lEAP.tXt" [ref=e113]:
+                - /url: /release/gZR-lEAP.tXt
+              - generic [ref=e114]: 26-04-21
+            - generic [ref=e115]:
+              - link "ht-hc2.txt" [ref=e117]:
+                - /url: /release/ht-hc2.txt
+              - generic [ref=e118]: 26-04-04
+            - generic [ref=e119]:
+              - link "ht-hc1.txt" [ref=e121]:
+                - /url: /release/ht-hc1.txt
+              - generic [ref=e122]: 26-03-22
+            - generic [ref=e123]:
+              - link "SE-WNDR.txt" [ref=e125]:
+                - /url: /release/SE-WNDR.txt
+              - generic [ref=e126]: 26-02-23
+            - generic [ref=e127]:
+              - link "spn-russ.txt" [ref=e129]:
+                - /url: /release/spn-russ.txt
+              - generic [ref=e130]: 26-02-15
+            - generic [ref=e131]:
+              - link "asl-exe.txt" [ref=e133]:
+                - /url: /release/asl-exe.txt
+              - generic [ref=e134]: 26-02-15
+            - generic [ref=e135]:
+              - link "-g-2ooo.txt" [ref=e137]:
+                - /url: /release/-g-2ooo.txt
+              - generic [ref=e138]: 26-02-15
+        - generic [ref=e139]:
+          - heading "LATEST ADDED COLLYS" [level=2] [ref=e141]:
+            - link "LATEST ADDED COLLYS" [ref=e142]:
+              - /url: /collys?sort_by=timestamp&sort_order=D
+          - generic [ref=e143]:
+            - generic [ref=e144]:
+              - link "chr-checkmat" [ref=e145]:
+                - /url: /release/chr-checkmate.ans
+              - generic [ref=e146]: 26-05-16
+            - generic [ref=e147]:
+              - link "gZR-lEAP.tXt" [ref=e148]:
+                - /url: /release/gZR-lEAP.tXt
+              - generic [ref=e149]: 26-04-19
+            - generic [ref=e150]:
+              - link "wpx-boys.txt" [ref=e151]:
+                - /url: /release/wpx-boys.txt
+              - generic [ref=e152]: 26-04-14
+            - generic [ref=e153]:
+              - link "KKZ-BLU.TXT" [ref=e154]:
+                - /url: /release/KKZ-BLU.TXT
+              - generic [ref=e155]: 26-04-14
+            - generic [ref=e156]:
+              - link "kkz-awd.txt" [ref=e157]:
+                - /url: /release/kkz-awd.txt
+              - generic [ref=e158]: 26-04-14
+        - generic [ref=e159]:
+          - heading "LATEST ADDED MAGS" [level=2] [ref=e161]:
+            - link "LATEST ADDED MAGS" [ref=e162]:
+              - /url: /mags?sort_by=timestamp&sort_order=D
+          - generic [ref=e163]:
+            - generic [ref=e164]:
+              - link "OBS-AT03.DMS" [ref=e165]:
+                - /url: /magazine/OBS-AT03.DMS
+              - generic [ref=e166]: 24-02-08
+            - generic [ref=e167]:
+              - link "ART^MAG3.LHA" [ref=e168]:
+                - /url: /magazine/ART^MAG3.LHA
+              - generic [ref=e169]: 22-10-07
+            - generic [ref=e170]:
+              - link "ART^MAG4.LHA" [ref=e171]:
+                - /url: /magazine/ART^MAG4.LHA
+              - generic [ref=e172]: 22-10-07
+            - generic [ref=e173]:
+              - link "ART^MAG5.LHA" [ref=e174]:
+                - /url: /magazine/ART^MAG5.LHA
+              - generic [ref=e175]: 22-10-07
+            - generic [ref=e176]:
+              - link "ART^MAG2.LHA" [ref=e177]:
+                - /url: /magazine/ART^MAG2.LHA
+              - generic [ref=e178]: 22-10-07
+        - generic [ref=e179]:
+          - heading "LATEST ADDED APPS" [level=2] [ref=e181]:
+            - link "LATEST ADDED APPS" [ref=e182]:
+              - /url: /apps?sort_by=timestamp&sort_order=D
+          - generic [ref=e183]:
+            - generic [ref=e184]:
+              - link "Yq!-Crazy.lh" [ref=e185]:
+                - /url: /application/Yq!-Crazy.lha
+              - generic [ref=e186]: 11-03-14
+            - generic [ref=e187]:
+              - link "FRX-I2A15.lh" [ref=e188]:
+                - /url: /application/FRX-I2A15.lha
+              - generic [ref=e189]: 10-11-25
+            - generic [ref=e190]:
+              - link "ladraw-1.zip" [ref=e191]:
+                - /url: /application/ladraw-1.zip
+              - generic [ref=e192]: 10-11-08
+            - generic [ref=e193]:
+              - link "t!s-af10.zip" [ref=e194]:
+                - /url: /application/t!s-af10.zip
+              - generic [ref=e195]: 09-12-22
+            - generic [ref=e196]:
+              - link "kansi10.lha" [ref=e197]:
+                - /url: /application/kansi10.lha
+              - generic [ref=e198]: 09-11-13
+        - generic [ref=e199]:
+          - heading "NEW USERS" [level=2] [ref=e201]
+          - generic [ref=e202]:
+            - generic [ref=e203]:
+              - link "JasonGrant" [ref=e204]:
+                - /url: /member/jasongrant
+              - generic [ref=e205]: "17195900"
+            - generic [ref=e206]:
+              - link "RobertSwift" [ref=e207]:
+                - /url: /member/robertswift
+              - generic [ref=e208]: "17189118"
+            - generic [ref=e209]:
+              - link "LewisPah" [ref=e210]:
+                - /url: /member/lewispah
+              - generic [ref=e211]: "17183826"
+            - generic [ref=e212]:
+              - link "Reneetus" [ref=e213]:
+                - /url: /member/reneetus
+              - generic [ref=e214]: "17183766"
+            - generic [ref=e215]:
+              - link "Develotoist" [ref=e216]:
+                - /url: /member/develotoist
+              - generic [ref=e217]: "17180883"
+        - heading "WEEKTOP - BBS UPLOADERS" [level=2] [ref=e220]
+      - generic [ref=e223]:
+        - generic [ref=e224]:
+          - heading "TOP 5 COLLYS" [level=2] [ref=e226]
+          - generic [ref=e227]:
+            - generic [ref=e228]:
+              - link "dS!-GRFF.txt" [ref=e229]:
+                - /url: /release/dS!-GRFF.txt
+              - generic [ref=e230]: 9.83 PTS
+            - generic [ref=e231]:
+              - link "dS!-USAW.txt" [ref=e232]:
+                - /url: /release/dS!-USAW.txt
+              - generic [ref=e233]: 9.83 PTS
+            - generic [ref=e234]:
+              - link "hos-afro.txt" [ref=e235]:
+                - /url: /release/hos-afro.txt
+              - generic [ref=e236]: 9.61 PTS
+            - generic [ref=e237]:
+              - link "DZ-TAOS2.TXT" [ref=e238]:
+                - /url: /release/DZ-TAOS2.TXT
+              - generic [ref=e239]: 9.60 PTS
+            - generic [ref=e240]:
+              - link "nup-tptp.txt" [ref=e241]:
+                - /url: /release/nup-tptp.txt
+              - generic [ref=e242]: 9.54 PTS
+        - generic [ref=e243]:
+          - heading "MOST VIEWED COLLYS" [level=2] [ref=e245]
+          - generic [ref=e246]:
+            - generic [ref=e247]:
+              - link "hos-afro.txt" [ref=e248]:
+                - /url: /release/hos-afro.txt
+              - generic [ref=e249]: "3115"
+            - generic [ref=e250]:
+              - link "dS!-GRFF.txt" [ref=e251]:
+                - /url: /release/dS!-GRFF.txt
+              - generic [ref=e252]: "1336"
+            - generic [ref=e253]:
+              - link "se-men.txt" [ref=e254]:
+                - /url: /release/se-men.txt
+              - generic [ref=e255]: "972"
+            - generic [ref=e256]:
+              - link "LP!-HATE.TXT" [ref=e257]:
+                - /url: /release/LP!-HATE.TXT
+              - generic [ref=e258]: "839"
+            - generic [ref=e259]:
+              - link "r-hl.txt" [ref=e260]:
+                - /url: /release/r-hl.txt
+              - generic [ref=e261]: "691"
+        - generic [ref=e262]:
+          - heading "TOP 5 ARTISTS" [level=2] [ref=e264]
+          - generic [ref=e265]:
+            - generic [ref=e266]:
+              - link "Skin" [ref=e267]:
+                - /url: /artist/skin
+              - generic [ref=e268]: 9.05 PTS
+            - generic [ref=e269]:
+              - link "Desoto" [ref=e270]:
+                - /url: /artist/desoto
+              - generic [ref=e271]: 9.00 PTS
+            - generic [ref=e272]:
+              - link "Stylez" [ref=e273]:
+                - /url: /artist/stylez
+              - generic [ref=e274]: 8.86 PTS
+            - generic [ref=e275]:
+              - link "Enforcer" [ref=e276]:
+                - /url: /artist/enforcer
+              - generic [ref=e277]: 8.86 PTS
+            - generic [ref=e278]:
+              - link "nUP!" [ref=e279]:
+                - /url: /artist/nup
+              - generic [ref=e280]: 8.80 PTS
+        - generic [ref=e281]:
+          - heading "TOP 5 CREWS" [level=2] [ref=e283]
+          - generic [ref=e284]:
+            - generic [ref=e285]:
+              - link "Fantasy Project" [ref=e286]:
+                - /url: /crew/fantasy-project
+              - generic [ref=e287]: 9.00 PTS
+            - generic [ref=e288]:
+              - link "HuMaNe & VaNiTy" [ref=e289]:
+                - /url: /crew/humane-vanity
+              - generic [ref=e290]: 8.75 PTS
+            - generic [ref=e291]:
+              - link "Low Profile" [ref=e292]:
+                - /url: /crew/low-profile
+              - generic [ref=e293]: 8.56 PTS
+            - generic [ref=e294]:
+              - link "Arclite" [ref=e295]:
+                - /url: /crew/arclite
+              - generic [ref=e296]: 8.53 PTS
+            - generic [ref=e297]:
+              - link "G-Style" [ref=e298]:
+                - /url: /crew/g-style
+              - generic [ref=e299]: 8.53 PTS
+        - generic [ref=e300]:
+          - heading "TOP UPLOADERS" [level=2] [ref=e302]
+          - generic [ref=e303]:
+            - generic [ref=e304]:
+              - link "hAkR!" [ref=e305]:
+                - /url: /member/hakr
+              - generic [ref=e306]: 70.8 MB
+            - generic [ref=e307]:
+              - link "dipswitch" [ref=e308]:
+                - /url: /member/dipswitch
+              - generic [ref=e309]: 51.8 MB
+            - generic [ref=e310]:
+              - link "Spot" [ref=e311]:
+                - /url: /member/spot
+              - generic [ref=e312]: 42.4 MB
+            - generic [ref=e313]:
+              - link "dMG" [ref=e314]:
+                - /url: /member/dmg
+              - generic [ref=e315]: 37.5 MB
+            - generic [ref=e316]:
+              - link "z!o" [ref=e317]:
+                - /url: /member/z-o
+              - generic [ref=e318]: 31.8 MB
+        - generic [ref=e319]:
+          - heading "TOP COMMENTERS" [level=2] [ref=e321]
+          - generic [ref=e322]:
+            - generic [ref=e323]:
+              - link "z!o" [ref=e324]:
+                - /url: /member/z-o
+              - generic [ref=e325]: "665"
+            - generic [ref=e326]:
+              - link "dipswitch" [ref=e327]:
+                - /url: /member/dipswitch
+              - generic [ref=e328]: "529"
+            - generic [ref=e329]:
+              - link "spot" [ref=e330]:
+                - /url: /member/spot
+              - generic [ref=e331]: "450"
+            - generic [ref=e332]:
+              - link "zefyros" [ref=e333]:
+                - /url: /member/zefyros
+              - generic [ref=e334]: "349"
+            - generic [ref=e335]:
+              - link "hARRiSONbERGEROn" [ref=e336]:
+                - /url: /member/harrisonbergeron
+              - generic [ref=e337]: "311"
+        - generic [ref=e338]:
+          - heading "aSCIIaRENA STATS" [level=2] [ref=e340]
+          - generic [ref=e341]:
+            - generic [ref=e342]:
+              - generic [ref=e343]: "Collys Online:"
+              - generic [ref=e344]: "3983"
+            - generic [ref=e345]:
+              - generic [ref=e346]: "Pumped Bytes:"
+              - generic [ref=e347]: 277.2 MB
+            - generic [ref=e348]:
+              - generic [ref=e349]: "Users:"
+              - generic [ref=e350]: "656"
+            - generic [ref=e351]:
+              - generic [ref=e352]: "Comments:"
+              - generic [ref=e353]: "4389"
+        - heading "WEEKTOP - BBS:ES" [level=2] [ref=e356]
+  - text: ░░█
+  - alert [ref=e359]

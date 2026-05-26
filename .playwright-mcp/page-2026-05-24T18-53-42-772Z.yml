@@ -1,0 +1,7 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]: 404 - NOT FOUND
+    - generic [ref=e4]: The page you are looking for does not exist.
+    - link "< back to collys" [ref=e5] [cursor=pointer]:
+      - /url: /collys
+  - alert [ref=e6]

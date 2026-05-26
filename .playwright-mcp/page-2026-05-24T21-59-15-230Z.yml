@@ -1,0 +1,492 @@
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - link "aSCIIaRENA" [ref=e4]:
+      - /url: /
+    - generic [ref=e5]:
+      - list [ref=e6]:
+        - listitem [ref=e7]:
+          - link "COLLYS v" [ref=e8]:
+            - /url: /collys
+        - listitem [ref=e9]:
+          - link "MAGS v" [ref=e10]:
+            - /url: /mags
+        - listitem [ref=e11]:
+          - link "APPS v" [ref=e12]:
+            - /url: /apps
+        - listitem [ref=e13]:
+          - link "ARTiSTS" [ref=e14]:
+            - /url: /artists
+        - listitem [ref=e15]:
+          - link "CREWS" [ref=e16]:
+            - /url: /crews
+        - listitem [ref=e17]:
+          - link "BOARDS" [ref=e18]:
+            - /url: /bbs
+        - listitem [ref=e19]:
+          - link "REQUESTS" [ref=e20]:
+            - /url: /requests
+        - listitem [ref=e21]:
+          - link "ABOUT" [ref=e22]:
+            - /url: /about
+        - listitem [ref=e23]:
+          - link "ASCII STYLE DESIGNER" [ref=e24]:
+            - /url: /styleeditor
+        - listitem [ref=e25]:
+          - link "WORKBENCH" [ref=e26]:
+            - /url: https://hippoplayer.se
+        - listitem [ref=e27]:
+          - link "SUBMiT v" [ref=e28]:
+            - /url: /submit
+      - list [ref=e29]:
+        - listitem [ref=e30]:
+          - textbox "search..." [ref=e32]
+        - listitem [ref=e33]:
+          - link "LOGiN" [ref=e34]:
+            - /url: "#login"
+  - generic [ref=e35]:
+    - link "___________________________________________________ ______ ________________ \\ ___ / ___ _ ___ /\\ __/\\ __/\\ ___ /\\ ___ \\ __ / \\ __ \\ ___ / \\__ \\ \\ \\____/ / __/ / \\ / \\ \\__ \\ \\/ \\_ __/ \\__/_ / \\ \\__ \\ \\ / \\/ _ \\____ \\ \\/ \\/ \\/ \\ / \\/ _ / _ \\ \\/ / / \\/ \\ / _/ / _/ / \\_ \\/ / / / / / _ / / / / \\______\\_______/\\_______/\\___/\\___/\\_______/_/____/\\______\\__/_____________/zfr==" [ref=e41]:
+      - /url: /
+      - generic [ref=e42]: ___________________________________________________ ______ ________________ \ ___ / ___ _ ___ /\ __/\ __/\ ___ /\ ___ \ __ / \ __ \ ___ / \__ \ \ \____/ / __/ / \ / \ \__ \ \/ \_ __/ \__/_ / \ \__ \ \ / \/ _ \____ \ \/ \/ \/ \ / \/ _ / _ \ \/ / / \/ \ / _/ / _/ / \_ \/ / / / / / _ / / / / \______\_______/\_______/\___/\___/\_______/_/____/\______\__/_____________/zfr==
+    - heading "rELEAsE iNFO" [level=1] [ref=e46]
+    - generic [ref=e50]:
+      - generic [ref=e51]:
+        - heading "Grass" [level=1] [ref=e54]
+        - generic [ref=e56]:
+          - generic [ref=e59]: First azkii kolly by ZaBoRa!/pT^tNg^cL
+          - generic [ref=e60]:
+            - generic [ref=e61]:
+              - text: "Artist(s):"
+              - link "Zabora" [ref=e63]:
+                - /url: /artist/zabora
+            - generic [ref=e64]:
+              - text: "Crew(s):"
+              - link "Independent" [ref=e66]:
+                - /url: /crew/independent
+            - generic [ref=e67]: "Filename: zb-grass.txt"
+            - generic [ref=e68]: "Size: 35 KB"
+            - generic [ref=e69]: "Released: February 1997"
+            - generic [ref=e70]: "Rating: Awaiting 1 vote"
+            - generic [ref=e71]:
+              - text: "Added by:"
+              - link "spot" [ref=e72]:
+                - /url: /member/spot
+            - generic [ref=e73]: "Viewed: 13 times"
+            - generic [ref=e74]: "Downloaded: 0 Times"
+        - heading "More by Zabora" [level=2] [ref=e77]
+        - generic [ref=e78]:
+          - link "Grass" [ref=e80]:
+            - /url: /release/zbr-gras.txt
+          - link "Ubik" [ref=e82]:
+            - /url: /release/sea-ubik.txt
+          - link "Quantum the Colly" [ref=e84]:
+            - /url: /release/sea-qntm.txt
+          - link "Psilocybe Semilanceta" [ref=e86]:
+            - /url: /release/sea-psyl.txt
+          - link "Kataryniarz" [ref=e88]:
+            - /url: /release/sea-ktrn.txt
+          - link "Jak to Kurwa Nazwac?" [ref=e90]:
+            - /url: /release/sea-jtkn.txt
+        - heading "More from Independent" [level=2] [ref=e93]
+        - generic [ref=e94]:
+          - link "Boys Like It, Why Can't You?" [ref=e96]:
+            - /url: /release/wpx-boys.txt
+          - link "When Your Mind Is Flowing" [ref=e98]:
+            - /url: /release/vcr!-w.y.m.i.f
+          - link "The Mini Ascii Collection" [ref=e100]:
+            - /url: /release/minicii.txt
+          - 'link "Mini Ascii Collection #5" [ref=e102]':
+            - /url: /release/masci5.txt
+          - link "Crap" [ref=e104]:
+            - /url: /release/adn-crap.txt
+          - link "Request" [ref=e106]:
+            - /url: /release/tg!.requ.txt
+        - generic [ref=e107]:
+          - generic [ref=e108]:
+            - button "Hide Colly" [ref=e109]
+            - button "Fullscreen" [ref=e110]
+            - button "Fit to screen" [ref=e111]
+            - button "Download" [ref=e112]
+            - generic [ref=e113]: 14 views
+            - button "Copy as image" [ref=e114]
+            - button "Share" [ref=e116]
+            - button "View Comments" [ref=e117]
+          - generic [ref=e118]:
+            - button "BG Color" [ref=e120]
+            - button "FG Color" [ref=e123]
+            - generic [ref=e125]:
+              - button "mOsOul v" [active] [ref=e126]
+              - generic [ref=e127]:
+                - button "MicroKnight" [ref=e128]
+                - button "MicroKnight+" [ref=e129]
+                - button "mOsOul" [ref=e130]
+                - button "P0T-NOoDLE" [ref=e131]
+                - button "A500 Topaz" [ref=e132]
+                - button "A500 Topaz+" [ref=e133]
+                - button "A1200 Topaz" [ref=e134]
+                - button "A1200 Topaz+" [ref=e135]
+        - generic [ref=e137]: "@BEGIN_FILE_ID.DIZ First azkii kolly by ZaBoRa!/pT^tNg^cL @END_FILE_ID.DIZ · / g r a s s - --/----------------------------- - )¯¯¯¯¯/_____ \\¯¯¯¯( _____ /¯¯ ) /-) \\_ \\ ¯¯¯\\ ( / /(¯¯¯(¯¯( /¯¯¯¯¯\\/\\ \\ ¯¯¯\\ / ¯ /¯ ¯¯ /\\ ^ \\ ) \\_ \\ /____ / \\ _ \\¯______\\) \\ zB®!)____/---/______\\-/____\\_____________\\ / · _ ____________________________________/_ / ____ _______ .____ _______ ________ _______ ______)__ \\./ _ \\| _(______/ \\._\\___ \\ / _ \\. \\ _____| _ | \\_ / 7 | _( /. _ | \\ \\i___\\____/ | ' /__________|___\\______|____/ | tF!___\\ /_____|_______/ /__u'R! / z a b o r a ! _/_______________________ _ / h i s i s b a c k t o a z k e e a r t i n s p e c i a l l c o l l y d e d i c a t e d t o a l l m e m b e r s o f _ ___________________________________________/_ / p a l i m y t r a f k e / / _________ ______ ._____. ___ ___ ___ _____ ./ / _ \\| | _(___)_ / \\/ \\\\ \\_____ | 7 / _ | _|__/ \\| \\/ .\\ \\ / | _/_____/ | /_________|____/ | / |______\\ /_____|______/ / /______|_______/ ._____. .______/ __. _| |_ ________ _______ | __/__/ |_____ _______ \\_ _/_\\___ \\ / _ \\| ___/ / / /____ | | _( /. _ | | \\ \\ 7__/ / |_____|____\\______|____/ |______|____|\\____\\_________/ /_____| / tF!/u'R! __/_____ _ \\/ s o . . . g o ! ! ! · / · / f i r s t w o r d / - -----/--------------------------------/--- -- - - · / / |/ / ; hi jest sobota, wczoraj / /| byl piatek 13... postanowlem / / : w koncu cos zrobic no i powstala / ; ta kolekcja... a ze jestem hq pALIMy / : raFke tak wiec nizej znajdziecie logosiki / | dla czlonkow tej qll grupki... jesli chcialbys / ; sie joitnac to szukaj informacji gdzies nizej... / | A tak po za tym to to jest moja czwarta kolekcja... / : / / · / ZaBoRa!/pT^tNg^cL __/_______________________________/______________________________ __ _ \\/ /14.12.96. __/__________ __ _ \\/ g r a s s /\\ /\\ ·¯¯\\¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯/¯¯· zB®! . ¯\\· \\\\¯¯¯¯ ¯ - - ^ - - ¯ ¯¯¯¯// ·/¯ . - ¯)_\\\\ \\\\¯ i n d e x ¯// //_(¯ - _ __ (__\\ \\· ·/ /__( __ _ _ __ _________\\ /_________ __ _ k u b i k - 2 a z k e e m a d e l - 2 a z k e e m r . u h u - 2 a z k e e p a u l a - 3 a z k e e s e r o - 2 a z k e e v o i c e r - 2 a z k e e z a b o r a ! - 1 a z k e e p a l i m y t r a f k e - 1 a z k e e t o t a l: - 15 a z k e e l o g o s · / g r a s s - -- --/----------------------------------------- -- - ____/__ ______ ) /_____ \\ ( _____ hlej... sendnij /¯¯ ) /-) \\_ \\ ¯¯¯\\ ( w koncu cos do / /(¯¯¯(¯¯( /¯¯¯¯¯\\/\\ \\ ¯¯¯\\ mnie... / ¯ /¯ ¯¯ /\\ ^ \\ \\ \\ \\ / / \\ _ \\¯ \\ \\ czekam... _/ /---/ \\-/ \\ -· \\ )zB®! name: kubik ¹ ¯¯¯/¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯/for: kubik/pt · ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ ¯¯ ¯ · / k u b i k - --/------------------------------- - / _____ _______ ____ / __| (_____| ( __| (_ / _) | / (|___ )¯¯¯¯¯/___) | / / | / ) '. / ¯¯ /-) \\ / / | + ¯¯\\ ¯¯¯ / / ¯¯¯/ + ¯¯\\ / |__| \\ (------' /__| \\ / |zB®!__\\¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ |_____\\ · · / g r a s s - -- --/----------------------------------------- -- - ____/__ ______ ) /_____ \\ ( _____ podeslij traitorowi /¯¯ ) /-) \\_ \\ ¯¯¯\\ ( te zrodla... / /(¯¯¯(¯¯( /¯¯¯¯¯\\/\\ \\ ¯¯¯\\ / ¯ /¯ ¯¯ /\\ ^ \\ \\ \\ \\ a mi jakis stuff :-) / / \\ _ \\¯ \\ \\ _/ /---/ \\-/ \\ -· \\ )zB®! name: kubik ² CU!!! ¯¯¯/¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯/for: kubik/pt · ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ ¯¯ ¯ · / k u b i k - --/------------------------------- - _/___ _______ ____ __| (_ | ( __| (_ ) | /--|¯¯¯( )¯¯¯¯¯/__) | / / / | / ¯¯ /-) \\ / / + ¯¯\\ ¯ / / ¯¯¯/+ ¯¯\\ / | \\ /------' /_| \\ ¯/¯¯¯|zB®!__\\¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ |_____\\ / · · / g r a s s - -- --/----------------------------------------- -- - ____/__ ______ ) /_____ \\ ( _____ ty tez si w koncu /¯¯ ) /-) \\_ \\ ¯¯¯\\ ( odezwij... / /(¯¯¯(¯¯( /¯¯¯¯¯\\/\\ \\ ¯¯¯\\ / ¯ /¯ ¯¯ /\\ ^ \\ \\ \\ \\ jareles cos / / \\ _ \\¯ \\ \\ ostatnio... _/ /---/ \\-/ \\ -· \\ )zB®! name: madel ¹ ¯¯¯/¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯/for: madel/pt^rno^fire^antyjabol · ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ ¯¯ ¯ · / m a d e l - --/----------------------------------------- - / ________ / _____ _____\\___ (_ __ / ) \\ ) / ___/ - -----) | / /¯¯` \\¯¯¯¯¯¯\\¯¯¯¯( / ( )¯¯¯¯/ | / / ¯\\/¯ \\ ^ \\ ¯¯ / ¯¯¯\\¯ ) / | / / /______\\ _ \\ /___ \\ /¯¯¯¯¯/ | / /zB®!____\\ ---/_____\\--( )_______\\ /---' / /_______/ · · / g r a s s - -- --/----------------------------------------- -- - ____/__ ______ ) /_____ \\ ( _____ /¯¯ ) /-) \\_ \\ ¯¯¯\\ ( zaluj ze nie byles / /(¯¯¯(¯¯( /¯¯¯¯¯\\/\\ \\ ¯¯¯\\ na gravity / ¯ /¯ ¯¯ /\\ ^ \\ \\ \\ \\ / / \\ _ \\¯ \\ \\ ale zjara tam byla _/ /---/ \\-/ \\ -· \\ )zB®! name: madel ² :-) ¯¯¯/¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯/for: madel/pt^rno^fire^antyjabol · ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ ¯¯ ¯ · / m a d e l - --/-------------------------- - / _______ __/__ | /___ ) \\ | /-) /--. /¯¯` \\¯¯¯¯¯¯\\¯¯¯¯( / __/ | / ¯\\/¯ \\ ^ \\ ¯¯ / (| )( / /______\\ _ \\ / ¯¯¯\\ /¯¯¯\\ _/ \\ ---/_____\\-(_______\\ \\ )zB®!__________________________________\\ ¯/ · · / g r a s s - -- --/----------------------------------------- -- - ____/__ ______ ) /_____ \\ ( _____ czesc chlejusie... /¯¯ ) /-) \\_ \\ ¯¯¯\\ ( / /(¯¯¯(¯¯( /¯¯¯¯¯\\/\\ \\ ¯¯¯\\ qll bylo na party / ¯ /¯ ¯¯ /\\ ^ \\ \\ \\ \\ / / \\ _ \\¯ \\ \\ co z rush hours? _/ /---/ \\-/ \\ -· \\ )zB®! name: mr.uhu ¹ ¯¯¯/¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯/for: mr.uhu/pt^scum^vp^fg^pw^smk^aup · ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ ¯¯ ¯ · / m r. u h u - --/----------------------------------- - )¯¯¯¯\\ ____ ____ _ ____ /¯¯` \\ ) \\_ ---| (_) |---.-| (_ / ¯\\/¯ \\¯¯( / | | / | | | / / /______\\¯¯ /\\ | ¯ / __¯ | ¯ / /zB®! \\| \\__| / \\ _ | / ¯/¯¯¯¯¯¯¯¯|__/ \\ :_____/ \\|___| / / /_____________________\\------/ · · / g r a s s - -- --/----------------------------------------- -- - ____/__ ______ chyba zrobie ten ) /_____ \\ ( _____ mitting w zaganiu /¯¯ ) /-) \\_ \\ ¯¯¯\\ ( / /(¯¯¯(¯¯( /¯¯¯¯¯\\/\\ \\ ¯¯¯\\ ofcoz jak bedzie / ¯ /¯ ¯¯ /\\ ^ \\ \\ \\ \\ to cie widze... / / \\ _ \\¯ \\ \\_ _/ /---/ \\-/ \\ -· ( spriduj to na max// )zB®! name: mr.uhu ² ¯¯¯/¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯/for: mr.uhu/pt^scum^vp^fg^pw^smk^aup · ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ ¯¯ ¯ · / m r. u h u - --/------------------------------------ - / ---. / )¯¯¯¯\\ ____ _____ _| | ____ / /¯¯` \\ ) \\_ --| (_) | |-| (_ / / ¯\\/¯ \\¯¯( / | | / | | | / / / /______\\¯¯ /\\ | | / ¯ | ¯ / / /zB®! \\| \\__| ¯ / \\¯¯¯ | / / ¯¯¯¯¯¯¯¯¯¯|__/ \\ | / \\|___|___/ / /---------|____/------\\ · · / g r a s s - -- --/----------------------------------------- -- - ____/__ ______ ) /_____ \\ ( _____ witaj... /¯¯ ) /-) \\_ \\ ¯¯¯\\ ( na poczatek pliss / /(¯¯¯(¯¯( /¯¯¯¯¯\\/\\ \\ ¯¯¯\\ o sprida tej colly / ¯ /¯ ¯¯ /\\ ^ \\ \\ \\ \\ / / \\ _ \\¯ \\ \\ rest nizej... _/ /---/ \\-/ \\ -· \\ )zB®! name: paula ¹ ¯¯¯/¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯/for: paula/pt^vp^odg · ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ ¯¯ ¯ · / p a u l a - --/---------------------- - __/_ ________ ) _\\____ __)__ / ___/ __( / \\ ---| ( / ¯¯¯¯\\ \\_______/ ^ \\ | / )/ ^ \\ / \\ _ \\ ¯ / /¯¯¯¯/ _ \\ _/ \\--/____\\___/ /--/____\\ )zB®! \\ '-------' ¯/¯¯¯¯¯¯¯¯¯ · · / g r a s s - -- --/----------------------------------------- -- - ____/__ ______ ) /_____ \\ ( _____ hej jestem back /¯¯ ) /-) \\_ \\ ¯¯¯\\ ( chyba bedzie ten / /(¯¯¯(¯¯( /¯¯¯¯¯\\/\\ \\ ¯¯¯\\ mtting w zaganiu, / ¯ /¯ ¯¯ /\\ ^ \\ \\ \\ \\ ale... (reszta w / / \\ _ \\¯ \\ \\ lettku) _/ /---/ \\-/ \\ -· \\ )zB®! name:paula ² ¯¯¯/¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯/for: paula/pt^vp^odg · ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ ¯¯ ¯ · / p a u l a - --/--------------------- - )¯¯¯¯(_ ____ )¯¯__ /¯¯¯\\ __)__ / ¯¯¯\\ / )___/ ^ \\--| ( /¯¯/^ \\ / \\_ _ \\ | / / _ \\ / ( --/____\\¯ / / -/____\\ )_________\\ )____/¯¯¯¯ / · · / g r a s s - -- --/------------------------------------------ -- - ____/__ ______ no i znowu logosik... ) /_____ \\ ( _____ /¯¯ ) /-) \\_ \\ ¯¯¯\\ ( jak sie zobaczymy / /(¯¯¯(¯¯( /¯¯¯¯¯\\/\\ \\ ¯¯¯\\ to ofcoz zagramy i / ¯ /¯ ¯¯ /\\ ^ \\ \\ \\ \\ zajaramy... :-) / / \\ _ \\¯ \\ \\ _/ /---/ \\-/ \\ -· \\na razie to 3-m sie )zB®! name: paula ³ ¯¯¯/¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯/for: paula/pt^vp^odg · ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ ¯¯ ¯ · / p a u l a - --/---------------------- - )¯¯¯¯(_ ____ )¯¯__ /¯¯¯\\ __)__ / ¯¯¯\\ | )___/ ^ \\--| ( /¯¯/^ \\ | \\_ _ \\ | / / _ \\ | ( --/____\\¯ / / -/____\\ /)______\\ )____/¯¯¯¯ / · · / g r a s s - -- --/-------------------------------------------- ____/__ ______ mam nadzieje ze to ) /_____ \\ ( _____ w ogole zobaczysz... /¯¯ ) /-) \\_ \\ ¯¯¯\\ ( / /(¯¯¯(¯¯( /¯¯¯¯¯\\/\\ \\ ¯¯¯\\ moze ci ktos to / ¯ /¯ ¯¯ /\\ ^ \\ \\ \\ \\ podrzuci... / / \\ _ \\¯ \\ \\ _/ /---/ \\-/ \\ -· \\ )zB®! name: sero ¹ ¯¯¯/¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯/sero: pt^samar^vp^aup · ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ · / s e r o - --/-------------------------- - \\¯¯¯¯( ________ _____ ____ /\\ ¯¯¯\\__ (_ ) \\_ ) \\_ / /\\ \\ ___/¯¯¯¯( /¯¯ __ ( / / \\ \\ ( ¯¯ /\\ ( | / / ¯ \\ ¯¯¯\\ \\ | /_/ \\ \\___ \\____( / )zB®! (-----\\(________\\ · ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ · / g r a s s - -- --/-------------------------------------------- ____/__ ______ ) /_____ \\ ( _____ tego policjanta na /¯¯ ) /-) \\_ \\ ¯¯¯\\ ( na party to niezle / /(¯¯¯(¯¯( /¯¯¯¯¯\\/\\ \\ ¯¯¯\\ przekreciles... / ¯ /¯ ¯¯ /\\ ^ \\ \\ \\ \\ to nas chyba uratowalo / / \\ _ \\¯ \\ \\ no nie? _/ /---/ \\-/ \\ -· \\ )zB®! name: sero ² CU!!! ¯¯¯/¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯/sero: pt^samar^vp^aup · ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ · / s e r o - --/-------------------------- - \\¯¯¯¯( ________ _____ ____ \\ ¯¯¯\\__ (_ ) \\_ ) \\_ /\\ \\ ___/¯¯¯¯( /¯¯ ( / \\ \\ ( ¯¯ /\\ -- | / ¯ \\ ¯¯¯\\ \\ ( | _/zB®!_______( \\-(______\\- | )------------------- /________( / · · / g r a s s - -- --/----------------------------------------- -- - ____/__ ______ ) /_____ \\ ( _____ cze lamerze... /¯¯ ) /-) \\_ \\ ¯¯¯\\ ( jak chcesz knigi / /(¯¯¯(¯¯( /¯¯¯¯¯\\/\\ \\ ¯¯¯\\ to... przyjdz do mnie / ¯ /¯ ¯¯ /\\ ^ \\ \\ \\ \\ / / \\ _ \\¯ \\ \\ masz tyle samo, co ja _/ /---/ \\-/ \\ -· \\ do ciebie... )zB®! name: voicer ¹ ¯¯¯/¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯/for: voicer/pt^pht · ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ ¯¯ ¯ · / v o i c e r - --/-------------------------------- - ___|¯¯¯¯(_ ________ _____ ) | /____ _____\\__ (_ ) \\_ | | / __ (-)¯¯¯\\ / ___/¯¯¯¯( / | )/ / ( | ¯¯¯¯/ / ( ¯¯ /\\ | ¯ / - | / (¯¯¯\\ ¯¯¯\\ \\ |zB®!_/ \\_____| /________\\__ \\-) \\ / |___/_________________\\-------- / · · / g r a s s - -- --/----------------------------------------- -- - ____/__ ______ ) /_____ \\ ( _____ a tak w ogole to moze /¯¯ ) /-) \\_ \\ ¯¯¯\\ ( na swieta cos przywioze / /(¯¯¯(¯¯( /¯¯¯¯¯\\/\\ \\ ¯¯¯\\ na chate... / ¯ /¯ ¯¯ /\\ ^ \\ \\ \\ \\ / / \\ _ \\¯ \\ \\ CU!!! _/ /---/ \\-/ \\ -· \\ )zB®! name: voicer ² ¯¯¯/¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯/for: voicer/pt^pht · ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ ¯¯ ¯ · / v o i c e r - --/-------------------------------- - ___|¯¯¯¯(_ ________ _____ ) | /____ _____\\__ (_ ) \\_ | | / __ (-)¯¯¯\\ / ___/¯¯¯¯( / | )/ / ( | ¯¯¯¯/ / ( ¯¯ /\\ | ¯ / - | / (¯¯¯\\ ¯¯¯\\ \\ |zB®!_/ \\_____| /________\\__ \\-) \\ / |___/_________________\\-------- / · · / g r a s s - -- --/----------------------------------------- -- - ____/__ ______ prosba do wszystkich ) /_____ \\ ( _____ ktorzy to dostana: /¯¯ ) /-) \\_ \\ ¯¯¯\\ ( / /(¯¯¯(¯¯( /¯¯¯¯¯\\/\\ \\ ¯¯¯\\ !!! SPRID IT !!! / ¯ /¯ ¯¯ /\\ ^ \\ \\ \\ \\ !!! SPRID IT !!! / / \\ _ \\¯ \\ \\ !!! SPRID IT !!! _/ /---/ \\-/ \\ -· \\ )zB®! name: zabora pliss & thanx ¯¯¯/¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯/for: me (zabora/pt^tng^cl) · ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ ¯¯ ¯ · / z a b o r a ! - --/-------------------------------------- - / _____ _______ ______ _____ __ / ) / | ( / \\ ) \\_- -------) | / /¯¯¯ / ¯¯¯¯¯\\ )¯¯¯¯¯/ __ \\¯¯¯¯( /¯¯¯¯¯¯\\ | / / /\\ ^ \\ ¯¯ / _ ( \\ ¯¯ /\\ ^ \\ | / / _ \\ _ \\ /________( \\ _ \\--| / /zB®!_____\\-/_____\\--' |___/ \\-/_____\\-' / /--------- · · / g r a s s - -- --/----------------------------------------- -- - ____/__ ______ ) /_____ \\ ( _____ /¯¯ ) /-) \\_ \\ ¯¯¯\\ ( for joing: / /(¯¯¯(¯¯( /¯¯¯¯¯\\/\\ \\ ¯¯¯\\ / ¯ /¯ ¯¯ /\\ ^ \\ \\ \\ \\ write / / \\ _ \\¯ \\ \\ to / /---/ \\-/ \\ -· \\ zabora! )zB®! name: pt /¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯/for: all members · ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ ¯¯ ¯ · / p a l i m y t r a f k e - -- ---/------------------------------------ -- - ___/ _______ _____ _ ) _\\______)_ / ) \\ \\ ___/ __( / \\ /)¯¯¯|¯` \\ \\¯¯¯/ \\_______/ ^ \\ )/¯\\ |¯\\/¯ \\- / / \\ _ \\ /¯¯¯¯/--| /______\\ / _/ \\--/____\\____/ |_____\\___/ )zB®! \\ '----------' ¯¯/¯¯¯¯¯¯¯¯ _______________ ___ / _) /) \\______ ____|__ (__ / )__ ___/¯¯¯¯( / \\__) / /_____ / / \\ ¯¯ /\\ ^ \\ ___/ / _ / / / \\ \\ _ \\ ___/+ ¯¯\\ ) /¯¯( / /_________\\_/ \\-/____\\ \\__| \\ ¯¯ / · /--------- /_______\\ |______\\¯¯¯¯¯ t h e e n d · · \\ \\ l a s t w o r d \\ - -- ---\\-----------------------------------------\\----- - \\ \\ · \\ \\| \\ to juz wszystko na dzis... ; \\ |\\ \\ : \\ \\ nie chce mi sie wiecej pisac wiec ; \\ juz nie bede pisal mam nadzieje, ze sie : \\ komus podobalo... jak nie, no coz mogl nie | \\ ogladac... a teraz prosba do was... spridujce to ; \\ pliss nad thanx... | \\ \\ : \\ \\ ZaBoRa!/pT^tNG^cL · \\ _ __ _____________________\\_________________________________________\\__ \\ \\/ _ __ __________\\__ g r a s s t h e c o l l y \\/ m y f o u r c o l l y s o m e i n f o s (13.XII.96) __ ___________ ) /------(_---\\: + '/___)__ __ )¯¯¯| ) ' ___··+·/ ¯ ( · :' / )· ·+/ ) \\/· |)¯| /| | )_____/ .:_ `7. / 7---( / / .:| :/ | |·.: ) · /( ; · /-)¯¯)· \\ .: |· | | |: ¯` + ':¯ : '\\ | +·¯¯\\ ( · :· | : 7--.__|---(). :. |_______+ \\ ·:+/:. | )______: ¯`---/_('/_________\\--+/ :zB®! p A L I M y t r a F k e / _(________ _)¯¯¯¯¯¯/------(_----\\¯¯¯(_-----\\)¯¯¯/-------(\\:. ( /--( \\ :. . / ___ .:// __|:. ____+__/-) /¯ ____\\· \\ / .: __( )_____/ .:_/____________/ | / ·+· ( `--' (_ .: _ \\ /( | \\ ` /¯¯7· ¯¯¯¯¯¯¯7 _) (_ (/ \\ ':¯ |· \\_ ·' ; +:.| )_________(_____7 \\_ |___()+· · (--) _ .:(/¯/ ·· | /______(--' /_____ . ¯ | \\/_______( )-------)_____7 !!! pALIMy traFke NEWS !!! kILKa nOWINEk z pIERWSZEj nA sCENIe gRUPKi jARACZy Mr.Uhu - joinoî sië na Gravity party w Opolu Paula - joinela sie ostanio... :-) Sero - joinoî sië na Gravity party w Opolu Voicr - joinoî sië na PKP przed podróûâ na Gravity... Oficial members of pALIMy traFke (13.XII.96 - piatek!!!) Kubik........................amiga, code, swap, gRASSMAn Madel..............................amiga, swap, gRASSMAn Mr.UHU.............................amiga, swap, gRASSMAn Paula.......................pc, girl-swap!!!, grasswomen :-) Sero...............................atari, code, gRASSMAn Voicer............................amiga, music, gRASSMAn ZaBoRa!..................HQ, amiga, swap, azke, gRASSMAn Chcesz sië joitnâê? Jako, zë ostatnio mam doôc duûo propozycji odnoôcie wciâgniëcia ludu do pT wprowadza sie troszke nowsze zasady joingu. Caîkiem nowe zasady: - Joitnâê sië moûe kaûdy, kto podeôle jakiô EXTRA STUFF. - Joitnâê sië moûe kaûdy, kto znajdzie ZaBoRa! na party i teû bëdzie miaî EXTRA STUFF. - Joitnâê sië moûe kaûdy, kto znajdzie ZaBoRa! na party i bëdzie miaî trochë szczëôcia, czyli ZaBoRa! bëdzie miaî jakiô EXTRA STUFF - Joiniëcie nastëpuje prawie automatycznie po przyjaraniu czegoô z odpowiednimi osobami... :-) - Inny sposób. Naleûy bardzo îadnie zagadaê z ZaBoRâ! to moûe wprowadzi sië jakieô specjalne zasady przyjmowanie... ·*· ·*· ·*· r z e c z y w i s t o s c j e s t t y l k o s n e m s t r e f a m r o k u najlepszy zinek o fantastyce i pochodnych slij wszystko co masz no i na co jeszcze czekasz send to: ZaBoRa! / tNg ^ pT ^ ClaN or to... YoYo / MaWi ^ ClaN Grzegorz Juraszek Kotowicka 27/7 47-400 racoborz Jetti/Clan Norbert Pietraszek Ogrodowa 9 26-060 checiny Korbal/Dinx Project Przemyslaw Korpysz niedzialkowskiego 47/8 41-800 zabrze Czarny/Skulls Wojtek Tulik myslowicka 5/43 47-400 racziborz ·*· ·*· ·*· n e w g r o u p s Traitor of tHe NeXt GenEraTioN ^ Phase Truce Traitor ma zamiar zalorzyc grupke ray-tracerow... wszelkie info u niego... Traitor/tNg^pHt Tomasz Cechowski swierkowa 9/3 68-100 zagan polska s o . . . l o o k f o r m e . . . ·| :| ::| :::| .::::| /\\___/\\ |\\___ |\\____ .:|\\:::| / / | \\ | \\ .:::| ¯¯¯¯¯\\_ _/ _ /\\ | |\\_ \\/\\ | |\\_ \\:/\\:| / \\ / / \\| | \\ \\_¯¯¯\\| / \\_ \\| / \\/ / /\\ \\ ¯¯¯ / \\/ /\\ \\ / / /\\__ \\ \\ /\\ / _/\\_ \\_ \\/ \\ \\ / / / /¯¯ \\ \\_\\/ / / \\¯¯¯ \\_/| _/ ¯ /, \\__/ |\\_/ /| \\, \\_| \\ ___ /-\\ /__ |__ /-| ___\\ /| \\/ \\/ ) /·::\\|::\\/::|/::(-zB®!-)| ¯¯¯¯¯ ·:::::::::::::::::::::| Tomasz ZaBoRowski::::::: e-mail: zabora@kret.ifd.uni.wroc.pl Kopernika 28 / 8::::::::::::::| 68 - 100 ZaGaN::::::::WWW: http://kret.ifd.uni.wroc.pl/~zabora PoLsKa::::::::::::::| ··:::::::: ::::::::.. .::::::::::.. .:. .:::::::::::::::::·.. .:::::::::::::··`::::::· ¸.:::::::::::::::::; ::::::. ··::::::::· :: ·:· :·· ··::::` ::. ..:· i look for join to some azke group .:;· :: :. .;· ·.:· ;: ·; : · .· · `.::. :.;.:.:::·:. .::·: · '· .::·: ::: :·f:a s t g r e e t s : . :::· ·::.;:· union ': ·; :. scum ·· · hah-kolor anadune phase truce fire rno motion samar dinx project fci hv opium freezers skulls sadist phuture 303 eternal erotic dezign appendix mawi clan no to kurwa dzamp nipsson floopy whelpz bad zone u'race dog style · : · and... rest muther fuckers . · ·:· · :: ; :: · ::::· ::::: ·::· :;: and special to:::· ..::·:. .::.· .:::·:. palimy jointy · . ::.: vodka peaple :.· fraktal generator smockers atari universet picia hlor dezign pijemy wodke odbyt dezign piwo thelefoment anty-jabol zobrowka piffko kraciaste koszule przyjaciele przyjaciol wszystkich przyjaciol przyjaciol:-) .:::::· :.::::::·. · ::and:rest... :: ::. .;· ·.:· ;: :; : · · · · . ·.: ::· · `.::. :.;.:.:::·:. .::·:·:: '· .::·:· :. :::. ·:·::::.:. . :::· ·· ·::.;:· ': :;::. .::·:Grass info: ::.· ·::zabora..°¹.............the founder/u'race (tF!) ¸.:::. . ::.palimy trafke..°¹......the founder/u'race (tF!):. . :·:· :::.::.:. :· ;rest logos........................zabora (zB®!)::·. :;. :·:::::· ·dezign............................zabora (zB®!):::. ·:··:·.· .;·:::::· all logos dedicatet to....pALIMy traFke members:.:;· :: :.. .;: .:: ;: :; :·. ' · /\\ r e q u e s t ¯¯\\¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ ¯¯ ¯ i n e d d t h i s a z k e e \\ \\ \\ ZaBoRa! tHe NeXt GenEraTioN \\ tNg pALIMy traFke \\pT Clan strefa mroku fantastyka fantasy rpg\\ traitor _ __ ____\\__ \\/zB®! ZaBoRa!/tHe NeXt GenEraTioN ^ ClaN ^ pALIMy traFke snail mail: Tomasz Zaborowski Kopernika 28/8 68-100 zagan polaska internet: e-mail: zabora@kret.ifd.uni.wroc.pl pAGE: http://kret.ifd.uni.wroc.pl/~zabora"
+        - generic [ref=e138]:
+          - generic [ref=e139]:
+            - generic [ref=e140]:
+              - text: "BY:yonx DATE:2009-11-08 RATING:"
+              - generic [ref=e141]: "6"
+            - generic [ref=e142]: still a quite original style, me likes..
+          - generic [ref=e144]:
+            - generic [ref=e145]:
+              - text: "BY:Spot DATE:2009-11-06 RATING:"
+              - generic [ref=e146]: "6"
+            - generic [ref=e147]: if every logo would be as nice as the grass logo this would be a kick ass colly.
+      - generic [ref=e149]:
+        - generic [ref=e150]:
+          - heading "USERS ONLINE" [level=2] [ref=e152]
+          - generic [ref=e155]: 99 anonymous online
+        - generic [ref=e156]:
+          - heading "LAST CALLERS" [level=2] [ref=e158]
+          - generic [ref=e159]:
+            - generic [ref=e160]:
+              - link "chrome" [ref=e161]:
+                - /url: /member/chrome
+              - generic [ref=e162]: 17:50
+            - generic [ref=e163]:
+              - link "JasonGrant" [ref=e164]:
+                - /url: /member/jasongrant
+              - generic [ref=e165]: 15:58
+            - generic [ref=e166]:
+              - link "nxnguyen" [ref=e167]:
+                - /url: /member/nxnguyen
+              - generic [ref=e168]: 19:37
+            - generic [ref=e169]:
+              - link "dipswitch" [ref=e170]:
+                - /url: /member/dipswitch
+              - generic [ref=e171]: 19:10
+            - generic [ref=e172]:
+              - link "dipswitch" [ref=e173]:
+                - /url: /member/dipswitch
+              - generic [ref=e174]: 19:10
+        - generic [ref=e175]:
+          - heading "NEW COLLYS" [level=2] [ref=e177]:
+            - link "NEW COLLYS" [ref=e178]:
+              - /url: /collys?sort_by=cdate&sort_order=D
+          - generic [ref=e179]:
+            - generic [ref=e180]:
+              - link "chr-checkmat" [ref=e182]:
+                - /url: /release/chr-checkmate.ans
+              - generic [ref=e183]: 26-05-16
+            - generic [ref=e184]:
+              - link "gZR-lEAP.tXt" [ref=e186]:
+                - /url: /release/gZR-lEAP.tXt
+              - generic [ref=e187]: 26-04-21
+            - generic [ref=e188]:
+              - link "ht-hc2.txt" [ref=e190]:
+                - /url: /release/ht-hc2.txt
+              - generic [ref=e191]: 26-04-04
+            - generic [ref=e192]:
+              - link "ht-hc1.txt" [ref=e194]:
+                - /url: /release/ht-hc1.txt
+              - generic [ref=e195]: 26-03-22
+            - generic [ref=e196]:
+              - link "SE-WNDR.txt" [ref=e198]:
+                - /url: /release/SE-WNDR.txt
+              - generic [ref=e199]: 26-02-23
+            - generic [ref=e200]:
+              - link "spn-russ.txt" [ref=e202]:
+                - /url: /release/spn-russ.txt
+              - generic [ref=e203]: 26-02-15
+            - generic [ref=e204]:
+              - link "asl-exe.txt" [ref=e206]:
+                - /url: /release/asl-exe.txt
+              - generic [ref=e207]: 26-02-15
+            - generic [ref=e208]:
+              - link "-g-2ooo.txt" [ref=e210]:
+                - /url: /release/-g-2ooo.txt
+              - generic [ref=e211]: 26-02-15
+        - generic [ref=e212]:
+          - heading "LATEST ADDED COLLYS" [level=2] [ref=e214]:
+            - link "LATEST ADDED COLLYS" [ref=e215]:
+              - /url: /collys?sort_by=timestamp&sort_order=D
+          - generic [ref=e216]:
+            - generic [ref=e217]:
+              - link "chr-checkmat" [ref=e218]:
+                - /url: /release/chr-checkmate.ans
+              - generic [ref=e219]: 26-05-16
+            - generic [ref=e220]:
+              - link "gZR-lEAP.tXt" [ref=e221]:
+                - /url: /release/gZR-lEAP.tXt
+              - generic [ref=e222]: 26-04-19
+            - generic [ref=e223]:
+              - link "wpx-boys.txt" [ref=e224]:
+                - /url: /release/wpx-boys.txt
+              - generic [ref=e225]: 26-04-14
+            - generic [ref=e226]:
+              - link "KKZ-BLU.TXT" [ref=e227]:
+                - /url: /release/KKZ-BLU.TXT
+              - generic [ref=e228]: 26-04-14
+            - generic [ref=e229]:
+              - link "kkz-awd.txt" [ref=e230]:
+                - /url: /release/kkz-awd.txt
+              - generic [ref=e231]: 26-04-14
+        - generic [ref=e232]:
+          - heading "LATEST ADDED MAGS" [level=2] [ref=e234]:
+            - link "LATEST ADDED MAGS" [ref=e235]:
+              - /url: /mags?sort_by=timestamp&sort_order=D
+          - generic [ref=e236]:
+            - generic [ref=e237]:
+              - link "OBS-AT03.DMS" [ref=e238]:
+                - /url: /magazine/OBS-AT03.DMS
+              - generic [ref=e239]: 24-02-08
+            - generic [ref=e240]:
+              - link "ART^MAG3.LHA" [ref=e241]:
+                - /url: /magazine/ART^MAG3.LHA
+              - generic [ref=e242]: 22-10-07
+            - generic [ref=e243]:
+              - link "ART^MAG4.LHA" [ref=e244]:
+                - /url: /magazine/ART^MAG4.LHA
+              - generic [ref=e245]: 22-10-07
+            - generic [ref=e246]:
+              - link "ART^MAG5.LHA" [ref=e247]:
+                - /url: /magazine/ART^MAG5.LHA
+              - generic [ref=e248]: 22-10-07
+            - generic [ref=e249]:
+              - link "ART^MAG2.LHA" [ref=e250]:
+                - /url: /magazine/ART^MAG2.LHA
+              - generic [ref=e251]: 22-10-07
+        - generic [ref=e252]:
+          - heading "LATEST ADDED APPS" [level=2] [ref=e254]:
+            - link "LATEST ADDED APPS" [ref=e255]:
+              - /url: /apps?sort_by=timestamp&sort_order=D
+          - generic [ref=e256]:
+            - generic [ref=e257]:
+              - link "Yq!-Crazy.lh" [ref=e258]:
+                - /url: /application/Yq!-Crazy.lha
+              - generic [ref=e259]: 11-03-14
+            - generic [ref=e260]:
+              - link "FRX-I2A15.lh" [ref=e261]:
+                - /url: /application/FRX-I2A15.lha
+              - generic [ref=e262]: 10-11-25
+            - generic [ref=e263]:
+              - link "ladraw-1.zip" [ref=e264]:
+                - /url: /application/ladraw-1.zip
+              - generic [ref=e265]: 10-11-08
+            - generic [ref=e266]:
+              - link "t!s-af10.zip" [ref=e267]:
+                - /url: /application/t!s-af10.zip
+              - generic [ref=e268]: 09-12-22
+            - generic [ref=e269]:
+              - link "kansi10.lha" [ref=e270]:
+                - /url: /application/kansi10.lha
+              - generic [ref=e271]: 09-11-13
+        - generic [ref=e272]:
+          - heading "NEW USERS" [level=2] [ref=e274]
+          - generic [ref=e275]:
+            - generic [ref=e276]:
+              - link "JasonGrant" [ref=e277]:
+                - /url: /member/jasongrant
+              - generic [ref=e278]: 24-06-28
+            - generic [ref=e279]:
+              - link "RobertSwift" [ref=e280]:
+                - /url: /member/robertswift
+              - generic [ref=e281]: 24-06-20
+            - generic [ref=e282]:
+              - link "LewisPah" [ref=e283]:
+                - /url: /member/lewispah
+              - generic [ref=e284]: 24-06-14
+            - generic [ref=e285]:
+              - link "Reneetus" [ref=e286]:
+                - /url: /member/reneetus
+              - generic [ref=e287]: 24-06-14
+            - generic [ref=e288]:
+              - link "Develotoist" [ref=e289]:
+                - /url: /member/develotoist
+              - generic [ref=e290]: 24-06-11
+        - generic [ref=e291]:
+          - heading "WEEKTOP - BBS UPLOADERS" [level=2] [ref=e293]
+          - generic [ref=e295]:
+            - generic [ref=e296]:
+              - generic [ref=e297]: EALL/HT
+              - generic [ref=e298]: 1.59 GB
+            - generic [ref=e299]:
+              - generic [ref=e300]: sLASH
+              - generic [ref=e301]: 1.02 GB
+            - generic [ref=e302]:
+              - generic [ref=e303]: RaGe
+              - generic [ref=e304]: 181 MB
+            - generic [ref=e305]:
+              - generic [ref=e306]: sLASH_
+              - generic [ref=e307]: 129 MB
+            - generic [ref=e308]:
+              - generic [ref=e309]: jUDGE dREDD
+              - generic [ref=e310]: 71 MB
+      - generic [ref=e311]:
+        - generic [ref=e312]:
+          - heading "TOP 5 COLLYS" [level=2] [ref=e314]
+          - generic [ref=e315]:
+            - generic [ref=e316]:
+              - link "dS!-GRFF.txt" [ref=e317]:
+                - /url: /release/dS!-GRFF.txt
+              - generic [ref=e318]: 9.83 PTS
+            - generic [ref=e319]:
+              - link "dS!-USAW.txt" [ref=e320]:
+                - /url: /release/dS!-USAW.txt
+              - generic [ref=e321]: 9.83 PTS
+            - generic [ref=e322]:
+              - link "hos-afro.txt" [ref=e323]:
+                - /url: /release/hos-afro.txt
+              - generic [ref=e324]: 9.61 PTS
+            - generic [ref=e325]:
+              - link "DZ-TAOS2.TXT" [ref=e326]:
+                - /url: /release/DZ-TAOS2.TXT
+              - generic [ref=e327]: 9.60 PTS
+            - generic [ref=e328]:
+              - link "nup-tptp.txt" [ref=e329]:
+                - /url: /release/nup-tptp.txt
+              - generic [ref=e330]: 9.54 PTS
+        - generic [ref=e331]:
+          - heading "MOST VIEWED COLLYS" [level=2] [ref=e333]
+          - generic [ref=e334]:
+            - generic [ref=e335]:
+              - link "hos-afro.txt" [ref=e336]:
+                - /url: /release/hos-afro.txt
+              - generic [ref=e337]: "3116"
+            - generic [ref=e338]:
+              - link "dS!-GRFF.txt" [ref=e339]:
+                - /url: /release/dS!-GRFF.txt
+              - generic [ref=e340]: "1336"
+            - generic [ref=e341]:
+              - link "se-men.txt" [ref=e342]:
+                - /url: /release/se-men.txt
+              - generic [ref=e343]: "972"
+            - generic [ref=e344]:
+              - link "LP!-HATE.TXT" [ref=e345]:
+                - /url: /release/LP!-HATE.TXT
+              - generic [ref=e346]: "839"
+            - generic [ref=e347]:
+              - link "r-hl.txt" [ref=e348]:
+                - /url: /release/r-hl.txt
+              - generic [ref=e349]: "691"
+        - generic [ref=e350]:
+          - heading "TOP 5 ARTISTS" [level=2] [ref=e352]
+          - generic [ref=e353]:
+            - generic [ref=e354]:
+              - link "Skin" [ref=e355]:
+                - /url: /artist/skin
+              - generic [ref=e356]: 9.05 PTS
+            - generic [ref=e357]:
+              - link "Desoto" [ref=e358]:
+                - /url: /artist/desoto
+              - generic [ref=e359]: 9.00 PTS
+            - generic [ref=e360]:
+              - link "Stylez" [ref=e361]:
+                - /url: /artist/stylez
+              - generic [ref=e362]: 8.86 PTS
+            - generic [ref=e363]:
+              - link "Enforcer" [ref=e364]:
+                - /url: /artist/enforcer
+              - generic [ref=e365]: 8.86 PTS
+            - generic [ref=e366]:
+              - link "nUP!" [ref=e367]:
+                - /url: /artist/nup
+              - generic [ref=e368]: 8.80 PTS
+        - generic [ref=e369]:
+          - heading "TOP 5 CREWS" [level=2] [ref=e371]
+          - generic [ref=e372]:
+            - generic [ref=e373]:
+              - link "Fantasy Project" [ref=e374]:
+                - /url: /crew/fantasy-project
+              - generic [ref=e375]: 9.00 PTS
+            - generic [ref=e376]:
+              - link "HuMaNe & VaNiTy" [ref=e377]:
+                - /url: /crew/humane-vanity
+              - generic [ref=e378]: 8.75 PTS
+            - generic [ref=e379]:
+              - link "Low Profile" [ref=e380]:
+                - /url: /crew/low-profile
+              - generic [ref=e381]: 8.56 PTS
+            - generic [ref=e382]:
+              - link "Arclite" [ref=e383]:
+                - /url: /crew/arclite
+              - generic [ref=e384]: 8.53 PTS
+            - generic [ref=e385]:
+              - link "G-Style" [ref=e386]:
+                - /url: /crew/g-style
+              - generic [ref=e387]: 8.53 PTS
+        - generic [ref=e388]:
+          - heading "TOP UPLOADERS" [level=2] [ref=e390]
+          - generic [ref=e391]:
+            - generic [ref=e392]:
+              - link "hAkR!" [ref=e393]:
+                - /url: /member/hakr
+              - generic [ref=e394]: 70.8 MB
+            - generic [ref=e395]:
+              - link "dipswitch" [ref=e396]:
+                - /url: /member/dipswitch
+              - generic [ref=e397]: 51.8 MB
+            - generic [ref=e398]:
+              - link "Spot" [ref=e399]:
+                - /url: /member/spot
+              - generic [ref=e400]: 42.4 MB
+            - generic [ref=e401]:
+              - link "dMG" [ref=e402]:
+                - /url: /member/dmg
+              - generic [ref=e403]: 37.5 MB
+            - generic [ref=e404]:
+              - link "z!o" [ref=e405]:
+                - /url: /member/z-o
+              - generic [ref=e406]: 31.8 MB
+        - generic [ref=e407]:
+          - heading "TOP COMMENTERS" [level=2] [ref=e409]
+          - generic [ref=e410]:
+            - generic [ref=e411]:
+              - link "z!o" [ref=e412]:
+                - /url: /member/z-o
+              - generic [ref=e413]: "665"
+            - generic [ref=e414]:
+              - link "dipswitch" [ref=e415]:
+                - /url: /member/dipswitch
+              - generic [ref=e416]: "529"
+            - generic [ref=e417]:
+              - link "spot" [ref=e418]:
+                - /url: /member/spot
+              - generic [ref=e419]: "450"
+            - generic [ref=e420]:
+              - link "zefyros" [ref=e421]:
+                - /url: /member/zefyros
+              - generic [ref=e422]: "349"
+            - generic [ref=e423]:
+              - link "hARRiSONbERGEROn" [ref=e424]:
+                - /url: /member/harrisonbergeron
+              - generic [ref=e425]: "311"
+        - generic [ref=e426]:
+          - heading "aSCIIaRENA STATS" [level=2] [ref=e428]
+          - generic [ref=e429]:
+            - generic [ref=e430]:
+              - generic [ref=e431]: "Collys Online:"
+              - generic [ref=e432]: "3983"
+            - generic [ref=e433]:
+              - generic [ref=e434]: "Pumped Bytes:"
+              - generic [ref=e435]: 277.2 MB
+            - generic [ref=e436]:
+              - generic [ref=e437]: "Users:"
+              - generic [ref=e438]: "656"
+            - generic [ref=e439]:
+              - generic [ref=e440]: "Comments:"
+              - generic [ref=e441]: "4389"
+        - generic [ref=e442]:
+          - heading "WEEKTOP - BBS:ES" [level=2] [ref=e444]
+          - generic [ref=e446]:
+            - generic [ref=e447]:
+              - generic [ref=e448]: AmigaUnderground
+              - generic [ref=e449]: 310 MB
+            - generic [ref=e450]:
+              - generic [ref=e451]: Fastline
+              - generic [ref=e452]: 310 MB
+            - generic [ref=e453]:
+              - generic [ref=e454]: Death Row
+              - generic [ref=e455]: 310 MB
+            - generic [ref=e456]:
+              - generic [ref=e457]: Phantasm
+              - generic [ref=e458]: 310 MB
+            - generic [ref=e459]:
+              - generic [ref=e460]: Sanctuary
+              - generic [ref=e461]: 310 MB
+  - text: ░░█
+  - alert [ref=e462]

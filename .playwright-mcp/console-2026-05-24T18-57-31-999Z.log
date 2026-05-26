@@ -1,0 +1,2 @@
+[    1382ms] [WARNING] Error while trying to use the following icon from the Manifest: https://asciiarena.se/assets/data/socialmedia.png (Resource size is not correct - typo in the Manifest?) @ https://asciiarena.se/release/hos-afro.txt:0
+[    1474ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ https://asciiarena.se/release/hos-afro.txt:0

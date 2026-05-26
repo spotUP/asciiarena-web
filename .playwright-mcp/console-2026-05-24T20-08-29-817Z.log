@@ -1,0 +1,2 @@
+[    1515ms] [WARNING] Error while trying to use the following icon from the Manifest: https://asciiarena.se/assets/data/socialmedia.png (Resource size is not correct - typo in the Manifest?) @ https://asciiarena.se/submit:0
+[   19633ms] [ERROR] Failed to load resource: the server responded with a status of 409 (Conflict) @ https://asciiarena.se/api/collys:0

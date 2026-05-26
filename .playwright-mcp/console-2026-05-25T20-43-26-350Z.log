@@ -1,0 +1,23 @@
+[     773ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ https://dev.asciiarena.se/:0
+[    1638ms] [ERROR] Error: useChatContext used outside ChatProvider
+    at https://dev.asciiarena.se/_next/static/chunks/14bpiiu32_.qx.js:1:17073
+    at https://dev.asciiarena.se/_next/static/chunks/0pscphcr7r-c5.js:8:29141
+    at ay (https://dev.asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:62886)
+    at oJ (https://dev.asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:83143)
+    at iu (https://dev.asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:93735)
+    at sd (https://dev.asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:137985)
+    at https://dev.asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:137830
+    at sf (https://dev.asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:137838)
+    at se (https://dev.asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:133759)
+    at s$ (https://dev.asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:159536) @ https://dev.asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:0
+[    1640ms] [ERROR] Error: useChatContext used outside ChatProvider
+    at https://dev.asciiarena.se/_next/static/chunks/14bpiiu32_.qx.js:1:17073
+    at https://dev.asciiarena.se/_next/static/chunks/0pscphcr7r-c5.js:8:29141
+    at ay (https://dev.asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:62886)
+    at oJ (https://dev.asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:83143)
+    at iu (https://dev.asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:93735)
+    at sd (https://dev.asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:137985)
+    at https://dev.asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:137830
+    at sf (https://dev.asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:137838)
+    at se (https://dev.asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:133759)
+    at s$ (https://dev.asciiarena.se/_next/static/chunks/0m_p1bxtorv5i.js:1:159536) @ https://dev.asciiarena.se/_next/static/chunks/040q6jkl6fzey.js:0

@@ -1,0 +1,9 @@
+[  106237ms] [ERROR] Failed to load resource: the server responded with a status of 500 () @ https://scenewall.bbs.io:1543/GlobalLastCallers/api/GlobalLastCallers/Stats?StatType=26&Count=5:0
+[  145907ms] [WARNING] Blocked aria-hidden on an element because its descendant retained focus. The focus must not be hidden from assistive technology users. Avoid using aria-hidden on a focused element or its ancestor. Consider using the inert attribute instead, which will also prevent focus. For more details, see the aria-hidden section of the WAI-ARIA specification at https://w3c.github.io/aria/#aria-hidden.
+Element with focus: <button.btn-close btn-close-white>
+Ancestor with aria-hidden: <div.modal#login> @ https://dev.asciiarena.se/login:0
+[  161350ms] [WARNING] Blocked aria-hidden on an element because its descendant retained focus. The focus must not be hidden from assistive technology users. Avoid using aria-hidden on a focused element or its ancestor. Consider using the inert attribute instead, which will also prevent focus. For more details, see the aria-hidden section of the WAI-ARIA specification at https://w3c.github.io/aria/#aria-hidden.
+Element with focus: <button.btn-secondary bg-transparent aml-1 apl-1#login-submit-btn>
+Ancestor with aria-hidden: <div.modal#login> @ https://dev.asciiarena.se/:0
+[  173761ms] [WARNING] The resource https://dev.asciiarena.se/assets/fonts/TopazPlus_a1200.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://dev.asciiarena.se/admin#sitelogo:0
+[  181579ms] [WARNING] The resource https://dev.asciiarena.se/assets/fonts/TopazPlus_a1200.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://dev.asciiarena.se/admin#sitelogo:0

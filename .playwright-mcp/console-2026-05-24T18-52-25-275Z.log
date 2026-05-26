@@ -1,0 +1,2 @@
+[     382ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://asciiarena.se/playlists:0
+[    1257ms] [WARNING] Error while trying to use the following icon from the Manifest: https://asciiarena.se/assets/data/socialmedia.png (Resource size is not correct - typo in the Manifest?) @ https://asciiarena.se/playlists:0

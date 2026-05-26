@@ -1,0 +1,11 @@
+[     752ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://asciiarena.se/assets/fonts/TopazPlus_a1200.woff2:0
+[     906ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://asciiarena.se/assets/css/bootstrap5.min.css:0
+[    1058ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://asciiarena.se/assets/css/site.css:0
+[    1059ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://asciiarena.se/assets/css/overrides.css:0
+[    1062ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://asciiarena.se/assets/css/386.css:0
+[    1100ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://asciiarena.se/assets/js/bootstrap5.bundle.min.js:0
+[    1251ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://asciiarena.se/assets/js/386-animation/index.js:0
+[    1738ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://asciiarena.se/assets/data/socialmedia.png:0
+[    1739ms] [WARNING] Error while trying to use the following icon from the Manifest: https://asciiarena.se/assets/data/socialmedia.png (Download error or resource isn't a valid image) @ https://asciiarena.se/:0
+[    6519ms] [WARNING] The resource https://asciiarena.se/assets/fonts/TopazPlus_a1200.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://asciiarena.se/:0
+[   16112ms] [WARNING] The resource https://asciiarena.se/assets/fonts/TopazPlus_a1200.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://asciiarena.se/:0

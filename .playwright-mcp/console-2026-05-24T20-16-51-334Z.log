@@ -1,0 +1,5 @@
+[    1445ms] [WARNING] Error while trying to use the following icon from the Manifest: https://asciiarena.se/assets/data/socialmedia.png (Resource size is not correct - typo in the Manifest?) @ https://asciiarena.se/member/Spot:0
+[    1869ms] [ERROR] Failed to load resource: the server responded with a status of 503 (Service Unavailable) @ https://asciiarena.se/crew/g-style?_rsc=4bUmUtuYfXpXsiR2:0
+[    1870ms] [ERROR] Failed to load resource: the server responded with a status of 503 (Service Unavailable) @ https://asciiarena.se/member/hakr?_rsc=4bUmUtuYfXpXsiR2:0
+[    1871ms] [ERROR] Failed to load resource: the server responded with a status of 503 (Service Unavailable) @ https://asciiarena.se/crew/arclite?_rsc=4bUmUtuYfXpXsiR2:0
+[    1877ms] [ERROR] Failed to load resource: the server responded with a status of 503 (Service Unavailable) @ https://asciiarena.se/crew/low-profile?_rsc=4bUmUtuYfXpXsiR2:0
