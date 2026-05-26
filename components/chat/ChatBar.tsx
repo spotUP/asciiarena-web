@@ -117,8 +117,9 @@ export default function ChatBar({ userId, userNick }: Props) {
       display: "flex",
       alignItems: "flex-end",
       gap: "4px",
-      padding: "0 8px",
+      padding: "0 0 0 0",
       pointerEvents: "none",
+      maxWidth: "100vw",
     }}>
       {/* Expanded chat windows stacked right-to-left */}
       {expandedWindows.map(w => (
@@ -147,7 +148,7 @@ export default function ChatBar({ userId, userNick }: Props) {
         fontFamily: "TopazPlus_a1200, monospace",
         fontSize: "13px",
         flexWrap: "wrap",
-        maxWidth: "calc(100vw - 16px)",
+        maxWidth: "100vw",
       }}>
         {/* NEW CHAT button */}
         <div style={{ position: "relative" }}>
@@ -162,7 +163,7 @@ export default function ChatBar({ userId, userNick }: Props) {
           </button>
           {newNickOpen && (
             <div style={{
-              position: "absolute", bottom: "100%", left: 0,
+              position: "absolute", bottom: "100%", right: 0,
               backgroundColor: "#212121", border: "1px solid #444",
               padding: "6px", display: "flex", flexDirection: "column", gap: "4px",
               minWidth: "160px",
