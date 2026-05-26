@@ -129,8 +129,27 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  const session = await auth();
-  if (!session?.user?.id) return apiError("Unauthorized", 401);
+  // Accept either a NextAuth session cookie or a Bearer api_token from CED
+  let uploaderNick: string;
+  let uploaderId: number;
+
+  const authHeader = request.headers.get("authorization") ?? "";
+  const bearerToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : null;
+
+  if (bearerToken) {
+    const tokenRows = await prisma.$queryRaw<[{ id: number; nick: string }]>(
+      Prisma.sql`SELECT id, nick FROM users WHERE api_token = ${bearerToken} LIMIT 1`
+    );
+    const tokenUser = tokenRows[0];
+    if (!tokenUser) return apiError("Unauthorized", 401);
+    uploaderNick = tokenUser.nick;
+    uploaderId = tokenUser.id;
+  } else {
+    const session = await auth();
+    if (!session?.user?.id) return apiError("Unauthorized", 401);
+    uploaderNick = session.user.name ?? "";
+    uploaderId = parseInt(session.user.id);
+  }
 
   let formData: FormData;
   try {
@@ -189,8 +208,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   const file_id = filename + ".diz";
-  const uploaderNick = session.user.name ?? "";
-  const uploaderId = parseInt(session.user.id);
 
   // Insert colly
   await prisma.$executeRaw(
