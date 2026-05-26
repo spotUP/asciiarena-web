@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
+import { broadcast } from "@/lib/live";
 
 export async function postRequestComment(
   requestId: number,
@@ -11,6 +12,7 @@ export async function postRequestComment(
   const session = await getSession();
   if (!session?.user?.id) return { success: false, error: "Not logged in" };
   const userId = Number(session.user.id);
+  const nick = session.user.name ?? "";
   try {
     await prisma.$executeRaw`
       INSERT INTO request_comments (request_id, user_id, comment, timestamp)
@@ -20,6 +22,7 @@ export async function postRequestComment(
     return { success: false, error: "Failed" };
   }
   revalidatePath('/requests/' + requestId);
+  broadcast(`requests:${requestId}`, { type: "posted", nick });
   return { success: true };
 }
 
@@ -41,5 +44,7 @@ export async function updateRequestStatus(
   }
   revalidatePath('/requests');
   revalidatePath('/requests/' + requestId);
+  broadcast("site:status", { type: "request-status", id: requestId, status });
+  broadcast(`requests:${requestId}`, { type: "status", status });
   return { success: true };
 }

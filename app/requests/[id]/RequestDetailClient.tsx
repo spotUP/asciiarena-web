@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { postRequestComment, updateRequestStatus } from "@/app/actions/requests";
 
 interface Comment {
@@ -22,6 +23,7 @@ interface Props {
 }
 
 export default function RequestDetailClient({ requestId, canChangeStatus, isLoggedIn, userNick }: Props) {
+  const router = useRouter();
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentsLoaded, setCommentsLoaded] = useState(false);
   const [commentText, setCommentText] = useState("");
@@ -72,10 +74,12 @@ export default function RequestDetailClient({ requestId, canChangeStatus, isLogg
         setDrafts(prev => { const next = { ...prev }; delete next[nick]; return next; });
       } else if (event.type === "posted") {
         loadComments();
+      } else if (event.type === "status") {
+        router.refresh();
       }
     };
     return () => es.close();
-  }, [channel, loadComments]);
+  }, [channel, loadComments, router]);
 
   const broadcastTyping = (text: string) => {
     if (typingTimer.current) clearTimeout(typingTimer.current);
@@ -109,7 +113,8 @@ export default function RequestDetailClient({ requestId, canChangeStatus, isLogg
   const changeStatus = async (newStatus: number) => {
     const r = await updateRequestStatus(requestId, newStatus);
     if (r.success) {
-      window.location.reload();
+      flash("Status updated.", setStatusResult);
+      router.refresh();
     } else {
       flash(r.error ?? "Failed to update status.", setStatusResult);
     }

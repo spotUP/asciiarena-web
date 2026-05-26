@@ -95,6 +95,20 @@ export default function RequestsClient() {
     return () => { cancelled = true; };
   }, [page, sort, asc, filter, viewmode]);
 
+  // Effect 2b: live status changes from any admin/owner action
+  useEffect(() => {
+    const es = new EventSource("/api/live?channel=site:status");
+    es.onmessage = (e: MessageEvent<string>) => {
+      try {
+        const evt = JSON.parse(e.data) as { type?: string; id?: number; status?: number };
+        if (evt.type === "request-status" && typeof evt.id === "number" && typeof evt.status === "number") {
+          setAllRows(prev => prev.map(r => r.id === evt.id ? { ...r, status: evt.status ?? r.status } : r));
+        }
+      } catch {}
+    };
+    return () => es.close();
+  }, []);
+
   // Effect 3: IntersectionObserver
   useEffect(() => {
     const el = sentinelRef.current;
