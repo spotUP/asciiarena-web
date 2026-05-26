@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   experimental: {
     serverActions: {
-      allowedOrigins: ["localhost:3000", "asciiarena.se", "www.asciiarena.se"],
+      allowedOrigins: ["localhost:3000", "asciiarena.se", "www.asciiarena.se", "dev.asciiarena.se"],
     },
   },
   turbopack: {
