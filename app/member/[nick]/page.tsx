@@ -245,11 +245,8 @@ export default async function MemberPage({
         )}
 
         {!isOwnProfile && (
-          <div className="row apt-1" style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+          <div className="row apt-1">
             <ChatButton peerId={member.id} peerNick={member.nick ?? ""} />
-            <Link href={`/messages?sendmsg=${member.id}`}>
-              <input type="button" className="btn-big" value="Send Message" readOnly />
-            </Link>
           </div>
         )}
 

@@ -35,6 +35,12 @@ interface HandleRow {
   artisturl: string;
 }
 
+function formatJoined(ts: string | null): string {
+  if (!ts) return "Unknown";
+  const d = new Date(Number(ts) * 1000);
+  return d.toISOString().slice(0, 10);
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ nick: string }> }): Promise<Metadata> {
   const { nick } = await params;
   const artist = await prisma.artists.findFirst({ where: { artisturl: nick } });
@@ -174,7 +180,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
       {artist.users?.joined && (
         <div className="col-lg-12 pl-0">
           <span className="lightgrey">Member since: </span>
-          {artist.users.joined}
+          {formatJoined(artist.users.joined)}
         </div>
       )}
       {otherHandles.length > 0 && (

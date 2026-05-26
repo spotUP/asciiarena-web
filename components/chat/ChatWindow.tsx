@@ -30,7 +30,7 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
   const { closeChat, minimizeChat, setThreadId, markRead, incrementUnread } = useChatContext();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
-  const [typingNick, setTypingNick] = useState<string | null>(null);
+  const [peerDraft, setPeerDraft] = useState<{ nick: string; text: string } | null>(null);
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -85,11 +85,12 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
       try {
         const event = JSON.parse(e.data);
         if (event.type === "typing" && event.nick && event.nick !== userNick) {
-          setTypingNick(event.nick as string);
+          setPeerDraft({ nick: event.nick as string, text: (event.draft as string) ?? "" });
           if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
-          typingTimerRef.current = setTimeout(() => setTypingNick(null), 4000);
+          typingTimerRef.current = setTimeout(() => setPeerDraft(null), 4000);
         } else if (event.type === "clear") {
-          setTypingNick(null);
+          if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+          setPeerDraft(null);
         }
       } catch { /* ignore */ }
     };
@@ -272,9 +273,12 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
             </div>
           );
         })}
-        {typingNick && (
-          <div className="lightgrey" style={{ fontStyle: "italic", opacity: 0.7 }}>
-            {typingNick} is typing...
+        {peerDraft && (
+          <div style={{ marginBottom: "4px" }}>
+            <span style={{ color: "#ff55ff", marginRight: "4px" }}>{peerDraft.nick}</span>
+            <span style={{ color: "#aaaaaa", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+              {peerDraft.text}<span style={{ borderLeft: "2px solid #aaaaaa", marginLeft: "1px" }} />
+            </span>
           </div>
         )}
       </div>

@@ -5,17 +5,20 @@ echo "Building..."
 npm run build
 
 echo "Deploying PHP site..."
-rsync -a --include='*.php' --include='.htaccess' --exclude='*' \
+rsync -a --no-owner --no-group --include='*.php' --include='.htaccess' --exclude='*' \
+  -e "ssh -o ServerAliveInterval=10 -o ServerAliveCountMax=6" \
   . \
   spot@97.75.89.139:/var/www/asciiarena.se/nextjs-old/
 
 echo "Deploying .next/..."
-rsync -a --delete --exclude='cache' \
+rsync -a --no-owner --no-group --delete --exclude='cache' \
+  -e "ssh -o ServerAliveInterval=10 -o ServerAliveCountMax=6" \
   .next/ \
   spot@97.75.89.139:/var/www/asciiarena.se/nextjs-current/.next/
 
 echo "Deploying public/..."
-rsync -aL \
+rsync -aL --no-owner --no-group \
+  -e "ssh -o ServerAliveInterval=10 -o ServerAliveCountMax=6" \
   public/ \
   spot@97.75.89.139:/var/www/asciiarena.se/nextjs-current/public/
 
