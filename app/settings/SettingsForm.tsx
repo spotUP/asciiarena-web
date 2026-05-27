@@ -577,8 +577,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
               onClick={() => switchTab(t.id)}
               className={isActive ? "yellow" : "lightgrey"}
               style={{
-                background: isActive ? "#aa00aa" : "transparent",
-                color: isActive ? "#ffffff" : undefined,
+                background: isActive ? "#212121" : "transparent",
                 border: 0,
                 padding: "0 16px",
                 height: "16px",
