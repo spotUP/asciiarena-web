@@ -339,6 +339,20 @@ model users {
   @@index([nickurl], map: "nickurl")
 }
 
+model notifications {
+  id          Int      @id @default(autoincrement())
+  user_id     Int      @db.UnsignedInt
+  type        String   @db.VarChar(32)
+  actor_nick  String?  @db.VarChar(64)
+  target      String?  @db.VarChar(255)
+  target_url  String?  @db.VarChar(512)
+  payload     Json?
+  read_at     Int?
+  created_at  Int
+
+  @@index([user_id, read_at, created_at], map: "ix_user_unread")
+}
+
 model users_online {
   id        BigInt  @id @default(autoincrement()) @db.UnsignedBigInt
   timestamp Int

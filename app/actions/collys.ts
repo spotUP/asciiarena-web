@@ -6,6 +6,7 @@ import { Prisma } from "@/lib/generated/prisma/client";
 import { revalidatePath } from "next/cache";
 import { broadcast } from "@/lib/live";
 import { broadcastActivityIfAllowed } from "@/lib/activity";
+import { createNotification } from "@/lib/notifications";
 
 export async function trackView(collyId: number) {
   try {
@@ -27,12 +28,19 @@ export async function addFavourite(collyId: number): Promise<{ success: boolean;
   try {
     const exists = await prisma.favourites.count({ where: { user_id: userId, colly_id: collyId } });
     if (!exists) await prisma.favourites.create({ data: { user_id: userId, colly_id: collyId } });
-    const colly = await prisma.collys.findUnique({ where: { id: collyId }, select: { filename: true } });
+    const colly = await prisma.collys.findUnique({ where: { id: collyId }, select: { filename: true, uploader_id: true } });
     if (colly?.filename) {
       revalidatePath(`/release/${colly.filename}`);
       await broadcastActivityIfAllowed(userId, "fav", { type: "fav", nick: session.user.name ?? "", target: colly.filename, targetUrl: `/release/${colly.filename}`, timestamp: Math.floor(Date.now() / 1000) });
     }
     broadcast(`release:${collyId}:fav`, { type: "changed", delta: 1, nick: session.user.name ?? "" });
+    if (!exists && colly?.uploader_id && colly.uploader_id !== userId && colly.filename) {
+      await createNotification(colly.uploader_id, "notif-fav", {
+        actorNick: session.user.name ?? null,
+        target: colly.filename,
+        targetUrl: `/release/${colly.filename}`,
+      });
+    }
     revalidatePath(`/member`);
     return { success: true };
   } catch { return { success: false, error: "Failed" }; }
@@ -90,7 +98,7 @@ export async function postComment(
   const userId = Number(session.user.id);
   const nick = session.user.name ?? null;
   const ratingNum = rating ? parseInt(rating) : null;
-  const colly = await prisma.collys.findUnique({ where: { id: collyId }, select: { filename: true } });
+  const colly = await prisma.collys.findUnique({ where: { id: collyId }, select: { filename: true, uploader_id: true } });
   await prisma.$executeRaw`
     INSERT INTO comments (colly_id, user_id, comment, rating, timestamp, filename, nick)
     VALUES (${collyId}, ${userId}, ${comment}, ${ratingNum}, ${Math.floor(Date.now() / 1000)}, ${colly?.filename ?? null}, ${nick})
@@ -104,6 +112,13 @@ export async function postComment(
       collyId,
       filename: colly?.filename ?? null,
       rating: ratingNum,
+    });
+  }
+  if (colly?.uploader_id && colly.uploader_id !== userId && colly.filename) {
+    await createNotification(colly.uploader_id, "notif-comment", {
+      actorNick: nick,
+      target: colly.filename,
+      targetUrl: `/release/${colly.filename}`,
     });
   }
   return { success: true };

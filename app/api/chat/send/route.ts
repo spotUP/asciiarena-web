@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { broadcast } from "@/lib/live";
+import { createNotification } from "@/lib/notifications";
 
 const schema = z.object({
   peerId: z.number().int().positive(),
@@ -38,6 +39,13 @@ export async function POST(request: NextRequest) {
     broadcast(`thread:${existingThreadId}`, { type: "message" });
     broadcast(`user:${peerId}:messages`, { type: "message", fromId, fromNick, threadId: existingThreadId });
 
+    if (peerId !== fromId) {
+      await createNotification(peerId, "notif-message", {
+        actorNick: fromNick,
+        targetUrl: `/messages?thread=${existingThreadId}`,
+      });
+    }
+
     return apiOk({ ok: true, threadId: existingThreadId });
   }
 
@@ -64,6 +72,13 @@ export async function POST(request: NextRequest) {
 
   broadcast(`thread:${threadId}`, { type: "message" });
   broadcast(`user:${peerId}:messages`, { type: "message", fromId, fromNick, threadId });
+
+  if (peerId !== fromId) {
+    await createNotification(peerId, "notif-message", {
+      actorNick: fromNick,
+      targetUrl: `/messages?thread=${threadId}`,
+    });
+  }
 
   return apiOk({ ok: true, threadId });
 }

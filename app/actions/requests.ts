@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 import { broadcast } from "@/lib/live";
+import { createNotification } from "@/lib/notifications";
 
 export async function postRequestComment(
   requestId: number,
@@ -23,6 +24,14 @@ export async function postRequestComment(
   }
   revalidatePath('/requests/' + requestId);
   broadcast(`requests:${requestId}`, { type: "posted", nick });
+  const req = await prisma.requests.findUnique({ where: { id: requestId }, select: { requestedby: true, title: true } });
+  if (req?.requestedby && req.requestedby !== userId) {
+    await createNotification(req.requestedby, "notif-reply", {
+      actorNick: nick,
+      target: req.title ?? null,
+      targetUrl: `/requests/${requestId}`,
+    });
+  }
   return { success: true };
 }
 
@@ -46,5 +55,13 @@ export async function updateRequestStatus(
   revalidatePath('/requests/' + requestId);
   broadcast("site:status", { type: "request-status", id: requestId, status });
   broadcast(`requests:${requestId}`, { type: "status", status });
+  if (req.requestedby && req.requestedby !== userId) {
+    await createNotification(req.requestedby, "notif-status", {
+      actorNick: session.user.name ?? null,
+      target: req.title ?? null,
+      targetUrl: `/requests/${requestId}`,
+      payload: { status },
+    });
+  }
   return { success: true };
 }

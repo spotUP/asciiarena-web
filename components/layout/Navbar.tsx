@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Session } from "next-auth";
 import UnreadBadge from "@/components/layout/UnreadBadge";
 import LogoutButton from "@/components/layout/LogoutButton";
+import NotificationBell from "@/components/layout/NotificationBell";
 
 export type NavbarProps = {
   session: Session | null;
@@ -138,6 +139,12 @@ export default function Navbar({ session }: NavbarProps) {
                 >
                   LOGiN
                 </a>
+              </li>
+            )}
+
+            {isLoggedIn && session?.user?.id && (
+              <li className="nav-item">
+                <NotificationBell userId={parseInt(session.user.id)} />
               </li>
             )}
 
