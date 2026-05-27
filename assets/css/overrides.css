@@ -195,17 +195,22 @@ button.dropdown-item {
   position: absolute !important;
 }
 .form-switch .form-check-label { cursor: pointer; }
+/* CSS-painted 3-cell (24x16) toggle: 8x16 "knob" sliding on a 24x16 "track".
+   Avoids font-dependent glyph metrics (█ wasn't full-height in TopazPlus). */
 .form-switch .form-check-label::before {
-  content: '\2588\2591\2591';
-  color: #aaaaaa;
-  margin-right: 6px;
-  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, monospace;
-  font-size: 16px;
-  line-height: 16px;
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 16px;
+  margin-right: 8px;
+  vertical-align: middle;
+  background-color: #555555;
+  background-image: linear-gradient(to right, #aaaaaa 0 8px, transparent 8px 24px);
+  background-repeat: no-repeat;
 }
 .form-switch .form-check-input:checked + .form-check-label::before {
-  content: '\2591\2591\2588';
-  color: #55ff55;
+  background-color: #555555;
+  background-image: linear-gradient(to right, transparent 0 16px, #55ff55 16px 24px);
 }
 
 /* ── BS4→BS5 component parity ── */
