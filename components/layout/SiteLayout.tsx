@@ -40,9 +40,24 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
   // auth() is overloaded; cast to the Session | null variant
   const session = rawSession as Session | null;
 
-  const userPrefs = session?.user as { crt_effect?: string; anim_effect?: string } | undefined;
-  const showCrt = !session?.user || userPrefs?.crt_effect !== "N";
-  const showAnim = !session?.user || userPrefs?.anim_effect !== "N";
+  // crt/anim come from the DB rather than the session JWT so that toggling
+  // them in /settings takes effect on the next router.refresh (triggered by
+  // the user:{id}:profile broadcast in LiveRefresh below) — JWT-cached
+  // values would otherwise stick until next login.
+  let crtEffect: string | null = null;
+  let animEffect: string | null = null;
+  if (session?.user?.id) {
+    try {
+      const row = await prisma.users.findUnique({
+        where: { id: parseInt(session.user.id) },
+        select: { crt_effect: true, anim_effect: true },
+      });
+      crtEffect = row?.crt_effect ?? null;
+      animEffect = row?.anim_effect ?? null;
+    } catch { /* fall through to defaults */ }
+  }
+  const showCrt = !session?.user || crtEffect !== "N";
+  const showAnim = !session?.user || animEffect !== "N";
 
   return (
     <>
@@ -68,7 +83,10 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
 
       <Navbar session={session} />
       {session?.user?.id && (
-        <LiveRefresh channel={`user:${session.user.id}:widgets`} />
+        <>
+          <LiveRefresh channel={`user:${session.user.id}:widgets`} />
+          <LiveRefresh channel={`user:${session.user.id}:profile`} />
+        </>
       )}
 
       <div className="container-fluid mobile-bg">
