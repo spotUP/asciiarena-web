@@ -50,8 +50,8 @@ export default function WidgetSettings() {
         for you — other users are not affected. Changes apply live to every open tab.
       </div>
       {WIDGET_GROUPS.map(group => (
-        <div key={group.label} className="col-lg-12 p-0 amt-1">
-          <div className="white">{group.label}</div>
+        <div key={group.label} className="col-lg-12 p-0 amt-2">
+          <div className="white amb-1">{group.label}</div>
           {group.keys.map(key => {
             const id = `${baseId}-${key}`;
             return (
