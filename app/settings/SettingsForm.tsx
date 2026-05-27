@@ -301,7 +301,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
         </div>
       </div>
 
-      <div className="header col-lg-12 p-0 amt-1 amb-1">
+      <div className="header col-lg-12 p-0 amt-2 amb-1">
         <h2 className="ap-1 bg-header">UPLOAD SiGNATURE</h2>
       </div>
       <div className="row amb-1">
