@@ -369,9 +369,12 @@ button.dropdown-item {
   color: #bbbbbb !important;
 }
 
-/* DosSelect trigger — matches the .form-control text-input look:
-   same #000084 dark-blue terminal bg, same #444 + brightness(170%) hover. */
-.dos-select-trigger { background-color: #000084 !important; }
+/* DosSelect trigger — matches the .form-control text-input rendering on
+   the settings page. The effective bg comes from site.css's
+   input.form-control { background: #2a2a2a !important } rule (more
+   specific than .form-control), so we use the same #2a2a2a here and
+   the same #444 + brightness(170%) hover. */
+.dos-select-trigger { background-color: #2a2a2a !important; }
 .dos-select-trigger:hover {
   background-color: #444444 !important;
   color: #bbbbbb !important;
