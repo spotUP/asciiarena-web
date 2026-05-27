@@ -1,7 +1,5 @@
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/generated/prisma/client";
-import SiteLayout from "@/components/layout/SiteLayout";
-import AdminNav from "@/components/admin/AdminNav";
 import Link from "next/link";
 
 interface StatRow { cnt: bigint | number }
@@ -35,9 +33,17 @@ async function getStats() {
 function StatCard({ label, value, href, warn }: { label: string; value: number; href?: string; warn?: boolean }) {
   const color = warn && value > 0 ? "#ff5555" : "#ffff55";
   const content = (
-    <div style={{ padding: "8px 12px", backgroundColor: "#212121", border: "1px solid #444", minWidth: "120px" }}>
-      <div style={{ color: "#aaaaaa", fontSize: "11px", marginBottom: "2px" }}>{label}</div>
-      <div style={{ color, fontSize: "20px", fontFamily: "TopazPlus_a1200, monospace" }}>{value}</div>
+    <div style={{
+      padding: "8px 16px",
+      backgroundColor: "#212121",
+      minWidth: "160px",
+      height: "64px",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+    }}>
+      <div style={{ color: "#aaaaaa", fontSize: "16px", lineHeight: "16px", marginBottom: "8px" }}>{label}</div>
+      <div style={{ color, fontSize: "32px", lineHeight: "32px", fontFamily: "TopazPlus_a1200, monospace" }}>{value}</div>
     </div>
   );
   return href ? <Link href={href} style={{ textDecoration: "none" }}>{content}</Link> : content;
@@ -52,39 +58,37 @@ export default async function AdminDashboard() {
   const stats = await getStats();
 
   return (
-    <SiteLayout title="ADMiN">
-      <AdminNav />
-
-      <div className="row apt-1 apb-1">
-        <div className="header col-lg-12 p-0">
-          <h2 className="ap-1 bg-header">DASHBOARD</h2>
-        </div>
+    <>
+      <div className="header col-lg-12 p-0 amb-1">
+        <h2 className="ap-1 bg-header">DASHBOARD</h2>
       </div>
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "16px" }}>
-        <StatCard label="TOTAL USERS"    value={stats.users} href="/admin/users" />
-        <StatCard label="ACTIVE 30D"     value={stats.activeUsers} />
-        <StatCard label="TOTAL COLLYS"   value={stats.collys} href="/admin/collys" />
-        <StatCard label="BROKEN COLLYS"  value={stats.broken} href="/admin/collys" warn />
-        <StatCard label="OPEN REQUESTS"  value={stats.pending} href="/admin/requests" warn />
-        <StatCard label="UNCLAIMED ARTISTS" value={stats.unclaimed} href="/admin/artists" />
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", marginBottom: "32px" }}>
+        <StatCard label="TOTAL USERS"       value={stats.users}      href="/admin/users" />
+        <StatCard label="ACTIVE 30D"        value={stats.activeUsers} />
+        <StatCard label="TOTAL COLLYS"      value={stats.collys}     href="/admin/collys" />
+        <StatCard label="BROKEN COLLYS"     value={stats.broken}     href="/admin/collys" warn />
+        <StatCard label="OPEN REQUESTS"     value={stats.pending}    href="/admin/requests" warn />
+        <StatCard label="UNCLAIMED ARTISTS" value={stats.unclaimed}  href="/admin/artists" />
       </div>
 
-      <div className="row apt-1">
-        <div className="header col-lg-12 p-0">
-          <h2 className="ap-1 bg-header">RECENT UPLOADS</h2>
-        </div>
+      <div className="header col-lg-12 p-0 amb-1">
+        <h2 className="ap-1 bg-header">RECENT UPLOADS</h2>
       </div>
-      {stats.recentUploads.map((r, i) => (
-        <div key={i} className="col-lg-12 p-0 d-flex" style={{ gap: "16px", padding: "2px 0", fontSize: "13px" }}>
-          <Link className="magenta" href={`/release/${r.filename}`} style={{ minWidth: "180px", fontFamily: "TopazPlus_a1200, monospace" }}>
-            {r.filename}
-          </Link>
-          <span className="lightgrey" style={{ flex: 1 }}>{r.name ?? "-"}</span>
-          <span className="lightgrey" style={{ minWidth: "80px" }}>{r.uploader ?? "-"}</span>
-          <span className="lightgrey" style={{ minWidth: "90px" }}>{formatTs(r.timestamp)}</span>
-        </div>
-      ))}
-    </SiteLayout>
+      <div className="container-fluid bg-secondary apb-1 ap-1">
+        {stats.recentUploads.map((r, i) => (
+          <div key={i} className="col-lg-12 p-0 d-flex" style={{ gap: "16px", height: "16px", lineHeight: "16px" }}>
+            <Link className="magenta" href={`/release/${r.filename}`} style={{ minWidth: "240px", fontFamily: "TopazPlus_a1200, monospace" }}>
+              {r.filename}
+            </Link>
+            <span className="lightgrey" style={{ flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              {r.name ?? "-"}
+            </span>
+            <span className="lightgrey" style={{ minWidth: "96px" }}>{r.uploader ?? "-"}</span>
+            <span className="lightgrey" style={{ minWidth: "96px" }}>{formatTs(r.timestamp)}</span>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }

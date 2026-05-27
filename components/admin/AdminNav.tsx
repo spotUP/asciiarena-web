@@ -3,39 +3,49 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const links = [
-  { href: "/admin",          label: "Dashboard" },
-  { href: "/admin/collys",   label: "Collys" },
-  { href: "/admin/users",    label: "Users" },
-  { href: "/admin/artists",  label: "Artists" },
-  { href: "/admin/crews",    label: "Crews" },
-  { href: "/admin/logos",    label: "Logos" },
-  { href: "/admin/content",  label: "Apps & Mags" },
+const TABS = [
+  { href: "/admin",          label: "DASHBOARD" },
+  { href: "/admin/collys",   label: "COLLYS" },
+  { href: "/admin/users",    label: "USERS" },
+  { href: "/admin/artists",  label: "ARTiSTS" },
+  { href: "/admin/crews",    label: "CREWS" },
+  { href: "/admin/logos",    label: "LOGOS" },
+  { href: "/admin/content",  label: "APPS & MAGS" },
   { href: "/admin/bbs",      label: "BBS" },
-  { href: "/admin/requests", label: "Requests" },
+  { href: "/admin/requests", label: "REQUESTS" },
 ];
 
 export default function AdminNav() {
   const pathname = usePathname();
   return (
-    <div className="col-lg-12 p-0" style={{ marginBottom: "8px", display: "flex", flexWrap: "wrap", gap: "2px", borderBottom: "1px solid #444", paddingBottom: "6px" }}>
-      {links.map(l => {
-        const active = l.href === "/admin" ? pathname === "/admin" : pathname.startsWith(l.href);
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        background: "#000000",
+        height: "16px",
+        lineHeight: "16px",
+        marginBottom: "16px",
+      }}
+    >
+      {TABS.map(t => {
+        const isActive = t.href === "/admin" ? pathname === "/admin" : pathname.startsWith(t.href);
         return (
           <Link
-            key={l.href}
-            href={l.href}
+            key={t.href}
+            href={t.href}
             style={{
-              padding: "2px 8px",
-              fontFamily: "TopazPlus_a1200, monospace",
-              fontSize: "13px",
-              color: active ? "#ffff55" : "#aaaaaa",
-              backgroundColor: active ? "#333" : "transparent",
+              background: isActive ? "#212121" : "transparent",
+              color: isActive ? "#ffff55" : "#aaaaaa",
+              padding: "0 16px",
+              height: "16px",
+              lineHeight: "16px",
+              fontSize: "16px",
+              fontFamily: "inherit",
               textDecoration: "none",
-              border: active ? "1px solid #555" : "1px solid transparent",
             }}
           >
-            {l.label}
+            {t.label}
           </Link>
         );
       })}
