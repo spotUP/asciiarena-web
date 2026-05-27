@@ -323,7 +323,7 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
           <div style={{ marginBottom: "4px" }}>
             <span style={{ color: "#ff55ff", marginRight: "4px" }}>{peerDraft.nick}</span>
             <span style={{ color: "#aaaaaa", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-              {peerDraft.text}<span style={{ borderLeft: "2px solid #aaaaaa", marginLeft: "1px" }} />
+              {peerDraft.text}<span className="cursor-block" />
             </span>
           </div>
         )}
@@ -344,8 +344,9 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
             border: "none",
             color: "#aaaaaa",
             fontFamily: "TopazPlus_a1200, monospace",
-            fontSize: "13px",
-            padding: "4px 6px",
+            fontSize: "16px",
+            lineHeight: "16px",
+            padding: "0 8px",
             outline: "none",
             minWidth: 0,
           }}

@@ -39,7 +39,11 @@ export default function CaretOverlay() {
     // The visible caret block.
     const block = document.createElement("span");
     block.className = "cursor-block-overlay";
-    block.style.position = "absolute";
+    // Fixed positioning so the caret stays glued to its input regardless of
+    // whether the input is in a scrolled document body or a position:fixed
+    // container (e.g. the chat dock). We re-measure on scroll/resize so
+    // either case keeps the caret aligned.
+    block.style.position = "fixed";
     block.style.pointerEvents = "none";
     block.style.display = "none";
     block.style.zIndex = "2147483646"; // just below MAX_INT so dropdowns can sit above
@@ -122,9 +126,9 @@ export default function CaretOverlay() {
         ? 0
         : Math.max(0, (el.clientHeight - lineHeight) / 2);
 
-      const x = rect.left + window.scrollX + marker.offsetLeft - el.scrollLeft;
-      const y =
-        rect.top + window.scrollY + verticalCentre + marker.offsetTop - el.scrollTop;
+      // Viewport-relative coords (position:fixed): no scrollX/scrollY added.
+      const x = rect.left + marker.offsetLeft - el.scrollLeft;
+      const y = rect.top + verticalCentre + marker.offsetTop - el.scrollTop;
 
       block.style.display = "block";
       block.style.left = `${x}px`;

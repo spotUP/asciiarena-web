@@ -177,7 +177,8 @@ export default function ChatBar({ userId, userNick }: Props) {
                 autoFocus
                 style={{
                   background: "#111", border: "1px solid #444", color: "#aaaaaa",
-                  fontFamily: "inherit", fontSize: "inherit", padding: "2px 4px",
+                  fontFamily: "inherit", fontSize: "16px", lineHeight: "16px",
+                  padding: "0 8px",
                 }}
               />
               {suggestions.length > 0 && (
