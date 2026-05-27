@@ -486,12 +486,12 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
             </div>
           </div>
           {suggestedArtists.map(a => (
-            <div key={a.id} className="row apt-1 align-items-center">
-              <div className="col-xs-12 col-md-6">
-                <a className="magenta" href={`/artist/${a.artisturl}`}>{a.nick}</a>
-                <span className="lightgrey"> (artist page)</span>
-              </div>
-              <div className="col-xs-12 col-md-6">
+            <div key={a.id} className="row apt-1">
+              <div className="col-12" style={{ display: "flex", gap: "16px", alignItems: "center", flexWrap: "wrap" }}>
+                <span>
+                  <a className="magenta" href={`/artist/${a.artisturl}`}>{a.nick}</a>
+                  <span className="lightgrey"> (artist page)</span>
+                </span>
                 <input
                   type="button" className="btn-big" value="Claim this handle"
                   onClick={() => claimArtist(a.nick)}
@@ -508,11 +508,9 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
             <div className="col-12"><span className="white">Linked handles:</span></div>
           </div>
           {linkedArtists.map(a => (
-            <div key={a.id} className="row apt-1 align-items-center">
-              <div className="col-xs-12 col-md-6">
+            <div key={a.id} className="row apt-1">
+              <div className="col-12" style={{ display: "flex", gap: "16px", alignItems: "center", flexWrap: "wrap" }}>
                 <a className="magenta" href={`/artist/${a.artisturl}`}>{a.nick}</a>
-              </div>
-              <div className="col-xs-12 col-md-6">
                 <input
                   type="button" className="btn-big" value="Unlink"
                   onClick={() => unclaimArtist(a.id, a.nick)}
