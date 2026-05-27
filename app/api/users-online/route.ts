@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/generated/prisma/client";
+import { subscriberCount } from "@/lib/live";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +18,11 @@ export async function GET() {
     ),
   ]);
   return NextResponse.json({
-    activeUsers: activeUsers.map(u => ({ id: u.id, nick: u.nick ?? "" })),
+    activeUsers: activeUsers.map(u => ({
+      id: u.id,
+      nick: u.nick ?? "",
+      inChat: subscriberCount(`user:${u.id}:messages`) > 0,
+    })),
     anonymousOnline: Number(anonResult[0]?.cnt ?? 0),
   });
 }

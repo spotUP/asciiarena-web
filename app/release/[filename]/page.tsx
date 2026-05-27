@@ -76,7 +76,7 @@ export default async function ReleasePage({ params }: PageProps) {
   const isAdmin = session?.user?.rank === "Admin";
 
   // Batch 2: everything that only needs colly.id / userId
-  const [artistRows, crewRows, voteCount, isFavouritedCount, userPrefs] = await Promise.all([
+  const [artistRows, crewRows, voteCount, isFavouritedCount, favouritesTotal, userPrefs] = await Promise.all([
     prisma.artists_collys.findMany({
       where: { colly_id: colly.id },
       include: { artists: true },
@@ -91,6 +91,7 @@ export default async function ReleasePage({ params }: PageProps) {
     userId
       ? prisma.favourites.count({ where: { user_id: userId, colly_id: colly.id } })
       : Promise.resolve(0),
+    prisma.favourites.count({ where: { colly_id: colly.id } }),
     userId
       ? prisma.users.findFirst({
           where: { id: userId },
@@ -278,6 +279,8 @@ export default async function ReleasePage({ params }: PageProps) {
         collyTitle={colly.name ?? filename}
         siteUrl={process.env.NEXTAUTH_URL ?? "https://asciiarena.se"}
         initialViewCount={Number(colly.view_counter ?? 0)}
+        initialFavCount={favouritesTotal}
+        initialDownloadCount={downloads}
       />
 
       </Suspense>

@@ -10,11 +10,13 @@ interface UserEntry {
   id: number;
   nick: string;
   state: NickState;
+  inChat: boolean;
 }
 
 interface ActiveUser {
   id: number;
   nick: string;
+  inChat?: boolean;
 }
 
 interface OnlineData {
@@ -54,6 +56,7 @@ export default function UsersOnlineLive({ isLoggedIn = false }: { isLoggedIn?: b
           id: u.id,
           nick: u.nick,
           state: entering.includes(u.nick) ? ("entering" as NickState) : "stable",
+          inChat: !!u.inChat,
         })),
         ...prev.filter(e => leaving.includes(e.nick)).map(e => ({ ...e, state: "leaving" as NickState })),
       ];
@@ -88,7 +91,7 @@ export default function UsersOnlineLive({ isLoggedIn = false }: { isLoggedIn?: b
     sessionIdRef.current = sid;
 
     load(d => {
-      setEntries(d.activeUsers.map(u => ({ id: u.id, nick: u.nick, state: "stable" })));
+      setEntries(d.activeUsers.map(u => ({ id: u.id, nick: u.nick, state: "stable", inChat: !!u.inChat })));
       setAnonCount(d.anonymousOnline);
       prevAnonRef.current = d.anonymousOnline;
     });
@@ -131,6 +134,19 @@ export default function UsersOnlineLive({ isLoggedIn = false }: { isLoggedIn?: b
             <a className="yellow" href={`/member/${urlsafe(entry.nick)}`}>
               <ScrambleText text={entry.nick} mode={entry.state} />
             </a>
+            {entry.inChat && (
+              <span
+                title={`${entry.nick} has chat open`}
+                style={{
+                  display: "inline-block",
+                  width: "6px",
+                  height: "6px",
+                  borderRadius: "50%",
+                  background: "#55ffff",
+                  boxShadow: "0 0 4px #55ffff",
+                }}
+              />
+            )}
             {isLoggedIn && entry.id > 0 && (
               <button
                 onClick={() => openChat(entry.id, entry.nick)}

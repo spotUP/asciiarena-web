@@ -4,6 +4,7 @@ import SiteLayout from "@/components/layout/SiteLayout";
 import UnfaveButton from "./UnfaveButton";
 import ChatButton from "./ChatButton";
 import OnlineDot from "@/components/ui/OnlineDot";
+import LiveRefresh from "@/components/widgets/LiveRefresh";
 import { prisma } from "@/lib/db";
 import { getSession as auth } from "@/lib/session";
 import { decodeParam } from "@/lib/utils";
@@ -157,6 +158,7 @@ export default async function MemberPage({
 
   return (
     <SiteLayout title="MEMBER">
+      <LiveRefresh channel={`user:${member.id}:profile`} />
       <div className="container-fluid apb-1">
         <div className="row align-items-center">
           <div className="col-sm-4">

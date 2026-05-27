@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { broadcast } from "@/lib/live";
+import { broadcast, subscriberCount } from "@/lib/live";
 import { apiOk } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
 
@@ -23,7 +23,11 @@ async function broadcastOnline() {
   ]);
   broadcast("site:online", {
     type: "update",
-    activeUsers: activeUsers.map(u => ({ id: u.id, nick: u.nick ?? "" })),
+    activeUsers: activeUsers.map(u => ({
+      id: u.id,
+      nick: u.nick ?? "",
+      inChat: subscriberCount(`user:${u.id}:messages`) > 0,
+    })),
     anonymousOnline: Number(anonResult[0]?.cnt ?? 0),
   });
 }

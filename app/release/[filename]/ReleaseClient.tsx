@@ -76,6 +76,8 @@ interface Props {
   collyTitle: string;
   siteUrl: string;
   initialViewCount: number;
+  initialFavCount: number;
+  initialDownloadCount: number;
 }
 
 type Section = null | "add-comment" | "edit-comment" | "broken";
@@ -242,7 +244,7 @@ export default function ReleaseClient({
   collyId, filename, collyFileUrl, userNick, isAdmin,
   isFavourited, initBgColor, initFgColor, initFont,
   isArchive, fileContent, type, collyTitle, siteUrl,
-  initialViewCount,
+  initialViewCount, initialFavCount, initialDownloadCount,
 }: Props) {
   const [collyVisible, setCollyVisible] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -257,6 +259,8 @@ export default function ReleaseClient({
   const [shareOpen, setShareOpen] = useState(false);
   const [fontOpen, setFontOpen] = useState(false);
   const [viewCount, setViewCount] = useState(initialViewCount);
+  const [favCount, setFavCount] = useState(initialFavCount);
+  const [downloadCount, setDownloadCount] = useState(initialDownloadCount);
   const [copyImageLabel, setCopyImageLabel] = useState("Copy as image");
   const [, startTransition] = useTransition();
 
@@ -320,10 +324,43 @@ export default function ReleaseClient({
         setDrafts(prev => { const next = { ...prev }; delete next[nick]; return next; });
       } else if (event.type === "posted") {
         loadComments();
+      } else if (event.type === "edited") {
+        const ev = event as { commentId?: number; comment?: string };
+        if (ev.commentId != null) {
+          setComments(prev => prev.map(c => c.id === ev.commentId ? { ...c, comment: ev.comment ?? c.comment } : c));
+        }
+      } else if (event.type === "deleted") {
+        const ev = event as { commentId?: number };
+        if (ev.commentId != null) {
+          setComments(prev => prev.filter(c => c.id !== ev.commentId));
+        }
       }
     };
     return () => es.close();
   }, [channel, loadComments]);
+
+  // Per-release favourite + download channels
+  useEffect(() => {
+    const esFav = new EventSource(`/api/live?channel=release:${collyId}:fav`);
+    esFav.onmessage = (e: MessageEvent<string>) => {
+      try {
+        const ev = JSON.parse(e.data) as { type?: string; delta?: number; nick?: string };
+        // Skip events caused by this user — they've already been applied optimistically.
+        if (ev.nick && userNick && ev.nick === userNick) return;
+        if (ev.type === "changed" && typeof ev.delta === "number") {
+          setFavCount(c => Math.max(0, c + ev.delta!));
+        }
+      } catch {}
+    };
+    const esDl = new EventSource(`/api/live?channel=release:${collyId}:downloads`);
+    esDl.onmessage = (e: MessageEvent<string>) => {
+      try {
+        const ev = JSON.parse(e.data) as { type?: string };
+        if (ev.type === "downloaded") setDownloadCount(c => c + 1);
+      } catch {}
+    };
+    return () => { esFav.close(); esDl.close(); };
+  }, [collyId, userNick]);
 
   const broadcastTyping = useCallback((text: string) => {
     if (typingTimer.current) clearTimeout(typingTimer.current);
@@ -613,12 +650,14 @@ export default function ReleaseClient({
   const toggleFav = async () => {
     if (!fav) {
       setFav(true); // optimistic
+      setFavCount(c => c + 1);
       const r = await addFavourite(collyId);
-      if (!r.success) setFav(false); // roll back
+      if (!r.success) { setFav(false); setFavCount(c => Math.max(0, c - 1)); }
     } else {
       setFav(false); // optimistic
+      setFavCount(c => Math.max(0, c - 1));
       const r = await removeFavourite(collyId);
-      if (!r.success) setFav(true); // roll back
+      if (!r.success) { setFav(true); setFavCount(c => c + 1); }
     }
   };
 
@@ -745,6 +784,12 @@ export default function ReleaseClient({
           )}
           {commentsLoaded && comments.length > 0 && (
             <span className="lightgrey">{comments.length} {comments.length === 1 ? "comment" : "comments"}</span>
+          )}
+          {favCount > 0 && (
+            <span className="lightgrey">{favCount} {favCount === 1 ? "favourite" : "favourites"}</span>
+          )}
+          {downloadCount > 0 && (
+            <span className="lightgrey">{downloadCount} {downloadCount === 1 ? "download" : "downloads"}</span>
           )}
 
           {commentsLoaded && comments.length > 0 && (

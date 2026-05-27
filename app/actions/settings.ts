@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { urlsafe } from "@/lib/utils";
+import { broadcast } from "@/lib/live";
 import bcrypt from "bcryptjs";
 import { createHash } from "crypto";
 
@@ -165,6 +166,7 @@ export async function saveSettings(
         anim_effect = ${animVal}
       WHERE id = ${userId}
     `;
+    broadcast(`user:${userId}:profile`, { type: "updated" });
     return { success: true };
   } catch {
     return { success: false, error: "An error occurred saving your settings." };
