@@ -16,6 +16,7 @@ import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { existsSync } from "fs";
 import { broadcast } from "@/lib/live";
+import { ensureArtistId, ensureCrewId } from "@/lib/ensureEntity";
 import { broadcastActivityIfAllowed } from "@/lib/activity";
 
 interface CollyRow {
@@ -223,23 +224,22 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const collyId = insertedRow[0]?.rowid;
   if (!collyId) return apiError("Failed to insert colly", 500);
 
-  // Insert crew relationships
+  // Insert crew relationships — ensure-or-create each named crew so the
+  // submitter doesn't have to leave the form to add a missing crew.
   for (const crewname of crewnames) {
+    const crewId = await ensureCrewId(crewname);
+    if (!crewId) continue;
     await prisma.$executeRaw(
-      Prisma.sql`INSERT INTO collys_crews (colly_id, crew_id)
-        SELECT ${collyId}, id FROM crews
-        WHERE name = ${crewname}
-          AND (SELECT count(*) FROM collys_crews WHERE colly_id = ${collyId} AND crew_id = crews.id) = 0`
+      Prisma.sql`INSERT IGNORE INTO collys_crews (colly_id, crew_id) VALUES (${collyId}, ${crewId})`
     );
   }
 
-  // Insert artist relationships
+  // Insert artist relationships — ensure-or-create each named artist.
   for (const artistname of artistnames) {
+    const artistId = await ensureArtistId(artistname);
+    if (!artistId) continue;
     await prisma.$executeRaw(
-      Prisma.sql`INSERT INTO artists_collys (colly_id, artist_id)
-        SELECT ${collyId}, id FROM artists
-        WHERE nick = ${artistname}
-          AND (SELECT count(*) FROM artists_collys WHERE colly_id = ${collyId} AND artist_id = artists.id) = 0`
+      Prisma.sql`INSERT IGNORE INTO artists_collys (colly_id, artist_id) VALUES (${collyId}, ${artistId})`
     );
   }
 

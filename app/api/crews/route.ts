@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { apiError, apiOk, urlsafe, safeSort, CREW_SORT_COLS } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { broadcast } from "@/lib/live";
+import { ensureBbsName } from "@/lib/ensureEntity";
 
 interface CrewRow {
   id: number;
@@ -107,11 +108,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       VALUES (${name}, ${acronym}, ${contact}, ${crewurl}, NULL, ${www}, ${active})`
   );
 
+  // bbs_of is keyed by BBS name (not id), but ensure the BBS exists as a
+  // real row so the listing pill fires and downstream lookups work.
   for (const bbsname of bbsnames) {
+    const canonical = await ensureBbsName(bbsname);
+    if (!canonical) continue;
     await prisma.$executeRaw(
       Prisma.sql`INSERT INTO bbs_of (name, crew)
-        SELECT ${bbsname}, ${name}
-        WHERE (SELECT count(*) FROM bbs_of WHERE name = ${bbsname} AND crew = ${name}) = 0`
+        SELECT ${canonical}, ${name}
+        WHERE (SELECT count(*) FROM bbs_of WHERE name = ${canonical} AND crew = ${name}) = 0`
     );
   }
 

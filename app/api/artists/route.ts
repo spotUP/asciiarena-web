@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { apiError, apiOk, urlsafe, safeSort, ARTIST_SORT_COLS } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { broadcast } from "@/lib/live";
+import { ensureCrewId } from "@/lib/ensureEntity";
 
 interface ArtistRow {
   id: number;
@@ -125,7 +126,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       VALUES (${nick}, ${acronym}, ${www}, ${active}, ${country}, ${artisturl})`
   );
 
+  // member_of is keyed by crew name (not id) so we still INSERT by name,
+  // but call ensureCrewId first so the named crew exists as a real row
+  // when the listing pill fires and downstream lookups need it.
   for (const crewname of crewnames) {
+    await ensureCrewId(crewname);
     await prisma.$executeRaw(
       Prisma.sql`INSERT INTO member_of (crew, nick)
         SELECT ${crewname}, ${nick}

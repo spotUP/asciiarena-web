@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import DosSelect from "@/components/ui/DosSelect";
+import Combobox from "@/components/ui/Combobox";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -365,23 +365,26 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
   // ── Multi-select renderer ─────────────────────────────────────────────────
 
   function MultiSelect({
-    label, values, options, placeholder, onChange,
+    label, values, options, placeholder, createLabel, onChange,
   }: {
     label: string;
     values: string[];
     options: string[];
     placeholder: string;
+    /** Singular noun for the "+ Create new <createLabel>" sentinel. */
+    createLabel?: string;
     onChange: (next: string[]) => void;
   }) {
     return (
       <Field label={label}>
         {values.map((val, i) => (
           <div key={i} style={{ display: "flex", gap: "8px", alignItems: "center" }} className="amb-1">
-            <DosSelect
+            <Combobox
               width={240}
               value={val}
               placeholder={placeholder}
-              options={[{ value: "", label: placeholder }, ...options.map(o => ({ value: o, label: o }))]}
+              createLabel={createLabel}
+              options={options.map(o => ({ value: o, label: o }))}
               onChange={v => onChange(updateField(values, i, v))}
             />
             {values.length > 1 && (
@@ -478,8 +481,8 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
                 <input type="number" className="form-control" min={1} max={31} placeholder="DD" style={{ width: "80px" }} value={collyDay} onChange={e => setCollyDay(e.target.value)} />
               </div>
             </Field>
-            <MultiSelect label="Artist(s)" values={collyArtists} options={artistList} placeholder="-- Unknown --" onChange={setCollyArtists} />
-            <MultiSelect label="Crew(s)" values={collyCrews} options={crewList} placeholder="-- None --" onChange={setCollyCrews} />
+            <MultiSelect label="Artist(s)" values={collyArtists} options={artistList} placeholder="-- Unknown --" createLabel="artist" onChange={setCollyArtists} />
+            <MultiSelect label="Crew(s)" values={collyCrews} options={crewList} placeholder="-- None --" createLabel="crew" onChange={setCollyCrews} />
             <div className="amt-1">
               <input type="submit" className="btn-big bg-green white" value="Upload Colly" />
             </div>
@@ -509,7 +512,7 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
             <Field label="Active">
               <input type="text" className="form-control w-100" value={crewActive} onChange={e => setCrewActive(e.target.value)} placeholder="e.g. yes, no, inactive" />
             </Field>
-            <MultiSelect label="BBS(es)" values={crewBbses} options={bbsList} placeholder="-- None --" onChange={setCrewBbses} />
+            <MultiSelect label="BBS(es)" values={crewBbses} options={bbsList} placeholder="-- None --" createLabel="BBS" onChange={setCrewBbses} />
             <div className="amt-1">
               <input type="submit" className="btn-big bg-green white" value="Submit Crew" />
             </div>
@@ -539,7 +542,7 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
             <Field label="Active">
               <input type="text" className="form-control w-100" value={artistActive} onChange={e => setArtistActive(e.target.value)} placeholder="e.g. yes, no, inactive" />
             </Field>
-            <MultiSelect label="Crew(s)" values={artistCrews} options={crewList} placeholder="-- None --" onChange={setArtistCrews} />
+            <MultiSelect label="Crew(s)" values={artistCrews} options={crewList} placeholder="-- None --" createLabel="crew" onChange={setArtistCrews} />
             <div className="amt-1">
               <input type="submit" className="btn-big bg-green white" value="Submit Artist" />
             </div>
