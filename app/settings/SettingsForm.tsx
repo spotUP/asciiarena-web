@@ -235,9 +235,11 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
 
       <div className="row apt-1"><div className="col-12">Birth</div></div>
       <div className="row amb-1">
-        <div className="col-4 col-md-3 apt-1">
+        <div className="col-xs-12 col-md-8" style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
           <select
-            className="form-select w-100" value={settings.byear ?? ""}
+            className="form-select"
+            style={{ width: "96px" }}
+            value={settings.byear ?? ""}
             onChange={(e) => set("byear", e.target.value ? parseInt(e.target.value) : null)}
           >
             <option value="">Year</option>
@@ -245,10 +247,10 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
               <option key={y} value={y}>{y}</option>
             ))}
           </select>
-        </div>
-        <div className="col-4 col-md-3 apt-1">
           <select
-            className="form-select w-100" value={settings.bmonth ?? ""}
+            className="form-select"
+            style={{ width: "80px" }}
+            value={settings.bmonth ?? ""}
             onChange={(e) => set("bmonth", e.target.value ? parseInt(e.target.value) : null)}
           >
             <option value="">Month</option>
@@ -256,10 +258,10 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
               <option key={m} value={m}>{m}</option>
             ))}
           </select>
-        </div>
-        <div className="col-4 col-md-2 apt-1">
           <select
-            className="form-select w-100" value={settings.bday ?? ""}
+            className="form-select"
+            style={{ width: "64px" }}
+            value={settings.bday ?? ""}
             onChange={(e) => set("bday", e.target.value ? parseInt(e.target.value) : null)}
           >
             <option value="">Day</option>
