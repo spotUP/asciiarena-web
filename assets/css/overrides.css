@@ -369,6 +369,15 @@ button.dropdown-item {
   color: #bbbbbb !important;
 }
 
+/* DosSelect trigger — matches the .form-control text-input look:
+   same #000084 dark-blue terminal bg, same #444 + brightness(170%) hover. */
+.dos-select-trigger { background-color: #000084 !important; }
+.dos-select-trigger:hover {
+  background-color: #444444 !important;
+  color: #bbbbbb !important;
+  filter: brightness(170%);
+}
+
 /* Native <select> fallback: match the panel-secondary bg, on-grid.
    Prefer the themed <DosSelect> client component (components/ui/DosSelect)
    for anything that needs a styled open menu. */

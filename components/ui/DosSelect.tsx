@@ -40,8 +40,8 @@ export default function DosSelect({ value, options, onChange, width, placeholder
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
+        className="dos-select-trigger"
         style={{
-          background: "#444444",
           color: "#ffffff",
           border: 0,
           height: "16px",
