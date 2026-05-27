@@ -146,16 +146,37 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
   // ── Hash sync ──────────────────────────────────────────────────────────────
 
   useEffect(() => {
-    const fromHash = (window.location.hash || "").replace(/^#/, "");
-    if (VALID_HASHES.includes(fromHash)) {
-      setActiveTab(fromHash === "ascii_mag" ? "mag" : (fromHash as TabId));
-    }
     const onHash = () => {
       const h = (window.location.hash || "").replace(/^#/, "");
-      if (VALID_HASHES.includes(h)) setActiveTab(h === "ascii_mag" ? "mag" : (h as TabId));
+      if (VALID_HASHES.includes(h)) {
+        setActiveTab(h === "ascii_mag" ? "mag" : (h as TabId));
+      }
     };
+
+    // Next.js Link clicks that change only the hash use history.pushState,
+    // which doesn't fire 'hashchange'. Wrap pushState/replaceState locally
+    // so a NavBar link to /submit#bbs from /submit#colly still swaps tabs.
+    const origPush = history.pushState;
+    const origReplace = history.replaceState;
+    history.pushState = function (...args) {
+      origPush.apply(this, args);
+      onHash();
+    } as typeof history.pushState;
+    history.replaceState = function (...args) {
+      origReplace.apply(this, args);
+      onHash();
+    } as typeof history.replaceState;
+
     window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
+    window.addEventListener("popstate", onHash);
+    onHash(); // initial
+
+    return () => {
+      window.removeEventListener("hashchange", onHash);
+      window.removeEventListener("popstate", onHash);
+      history.pushState = origPush;
+      history.replaceState = origReplace;
+    };
   }, []);
 
   const switchTab = (id: TabId) => {
