@@ -170,6 +170,20 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
     setSettings((prev) => ({ ...prev, [key]: value }));
   }
 
+  // crt_effect / anim_effect are display-layer flags that should take effect
+  // the instant the toggle flips, not on Save. POST to the small auto-save
+  // endpoint which updates the DB and broadcasts on user:{id}:profile —
+  // SiteLayout subscribes and router.refresh picks up the new value.
+  async function autoSaveDisplay(patch: { crt_effect?: number; anim_effect?: number }) {
+    try {
+      await fetch("/api/settings/display", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(patch),
+      });
+    } catch { /* swallow — the next full Save will reconcile */ }
+  }
+
   // -- Panel renderers ------------------------------------------------------
 
   const hiddenFields = (
@@ -383,7 +397,11 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
             <input
               type="checkbox" className="form-check-input" id="crt_effect"
               checked={(settings.crt_effect ?? 0) === 1}
-              onChange={(e) => set("crt_effect", e.target.checked ? 1 : 0)}
+              onChange={(e) => {
+                const v = e.target.checked ? 1 : 0;
+                set("crt_effect", v);
+                autoSaveDisplay({ crt_effect: v });
+              }}
             />
             <label className="form-check-label" htmlFor="crt_effect">
               CRT screen effect
@@ -398,7 +416,11 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
             <input
               type="checkbox" className="form-check-input" id="anim_effect"
               checked={(settings.anim_effect ?? 0) === 1}
-              onChange={(e) => set("anim_effect", e.target.checked ? 1 : 0)}
+              onChange={(e) => {
+                const v = e.target.checked ? 1 : 0;
+                set("anim_effect", v);
+                autoSaveDisplay({ anim_effect: v });
+              }}
             />
             <label className="form-check-label" htmlFor="anim_effect">
               Modem animation effect
