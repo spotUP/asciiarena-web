@@ -56,7 +56,6 @@ export default function WidgetSettings() {
             const id = `${baseId}-${key}`;
             return (
               <div key={key} className="form-check form-switch">
-                Hide <span className="yellow">{WIDGET_LABELS[key]}</span>
                 <input
                   type="checkbox"
                   className="form-check-input"
@@ -64,7 +63,9 @@ export default function WidgetSettings() {
                   checked={hidden.has(key)}
                   onChange={() => toggle(key)}
                 />
-                <label className="form-check-label" htmlFor={id} />
+                <label className="form-check-label" htmlFor={id}>
+                  Hide <span className="yellow">{WIDGET_LABELS[key]}</span>
+                </label>
               </div>
             );
           })}

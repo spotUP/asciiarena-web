@@ -289,13 +289,14 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
       <div className="row amb-1 apt-1">
         <div className="col-12">
           <div className="form-check form-switch">
-            Show E-Mail on profile
             <input
               type="checkbox" className="form-check-input" id="display_mail"
               checked={(settings.display_mail ?? 0) === 1}
               onChange={(e) => set("display_mail", e.target.checked ? 1 : 0)}
             />
-            <label className="form-check-label" htmlFor="display_mail" />
+            <label className="form-check-label" htmlFor="display_mail">
+              Show E-Mail on profile
+            </label>
           </div>
         </div>
       </div>
@@ -379,13 +380,14 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
       <div className="row amb-1 apt-1">
         <div className="col-12">
           <div className="form-check form-switch">
-            CRT screen effect
             <input
               type="checkbox" className="form-check-input" id="crt_effect"
               checked={(settings.crt_effect ?? 0) === 1}
               onChange={(e) => set("crt_effect", e.target.checked ? 1 : 0)}
             />
-            <label className="form-check-label" htmlFor="crt_effect" />
+            <label className="form-check-label" htmlFor="crt_effect">
+              CRT screen effect
+            </label>
           </div>
         </div>
       </div>
@@ -393,13 +395,14 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
       <div className="row amb-1">
         <div className="col-12">
           <div className="form-check form-switch">
-            Modem animation effect
             <input
               type="checkbox" className="form-check-input" id="anim_effect"
               checked={(settings.anim_effect ?? 0) === 1}
               onChange={(e) => set("anim_effect", e.target.checked ? 1 : 0)}
             />
-            <label className="form-check-label" htmlFor="anim_effect" />
+            <label className="form-check-label" htmlFor="anim_effect">
+              Modem animation effect
+            </label>
           </div>
         </div>
       </div>

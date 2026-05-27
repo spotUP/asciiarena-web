@@ -50,7 +50,6 @@ export default function LiveFeedSettings() {
           const id = `${baseId}-${type}`;
           return (
             <div key={type} className="form-check form-switch">
-              Hide <span className="yellow">{ACTIVITY_LABELS[type]}</span>
               <input
                 type="checkbox"
                 className="form-check-input"
@@ -58,7 +57,9 @@ export default function LiveFeedSettings() {
                 checked={hidden.has(type)}
                 onChange={() => toggle(type)}
               />
-              <label className="form-check-label" htmlFor={id} />
+              <label className="form-check-label" htmlFor={id}>
+                Hide <span className="yellow">{ACTIVITY_LABELS[type]}</span>
+              </label>
             </div>
           );
         })}
