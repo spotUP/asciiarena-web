@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { WIDGET_KEYS, type WidgetKey } from "@/lib/widgets-types";
+import { broadcast } from "@/lib/live";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +44,8 @@ export async function POST(request: NextRequest) {
     where: { id: userId },
     data: { hidden_widgets: value },
   });
+
+  broadcast(`user:${userId}:widgets`, { type: "updated", hidden: dedup });
 
   return apiOk({ ok: true, hidden: dedup });
 }

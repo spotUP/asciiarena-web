@@ -9,6 +9,7 @@ import LogoHeader from "./LogoHeader";
 import PageHeader from "./PageHeader";
 import LeftSidebar from "./LeftSidebar";
 import RightSidebar from "./RightSidebar";
+import LiveRefresh from "@/components/widgets/LiveRefresh";
 
 export type SiteLayoutProps = {
   title?: string | string[];
@@ -66,6 +67,9 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
       <div className="vignette"></div>
 
       <Navbar session={session} />
+      {session?.user?.id && (
+        <LiveRefresh channel={`user:${session.user.id}:widgets`} />
+      )}
 
       <div className="container-fluid mobile-bg">
         <div className="row" style={{ paddingTop: "58px", paddingBottom: "16px" }}>

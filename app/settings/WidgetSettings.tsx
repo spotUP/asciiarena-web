@@ -25,8 +25,8 @@ export default function WidgetSettings() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ hidden: Array.from(next) }),
     });
-    setStatus(res.ok ? "saved (reload to see)" : "save failed");
-    setTimeout(() => setStatus(""), 2500);
+    setStatus(res.ok ? "saved" : "save failed");
+    setTimeout(() => setStatus(""), 1500);
   };
 
   const toggle = (key: WidgetKey) => {
@@ -47,7 +47,7 @@ export default function WidgetSettings() {
       <div className="col-lg-12 p-0 lightgrey amb-1">
         Hide any widget you don&apos;t want to see on your screen. Toggles you flip ON are
         <span className="yellow"> hidden </span>
-        for you — other users are not affected. Reload after a change to see the new layout.
+        for you — other users are not affected. Changes apply live to every open tab.
       </div>
       {WIDGET_GROUPS.map(group => (
         <div key={group.label} className="col-lg-12 p-0 amt-1">
