@@ -169,11 +169,32 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
 
     window.addEventListener("hashchange", onHash);
     window.addEventListener("popstate", onHash);
+
+    // Belt-and-braces: catch <a href="/submit#xyz"> clicks at the document
+    // level. If Next.js's router intercepts the click and calls pushState
+    // through a cached reference that bypasses our wrap, this listener
+    // still fires synchronously on click and applies the tab change
+    // directly from the href.
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = (e.target as HTMLElement | null)?.closest("a");
+      if (!a) return;
+      const href = a.getAttribute("href") ?? "";
+      const m = href.match(/^\/submit#(.+)$/);
+      if (!m) return;
+      const target = m[1] === "ascii_mag" ? "mag" : m[1];
+      if (TABS.some(t => t.id === target)) {
+        setActiveTab(target as TabId);
+      }
+    };
+    document.addEventListener("click", onClick);
+
     onHash(); // initial
 
     return () => {
       window.removeEventListener("hashchange", onHash);
       window.removeEventListener("popstate", onHash);
+      document.removeEventListener("click", onClick);
       history.pushState = origPush;
       history.replaceState = origReplace;
     };
