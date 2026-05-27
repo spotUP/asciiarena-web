@@ -41,7 +41,7 @@ export default function DosSelect({ value, options, onChange, width, placeholder
         type="button"
         onClick={() => setOpen(o => !o)}
         style={{
-          background: "#212121",
+          background: "#444444",
           color: "#ffffff",
           border: 0,
           height: "16px",
