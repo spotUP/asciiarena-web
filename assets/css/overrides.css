@@ -369,9 +369,11 @@ button.dropdown-item {
   color: #bbbbbb !important;
 }
 
-/* Selects: BS386 dark blue terminal look, matching .form-control inputs. */
+/* Native <select> fallback: match the panel-secondary bg, on-grid.
+   Prefer the themed <DosSelect> client component (components/ui/DosSelect)
+   for anything that needs a styled open menu. */
 select.form-select, select.form-control {
-  background-color: #000084 !important;
+  background-color: #212121 !important;
   color: #ffffff !important;
   border: 0 !important;
   border-radius: 0 !important;
@@ -384,19 +386,9 @@ select.form-select, select.form-control {
   font-size: 16px !important;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, monospace !important;
   width: auto !important;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  /* Single-glyph ▼ caret painted in the right padding gap. */
-  background-image: linear-gradient(45deg, transparent 50%, #ffffff 50%),
-                    linear-gradient(135deg, #ffffff 50%, transparent 50%);
-  background-position: calc(100% - 12px) center, calc(100% - 8px) center;
-  background-size: 4px 4px, 4px 4px;
-  background-repeat: no-repeat;
-  padding-right: 24px !important;
 }
 select.form-select option, select.form-control option {
-  background-color: #000084;
+  background-color: #212121;
   color: #ffffff;
 }
 

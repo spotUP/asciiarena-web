@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback, useActionState } from "react";
 import { saveSettings, changePassword, type Settings } from "@/app/actions/settings";
 import LiveFeedSettings from "./LiveFeedSettings";
 import WidgetSettings from "./WidgetSettings";
+import DosSelect from "@/components/ui/DosSelect";
 
 interface ArtistHandle {
   id: number;
@@ -236,39 +237,27 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
       <div className="row apt-1"><div className="col-12">Birth</div></div>
       <div className="row amb-1">
         <div className="col-xs-12 col-md-8" style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-          <select
-            className="form-select"
-            style={{ width: "96px" }}
-            value={settings.byear ?? ""}
-            onChange={(e) => set("byear", e.target.value ? parseInt(e.target.value) : null)}
-          >
-            <option value="">Year</option>
-            {Array.from({ length: currentYear - 5 - 1920 + 1 }, (_, i) => 1920 + i).map(y => (
-              <option key={y} value={y}>{y}</option>
-            ))}
-          </select>
-          <select
-            className="form-select"
-            style={{ width: "80px" }}
-            value={settings.bmonth ?? ""}
-            onChange={(e) => set("bmonth", e.target.value ? parseInt(e.target.value) : null)}
-          >
-            <option value="">Month</option>
-            {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
-              <option key={m} value={m}>{m}</option>
-            ))}
-          </select>
-          <select
-            className="form-select"
-            style={{ width: "64px" }}
-            value={settings.bday ?? ""}
-            onChange={(e) => set("bday", e.target.value ? parseInt(e.target.value) : null)}
-          >
-            <option value="">Day</option>
-            {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
-              <option key={d} value={d}>{d}</option>
-            ))}
-          </select>
+          <DosSelect
+            width={96}
+            placeholder="Year"
+            value={settings.byear?.toString() ?? ""}
+            options={Array.from({ length: currentYear - 5 - 1920 + 1 }, (_, i) => 1920 + i).map(y => ({ value: y.toString(), label: y.toString() }))}
+            onChange={(v) => set("byear", v ? parseInt(v) : null)}
+          />
+          <DosSelect
+            width={80}
+            placeholder="Month"
+            value={settings.bmonth?.toString() ?? ""}
+            options={Array.from({ length: 12 }, (_, i) => i + 1).map(m => ({ value: m.toString(), label: m.toString() }))}
+            onChange={(v) => set("bmonth", v ? parseInt(v) : null)}
+          />
+          <DosSelect
+            width={64}
+            placeholder="Day"
+            value={settings.bday?.toString() ?? ""}
+            options={Array.from({ length: 31 }, (_, i) => i + 1).map(d => ({ value: d.toString(), label: d.toString() }))}
+            onChange={(v) => set("bday", v ? parseInt(v) : null)}
+          />
         </div>
       </div>
 
@@ -341,55 +330,51 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
       <div className="row amb-1 apt-1"><div className="col-12">File list mode</div></div>
       <div className="row amb-1">
         <div className="col-xs-12 col-md-6">
-          <select
-            className="form-select w-100" value={settings.viewmode ?? 0}
-            onChange={(e) => set("viewmode", parseInt(e.target.value))}
-          >
-            <option value={0}>Standard</option>
-            <option value={1}>BBS</option>
-          </select>
+          <DosSelect
+            width={160}
+            value={(settings.viewmode ?? 0).toString()}
+            options={[
+              { value: "0", label: "Standard" },
+              { value: "1", label: "BBS" },
+            ]}
+            onChange={(v) => set("viewmode", parseInt(v))}
+          />
         </div>
       </div>
 
       <div className="row amb-1"><div className="col-12 apt-1">Default Colly Background</div></div>
       <div className="row amb-1">
         <div className="col-xs-12 col-md-6">
-          <select
-            className="form-select w-100" value={settings.def_bg_col ?? ""}
-            onChange={(e) => set("def_bg_col", e.target.value)}
-          >
-            {COLOR_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
+          <DosSelect
+            width={200}
+            value={settings.def_bg_col ?? ""}
+            options={COLOR_OPTIONS}
+            onChange={(v) => set("def_bg_col", v)}
+          />
         </div>
       </div>
 
       <div className="row amb-1"><div className="col-12 apt-1">Default Colly Foreground</div></div>
       <div className="row amb-1">
         <div className="col-xs-12 col-md-6">
-          <select
-            className="form-select w-100" value={settings.def_fg_col ?? ""}
-            onChange={(e) => set("def_fg_col", e.target.value)}
-          >
-            {COLOR_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
+          <DosSelect
+            width={200}
+            value={settings.def_fg_col ?? ""}
+            options={COLOR_OPTIONS}
+            onChange={(v) => set("def_fg_col", v)}
+          />
         </div>
       </div>
 
       <div className="row amb-1"><div className="col-12 apt-1">Default Colly Font</div></div>
       <div className="row amb-1">
         <div className="col-xs-12 col-md-6">
-          <select
-            className="form-select w-100" value={settings.def_font ?? ""}
-            onChange={(e) => set("def_font", e.target.value ? parseInt(e.target.value) : null)}
-          >
-            {FONT_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
+          <DosSelect
+            width={200}
+            value={settings.def_font?.toString() ?? ""}
+            options={FONT_OPTIONS.map(f => ({ value: f.value.toString(), label: f.label }))}
+            onChange={(v) => set("def_font", v ? parseInt(v) : null)}
+          />
         </div>
       </div>
 
