@@ -210,6 +210,8 @@ button.dropdown-item {
   height: 16px;
   margin-left: 8px;
   vertical-align: middle;
+  position: relative;
+  top: -2px;
   background-color: #555555;
   background-image: linear-gradient(to right, #aaaaaa 0 8px, transparent 8px 24px);
   background-repeat: no-repeat;
