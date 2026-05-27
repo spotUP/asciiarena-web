@@ -531,78 +531,74 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
   );
 
   return (
-    <div className="row m-0">
-      {/* Left column — vertical tab nav */}
-      <div className="col-lg-3 col-12 p-0">
-        <div className="container-fluid bg-secondary apb-1 ap-1 amb-1">
-          <div className="header col-lg-12 p-0 amb-1">
-            <h2 className="ap-1 bg-header">SETTiNGS</h2>
-          </div>
-          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-            {TABS.map(t => {
-              const isActive = activeTab === t.id;
-              return (
-                <li key={t.id}>
-                  <button
-                    type="button"
-                    onClick={() => switchTab(t.id)}
-                    className={isActive ? "yellow" : "lightgrey"}
-                    style={{
-                      display: "block",
-                      width: "100%",
-                      textAlign: "left",
-                      background: isActive ? "#000084" : "transparent",
-                      border: 0,
-                      padding: "0 8px",
-                      height: "16px",
-                      lineHeight: "16px",
-                      fontSize: "16px",
-                      fontFamily: "inherit",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {isActive ? "> " : "  "}{t.label}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+    <>
+      {/* Horizontal tab bar */}
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          background: "#000000",
+          height: "16px",
+          lineHeight: "16px",
+          marginBottom: "16px",
+        }}
+      >
+        {TABS.map(t => {
+          const isActive = activeTab === t.id;
+          return (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => switchTab(t.id)}
+              className={isActive ? "yellow" : "lightgrey"}
+              style={{
+                background: isActive ? "#aa00aa" : "transparent",
+                color: isActive ? "#ffffff" : undefined,
+                border: 0,
+                padding: "0 16px",
+                height: "16px",
+                lineHeight: "16px",
+                fontSize: "16px",
+                fontFamily: "inherit",
+                cursor: "pointer",
+              }}
+            >
+              {t.label}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Right column — active panel */}
-      <div className="col-lg-9 col-12 p-0">
-        {alertMsg && (
-          <div className={`bs-component quick-alert animate__animated ${
-            alertMsg.success ? "animate__bounceIn alert alert-success" : "animate__shakeX alert alert-warning"
-          }`}>
-            {alertMsg.text}
-          </div>
-        )}
+      {alertMsg && (
+        <div className={`bs-component quick-alert animate__animated ${
+          alertMsg.success ? "animate__bounceIn alert alert-success" : "animate__shakeX alert alert-warning"
+        }`}>
+          {alertMsg.text}
+        </div>
+      )}
 
-        {(activeTab === "profile" || activeTab === "site") && (
-          <form autoComplete="off" action={saveAction}>
-            {hiddenFields}
-            <div className="container-fluid bg-secondary apb-1 ap-1">
-              {activeTab === "profile" && profilePanel}
-              {activeTab === "site" && sitePanel}
-              <div className="row amb-1">
-                <div className="col-12 apt-1">
-                  <input
-                    type="submit" className="btn-big bg-green white"
-                    value="Save" disabled={savePending}
-                  />
-                </div>
+      {(activeTab === "profile" || activeTab === "site") && (
+        <form autoComplete="off" action={saveAction}>
+          {hiddenFields}
+          <div className="container-fluid bg-secondary apb-1 ap-1">
+            {activeTab === "profile" && profilePanel}
+            {activeTab === "site" && sitePanel}
+            <div className="row amb-1">
+              <div className="col-12 apt-1">
+                <input
+                  type="submit" className="btn-big bg-green white"
+                  value="Save" disabled={savePending}
+                />
               </div>
             </div>
-          </form>
-        )}
+          </div>
+        </form>
+      )}
 
-        {activeTab === "password" && passwordPanel}
-        {activeTab === "artist" && artistPanel}
-        {activeTab === "feed" && <LiveFeedSettings />}
-        {activeTab === "widgets" && <WidgetSettings />}
-      </div>
-    </div>
+      {activeTab === "password" && passwordPanel}
+      {activeTab === "artist" && artistPanel}
+      {activeTab === "feed" && <LiveFeedSettings />}
+      {activeTab === "widgets" && <WidgetSettings />}
+    </>
   );
 }
