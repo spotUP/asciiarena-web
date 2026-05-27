@@ -195,14 +195,20 @@ button.dropdown-item {
   position: absolute !important;
 }
 .form-switch .form-check-label { cursor: pointer; }
+/* Drop Bootstrap's default .form-check left indent — asciiarena doesn't
+   indent form rows. The switch sits inline at the end of the label text. */
+.form-check { padding-left: 0 !important; }
+
 /* CSS-painted 3-cell (24x16) toggle: 8x16 "knob" sliding on a 24x16 "track".
-   Avoids font-dependent glyph metrics (█ wasn't full-height in TopazPlus). */
+   Avoids font-dependent glyph metrics (█ wasn't full-height in TopazPlus).
+   8px left margin gives breathing room between the label text and the
+   switch. */
 .form-switch .form-check-label::before {
   content: '';
   display: inline-block;
   width: 24px;
   height: 16px;
-  margin-right: 8px;
+  margin-left: 8px;
   vertical-align: middle;
   background-color: #555555;
   background-image: linear-gradient(to right, #aaaaaa 0 8px, transparent 8px 24px);
