@@ -57,8 +57,10 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
       animEffect = row?.anim_effect ?? null;
     } catch { /* fall through to defaults */ }
   }
-  const showCrt = !session?.user || crtEffect !== "N";
-  const showAnim = !session?.user || animEffect !== "N";
+  // Both effects default to OFF. Anonymous users never see them; logged-in
+  // users only see them when they have explicitly opted in (value === "Y").
+  const showCrt = crtEffect === "Y";
+  const showAnim = animEffect === "Y";
 
   return (
     <>
