@@ -3,11 +3,12 @@
 .blink { animation: blink 1s step-end infinite; }
 
 .cursor-block {
+  /* 8x16 terminal grid: one cell wide, one cell tall, no rounded edges. */
   display: inline-block;
-  width: 0.55em;
-  height: 1em;
+  width: 8px;
+  height: 16px;
   background: #ff5555;
-  vertical-align: text-bottom;
+  vertical-align: bottom;
   animation: blink 1s step-end infinite;
 }
 

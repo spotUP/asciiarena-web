@@ -34,21 +34,21 @@ export default function NotificationDropdown({ items, unread, onMarkAll, onClose
         top: "100%",
         right: 0,
         zIndex: 300,
-        minWidth: "320px",
-        maxWidth: "420px",
-        maxHeight: "60vh",
+        width: "400px",
+        maxHeight: "640px",
         overflowY: "auto",
-        background: "#1a1a1a",
-        border: "1px solid #555",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.6)",
+        background: "#222222",
+        border: "0",
         fontFamily: "TopazPlus_a1200, monospace",
-        fontSize: "13px",
+        fontSize: "16px",
+        lineHeight: "16px",
       }}
     >
       <div
+        className="bg-header"
         style={{
-          padding: "8px 12px",
-          borderBottom: "1px solid #333",
+          height: "16px",
+          padding: "0 8px",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
@@ -59,14 +59,25 @@ export default function NotificationDropdown({ items, unread, onMarkAll, onClose
           <button
             onClick={onMarkAll}
             className="lightgrey"
-            style={{ background: "none", border: "none", cursor: "pointer", fontSize: "12px" }}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "16px",
+              lineHeight: "16px",
+              padding: 0,
+              fontFamily: "inherit",
+            }}
           >
-            mark all read
+            [mark all read]
           </button>
         )}
       </div>
       {items.length === 0 ? (
-        <div style={{ padding: "16px", color: "#888", textAlign: "center" }}>
+        <div
+          className="lightgrey"
+          style={{ padding: "16px 8px", textAlign: "center" }}
+        >
           No notifications yet.
         </div>
       ) : (
@@ -76,13 +87,13 @@ export default function NotificationDropdown({ items, unread, onMarkAll, onClose
           const content = (
             <div
               style={{
-                padding: "8px 12px",
-                borderBottom: "1px solid #2a2a2a",
-                background: isUnread ? "#222" : "transparent",
+                padding: "0 8px",
+                background: isUnread ? "#000084" : "transparent",
                 cursor: n.targetUrl ? "pointer" : "default",
+                minHeight: "32px",
               }}
             >
-              <div>
+              <div style={{ lineHeight: "16px" }}>
                 <span className={isUnread ? "magenta" : "lightgrey"}>{n.actorNick ?? "someone"}</span>{" "}
                 <span className="lightgrey">{verb}</span>
                 {n.target && (
@@ -92,7 +103,7 @@ export default function NotificationDropdown({ items, unread, onMarkAll, onClose
                   </>
                 )}
               </div>
-              <div className="lightgrey" style={{ fontSize: "11px", marginTop: "2px" }}>
+              <div className="lightgrey" style={{ lineHeight: "16px" }}>
                 {fmtAgo(n.createdAt)}
               </div>
             </div>

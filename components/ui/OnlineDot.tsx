@@ -35,16 +35,15 @@ export default function OnlineDot({ nick }: { nick: string }) {
   return (
     <span
       title={`${nick} is online right now`}
+      className="green"
       style={{
-        display: "inline-block",
-        width: "10px",
-        height: "10px",
-        borderRadius: "50%",
-        background: "#55ff55",
-        boxShadow: "0 0 6px #55ff55",
         marginLeft: "8px",
-        verticalAlign: "middle",
+        fontFamily: "TopazPlus_a1200, monospace",
+        fontSize: "16px",
+        lineHeight: "16px",
       }}
-    />
+    >
+      [*]
+    </span>
   );
 }

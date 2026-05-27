@@ -137,15 +137,11 @@ export default function UsersOnlineLive({ isLoggedIn = false }: { isLoggedIn?: b
             {entry.inChat && (
               <span
                 title={`${entry.nick} has chat open`}
-                style={{
-                  display: "inline-block",
-                  width: "6px",
-                  height: "6px",
-                  borderRadius: "50%",
-                  background: "#55ffff",
-                  boxShadow: "0 0 4px #55ffff",
-                }}
-              />
+                className="cyan"
+                style={{ fontFamily: "inherit", fontSize: "inherit" }}
+              >
+                [c]
+              </span>
             )}
             {isLoggedIn && entry.id > 0 && (
               <button

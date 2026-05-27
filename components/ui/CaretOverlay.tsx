@@ -107,22 +107,30 @@ export default function CaretOverlay() {
       marker.textContent = caretIdx === value.length ? "​" : "";
       mirror.appendChild(marker);
 
-      const rect = el.getBoundingClientRect();
-      const x = rect.left + window.scrollX + marker.offsetLeft - el.scrollLeft;
-      const y = rect.top + window.scrollY + marker.offsetTop - el.scrollTop;
+      // 8x16 terminal grid: one cell is 8 wide x 16 tall.
+      const CELL_W = 8;
+      const CELL_H = 16;
 
-      // Caret block sized to roughly one character: width derived from "M".
-      const charProbe = document.createElement("span");
-      charProbe.textContent = "M";
-      mirror.appendChild(charProbe);
-      const charWidth = charProbe.offsetWidth || parseFloat(cs.fontSize) * 0.55;
-      const lineHeight = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.2;
+      const rect = el.getBoundingClientRect();
+      const lineHeight = parseFloat(cs.lineHeight) || CELL_H;
+      // Inputs in this site are 48px tall with 16px line-height, so the
+      // browser vertically centres their text. Add that offset so the caret
+      // sits with the text, not on the first grid row above it. Textareas
+      // are top-aligned, so no offset.
+      const isTextareaEl = el instanceof HTMLTextAreaElement;
+      const verticalCentre = isTextareaEl
+        ? 0
+        : Math.max(0, (el.clientHeight - lineHeight) / 2);
+
+      const x = rect.left + window.scrollX + marker.offsetLeft - el.scrollLeft;
+      const y =
+        rect.top + window.scrollY + verticalCentre + marker.offsetTop - el.scrollTop;
 
       block.style.display = "block";
       block.style.left = `${x}px`;
       block.style.top = `${y}px`;
-      block.style.width = `${Math.max(1, charWidth * 0.55)}px`;
-      block.style.height = `${lineHeight}px`;
+      block.style.width = `${CELL_W}px`;
+      block.style.height = `${CELL_H}px`;
     }
 
     function startTracking(el: TextInput) {

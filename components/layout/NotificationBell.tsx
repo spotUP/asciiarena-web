@@ -80,29 +80,20 @@ export default function NotificationBell({ userId }: Props) {
           background: "none",
           border: "none",
           cursor: "pointer",
-          padding: "4px 8px",
+          padding: "0 8px",
+          height: "16px",
+          lineHeight: "16px",
           fontFamily: "inherit",
           fontSize: "16px",
-          position: "relative",
         }}
       >
         <span style={{ color: unread > 0 ? "#ff55ff" : "#aaaaaa" }}>[bell]</span>
         {unread > 0 && (
           <span
-            style={{
-              position: "absolute",
-              top: 0,
-              right: 0,
-              background: "#ff5555",
-              color: "#fff",
-              fontSize: "10px",
-              padding: "0 4px",
-              borderRadius: "8px",
-              minWidth: "16px",
-              textAlign: "center",
-            }}
+            className="red"
+            style={{ marginLeft: "8px" }}
           >
-            {unread}
+            ({unread})
           </span>
         )}
       </button>
