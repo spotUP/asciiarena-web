@@ -404,10 +404,11 @@ select.form-select option, select.form-control option {
   color: #ffffff;
 }
 
-/* Textareas: dark blue terminal look with 3D border */
+/* Textareas: match the input.form-control bg so a multi-line field reads
+   as the same input fabric as its single-line cousin. */
 textarea.form-control {
   height: auto !important;
-  background-color: #000084 !important;
+  background-color: #2a2a2a !important;
   color: #fff !important;
   border: 0 !important;
   border-radius: 0 !important;
