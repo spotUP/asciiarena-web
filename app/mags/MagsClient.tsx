@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import NewItemsPill from "@/components/ui/NewItemsPill";
 
 interface MagRow {
   url: string;
@@ -82,6 +83,10 @@ export default function MagsClient({ initialSort, initialOrder }: MagsClientProp
 
   return (
     <>
+      <NewItemsPill
+        channel="site:mags"
+        onReset={() => { setAllRows([]); setPage(1); setHasMore(true); }}
+      />
       <div className="row">
         <div className="col-6 m-0 apt-1 apb-1 d-flex">
           <div className="bg-secondary apb-1 w-100">

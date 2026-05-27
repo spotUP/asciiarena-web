@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
+import { broadcast } from "@/lib/live";
 
 const postSchema = z.object({
   title: z.string().min(1).max(500),
@@ -98,6 +99,7 @@ export async function POST(request: NextRequest) {
     VALUES (${title ?? ""}, ${author ?? ""}, ${genre ?? ""}, ${filename}, ${filedata ?? null}, UNIX_TIMESTAMP())
   `;
 
+  broadcast("site:playlists", { type: "added", title, filename });
   return apiOk({ status: true }, 201);
 }
 

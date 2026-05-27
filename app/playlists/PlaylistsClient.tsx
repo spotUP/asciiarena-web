@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { addPlaylist as addPlaylistAction, deletePlaylist as deletePlaylistAction } from "@/app/actions/playlists";
+import NewItemsPill from "@/components/ui/NewItemsPill";
 
 interface PlaylistRow {
   id: number;
@@ -86,6 +87,10 @@ export default function PlaylistsClient() {
 
   return (
     <>
+      <NewItemsPill
+        channel="site:playlists"
+        onReset={() => { setRows([]); setPage(1); }}
+      />
       <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "8px", flexWrap: "wrap" }}>
         <input type="button" className="btn-big" value="|<" onClick={() => setPage(1)} />
         <input type="button" className="btn-big" value="<" onClick={() => setPage(p => Math.max(1, p - 1))} />

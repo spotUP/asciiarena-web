@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import NewItemsPill from "@/components/ui/NewItemsPill";
 
 interface RequestRow {
   id: number;
@@ -133,6 +134,10 @@ export default function RequestsClient() {
 
   return (
     <>
+      <NewItemsPill
+        channel="site:requests"
+        onReset={() => { setAllRows([]); setPage(1); setHasMore(true); }}
+      />
       <div className="row">
         <div className="col-6 m-0 apt-1 apb-1 d-flex">
           <div className="bg-secondary apb-1 w-100">

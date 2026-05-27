@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk, urlsafe, safeSort, ARTIST_SORT_COLS } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
+import { broadcast } from "@/lib/live";
 
 interface ArtistRow {
   id: number;
@@ -132,5 +133,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
+  broadcast("site:artists", { type: "added", nick });
   return apiOk({ status: true }, 201);
 }

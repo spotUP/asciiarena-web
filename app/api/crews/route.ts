@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk, urlsafe, safeSort, CREW_SORT_COLS } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
+import { broadcast } from "@/lib/live";
 
 interface CrewRow {
   id: number;
@@ -114,5 +115,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
+  broadcast("site:crews", { type: "added", name });
   return apiOk({ status: true }, 201);
 }

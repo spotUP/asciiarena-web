@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { urlsafe } from "@/lib/utils";
+import NewItemsPill from "@/components/ui/NewItemsPill";
 
 interface CollyRow {
   url: string;
@@ -119,6 +120,10 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
 
   return (
     <>
+      <NewItemsPill
+        channel="site:releases"
+        onReset={() => { setAllRows([]); setPage(1); setHasMore(true); }}
+      />
       <div className="row">
         <div className="col-6 m-0 apt-1 apb-1">
           <div className="btn-group">

@@ -6,6 +6,7 @@ import { Prisma } from "@/lib/generated/prisma/client";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { existsSync } from "fs";
+import { broadcast } from "@/lib/live";
 
 interface MagRow {
   id: number;
@@ -157,5 +158,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     `A new magazine has just been uploaded to asciiarena.se by ${uploaderNick} named [${name}](${magUrl})`
   );
 
+  broadcast("site:mags", { type: "added", filename });
   return apiOk({ status: true }, 201);
 }

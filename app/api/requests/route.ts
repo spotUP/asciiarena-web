@@ -123,6 +123,7 @@ export async function POST(request: NextRequest) {
   const inserted = await prisma.$queryRaw<[{ id: number }]>`SELECT LAST_INSERT_ID() AS id`;
   const reqId = inserted[0]?.id;
   await broadcastActivityIfAllowed(userId, "request", { type: "request", nick, target: title, targetUrl: reqId ? `/requests/${reqId}` : "/requests", timestamp: Math.floor(Date.now() / 1000) });
+  broadcast("site:requests", { type: "added", id: reqId, title });
 
   return apiOk({ status: true }, 201);
 }

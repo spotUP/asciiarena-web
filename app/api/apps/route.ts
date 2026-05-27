@@ -6,6 +6,7 @@ import { Prisma } from "@/lib/generated/prisma/client";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { existsSync } from "fs";
+import { broadcast } from "@/lib/live";
 
 interface AppRow {
   id: number;
@@ -154,5 +155,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     `A new application has just been uploaded to asciiarena.se by ${uploaderNick} named [${name}](${appUrl})`
   );
 
+  broadcast("site:apps", { type: "added", filename });
   return apiOk({ status: true }, 201);
 }
