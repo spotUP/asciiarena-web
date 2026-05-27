@@ -158,14 +158,14 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
     // so a NavBar link to /submit#bbs from /submit#colly still swaps tabs.
     const origPush = history.pushState;
     const origReplace = history.replaceState;
-    history.pushState = function (...args) {
-      origPush.apply(this, args);
+    history.pushState = ((...args: Parameters<typeof history.pushState>) => {
+      origPush.apply(history, args);
       onHash();
-    } as typeof history.pushState;
-    history.replaceState = function (...args) {
-      origReplace.apply(this, args);
+    }) as typeof history.pushState;
+    history.replaceState = ((...args: Parameters<typeof history.replaceState>) => {
+      origReplace.apply(history, args);
       onHash();
-    } as typeof history.replaceState;
+    }) as typeof history.replaceState;
 
     window.addEventListener("hashchange", onHash);
     window.addEventListener("popstate", onHash);
