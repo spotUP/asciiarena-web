@@ -45,6 +45,8 @@ export default function DosSelect({ value, options, onChange, width, placeholder
           color: "#ffffff",
           border: 0,
           height: "16px",
+          minHeight: 0,
+          maxHeight: "16px",
           lineHeight: "16px",
           padding: "0 24px 0 8px",
           fontSize: "16px",
@@ -56,6 +58,7 @@ export default function DosSelect({ value, options, onChange, width, placeholder
           whiteSpace: "nowrap",
           overflow: "hidden",
           textOverflow: "ellipsis",
+          boxSizing: "border-box",
         }}
       >
         {current ? current.label : (placeholder ?? "")}
@@ -107,7 +110,10 @@ export default function DosSelect({ value, options, onChange, width, placeholder
                   lineHeight: "16px",
                   padding: "0 8px",
                   height: "16px",
+                  minHeight: 0,
+                  maxHeight: "16px",
                   cursor: "pointer",
+                  boxSizing: "border-box",
                 }}
               >
                 {o.label}
