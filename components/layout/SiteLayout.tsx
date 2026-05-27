@@ -10,6 +10,7 @@ import PageHeader from "./PageHeader";
 import LeftSidebar from "./LeftSidebar";
 import RightSidebar from "./RightSidebar";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
+import ModemAnim from "./ModemAnim";
 
 export type SiteLayoutProps = {
   title?: string | string[];
@@ -61,22 +62,16 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
 
   return (
     <>
-      {/* 386 boot animation — only shown when anim_effect is enabled */}
-      {showAnim ? (
+      {/* BBS-style modem redraw animation — runs on initial load and on
+          every SPA navigation when enabled. Disabled = body shown directly. */}
+      {!showAnim && (
         <script
-          type="module"
-          dangerouslySetInnerHTML={{ __html: `
-            try {
-              const { default: init386 } = await import('/assets/js/386-animation/index.js');
-              init386({ fastLoad: true, onePass: true, speedFactor: 4, background: '#000000', cursorColor: '#ff0000' });
-            } catch(e) {
-              document.body.style.visibility = 'visible';
-            }
-          `}}
+          dangerouslySetInnerHTML={{
+            __html: "document.body.style.visibility='visible';",
+          }}
         />
-      ) : (
-        <script dangerouslySetInnerHTML={{ __html: "document.body.style.visibility='visible';" }} />
       )}
+      <ModemAnim enabled={showAnim} />
 
       {showCrt && <div className="scanlines"></div>}
       <div className="vignette"></div>
