@@ -48,32 +48,22 @@ export default function DosSelect({ value, options, onChange, width, placeholder
           minHeight: 0,
           maxHeight: "16px",
           lineHeight: "16px",
-          padding: "0 24px 0 8px",
+          padding: "0 8px",
           fontSize: "16px",
           fontFamily: "TopazPlus_a1200, monospace",
           width: width ? `${width}px` : undefined,
-          textAlign: "left",
           cursor: "pointer",
-          position: "relative",
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
           boxSizing: "border-box",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "8px",
         }}
       >
-        {current ? current.label : (placeholder ?? "")}
-        <span
-          aria-hidden
-          style={{
-            position: "absolute",
-            right: "8px",
-            top: 0,
-            color: "#aaaaaa",
-            pointerEvents: "none",
-          }}
-        >
-          v
+        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {current ? current.label : (placeholder ?? "")}
         </span>
+        <span aria-hidden className="lightgrey" style={{ flexShrink: 0 }}>v</span>
       </button>
       {open && (
         <ul
