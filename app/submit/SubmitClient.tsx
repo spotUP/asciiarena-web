@@ -176,7 +176,7 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
     // still fires synchronously on click and applies the tab change
     // directly from the href.
     const onClick = (e: MouseEvent) => {
-      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       const a = (e.target as HTMLElement | null)?.closest("a");
       if (!a) return;
       const href = a.getAttribute("href") ?? "";
@@ -187,14 +187,17 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
         setActiveTab(target as TabId);
       }
     };
-    document.addEventListener("click", onClick);
+    // Capture phase so we run before Next.js's <Link> click handler, which
+    // calls preventDefault() (causing a bubble-phase listener to skip via
+    // e.defaultPrevented). Capture has no such gate.
+    document.addEventListener("click", onClick, true);
 
     onHash(); // initial
 
     return () => {
       window.removeEventListener("hashchange", onHash);
       window.removeEventListener("popstate", onHash);
-      document.removeEventListener("click", onClick);
+      document.removeEventListener("click", onClick, true);
       history.pushState = origPush;
       history.replaceState = origReplace;
     };
