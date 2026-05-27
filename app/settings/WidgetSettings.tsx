@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { WIDGET_GROUPS, WIDGET_LABELS, type WidgetKey } from "@/lib/widgets-types";
 
 export default function WidgetSettings() {
   const [hidden, setHidden] = useState<Set<WidgetKey>>(new Set());
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("");
+  const baseId = useId();
 
   useEffect(() => {
     fetch("/api/settings/widgets")
@@ -39,34 +40,37 @@ export default function WidgetSettings() {
   if (loading) return null;
 
   return (
-    <div className="row apt-1 apb-1">
-      <div className="col-lg-12 p-0">
+    <div className="container-fluid bg-secondary amb-1 apb-1 ap-1">
+      <div className="header col-lg-12 p-0 amb-1">
         <h2 className="ap-1 bg-header">WiDGETS</h2>
       </div>
-      <div className="col-lg-12 p-0 apt-1 lightgrey" style={{ fontSize: "13px" }}>
-        Hide any widget you don&apos;t want to see on your screen. Boxes you tick are
+      <div className="col-lg-12 p-0 lightgrey amb-1">
+        Hide any widget you don&apos;t want to see on your screen. Toggles you flip ON are
         <span className="yellow"> hidden </span>
         for you — other users are not affected. Reload after a change to see the new layout.
       </div>
       {WIDGET_GROUPS.map(group => (
-        <div key={group.label} className="col-lg-12 p-0 apt-1">
-          <div className="white" style={{ fontSize: "13px", marginBottom: "4px" }}>
-            {group.label}
-          </div>
-          {group.keys.map(key => (
-            <label key={key} style={{ display: "block", padding: "1px 0 1px 8px", cursor: "pointer", fontSize: "13px" }}>
-              <input
-                type="checkbox"
-                checked={hidden.has(key)}
-                onChange={() => toggle(key)}
-                style={{ marginRight: "8px", verticalAlign: "middle" }}
-              />
-              Hide <span className="yellow">{WIDGET_LABELS[key]}</span>
-            </label>
-          ))}
+        <div key={group.label} className="col-lg-12 p-0 amt-1">
+          <div className="white">{group.label}</div>
+          {group.keys.map(key => {
+            const id = `${baseId}-${key}`;
+            return (
+              <div key={key} className="form-check form-switch">
+                Hide <span className="yellow">{WIDGET_LABELS[key]}</span>
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id={id}
+                  checked={hidden.has(key)}
+                  onChange={() => toggle(key)}
+                />
+                <label className="form-check-label" htmlFor={id} />
+              </div>
+            );
+          })}
         </div>
       ))}
-      {status && <div className="col-lg-12 p-0 apt-1 lightgrey" style={{ fontSize: "12px" }}>{status}</div>}
+      {status && <div className="col-lg-12 p-0 amt-1 lightgrey">{status}</div>}
     </div>
   );
 }

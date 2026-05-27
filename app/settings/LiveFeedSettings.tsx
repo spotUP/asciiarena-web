@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { ACTIVITY_TYPES, ACTIVITY_LABELS, type ActivityType } from "@/lib/activity-types";
 
 export default function LiveFeedSettings() {
   const [hidden, setHidden] = useState<Set<ActivityType>>(new Set());
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("");
+  const baseId = useId();
 
   useEffect(() => {
     fetch("/api/settings/activity")
@@ -35,28 +36,33 @@ export default function LiveFeedSettings() {
   if (loading) return null;
 
   return (
-    <div className="row apt-1 apb-1">
-      <div className="col-lg-12 p-0">
+    <div className="container-fluid bg-secondary amb-1 apb-1 ap-1">
+      <div className="header col-lg-12 p-0 amb-1">
         <h2 className="ap-1 bg-header">LIVE FEED PRIVACY</h2>
       </div>
-      <div className="col-lg-12 p-0 apt-1 lightgrey" style={{ fontSize: "13px" }}>
+      <div className="col-lg-12 p-0 lightgrey amb-1">
         By default, none of your actions are broadcast — you opt in here per action.
-        A ticked box means that action stays <span className="yellow">hidden</span> from
-        the live feed. Untick a box to share that action with others.
+        A toggle that is ON means that action stays <span className="yellow">hidden</span> from
+        the live feed. Switch it OFF to share that action with others.
       </div>
-      <div className="col-lg-12 p-0 apt-1">
-        {ACTIVITY_TYPES.map(type => (
-          <label key={type} style={{ display: "block", padding: "2px 0", cursor: "pointer", fontSize: "14px" }}>
-            <input
-              type="checkbox"
-              checked={hidden.has(type)}
-              onChange={() => toggle(type)}
-              style={{ marginRight: "8px", verticalAlign: "middle" }}
-            />
-            Hide <span className="yellow">{ACTIVITY_LABELS[type]}</span>
-          </label>
-        ))}
-        {status && <div className="lightgrey apt-1" style={{ fontSize: "12px" }}>{status}</div>}
+      <div className="col-lg-12 p-0">
+        {ACTIVITY_TYPES.map(type => {
+          const id = `${baseId}-${type}`;
+          return (
+            <div key={type} className="form-check form-switch">
+              Hide <span className="yellow">{ACTIVITY_LABELS[type]}</span>
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id={id}
+                checked={hidden.has(type)}
+                onChange={() => toggle(type)}
+              />
+              <label className="form-check-label" htmlFor={id} />
+            </div>
+          );
+        })}
+        {status && <div className="lightgrey amt-1">{status}</div>}
       </div>
     </div>
   );

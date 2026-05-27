@@ -174,10 +174,8 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
           )}
 
           {/* User Settings */}
-          <div className="row amb-1">
-            <div className="col-xs-12 col-md-6">
-              <span className="white">User Settings</span>
-            </div>
+          <div className="header col-lg-12 p-0 amb-1">
+            <h2 className="ap-1 bg-header">USER SETTINGS</h2>
           </div>
 
           <div className="row apt-1">
@@ -187,7 +185,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
             <div className="col-xs-12 col-md-6 apb-1 apt-1">
               <input
                 type="text"
-                className="w-100"
+                className="form-control w-100"
                 maxLength={14}
                 value={settings.nick ?? ""}
                 onChange={(e) => set("nick", e.target.value)}
@@ -202,7 +200,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
             <div className="col-xs-12 col-md-6">
               <input
                 type="text"
-                className="w-100"
+                className="form-control w-100"
                 value={settings.crew ?? ""}
                 onChange={(e) => set("crew", e.target.value)}
               />
@@ -266,7 +264,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
             <div className="col-xs-12 col-md-6">
               <input
                 type="text"
-                className="w-100"
+                className="form-control w-100"
                 value={settings.country ?? ""}
                 onChange={(e) => set("country", e.target.value)}
               />
@@ -280,7 +278,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
             <div className="col-xs-12 col-md-6">
               <input
                 type="email"
-                className="w-100"
+                className="form-control w-100"
                 value={settings.mail ?? ""}
                 onChange={(e) => set("mail", e.target.value)}
               />
@@ -294,7 +292,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
             <div className="col-xs-12 col-md-6">
               <input
                 type="url"
-                className="w-100"
+                className="form-control w-100"
                 value={settings.webpage ?? ""}
                 onChange={(e) => set("webpage", e.target.value)}
                 placeholder="https://..."
@@ -319,10 +317,8 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
           </div>
 
           {/* Site Settings */}
-          <div className="row amb-1 apt-1">
-            <div className="col-xs-12 col-md-6 apt-1">
-              <span className="white">Site Settings</span>
-            </div>
+          <div className="header col-lg-12 p-0 amt-1 amb-1">
+            <h2 className="ap-1 bg-header">SITE SETTINGS</h2>
           </div>
 
           <div className="row amb-1 apt-1">
@@ -434,16 +430,14 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
             </div>
           </div>
 
-          <div className="row amb-1">
-            <div className="col-xs-12 col-md-6">
-              <span className="white">Upload Signature</span>
-            </div>
+          <div className="header col-lg-12 p-0 amt-1 amb-1">
+            <h2 className="ap-1 bg-header">UPLOAD SIGNATURE</h2>
           </div>
           <div className="row amb-1">
             <div className="col-xs-12 col-md-6 apb-1">
               <input
                 type="text"
-                className="w-100"
+                className="form-control w-100"
                 maxLength={44}
                 value={settings.upload_signature ?? ""}
                 onChange={(e) => set("upload_signature", e.target.value)}
@@ -467,10 +461,8 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
       {/* Password — separate form with its own action */}
       <form autoComplete="off" action={pwAction}>
         <div className="container-fluid bg-secondary amb-1 apb-1 ap-1">
-          <div className="row amb-1 apt-1">
-            <div className="col-xs-12 col-md-12 apt-1">
-              <span className="white">Password Settings</span>
-            </div>
+          <div className="header col-lg-12 p-0 amb-1">
+            <h2 className="ap-1 bg-header">PASSWORD SETTINGS</h2>
           </div>
 
           <div className="row amb-1 apt-1">
@@ -480,7 +472,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
             <div className="col-xs-12 col-md-6">
               <input
                 type="password"
-                className="w-100"
+                className="form-control w-100"
                 autoComplete="new-password"
                 name="oldpass"
               />
@@ -494,7 +486,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
             <div className="col-xs-12 col-md-6">
               <input
                 type="password"
-                className="w-100"
+                className="form-control w-100"
                 autoComplete="new-password"
                 name="newpass"
               />
@@ -508,7 +500,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
             <div className="col-xs-12 col-md-6">
               <input
                 type="password"
-                className="w-100"
+                className="form-control w-100"
                 autoComplete="new-password"
                 name="repeatpass"
               />
@@ -530,10 +522,8 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
 
       {/* Artist Identity — separate from main form, no submit */}
       <div className="container-fluid bg-secondary amb-1 apb-1 ap-1">
-        <div className="row amb-1">
-          <div className="col-xs-12 col-md-12 apt-1">
-            <span className="white">Artist Identity</span>
-          </div>
+        <div className="header col-lg-12 p-0 amb-1">
+          <h2 className="ap-1 bg-header">ARTIST IDENTITY</h2>
         </div>
         <div className="row">
           <div className="col-xs-12 col-md-10">
@@ -611,7 +601,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
           <div className="col-xs-12 col-md-4 apb-1">
             <input
               type="text"
-              className="w-100"
+              className="form-control w-100"
               placeholder="Enter artist nick..."
               value={claimNick}
               onChange={e => setClaimNick(e.target.value)}
