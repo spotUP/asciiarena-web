@@ -124,6 +124,7 @@ export async function POST(request: NextRequest) {
   const reqId = inserted[0]?.id;
   await broadcastActivityIfAllowed(userId, "request", { type: "request", nick, target: title, targetUrl: reqId ? `/requests/${reqId}` : "/requests", timestamp: Math.floor(Date.now() / 1000) });
   broadcast("site:requests", { type: "added", id: reqId, title });
+  broadcast("site:moderation", { type: "request-added", id: reqId });
 
   return apiOk({ status: true }, 201);
 }

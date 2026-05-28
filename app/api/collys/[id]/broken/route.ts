@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
+import { broadcast } from "@/lib/live";
 
 const postSchema = z.object({
   comment: z.string().max(1000).optional(),
@@ -27,5 +28,6 @@ export async function POST(
     Prisma.sql`UPDATE collys SET broken = 1, broken_comment = ${comment} WHERE id = ${collyId}`
   );
 
+  broadcast("site:moderation", { type: "broken", collyId });
   return apiOk({ status: true });
 }

@@ -3,6 +3,7 @@ import type { Session } from "next-auth";
 import UnreadBadge from "@/components/layout/UnreadBadge";
 import LogoutButton from "@/components/layout/LogoutButton";
 import NotificationBell from "@/components/layout/NotificationBell";
+import ModerationBadge from "@/components/admin/ModerationBadge";
 
 export type NavbarProps = {
   session: Session | null;
@@ -177,7 +178,7 @@ export default function Navbar({ session }: NavbarProps) {
                   href="/admin"
                   id="admin-dropdown"
                 >
-                  ADMiN v
+                  ADMiN v<ModerationBadge />
                 </a>
                 <div className="dropdown-menu dropdown-menu-end dropdown-menu-fix bg-red ascii" aria-labelledby="admin-dropdown">
                   <Link className="dropdown-item ascii" href="/admin">Dashboard</Link>

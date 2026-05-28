@@ -5,6 +5,7 @@ import path from "path";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
+import { broadcast } from "@/lib/live";
 
 const patchSchema = z.object({
   id: z.number().int().positive(),
@@ -85,6 +86,11 @@ export async function PATCH(request: NextRequest) {
     WHERE id = ${id}
   `;
 
+  // Whenever broken state could have changed, ping the moderation badge so
+  // it re-fetches its count. Cheap signal — receivers just re-poll.
+  if (broken !== undefined) {
+    broadcast("site:moderation", { type: "broken-changed", collyId: id, broken });
+  }
   return apiOk({ status: true });
 }
 
