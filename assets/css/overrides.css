@@ -462,6 +462,38 @@ h4, .h4 {
 .modal .btn { filter: drop-shadow(7px 8px 0 black); background: #fff; }
 .modal .btn::first-letter { color: #f55; }
 
+/* Amiga copper-gradient effect on the site logo. The ASCII art is the
+   <span> in components/layout/LogoHeader.tsx; clipping a vertical
+   linear-gradient to the text makes each rasterline render in a slightly
+   different colour, the way a Copper list would set palette registers
+   between scanlines on AGA hardware. Palette below is a magenta-keyed
+   copper bar set, picked to harmonise with the site's pink/magenta
+   accent colour throughout. */
+.copper-gradient {
+  background: linear-gradient(
+    to bottom,
+    #ffffff 0%,
+    #ffaaff 12%,
+    #ff77ff 24%,
+    #ff55ff 36%,
+    #ff00ff 50%,
+    #cc00aa 64%,
+    #aa0077 78%,
+    #770055 90%,
+    #330033 100%
+  );
+  background-size: 100% 200%;
+  background-repeat: no-repeat;
+  background-position: 0% 0%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent;
+  /* Position scrolled by a requestAnimationFrame loop in LogoHeader.tsx —
+     CSS animation of bg-position on bg-clip:text is silently skipped by
+     Chrome's compositor in many cases, so we drive it from JS instead. */
+}
+
 /* Poll cards: tighten form-check row spacing so 8 options don't waste a
    screen of vertical space. The 16-line height + 4px tail makes each row
    fit on the 8x16 grid. */
