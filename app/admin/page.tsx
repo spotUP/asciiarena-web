@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/generated/prisma/client";
 import Link from "next/link";
+import LiveRefresh from "@/components/widgets/LiveRefresh";
 
 interface StatRow { cnt: bigint | number }
 
@@ -59,6 +60,10 @@ export default async function AdminDashboard() {
 
   return (
     <>
+      <LiveRefresh channel="site:releases" />
+      <LiveRefresh channel="site:users" />
+      <LiveRefresh channel="site:requests" />
+      <LiveRefresh channel="site:comments" />
       <div className="header col-lg-12 p-0 amb-1">
         <h2 className="ap-1 bg-header">DASHBOARD</h2>
       </div>

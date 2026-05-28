@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { unstable_cache } from "next/cache";
+import LiveRefresh from "@/components/widgets/LiveRefresh";
 
 type TopCommenter = { topcommentators: number; nick: string; user_id: number };
 
@@ -20,7 +21,7 @@ const getTopCommenters = unstable_cache(
     return rows.map(r => ({ ...r, topcommentators: Number(r.topcommentators) }));
   },
   ["top-commenters"],
-  { revalidate: 600 }
+  { revalidate: 600, tags: ["site:top-commenters"] }
 );
 
 export default async function TopCommenters({ limit = 5 }: { limit?: number }) {
@@ -29,6 +30,7 @@ export default async function TopCommenters({ limit = 5 }: { limit?: number }) {
   
     return (
       <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
+        <LiveRefresh channel="site:comments" />
         <div className="header col-lg-12 p-0">
           <h2 className="ap-1 bg-header">TOP COMMENTERS</h2>
         </div>

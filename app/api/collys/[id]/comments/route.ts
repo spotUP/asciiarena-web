@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { broadcast } from "@/lib/live";
+import { revalidateTag } from "next/cache";
 
 const postSchema = z.object({
   comment: z.string().min(1).max(5000),
@@ -151,6 +152,8 @@ export async function POST(
 
   broadcast(`comments:${collyId}`, { type: "posted", nick });
   broadcast("site:comments", { type: "posted" });
+  revalidateTag("site:stats", "default");
+  revalidateTag("site:top-commenters", "default");
 
   return apiOk({ status: true });
 }

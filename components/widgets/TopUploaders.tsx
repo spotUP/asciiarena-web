@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { urlsafe, formatBytes } from "@/lib/utils";
 import { unstable_cache } from "next/cache";
+import LiveRefresh from "@/components/widgets/LiveRefresh";
 
 const getTopUploaders = unstable_cache(
   async (limit: number) => prisma.users.findMany({
@@ -11,7 +12,7 @@ const getTopUploaders = unstable_cache(
       select: { id: true, nick: true, uploaded: true },
     }),
   ["top-uploaders"],
-  { revalidate: 600 }
+  { revalidate: 600, tags: ["site:top-uploaders"] }
 );
 
 export default async function TopUploaders({ limit = 5 }: { limit?: number }) {
@@ -20,6 +21,7 @@ export default async function TopUploaders({ limit = 5 }: { limit?: number }) {
   
     return (
       <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
+        <LiveRefresh channel="site:releases" />
         <div className="header col-lg-12 p-0">
           <h2 className="ap-1 bg-header">TOP UPLOADERS</h2>
         </div>

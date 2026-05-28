@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { unstable_cache } from "next/cache";
+import LiveRefresh from "@/components/widgets/LiveRefresh";
 
 const getMostViewed = unstable_cache(
   async (limit: number) => prisma.collys.findMany({
@@ -9,7 +10,7 @@ const getMostViewed = unstable_cache(
       select: { id: true, filename: true, view_counter: true },
     }),
   ["most-viewed-collys"],
-  { revalidate: 300 }
+  { revalidate: 300, tags: ["site:most-viewed"] }
 );
 
 export default async function MostViewedCollys({ limit = 5 }: { limit?: number }) {
@@ -18,6 +19,8 @@ export default async function MostViewedCollys({ limit = 5 }: { limit?: number }
   
     return (
       <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
+        <LiveRefresh channel="site:releases" />
+        <LiveRefresh channel="site:votes" />
         <div className="header col-lg-12 p-0">
           <h2 className="ap-1 bg-header">MOST VIEWED COLLYS</h2>
         </div>

@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { Prisma } from "@/lib/generated/prisma/client";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { broadcast } from "@/lib/live";
 import { broadcastActivityIfAllowed } from "@/lib/activity";
 import { createNotification } from "@/lib/notifications";
@@ -106,6 +106,10 @@ export async function postComment(
   if (colly?.filename) revalidatePath('/release/' + colly.filename);
   broadcast(`comments:${collyId}`, { type: "posted", nick });
   broadcast("site:comments", { type: "posted" });
+  // Bust the cached sidebar widgets so LiveRefresh on site:comments
+  // actually returns fresh numbers instead of the 5-10min unstable_cache.
+  revalidateTag("site:stats", "default");
+  revalidateTag("site:top-commenters", "default");
   if (ratingNum !== null) {
     broadcast("site:votes", {
       type: "vote",
@@ -113,6 +117,7 @@ export async function postComment(
       filename: colly?.filename ?? null,
       rating: ratingNum,
     });
+    revalidateTag("site:most-viewed", "default");
   }
   if (colly?.uploader_id && colly.uploader_id !== userId && colly.filename) {
     await createNotification(colly.uploader_id, "notif-comment", {

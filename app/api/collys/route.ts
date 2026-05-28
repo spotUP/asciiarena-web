@@ -249,6 +249,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   );
 
   revalidateTag("latest-collys", "default");
+  // Sidebar widgets cache their data with these tags — bust them so the
+  // LiveRefresh subscribers see fresh numbers in addition to the bare re-render.
+  revalidateTag("site:stats", "default");
+  revalidateTag("site:top-uploaders", "default");
+  revalidateTag("site:most-viewed", "default");
   broadcast("site:releases", { type: "posted" });
   await broadcastActivityIfAllowed(uploaderId, "upload", { type: "upload", nick: uploaderNick, target: filename, targetUrl: `/release/${filename}`, timestamp: Math.floor(Date.now() / 1000) });
 

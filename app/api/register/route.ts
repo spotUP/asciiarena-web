@@ -6,6 +6,7 @@ import { checkRateLimit } from "@/lib/rateLimit";
 import bcrypt from "bcryptjs";
 import { ACTIVITY_TYPES, type ActivityType } from "@/lib/activity-types";
 import { broadcast } from "@/lib/live";
+import { revalidateTag } from "next/cache";
 
 async function sendWelcomeMail(nick: string, mail: string) {
   const mailHost = process.env.MAILHOST;
@@ -143,6 +144,7 @@ export async function POST(request: NextRequest) {
   sendWelcomeMail(nick, mail).catch(() => {});
 
   broadcast("site:users", { type: "joined", nick });
+  revalidateTag("site:stats", "default");
 
   return apiOk({ status: true }, 201);
 }
