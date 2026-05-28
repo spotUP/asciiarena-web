@@ -14,16 +14,25 @@ function startCopperScroll(): () => void {
   if (els.length === 0 || matchMedia("(prefers-reduced-motion: reduce)").matches) {
     return () => {};
   }
-  const period = 8000; // ms for one direction; full ping-pong = 16s
-  // ease-in-out cubic — matches CSS cubic-bezier(0.42, 0, 0.58, 1) feel
-  const ease = (t: number) => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  // Sinusoidal ping-pong: position = (1 - cos(2π·t/period)) / 2, mapped to
+  // 0–100%. Cosine naturally reverses at the peaks, so the gradient eases
+  // into each turn-around without us having to stitch two ease curves.
+  // 10s full cycle (5s up, 5s down). Slow enough to feel deliberate, fast
+  // enough that the palette shift is visible without staring.
+  const period = 10000;
   const start = performance.now();
   let raf = 0;
   const tick = (now: number) => {
-    const elapsed = (now - start) % (period * 2);
-    const phase = elapsed < period ? elapsed / period : 1 - (elapsed - period) / period;
-    const pos = (ease(phase) * 100).toFixed(2);
-    for (const el of els) el.style.backgroundPositionY = `${pos}%`;
+    const t = ((now - start) % period) / period; // 0..1
+    // 0 at t=0, 1 at t=0.5, 0 at t=1 — natural ping-pong shape.
+    const wave = (1 - Math.cos(2 * Math.PI * t)) / 2;
+    const pos = (wave * 100).toFixed(2);
+    // Setting the full shorthand (not the longhand backgroundPositionY)
+    // because the CSS uses `background-position: 0% 0%` shorthand — some
+    // browsers don't compose a longhand inline-style write over a shorthand
+    // stylesheet rule cleanly, and on background-clip:text elements that
+    // can leave the gradient frozen at the initial frame.
+    for (const el of els) el.style.backgroundPosition = `0% ${pos}%`;
     raf = requestAnimationFrame(tick);
   };
   raf = requestAnimationFrame(tick);

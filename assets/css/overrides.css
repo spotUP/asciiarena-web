@@ -472,15 +472,15 @@ h4, .h4 {
 .copper-gradient {
   background: linear-gradient(
     to bottom,
-    #ffffff 0%,
+    #ffccff 0%,
     #ffaaff 12%,
-    #ff77ff 24%,
+    #ff88ff 24%,
     #ff55ff 36%,
-    #ff00ff 50%,
-    #cc00aa 64%,
-    #aa0077 78%,
-    #770055 90%,
-    #330033 100%
+    #dd44cc 50%,
+    #bb3399 64%,
+    #99337a 78%,
+    #663366 90%,
+    #4a2244 100%
   );
   background-size: 100% 200%;
   background-repeat: no-repeat;
