@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { unstable_cache } from "next/cache";
+import LiveRefresh from "@/components/widgets/LiveRefresh";
 
 export type LatestAppsProps = {
   limit?: number;
@@ -14,7 +15,7 @@ const getLatestApps = unstable_cache(
     select: { id: true, filename: true, timestamp: true },
   }),
   ["latest-apps"],
-  { revalidate: 120 }
+  { revalidate: 120, tags: ["site:latest-apps"] }
 );
 
 export default async function LatestApps({ limit = 5 }: LatestAppsProps) {
@@ -23,6 +24,7 @@ export default async function LatestApps({ limit = 5 }: LatestAppsProps) {
 
     return (
       <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
+        <LiveRefresh channel="site:apps" />
         <div className="header col-lg-12 p-0">
           <h2 className="ap-1 bg-header text-truncate lightgreen">
             <Link className="lightgreen" href="/apps?sort_by=timestamp&sort_order=D">LATEST ADDED APPS</Link>

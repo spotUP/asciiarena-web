@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
+import { revalidateTag } from "next/cache";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -23,6 +24,7 @@ export async function POST(request: NextRequest) {
   await prisma.$executeRaw(
     Prisma.sql`INSERT INTO logos (author, ascii) VALUES (${author}, ${ascii})`
   );
+  revalidateTag("site:logos", "default");
 
   return apiOk({ status: true }, 201);
 }

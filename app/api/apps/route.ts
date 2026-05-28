@@ -7,6 +7,7 @@ import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { existsSync } from "fs";
 import { broadcast } from "@/lib/live";
+import { revalidateTag } from "next/cache";
 
 interface AppRow {
   id: number;
@@ -156,5 +157,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   );
 
   broadcast("site:apps", { type: "added", filename });
+  revalidateTag("site:latest-apps", "default");
   return apiOk({ status: true }, 201);
 }

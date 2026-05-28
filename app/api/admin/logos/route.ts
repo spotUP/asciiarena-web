@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
+import { revalidateTag } from "next/cache";
 
 const postSchema = z.object({
   ascii: z.string().min(1),
@@ -33,6 +34,7 @@ export async function POST(request: NextRequest) {
   if (!postParsed.data.ascii.trim()) return apiError("ascii content required", 400);
 
   await prisma.$executeRaw`INSERT INTO logos (ascii) VALUES (${postParsed.data.ascii})`;
+  revalidateTag("site:logos", "default");
   return apiOk({ status: true }, 201);
 }
 
@@ -45,5 +47,6 @@ export async function DELETE(request: NextRequest) {
   if (!deleteParsed.success) return apiError("Invalid request: " + deleteParsed.error.issues[0]?.message, 400);
 
   await prisma.$executeRaw`DELETE FROM logos WHERE logo_id = ${deleteParsed.data.id}`;
+  revalidateTag("site:logos", "default");
   return apiOk({ status: true });
 }

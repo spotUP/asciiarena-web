@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { unstable_cache } from "next/cache";
+import LiveRefresh from "@/components/widgets/LiveRefresh";
 
 export type LatestMagsProps = {
   limit?: number;
@@ -13,7 +14,7 @@ const getLatestMags = unstable_cache(
     select: { id: true, filename: true, timestamp: true },
   }),
   ["latest-mags"],
-  { revalidate: 120 }
+  { revalidate: 120, tags: ["site:latest-mags"] }
 );
 
 export default async function LatestMags({ limit = 5 }: LatestMagsProps) {
@@ -22,6 +23,7 @@ export default async function LatestMags({ limit = 5 }: LatestMagsProps) {
 
     return (
       <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
+        <LiveRefresh channel="site:mags" />
         <div className="header col-lg-12 p-0">
           <h2 className="ap-1 bg-header text-truncate lightgreen">
             <Link className="lightgreen" href="/mags?sort_by=timestamp&sort_order=D">LATEST ADDED MAGS</Link>
