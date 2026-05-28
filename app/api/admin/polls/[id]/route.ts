@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { broadcast } from "@/lib/live";
 import { urlsafe } from "@/lib/utils";
+import { createBulkNotification } from "@/lib/notifications";
 import type { PollType, PollStatus, PollShowResults, PollResultLayout, PollConfig } from "@/lib/polls/types";
 import { POLL_TYPES } from "@/lib/polls/types";
 
@@ -101,6 +102,21 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
 
   broadcast("site:polls", { type: "updated", id: updated.id, slug: updated.slug, status: updated.status, featured: updated.featured });
   broadcast(`poll:${updated.id}`, { type: "updated" });
+
+  // Fan out a notification on the transition into "open" (from draft or
+  // closed). Only fires when status actually flipped — re-saving an already-
+  // open poll doesn't spam the bell. Honours the per-user notif-poll opt-out
+  // and skips users inactive for 30+ days (see lib/notifications.ts).
+  if (existing.status !== "open" && updated.status === "open") {
+    const actorId = Number((session as { user: { id: string } }).user.id);
+    void createBulkNotification("notif-poll", {
+      actorId,
+      actorNick: (session as { user: { name?: string } }).user.name ?? null,
+      target: updated.title,
+      targetUrl: `/polls/${updated.slug}`,
+    });
+  }
+
   return NextResponse.json({ ok: true });
 }
 

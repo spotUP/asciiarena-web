@@ -12,11 +12,13 @@ export const ACTIVITY_TYPES = [
   "fav",
   "unfav",
   "claim",
+  "poll",
   "notif-comment",
   "notif-fav",
   "notif-reply",
   "notif-message",
   "notif-status",
+  "notif-poll",
 ] as const;
 export type ActivityType = (typeof ACTIVITY_TYPES)[number];
 
@@ -29,9 +31,11 @@ export const ACTIVITY_LABELS: Record<ActivityType, string> = {
   fav: "Favouriting collys",
   unfav: "Un-favouriting collys",
   claim: "Claiming artist pages",
+  poll: "Voting in polls",
   "notif-comment": "Notifications: comments on my collys",
   "notif-fav": "Notifications: someone favourites my colly",
   "notif-reply": "Notifications: replies to my request",
   "notif-message": "Notifications: someone messages me",
   "notif-status": "Notifications: my request's status changes",
+  "notif-poll": "Notifications: a new community poll has opened",
 };

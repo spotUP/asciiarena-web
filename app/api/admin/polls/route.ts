@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { broadcast } from "@/lib/live";
 import { urlsafe } from "@/lib/utils";
+import { createBulkNotification } from "@/lib/notifications";
 import type { PollType, PollStatus, PollShowResults, PollResultLayout, PollConfig } from "@/lib/polls/types";
 import { POLL_TYPES } from "@/lib/polls/types";
 
@@ -77,5 +78,17 @@ export async function POST(req: NextRequest) {
   });
 
   broadcast("site:polls", { type: "created", id: created.id, slug: created.slug });
+
+  // Created already-open? Fan out notif-poll immediately. Drafts wait until
+  // the admin flips status to "open" in the PATCH handler.
+  if (created.status === "open") {
+    void createBulkNotification("notif-poll", {
+      actorId: userId,
+      actorNick: (session as { user: { name?: string } }).user.name ?? null,
+      target: created.title,
+      targetUrl: `/polls/${created.slug}`,
+    });
+  }
+
   return NextResponse.json({ ok: true, id: created.id, slug: created.slug });
 }
