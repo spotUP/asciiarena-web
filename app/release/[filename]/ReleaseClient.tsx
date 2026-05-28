@@ -309,8 +309,6 @@ export default function ReleaseClient({
       const event = JSON.parse(e.data) as { type: string; nick?: string; draft?: string; count?: number };
       if (event.type === "watching") {
         setWatching(event.count ?? 0);
-      } else if (event.type === "viewed") {
-        setViewCount(v => v + 1);
       } else if (event.type === "typing" && event.nick) {
         const nick = event.nick;
         setDrafts(prev => ({ ...prev, [nick]: { nick, text: event.draft ?? "" } }));
@@ -372,6 +370,22 @@ export default function ReleaseClient({
       }).catch(() => {});
     }, 50);
   }, [channel]);
+
+  // Subscribe to live view-count updates from other viewers. trackView
+  // broadcasts the new absolute total each time someone opens this page;
+  // we use the broadcast value (not local +1) so all viewers stay in sync.
+  useEffect(() => {
+    const es = new EventSource(`/api/live?channel=release:${collyId}:views`);
+    es.onmessage = (e: MessageEvent<string>) => {
+      try {
+        const evt = JSON.parse(e.data) as { type?: string; total?: number };
+        if (evt.type === "viewed" && typeof evt.total === "number") {
+          setViewCount(evt.total);
+        }
+      } catch { /* ignore */ }
+    };
+    return () => es.close();
+  }, [collyId]);
 
   useEffect(() => {
     trackView(collyId).then(() => {

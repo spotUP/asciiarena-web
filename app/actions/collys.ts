@@ -11,6 +11,13 @@ import { createNotification } from "@/lib/notifications";
 export async function trackView(collyId: number) {
   try {
     await prisma.collys.updateMany({ where: { id: collyId }, data: { view_counter: { increment: 1 } } });
+    // Read the new total back so the broadcast carries the exact count for
+    // ticker subscribers. One extra fast index-hit query is worth it; without
+    // the count, viewers would all see their own local "+1" and drift apart.
+    const row = await prisma.collys.findUnique({ where: { id: collyId }, select: { view_counter: true } });
+    if (row?.view_counter != null) {
+      broadcast(`release:${collyId}:views`, { type: "viewed", total: row.view_counter });
+    }
   } catch { /* fire-and-forget */ }
 }
 
