@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
+import { broadcast } from "@/lib/live";
 
 const patchSchema = z.object({
   id: z.number().int().positive(),
@@ -49,6 +50,7 @@ export async function PATCH(request: NextRequest) {
       acronym = COALESCE(${body.acronym ?? null}, acronym)
     WHERE id = ${body.id}
   `;
+  broadcast("site:crews", { type: "updated", id: body.id });
   return apiOk({ status: true });
 }
 
@@ -63,5 +65,6 @@ export async function DELETE(request: NextRequest) {
 
   await prisma.$executeRaw`DELETE FROM collys_crews WHERE crew_id = ${body.id}`;
   await prisma.$executeRaw`DELETE FROM crews WHERE id = ${body.id}`;
+  broadcast("site:crews", { type: "deleted", id: body.id });
   return apiOk({ status: true });
 }

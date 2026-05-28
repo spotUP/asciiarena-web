@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk, safeSort, BBS_SORT_COLS } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
+import { broadcast } from "@/lib/live";
 
 interface BbsRow {
   id: number;
@@ -91,5 +92,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       VALUES (${name}, ${address}, ${sysop}, ${number}, ${country}, ${online}, ${software})`
   );
 
+  broadcast("site:bbs", { type: "added", name });
   return apiOk({ status: true }, 201);
 }
