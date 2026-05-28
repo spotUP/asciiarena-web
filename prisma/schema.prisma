@@ -400,3 +400,84 @@ enum users_anim_effect {
   Y
   N
 }
+
+model polls {
+  id            Int                  @id @default(autoincrement()) @db.UnsignedInt
+  slug          String               @unique(map: "uq_slug") @db.VarChar(96)
+  title         String               @db.VarChar(255)
+  body          String               @db.MediumText
+  type          polls_type
+  status        polls_status         @default(draft)
+  featured      Boolean              @default(false)
+  created_by_id Int                  @db.UnsignedInt
+  opens_at      Int?
+  closes_at     Int?
+  config        Json?
+  show_results  polls_show_results   @default(always)
+  result_layout polls_result_layout  @default(tail)
+  created_at    Int
+  updated_at    Int
+  options       poll_options[]
+  votes         poll_votes[]
+
+  @@index([status, featured], map: "ix_status_featured")
+  @@index([created_by_id], map: "ix_creator")
+}
+
+model poll_options {
+  id            Int          @id @default(autoincrement()) @db.UnsignedInt
+  poll_id       Int          @db.UnsignedInt
+  label         String       @db.VarChar(255)
+  color_idx     Int          @default(7) @db.TinyInt
+  sort_order    Int          @default(0)
+  created_by_id Int?         @db.UnsignedInt
+  approved      Boolean      @default(true)
+  polls         polls        @relation(fields: [poll_id], references: [id], onDelete: Cascade, map: "poll_options_ibfk_1")
+  votes         poll_votes[]
+
+  @@index([poll_id], map: "ix_poll")
+}
+
+model poll_votes {
+  id          Int          @id @default(autoincrement()) @db.UnsignedInt
+  poll_id     Int          @db.UnsignedInt
+  user_id     Int          @db.UnsignedInt
+  option_id   Int          @db.UnsignedInt
+  vote_value  Int?
+  created_at  Int
+  updated_at  Int
+  polls       polls        @relation(fields: [poll_id], references: [id], onDelete: Cascade, map: "poll_votes_ibfk_1")
+  options     poll_options @relation(fields: [option_id], references: [id], onDelete: Cascade, map: "poll_votes_ibfk_2")
+
+  @@unique([poll_id, user_id, option_id], map: "uq_poll_user_option")
+  @@index([poll_id], map: "ix_poll")
+  @@index([user_id], map: "ix_user")
+}
+
+enum polls_type {
+  single
+  multi
+  yesno
+  rating
+  ranked
+  approval
+  text_suggest
+}
+
+enum polls_status {
+  draft
+  open
+  closed
+}
+
+enum polls_show_results {
+  always
+  after_vote
+  after_close
+}
+
+enum polls_result_layout {
+  solid
+  tail
+  dual_row
+}

@@ -5,6 +5,7 @@ import UsersOnlineLive from "@/components/widgets/UsersOnlineLive";
 import CedSessions from "@/components/widgets/CedSessions";
 import ActivityFeed from "@/components/widgets/ActivityFeed";
 import LastCallers from "@/components/widgets/LastCallers";
+import PollSidebarLatest from "@/components/widgets/PollSidebarLatest";
 import LatestCollys from "@/components/widgets/LatestCollys";
 import LatestMags from "@/components/widgets/LatestMags";
 import LatestApps from "@/components/widgets/LatestApps";
@@ -21,6 +22,7 @@ export default async function LeftSidebar() {
       {!hidden.has("activity_feed") && <ActivityFeed />}
       {!hidden.has("ced_sessions") && <CedSessions />}
       {!hidden.has("last_callers") && <Suspense fallback={null}><LastCallers limit={5} /></Suspense>}
+      {!hidden.has("poll_latest_closed") && <Suspense fallback={null}><PollSidebarLatest /></Suspense>}
       {!hidden.has("latest_collys_released") && <Suspense fallback={null}><LatestCollys type="released" limit={8} /></Suspense>}
       {!hidden.has("latest_collys_added") && <Suspense fallback={null}><LatestCollys type="added" limit={5} /></Suspense>}
       {!hidden.has("latest_mags") && <Suspense fallback={null}><LatestMags limit={5} /></Suspense>}

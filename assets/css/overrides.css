@@ -462,6 +462,20 @@ h4, .h4 {
 .modal .btn { filter: drop-shadow(7px 8px 0 black); background: #fff; }
 .modal .btn::first-letter { color: #f55; }
 
+/* Poll cards: tighten form-check row spacing so 8 options don't waste a
+   screen of vertical space. The 16-line height + 4px tail makes each row
+   fit on the 8x16 grid. */
+.poll-card .form-check {
+  min-height: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  line-height: 20px;
+}
+.poll-card .form-check .form-check-input {
+  margin-top: 2px !important;
+}
+
 /* Navbar search override: keep terminal blue bg */
 .navbar .form-control {
   background-color: #212121 !important;
@@ -472,3 +486,4 @@ h4, .h4 {
   line-height: 16px !important;
   width: 80px !important;
 }
+

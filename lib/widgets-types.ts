@@ -10,6 +10,7 @@
 
 export const WIDGET_KEYS = [
   // Home main content
+  "poll_hero",
   "latest_releases",
   "random_releases",
   "latest_comments",
@@ -21,6 +22,7 @@ export const WIDGET_KEYS = [
   "activity_feed",
   "ced_sessions",
   "last_callers",
+  "poll_latest_closed",
   "latest_collys_released",
   "latest_collys_added",
   "latest_mags",
@@ -41,6 +43,8 @@ export const WIDGET_KEYS = [
 export type WidgetKey = (typeof WIDGET_KEYS)[number];
 
 export const WIDGET_LABELS: Record<WidgetKey, string> = {
+  poll_hero: "Featured Poll (Hero)",
+  poll_latest_closed: "Last Poll Results",
   latest_releases: "Latest Releases",
   random_releases: "Random Releases",
   latest_comments: "Latest Comments",
@@ -71,12 +75,13 @@ export const WIDGET_LABELS: Record<WidgetKey, string> = {
 export const WIDGET_GROUPS: { label: string; keys: WidgetKey[] }[] = [
   {
     label: "Home main column",
-    keys: ["latest_releases", "random_releases", "latest_comments", "recently_viewed", "wall", "global_wall"],
+    keys: ["poll_hero", "latest_releases", "random_releases", "latest_comments", "recently_viewed", "wall", "global_wall"],
   },
   {
     label: "Left sidebar",
     keys: [
       "users_online", "activity_feed", "ced_sessions", "last_callers",
+      "poll_latest_closed",
       "latest_collys_released", "latest_collys_added", "latest_mags",
       "latest_apps", "new_users", "weektop",
     ],
