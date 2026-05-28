@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 export type LogoHeaderProps = {
   logos: string[];
@@ -8,30 +8,21 @@ export type LogoHeaderProps = {
 
 // Smooth ping-pong copper-bar scroller. CSS animations on background-position
 // of background-clip:text elements are silently dropped by Chrome's
-// compositor, so the loop sets style.backgroundPositionY directly each frame.
+// compositor, so the loop sets style.backgroundPosition directly each frame.
+// Re-queries each tick so logos that come/go during slide transitions are
+// picked up automatically.
 function startCopperScroll(): () => void {
-  const els = document.querySelectorAll<HTMLElement>(".copper-gradient");
-  if (els.length === 0 || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
     return () => {};
   }
-  // Sinusoidal ping-pong: position = (1 - cos(2π·t/period)) / 2, mapped to
-  // 0–100%. Cosine naturally reverses at the peaks, so the gradient eases
-  // into each turn-around without us having to stitch two ease curves.
-  // 10s full cycle (5s up, 5s down). Slow enough to feel deliberate, fast
-  // enough that the palette shift is visible without staring.
   const period = 10000;
   const start = performance.now();
   let raf = 0;
   const tick = (now: number) => {
-    const t = ((now - start) % period) / period; // 0..1
-    // 0 at t=0, 1 at t=0.5, 0 at t=1 — natural ping-pong shape.
+    const t = ((now - start) % period) / period;
     const wave = (1 - Math.cos(2 * Math.PI * t)) / 2;
     const pos = (wave * 100).toFixed(2);
-    // Setting the full shorthand (not the longhand backgroundPositionY)
-    // because the CSS uses `background-position: 0% 0%` shorthand — some
-    // browsers don't compose a longhand inline-style write over a shorthand
-    // stylesheet rule cleanly, and on background-clip:text elements that
-    // can leave the gradient frozen at the initial frame.
+    const els = document.querySelectorAll<HTMLElement>(".copper-gradient");
     for (const el of els) el.style.backgroundPosition = `0% ${pos}%`;
     raf = requestAnimationFrame(tick);
   };
@@ -39,11 +30,16 @@ function startCopperScroll(): () => void {
   return () => cancelAnimationFrame(raf);
 }
 
+const SLIDE_MS = 800;
+const SLIDE_EASING = "cubic-bezier(0.65, 0, 0.35, 1)"; // expo-ish ease-in-out
+
 export default function LogoHeader({ logos }: LogoHeaderProps) {
   // Shuffle client-side only — useMemo with Math.random() runs on server too,
   // producing a different order and causing a hydration mismatch.
   const [shuffled, setShuffled] = useState<string[]>([]);
   const [current, setCurrent] = useState(0);
+  const [prev, setPrev] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setShuffled([...logos].sort(() => Math.random() - 0.5).slice(0, 10));
@@ -57,26 +53,61 @@ export default function LogoHeader({ logos }: LogoHeaderProps) {
 
   useEffect(() => {
     if (shuffled.length < 2) return;
-    const id = setInterval(() => setCurrent((i) => (i + 1) % shuffled.length), 60000);
+    const id = setInterval(() => {
+      setCurrent(c => {
+        setPrev(c);
+        return (c + 1) % shuffled.length;
+      });
+    }, 60000);
     return () => clearInterval(id);
   }, [shuffled.length]);
 
+  // Slide the outgoing logo off the left and the new one in from the right.
+  // useLayoutEffect runs after the DOM is updated but before paint, so the
+  // first keyframe (incoming at translateX(100%)) is in place before the
+  // browser flashes a frame at translateX(0).
+  useLayoutEffect(() => {
+    if (prev == null) return;
+    const container = containerRef.current;
+    if (!container) return;
+    const prevEl = container.querySelector<HTMLElement>(`[data-logo-idx="${prev}"]`);
+    const curEl = container.querySelector<HTMLElement>(`[data-logo-idx="${current}"]`);
+    if (prevEl) {
+      prevEl.animate(
+        [{ transform: "translateX(0)" }, { transform: "translateX(-100%)" }],
+        { duration: SLIDE_MS, easing: SLIDE_EASING, fill: "forwards" },
+      );
+    }
+    if (curEl) {
+      curEl.animate(
+        [{ transform: "translateX(100%)" }, { transform: "translateX(0)" }],
+        { duration: SLIDE_MS, easing: SLIDE_EASING, fill: "forwards" },
+      );
+    }
+    const t = setTimeout(() => setPrev(null), SLIDE_MS);
+    return () => clearTimeout(t);
+  }, [prev, current]);
+
   return (
-    <div className="overflow-hidden d-none d-lg-block mx-auto">
-      <div id="logoswitcher">
-        {shuffled.map((logo, i) => (
-          <div
-            key={i}
-            className="logo nolink"
-            style={i !== current ? { display: "none", whiteSpace: "pre" } : { whiteSpace: "pre" }}
-          >
-            <a href="/" className="logo ascii">
-              <pre className="copper-gradient" style={{ overflow: "hidden" }}>
-                {logo}
-              </pre>
-            </a>
-          </div>
-        ))}
+    <div className="overflow-hidden d-none d-lg-block mx-auto" ref={containerRef}>
+      <div id="logoswitcher" className="logo-stack">
+        {shuffled.map((logo, i) => {
+          if (i !== current && i !== prev) return null;
+          return (
+            <div
+              key={i}
+              data-logo-idx={i}
+              className="logo nolink logo-slot"
+              style={{ whiteSpace: "pre" }}
+            >
+              <a href="/" className="logo ascii">
+                <pre className="copper-gradient" style={{ overflow: "hidden" }}>
+                  {logo}
+                </pre>
+              </a>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

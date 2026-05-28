@@ -469,6 +469,18 @@ h4, .h4 {
    between scanlines on AGA hardware. Palette below is a magenta-keyed
    copper bar set, picked to harmonise with the site's pink/magenta
    accent colour throughout. */
+/* Logo carousel: stack incoming + outgoing logos in the same grid cell so
+   they can slide across each other without one bumping the other vertically
+   during the transition. Both children take row/column 1, so they overlap.
+   The parent container's overflow:hidden clips the slid-off element. */
+.logo-stack {
+  display: grid;
+}
+.logo-stack > .logo-slot {
+  grid-row: 1;
+  grid-column: 1;
+}
+
 .copper-gradient {
   background: linear-gradient(
     to bottom,
