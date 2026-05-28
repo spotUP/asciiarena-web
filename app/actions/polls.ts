@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { broadcast } from "@/lib/live";
+import { broadcastActivityIfAllowed } from "@/lib/activity";
 import { revalidatePath } from "next/cache";
 import type { VotePayload, PollOptionView } from "@/lib/polls/types";
 import { validateVote, isSingleVoteType } from "@/lib/polls/cast";
@@ -99,6 +100,15 @@ export async function castVoteAction(pollId: number, payload: VotePayload): Prom
   });
 
   broadcast(`poll:${poll.id}`, { type: "voted", nick: session.user.name ?? "" });
+  // "X voted in Y" in the live activity feed sidebar — gated by the user's
+  // notif/activity opt-out matrix via broadcastActivityIfAllowed.
+  await broadcastActivityIfAllowed(userId, "poll", {
+    type: "poll",
+    nick: session.user.name ?? "",
+    target: poll.title,
+    targetUrl: `/polls/${poll.slug}`,
+    timestamp: t,
+  });
   revalidatePath(`/polls/${poll.slug}`);
   revalidatePath(`/polls`);
   revalidatePath(`/`);

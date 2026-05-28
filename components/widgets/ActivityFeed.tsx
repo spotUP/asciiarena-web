@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-type ActivityType = "view" | "comment" | "fav" | "unfav" | "wall" | "request" | "upload" | "claim";
+type ActivityType = "view" | "comment" | "fav" | "unfav" | "wall" | "request" | "upload" | "claim" | "poll";
 
 interface ActivityEntry {
   id: number;
@@ -25,6 +25,11 @@ function actionLabel(type: ActivityType): string {
     case "request": return "requested:";
     case "upload":  return "uploaded";
     case "claim":   return "claimed artist";
+    case "poll":    return "voted in poll";
+    // notif-* types are personal notifications, never broadcast to the
+    // site activity feed — return an empty label as a safety fallback if
+    // one ever leaks through.
+    default:        return "";
   }
 }
 
