@@ -8,6 +8,7 @@ import { getSession as auth } from "@/lib/session";
 import { urlsafe, decodeParam } from "@/lib/utils";
 import ClaimArtistButton from "./ClaimArtistButton";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
+import WatchingPip from "@/components/widgets/WatchingPip";
 
 interface PageProps {
   params: Promise<{ nick: string }>;
@@ -138,7 +139,10 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
       <LiveRefresh channel="site:votes" />
       <div className="row apb-1">
         <div className="header col-lg-12">
-          <h2 className="ap-1 bg-header">{artist.nick}</h2>
+          <h2 className="ap-1 bg-header">
+            {artist.nick}
+            <WatchingPip channel={`viewing:artist:${artist.id}`} />
+          </h2>
         </div>
       </div>
 

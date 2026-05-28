@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
+import WatchingPip from "@/components/widgets/WatchingPip";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const id = Number((await params).id);
@@ -38,7 +39,10 @@ export default async function BbsPage({ params }: PageProps) {
     <SiteLayout title="BBS iNFO">
       <div className="row apb-1">
         <div className="header col-lg-12">
-          <h2 className="ap-1 bg-header">{bbs.name}</h2>
+          <h2 className="ap-1 bg-header">
+            {bbs.name}
+            <WatchingPip channel={`viewing:bbs:${bbs.id}`} />
+          </h2>
         </div>
       </div>
 

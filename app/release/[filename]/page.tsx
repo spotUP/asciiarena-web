@@ -10,6 +10,7 @@ import { getSession as auth } from "@/lib/session";
 import { urlsafe, formatBytes, decodeParam } from "@/lib/utils";
 import ReleaseClient from "./ReleaseClient";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
+import WatchingPip from "@/components/widgets/WatchingPip";
 
 interface PageProps {
   params: Promise<{ filename: string }>;
@@ -174,7 +175,10 @@ export default async function ReleasePage({ params }: PageProps) {
       {/* Summary card — matches info_release_summary.php */}
       <div className="row">
         <div className="header col-lg-12">
-          <h1 className="ap-1 bg-header">{colly.name ?? colly.filename}</h1>
+          <h1 className="ap-1 bg-header">
+            {colly.name ?? colly.filename}
+            <WatchingPip channel={`viewing:release:${colly.id}`} />
+          </h1>
         </div>
       </div>
       <div className="container-fluid">

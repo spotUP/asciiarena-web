@@ -5,6 +5,7 @@ import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { urlsafe, decodeParam } from "@/lib/utils";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
+import WatchingPip from "@/components/widgets/WatchingPip";
 
 interface PageProps {
   params: Promise<{ name: string }>;
@@ -91,7 +92,10 @@ export default async function CrewPage({ params }: PageProps) {
       <LiveRefresh channel="site:votes" />
       <div className="row apb-1">
         <div className="header col-lg-12">
-          <h2 className="ap-1 bg-header">{crew.name}</h2>
+          <h2 className="ap-1 bg-header">
+            {crew.name}
+            <WatchingPip channel={`viewing:crew:${crew.id}`} />
+          </h2>
         </div>
       </div>
 
