@@ -9,6 +9,7 @@ interface ChatMessage {
   postername: string | null;
   message: string | null;
   timestamp: number | null;
+  unread?: boolean;
 }
 
 interface Props {
@@ -44,6 +45,12 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
   const esTypingRef = useRef<EventSource | null>(null);
   const threadIdRef = useRef<number | null>(threadId);
   const minimizedRef = useRef(minimized);
+  // First-open scroll: on the initial render after messages arrive, land
+  // at the boundary between read and unread instead of the very bottom,
+  // so the user catches up from where they left off. Subsequent message
+  // arrivals fall back to scroll-to-bottom (handled in the same effect).
+  const hasDoneInitialScrollRef = useRef(false);
+  const firstUnreadIdRef = useRef<number | null>(null);
 
   useEffect(() => { threadIdRef.current = threadId; }, [threadId]);
   useEffect(() => { minimizedRef.current = minimized; }, [minimized]);
@@ -53,7 +60,15 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
       .then(r => r.json())
       .then((data: unknown) => {
         if (Array.isArray(data)) {
-          setMessages([...(data as ChatMessage[])].reverse());
+          const list = [...(data as ChatMessage[])].reverse();
+          // Record the first unread message id once, on the initial load,
+          // so the scroll effect below can find it after render. We capture
+          // before /api/chat/read clears the flag.
+          if (!hasDoneInitialScrollRef.current && firstUnreadIdRef.current == null) {
+            const firstUnread = list.find(m => m.unread);
+            if (firstUnread) firstUnreadIdRef.current = firstUnread.id;
+          }
+          setMessages(list);
         }
       })
       .catch(() => {});
@@ -147,12 +162,26 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
     }
   }, [minimized, peerId, markRead, markReadIfVisible]);
 
-  // Auto-scroll to bottom on new messages AND when the peer's draft grows,
-  // so the live-typing line stays visible instead of being clipped under
-  // the input row.
+  // Initial open: scroll to the first unread message so the user lands at
+  // the read/unread boundary and can catch up downward. Subsequent renders
+  // (new arrivals, typing indicators) just stick to the bottom as before.
   useEffect(() => {
     const el = scrollRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    if (!el) return;
+    if (!hasDoneInitialScrollRef.current && messages.length > 0) {
+      hasDoneInitialScrollRef.current = true;
+      const target = firstUnreadIdRef.current;
+      if (target != null) {
+        const node = el.querySelector<HTMLElement>(`[data-msg-id="${target}"]`);
+        if (node) {
+          // Position the first unread row near the top, leaving the older
+          // (already-read) tail above it so context is one quick scroll away.
+          el.scrollTop = node.offsetTop - el.clientTop - 4;
+          return;
+        }
+      }
+    }
+    el.scrollTop = el.scrollHeight;
   }, [messages, peerDraft]);
 
   const broadcastTyping = (text: string) => {
@@ -306,9 +335,26 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
           </div>
         )}
         {messages.map(msg => {
-          const isOwn = msg.from_id === myId;
+          // Legacy rows can have null from_id; in that case fall back to
+          // comparing the stored sender nick against the viewer's nick.
+          const isOwn =
+            msg.from_id === myId ||
+            (msg.from_id == null && msg.postername === userNick);
+          const isFirstUnreadMarker = firstUnreadIdRef.current === msg.id;
           return (
-            <div key={msg.id} style={{ marginBottom: "4px" }}>
+            <div key={msg.id} data-msg-id={msg.id} style={{ marginBottom: "4px" }}>
+              {isFirstUnreadMarker && (
+                <div className="lightred" style={{
+                  fontSize: "11px",
+                  borderTop: "1px dashed #ff5555",
+                  paddingTop: "2px",
+                  marginBottom: "2px",
+                  textAlign: "center",
+                  fontFamily: "TopazPlus_a1200, monospace",
+                }}>
+                  — new since last visit —
+                </div>
+              )}
               <span style={{ color: isOwn ? "#ffff55" : "#ff55ff", marginRight: "4px" }}>
                 {msg.postername ?? (isOwn ? userNick : peerNick)}
               </span>
