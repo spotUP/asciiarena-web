@@ -39,11 +39,16 @@ export default function ChatBar({ userId, userNick }: Props) {
           const existingWindow = windowsRef.current.find(w => w.peerId === event.fromId);
           if (existingWindow) {
             if (existingWindow.minimized) {
-              incrementUnread(event.fromId);
+              // Pop the window back open so the user sees the new message
+              // immediately — matches the muscle memory of every other chat UI.
+              minimizeChat(event.fromId, false);
             }
             // If not minimized, the window's own SSE handles the message
           } else {
-            // No window open — flash the bar
+            // First DM from this person this session — auto-create the window
+            // in minimised state so it parks in the bar with an unread badge
+            // (instead of disappearing after an 8s flash and being missed).
+            openChat(event.fromId, event.fromNick, undefined, { startMinimized: true, unread: 1 });
             setFlashNick(event.fromNick ?? null);
             if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
             flashTimerRef.current = setTimeout(() => setFlashNick(null), 8000);
@@ -52,7 +57,7 @@ export default function ChatBar({ userId, userNick }: Props) {
       } catch { /* ignore */ }
     };
     return () => es.close();
-  }, [userId, incrementUnread]);
+  }, [userId, incrementUnread, minimizeChat, openChat]);
 
   const fetchSuggestions = useCallback((q: string) => {
     if (suggestDebounceRef.current) clearTimeout(suggestDebounceRef.current);

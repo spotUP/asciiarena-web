@@ -12,7 +12,7 @@ export interface ChatWindowState {
 
 interface ChatContextValue {
   windows: ChatWindowState[];
-  openChat: (peerId: number, peerNick: string, threadId?: number) => void;
+  openChat: (peerId: number, peerNick: string, threadId?: number, opts?: { startMinimized?: boolean; unread?: number }) => void;
   closeChat: (peerId: number) => void;
   minimizeChat: (peerId: number, minimized: boolean) => void;
   markRead: (peerId: number) => void;
@@ -31,18 +31,35 @@ export function useChatContext(): ChatContextValue {
 export function ChatContextProvider({ children }: { children: ReactNode }) {
   const [windows, setWindows] = useState<ChatWindowState[]>([]);
 
-  const openChat = useCallback((peerId: number, peerNick: string, threadId?: number) => {
+  const openChat = useCallback((
+    peerId: number,
+    peerNick: string,
+    threadId?: number,
+    opts?: { startMinimized?: boolean; unread?: number },
+  ) => {
     // Legacy messages have thread=0; treat that as "no real thread yet" so the
     // window falls through to /api/chat/thread lookup or new-thread creation.
     const tid = threadId && threadId > 0 ? threadId : null;
+    const startMinimized = opts?.startMinimized ?? false;
+    const initialUnread = opts?.unread ?? 0;
     setWindows(prev => {
       const exists = prev.find(w => w.peerId === peerId);
       if (exists) {
+        // Existing window: don't override minimized state if caller wants
+        // a passive (background) open — only expand when the user explicitly
+        // opened it. Always clear unread because the user is now aware of it.
         return prev.map(w =>
-          w.peerId === peerId ? { ...w, minimized: false, unread: 0, threadId: tid ?? w.threadId } : w
+          w.peerId === peerId
+            ? {
+                ...w,
+                minimized: startMinimized ? w.minimized : false,
+                unread: startMinimized ? w.unread + initialUnread : 0,
+                threadId: tid ?? w.threadId,
+              }
+            : w
         );
       }
-      const next = [...prev, { peerId, peerNick, threadId: tid, minimized: false, unread: 0 }];
+      const next = [...prev, { peerId, peerNick, threadId: tid, minimized: startMinimized, unread: initialUnread }];
       if (next.length > 4) {
         // Drop oldest minimized window to stay at max 4
         const minIdx = next.findIndex(w => w.minimized);
