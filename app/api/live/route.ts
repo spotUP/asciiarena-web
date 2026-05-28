@@ -2,6 +2,12 @@ import { NextRequest } from "next/server";
 import { subscribe, broadcast, subscriberCount } from "@/lib/live";
 import { auth } from "@/lib/auth";
 import { apiError } from "@/lib/utils";
+import { ensureCedPoller } from "@/lib/cedPoller";
+
+// Start the singleton CED poller when the SSE route first loads. It self-
+// gates on subscriberCount("site:ced-sessions") so it doesn't hammer the
+// external API when nobody's watching the widget.
+ensureCedPoller();
 
 export const dynamic = "force-dynamic";
 

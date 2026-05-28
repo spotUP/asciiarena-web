@@ -3,10 +3,14 @@ import { useEffect, useState } from "react";
 import { urlsafe } from "@/lib/utils";
 import type { CedDocument, CedSessionsData } from "@/app/api/ced-sessions/route";
 
-const POLL_MS = 30_000;
 const SPECTATE_BASE = "https://hippoplayer.se/?spectate=";
 
-function load(set: (d: CedDocument[]) => void) {
+// Pulls the initial state from /api/ced-sessions (so the widget shows
+// data immediately on first paint) then subscribes to the site:ced-sessions
+// SSE channel. The server-side singleton poller in lib/cedPoller.ts polls
+// the external feed every 10s for all viewers combined — no per-browser
+// polling.
+function loadInitial(set: (d: CedDocument[]) => void) {
   fetch("/api/ced-sessions")
     .then(r => r.json())
     .then((d: unknown) => {
@@ -17,13 +21,26 @@ function load(set: (d: CedDocument[]) => void) {
     .catch(() => {});
 }
 
+interface CedSessionsEvent {
+  type?: string;
+  documents?: CedDocument[];
+}
+
 export default function CedSessions() {
   const [documents, setDocuments] = useState<CedDocument[]>([]);
 
   useEffect(() => {
-    load(setDocuments);
-    const interval = setInterval(() => load(setDocuments), POLL_MS);
-    return () => clearInterval(interval);
+    loadInitial(setDocuments);
+    const es = new EventSource(`/api/live?channel=site:ced-sessions`);
+    es.onmessage = (e: MessageEvent<string>) => {
+      try {
+        const evt = JSON.parse(e.data) as CedSessionsEvent;
+        if (evt.type === "update" && Array.isArray(evt.documents)) {
+          setDocuments(evt.documents);
+        }
+      } catch { /* ignore */ }
+    };
+    return () => es.close();
   }, []);
 
   if (documents.length === 0) return null;
