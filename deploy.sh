@@ -1,24 +1,43 @@
 #!/bin/bash
 set -e
 
+# Wrapper that makes rsync resilient to flaky SSH:
+#   --partial + --partial-dir keeps in-flight files across disconnects,
+#                              next attempt resumes instead of restarting
+#   --compress                 fewer bytes on the wire, faster + less time
+#                              exposed to a drop
+#   retry loop                 disconnects auto-resume up to 5 times
+RSYNC_SSH="ssh -o ServerAliveInterval=10 -o ServerAliveCountMax=12 -o ConnectTimeout=15"
+rsync_resilient() {
+  local attempt=0
+  until [ $attempt -ge 5 ]; do
+    attempt=$((attempt + 1))
+    if rsync -a --partial --partial-dir=.rsync-partial --compress \
+            --no-owner --no-group "$@" -e "$RSYNC_SSH"; then
+      return 0
+    fi
+    echo "  rsync attempt $attempt failed, retrying in 5s..."
+    sleep 5
+  done
+  echo "  rsync gave up after 5 attempts"
+  return 1
+}
+
 echo "Building..."
 npm run build
 
 echo "Deploying PHP site..."
-rsync -a --no-owner --no-group --include='*.php' --include='.htaccess' --exclude='*' \
-  -e "ssh -o ServerAliveInterval=10 -o ServerAliveCountMax=6" \
+rsync_resilient --include='*.php' --include='.htaccess' --exclude='*' \
   . \
   spot@97.75.89.139:/var/www/asciiarena.se/nextjs-old/
 
 echo "Deploying .next/..."
-rsync -a --no-owner --no-group --delete --exclude='cache' \
-  -e "ssh -o ServerAliveInterval=10 -o ServerAliveCountMax=6" \
+rsync_resilient --delete --exclude='cache' \
   .next/ \
   spot@97.75.89.139:/var/www/asciiarena.se/nextjs-current/.next/
 
 echo "Deploying public/..."
-rsync -aL --no-owner --no-group \
-  -e "ssh -o ServerAliveInterval=10 -o ServerAliveCountMax=6" \
+rsync_resilient -L \
   public/ \
   spot@97.75.89.139:/var/www/asciiarena.se/nextjs-current/public/
 
