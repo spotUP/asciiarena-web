@@ -81,10 +81,14 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
   const isUnclaimed = artist.user_id === null;
   const canClaim = !!userId && isUnclaimed;
 
-  // Map validated sort keys to safe Prisma.sql fragments — never interpolates user input
+  // Map validated sort keys to safe Prisma.sql fragments — never interpolates user input.
+  // c.name uses COALESCE(c.name, c.filename) because the UI falls back to the
+  // filename when name is NULL; without the COALESCE, MySQL sorts NULLs first
+  // (all the filename-fallback rows cluster at the top alphabetised by NULL)
+  // and the sort looks broken visually even though it ran.
   const SORT_SQL: Record<string, Prisma.Sql> = {
     "c.filename":       Prisma.sql`c.filename`,
-    "c.name":           Prisma.sql`c.name`,
+    "c.name":           Prisma.sql`COALESCE(c.name, c.filename)`,
     "w.name":           Prisma.sql`w.name`,
     "c.year":           Prisma.sql`c.year`,
     "c.year, c.month":  Prisma.sql`c.year, c.month`,
