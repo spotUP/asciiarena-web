@@ -17,7 +17,7 @@ interface PageProps {
 
 const VALID_SORT_COLS = new Set([
   "c.filename",
-  "a.nick",
+  "c.name",
   "w.name",
   "c.year",
   "c.year, c.month",
@@ -84,7 +84,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
   // Map validated sort keys to safe Prisma.sql fragments — never interpolates user input
   const SORT_SQL: Record<string, Prisma.Sql> = {
     "c.filename":       Prisma.sql`c.filename`,
-    "a.nick":           Prisma.sql`a.nick`,
+    "c.name":           Prisma.sql`c.name`,
     "w.name":           Prisma.sql`w.name`,
     "c.year":           Prisma.sql`c.year`,
     "c.year, c.month":  Prisma.sql`c.year, c.month`,
@@ -239,15 +239,18 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
         </>
       )}
 
-      {/* Sort links */}
+      {/* Sort links — each wrapped in col-lg-3 so the header alignment matches
+          the data rows below (same 4 × col-lg-3 grid). Without the wrappers,
+          justify-content-between distributes them by natural text width and
+          they end up offset relative to the columns. */}
       <div className="row apt-1 apb-1">
         <h2 className="bg-header">All {acronym} Releases</h2>
       </div>
       <div className="col-lg-12 d-flex justify-content-between pl-0">
-        <Link href={`?sort_by=c.filename`}>Filename</Link>
-        <Link href={`?sort_by=a.nick`}>Name</Link>
-        <Link href={`?sort_by=w.name`}>Crew</Link>
-        <Link href={`?sort_by=c.year`}>Release Date</Link>
+        <div className="col-lg-3 pl-0"><Link href={`?sort_by=c.filename`}>Filename</Link></div>
+        <div className="col-lg-3 pl-0"><Link href={`?sort_by=c.name`}>Name</Link></div>
+        <div className="col-lg-3 pl-0"><Link href={`?sort_by=w.name`}>Crew</Link></div>
+        <div className="col-lg-3 pl-0"><Link href={`?sort_by=c.year`}>Release Date</Link></div>
       </div>
 
       {/* All releases */}

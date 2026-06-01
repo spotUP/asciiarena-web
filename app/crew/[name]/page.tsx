@@ -26,6 +26,12 @@ interface MemberRow {
   user_nickurl: string | null;
 }
 
+interface BoardRow {
+  bbs_id: number | null;
+  bbs_name: string;
+  sysop: string | null;
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { name: rawCrewurl } = await params;
   const crewurl = decodeParam(rawCrewurl);
@@ -54,7 +60,7 @@ export default async function CrewPage({ params }: PageProps) {
   });
   if (!crew) notFound();
 
-  const [members, crewCollys, releaseRows] = await Promise.all([
+  const [members, crewCollys, releaseRows, boards] = await Promise.all([
     prisma.$queryRaw<MemberRow[]>`
       SELECT mo.id, mo.nick, mo.crew, a.artisturl, u.nickurl AS user_nickurl
       FROM member_of mo
@@ -69,6 +75,16 @@ export default async function CrewPage({ params }: PageProps) {
       include: { collys: { select: { id: true, filename: true, name: true, year: true } } },
       orderBy: { collys: { filename: "asc" } },
     }),
+    // BBS affiliations via the bbs_of join table (legacy schema — same column
+    // shape PHP's info_crew.php read). Left-join into bbses to surface the
+    // sysop and a stable link target.
+    prisma.$queryRaw<BoardRow[]>`
+      SELECT b.id AS bbs_id, bo.name AS bbs_name, b.sysop
+      FROM bbs_of bo
+      LEFT JOIN bbses b ON LOWER(b.name) = LOWER(bo.name)
+      WHERE bo.crew = ${crew.name}
+      ORDER BY bo.name ASC
+    `,
   ]);
 
   const collyIds = crewCollys.map((r) => r.colly_id);
@@ -153,6 +169,25 @@ export default async function CrewPage({ params }: PageProps) {
         ))
       ) : (
         <div className="col-lg-12 pl-0 lightgrey">No members listed.</div>
+      )}
+
+      {/* Boards — affiliated BBSes via the bbs_of join table. */}
+      {boards.length > 0 && (
+        <>
+          <div className="row apt-1 apb-1">
+            <h2 className="bg-header">Boards</h2>
+          </div>
+          {boards.map((b, i) => (
+            <div key={`${b.bbs_id ?? "x"}-${i}`} className="col-lg-12 pl-0 d-flex" style={{ gap: "12px" }}>
+              {b.bbs_id ? (
+                <Link className="magenta" href={`/bbs/${b.bbs_id}`}>{b.bbs_name}</Link>
+              ) : (
+                <span>{b.bbs_name}</span>
+              )}
+              {b.sysop && <span className="lightgrey">sysop {b.sysop}</span>}
+            </div>
+          ))}
+        </>
       )}
 
       {/* Releases */}
