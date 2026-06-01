@@ -14,7 +14,7 @@ const CHANNEL = "globalwall:1";
 const DRAFT_TTL = 4000;
 
 function loadPosts(set: (p: WallPost[]) => void) {
-  fetch("https://scenewall.bbs.io:1543/GlobalWall/api/WallItems?itemcount=15")
+  fetch("/api/scenewall?endpoint=globalwall")
     .then(r => r.json())
     .then((data: unknown) => { if (Array.isArray(data)) set(data as WallPost[]); })
     .catch(() => {});

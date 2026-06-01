@@ -27,9 +27,9 @@ export default function BBSWeektop() {
   const [items, setItems] = useState<StatItem[] | null>(null);
 
   useEffect(() => {
-    fetch("https://scenewall.bbs.io:1543/GlobalLastCallers/api/GlobalLastCallers/Stats?StatType=26&Count=5")
+    fetch("/api/scenewall?endpoint=bbs-weektop")
       .then(r => r.json())
-      .then((data: { stats: StatItem[] }) => setItems(Array.isArray(data?.stats) ? data.stats : []))
+      .then((data: { stats: StatItem[] } | null) => setItems(Array.isArray(data?.stats) ? data.stats : []))
       .catch(() => setItems([]));
   }, []);
 

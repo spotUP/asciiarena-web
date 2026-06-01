@@ -27,7 +27,7 @@ export default function Weektop() {
   const [items, setItems] = useState<StatItem[] | null>(null);
 
   useEffect(() => {
-    fetch("https://scenewall.bbs.io:1543/GlobalLastCallers/api/GlobalLastCallers/Stats?StatType=16&Count=5")
+    fetch("/api/scenewall?endpoint=weektop")
       .then(r => r.json())
       .then((data: { stats: StatItem[] }) => setItems(Array.isArray(data?.stats) ? data.stats : []))
       .catch(() => setItems([]));
