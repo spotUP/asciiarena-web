@@ -506,6 +506,17 @@ h4, .h4 {
      Chrome's compositor in many cases, so we drive it from JS instead. */
 }
 
+/* Site-wide consistency: every list / section header rendered as an
+   <h1>/<h2>/<h3> with the .bg-header band gets 16px below it, so the
+   content underneath always has the same gap. Some pages wrapped the
+   header in apb-1 (or apt-1/apb-1) divs, others rendered the heading
+   bare and the spacing varied per page. */
+h1.bg-header,
+h2.bg-header,
+h3.bg-header {
+  margin-bottom: 16px !important;
+}
+
 /* Poll cards: tighten form-check row spacing so 8 options don't waste a
    screen of vertical space. The 16-line height + 4px tail makes each row
    fit on the 8x16 grid. */
