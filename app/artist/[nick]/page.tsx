@@ -91,15 +91,15 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
   //      filenames like "R21-AAP.ZIP" sort before lowercase ones like
   //      "asc-w46.txt" (ASCII 'R' is 82, 'a' is 97) and the result looks
   //      random to a human reader.
-  // TRIM-around-LOWER is essential: at least one row in the wild has a
-  // leading space in c.filename (which CSS collapses in the render but
-  // SQL sorts as ASCII 32 → that row always bubbles to position 1).
-  // Same defensive trimming on c.name and w.name so any leading
-  // whitespace doesn't poison the comparison.
+  // REGEXP_REPLACE strips ALL leading non-alphanumeric chars before sort —
+  // covers leading spaces, tabs, control chars, BOM, punctuation, etc.
+  // Plain TRIM only strips spaces (ASCII 0x20), so a row with a leading
+  // tab/CR/LF (ASCII < 0x20) still bubbled to the top. CASE picks
+  // filename when c.name is missing/blank, matching the UI fallback.
   const SORT_SQL: Record<string, Prisma.Sql> = {
-    "c.filename":       Prisma.sql`LOWER(TRIM(c.filename))`,
-    "c.name":           Prisma.sql`LOWER(TRIM(CASE WHEN c.name IS NULL OR LENGTH(TRIM(c.name)) = 0 THEN c.filename ELSE c.name END))`,
-    "w.name":           Prisma.sql`(w.name IS NULL OR LENGTH(TRIM(w.name)) = 0), LOWER(TRIM(w.name))`,
+    "c.filename":       Prisma.sql`LOWER(REGEXP_REPLACE(c.filename, '^[^[:alnum:]]+', ''))`,
+    "c.name":           Prisma.sql`LOWER(REGEXP_REPLACE(CASE WHEN c.name IS NULL OR LENGTH(TRIM(c.name)) = 0 THEN c.filename ELSE c.name END, '^[^[:alnum:]]+', ''))`,
+    "w.name":           Prisma.sql`(w.name IS NULL OR LENGTH(TRIM(w.name)) = 0), LOWER(REGEXP_REPLACE(COALESCE(w.name, ''), '^[^[:alnum:]]+', ''))`,
     "c.year":           Prisma.sql`c.year`,
     "c.year, c.month":  Prisma.sql`c.year, c.month`,
   };
