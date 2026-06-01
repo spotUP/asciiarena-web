@@ -233,11 +233,16 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
       <div className="row apt-1 apb-1">
         <h2 className="bg-header">All {acronym} Releases</h2>
       </div>
+      {/* Plain <a> tags (not Next.js <Link>) so each sort click is a full
+          page navigation. Link would use the Router Cache and could serve
+          a previously-loaded sort order when only searchParams change —
+          that was the symptom dipswitch caught on FF: click Crew then
+          Name, the page stayed on the Crew sort and just looked broken. */}
       <div className="col-lg-12 d-flex justify-content-between pl-0">
-        <div className="col-lg-3 pl-0"><Link href={`?sort_by=c.filename`}>Filename</Link></div>
-        <div className="col-lg-3 pl-0"><Link href={`?sort_by=c.name`}>Name</Link></div>
-        <div className="col-lg-3 pl-0"><Link href={`?sort_by=w.name`}>Crew</Link></div>
-        <div className="col-lg-3 pl-0"><Link href={`?sort_by=c.year`}>Release Date</Link></div>
+        <div className="col-lg-3 pl-0"><a href={`?sort_by=c.filename`}>Filename</a></div>
+        <div className="col-lg-3 pl-0"><a href={`?sort_by=c.name`}>Name</a></div>
+        <div className="col-lg-3 pl-0"><a href={`?sort_by=w.name`}>Crew</a></div>
+        <div className="col-lg-3 pl-0"><a href={`?sort_by=c.year`}>Release Date</a></div>
       </div>
 
       {/* All releases */}
