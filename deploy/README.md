@@ -8,6 +8,7 @@ below.
 |---|---|
 | `asciiarena-next-dev.service` | `/etc/systemd/system/asciiarena-next-dev.service` |
 | `dev.asciiarena.se-ssl.conf` | `/etc/apache2/sites-enabled/dev.asciiarena.se-ssl.conf` |
+| `mpm_event.conf` | `/etc/apache2/mods-enabled/mpm_event.conf` |
 
 ## Sync the systemd unit
 
@@ -20,6 +21,20 @@ ssh spot@asciiarena.se '
   sudo systemctl daemon-reload &&
   sudo systemctl restart asciiarena-next-dev &&
   systemctl is-active asciiarena-next-dev
+'
+```
+
+## Sync the Apache MPM config
+
+```sh
+scp deploy/mpm_event.conf spot@asciiarena.se:/tmp/
+ssh spot@asciiarena.se '
+  sudo cp /etc/apache2/mods-enabled/mpm_event.conf \
+          /etc/apache2/mods-enabled/mpm_event.conf.bak-$(date +%Y%m%d-%H%M%S) &&
+  sudo mv /tmp/mpm_event.conf /etc/apache2/mods-enabled/ &&
+  sudo apachectl -t &&
+  sudo systemctl reload apache2 &&
+  systemctl is-active apache2
 '
 ```
 
@@ -51,8 +66,17 @@ socket. Without `disablereuse=on` the worker pool can pin a half-dead
 connection from a previous deploy and hand it to subsequent requests,
 which then hang for up to `ProxyTimeout` (300s).
 
+**Apache MPM** — bumped MaxRequestWorkers from 150 to 1024 (plus matching
+ThreadLimit/ThreadsPerChild). SSE streams under `/api/live` tie up one
+worker for the lifetime of the connection — event MPM can't async-park a
+response once the body is flowing. With ~5 SSE channels per active visitor
+(LiveRefresh widgets + chat + polls hero), the original 150 saturated at
+~30 concurrent visitors and regular page requests started queueing past
+their 10s client timeout.
+
 Together they are the difference between "deploy briefly returns 503" and
-"deploy completes invisibly".
+"deploy completes invisibly", and between "30 concurrent users
+unresponsive" and "many hundreds fine".
 
 ## Prod
 
