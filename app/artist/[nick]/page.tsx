@@ -259,7 +259,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
           justify-content-between distributes them by natural text width and
           they end up offset relative to the columns. */}
       <div className="row apt-1 apb-1">
-        <h2 className="bg-header">All {acronym} Releases</h2>
+        <h2 className="ap-1 bg-header">All {acronym} Releases</h2>
       </div>
       {/* Plain <a> tags (not Next.js <Link>) so each sort click is a full
           page navigation. Link would use the Router Cache and could serve
