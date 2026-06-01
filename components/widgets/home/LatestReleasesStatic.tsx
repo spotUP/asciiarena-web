@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { readFileSync, existsSync } from "fs";
@@ -24,6 +25,60 @@ function readDiz(filePath: string): string | null {
   }
 }
 
+// Cache both the DB query AND the .diz file reads together for 60s. The
+// random variant used ORDER BY RAND() (O(n) on the collys table) and the
+// non-random variant still ran 20 fs.existsSync+readFileSync calls per
+// render. With cache, every visitor inside the 60s window gets the
+// pre-rendered hero in <1ms instead of paying the full I/O tax.
+const getReleasesForHero = unstable_cache(
+  async (random: boolean, columns: number, collectionsPath: string, magsPath: string, appsPath: string) => {
+    const orderClause = random
+      ? Prisma.raw("ORDER BY RAND()")
+      : Prisma.raw("ORDER BY a.fyear DESC, a.fmonth DESC, a.fday DESC");
+
+    let rows: ReleaseRow[] = [];
+    try {
+      rows = await prisma.$queryRaw<ReleaseRow[]>(Prisma.sql`
+        SELECT * FROM (
+          SELECT 'C' AS type, filename,
+            year AS fyear, month AS fmonth, day AS fday
+          FROM collys
+          LIMIT 20
+        ) a
+        ${orderClause}
+        LIMIT 20
+      `);
+    } catch {
+      return [];
+    }
+
+    const releases: { url: string; content: string }[] = [];
+    for (const row of rows) {
+      if (releases.length >= columns) break;
+      const filename = String(row.filename);
+      const dirname = filename.replace(/\.[^.]+$/, "");
+      let dizPath = "";
+      let url = "";
+      if (row.type === "C") {
+        dizPath = path.join(collectionsPath, dirname, `${filename}.diz`);
+        url = `/release/${filename}`;
+      } else if (row.type === "M") {
+        dizPath = path.join(magsPath, dirname, `${filename}.diz`);
+        url = `/magazine/${filename}`;
+      } else if (row.type === "A") {
+        const base = filename.replace(/\.[^.]+$/, "");
+        dizPath = path.join(appsPath, `${base}.diz`);
+        url = `/application/${filename}`;
+      }
+      const content = readDiz(dizPath);
+      if (content) releases.push({ url, content });
+    }
+    return releases;
+  },
+  ["latest-releases-hero"],
+  { revalidate: 60 },
+);
+
 export default async function LatestReleasesStatic({ columns = 2, random = false, header = "LATEST RELEASES" }: {
   columns?: number;
   random?: boolean;
@@ -32,51 +87,7 @@ export default async function LatestReleasesStatic({ columns = 2, random = false
   const collectionsPath = process.env.COLLECTIONS_PATH ?? path.join(process.cwd(), "collections");
   const magsPath = process.env.MAGS_PATH ?? path.join(process.cwd(), "mags");
   const appsPath = process.env.APPS_PATH ?? path.join(process.cwd(), "apps");
-
-  const orderClause = random
-    ? Prisma.raw("ORDER BY RAND()")
-    : Prisma.raw("ORDER BY a.fyear DESC, a.fmonth DESC, a.fday DESC");
-
-  let rows: ReleaseRow[] = [];
-  try {
-    rows = await prisma.$queryRaw<ReleaseRow[]>(Prisma.sql`
-      SELECT * FROM (
-        SELECT 'C' AS type, filename,
-          year AS fyear, month AS fmonth, day AS fday
-        FROM collys
-        LIMIT 20
-      ) a
-      ${orderClause}
-      LIMIT 20
-    `);
-  } catch {
-    // DB unavailable — render the header with no releases
-  }
-
-  const releases: { url: string; content: string }[] = [];
-
-  for (const row of rows) {
-    if (releases.length >= columns) break;
-    const filename = String(row.filename);
-    const dirname = filename.replace(/\.[^.]+$/, "");
-    let dizPath = "";
-    let url = "";
-
-    if (row.type === "C") {
-      dizPath = path.join(collectionsPath, dirname, `${filename}.diz`);
-      url = `/release/${filename}`;
-    } else if (row.type === "M") {
-      dizPath = path.join(magsPath, dirname, `${filename}.diz`);
-      url = `/magazine/${filename}`;
-    } else if (row.type === "A") {
-      const base = filename.replace(/\.[^.]+$/, "");
-      dizPath = path.join(appsPath, `${base}.diz`);
-      url = `/application/${filename}`;
-    }
-
-    const content = readDiz(dizPath);
-    if (content) releases.push({ url, content });
-  }
+  const releases = await getReleasesForHero(random, columns, collectionsPath, magsPath, appsPath);
 
   const colSize = Math.round(12 / columns);
 

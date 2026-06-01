@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
 
@@ -12,19 +13,22 @@ function padPart(val: number | null | undefined, fallback: string): string {
   return String(val).padStart(2, "0");
 }
 
-async function getLatestCollys(type: "released" | "added", limit: number) {
-  return type === "released"
-    ? prisma.collys.findMany({
-        orderBy: [{ year: "desc" }, { month: "desc" }, { day: "desc" }, { timestamp: "desc" }],
-        take: limit,
-        select: { id: true, filename: true, year: true, month: true, day: true, timestamp: true },
-      })
-    : prisma.collys.findMany({
-        orderBy: { timestamp: "desc" },
-        take: limit,
-        select: { id: true, filename: true, year: true, month: true, day: true, timestamp: true },
-      });
-}
+const getLatestCollys = unstable_cache(
+  async (type: "released" | "added", limit: number) =>
+    type === "released"
+      ? prisma.collys.findMany({
+          orderBy: [{ year: "desc" }, { month: "desc" }, { day: "desc" }, { timestamp: "desc" }],
+          take: limit,
+          select: { id: true, filename: true, year: true, month: true, day: true, timestamp: true },
+        })
+      : prisma.collys.findMany({
+          orderBy: { timestamp: "desc" },
+          take: limit,
+          select: { id: true, filename: true, year: true, month: true, day: true, timestamp: true },
+        }),
+  ["latest-collys-widget"],
+  { revalidate: 60 },
+);
 
 export default async function LatestCollys({ type, limit = 8 }: LatestCollysProps) {
   try {

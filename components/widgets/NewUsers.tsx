@@ -1,15 +1,22 @@
 import Link from "next/link";
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
 
+const getNewUsers = unstable_cache(
+  async () => prisma.users.findMany({
+    orderBy: { joined: "desc" },
+    take: 5,
+    select: { id: true, nick: true, joined: true },
+  }),
+  ["new-users-widget"],
+  { revalidate: 60 },
+);
+
 export default async function NewUsers() {
   try {
-    const rows = await prisma.users.findMany({
-      orderBy: { joined: "desc" },
-      take: 5,
-      select: { id: true, nick: true, joined: true },
-    });
+    const rows = await getNewUsers();
 
     return (
       <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
