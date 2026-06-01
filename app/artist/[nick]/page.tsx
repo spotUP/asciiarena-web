@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { readFileSync, existsSync } from "fs";
+import path from "path";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/generated/prisma/client";
@@ -9,6 +11,24 @@ import { urlsafe, decodeParam } from "@/lib/utils";
 import ClaimArtistButton from "./ClaimArtistButton";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
 import WatchingPip from "@/components/widgets/WatchingPip";
+
+// Reads the .diz preview for a colly filename and HTML-escapes it for
+// dangerouslySetInnerHTML. Matches the home LatestReleasesStatic widget
+// so the Latest Release card on the artist page looks identical.
+function readReleaseDiz(filename: string): string | null {
+  const collectionsPath = process.env.COLLECTIONS_PATH ?? path.join(process.cwd(), "collections");
+  const dirname = filename.replace(/\.[^.]+$/, "");
+  const dizPath = path.join(collectionsPath, dirname, `${filename}.diz`);
+  try {
+    if (!existsSync(dizPath)) return null;
+    return readFileSync(dizPath).toString("latin1")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  } catch {
+    return null;
+  }
+}
 
 interface PageProps {
   params: Promise<{ nick: string }>;
@@ -227,32 +247,33 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
         {ratingDisplay}
       </div>
 
-      {/* Latest Release card. */}
-      {latestRelease && (
-        <>
-          <div className="row apt-1">
-            <h2 className="ap-1 bg-header">Latest Release</h2>
-          </div>
-          <div className="col-lg-12 pl-0 d-flex justify-content-between">
-            <div className="col-lg-4 pl-0">
-              <a className="magenta" href={`/release/${latestRelease.filename}`}>
-                {latestRelease.filename.slice(0, 20)}
-              </a>
+      {/* Latest Release — renders the colly's file_id.diz preview as
+          clickable ASCII, matching the home page's LatestReleasesStatic
+          widget. Falls back silently when the .diz file is missing. */}
+      {latestRelease && (() => {
+        const dizContent = readReleaseDiz(latestRelease.filename);
+        if (!dizContent) return null;
+        return (
+          <>
+            <div className="row apt-1">
+              <h2 className="ap-1 bg-header">Latest Release</h2>
             </div>
-            <div className="col-lg-4 pl-0">
-              {latestRelease.name?.slice(0, 35) ?? "-"}
-            </div>
-            {latestRelease.crew && latestRelease.crewurl && (
-              <div className="col-lg-2 pl-0">
-                <a href={`/crew/${latestRelease.crewurl}`}>{latestRelease.crew}</a>
+            <div className="row m-0 p-0">
+              <div className="col-12 d-flex justify-content-center align-items-center overflow-hidden apt-1 apb-1">
+                <div className="row">
+                  <pre>
+                    <a
+                      href={`/release/${latestRelease.filename}`}
+                      className="ascii magenta"
+                      dangerouslySetInnerHTML={{ __html: dizContent }}
+                    />
+                  </pre>
+                </div>
               </div>
-            )}
-            <div className="col-lg-2 pl-0">
-              <span className="lightgrey">{latestRelease.year}</span>
             </div>
-          </div>
-        </>
-      )}
+          </>
+        );
+      })()}
 
       {/* Sort links — each wrapped in col-lg-3 so the header alignment matches
           the data rows below (same 4 × col-lg-3 grid). Without the wrappers,
