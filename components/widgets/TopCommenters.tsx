@@ -40,7 +40,7 @@ export default async function TopCommenters({ limit = 5 }: { limit?: number }) {
               key={row.user_id}
               className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between"
             >
-              <Link className="yellow text-truncate" href={`/member/${urlsafe(row.nick)}`}>
+              <Link prefetch={false} className="yellow text-truncate" href={`/member/${urlsafe(row.nick)}`}>
                 {row.nick}
               </Link>
               <span className="text-truncate">{Number(row.topcommentators)}</span>

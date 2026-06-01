@@ -31,7 +31,7 @@ export default async function TopArtists({ limit = 5 }: { limit?: number }) {
                 key={row.id}
                 className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between"
               >
-                <Link className="green text-truncate" href={`/artist/${urlsafe(nick)}`}>
+                <Link prefetch={false} className="green text-truncate" href={`/artist/${urlsafe(nick)}`}>
                   {nick}
                 </Link>
                 <span className="text-truncate">{rating} PTS</span>

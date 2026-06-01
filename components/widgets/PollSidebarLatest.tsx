@@ -25,7 +25,7 @@ export default async function PollSidebarLatest() {
         variant="sidebar"
       />
       <div style={{ textAlign: "right", padding: "0 8px" }}>
-        <Link href="/polls/archive" className="lightgrey" style={{
+        <Link prefetch={false} href="/polls/archive" className="lightgrey" style={{
           fontFamily: "TopazPlus_a1200, monospace", fontSize: "16px", lineHeight: "16px",
         }}>
           {"[ all past polls -> ]"}

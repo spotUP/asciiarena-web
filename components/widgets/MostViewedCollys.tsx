@@ -34,7 +34,7 @@ export default async function MostViewedCollys({ limit = 5 }: { limit?: number }
                 key={row.id}
                 className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between"
               >
-                <Link className="magenta text-truncate" href={`/release/${filename}`}>
+                <Link prefetch={false} className="magenta text-truncate" href={`/release/${filename}`}>
                   {truncated}
                 </Link>
                 <span className="text-truncate">{row.view_counter}</span>

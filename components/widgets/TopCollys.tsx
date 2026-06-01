@@ -33,7 +33,7 @@ export default async function TopCollys({ limit = 5 }: { limit?: number }) {
             const rating = Number(row.rating).toFixed(1);
             return (
               <div key={filename} className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
-                <Link className="magenta text-truncate" href={`/release/${filename}`}>{filename}</Link>
+                <Link prefetch={false} className="magenta text-truncate" href={`/release/${filename}`}>{filename}</Link>
                 <span className="text-truncate">{rating} PTS</span>
               </div>
             );

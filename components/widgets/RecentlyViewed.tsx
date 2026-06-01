@@ -18,7 +18,7 @@ export default function RecentlyViewed() {
       <div className="col-12 bg-secondary ap-1 apb-1">
         {items.map(r => (
           <div key={r.filename} className="text-truncate" style={{ height: "16px", lineHeight: "16px", fontFamily: "TopazPlus_a1200, monospace", fontSize: "16px" }}>
-            <Link className="magenta" href={`/release/${r.filename}`}>{r.name ?? r.filename}</Link>
+            <Link prefetch={false} className="magenta" href={`/release/${r.filename}`}>{r.name ?? r.filename}</Link>
           </div>
         ))}
       </div>

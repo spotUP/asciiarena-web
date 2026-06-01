@@ -40,6 +40,7 @@ export default async function LastCallers({ limit = 5 }: LastCallersProps) {
                   className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between"
                 >
                   <Link
+                    prefetch={false}
                     className="yellow text-truncate"
                     href={`/member/${urlsafe(row.nick)}`}
                   >

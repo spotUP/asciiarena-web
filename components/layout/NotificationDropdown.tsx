@@ -109,7 +109,7 @@ export default function NotificationDropdown({ items, unread, onMarkAll, onClose
             </div>
           );
           return n.targetUrl ? (
-            <Link key={n.id} href={n.targetUrl} onClick={onClose} style={{ textDecoration: "none" }}>
+            <Link prefetch={false} key={n.id} href={n.targetUrl} onClick={onClose} style={{ textDecoration: "none" }}>
               {content}
             </Link>
           ) : (

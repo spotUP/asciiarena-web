@@ -13,9 +13,11 @@ const DRAFT_TTL = 4000;
 export default function SiteWall({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [posts, setPosts] = useState<WallPost[]>([]);
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
+  const [submitting, setSubmitting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const draftTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inFlight = useRef(false);
 
   useEffect(() => {
     fetch(`/api/wall?wall_id=${WALL_ID}`)
@@ -62,9 +64,15 @@ export default function SiteWall({ isLoggedIn }: { isLoggedIn: boolean }) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Guard against double-submit: synchronous ref so a second submit fired
+    // before React re-renders the button-disabled state still gets blocked.
+    if (inFlight.current) return;
     const input = inputRef.current;
     const text = input?.value?.trim();
     if (!text) return;
+    inFlight.current = true;
+    setSubmitting(true);
+    if (input) input.value = "";
     fetch("/api/wall", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -73,14 +81,17 @@ export default function SiteWall({ isLoggedIn }: { isLoggedIn: boolean }) {
       .then(r => r.json())
       .then((data: unknown) => {
         if (Array.isArray(data)) setPosts(data as WallPost[]);
-        if (input) input.value = "";
         fetch("/api/live", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ channel: CHANNEL, type: "clear" }),
         }).catch(() => {});
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        inFlight.current = false;
+        setSubmitting(false);
+      });
   };
 
   const activeDrafts = Object.values(drafts).filter(d => d.text.length > 0);
@@ -133,11 +144,12 @@ export default function SiteWall({ isLoggedIn }: { isLoggedIn: boolean }) {
                   placeholder="Tag the wall"
                   required
                   autoComplete="off"
+                  disabled={submitting}
                   onChange={e => broadcastTyping(e.target.value)}
                 />
               </div>
               <div className="col-2 col-lg-1 bg-secondary m-0 p-0">
-                <button className="button w-100 btn-primary black bg-lightgrey" type="submit">Tag</button>
+                <button className="button w-100 btn-primary black bg-lightgrey" type="submit" disabled={submitting}>Tag</button>
               </div>
             </div>
           </form>

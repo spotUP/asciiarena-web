@@ -44,7 +44,7 @@ export default async function LatestCollys({ type, limit = 8 }: LatestCollysProp
         <LiveRefresh channel="site:releases" />
         <div className="header col-lg-12 p-0">
           <h2 className={headerClass}>
-            <Link href={headerHref} className={isReleased ? undefined : "lightgreen"}>{headerText}</Link>
+            <Link prefetch={false} href={headerHref} className={isReleased ? undefined : "lightgreen"}>{headerText}</Link>
           </h2>
         </div>
         <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
@@ -58,7 +58,7 @@ export default async function LatestCollys({ type, limit = 8 }: LatestCollysProp
               const dy = padPart(row.day, "xx");
               return (
                 <div key={row.id} className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
-                  <span><Link className="magenta text-truncate" href={`/release/${filename}`}>{truncated}</Link></span>
+                  <span><Link prefetch={false} className="magenta text-truncate" href={`/release/${filename}`}>{truncated}</Link></span>
                   <span className="text-truncate">{yr}-{mo}-{dy}</span>
                 </div>
               );
@@ -68,7 +68,7 @@ export default async function LatestCollys({ type, limit = 8 }: LatestCollysProp
                 : "";
               return (
                 <div key={row.id} className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
-                  <Link className="magenta text-truncate" href={`/release/${filename}`}>{truncated}</Link>
+                  <Link prefetch={false} className="magenta text-truncate" href={`/release/${filename}`}>{truncated}</Link>
                   <span className="text-truncate">{uploadDate}</span>
                 </div>
               );

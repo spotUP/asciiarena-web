@@ -412,7 +412,7 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
             flexShrink: 0,
           }}
         >
-          SND
+          Send
         </button>
       </div>
     </div>

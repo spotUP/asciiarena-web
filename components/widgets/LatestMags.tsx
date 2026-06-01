@@ -26,7 +26,7 @@ export default async function LatestMags({ limit = 5 }: LatestMagsProps) {
         <LiveRefresh channel="site:mags" />
         <div className="header col-lg-12 p-0">
           <h2 className="ap-1 bg-header text-truncate lightgreen">
-            <Link className="lightgreen" href="/mags?sort_by=timestamp&sort_order=D">LATEST ADDED MAGS</Link>
+            <Link prefetch={false} className="lightgreen" href="/mags?sort_by=timestamp&sort_order=D">LATEST ADDED MAGS</Link>
           </h2>
         </div>
         <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
@@ -38,7 +38,7 @@ export default async function LatestMags({ limit = 5 }: LatestMagsProps) {
               : "";
             return (
               <div key={row.id} className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
-                <Link className="magenta text-truncate" href={`/magazine/${filename}`}>{truncated}</Link>
+                <Link prefetch={false} className="magenta text-truncate" href={`/magazine/${filename}`}>{truncated}</Link>
                 <span className="text-truncate">{uploadDate}</span>
               </div>
             );
