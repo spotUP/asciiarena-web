@@ -139,13 +139,6 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
       ? `Awaiting ${Math.max(0, 3 - voteCount)} votes`
       : `${artist.rating.toFixed(1)} (${voteCount} votes)`;
 
-  // Latest release is the most recent by year/month
-  const latestRelease = releasesRaw.reduce<ReleaseRow | null>((best, r) => {
-    if (!best) return r;
-    if ((r.year ?? 0) > (best.year ?? 0)) return r;
-    return best;
-  }, null);
-
   const acronym = artist.acronym ?? artist.nick;
 
   return (
@@ -226,32 +219,12 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
         {ratingDisplay}
       </div>
 
-      {/* Latest Release */}
-      {latestRelease && (
-        <>
-          <div className="row apt-1">
-            <h2 className="ap-1 bg-header">Latest Release</h2>
-          </div>
-          <div className="col-lg-12 pl-0 d-flex justify-content-between">
-            <div className="col-lg-4 pl-0">
-              <Link className="magenta" href={`/release/${latestRelease.filename}`}>
-                {latestRelease.filename.slice(0, 20)}
-              </Link>
-            </div>
-            <div className="col-lg-4 pl-0">
-              {latestRelease.name?.slice(0, 35) ?? "-"}
-            </div>
-            {latestRelease.crew && latestRelease.crewurl && (
-              <div className="col-lg-2 pl-0">
-                <Link href={`/crew/${latestRelease.crewurl}`}>{latestRelease.crew}</Link>
-              </div>
-            )}
-            <div className="col-lg-2 pl-0">
-              <span className="lightgrey">{latestRelease.year}</span>
-            </div>
-          </div>
-        </>
-      )}
+      {/* Removed the dedicated "Latest Release" card — it duplicated the
+          first row of the All Releases table (when sorted by year DESC) and
+          read visually as the first table row, breaking the apparent sort
+          order when the user picked Name/Crew. The All Releases table below
+          shows the same release; default sort is filename ASC, but Release
+          Date is one click away. */}
 
       {/* Sort links — each wrapped in col-lg-3 so the header alignment matches
           the data rows below (same 4 × col-lg-3 grid). Without the wrappers,
