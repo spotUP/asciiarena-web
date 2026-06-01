@@ -7,7 +7,12 @@ import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { getSession as auth } from "@/lib/session";
-import { urlsafe, decodeParam } from "@/lib/utils";
+import { urlsafe, decodeParam, formatBytes } from "@/lib/utils";
+
+const MONTHS = [
+  "Unknown", "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
 import ClaimArtistButton from "./ClaimArtistButton";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
 import WatchingPip from "@/components/widgets/WatchingPip";
@@ -48,6 +53,13 @@ interface ReleaseRow {
   filename: string;
   name: string | null;
   year: number | null;
+  month: number | null;
+  day: number | null;
+  filesize: number | null;
+  uploader: string | null;
+  view_counter: number | null;
+  downloads: number | null;
+  rating: number | null;
   crew: string | null;
   crewurl: string | null;
 }
@@ -129,7 +141,9 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
     prisma.member_of.findMany({ where: { nick: artist.nick } }),
     prisma.artists_collys.findMany({ where: { artist_id: artist.id }, select: { colly_id: true } }),
     prisma.$queryRaw<ReleaseRow[]>`
-      SELECT ac.colly_id, c.filename, c.name, c.year, w.name AS crew, w.crewurl
+      SELECT ac.colly_id, c.filename, c.name, c.year, c.month, c.day,
+             c.filesize, c.uploader, c.view_counter, c.downloads, c.rating,
+             w.name AS crew, w.crewurl
       FROM artists_collys ac
       JOIN collys c ON c.id = ac.colly_id
       LEFT JOIN collys_crews cc ON cc.colly_id = c.id AND cc.sortorder = (
@@ -247,27 +261,66 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
         {ratingDisplay}
       </div>
 
-      {/* Latest Release — renders the colly's file_id.diz preview as
-          clickable ASCII, matching the home page's LatestReleasesStatic
-          widget. Falls back silently when the .diz file is missing. */}
+      {/* Latest Release — same .diz-left/metadata-right layout as
+          /release/[filename] info_release_summary, so the artist page
+          mirrors the dedicated release page. Falls back silently when
+          the .diz file is missing. */}
       {latestRelease && (() => {
         const dizContent = readReleaseDiz(latestRelease.filename);
         if (!dizContent) return null;
+        const lrDay = latestRelease.day && latestRelease.day !== 0 ? latestRelease.day : null;
+        const lrMonth = latestRelease.month && latestRelease.month !== 0 ? MONTHS[latestRelease.month] : null;
+        const lrYear = latestRelease.year && latestRelease.year !== 0 ? latestRelease.year : null;
+        const lrShowDate = lrDay || lrMonth || lrYear;
+        const lrRating = (latestRelease.rating && latestRelease.rating > 0)
+          ? `${Number(latestRelease.rating).toFixed(1)}`
+          : "Awaiting votes";
         return (
           <>
             <div className="row apt-1">
               <h2 className="ap-1 bg-header">Latest Release</h2>
             </div>
-            <div className="row m-0 p-0">
-              <div className="col-12 d-flex justify-content-center align-items-center overflow-hidden apt-1 apb-1">
-                <div className="row">
-                  <pre>
-                    <a
-                      href={`/release/${latestRelease.filename}`}
-                      className="ascii magenta"
+            <div className="container-fluid">
+              <div className="row apt-1 apl-1 apr-1 bg-secondary overflow-hidden">
+                {/* Left: .diz preview */}
+                <div className="col-lg-8 d-flex justify-content-center justify-content-lg-start" style={{ position: "relative", top: "-16px" }}>
+                  <span>
+                    <pre
+                      className="magenta apt-1"
                       dangerouslySetInnerHTML={{ __html: dizContent }}
                     />
-                  </pre>
+                  </span>
+                </div>
+                {/* Right: metadata */}
+                <div className="col-lg-4 apb-1">
+                  <div>
+                    <span className="white">Artist: </span>
+                    <Link className="green" href={`/artist/${artist.artisturl}`}>{artist.nick}</Link>
+                  </div>
+                  {latestRelease.crew && latestRelease.crewurl && (
+                    <div>
+                      <span className="white">Crew: </span>
+                      <Link href={`/crew/${latestRelease.crewurl}`}>{latestRelease.crew}</Link>
+                    </div>
+                  )}
+                  <div><span className="white">Name: </span>{latestRelease.name ?? "-"}</div>
+                  <div>
+                    <span className="white">Filename: </span>
+                    <Link className="magenta" href={`/release/${latestRelease.filename}`}>{latestRelease.filename}</Link>
+                  </div>
+                  <div><span className="white">Size: </span>{latestRelease.filesize != null ? formatBytes(Number(latestRelease.filesize)) : "-"}</div>
+                  {lrShowDate && (
+                    <div><span className="white">Released: </span>{[lrDay, lrMonth, lrYear].filter(Boolean).join(" ")}</div>
+                  )}
+                  <div><span className="white">Rating: </span>{lrRating}</div>
+                  {latestRelease.uploader && (
+                    <div>
+                      <span className="white">Added by: </span>
+                      <Link href={`/member/${urlsafe(latestRelease.uploader)}`}>{latestRelease.uploader}</Link>
+                    </div>
+                  )}
+                  <div><span className="white">Viewed: </span>{latestRelease.view_counter ?? 0} times</div>
+                  <div><span className="white">Downloaded: </span>{latestRelease.downloads ?? 0} time{(latestRelease.downloads ?? 0) !== 1 ? "s" : ""}</div>
                 </div>
               </div>
             </div>
