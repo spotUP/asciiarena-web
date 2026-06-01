@@ -232,17 +232,24 @@ export default async function ReleasePage({ params }: PageProps) {
         <div className="container-fluid">
           <div className="row apt-1">
             <div className="col-12">
-              <h2 className="ap-1 bg-header">More by {artists[0]?.nick}</h2>
+              {/* marginBottom 0 overrides the site-wide bg-header
+                  gap; this header sits flush against the bg-secondary
+                  strip directly below it. */}
+              <h2 className="ap-1 bg-header" style={{ marginBottom: 0 }}>More by {artists[0]?.nick}</h2>
             </div>
           </div>
-          <div className="row apt-1 apb-1 bg-secondary">
-            {moreByArtist.map(r => (
-              <div key={r.colly_id} className="col-12 col-sm-6 col-md-4 text-truncate apl-1 apb-1">
-                <Link className="magenta" href={`/release/${r.collys?.filename}`}>
-                  {r.collys?.name ?? r.collys?.filename}
-                </Link>
+          <div className="row">
+            <div className="col-12 bg-secondary apt-1 apb-1">
+              <div className="row">
+                {moreByArtist.map(r => (
+                  <div key={r.colly_id} className="col-12 col-sm-6 col-md-4 text-truncate apl-1 apb-1">
+                    <Link className="magenta" href={`/release/${r.collys?.filename}`}>
+                      {r.collys?.name ?? r.collys?.filename}
+                    </Link>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
       )}
@@ -251,17 +258,21 @@ export default async function ReleasePage({ params }: PageProps) {
         <div className="container-fluid">
           <div className="row apt-1">
             <div className="col-12">
-              <h2 className="ap-1 bg-header">More from {crews[0]?.name}</h2>
+              <h2 className="ap-1 bg-header" style={{ marginBottom: 0 }}>More from {crews[0]?.name}</h2>
             </div>
           </div>
-          <div className="row apt-1 apb-1 bg-secondary">
-            {moreFromCrew.map(r => (
-              <div key={r.colly_id} className="col-12 col-sm-6 col-md-4 text-truncate apl-1 apb-1">
-                <Link className="magenta" href={`/release/${r.collys?.filename}`}>
-                  {r.collys?.name ?? r.collys?.filename}
-                </Link>
+          <div className="row">
+            <div className="col-12 bg-secondary apt-1 apb-1">
+              <div className="row">
+                {moreFromCrew.map(r => (
+                  <div key={r.colly_id} className="col-12 col-sm-6 col-md-4 text-truncate apl-1 apb-1">
+                    <Link className="magenta" href={`/release/${r.collys?.filename}`}>
+                      {r.collys?.name ?? r.collys?.filename}
+                    </Link>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
       )}
