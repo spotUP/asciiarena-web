@@ -139,6 +139,14 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
       ? `Awaiting ${Math.max(0, 3 - voteCount)} votes`
       : `${artist.rating.toFixed(1)} (${voteCount} votes)`;
 
+  // Latest release is the most recent by year/month — shown in its own
+  // card above the All Releases table.
+  const latestRelease = releasesRaw.reduce<ReleaseRow | null>((best, r) => {
+    if (!best) return r;
+    if ((r.year ?? 0) > (best.year ?? 0)) return r;
+    return best;
+  }, null);
+
   const acronym = artist.acronym ?? artist.nick;
 
   return (
@@ -219,12 +227,46 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
         {ratingDisplay}
       </div>
 
-      {/* Removed the dedicated "Latest Release" card — it duplicated the
-          first row of the All Releases table (when sorted by year DESC) and
-          read visually as the first table row, breaking the apparent sort
-          order when the user picked Name/Crew. The All Releases table below
-          shows the same release; default sort is filename ASC, but Release
-          Date is one click away. */}
+      {/* Latest Release card. Visually separated from the All Releases
+          table below by:
+            - its own bg-header heading "Latest Release"
+            - a yellow outline + slightly darker bg so the card reads as a
+              distinct box, not a stray row of the table
+            - an explicit "Latest Release" prefix on the row itself for
+              extra clarity if someone misses the heading */}
+      {latestRelease && (
+        <>
+          <div className="row apt-1">
+            <h2 className="ap-1 bg-header">Latest Release</h2>
+          </div>
+          <div
+            className="col-lg-12 d-flex justify-content-between"
+            style={{
+              border: "1px solid #ffff55",
+              padding: "8px 0",
+              background: "#212121",
+              marginBottom: "16px",
+            }}
+          >
+            <div className="col-lg-4 pl-0" style={{ paddingLeft: "8px" }}>
+              <a className="magenta" href={`/release/${latestRelease.filename}`}>
+                {latestRelease.filename.slice(0, 20)}
+              </a>
+            </div>
+            <div className="col-lg-4 pl-0">
+              {latestRelease.name?.slice(0, 35) ?? "-"}
+            </div>
+            {latestRelease.crew && latestRelease.crewurl && (
+              <div className="col-lg-2 pl-0">
+                <a href={`/crew/${latestRelease.crewurl}`}>{latestRelease.crew}</a>
+              </div>
+            )}
+            <div className="col-lg-2 pl-0">
+              <span className="lightgrey">{latestRelease.year}</span>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Sort links — each wrapped in col-lg-3 so the header alignment matches
           the data rows below (same 4 × col-lg-3 grid). Without the wrappers,
