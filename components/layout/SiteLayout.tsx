@@ -221,6 +221,15 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
         }
         document.getElementById("login-submit-btn")?.addEventListener("click", loginUser);
         document.getElementById("login-form")?.addEventListener("submit", function(e) { e.preventDefault(); loginUser(); });
+        // Enter doesn't trigger implicit form submission here because the
+        // form has two text inputs and no submit-type button (the LOG iN
+        // button is type="button" so we can intercept the click and POST
+        // via fetch instead of letting NextAuth redirect us off-host).
+        // Add an explicit Enter handler to both inputs so password+Enter
+        // logs in like the user expects.
+        function onEnter(e) { if (e.key === "Enter") { e.preventDefault(); loginUser(); } }
+        document.getElementById("login-nick")?.addEventListener("keydown", onEnter);
+        document.getElementById("login-password")?.addEventListener("keydown", onEnter);
         document.getElementById("login")?.addEventListener("shown.bs.modal", function() {
           document.getElementById("login-nick")?.focus();
         });
