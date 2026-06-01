@@ -516,6 +516,19 @@ h2.bg-header,
 h3.bg-header {
   margin-bottom: 16px !important;
 }
+/* …except inside the left/right sidebar columns, where each widget is
+   a self-contained card whose header bar should sit flush against the
+   bg-secondary body directly below it. The vertical spacing instead
+   goes on the widget container so widgets stack with a clean 16px gap
+   between cards. */
+.col-lg-2 h1.bg-header,
+.col-lg-2 h2.bg-header,
+.col-lg-2 h3.bg-header {
+  margin-bottom: 0 !important;
+}
+.col-lg-2 > .container {
+  margin-bottom: 16px;
+}
 
 /* Poll cards: tighten form-check row spacing so 8 options don't waste a
    screen of vertical space. The 16-line height + 4px tail makes each row
