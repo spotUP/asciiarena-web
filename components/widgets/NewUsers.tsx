@@ -26,8 +26,16 @@ export default async function NewUsers() {
         </div>
         <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
           {rows.map((row) => {
-            const joinDate = row.joined
-              ? new Date(Number(row.joined) * 1000).toISOString().substring(2, 10)
+            // users.joined is sometimes a unix timestamp (numeric string),
+            // sometimes a "YYYY-MM-DD" string (newer rows). Number(joined)
+            // on the latter is NaN, which made `new Date(NaN).toISOString()`
+            // throw RangeError on every home-page render. Handle both.
+            const raw = row.joined == null ? "" : String(row.joined);
+            const ts = /^\d+$/.test(raw)
+              ? new Date(Number(raw) * 1000)
+              : new Date(raw);
+            const joinDate = Number.isFinite(ts.getTime())
+              ? ts.toISOString().substring(2, 10)
               : "";
             return (
               <div
