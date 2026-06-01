@@ -86,7 +86,7 @@ export default function BBSClient({ initialSort, initialOrder }: BBSClientProps)
       />
       <div className="row">
         <div className="col-6 m-0 apt-1 apb-1 d-flex">
-          <div className="bg-secondary apb-1 w-100">
+          <div className="bg-secondary w-100">
             <input
               id="filter"
               value={filter}
