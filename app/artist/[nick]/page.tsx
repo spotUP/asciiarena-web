@@ -82,14 +82,24 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
   const canClaim = !!userId && isUnclaimed;
 
   // Map validated sort keys to safe Prisma.sql fragments — never interpolates user input.
-  // c.name uses COALESCE(c.name, c.filename) because the UI falls back to the
-  // filename when name is NULL; without the COALESCE, MySQL sorts NULLs first
-  // (all the filename-fallback rows cluster at the top alphabetised by NULL)
-  // and the sort looks broken visually even though it ran.
+  //
+  // Two corrections vs. the obvious "ORDER BY c.name":
+  //   1. COALESCE with c.filename for c.name (and likewise route the empty
+  //      crew through "IS NULL" first) so NULL columns don't quietly cluster
+  //      at the top under default ASC NULLS-first behaviour.
+  //   2. LOWER() so the sort is case-insensitive — without it uppercase
+  //      filenames like "R21-AAP.ZIP" sort before lowercase ones like
+  //      "asc-w46.txt" (ASCII 'R' is 82, 'a' is 97) and the result looks
+  //      random to a human reader.
+  // TRIM-around-LOWER is essential: at least one row in the wild has a
+  // leading space in c.filename (which CSS collapses in the render but
+  // SQL sorts as ASCII 32 → that row always bubbles to position 1).
+  // Same defensive trimming on c.name and w.name so any leading
+  // whitespace doesn't poison the comparison.
   const SORT_SQL: Record<string, Prisma.Sql> = {
-    "c.filename":       Prisma.sql`c.filename`,
-    "c.name":           Prisma.sql`COALESCE(c.name, c.filename)`,
-    "w.name":           Prisma.sql`w.name`,
+    "c.filename":       Prisma.sql`LOWER(TRIM(c.filename))`,
+    "c.name":           Prisma.sql`LOWER(TRIM(CASE WHEN c.name IS NULL OR LENGTH(TRIM(c.name)) = 0 THEN c.filename ELSE c.name END))`,
+    "w.name":           Prisma.sql`(w.name IS NULL OR LENGTH(TRIM(w.name)) = 0), LOWER(TRIM(w.name))`,
     "c.year":           Prisma.sql`c.year`,
     "c.year, c.month":  Prisma.sql`c.year, c.month`,
   };
