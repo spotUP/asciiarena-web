@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, after } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { broadcast, subscriberCount } from "@/lib/live";
@@ -8,6 +8,14 @@ import { Prisma } from "@/lib/generated/prisma/client";
 export const dynamic = "force-dynamic";
 
 const BOT_UA = /bot|crawl|spider|google|bing|yahoo|baidu|duckduck|semrush|ahrefs|python|curl|wget|scrapy|java\/|ruby\/|go-http/i;
+
+// Throttle the heavy broadcastOnline() fan-out to once per 5s across all
+// concurrent pings. Every browser tab fires a heartbeat ping on mount and
+// every 60s; without this, a tab-burst (a few visitors loading at once)
+// makes every ping wait on 2 fresh DB queries + a fan-out. With it, those
+// pings return instantly and one broadcast covers the whole window.
+const BROADCAST_INTERVAL_MS = 5_000;
+let lastBroadcast = 0;
 
 async function broadcastOnline() {
   const cutoff = Math.floor(Date.now() / 1000) - 300;
@@ -61,6 +69,14 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  await broadcastOnline();
+  // Fan-out runs AFTER the response is sent (next/server's `after` hook),
+  // and only one fan-out fires per 5s window even under a tab-burst, so the
+  // client never waits on broadcastOnline()'s 2 DB queries.
+  const nowMs = Date.now();
+  if (nowMs - lastBroadcast >= BROADCAST_INTERVAL_MS) {
+    lastBroadcast = nowMs;
+    after(() => broadcastOnline().catch(() => { /* swallow */ }));
+  }
+
   return apiOk({ ok: true });
 }
