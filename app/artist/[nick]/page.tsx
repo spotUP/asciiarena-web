@@ -227,28 +227,14 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
         {ratingDisplay}
       </div>
 
-      {/* Latest Release card. Visually separated from the All Releases
-          table below by:
-            - its own bg-header heading "Latest Release"
-            - a yellow outline + slightly darker bg so the card reads as a
-              distinct box, not a stray row of the table
-            - an explicit "Latest Release" prefix on the row itself for
-              extra clarity if someone misses the heading */}
+      {/* Latest Release card. */}
       {latestRelease && (
         <>
           <div className="row apt-1">
             <h2 className="ap-1 bg-header">Latest Release</h2>
           </div>
-          <div
-            className="col-lg-12 d-flex justify-content-between"
-            style={{
-              border: "1px solid #ffff55",
-              padding: "8px 0",
-              background: "#212121",
-              marginBottom: "16px",
-            }}
-          >
-            <div className="col-lg-4 pl-0" style={{ paddingLeft: "8px" }}>
+          <div className="col-lg-12 pl-0 d-flex justify-content-between">
+            <div className="col-lg-4 pl-0">
               <a className="magenta" href={`/release/${latestRelease.filename}`}>
                 {latestRelease.filename.slice(0, 20)}
               </a>

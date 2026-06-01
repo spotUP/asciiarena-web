@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from "react";
 
-interface Counts { broken: number; pending: number; total: number }
+interface Counts { broken: number; total: number }
 
-// Tiny pill next to the ADMIN navbar link showing how many things need
-// triage (broken collys + pending requests). Subscribes to the
-// site:moderation channel and re-fetches on any event so it stays in
-// sync with the dashboard counters.
+// Tiny pill next to the ADMIN navbar link showing how many broken collys
+// are awaiting review. Subscribes to the site:moderation channel and
+// re-fetches on any event.
 export default function ModerationBadge() {
-  const [counts, setCounts] = useState<Counts>({ broken: 0, pending: 0, total: 0 });
+  const [counts, setCounts] = useState<Counts>({ broken: 0, total: 0 });
 
   const refresh = () => {
     fetch("/api/admin/moderation-count")
@@ -33,7 +32,7 @@ export default function ModerationBadge() {
 
   if (counts.total === 0) return null;
 
-  const title = `${counts.broken} broken colly${counts.broken === 1 ? "" : "s"}, ${counts.pending} pending request${counts.pending === 1 ? "" : "s"}`;
+  const title = `${counts.broken} broken colly${counts.broken === 1 ? "" : "s"} need review`;
 
   return (
     <span

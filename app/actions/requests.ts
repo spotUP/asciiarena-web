@@ -55,8 +55,6 @@ export async function updateRequestStatus(
   revalidatePath('/requests/' + requestId);
   broadcast("site:status", { type: "request-status", id: requestId, status });
   broadcast(`requests:${requestId}`, { type: "status", status });
-  // Pending requests count goes down (or back up) — refresh the badge.
-  broadcast("site:moderation", { type: "request-status", id: requestId, status });
   if (req.requestedby && req.requestedby !== userId) {
     await createNotification(req.requestedby, "notif-status", {
       actorNick: session.user.name ?? null,

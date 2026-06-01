@@ -4,23 +4,21 @@ import { auth } from "@/lib/auth";
 
 interface CountRow { cnt: bigint | number }
 
-// Tiny endpoint backing the ModerationBadge in the navbar. Counts the two
-// things that need an admin's attention: broken collys awaiting review,
-// and submitted requests still in the open (pending triage) state.
+// Tiny endpoint backing the ModerationBadge in the navbar. Only counts
+// broken collys awaiting review. Open requests are a normal part of the
+// site flow, not something an admin needs to triage.
 export async function GET() {
   const session = await auth();
   if ((session?.user as { rank?: string } | undefined)?.rank !== "Admin") {
-    return NextResponse.json({ broken: 0, pending: 0, total: 0 }, { status: 403 });
+    return NextResponse.json({ broken: 0, total: 0 }, { status: 403 });
   }
   try {
-    const [brokenRow, pendingRow] = await Promise.all([
+    const [brokenRow] = await Promise.all([
       prisma.$queryRaw<CountRow[]>`SELECT COUNT(*) AS cnt FROM collys WHERE broken = 1`,
-      prisma.$queryRaw<CountRow[]>`SELECT COUNT(*) AS cnt FROM requests WHERE status = 0`,
     ]);
     const broken = Number(brokenRow[0]?.cnt ?? 0);
-    const pending = Number(pendingRow[0]?.cnt ?? 0);
-    return NextResponse.json({ broken, pending, total: broken + pending });
+    return NextResponse.json({ broken, total: broken });
   } catch {
-    return NextResponse.json({ broken: 0, pending: 0, total: 0 });
+    return NextResponse.json({ broken: 0, total: 0 });
   }
 }
