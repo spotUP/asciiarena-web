@@ -907,34 +907,29 @@ export default function ReleaseClient({
 
       {/* Comments list */}
       <div id="comments">
-        {/* Add comment form — always visible for logged-in users */}
+        {/* Add comment form — always visible for logged-in users.
+            Rows render at full width to match the colly preview above;
+            the previous apl-1/apr-1/aml-1/amr-1 padding-margin combo
+            indented the form by 16-32px on each side. */}
         {userNick && (
           <div className="amb-1">
-            <div className="row apl-1 apr-1">
-              <div className="header bg-header col-12 ap-1">ENTER YOUR COMMENT</div>
-            </div>
-            <div className="row">
-              <div className="col-12 aml-1 amr-1">
-                <textarea
-                  style={{ height: "128px", width: "100%" }}
-                  className="bg-secondary cyan ap-1"
-                  value={commentText}
-                  onChange={e => { setCommentText(e.target.value); broadcastTyping(e.target.value); }}
-                />
+            <div className="header bg-header col-12 ap-1">ENTER YOUR COMMENT</div>
+            <textarea
+              style={{ height: "128px", width: "100%", display: "block" }}
+              className="bg-secondary cyan ap-1"
+              value={commentText}
+              onChange={e => { setCommentText(e.target.value); broadcastTyping(e.target.value); }}
+            />
+            <div className="col-12 apl-1 apr-1 apb-1 apt-1 bg-secondary">
+              <div className="col-2 d-flex justify-content-between">
+                <label className="apr-1" htmlFor="user_rating">RATING</label>
+                <select id="user_rating" className="form-select" value={rating} onChange={e => setRating(e.target.value)}>
+                  <option value="">Blank</option>
+                  {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
+                </select>
               </div>
-            </div>
-            <div className="row aml-1 apl-1 apr-1">
-              <div className="col-12 apl-1 apr-1 apb-1 apt-1 bg-secondary">
-                <div className="col-2 d-flex justify-content-between">
-                  <label className="apr-1" htmlFor="user_rating">RATING</label>
-                  <select id="user_rating" className="form-select" value={rating} onChange={e => setRating(e.target.value)}>
-                    <option value="">Blank</option>
-                    {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
-                  </select>
-                </div>
-                <div className="col-12 p-0 m-0 apt-1">
-                  <input type="button" className="btn-big" value="Comment" onClick={sendComment} />
-                </div>
+              <div className="col-12 p-0 m-0 apt-1">
+                <input type="button" className="btn-big" value="Comment" onClick={sendComment} />
               </div>
             </div>
           </div>
