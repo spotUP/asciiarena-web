@@ -8,6 +8,7 @@ below.
 |---|---|
 | `asciiarena-next-dev.service` | `/etc/systemd/system/asciiarena-next-dev.service` |
 | `dev.asciiarena.se-ssl.conf` | `/etc/apache2/sites-enabled/dev.asciiarena.se-ssl.conf` |
+| `asciiarena.se-le-ssl.conf` | `/etc/apache2/sites-enabled/asciiarena.se-le-ssl.conf` (prod) |
 | `mpm_event.conf` | `/etc/apache2/mods-enabled/mpm_event.conf` |
 
 ## Sync the systemd unit
@@ -80,7 +81,9 @@ unresponsive" and "many hundreds fine".
 
 ## Prod
 
-There's no prod equivalent file checked in yet — production still runs PHP
-from the rollback at `0b927be`, so the prod systemd unit + Apache vhost
-haven't needed these changes. Add them here when prod cuts over to
-Next.js.
+Prod cut over to Next.js on 2026-06-01 (see `asciiarena.se-le-ssl.conf`).
+The prod systemd unit `asciiarena-next.service` got the same
+`KillMode=mixed` + `TimeoutStopSec=10` patch as dev, applied in place. The
+old PHP-routing vhost is preserved on the server as
+`asciiarena.se-le-ssl.conf.bak-pre-cutover-*` for emergency rollback —
+restore that file, reload Apache, and PHP is back.
