@@ -229,41 +229,41 @@ export default async function ReleasePage({ params }: PageProps) {
       </div>
 
       {moreByArtist.length > 0 && (
-        <>
+        <div className="container-fluid">
           <div className="row apt-1">
             <div className="col-12">
               <h2 className="ap-1 bg-header">More by {artists[0]?.nick}</h2>
             </div>
           </div>
-          <div className="row apt-1 bg-secondary">
+          <div className="row apt-1 apb-1 bg-secondary">
             {moreByArtist.map(r => (
-              <div key={r.colly_id} className="col-12 col-sm-6 col-md-4 text-truncate">
+              <div key={r.colly_id} className="col-12 col-sm-6 col-md-4 text-truncate apl-1 apb-1">
                 <Link className="magenta" href={`/release/${r.collys?.filename}`}>
                   {r.collys?.name ?? r.collys?.filename}
                 </Link>
               </div>
             ))}
           </div>
-        </>
+        </div>
       )}
 
       {moreFromCrew.length > 0 && (
-        <>
+        <div className="container-fluid">
           <div className="row apt-1">
             <div className="col-12">
               <h2 className="ap-1 bg-header">More from {crews[0]?.name}</h2>
             </div>
           </div>
-          <div className="row apt-1 bg-secondary">
+          <div className="row apt-1 apb-1 bg-secondary">
             {moreFromCrew.map(r => (
-              <div key={r.colly_id} className="col-12 col-sm-6 col-md-4 text-truncate">
+              <div key={r.colly_id} className="col-12 col-sm-6 col-md-4 text-truncate apl-1 apb-1">
                 <Link className="magenta" href={`/release/${r.collys?.filename}`}>
                   {r.collys?.name ?? r.collys?.filename}
                 </Link>
               </div>
             ))}
           </div>
-        </>
+        </div>
       )}
 
       <Suspense>
