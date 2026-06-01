@@ -946,7 +946,7 @@ export default function ReleaseClient({
               <span className="cyan" style={{ whiteSpace: "pre-wrap" }}>
                 {c.comment ?? `${c.nick} voted ${c.rating}`}
               </span>
-              <div className="col-12 p-0 m-0 apt-1">
+              <div className="col-12 p-0 m-0 apt-1" style={{ display: "flex", gap: "8px" }}>
                 {isAdmin && (
                   <>
                     <input type="button" className="btn-big" value="Edit" onClick={() => startEdit(c)} />
