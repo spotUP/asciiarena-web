@@ -91,10 +91,17 @@ export async function POST(request: NextRequest) {
     `;
     return apiOk({ status: true });
   } else {
-    await prisma.$executeRaw`
-      INSERT INTO styles (name, style, user, user_ids, status, group_id)
-      VALUES (${fontname}, ${fontdata}, ${userId}, ${userId}, ${fontstatus}, ${groupId})
-    `;
-    return apiOk({ status: true }, 201);
+    // Return the new id so the editor can switch to UPDATE mode and auto-save
+    // edits without creating a duplicate every time. INSERT + LAST_INSERT_ID()
+    // must share one connection (it's connection-scoped), hence the transaction.
+    const newFontId = await prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`
+        INSERT INTO styles (name, style, user, user_ids, status, group_id)
+        VALUES (${fontname}, ${fontdata}, ${userId}, ${userId}, ${fontstatus}, ${groupId})
+      `;
+      const inserted = await tx.$queryRaw<[{ id: bigint | number }]>`SELECT LAST_INSERT_ID() AS id`;
+      return Number(inserted[0]?.id ?? 0);
+    });
+    return apiOk({ status: true, fontid: newFontId }, 201);
   }
 }

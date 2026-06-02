@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import Script from "next/script";
+import { useToast } from "@/components/ui/ToastProvider";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -213,6 +214,11 @@ export default function StyleEditorClient({ userId }: { userNick: string; userId
   const [previewOutput, setPreviewOutput] = useState("");
   const [showHardBlanks, setShowHardBlanks] = useState(false);
   const [status, setStatus] = useState<{ msg: string; ok: boolean } | null>(null);
+  const { toast } = useToast();
+  // Skips the auto-save effect for non-user font changes (initial mount,
+  // loading a font, capturing a freshly-created font's id). Starts true so the
+  // mount render doesn't auto-save.
+  const suppressAutoSaveRef = useRef(true);
   const [importText, setImportText] = useState("");
   const [showImport, setShowImport] = useState(false);
   const [showExport, setShowExport] = useState(false);
@@ -255,6 +261,7 @@ export default function StyleEditorClient({ userId }: { userNick: string; userId
   }, []);
 
   const loadFont = useCallback(async (id: number) => {
+    suppressAutoSaveRef.current = true; // programmatic font swap — don't auto-save it
     if (id === 0) { setFont(emptyFont()); undoStacks.current.clear(); return; }
     const r = await fetch(`/api/fonts?id=${id}`);
     if (!r.ok) return;
@@ -273,21 +280,42 @@ export default function StyleEditorClient({ userId }: { userNick: string; userId
   }, []);
 
   const saveFont = useCallback(async () => {
-    if (!font.fontname.trim()) { setStatus({ msg: "Fill in the font name first.", ok: false }); return; }
+    if (!font.fontname.trim()) { toast("Fill in the font name first.", "warning"); return; }
+    const creating = !font.fontid;
     const body = { fontid: font.fontid || undefined, fontname: font.fontname, fontstatus: font.fontstatus, fontdata: createFigFileData(font), group_id: font.group_id };
     const r = await fetch("/api/fonts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-    if (r.ok) { setStatus({ msg: "Font saved!", ok: true }); await loadFontList(); }
-    else setStatus({ msg: "Save failed.", ok: false });
-  }, [font, loadFontList]);
+    if (r.ok) {
+      if (creating) {
+        // Capture the new id so the next save UPDATEs instead of inserting a
+        // duplicate. Setting it is a non-user change, so suppress its auto-save.
+        const d = await r.json().catch(() => null) as { fontid?: number } | null;
+        if (d?.fontid) { suppressAutoSaveRef.current = true; setFont(prev => ({ ...prev, fontid: Number(d.fontid) })); }
+      }
+      toast("Font saved", "success");
+      await loadFontList();
+    } else {
+      toast("Save failed.", "warning");
+    }
+  }, [font, loadFontList, toast]);
+
+  // Auto-save edits once a font has been saved (has an id). New fonts still
+  // need one explicit Save to be created; after that, edits persist on their
+  // own a short pause after you stop.
+  useEffect(() => {
+    if (suppressAutoSaveRef.current) { suppressAutoSaveRef.current = false; return; }
+    if (!font.fontid) return;
+    const t = setTimeout(() => { saveFont(); }, 1500);
+    return () => clearTimeout(t);
+  }, [font, saveFont]);
 
   const deleteFont = useCallback(async () => {
-    if (font.fontid === 0) { setStatus({ msg: "No saved font to delete.", ok: false }); return; }
+    if (font.fontid === 0) { toast("No saved font to delete.", "warning"); return; }
     if (!confirm("Delete this font? This cannot be undone.")) return;
     const r = await fetch(`/api/fonts/${font.fontid}`, { method: "DELETE" });
-    if (r.ok) { setStatus({ msg: "Font deleted.", ok: true }); setFont(emptyFont()); undoStacks.current.clear(); await loadFontList(); }
-    else if (r.status === 403) setStatus({ msg: "You do not own this font.", ok: false });
-    else setStatus({ msg: "Delete failed.", ok: false });
-  }, [font.fontid, loadFontList]);
+    if (r.ok) { toast("Font deleted", "success"); suppressAutoSaveRef.current = true; setFont(emptyFont()); undoStacks.current.clear(); await loadFontList(); }
+    else if (r.status === 403) toast("You do not own this font.", "warning");
+    else toast("Delete failed.", "warning");
+  }, [font.fontid, loadFontList, toast]);
 
   // ── Effects ───────────────────────────────────────────────────────────────
 
