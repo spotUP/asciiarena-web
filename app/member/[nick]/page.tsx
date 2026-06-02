@@ -55,10 +55,12 @@ interface FaveRow {
   crews: string | null;
 }
 
-function formatJoined(ts: number | bigint | null): string {
-  if (!ts) return "Unknown";
-  const d = new Date(Number(ts) * 1000);
-  return d.toISOString().slice(0, 10);
+function formatJoined(ts: number | bigint | string | null): string {
+  if (ts == null || ts === "") return "Unknown";
+  // joined is legacy: sometimes a unix-timestamp string, sometimes "YYYY-MM-DD".
+  const raw = String(ts);
+  const d = /^\d+$/.test(raw) ? new Date(Number(raw) * 1000) : new Date(raw);
+  return Number.isFinite(d.getTime()) ? d.toISOString().slice(0, 10) : "Unknown";
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ nick: string }> }): Promise<Metadata> {
@@ -242,7 +244,7 @@ export default async function MemberPage({
           </div>
         )}
 
-        {member.display_mail === 1 && member.mail && (
+        {Number(member.display_mail) === 1 && member.mail && (
           <div className="row apt-1">
             <div className="col-sm-12">
               <span className="white">Email: </span>

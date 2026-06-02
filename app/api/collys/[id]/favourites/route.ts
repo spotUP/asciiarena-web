@@ -16,7 +16,7 @@ export async function POST(
 
   const { id } = await params;
   const collyId = Number(id);
-  const userId = session.user.id;
+  const userId = parseInt(session.user.id, 10);
   const nick = session.user.name ?? "";
 
   const rows = await prisma.$queryRaw<CollyFilenameRow[]>(

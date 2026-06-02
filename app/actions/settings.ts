@@ -82,7 +82,9 @@ export async function getInitialSettings(): Promise<Settings | null> {
     viewmode: row.list_view_mode,
     def_bg_col: row.def_bg_col,
     def_fg_col: row.def_fg_col,
-    display_mail: row.display_mail,
+    // display_mail is a Char column ("0"/"1"); coerce to the 1/0 number the
+    // form checkbox compares with `=== 1`.
+    display_mail: String(row.display_mail) === "1" ? 1 : 0,
     def_font: row.def_font,
     crt_effect: row.crt_effect === "Y" ? 1 : 0,
     anim_effect: row.anim_effect === "Y" ? 1 : 0,

@@ -78,8 +78,9 @@ interface HandleRow {
 
 function formatJoined(ts: string | null): string {
   if (!ts) return "Unknown";
-  const d = new Date(Number(ts) * 1000);
-  return d.toISOString().slice(0, 10);
+  // joined is legacy: sometimes a unix-timestamp string, sometimes "YYYY-MM-DD".
+  const d = /^\d+$/.test(ts) ? new Date(Number(ts) * 1000) : new Date(ts);
+  return Number.isFinite(d.getTime()) ? d.toISOString().slice(0, 10) : "Unknown";
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ nick: string }> }): Promise<Metadata> {

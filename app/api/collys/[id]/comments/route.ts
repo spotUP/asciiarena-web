@@ -64,7 +64,7 @@ export async function POST(
 
   const comment = parsed.data.comment;
   const rating = parsed.data.rating ?? null;
-  const userId = session.user.id;
+  const userId = parseInt(session.user.id, 10);
   const nick = session.user.name ?? "";
   const timestamp = Math.floor(Date.now() / 1000);
 
