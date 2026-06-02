@@ -110,6 +110,7 @@ export default function DosSelect({ value, options, onChange, width, placeholder
               style={{
                 width: "100%",
                 boxSizing: "border-box",
+                height: "32px",
                 border: 0,
                 borderBottom: "1px solid #666",
                 background: "#212121",
@@ -117,7 +118,11 @@ export default function DosSelect({ value, options, onChange, width, placeholder
                 fontFamily: "TopazPlus_a1200, monospace",
                 fontSize: "16px",
                 lineHeight: "16px",
-                padding: "8px",
+                // Horizontal padding only: the site's block-caret overlay
+                // centres the caret via (clientHeight - lineHeight)/2 and assumes
+                // inputs have no vertical padding. Adding top padding double-counts
+                // and drops the caret below the text.
+                padding: "0 8px",
                 outline: "none",
               }}
             />
