@@ -158,9 +158,6 @@ export async function PATCH(request: NextRequest) {
 
   const crtVal = crt_effect != null ? (crt_effect === 1 ? "Y" : "N") : null;
   const animVal = anim_effect != null ? (anim_effect === 1 ? "Y" : "N") : null;
-  // country is a numeric SmallInt column — coerce to int-or-null so a stray
-  // non-numeric value can't crash the UPDATE (matches saveSettings action).
-  const countryInt = country && Number.isFinite(parseInt(country, 10)) ? parseInt(country, 10) : null;
 
   await prisma.$executeRaw`
     UPDATE users SET
@@ -170,7 +167,7 @@ export async function PATCH(request: NextRequest) {
       byear = ${byear ?? null},
       bmonth = ${bmonth ?? null},
       bday = ${bday ?? null},
-      country = ${countryInt},
+      country = ${country ?? null},
       mail = ${mail ?? null},
       webpage = ${webpage ?? null},
       upload_signature = ${upload_signature ?? null},

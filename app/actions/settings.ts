@@ -117,8 +117,8 @@ export async function saveSettings(
   const crt_effectRaw = formData.get("crt_effect") as string | null;
   const anim_effectRaw = formData.get("anim_effect") as string | null;
 
-  // Numeric columns (byear/bmonth/bday are Int, country is SmallInt). Guard
-  // against NaN so a non-numeric value can never crash the whole UPDATE.
+  // byear/bmonth/bday are Int columns — guard against NaN so a non-numeric
+  // value can never crash the whole UPDATE.
   const toIntOrNull = (v: string | null): number | null => {
     if (!v) return null;
     const n = parseInt(v, 10);
@@ -127,7 +127,8 @@ export async function saveSettings(
   const byear = toIntOrNull(byearRaw);
   const bmonth = toIntOrNull(bmonthRaw);
   const bday = toIntOrNull(bdayRaw);
-  const country = toIntOrNull(countryRaw);
+  // country is now VARCHAR(60) (migrated from SmallInt) — store the name string.
+  const country = countryRaw;
   // list_view_mode (Char 8) and def_font (Char 32) are STRING columns, not
   // ints — store the raw value. (parseInt here yielded NaN for "standard" or a
   // font name like "Topaz_a1200" and threw on UPDATE.)

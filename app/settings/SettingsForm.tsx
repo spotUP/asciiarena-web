@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/ToastProvider";
 import LiveFeedSettings from "./LiveFeedSettings";
 import WidgetSettings from "./WidgetSettings";
 import DosSelect from "@/components/ui/DosSelect";
+import { COUNTRIES } from "@/lib/countries";
 
 interface ArtistHandle {
   id: number;
@@ -298,9 +299,13 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
       <div className="row amb-1"><div className="col-12 apt-1">Country</div></div>
       <div className="row amb-1">
         <div className="col-xs-12 col-md-8">
-          <input
-            type="text" className="form-control w-100"
-            value={settings.country ?? ""} onChange={(e) => set("country", e.target.value)}
+          <DosSelect
+            width={240}
+            padded
+            placeholder="Select country"
+            value={settings.country ?? ""}
+            options={COUNTRIES.map(c => ({ value: c, label: c }))}
+            onChange={(v) => set("country", v)}
           />
         </div>
       </div>
