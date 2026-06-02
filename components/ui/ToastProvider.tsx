@@ -66,7 +66,15 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             role="alert"
             onClick={() => dismiss(t.id)}
             className={`alert alert-${t.kind} animate__animated animate__fadeInUp`}
-            style={{ margin: 0, pointerEvents: "all", cursor: "pointer" }}
+            style={{
+              margin: 0,
+              pointerEvents: "all",
+              cursor: "pointer",
+              // Site rule: everything renders at the fixed 16px terminal size.
+              fontSize: "16px",
+              lineHeight: "16px",
+              fontFamily: "TopazPlus_a1200, monospace",
+            }}
           >
             {t.msg}
           </div>

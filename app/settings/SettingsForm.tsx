@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useActionState, useRef } from "react";
-import { saveSettings, changePassword, type Settings } from "@/app/actions/settings";
+import { changePassword, type Settings } from "@/app/actions/settings";
 import { useToast } from "@/components/ui/ToastProvider";
 import LiveFeedSettings from "./LiveFeedSettings";
 import WidgetSettings from "./WidgetSettings";
@@ -111,40 +111,56 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   useEffect(() => { setCurrentYear(new Date().getFullYear()); }, []);
 
-  const [saveState, saveAction, savePending] = useActionState(saveSettings, { success: false });
   const [pwState, pwAction, pwPending] = useActionState(changePassword, { success: false });
 
   const [alertMsg, setAlertMsg] = useState<{ text: string; success: boolean } | null>(null);
   const { toast } = useToast();
+  const [saving, setSaving] = useState(false);
 
   // Auto-save profile/site settings: a short debounce after any field changes
-  // dispatches the same saveSettings action the old "Save" button used. The
-  // first run (initial mount) is skipped so we don't save unchanged data.
+  // PATCHes /api/settings. Uses a plain fetch (not the server action) on
+  // purpose — a server action revalidates the route, which re-runs the
+  // SiteLayout body-visibility / modem redraw and flashes the screen black on
+  // every keystroke-save. The first run (initial mount) is skipped.
   const firstSettingsRun = useRef(true);
   useEffect(() => {
     if (firstSettingsRun.current) { firstSettingsRun.current = false; return; }
     const t = setTimeout(() => {
-      const fd = new FormData();
-      fd.set("nick", settings.nick ?? "");
-      fd.set("crew", settings.crew ?? "");
-      fd.set("byear", settings.byear != null ? String(settings.byear) : "");
-      fd.set("bmonth", settings.bmonth != null ? String(settings.bmonth) : "");
-      fd.set("bday", settings.bday != null ? String(settings.bday) : "");
-      fd.set("country", settings.country ?? "");
-      fd.set("mail", settings.mail ?? "");
-      fd.set("webpage", settings.webpage ?? "");
-      fd.set("upload_signature", settings.upload_signature ?? "");
-      fd.set("viewmode", String(settings.viewmode ?? 0));
-      fd.set("def_bg_col", settings.def_bg_col ?? "");
-      fd.set("def_fg_col", settings.def_fg_col ?? "");
-      fd.set("display_mail", String(settings.display_mail ?? 0));
-      fd.set("def_font", settings.def_font ?? "");
-      fd.set("crt_effect", String(settings.crt_effect ?? 0));
-      fd.set("anim_effect", String(settings.anim_effect ?? 0));
-      saveAction(fd);
+      setSaving(true);
+      fetch("/api/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nick: settings.nick ?? "",
+          crew: settings.crew ?? "",
+          byear: settings.byear,
+          bmonth: settings.bmonth,
+          bday: settings.bday,
+          country: settings.country ?? "",
+          mail: settings.mail ?? "",
+          webpage: settings.webpage ?? "",
+          upload_signature: settings.upload_signature ?? "",
+          viewmode: String(settings.viewmode ?? ""),
+          def_bg_col: settings.def_bg_col ?? "",
+          def_fg_col: settings.def_fg_col ?? "",
+          display_mail: settings.display_mail ?? 0,
+          def_font: settings.def_font ?? "",
+          crt_effect: settings.crt_effect ?? 0,
+          anim_effect: settings.anim_effect ?? 0,
+        }),
+      })
+        .then(async (r) => {
+          if (r.ok) toast("Settings saved", "success");
+          else {
+            const d = await r.json().catch(() => null) as { error?: string } | null;
+            toast(d?.error ?? "Could not save settings", "warning");
+          }
+        })
+        .catch(() => toast("Could not save settings", "warning"))
+        .finally(() => setSaving(false));
     }, 800);
     return () => clearTimeout(t);
-  }, [settings, saveAction]);
+  }, [settings, toast]);
 
   const [linkedArtists, setLinkedArtists] = useState<ArtistHandle[]>([]);
   const [suggestedArtists, setSuggestedArtists] = useState<ArtistHandle[]>([]);
@@ -160,11 +176,6 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
   }, []);
 
   useEffect(() => { loadArtists(); }, [loadArtists]);
-
-  useEffect(() => {
-    if (saveState.success) toast("Settings saved", "success");
-    else if (saveState.error) toast(saveState.error, "warning");
-  }, [saveState, toast]);
 
   useEffect(() => {
     if (pwState.success) showAlert("Password changed successfully!", true);
@@ -627,14 +638,14 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
       )}
 
       {(activeTab === "profile" || activeTab === "site") && (
-        <form autoComplete="off" action={saveAction}>
+        <form autoComplete="off" onSubmit={(e) => e.preventDefault()}>
           {hiddenFields}
           <div className="container-fluid bg-secondary apb-1 ap-1">
             {activeTab === "profile" && profilePanel}
             {activeTab === "site" && sitePanel}
             <div className="row amb-1">
               <div className="col-12 apt-1 lightgrey">
-                {savePending ? "Saving..." : "Changes save automatically."}
+                {saving ? "Saving..." : "Changes save automatically."}
               </div>
             </div>
           </div>
