@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useChatContext } from "./ChatContext";
 import ChatWindow from "./ChatWindow";
+import { isSnoozed } from "@/lib/chat-snooze";
 
 interface Props {
   userId: string;
@@ -44,10 +45,7 @@ export default function ChatBar({ userId, userNick }: Props) {
           const existingWindow = windowsRef.current.find(w => w.peerId === event.fromId);
           if (existingWindow) {
             if (existingWindow.minimized) {
-              const snoozed =
-                existingWindow.minimizedAt != null &&
-                Date.now() - existingWindow.minimizedAt < MINIMIZE_SNOOZE_MS;
-              if (snoozed) {
+              if (isSnoozed(event.fromId, MINIMIZE_SNOOZE_MS)) {
                 // You minimized this recently — keep it collapsed; just bump
                 // the blinking unread count instead of popping it open.
                 incrementUnread(event.fromId);
@@ -57,6 +55,10 @@ export default function ChatBar({ userId, userNick }: Props) {
               }
             }
             // Already expanded: its own thread SSE shows the message inline.
+          } else if (isSnoozed(event.fromId, MINIMIZE_SNOOZE_MS)) {
+            // No window yet (e.g. after a reload) but still snoozed — park a
+            // collapsed blinking tab instead of popping a window open.
+            openChat(event.fromId, event.fromNick, undefined, { startMinimized: true, unread: 1 });
           } else {
             // First DM from this person this session — open it expanded.
             openChat(event.fromId, event.fromNick);

@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { setSnooze, clearSnooze } from "@/lib/chat-snooze";
 
 export interface ChatWindowState {
   threadId: number | null;
@@ -8,9 +9,6 @@ export interface ChatWindowState {
   peerNick: string;
   minimized: boolean;
   unread: number;
-  /** Epoch ms when the user last minimized this window, else null. Used to
-   *  snooze auto-expand for a while so a minimized chat stays collapsed. */
-  minimizedAt: number | null;
 }
 
 interface ChatContextValue {
@@ -45,6 +43,8 @@ export function ChatContextProvider({ children }: { children: ReactNode }) {
     const tid = threadId && threadId > 0 ? threadId : null;
     const startMinimized = opts?.startMinimized ?? false;
     const initialUnread = opts?.unread ?? 0;
+    // Expanding/opening a chat ends its auto-expand snooze.
+    if (!startMinimized) clearSnooze(peerId);
     setWindows(prev => {
       const exists = prev.find(w => w.peerId === peerId);
       if (exists) {
@@ -56,14 +56,13 @@ export function ChatContextProvider({ children }: { children: ReactNode }) {
             ? {
                 ...w,
                 minimized: startMinimized ? w.minimized : false,
-                minimizedAt: startMinimized ? w.minimizedAt : null,
                 unread: startMinimized ? w.unread + initialUnread : 0,
                 threadId: tid ?? w.threadId,
               }
             : w
         );
       }
-      const next = [...prev, { peerId, peerNick, threadId: tid, minimized: startMinimized, unread: initialUnread, minimizedAt: startMinimized ? Date.now() : null }];
+      const next = [...prev, { peerId, peerNick, threadId: tid, minimized: startMinimized, unread: initialUnread }];
       if (next.length > 4) {
         // Drop oldest minimized window to stay at max 4
         const minIdx = next.findIndex(w => w.minimized);
@@ -79,11 +78,10 @@ export function ChatContextProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const minimizeChat = useCallback((peerId: number, minimized: boolean) => {
-    setWindows(prev => prev.map(w =>
-      w.peerId === peerId
-        ? { ...w, minimized, minimizedAt: minimized ? Date.now() : null }
-        : w
-    ));
+    // Minimizing starts the auto-expand snooze; re-opening ends it. Persisted
+    // in localStorage so the snooze survives a page reload.
+    if (minimized) setSnooze(peerId); else clearSnooze(peerId);
+    setWindows(prev => prev.map(w => w.peerId === peerId ? { ...w, minimized } : w));
   }, []);
 
   const markRead = useCallback((peerId: number) => {
