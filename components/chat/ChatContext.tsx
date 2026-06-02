@@ -8,6 +8,9 @@ export interface ChatWindowState {
   peerNick: string;
   minimized: boolean;
   unread: number;
+  /** Epoch ms when the user last minimized this window, else null. Used to
+   *  snooze auto-expand for a while so a minimized chat stays collapsed. */
+  minimizedAt: number | null;
 }
 
 interface ChatContextValue {
@@ -53,13 +56,14 @@ export function ChatContextProvider({ children }: { children: ReactNode }) {
             ? {
                 ...w,
                 minimized: startMinimized ? w.minimized : false,
+                minimizedAt: startMinimized ? w.minimizedAt : null,
                 unread: startMinimized ? w.unread + initialUnread : 0,
                 threadId: tid ?? w.threadId,
               }
             : w
         );
       }
-      const next = [...prev, { peerId, peerNick, threadId: tid, minimized: startMinimized, unread: initialUnread }];
+      const next = [...prev, { peerId, peerNick, threadId: tid, minimized: startMinimized, unread: initialUnread, minimizedAt: startMinimized ? Date.now() : null }];
       if (next.length > 4) {
         // Drop oldest minimized window to stay at max 4
         const minIdx = next.findIndex(w => w.minimized);
@@ -75,7 +79,11 @@ export function ChatContextProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const minimizeChat = useCallback((peerId: number, minimized: boolean) => {
-    setWindows(prev => prev.map(w => w.peerId === peerId ? { ...w, minimized } : w));
+    setWindows(prev => prev.map(w =>
+      w.peerId === peerId
+        ? { ...w, minimized, minimizedAt: minimized ? Date.now() : null }
+        : w
+    ));
   }, []);
 
   const markRead = useCallback((peerId: number) => {

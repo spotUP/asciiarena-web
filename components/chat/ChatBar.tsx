@@ -16,20 +16,25 @@ interface IncomingMessage {
   threadId?: number;
 }
 
+// After you minimize a chat, new messages from that peer stay collapsed (just
+// the blinking unread tab) instead of popping the window open, for this long.
+const MINIMIZE_SNOOZE_MS = 30 * 60 * 1000; // 30 minutes
+
 export default function ChatBar({ userId, userNick }: Props) {
   const { windows, openChat, minimizeChat, incrementUnread } = useChatContext();
   const [newNick, setNewNick] = useState("");
   const [newNickOpen, setNewNickOpen] = useState(false);
   const [newNickError, setNewNickError] = useState("");
   const [suggestions, setSuggestions] = useState<Array<{ id: number; nick: string }>>([]);
-  const [flashNick, setFlashNick] = useState<string | null>(null);
-  const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const suggestDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const windowsRef = useRef(windows);
 
   useEffect(() => { windowsRef.current = windows; }, [windows]);
 
-  // SSE listener for incoming messages
+  // SSE listener for incoming messages. A new message opens the chat docked at
+  // the bottom, expanded so the message is immediately visible — UNLESS you
+  // recently minimized that peer's window, in which case it stays collapsed
+  // (blinking unread tab) and doesn't pop open again for MINIMIZE_SNOOZE_MS.
   useEffect(() => {
     const es = new EventSource(`/api/live?channel=user:${userId}:messages`);
     es.onmessage = (e) => {
@@ -39,19 +44,22 @@ export default function ChatBar({ userId, userNick }: Props) {
           const existingWindow = windowsRef.current.find(w => w.peerId === event.fromId);
           if (existingWindow) {
             if (existingWindow.minimized) {
-              // Pop the window back open so the user sees the new message
-              // immediately — matches the muscle memory of every other chat UI.
-              minimizeChat(event.fromId, false);
+              const snoozed =
+                existingWindow.minimizedAt != null &&
+                Date.now() - existingWindow.minimizedAt < MINIMIZE_SNOOZE_MS;
+              if (snoozed) {
+                // You minimized this recently — keep it collapsed; just bump
+                // the blinking unread count instead of popping it open.
+                incrementUnread(event.fromId);
+              } else {
+                // Snooze expired — pop the collapsed tab back open.
+                minimizeChat(event.fromId, false);
+              }
             }
-            // If not minimized, the window's own SSE handles the message
+            // Already expanded: its own thread SSE shows the message inline.
           } else {
-            // First DM from this person this session — auto-create the window
-            // in minimised state so it parks in the bar with an unread badge
-            // (instead of disappearing after an 8s flash and being missed).
-            openChat(event.fromId, event.fromNick, undefined, { startMinimized: true, unread: 1 });
-            setFlashNick(event.fromNick ?? null);
-            if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
-            flashTimerRef.current = setTimeout(() => setFlashNick(null), 8000);
+            // First DM from this person this session — open it expanded.
+            openChat(event.fromId, event.fromNick);
           }
         }
       } catch { /* ignore */ }
@@ -97,18 +105,6 @@ export default function ChatBar({ userId, userNick }: Props) {
     } catch {
       setNewNickError("error");
     }
-  };
-
-  const openFlash = () => {
-    if (!flashNick) return;
-    fetch(`/api/chat/user?nick=${encodeURIComponent(flashNick)}`)
-      .then(r => r.json())
-      .then((data: { id?: number; nick?: string }) => {
-        if (data?.id && data?.nick) openChat(data.id, data.nick);
-      })
-      .catch(() => {});
-    setFlashNick(null);
-    if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
   };
 
   const expandedWindows = windows.filter(w => !w.minimized);
@@ -217,25 +213,14 @@ export default function ChatBar({ userId, userNick }: Props) {
           )}
         </div>
 
-        {/* Flash notification for message from user with no open window */}
-        {flashNick && (
-          <button
-            onClick={openFlash}
-            className="blink"
-            style={{
-              background: "none", border: "none", color: "#ff55ff", cursor: "pointer",
-              fontFamily: "inherit", fontSize: "inherit", padding: "0 4px",
-            }}
-          >
-            [! {flashNick}]
-          </button>
-        )}
-
-        {/* Minimized window tabs */}
+        {/* Minimized window tabs. A tab with unread messages blinks magenta
+            and shows its count, and keeps doing so until you click it open —
+            no timeout. Clicking re-expands the window. */}
         {windows.filter(w => w.minimized).map(w => (
           <button
             key={w.peerId}
             onClick={() => minimizeChat(w.peerId, false)}
+            className={w.unread > 0 ? "blink" : undefined}
             style={{
               background: "none", border: "none",
               color: w.unread > 0 ? "#ff55ff" : "#aaaaaa",
