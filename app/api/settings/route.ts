@@ -16,11 +16,11 @@ const patchSchema = z.object({
   mail: z.string().max(255).optional(),
   webpage: z.string().max(500).optional(),
   upload_signature: z.string().max(1000).optional(),
-  viewmode: z.number().int().optional(),
+  viewmode: z.string().max(8).optional(),
   def_bg_col: z.string().max(20).optional(),
   def_fg_col: z.string().max(20).optional(),
   display_mail: z.number().int().optional(),
-  def_font: z.number().int().optional(),
+  def_font: z.string().max(32).optional(),
   crt_effect: z.number().int().optional(),
   anim_effect: z.number().int().optional(),
   oldpass: z.string().optional(),
@@ -158,6 +158,9 @@ export async function PATCH(request: NextRequest) {
 
   const crtVal = crt_effect != null ? (crt_effect === 1 ? "Y" : "N") : null;
   const animVal = anim_effect != null ? (anim_effect === 1 ? "Y" : "N") : null;
+  // country is a numeric SmallInt column — coerce to int-or-null so a stray
+  // non-numeric value can't crash the UPDATE (matches saveSettings action).
+  const countryInt = country && Number.isFinite(parseInt(country, 10)) ? parseInt(country, 10) : null;
 
   await prisma.$executeRaw`
     UPDATE users SET
@@ -167,7 +170,7 @@ export async function PATCH(request: NextRequest) {
       byear = ${byear ?? null},
       bmonth = ${bmonth ?? null},
       bday = ${bday ?? null},
-      country = ${country ?? null},
+      country = ${countryInt},
       mail = ${mail ?? null},
       webpage = ${webpage ?? null},
       upload_signature = ${upload_signature ?? null},

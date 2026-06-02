@@ -14,7 +14,7 @@ export async function addPlaylist(data: {
   if (session?.user?.rank !== "Admin") return { success: false, error: "Forbidden" };
   await prisma.$executeRaw`
     INSERT INTO hippo_playlists (title, author, genre, filename, uploaddate)
-    VALUES (${data.title}, ${data.author ?? ""}, ${data.genre ?? ""}, ${data.filename}, CURDATE())
+    VALUES (${data.title}, ${data.author ?? ""}, ${data.genre ?? ""}, ${data.filename}, UNIX_TIMESTAMP())
   `;
   revalidatePath('/playlists');
   return { success: true };

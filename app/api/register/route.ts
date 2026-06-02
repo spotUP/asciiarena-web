@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
       (nick, crew, pwhash, lastactive, current, mail, uploaded, \`rank\`, upload_signature, list_view_mode, display_mail, nickurl, activity_hidden_types)
     VALUES
       (${nick}, 'Independent', ${pwhash}, UNIX_TIMESTAMP(), '', ${mail}, 0, 'Inactive',
-       '- -- - aSCIIaRENa - ---- - aSCIIaRENa - -- -', 0, 0, ${nickurl}, ${activityHiddenTypes})
+       '- -- - aSCIIaRENa - ---- - aSCIIaRENa - -- -', 'standard', '0', ${nickurl}, ${activityHiddenTypes})
   `;
 
   // Fire-and-forget — don't fail registration if mail is misconfigured

@@ -104,7 +104,10 @@ export async function postComment(
   if (!session?.user?.id) return { success: false, error: "Not logged in" };
   const userId = Number(session.user.id);
   const nick = session.user.name ?? null;
-  const ratingNum = rating ? parseInt(rating) : null;
+  // Guard against NaN (rating is an Int column): a non-numeric value would
+  // throw the INSERT. Falls back to no rating.
+  const parsedRating = rating ? parseInt(rating, 10) : null;
+  const ratingNum = parsedRating != null && Number.isFinite(parsedRating) ? parsedRating : null;
   const colly = await prisma.collys.findUnique({ where: { id: collyId }, select: { filename: true, uploader_id: true } });
   await prisma.$executeRaw`
     INSERT INTO comments (colly_id, user_id, comment, rating, timestamp, filename, nick)
