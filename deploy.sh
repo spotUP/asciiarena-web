@@ -24,6 +24,12 @@ rsync_resilient() {
 }
 
 echo "Building..."
+# Always build from a clean .next. Incremental builds + the resilient
+# (retrying) rsync below could leave a single route's server chunk stale or
+# missing, which 500s only that route while everything else works (hit twice:
+# home page and /admin/migrate-country). A clean tree also avoids the stale
+# .next/dev types dir tripping rsync --delete.
+rm -rf .next
 npm run build
 
 echo "Deploying PHP site..."
