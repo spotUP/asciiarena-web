@@ -26,16 +26,25 @@ interface Props {
  */
 export default function DosSelect({ value, options, onChange, width, placeholder, padded }: Props) {
   const [open, setOpen] = useState(false);
+  const [filter, setFilter] = useState("");
   const ref = useRef<HTMLDivElement>(null);
+  const filterRef = useRef<HTMLInputElement>(null);
   const current = options.find(o => o.value === value);
+
+  // Inline filter at the top of the menu (like the old site) for long lists.
+  const showFilter = options.length > 7;
+  const q = filter.trim().toLowerCase();
+  const filtered = q ? options.filter(o => o.label.toLowerCase().includes(q)) : options;
 
   useEffect(() => {
     if (!open) return;
+    setFilter("");
+    const fid = setTimeout(() => filterRef.current?.focus(), 0);
     const h = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
+    return () => { clearTimeout(fid); document.removeEventListener("mousedown", h); };
   }, [open]);
 
   return (
@@ -69,51 +78,95 @@ export default function DosSelect({ value, options, onChange, width, placeholder
         <span aria-hidden className="lightgrey" style={{ flexShrink: 0 }}>v</span>
       </button>
       {open && (
-        <ul
+        <div
           className="dropdown-menu"
           style={{
-            display: "block",
+            display: "flex",
+            flexDirection: "column",
             position: "absolute",
             top: "100%",
             left: 0,
             minWidth: width ? `${width}px` : "auto",
             maxHeight: "320px",
-            overflowY: "auto",
             margin: 0,
             padding: 0,
             zIndex: 200,
           }}
         >
-          {options.map(o => (
-            <li key={o.value}>
-              <button
-                type="button"
-                className="dropdown-item"
-                onClick={() => {
-                  onChange(o.value);
-                  setOpen(false);
-                }}
+          {showFilter && (
+            <input
+              ref={filterRef}
+              type="text"
+              value={filter}
+              onChange={e => setFilter(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === "Escape") { setOpen(false); }
+                else if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (filtered.length > 0) { onChange(filtered[0].value); setOpen(false); }
+                }
+              }}
+              placeholder="filter..."
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+                border: 0,
+                borderBottom: "1px solid #666",
+                background: "#212121",
+                color: "#ffffff",
+                fontFamily: "TopazPlus_a1200, monospace",
+                fontSize: "16px",
+                lineHeight: "16px",
+                padding: "8px",
+                outline: "none",
+              }}
+            />
+          )}
+          <ul style={{ margin: 0, padding: 0, listStyle: "none", overflowY: "auto", flex: 1 }}>
+            {filtered.length === 0 ? (
+              <li
                 style={{
-                  width: "100%",
-                  textAlign: "left",
-                  border: 0,
-                  background: o.value === value ? "#888888" : "transparent",
-                  fontFamily: "TopazPlus_a1200, monospace",
-                  fontSize: "16px",
-                  lineHeight: "16px",
                   padding: "0 8px",
                   height: "16px",
-                  minHeight: 0,
-                  maxHeight: "16px",
-                  cursor: "pointer",
-                  boxSizing: "border-box",
+                  lineHeight: "16px",
+                  fontSize: "16px",
+                  fontFamily: "TopazPlus_a1200, monospace",
+                  color: "#666",
                 }}
               >
-                {o.label}
-              </button>
-            </li>
-          ))}
-        </ul>
+                no matches
+              </li>
+            ) : filtered.map(o => (
+              <li key={o.value}>
+                <button
+                  type="button"
+                  className="dropdown-item"
+                  onClick={() => {
+                    onChange(o.value);
+                    setOpen(false);
+                  }}
+                  style={{
+                    width: "100%",
+                    textAlign: "left",
+                    border: 0,
+                    background: o.value === value ? "#888888" : "transparent",
+                    fontFamily: "TopazPlus_a1200, monospace",
+                    fontSize: "16px",
+                    lineHeight: "16px",
+                    padding: "0 8px",
+                    height: "16px",
+                    minHeight: 0,
+                    maxHeight: "16px",
+                    cursor: "pointer",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  {o.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );
