@@ -92,10 +92,14 @@ export default async function CrewPage({ params }: PageProps) {
     ? await prisma.comments.count({ where: { colly_id: { in: collyIds }, rating: { gt: 0 } } })
     : 0;
 
-  const ratingDisplay =
-    !crew.rating || crew.rating === 0
-      ? `Awaiting ${Math.max(0, 3 - voteCount)} votes`
-      : `${crew.rating.toFixed(1)} (${voteCount} votes)`;
+  // "Awaiting N votes" only while votes are still needed; once enough votes
+  // exist, show the rating (never the nonsensical "Awaiting 0 votes").
+  const neededVotes = Math.max(0, 3 - voteCount);
+  const ratingDisplay = (crew.rating && crew.rating > 0)
+    ? `${crew.rating.toFixed(1)} (${voteCount} votes)`
+    : neededVotes > 0
+      ? `Awaiting ${neededVotes} vote${neededVotes !== 1 ? "s" : ""}`
+      : `${Number(crew.rating ?? 0).toFixed(1)} (${voteCount} votes)`;
   const releases: ReleaseRow[] = releaseRows.map(r => ({
     colly_id: r.colly_id,
     filename: r.collys.filename,

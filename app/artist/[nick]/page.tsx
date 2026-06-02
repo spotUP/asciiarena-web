@@ -160,10 +160,14 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
     ? await prisma.comments.count({ where: { colly_id: { in: collyIds }, rating: { gt: 0 } } })
     : 0;
 
-  const ratingDisplay =
-    !artist.rating || artist.rating === 0
-      ? `Awaiting ${Math.max(0, 3 - voteCount)} votes`
-      : `${artist.rating.toFixed(1)} (${voteCount} votes)`;
+  // "Awaiting N votes" only while votes are still needed; once enough votes
+  // exist, show the rating (never the nonsensical "Awaiting 0 votes").
+  const neededVotes = Math.max(0, 3 - voteCount);
+  const ratingDisplay = (artist.rating && artist.rating > 0)
+    ? `${artist.rating.toFixed(1)} (${voteCount} votes)`
+    : neededVotes > 0
+      ? `Awaiting ${neededVotes} vote${neededVotes !== 1 ? "s" : ""}`
+      : `${Number(artist.rating ?? 0).toFixed(1)} (${voteCount} votes)`;
 
   // Latest release is the most recent by year/month — shown in its own
   // card above the All Releases table.

@@ -77,7 +77,7 @@ export default async function ReleasePage({ params }: PageProps) {
   const isAdmin = session?.user?.rank === "Admin";
 
   // Batch 2: everything that only needs colly.id / userId
-  const [artistRows, crewRows, voteCount, isFavouritedCount, favouritesTotal, userPrefs] = await Promise.all([
+  const [artistRows, crewRows, ratingAgg, isFavouritedCount, favouritesTotal, userPrefs] = await Promise.all([
     prisma.artists_collys.findMany({
       where: { colly_id: colly.id },
       include: { artists: true },
@@ -88,7 +88,7 @@ export default async function ReleasePage({ params }: PageProps) {
       include: { crews: true },
       orderBy: { sortorder: "asc" },
     }),
-    prisma.comments.count({ where: { colly_id: colly.id, rating: { gt: 0 } } }),
+    prisma.comments.aggregate({ where: { colly_id: colly.id, rating: { gt: 0 } }, _count: { rating: true }, _avg: { rating: true } }),
     userId
       ? prisma.favourites.count({ where: { user_id: userId, colly_id: colly.id } })
       : Promise.resolve(0),
@@ -121,9 +121,16 @@ export default async function ReleasePage({ params }: PageProps) {
     }) : Promise.resolve([]),
   ]);
 
-  const ratingDisplay = (colly.rating && colly.rating > 0)
-    ? `${Number(colly.rating).toFixed(1)} (${voteCount} votes)`
-    : `Awaiting ${Math.max(0, 3 - voteCount)} vote${Math.max(0, 3 - voteCount) !== 1 ? "s" : ""}`;
+  // Show "Awaiting N votes" only while votes are still needed. Once enough
+  // votes exist, show the live average computed from the votes themselves
+  // (colly.rating is a stored aggregate that can lag, which is what produced
+  // the nonsensical "Awaiting 0 votes" — enough votes, but no shown rating).
+  const voteCount = ratingAgg._count.rating ?? 0;
+  const avgRating = ratingAgg._avg.rating != null ? Number(ratingAgg._avg.rating) : null;
+  const neededVotes = Math.max(0, 3 - voteCount);
+  const ratingDisplay = neededVotes > 0
+    ? `Awaiting ${neededVotes} vote${neededVotes !== 1 ? "s" : ""}`
+    : `${(avgRating ?? Number(colly.rating ?? 0)).toFixed(1)} (${voteCount} vote${voteCount !== 1 ? "s" : ""})`;
 
   // File paths
   const collectionsPath = process.env.COLLECTIONS_PATH ?? path.join(process.cwd(), "collections");
