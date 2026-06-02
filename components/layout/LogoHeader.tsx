@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 export type LogoHeaderProps = {
   logos: string[];
@@ -100,11 +101,11 @@ export default function LogoHeader({ logos }: LogoHeaderProps) {
               className="logo nolink logo-slot"
               style={{ whiteSpace: "pre" }}
             >
-              <a href="/" className="logo ascii">
+              <Link href="/" className="logo ascii">
                 <pre className="copper-gradient" style={{ overflow: "hidden" }}>
                   {logo}
                 </pre>
-              </a>
+              </Link>
             </div>
           );
         })}

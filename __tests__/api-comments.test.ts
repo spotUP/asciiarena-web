@@ -17,6 +17,13 @@ vi.mock("@/lib/generated/prisma/client", () => ({
   },
 }));
 
+// The route calls revalidateTag, which needs a Next request/render context
+// that doesn't exist under vitest. Stub it so the handler runs.
+vi.mock("next/cache", () => ({
+  revalidateTag: vi.fn(),
+  revalidatePath: vi.fn(),
+}));
+
 import { GET, POST } from "@/app/api/collys/[id]/comments/route";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
