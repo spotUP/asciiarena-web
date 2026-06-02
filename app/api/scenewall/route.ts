@@ -20,11 +20,19 @@ const ENDPOINT_URL: Record<Endpoint, string> = {
 const fetchScenewall = unstable_cache(
   async (endpoint: Endpoint) => {
     const ctrl = new AbortController();
-    // Hard cap: never block longer than 8s even if scenewall hangs.
-    // The cache miss still returns null in that case, widget renders empty.
-    const timer = setTimeout(() => ctrl.abort(), 8000);
+    // scenewall.bbs.io is genuinely slow — it consistently takes ~10-11s to
+    // respond. An earlier 8s cap aborted every request before the data arrived,
+    // so the widgets always rendered empty. This runs server-side and the
+    // result is cached for 5 min, and the widgets fetch it client-side behind a
+    // loader, so a generous cap here delays only the (cached) widget data, never
+    // the page itself. 20s gives scenewall comfortable headroom while still
+    // capping a truly hung upstream.
+    const timer = setTimeout(() => ctrl.abort(), 20000);
     try {
-      const r = await fetch(ENDPOINT_URL[endpoint], { signal: ctrl.signal });
+      const r = await fetch(ENDPOINT_URL[endpoint], {
+        signal: ctrl.signal,
+        headers: { "User-Agent": "Mozilla/5.0 (asciiarena widget proxy)", "Accept": "application/json" },
+      });
       if (!r.ok) return null;
       return await r.json();
     } catch {
