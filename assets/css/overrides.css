@@ -350,6 +350,11 @@ button.dropdown-item {
 .alert-light::before { background: #aa00aa; content: "Alert"; color: #fff; margin: 0 -8px 14px; padding: 0 8px; display: block; }
 .alert-dark::before { background: #000000; content: "dark"; color: #fff; margin: 0 -8px 14px; padding: 0 8px; display: block; }
 
+/* Toasts reuse the .alert look but are small transient pop-ups, not page
+   notices — suppress the BBS-style coloured header bar so the toast is just
+   the message in a coloured box. */
+.toast-alert::before { content: none !important; display: none !important; }
+
 /* Form controls: dark blue terminal look */
 .form-control, .form-select {
   height: 16px !important;

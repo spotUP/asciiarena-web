@@ -65,7 +65,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             key={t.id}
             role="alert"
             onClick={() => dismiss(t.id)}
-            className={`alert alert-${t.kind} animate__animated animate__fadeInUp`}
+            className={`toast-alert alert alert-${t.kind} animate__animated animate__fadeInUp`}
             style={{
               margin: 0,
               pointerEvents: "all",
