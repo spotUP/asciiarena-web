@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useActionState } from "react";
+import React, { useEffect, useState, useCallback, useActionState, useRef } from "react";
 import { saveSettings, changePassword, type Settings } from "@/app/actions/settings";
+import { useToast } from "@/components/ui/ToastProvider";
 import LiveFeedSettings from "./LiveFeedSettings";
 import WidgetSettings from "./WidgetSettings";
 import DosSelect from "@/components/ui/DosSelect";
@@ -113,6 +114,36 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
   const [pwState, pwAction, pwPending] = useActionState(changePassword, { success: false });
 
   const [alertMsg, setAlertMsg] = useState<{ text: string; success: boolean } | null>(null);
+  const { toast } = useToast();
+
+  // Auto-save profile/site settings: a short debounce after any field changes
+  // dispatches the same saveSettings action the old "Save" button used. The
+  // first run (initial mount) is skipped so we don't save unchanged data.
+  const firstSettingsRun = useRef(true);
+  useEffect(() => {
+    if (firstSettingsRun.current) { firstSettingsRun.current = false; return; }
+    const t = setTimeout(() => {
+      const fd = new FormData();
+      fd.set("nick", settings.nick ?? "");
+      fd.set("crew", settings.crew ?? "");
+      fd.set("byear", settings.byear != null ? String(settings.byear) : "");
+      fd.set("bmonth", settings.bmonth != null ? String(settings.bmonth) : "");
+      fd.set("bday", settings.bday != null ? String(settings.bday) : "");
+      fd.set("country", settings.country ?? "");
+      fd.set("mail", settings.mail ?? "");
+      fd.set("webpage", settings.webpage ?? "");
+      fd.set("upload_signature", settings.upload_signature ?? "");
+      fd.set("viewmode", String(settings.viewmode ?? 0));
+      fd.set("def_bg_col", settings.def_bg_col ?? "");
+      fd.set("def_fg_col", settings.def_fg_col ?? "");
+      fd.set("display_mail", String(settings.display_mail ?? 0));
+      fd.set("def_font", settings.def_font != null ? String(settings.def_font) : "");
+      fd.set("crt_effect", String(settings.crt_effect ?? 0));
+      fd.set("anim_effect", String(settings.anim_effect ?? 0));
+      saveAction(fd);
+    }, 800);
+    return () => clearTimeout(t);
+  }, [settings, saveAction]);
 
   const [linkedArtists, setLinkedArtists] = useState<ArtistHandle[]>([]);
   const [suggestedArtists, setSuggestedArtists] = useState<ArtistHandle[]>([]);
@@ -130,9 +161,9 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
   useEffect(() => { loadArtists(); }, [loadArtists]);
 
   useEffect(() => {
-    if (saveState.success) showAlert("Settings saved successfully!", true);
-    else if (saveState.error) showAlert(saveState.error, false);
-  }, [saveState]);
+    if (saveState.success) toast("Settings saved", "success");
+    else if (saveState.error) toast(saveState.error, "warning");
+  }, [saveState, toast]);
 
   useEffect(() => {
     if (pwState.success) showAlert("Password changed successfully!", true);
@@ -593,11 +624,8 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
             {activeTab === "profile" && profilePanel}
             {activeTab === "site" && sitePanel}
             <div className="row amb-1">
-              <div className="col-12 apt-1">
-                <input
-                  type="submit" className="btn-big bg-green white"
-                  value="Save" disabled={savePending}
-                />
+              <div className="col-12 apt-1 lightgrey">
+                {savePending ? "Saving..." : "Changes save automatically."}
               </div>
             </div>
           </div>
