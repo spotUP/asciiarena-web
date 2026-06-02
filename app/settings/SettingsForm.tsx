@@ -271,6 +271,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
         <div className="col-xs-12 col-md-8" style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
           <DosSelect
             width={96}
+            padded
             placeholder="Year"
             value={settings.byear?.toString() ?? ""}
             options={Array.from({ length: currentYear - 5 - 1920 + 1 }, (_, i) => 1920 + i).map(y => ({ value: y.toString(), label: y.toString() }))}
@@ -278,6 +279,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
           />
           <DosSelect
             width={80}
+            padded
             placeholder="Month"
             value={settings.bmonth?.toString() ?? ""}
             options={Array.from({ length: 12 }, (_, i) => i + 1).map(m => ({ value: m.toString(), label: m.toString() }))}
@@ -285,6 +287,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
           />
           <DosSelect
             width={64}
+            padded
             placeholder="Day"
             value={settings.bday?.toString() ?? ""}
             options={Array.from({ length: 31 }, (_, i) => i + 1).map(d => ({ value: d.toString(), label: d.toString() }))}
@@ -298,6 +301,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
         <div className="col-xs-12 col-md-8">
           <DosSelect
             width={240}
+            padded
             placeholder="Select country"
             value={settings.country ?? ""}
             options={COUNTRIES.map(c => ({ value: c, label: c }))}

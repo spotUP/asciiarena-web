@@ -13,6 +13,9 @@ interface Props {
   onChange: (v: string) => void;
   width?: number;
   placeholder?: string;
+  /** Match the height of form-control text inputs (16px top+bottom padding,
+   *  48px tall) when sitting in a form alongside them. */
+  padded?: boolean;
 }
 
 /**
@@ -21,7 +24,7 @@ interface Props {
  * the open list as a Bootstrap .dropdown-menu (already styled grey/black
  * in overrides.css) for a consistent DOS-menu look.
  */
-export default function DosSelect({ value, options, onChange, width, placeholder }: Props) {
+export default function DosSelect({ value, options, onChange, width, placeholder, padded }: Props) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const current = options.find(o => o.value === value);
@@ -44,11 +47,11 @@ export default function DosSelect({ value, options, onChange, width, placeholder
         style={{
           color: "#ffffff",
           border: 0,
-          height: "16px",
+          height: padded ? "48px" : "16px",
           minHeight: 0,
-          maxHeight: "16px",
+          maxHeight: padded ? "48px" : "16px",
           lineHeight: "16px",
-          padding: "0 8px",
+          padding: padded ? "16px 8px" : "0 8px",
           fontSize: "16px",
           fontFamily: "TopazPlus_a1200, monospace",
           width: width ? `${width}px` : undefined,
