@@ -5,9 +5,16 @@ import { readFileSync, existsSync } from "fs";
 import path from "path";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
-import { Prisma } from "@/lib/generated/prisma/client";
 import { getSession as auth } from "@/lib/session";
 import { urlsafe, decodeParam, formatBytes } from "@/lib/utils";
+import { normalizeOrder } from "@/lib/sort-headers";
+import { type ReleaseSortKey } from "@/lib/release-sort";
+import ArtistReleases from "./ArtistReleases";
+
+// Recognised sort keys for the "All Releases" table — shared (as clean keys)
+// with the client component and the JS comparator in lib/release-sort.
+const RELEASE_SORT_KEYS: ReleaseSortKey[] = ["filename", "name", "crew", "year"];
+const DEFAULT_SORT_KEY: ReleaseSortKey = "filename";
 
 const MONTHS = [
   "Unknown", "January", "February", "March", "April", "May", "June",
@@ -37,7 +44,7 @@ function readReleaseDiz(filename: string): string | null {
 
 interface PageProps {
   params: Promise<{ nick: string }>;
-  searchParams: Promise<{ sort_by?: string }>;
+  searchParams: Promise<{ sort_by?: string; order?: string }>;
 }
 
 const VALID_SORT_COLS = new Set([
@@ -98,7 +105,7 @@ export async function generateMetadata({ params }: { params: Promise<{ nick: str
 export default async function ArtistPage({ params, searchParams }: PageProps) {
   const { nick: rawNick } = await params;
   const nick = decodeParam(rawNick);
-  const { sort_by: rawSortBy } = await searchParams;
+  const { sort_by: rawSortBy, order: rawOrder } = await searchParams;
 
   const [session, artist] = await Promise.all([
     auth(),
@@ -113,29 +120,14 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
   const isUnclaimed = artist.user_id === null;
   const canClaim = !!userId && isUnclaimed;
 
-  // Map validated sort keys to safe Prisma.sql fragments — never interpolates user input.
-  //
-  // Two corrections vs. the obvious "ORDER BY c.name":
-  //   1. COALESCE with c.filename for c.name (and likewise route the empty
-  //      crew through "IS NULL" first) so NULL columns don't quietly cluster
-  //      at the top under default ASC NULLS-first behaviour.
-  //   2. LOWER() so the sort is case-insensitive — without it uppercase
-  //      filenames like "R21-AAP.ZIP" sort before lowercase ones like
-  //      "asc-w46.txt" (ASCII 'R' is 82, 'a' is 97) and the result looks
-  //      random to a human reader.
-  // REGEXP_REPLACE strips ALL leading non-alphanumeric chars before sort —
-  // covers leading spaces, tabs, control chars, BOM, punctuation, etc.
-  // Plain TRIM only strips spaces (ASCII 0x20), so a row with a leading
-  // tab/CR/LF (ASCII < 0x20) still bubbled to the top. CASE picks
-  // filename when c.name is missing/blank, matching the UI fallback.
-  const SORT_SQL: Record<string, Prisma.Sql> = {
-    "c.filename":       Prisma.sql`LOWER(REGEXP_REPLACE(c.filename, '^[^[:alnum:]]+', ''))`,
-    "c.name":           Prisma.sql`LOWER(REGEXP_REPLACE(CASE WHEN c.name IS NULL OR LENGTH(TRIM(c.name)) = 0 THEN c.filename ELSE c.name END, '^[^[:alnum:]]+', ''))`,
-    "w.name":           Prisma.sql`(w.name IS NULL OR LENGTH(TRIM(w.name)) = 0), LOWER(REGEXP_REPLACE(COALESCE(w.name, ''), '^[^[:alnum:]]+', ''))`,
-    "c.year":           Prisma.sql`c.year`,
-    "c.year, c.month":  Prisma.sql`c.year, c.month`,
-  };
-  const sortSql = (rawSortBy && SORT_SQL[rawSortBy]) ?? Prisma.sql`c.filename`;
+  // Resolve the requested sort for the initial server render. The ordering
+  // rules themselves live in lib/release-sort (the ArtistReleases client
+  // component applies the same comparator and re-sorts in the browser), so
+  // here we only validate which column/direction to start on.
+  const sortKey: ReleaseSortKey = RELEASE_SORT_KEYS.includes(rawSortBy as ReleaseSortKey)
+    ? (rawSortBy as ReleaseSortKey)
+    : DEFAULT_SORT_KEY;
+  const sortOrder = normalizeOrder(rawOrder);
 
   const [memberships, artistCollys, releasesRaw, otherHandles] = await Promise.all([
     prisma.member_of.findMany({ where: { nick: artist.nick } }),
@@ -152,7 +144,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
       LEFT JOIN crews w ON w.id = cc.crew_id
       LEFT JOIN artists a ON a.id = ac.artist_id
       WHERE ac.artist_id = ${artist.id}
-      ORDER BY ${sortSql} ASC
+      ORDER BY c.filename ASC
     `,
     artist.user_id !== null
       ? prisma.$queryRaw<HandleRow[]>`
@@ -328,53 +320,15 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
         );
       })()}
 
-      {/* Sort links — each wrapped in col-lg-3 so the header alignment matches
-          the data rows below (same 4 × col-lg-3 grid). Without the wrappers,
-          justify-content-between distributes them by natural text width and
-          they end up offset relative to the columns. */}
-      <div className="row apt-1 apb-1">
-        <h2 className="ap-1 bg-header">All {acronym} Releases</h2>
-      </div>
-      {/* Plain <a> tags (not Next.js <Link>) so each sort click is a full
-          page navigation. Link would use the Router Cache and could serve
-          a previously-loaded sort order when only searchParams change —
-          that was the symptom dipswitch caught on FF: click Crew then
-          Name, the page stayed on the Crew sort and just looked broken. */}
-      <div className="col-lg-12 d-flex justify-content-between pl-0">
-        <div className="col-lg-3 pl-0"><a href={`?sort_by=c.filename`}>Filename</a></div>
-        <div className="col-lg-3 pl-0"><a href={`?sort_by=c.name`}>Name</a></div>
-        <div className="col-lg-3 pl-0"><a href={`?sort_by=w.name`}>Crew</a></div>
-        <div className="col-lg-3 pl-0"><a href={`?sort_by=c.year`}>Release Date</a></div>
-      </div>
-
-      {/* All releases */}
-      {releasesRaw.map((r) => (
-        <div
-          key={r.colly_id}
-          className="col-lg-12 d-flex justify-content-between pl-0"
-        >
-          <div className="col-lg-3 pl-0">
-            <Link className="magenta" href={`/release/${r.filename}`}>
-              {r.filename.slice(0, 12)}
-            </Link>
-          </div>
-          <div className="col-lg-3 pl-0">
-            <Link className="magenta" href={`/release/${r.filename}`}>
-              {r.name?.slice(0, 35) ?? r.filename}
-            </Link>
-          </div>
-          <div className="col-lg-3 pl-0">
-            {r.crew && r.crewurl ? (
-              <Link href={`/crew/${r.crewurl}`}>{r.crew}</Link>
-            ) : (
-              r.crew ?? "-"
-            )}
-          </div>
-          <div className="col-lg-3 pl-0">
-            <span className="lightgrey">{r.year ?? "-"}</span>
-          </div>
-        </div>
-      ))}
+      {/* All Releases table — sorts client-side, instantly, with no reload.
+          The header bar, clickable sort headers, and rows all live in
+          ArtistReleases so the whole list re-orders in the browser. */}
+      <ArtistReleases
+        rows={releasesRaw}
+        acronym={acronym}
+        initialSort={sortKey}
+        initialOrder={sortOrder}
+      />
     </SiteLayout>
   );
 }

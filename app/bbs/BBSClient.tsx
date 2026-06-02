@@ -3,12 +3,15 @@
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import NewItemsPill from "@/components/ui/NewItemsPill";
+import SortHeader from "@/components/ui/SortHeader";
 
 interface BbsRow {
   url: string;
   id: number;
   name: string | null;
   sysop: string | null;
+  country: string | null;
+  online: number | boolean | null;
   total_count: number;
 }
 
@@ -101,15 +104,17 @@ export default function BBSClient({ initialSort, initialOrder }: BBSClientProps)
       </div>
 
       <div className="row amb-1">
-        <div className="col-6 white">
-          <button className="sort-btn" onClick={() => updateSort("name")}>
-            NAME
-          </button>
+        <div className="col-4 white">
+          <SortHeader col="name" label="NAME" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
-        <div className="col-6 white">
-          <button className="sort-btn" onClick={() => updateSort("sysop")}>
-            SYSOP
-          </button>
+        <div className="col-3 white">
+          <SortHeader col="sysop" label="SYSOP" sortKey={sort} asc={asc} onSort={updateSort} />
+        </div>
+        <div className="col-3 white">
+          <SortHeader col="country" label="COUNTRY" sortKey={sort} asc={asc} onSort={updateSort} />
+        </div>
+        <div className="col-2 white">
+          <SortHeader col="online" label="ACTiVE" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
       </div>
 
@@ -118,10 +123,12 @@ export default function BBSClient({ initialSort, initialOrder }: BBSClientProps)
         {!loading &&
           allRows.map((bbs) => (
             <div key={bbs.id} className="row">
-              <div className="col-6">
+              <div className="col-4">
                 <Link href={bbs.url}>{bbs.name}</Link>
               </div>
-              <div className="col-6">{bbs.sysop}</div>
+              <div className="col-3">{bbs.sysop}</div>
+              <div className="col-3 lightgrey">{bbs.country || "-"}</div>
+              <div className="col-2 lightgrey">{bbs.online ? "Yes" : "No"}</div>
             </div>
           ))}
         {loadingMore && <div className="row apt-1"><div className="col lightgrey">Loading...</div></div>}

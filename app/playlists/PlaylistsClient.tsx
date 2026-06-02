@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { addPlaylist as addPlaylistAction, deletePlaylist as deletePlaylistAction } from "@/app/actions/playlists";
 import NewItemsPill from "@/components/ui/NewItemsPill";
+import SortHeader from "@/components/ui/SortHeader";
 
 interface PlaylistRow {
   id: number;
@@ -106,16 +107,19 @@ export default function PlaylistsClient() {
         />
       </div>
 
+      {/* Column widths match the data rows below (col-5 / col-3 / col-2 / col-2
+          delete) so the headers line up with their columns. */}
       <div className="row amb-1">
-        <div className="col-6">
-          <button className="btn-link white" style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }} onClick={() => toggleSort("title")}>TITLE</button>
+        <div className="col-5">
+          <SortHeader col="title" label="TITLE" sortKey={sort} asc={asc} onSort={toggleSort} />
         </div>
         <div className="col-3">
-          <button className="btn-link white" style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }} onClick={() => toggleSort("genre")}>GENRE</button>
+          <SortHeader col="genre" label="GENRE" sortKey={sort} asc={asc} onSort={toggleSort} />
         </div>
-        <div className="col-3">
-          <button className="btn-link white" style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }} onClick={() => toggleSort("uploaddate")}>DATE</button>
+        <div className="col-2">
+          <SortHeader col="uploaddate" label="DATE" sortKey={sort} asc={asc} onSort={toggleSort} />
         </div>
+        <div className="col-2"></div>
       </div>
 
       <div>

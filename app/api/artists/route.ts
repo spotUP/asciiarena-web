@@ -10,6 +10,8 @@ interface ArtistRow {
   id: number;
   nick: string;
   crews: string | null;
+  rating: number | null;
+  country: string | null;
 }
 
 interface CountRow {
@@ -41,7 +43,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     // No filter: fast direct count + correlated subquery only for visible page rows
     const [dataRows, [countRow]] = await Promise.all([
       prisma.$queryRaw<ArtistRow[]>`
-        SELECT a.id, a.nick,
+        SELECT a.id, a.nick, a.rating, a.country,
           COALESCE((SELECT GROUP_CONCAT(m.crew ORDER BY m.crew SEPARATOR ',')
                     FROM member_of m WHERE m.nick = a.nick), '') AS crews
         FROM artists a
@@ -56,11 +58,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const like = likeParam;
     const [dataRows, countRows] = await Promise.all([
       prisma.$queryRaw<ArtistRow[]>`
-        SELECT s.id, s.nick, s.crews FROM (
-          SELECT a.id, a.nick,
+        SELECT s.id, s.nick, s.crews, s.rating, s.country FROM (
+          SELECT a.id, a.nick, a.rating, a.country,
             COALESCE(GROUP_CONCAT(m.crew ORDER BY m.crew SEPARATOR ','), '') AS crews
           FROM artists a LEFT JOIN member_of m ON a.nick = m.nick
-          GROUP BY a.id, a.nick
+          GROUP BY a.id, a.nick, a.rating, a.country
         ) s
         WHERE s.nick LIKE ${like} OR s.crews LIKE ${like}
         ORDER BY ${orderCol} ${orderDir}
@@ -83,6 +85,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     id: Number(row.id),
     nick: row.nick,
     crews: row.crews ?? "",
+    rating: row.rating != null ? Number(row.rating) : null,
+    country: row.country ?? "",
     total_count,
   }));
 

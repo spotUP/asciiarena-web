@@ -9,6 +9,8 @@ interface BbsRow {
   id: number;
   name: string | null;
   sysop: string | null;
+  country: string | null;
+  online: number | boolean | null;
 }
 
 interface CountRow {
@@ -52,6 +54,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     id: Number(row.id),
     name: row.name,
     sysop: row.sysop,
+    country: row.country ?? "",
+    online: row.online ? 1 : 0,
     total_count,
   }));
 

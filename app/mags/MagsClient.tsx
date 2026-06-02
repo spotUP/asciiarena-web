@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import NewItemsPill from "@/components/ui/NewItemsPill";
+import SortHeader from "@/components/ui/SortHeader";
 
 interface MagRow {
   url: string;
@@ -105,16 +106,16 @@ export default function MagsClient({ initialSort, initialOrder }: MagsClientProp
 
       <div className="row amb-1">
         <div className="col-3 white">
-          <button className="sort-btn" onClick={() => updateSort("name")}>NAME</button>
+          <SortHeader col="name" label="NAME" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
         <div className="col-3 white">
-          <button className="sort-btn" onClick={() => updateSort("filename")}>FILENAME</button>
+          <SortHeader col="filename" label="FILENAME" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
         <div className="col-3 white">
-          <button className="sort-btn" onClick={() => updateSort("author")}>AUTHOR</button>
+          <SortHeader col="author" label="AUTHOR" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
         <div className="col-3 white">
-          <button className="sort-btn" onClick={() => updateSort("timestamp")}>DATE</button>
+          <SortHeader col="timestamp" label="DATE" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
       </div>
 

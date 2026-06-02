@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import NewItemsPill from "@/components/ui/NewItemsPill";
+import SortHeader from "@/components/ui/SortHeader";
 
 interface CrewRow {
   url: string;
@@ -105,16 +106,16 @@ export default function CrewsClient({ initialSort, initialOrder }: CrewsClientPr
 
       <div className="row amb-1">
         <div className="col-4 white">
-          <button className="sort-btn" onClick={() => updateSort("name")}>CREW</button>
+          <SortHeader col="name" label="CREW" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
         <div className="col-2 white">
-          <button className="sort-btn" onClick={() => updateSort("members_cnt")}>MEMBERS</button>
+          <SortHeader col="members_cnt" label="MEMBERS" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
         <div className="col-2 white">
-          <button className="sort-btn" onClick={() => updateSort("releases_cnt")}>RELEASES</button>
+          <SortHeader col="releases_cnt" label="RELEASES" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
         <div className="col-2 white">
-          <button className="sort-btn" onClick={() => updateSort("rating")}>RATING</button>
+          <SortHeader col="rating" label="RATING" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
       </div>
 

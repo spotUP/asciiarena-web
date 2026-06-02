@@ -61,9 +61,9 @@ export { UPLOAD_WEBHOOK, REQUEST_WEBHOOK };
 
 // Whitelisted sort columns per entity — prevents ORDER BY injection
 export const COLLY_SORT_COLS = new Set(["name", "filename", "cdate", "filesize", "artists", "crews"]);
-export const ARTIST_SORT_COLS = new Set(["nick", "crews"]);
+export const ARTIST_SORT_COLS = new Set(["nick", "crews", "rating", "country"]);
 export const CREW_SORT_COLS = new Set(["name", "acronym", "members_cnt", "releases_cnt", "rating"]);
-export const BBS_SORT_COLS = new Set(["name", "sysop"]);
+export const BBS_SORT_COLS = new Set(["name", "sysop", "country", "online"]);
 export const APP_SORT_COLS = new Set(["name", "filename", "author", "timestamp"]);
 export const MAG_SORT_COLS = new Set(["name", "filename", "author", "timestamp"]);
 export const REQ_SORT_COLS = new Set(["title", "status", "timestamp"]);

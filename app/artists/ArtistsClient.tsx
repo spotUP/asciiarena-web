@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { urlsafe } from "@/lib/utils";
+import SortHeader from "@/components/ui/SortHeader";
 import NewItemsPill from "@/components/ui/NewItemsPill";
 
 interface ArtistRow {
@@ -11,6 +12,8 @@ interface ArtistRow {
   id: number;
   nick: string;
   crews: string;
+  rating: number | null;
+  country: string;
   total_count: number;
 }
 
@@ -120,10 +123,16 @@ export default function ArtistsClient({ initialSort, initialOrder }: ArtistsClie
 
       <div className="row amb-1">
         <div className="col-2">
-          <button className="sort-btn white" onClick={() => updateSort("nick")}>ARTiST</button>
+          <SortHeader col="nick" label="ARTiST" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
-        <div className="col-10">
-          <button className="sort-btn white" onClick={() => updateSort("crews")}>CREW</button>
+        <div className="col-6">
+          <SortHeader col="crews" label="CREW" sortKey={sort} asc={asc} onSort={updateSort} />
+        </div>
+        <div className="col-2">
+          <SortHeader col="rating" label="RATiNG" sortKey={sort} asc={asc} onSort={updateSort} />
+        </div>
+        <div className="col-2">
+          <SortHeader col="country" label="COUNTRY" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
       </div>
 
@@ -135,11 +144,13 @@ export default function ArtistsClient({ initialSort, initialOrder }: ArtistsClie
               <div className="forum_nick col-2">
                 <Link href={artist.url}>{artist.nick}</Link>
               </div>
-              <div className="artist_crew col-10">
+              <div className="artist_crew col-6">
                 {(artist.crews ?? "").split(",").filter(Boolean).map((crew, i) => (
                   <span key={crew}>{i > 0 && ", "}<Link href={`/crew/${urlsafe(crew.trim())}`}>{crew.trim()}</Link></span>
                 ))}
               </div>
+              <div className="col-2 lightgrey">{artist.rating != null ? artist.rating.toFixed(1) : "-"}</div>
+              <div className="col-2 lightgrey">{artist.country || "-"}</div>
             </div>
           ))}
         {loadingMore && <div className="row apt-1"><div className="col lightgrey">Loading...</div></div>}

@@ -140,6 +140,13 @@ button.dropdown-item {
 .sort-btn { background: none; border: none; color: inherit; cursor: pointer; font: inherit; padding: 0; }
 .sort-btn:hover { text-decoration: underline; }
 
+/* Sort headers (artist "All Releases" table). Yellow link colour + pointer
+   cursor signal clickability; the active column is brighter (white) + bold and
+   carries an ASCII ^/v direction arrow. No underline (matches site links). */
+.sort-header { color: #ffff55 !important; cursor: pointer; }
+.sort-header:hover { color: #ffffff !important; }
+.sort-header-active { color: #ffffff !important; font-weight: bold !important; }
+
 /* Bootstrap 5 adds ::after caret to dropdown-toggle; we use explicit <span class="caret"> */
 
 

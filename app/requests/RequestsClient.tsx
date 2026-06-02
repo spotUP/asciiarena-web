@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import NewItemsPill from "@/components/ui/NewItemsPill";
+import SortHeader from "@/components/ui/SortHeader";
 
 interface RequestRow {
   id: number;
@@ -171,16 +172,16 @@ export default function RequestsClient() {
 
       <div className="row amb-1">
         <div className="col-3">
-          <button className="sort-btn white" onClick={() => updateSort("title")}>Title</button>
+          <SortHeader col="title" label="Title" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
         <div className="col-3">
-          <button className="sort-btn white" onClick={() => updateSort("status")}>Status</button>
+          <SortHeader col="status" label="Status" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
         <div className="col-3">
           <span className="white">Requested By</span>
         </div>
         <div className="col-3">
-          <button className="sort-btn white" onClick={() => updateSort("timestamp")}>Date</button>
+          <SortHeader col="timestamp" label="Date" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
       </div>
 

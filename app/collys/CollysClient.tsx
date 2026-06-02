@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { urlsafe } from "@/lib/utils";
+import SortHeader from "@/components/ui/SortHeader";
 import NewItemsPill from "@/components/ui/NewItemsPill";
 
 interface CollyRow {
@@ -185,19 +186,19 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
         style={viewMode === 2 ? { display: "none" } : {}}
       >
         <div className="col-md-7 text-truncate d-none d-md-block">
-          <button className="sort-btn" onClick={() => updateSort("name")}>NAME</button>
+          <SortHeader col="name" label="NAME" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
         <div className="col text-truncate">
-          <button className="sort-btn" onClick={() => updateSort("filename")}>FILENAME</button>
+          <SortHeader col="filename" label="FILENAME" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
         <div className="col white text-truncate">
-          <button className="sort-btn" onClick={() => updateSort("artists")}>ARTiST</button>
+          <SortHeader col="artists" label="ARTiST" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
         <div className="col white text-truncate">
-          <button className="sort-btn" onClick={() => updateSort("crews")}>CREW</button>
+          <SortHeader col="crews" label="CREW" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
         <div className="col text-truncate d-none d-md-block">
-          <button className="sort-btn" onClick={() => updateSort("cdate")}>DATE</button>
+          <SortHeader col="cdate" label="DATE" sortKey={sort} asc={asc} onSort={updateSort} />
         </div>
       </div>
 
@@ -207,14 +208,14 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
         style={viewMode === 1 ? { display: "none" } : {}}
       >
         <span className="col-2 white">
-          <button className="sort-btn" onClick={() => updateSort("filename")}>FILENAME</button>
+          <SortHeader col="filename" label="FILENAME" sortKey={sort} asc={asc} onSort={updateSort} />
         </span>
         <span className="col-1 white">FLAGS</span>
         <span className="col-1 white">
-          <button className="sort-btn" onClick={() => updateSort("filesize")}>FILESIZE</button>
+          <SortHeader col="filesize" label="FILESIZE" sortKey={sort} asc={asc} onSort={updateSort} />
         </span>
         <span className="col-2 white">
-          <button className="sort-btn" onClick={() => updateSort("cdate")}>DATE</button>
+          <SortHeader col="cdate" label="DATE" sortKey={sort} asc={asc} onSort={updateSort} />
         </span>
         <span className="white">DESCRIPTION</span>
       </div>
