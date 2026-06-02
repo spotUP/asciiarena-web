@@ -6,7 +6,6 @@ import { useToast } from "@/components/ui/ToastProvider";
 import LiveFeedSettings from "./LiveFeedSettings";
 import WidgetSettings from "./WidgetSettings";
 import DosSelect from "@/components/ui/DosSelect";
-import { COUNTRIES } from "@/lib/countries";
 
 interface ArtistHandle {
   id: number;
@@ -138,7 +137,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
       fd.set("def_bg_col", settings.def_bg_col ?? "");
       fd.set("def_fg_col", settings.def_fg_col ?? "");
       fd.set("display_mail", String(settings.display_mail ?? 0));
-      fd.set("def_font", settings.def_font != null ? String(settings.def_font) : "");
+      fd.set("def_font", settings.def_font ?? "");
       fd.set("crt_effect", String(settings.crt_effect ?? 0));
       fd.set("anim_effect", String(settings.anim_effect ?? 0));
       saveAction(fd);
@@ -299,13 +298,9 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
       <div className="row amb-1"><div className="col-12 apt-1">Country</div></div>
       <div className="row amb-1">
         <div className="col-xs-12 col-md-8">
-          <DosSelect
-            width={240}
-            padded
-            placeholder="Select country"
-            value={settings.country ?? ""}
-            options={COUNTRIES.map(c => ({ value: c, label: c }))}
-            onChange={(v) => set("country", v)}
+          <input
+            type="text" className="form-control w-100"
+            value={settings.country ?? ""} onChange={(e) => set("country", e.target.value)}
           />
         </div>
       </div>
@@ -410,9 +405,10 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
         <div className="col-xs-12 col-md-6">
           <DosSelect
             width={200}
-            value={settings.def_font?.toString() ?? ""}
-            options={FONT_OPTIONS.map(f => ({ value: f.value.toString(), label: f.label }))}
-            onChange={(v) => set("def_font", v ? parseInt(v) : null)}
+            padded
+            value={settings.def_font ?? ""}
+            options={FONT_OPTIONS.map(f => ({ value: f.value, label: f.label }))}
+            onChange={(v) => set("def_font", v || null)}
           />
         </div>
       </div>

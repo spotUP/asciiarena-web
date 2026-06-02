@@ -3,7 +3,6 @@
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { urlsafe } from "@/lib/utils";
-import { broadcast } from "@/lib/live";
 import bcrypt from "bcryptjs";
 import { createHash } from "crypto";
 
@@ -21,7 +20,7 @@ export interface Settings {
   def_bg_col: string | null;
   def_fg_col: string | null;
   display_mail: number | null;
-  def_font: number | null;
+  def_font: string | null;
   crt_effect: number | null;
   anim_effect: number | null;
 }
@@ -40,7 +39,7 @@ interface UserRow {
   def_bg_col: string | null;
   def_fg_col: string | null;
   display_mail: number | null;
-  def_font: number | null;
+  def_font: string | null;
   crt_effect: string | null;
   anim_effect: string | null;
 }
@@ -104,7 +103,7 @@ export async function saveSettings(
   const byearRaw = formData.get("byear") as string;
   const bmonthRaw = formData.get("bmonth") as string;
   const bdayRaw = formData.get("bday") as string;
-  const country = (formData.get("country") as string) || null;
+  const countryRaw = (formData.get("country") as string) || null;
   const mail = (formData.get("mail") as string) || null;
   const webpage = (formData.get("webpage") as string) || null;
   const upload_signature = (formData.get("upload_signature") as string) || null;
@@ -116,12 +115,23 @@ export async function saveSettings(
   const crt_effectRaw = formData.get("crt_effect") as string | null;
   const anim_effectRaw = formData.get("anim_effect") as string | null;
 
-  const byear = byearRaw ? parseInt(byearRaw) : null;
-  const bmonth = bmonthRaw ? parseInt(bmonthRaw) : null;
-  const bday = bdayRaw ? parseInt(bdayRaw) : null;
-  const viewmode = viewmodeRaw ? parseInt(viewmodeRaw) : 0;
+  // Numeric columns (byear/bmonth/bday are Int, country is SmallInt). Guard
+  // against NaN so a non-numeric value can never crash the whole UPDATE.
+  const toIntOrNull = (v: string | null): number | null => {
+    if (!v) return null;
+    const n = parseInt(v, 10);
+    return Number.isFinite(n) ? n : null;
+  };
+  const byear = toIntOrNull(byearRaw);
+  const bmonth = toIntOrNull(bmonthRaw);
+  const bday = toIntOrNull(bdayRaw);
+  const country = toIntOrNull(countryRaw);
+  // list_view_mode (Char 8) and def_font (Char 32) are STRING columns, not
+  // ints — store the raw value. (parseInt here yielded NaN for "standard" or a
+  // font name like "Topaz_a1200" and threw on UPDATE.)
+  const viewmode = viewmodeRaw || null;
+  const def_font = def_fontRaw || null;
   const display_mail = display_mailRaw === "1" ? 1 : 0;
-  const def_font = def_fontRaw ? parseInt(def_fontRaw) : null;
   const crt_effect = crt_effectRaw === "1" ? 1 : 0;
   const anim_effect = anim_effectRaw === "1" ? 1 : 0;
 
@@ -166,7 +176,9 @@ export async function saveSettings(
         anim_effect = ${animVal}
       WHERE id = ${userId}
     `;
-    broadcast(`user:${userId}:profile`, { type: "updated" });
+    // No user:profile broadcast here: it forced a full router.refresh on every
+    // auto-save (the jarring black modem-redraw "blink"). crt/anim live updates
+    // are handled by their own /api/settings/display endpoint.
     return { success: true };
   } catch {
     return { success: false, error: "An error occurred saving your settings." };
