@@ -50,4 +50,23 @@ rsync_resilient -L \
 echo "Restarting service..."
 ssh spot@97.75.89.139 "sudo systemctl restart asciiarena-next && sleep 4 && systemctl is-active asciiarena-next"
 
+# Warm-up: after a restart the new Next process is up but its Prisma/MariaDB
+# pool hasn't connected yet, so the first requests in that window return a bare
+# 500. Poll the home page until it serves 200 so the deploy absorbs the
+# cold-start window instead of leaving it exposed to real visitors.
+echo "Warming up (waiting for home page to serve 200)..."
+warm=0
+for attempt in $(seq 1 30); do
+  code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 https://asciiarena.se/ || echo 000)
+  if [ "$code" = "200" ]; then
+    echo "  home page 200 after ${attempt}s — pool warm."
+    warm=1
+    break
+  fi
+  sleep 1
+done
+if [ "$warm" -ne 1 ]; then
+  echo "  WARNING: home page still not 200 after 30s (last code: ${code}). Check the service."
+fi
+
 echo "Done."
