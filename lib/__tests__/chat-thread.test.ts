@@ -37,6 +37,13 @@ describe("countUnread", () => {
   it("returns 0 when everything is read", () => {
     expect(countUnread(member({ joinedAt: 100, lastReadAt: 999 }), msgs, 1)).toBe(0);
   });
+  it("treats a message exactly at last_read_at as read, and one after as unread", () => {
+    const m: ThreadMessage[] = [
+      { timestamp: 110, fromId: 2 }, // == lastReadAt -> read
+      { timestamp: 111, fromId: 2 }, // > lastReadAt  -> unread
+    ];
+    expect(countUnread(member({ joinedAt: 100, lastReadAt: 110 }), m, 1)).toBe(1);
+  });
 });
 
 describe("resolveDisplayTitle", () => {
