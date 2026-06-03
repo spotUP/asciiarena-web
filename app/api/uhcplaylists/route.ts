@@ -1,12 +1,12 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
+import { servePlaylistFile } from "@/lib/playlistFile";
 
 interface PlaylistRow {
   filename: string;
   title: string;
   author: string;
   genre: string;
-  filedata: string | null;
 }
 
 export async function GET(request: NextRequest) {
@@ -14,23 +14,7 @@ export async function GET(request: NextRequest) {
   const limit = parseInt(request.nextUrl.searchParams.get("l") ?? "0") || 0;
 
   if (file) {
-    const rows = await prisma.$queryRaw<PlaylistRow[]>`
-      SELECT filename, filedata FROM hippo_playlists WHERE filename = ${file} LIMIT 1
-    `;
-    const row = rows[0];
-    if (!row?.filedata) return new Response("Not found", { status: 404 });
-
-    const base64 = row.filedata.replace("data:application/octet-stream;base64,", "");
-    const buf = Buffer.from(base64, "base64");
-
-    return new Response(buf, {
-      headers: {
-        "Content-Type": "application/octet-stream",
-        "Content-Disposition": `attachment; filename="${row.filename}"`,
-        "Content-Length": String(buf.length),
-        "Cache-Control": "no-cache",
-      },
-    });
+    return servePlaylistFile(file);
   }
 
   const rows = limit > 0

@@ -23,11 +23,10 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  async rewrites() {
-    return [
-      { source: "/playlist/:filename", destination: "/api/uhcplaylists?file=:filename" },
-    ];
-  },
+  // Note: /playlist/<filename> is served by the real dynamic route
+  // app/playlist/[filename]/route.ts, not a rewrite. A rewrite to
+  // /api/uhcplaylists?file=:filename did not forward the query param, so the
+  // route returned the index listing and HippoPlayer reported "not a playlist".
 
   async redirects() {
     return [
