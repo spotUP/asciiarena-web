@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback, KeyboardEvent } from "react";
 import { useChatContext } from "./ChatContext";
+import { playChatAlert, unlockChatAudio } from "@/lib/chatSound";
 
 interface ChatMessage {
   id: number;
@@ -38,6 +39,8 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
   const [input, setInput] = useState("");
   const [peerDraft, setPeerDraft] = useState<{ nick: string; text: string } | null>(null);
   const [sending, setSending] = useState(false);
+  const [flashing, setFlashing] = useState(false);
+  const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const typingDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -54,6 +57,12 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
 
   useEffect(() => { threadIdRef.current = threadId; }, [threadId]);
   useEffect(() => { minimizedRef.current = minimized; }, [minimized]);
+
+  const triggerFlash = useCallback(() => {
+    setFlashing(true);
+    if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+    flashTimerRef.current = setTimeout(() => setFlashing(false), 500);
+  }, []);
 
   const loadMessages = useCallback((tid: number) => {
     fetch(`/api/chat/messages/${tid}`)
@@ -95,6 +104,12 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
           } else {
             markReadIfVisible(tid);
           }
+        } else if (event.type === "alert") {
+          // Ignore the echo of our own yell (we already played it on click).
+          if (event.fromId !== parseInt(userId)) {
+            playChatAlert();
+            triggerFlash();
+          }
         }
       } catch { /* ignore */ }
     };
@@ -115,7 +130,7 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
       } catch { /* ignore */ }
     };
     esTypingRef.current = esTyping;
-  }, [peerId, userNick, loadMessages, incrementUnread, markReadIfVisible]);
+  }, [peerId, userId, userNick, loadMessages, incrementUnread, markReadIfVisible, triggerFlash]);
 
   // Initialize: find or confirm thread, load messages
   useEffect(() => {
@@ -143,6 +158,7 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
       esTypingRef.current?.close();
       if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
       if (typingDebounceRef.current) clearTimeout(typingDebounceRef.current);
+      if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -238,6 +254,19 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
     }
   };
 
+  const sendAlert = () => {
+    const tid = threadIdRef.current;
+    if (!tid || tid <= 0) return; // can't yell before the thread exists
+    unlockChatAudio();            // this click is a user gesture
+    playChatAlert();              // instant local feedback
+    triggerFlash();
+    fetch("/api/chat/alert", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ threadId: tid }),
+    }).catch(() => {});
+  };
+
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -282,7 +311,8 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
     }}>
       {/* Header */}
       <div style={{
-        backgroundColor: "#444",
+        backgroundColor: flashing ? "#cc7722" : "#444",
+        transition: "background-color 120ms",
         padding: "4px 6px",
         display: "flex",
         justifyContent: "space-between",
@@ -294,6 +324,13 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
           [{peerNick}]
         </span>
         <span style={{ display: "flex", gap: "4px", flexShrink: 0 }}>
+          {threadId ? (
+            <button onClick={(e) => { e.stopPropagation(); sendAlert(); }}
+              title="Alert everyone in this chat"
+              style={{ background: "none", border: "none", color: "#aaa", cursor: "pointer", padding: "0 2px", fontFamily: "inherit" }}>
+              !
+            </button>
+          ) : null}
           {!popout && (
             <button onClick={(e) => { e.stopPropagation(); openPopout(); }}
               title="Pop out to a separate window"
