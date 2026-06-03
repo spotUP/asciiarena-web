@@ -4,6 +4,7 @@ import nodemailer from "nodemailer";
 import { prisma } from "@/lib/db";
 import { apiError, apiOk } from "@/lib/utils";
 import { checkRateLimit } from "@/lib/rateLimit";
+import { hashResetToken } from "@/lib/resetToken";
 
 function buildToken(userId: number, email: string): string {
   const expiry = Date.now() + 4 * 60 * 60 * 1000;
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
 
   const token = buildToken(user.id, email);
   // Store a hash of the token so we can invalidate it after use
-  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+  const tokenHash = hashResetToken(token);
   await prisma.users.update({ where: { id: user.id }, data: { temp_pw_hash: tokenHash } });
   const siteRoot = process.env.NEXTAUTH_URL ?? "https://asciiarena.se";
   const resetLink = `${siteRoot}/reminder?reset=${token}`;

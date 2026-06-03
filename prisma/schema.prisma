@@ -305,7 +305,7 @@ model users {
   byear                            Int?
   bmonth                           Int?
   bday                             Int?
-  country                          Int?              @default(0) @db.SmallInt
+  country                          String?           @db.VarChar(60)
   mail                             String?           @db.Char(60)
   webpage                          String?           @db.Char(60)
   uploaded                         Int

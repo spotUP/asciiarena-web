@@ -3,6 +3,7 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { apiError, apiOk } from "@/lib/utils";
+import { hashResetToken } from "@/lib/resetToken";
 
 const PASSWORD_RE = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
 
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
   if (!verified) return apiError("Invalid or expired reset link.", 400);
 
   // Verify the token hash matches what was stored and hasn't been used yet
-  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+  const tokenHash = hashResetToken(token);
   const user = await prisma.users.findUnique({
     where: { id: verified.userId },
     select: { temp_pw_hash: true },
