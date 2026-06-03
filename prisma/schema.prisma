@@ -248,6 +248,20 @@ model messages {
   @@index([to_id], map: "to_id")
 }
 
+model chat_participants {
+  id           Int     @id @default(autoincrement()) @db.UnsignedInt
+  thread_id    Int     @db.UnsignedInt
+  user_id      Int     @db.UnsignedInt
+  joined_at    Int
+  left_at      Int?
+  last_read_at Int     @default(0)
+  title        String? @db.VarChar(128)
+
+  @@unique([thread_id, user_id], map: "uq_thread_user")
+  @@index([thread_id], map: "idx_thread")
+  @@index([user_id], map: "idx_user")
+}
+
 model request_comments {
   comment_id      Int     @id @default(autoincrement())
   request_id      Int
