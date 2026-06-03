@@ -9,6 +9,7 @@ export interface AlertEvent {
   type: "alert";
   fromId: number;
   fromNick: string;
+  [key: string]: unknown;
 }
 
 // fromId lets each receiver ignore the echo of their own alert (the sender
