@@ -27,6 +27,11 @@
  */
 export function createWorkerHandler() {
 	return {
+		// Called UN-chained by the engine (state.js auto-save, ui.js input
+		// gating). Single-user embed is never connected to a collab session.
+		isConnected() {
+			return false;
+		},
 		sendResize() {},
 		sendIceColorsChange() {},
 		sendLetterSpacingChange() {},
