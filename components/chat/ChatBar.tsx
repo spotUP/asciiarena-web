@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { useChatContext } from "./ChatContext";
+import { useChatContext, dmKey } from "./ChatContext";
 import ChatWindow from "./ChatWindow";
 import { isSnoozed } from "@/lib/chat-snooze";
 
@@ -42,16 +42,16 @@ export default function ChatBar({ userId, userNick }: Props) {
       try {
         const event = JSON.parse(e.data) as IncomingMessage;
         if (event.type === "message" && event.fromId && event.fromNick) {
-          const existingWindow = windowsRef.current.find(w => w.peerId === event.fromId);
+          const existingWindow = windowsRef.current.find(w => w.key === dmKey(event.fromId!));
           if (existingWindow) {
             if (existingWindow.minimized) {
               if (isSnoozed(event.fromId, MINIMIZE_SNOOZE_MS)) {
                 // You minimized this recently — keep it collapsed; just bump
                 // the blinking unread count instead of popping it open.
-                incrementUnread(event.fromId);
+                incrementUnread(dmKey(event.fromId));
               } else {
                 // Snooze expired — pop the collapsed tab back open.
-                minimizeChat(event.fromId, false);
+                minimizeChat(dmKey(event.fromId), false);
               }
             }
             // Already expanded: its own thread SSE shows the message inline.
@@ -126,11 +126,14 @@ export default function ChatBar({ userId, userNick }: Props) {
     }}>
       {/* Expanded chat windows stacked right-to-left */}
       {expandedWindows.map(w => (
-        <div key={w.peerId} style={{ pointerEvents: "all" }}>
+        <div key={w.key} style={{ pointerEvents: "all" }}>
           <ChatWindow
-            peerId={w.peerId}
-            peerNick={w.peerNick}
+            windowKey={w.key}
             threadId={w.threadId}
+            isGroup={w.isGroup}
+            peerId={w.peerId}
+            title={w.title}
+            participants={w.participants}
             minimized={w.minimized}
             userId={userId}
             userNick={userNick}
@@ -220,8 +223,8 @@ export default function ChatBar({ userId, userNick }: Props) {
             no timeout. Clicking re-expands the window. */}
         {windows.filter(w => w.minimized).map(w => (
           <button
-            key={w.peerId}
-            onClick={() => minimizeChat(w.peerId, false)}
+            key={w.key}
+            onClick={() => minimizeChat(w.key, false)}
             className={w.unread > 0 ? "blink" : undefined}
             style={{
               background: "none", border: "none",
@@ -229,21 +232,21 @@ export default function ChatBar({ userId, userNick }: Props) {
               cursor: "pointer", fontFamily: "inherit", fontSize: "inherit", padding: "0 4px",
             }}
           >
-            [{w.peerNick}{w.unread > 0 ? ` ${w.unread}` : ""}]
+            [{w.title}{w.unread > 0 ? ` ${w.unread}` : ""}]
           </button>
         ))}
 
         {/* Tabs for expanded windows (to minimize them) */}
         {expandedWindows.map(w => (
           <button
-            key={w.peerId}
-            onClick={() => minimizeChat(w.peerId, true)}
+            key={w.key}
+            onClick={() => minimizeChat(w.key, true)}
             style={{
               background: "none", border: "none", color: "#ffff55",
               cursor: "pointer", fontFamily: "inherit", fontSize: "inherit", padding: "0 4px",
             }}
           >
-            [{w.peerNick}]
+            [{w.title}]
           </button>
         ))}
       </div>

@@ -14,9 +14,12 @@ interface ChatMessage {
 }
 
 interface Props {
-  peerId: number;
-  peerNick: string;
+  windowKey: string;
   threadId: number | null;
+  isGroup: boolean;
+  peerId: number;
+  title: string;
+  participants: { id: number; nick: string }[];
   minimized: boolean;
   userId: string;
   userNick: string;
@@ -33,7 +36,7 @@ function formatTime(ts: number | null): string {
   return d.getHours().toString().padStart(2, "0") + ":" + d.getMinutes().toString().padStart(2, "0");
 }
 
-export default function ChatWindow({ peerId, peerNick, threadId, minimized, userId, userNick, popout = false }: Props) {
+export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title, participants, minimized, userId, userNick, popout = false }: Props) {
   const { closeChat, minimizeChat, setThreadId, markRead, incrementUnread } = useChatContext();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -100,7 +103,7 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
         if (event.type === "message") {
           loadMessages(tid);
           if (minimizedRef.current) {
-            incrementUnread(peerId);
+            incrementUnread(windowKey);
           } else {
             markReadIfVisible(tid);
           }
@@ -130,7 +133,7 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
       } catch { /* ignore */ }
     };
     esTypingRef.current = esTyping;
-  }, [peerId, userId, userNick, loadMessages, incrementUnread, markReadIfVisible, triggerFlash]);
+  }, [windowKey, userId, userNick, loadMessages, incrementUnread, markReadIfVisible, triggerFlash]);
 
   // Initialize: find or confirm thread, load messages
   useEffect(() => {
@@ -138,13 +141,13 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
       loadMessages(threadId);
       markReadIfVisible(threadId);
       subscribeToThread(threadId);
-    } else {
+    } else if (!isGroup) {
       fetch(`/api/chat/thread?peerId=${peerId}`)
         .then(r => r.json())
         .then((data: { threadId?: number | null }) => {
           const tid = data?.threadId;
           if (tid) {
-            setThreadId(peerId, tid);
+            setThreadId(windowKey, tid);
             loadMessages(tid);
             markReadIfVisible(tid);
             subscribeToThread(tid);
@@ -174,9 +177,9 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
   useEffect(() => {
     if (!minimized && threadIdRef.current) {
       markReadIfVisible(threadIdRef.current);
-      markRead(peerId);
+      markRead(windowKey);
     }
-  }, [minimized, peerId, markRead, markReadIfVisible]);
+  }, [minimized, windowKey, markRead, markReadIfVisible]);
 
   // Initial open: scroll to the first unread message so the user lands at
   // the read/unread boundary and can catch up downward. Subsequent renders
@@ -229,7 +232,10 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
     }
 
     try {
-      const body: { peerId: number; message: string; threadId?: number } = { peerId, message: text };
+      const body: { peerId: number; message: string; threadId?: number } = {
+        peerId: isGroup ? (participants[0]?.id ?? peerId) : peerId,
+        message: text,
+      };
       // Only pass a positive thread id; the server's Zod schema requires
       // .int().positive(), so threadId=0 (legacy rows) would 400.
       if (tid && tid > 0) body.threadId = tid;
@@ -243,7 +249,7 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
         setInput("");
         const newThreadId = data.threadId;
         if ((!tid || tid <= 0) && newThreadId) {
-          setThreadId(peerId, newThreadId);
+          setThreadId(windowKey, newThreadId);
           subscribeToThread(newThreadId);
         }
         const reloadId = newThreadId ?? (tid && tid > 0 ? tid : null);
@@ -282,7 +288,7 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
       `chat_${peerId}`,
       "width=340,height=500,resizable=yes,scrollbars=no,menubar=no,toolbar=no,location=no,status=no"
     );
-    if (w) closeChat(peerId);
+    if (w) closeChat(windowKey);
   };
 
   if (minimized) return null; // ChatBar renders the tab; window is hidden
@@ -319,9 +325,16 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
         alignItems: "center",
         cursor: popout ? "default" : "pointer",
         userSelect: "none",
-      }} onClick={popout ? undefined : () => minimizeChat(peerId, true)}>
-        <span className="yellow" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          [{peerNick}]
+      }} onClick={popout ? undefined : () => minimizeChat(windowKey, true)}>
+        <span style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
+          <span className="yellow" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            [{title}]
+          </span>
+          {isGroup && (
+            <span className="lightgrey" style={{ fontSize: "11px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {participants.map(p => p.nick).join(", ")}
+            </span>
+          )}
         </span>
         <span style={{ display: "flex", gap: "4px", flexShrink: 0 }}>
           {threadId ? (
@@ -331,7 +344,7 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
               !
             </button>
           ) : null}
-          {!popout && (
+          {!popout && !isGroup && (
             <button onClick={(e) => { e.stopPropagation(); openPopout(); }}
               title="Pop out to a separate window"
               style={{ background: "none", border: "none", color: "#aaa", cursor: "pointer", padding: "0 2px", fontFamily: "inherit" }}>
@@ -340,7 +353,7 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
             </button>
           )}
           {!popout && (
-            <button onClick={(e) => { e.stopPropagation(); minimizeChat(peerId, true); }}
+            <button onClick={(e) => { e.stopPropagation(); minimizeChat(windowKey, true); }}
               title="Minimise"
               style={{ background: "none", border: "none", color: "#aaa", cursor: "pointer", padding: "0 2px", fontFamily: "inherit" }}>
               _
@@ -349,7 +362,7 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
           <button onClick={(e) => {
             e.stopPropagation();
             if (popout) window.close();
-            else closeChat(peerId);
+            else closeChat(windowKey);
           }}
             title={popout ? "Close window" : "Close"}
             style={{ background: "none", border: "none", color: "#aaa", cursor: "pointer", padding: "0 2px", fontFamily: "inherit" }}>
@@ -393,7 +406,11 @@ export default function ChatWindow({ peerId, peerNick, threadId, minimized, user
                 </div>
               )}
               <span style={{ color: isOwn ? "#ffff55" : "#ff55ff", marginRight: "4px" }}>
-                {msg.postername ?? (isOwn ? userNick : peerNick)}
+                {isOwn
+                  ? (msg.postername ?? userNick)
+                  : (msg.postername
+                      ?? participants.find(p => p.id === msg.from_id)?.nick
+                      ?? title)}
               </span>
               <span className="lightgrey" style={{ fontSize: "11px" }}>{formatTime(msg.timestamp)}</span>
               <div style={{ color: "#aaaaaa", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>

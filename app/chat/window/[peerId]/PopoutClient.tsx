@@ -52,14 +52,17 @@ function PopoutInner({ peerId, peerNick, userId, userNick }: Props) {
   }, [peerId, peerNick, openChat]);
 
   const w = windows.find(x => x.peerId === peerId);
-  // Wait for openChat's setState to land so threadId/peerNick are stable.
+  // Wait for openChat's setState to land so threadId/title are stable.
   if (!w) return null;
 
   return (
     <ChatWindow
-      peerId={w.peerId}
-      peerNick={w.peerNick}
+      windowKey={w.key}
       threadId={w.threadId}
+      isGroup={w.isGroup}
+      peerId={w.peerId}
+      title={w.title}
+      participants={w.participants}
       minimized={false}
       userId={userId}
       userNick={userNick}
