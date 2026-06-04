@@ -265,7 +265,7 @@ export default function MessagesClient({ userId, userNick, initialReceiverId }: 
             href="#"
             onClick={(e) => { e.preventDefault(); handleTabClick("new"); }}
           >
-            New Message
+            New Chat
           </a>
         </li>
       </ul>
@@ -386,7 +386,7 @@ export default function MessagesClient({ userId, userNick, initialReceiverId }: 
         <div className="container-fluid bg-secondary aml-1 amr-1 apb-1 amt-1">
           <div className="header col-12 bg-header ap-1 d-flex justify-content-between align-items-center">
             <span>{selectedSubject || "(no subject)"}</span>
-            <input type="button" className="btn-big" value="Back to inbox" onClick={closeThread} />
+            <input type="button" className="btn-big" value="Back to conversations" onClick={closeThread} />
           </div>
           {loadingThread && (
             <div className="row apl-1 apt-1">

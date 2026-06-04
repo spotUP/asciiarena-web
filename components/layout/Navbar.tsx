@@ -161,7 +161,7 @@ export default function Navbar({ session }: NavbarProps) {
                   ACCOUNT v
                 </a>
                 <div className="dropdown-menu dropdown-menu-end ascii" aria-labelledby="account-dropdown">
-                  <Link prefetch={false} className="dropdown-item ascii" href="/messages">Messages<UnreadBadge userId={session?.user?.id} /></Link>
+                  <Link prefetch={false} className="dropdown-item ascii" href="/messages">Chat<UnreadBadge userId={session?.user?.id} /></Link>
                   <Link prefetch={false} className="dropdown-item ascii" href="/settings">Settings</Link>
                   <LogoutButton />
                 </div>

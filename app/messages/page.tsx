@@ -13,7 +13,7 @@ export default async function MessagesPage({
   const { sendmsg } = await searchParams;
   const initialReceiverId = sendmsg ? parseInt(sendmsg) || null : null;
   return (
-    <SiteLayout title="MESSAGES">
+    <SiteLayout title="CHAT">
       <MessagesClient
         userId={session.user.id ?? ""}
         userNick={session.user.name ?? ""}
