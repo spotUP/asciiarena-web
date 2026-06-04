@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
 import { setSnooze, clearSnooze } from "@/lib/chat-snooze";
 
 export interface ChatParticipant { id: number; nick: string }
@@ -15,6 +15,8 @@ export interface ChatWindowState {
   minimized: boolean;
   unread: number;
 }
+
+const STORAGE_KEY = "asciiarena:chat:windows";
 
 export function dmKey(peerId: number): string { return `p:${peerId}`; }
 export function threadKey(threadId: number): string { return `t:${threadId}`; }
@@ -49,6 +51,23 @@ function capWindows(next: ChatWindowState[]): ChatWindowState[] {
 
 export function ChatContextProvider({ children }: { children: ReactNode }) {
   const [windows, setWindows] = useState<ChatWindowState[]>([]);
+
+  // Restore the docked chats from a previous page/session on first mount.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const saved = window.localStorage.getItem(STORAGE_KEY);
+      if (!saved) return;
+      const parsed = JSON.parse(saved) as ChatWindowState[];
+      if (Array.isArray(parsed) && parsed.length > 0) setWindows(parsed);
+    } catch { /* ignore corrupt storage */ }
+  }, []);
+
+  // Keep the dock persisted so chats survive navigation + reload.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(windows)); } catch { /* quota / disabled */ }
+  }, [windows]);
 
   const openChat = useCallback<ChatContextValue["openChat"]>((peerId, peerNick, threadId, opts) => {
     const key = dmKey(peerId);
