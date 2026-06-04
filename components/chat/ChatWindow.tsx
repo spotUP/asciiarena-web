@@ -109,7 +109,9 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
     try {
       const list = await (await fetch(`/api/chat/thread/${tid}/members`)).json() as { userId: number; nick: string }[];
       const others = list.filter(p => p.userId !== parseInt(userId)).map(p => ({ id: p.userId, nick: p.nick }));
-      setParticipants(windowKey, others, resolveDisplayTitle(null, null, others.map(o => o.nick)));
+      const titleData = await (await fetch(`/api/chat/thread/${tid}/title`)).json() as { title?: string };
+      const resolvedTitle = titleData?.title ?? resolveDisplayTitle(null, null, others.map(o => o.nick));
+      setParticipants(windowKey, others, resolvedTitle);
     } catch { /* ignore */ }
   }, [userId, windowKey, setParticipants]);
 
@@ -300,13 +302,15 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
         if (!res.ok) return;
         return fetch(`/api/chat/thread/${tid}/members`)
           .then(r => r.json())
-          .then((list: unknown) => {
+          .then(async (list: unknown) => {
             if (!Array.isArray(list)) return;
             const members = list as Array<{ userId: number; nick: string }>;
             const others = members
               .filter(p => p.userId !== parseInt(userId))
               .map(p => ({ id: p.userId, nick: p.nick }));
-            setParticipants(windowKey, others, resolveDisplayTitle(null, null, others.map(o => o.nick)));
+            const titleData = await (await fetch(`/api/chat/thread/${tid}/title`)).json() as { title?: string };
+            const resolvedTitle = titleData?.title ?? resolveDisplayTitle(null, null, others.map(o => o.nick));
+            setParticipants(windowKey, others, resolvedTitle);
           });
       })
       .catch(() => {})
