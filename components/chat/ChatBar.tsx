@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useChatContext, dmKey } from "./ChatContext";
 import ChatWindow from "./ChatWindow";
 import { isSnoozed } from "@/lib/chat-snooze";
+import { resolveDisplayTitle } from "@/lib/chatThread";
 
 interface Props {
   userId: string;
@@ -15,6 +16,7 @@ interface IncomingMessage {
   fromId?: number;
   fromNick?: string;
   threadId?: number;
+  byNick?: string;
 }
 
 // After you minimize a chat, new messages from that peer stay collapsed (just
@@ -22,7 +24,7 @@ interface IncomingMessage {
 const MINIMIZE_SNOOZE_MS = 30 * 60 * 1000; // 30 minutes
 
 export default function ChatBar({ userId, userNick }: Props) {
-  const { windows, openChat, minimizeChat, incrementUnread } = useChatContext();
+  const { windows, openChat, openThread, minimizeChat, incrementUnread } = useChatContext();
   const [newNick, setNewNick] = useState("");
   const [newNickOpen, setNewNickOpen] = useState(false);
   const [newNickError, setNewNickError] = useState("");
@@ -63,11 +65,19 @@ export default function ChatBar({ userId, userNick }: Props) {
             // First DM from this person this session — open it expanded.
             openChat(event.fromId, event.fromNick);
           }
+        } else if (event.type === "thread-added" && event.threadId) {
+          fetch(`/api/chat/thread/${event.threadId}/members`)
+            .then(r => r.json())
+            .then((list: { userId: number; nick: string }[]) => {
+              const others = list.filter(p => p.userId !== parseInt(userId)).map(p => ({ id: p.userId, nick: p.nick }));
+              openThread(event.threadId!, others, resolveDisplayTitle(null, null, others.map(o => o.nick)), { startMinimized: true, unread: 1 });
+            })
+            .catch(() => {});
         }
       } catch { /* ignore */ }
     };
     return () => es.close();
-  }, [userId, incrementUnread, minimizeChat, openChat]);
+  }, [userId, incrementUnread, minimizeChat, openChat, openThread]);
 
   const fetchSuggestions = useCallback((q: string) => {
     if (suggestDebounceRef.current) clearTimeout(suggestDebounceRef.current);

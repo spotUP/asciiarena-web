@@ -40,6 +40,7 @@ function formatTime(ts: number | null): string {
 export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title, participants, minimized, userId, userNick, popout = false }: Props) {
   const { closeChat, minimizeChat, setThreadId, markRead, incrementUnread, setParticipants } = useChatContext();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [systemLines, setSystemLines] = useState<{ id: number; text: string }[]>([]);
   const [input, setInput] = useState("");
   const [peerDraft, setPeerDraft] = useState<{ nick: string; text: string } | null>(null);
   const [sending, setSending] = useState(false);
@@ -56,6 +57,7 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
   const esTypingRef = useRef<EventSource | null>(null);
   const threadIdRef = useRef<number | null>(threadId);
   const minimizedRef = useRef(minimized);
+  const sysIdRef = useRef(0);
   // First-open scroll: on the initial render after messages arrive, land
   // at the boundary between read and unread instead of the very bottom,
   // so the user catches up from where they left off. Subsequent message
@@ -65,6 +67,20 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
 
   useEffect(() => { threadIdRef.current = threadId; }, [threadId]);
   useEffect(() => { minimizedRef.current = minimized; }, [minimized]);
+
+  const pushSystemLine = useCallback((text: string) => {
+    sysIdRef.current += 1;
+    const id = sysIdRef.current;
+    setSystemLines(prev => [...prev, { id, text }]);
+  }, []);
+
+  const refreshParticipants = useCallback(async (tid: number) => {
+    try {
+      const list = await (await fetch(`/api/chat/thread/${tid}/members`)).json() as { userId: number; nick: string }[];
+      const others = list.filter(p => p.userId !== parseInt(userId)).map(p => ({ id: p.userId, nick: p.nick }));
+      setParticipants(windowKey, others, resolveDisplayTitle(null, null, others.map(o => o.nick)));
+    } catch { /* ignore */ }
+  }, [userId, windowKey, setParticipants]);
 
   const triggerFlash = useCallback(() => {
     setFlashing(true);
@@ -118,6 +134,12 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
             playChatAlert();
             triggerFlash();
           }
+        } else if (event.type === "member-joined") {
+          pushSystemLine(`${event.nick} joined`);
+          refreshParticipants(tid);
+        } else if (event.type === "member-left") {
+          pushSystemLine("a member left");
+          refreshParticipants(tid);
         }
       } catch { /* ignore */ }
     };
@@ -138,7 +160,7 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
       } catch { /* ignore */ }
     };
     esTypingRef.current = esTyping;
-  }, [windowKey, userId, userNick, loadMessages, incrementUnread, markReadIfVisible, triggerFlash]);
+  }, [windowKey, userId, userNick, loadMessages, incrementUnread, markReadIfVisible, triggerFlash, pushSystemLine, refreshParticipants]);
 
   // Initialize: find or confirm thread, load messages
   useEffect(() => {
@@ -520,6 +542,11 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
             </div>
           );
         })}
+        {systemLines.map(s => (
+          <div key={`sys-${s.id}`} className="lightgrey" style={{ textAlign: "center", fontSize: "11px", margin: "2px 0", fontFamily: "TopazPlus_a1200, monospace" }}>
+            — {s.text} —
+          </div>
+        ))}
         {peerDraft && (
           <div style={{ marginBottom: "4px" }}>
             <span style={{ color: "#ff55ff", marginRight: "4px" }}>{peerDraft.nick}</span>
