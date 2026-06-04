@@ -302,6 +302,16 @@ button.dropdown-item {
   left: 8px;
 }
 
+/* Chrome paints a static .btn-big's bottom-left corner BEHIND its parent's
+   background layer (e.g. a bg-secondary form), leaving an 8x16 grey notch over
+   the button — most visible on the green submit buttons. Promoting the button
+   to a positioned element moves it into the positioned-descendant paint step so
+   it always paints on top. No layout change (no offsets). Fixes the notch on
+   every .btn-big site-wide. */
+.btn-big {
+  position: relative;
+}
+
 /* Badges with bracket decorations */
 .badge {
   padding: 0 8px;
