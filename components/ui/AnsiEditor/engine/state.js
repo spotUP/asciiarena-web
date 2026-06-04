@@ -9,6 +9,7 @@
 import { Compression } from './compression.js';
 import { Storage } from './storage.js';
 import magicNumbers from './magicNumbers.js';
+import { ENGINE_ENV } from './env.js';
 
 // Object to hold application state
 const EditorState = {
@@ -88,12 +89,11 @@ class StateManager {
 		this.waitQueue = dependencyWaitQueue;
 		this.loadingFromStorage = false;
 
-		// Environment var or defaults
-		this.urlPrefix = import.meta.env.BASE_URL || '';
-		this.uiDir = this.urlPrefix + import.meta.env.VITE_UI_DIR || 'ui/';
-		this.fontDir = this.uiDir + import.meta.env.VITE_FONT_DIR || 'fonts/';
-		this.workerPath =
-			this.uiDir + 'js/' + import.meta.env.VITE_WORKER_FILE || 'worker.js';
+		// Environment config (ENGINE_ENV replaces Vite import.meta.env reads)
+		this.urlPrefix = ENGINE_ENV.urlPrefix;
+		this.uiDir = ENGINE_ENV.uiDir;
+		this.fontDir = ENGINE_ENV.fontDir;
+		this.workerPath = ENGINE_ENV.workerPath;
 
 		// Bind methods to ensure `this` is preserved when passed as callbacks
 		this.set = this.set.bind(this);
