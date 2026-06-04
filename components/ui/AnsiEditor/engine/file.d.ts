@@ -21,5 +21,6 @@ export declare function encodeAnsBytes(
 export declare const Load: unknown;
 export declare const Save: unknown;
 
+// Default export is the legacy { Load, Save } object; prefer the named exports (incl. encodeAnsBytes).
 declare const _default: { Load: typeof Load; Save: typeof Save };
 export default _default;

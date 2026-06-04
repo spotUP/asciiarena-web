@@ -75,6 +75,7 @@ export function initAnsiEditor(
     // setFont is declared async but we intentionally do not await it here:
     // the callback argument is called synchronously inside the font-load
     // completion handler, so the configuration runs at the right moment.
+    // State.textArtCanvas was assigned synchronously above; the ! is safe here.
     void State.textArtCanvas!.setFont(font, () => {
       State.textArtCanvas!.resize(columns, rows);
       State.textArtCanvas!.clear();
@@ -93,7 +94,7 @@ export function initAnsiEditor(
     },
 
     destroy(): void {
-      container.replaceChildren();
+      wrapper.remove();
       // TODO(phase 2): also detach engine listeners (keyboard, resize, etc.)
     },
   };

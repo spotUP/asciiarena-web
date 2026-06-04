@@ -13,6 +13,7 @@ export interface TextArtCanvas {
   /**
    * Async; loads the named font PNG, then calls `callback` once applied.
    * The optional `scaleFactor` parameter is unused by mount.ts.
+   * Async; font-load completion/errors surface via the callback, not the returned promise.
    */
   setFont(fontName: string, callback: () => void): Promise<void>;
   resize(columns: number, rows: number): void;
