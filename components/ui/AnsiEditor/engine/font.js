@@ -255,7 +255,9 @@ const loadFontFromImage = (
 			);
 		};
 
-		loadImageAndGetImageData(`${State.fontDir}${fontName}.png`)
+		// '+' in a path 404s behind the prod proxy; font files with '+' are
+		// stored with 'plus' on disk (see fontCache.js). Map name -> file.
+		loadImageAndGetImageData(`${State.fontDir}${fontName.replace(/\+/g, "plus")}.png`)
 			.then(imageData => {
 				const newFontData = parseFontData(imageData);
 
