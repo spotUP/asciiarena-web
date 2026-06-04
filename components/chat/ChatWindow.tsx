@@ -48,6 +48,8 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
   const [addOpen, setAddOpen] = useState(false);
   const [addSearch, setAddSearch] = useState("");
   const [addSuggestions, setAddSuggestions] = useState<Array<{ id: number; nick: string }>>([]);
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [titleDraft, setTitleDraft] = useState("");
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -67,6 +69,35 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
 
   useEffect(() => { threadIdRef.current = threadId; }, [threadId]);
   useEffect(() => { minimizedRef.current = minimized; }, [minimized]);
+
+  // Fetch the resolved (per-user) title whenever the thread changes
+  useEffect(() => {
+    const tid = threadId;
+    if (!tid || tid <= 0) return;
+    let cancelled = false;
+    fetch(`/api/chat/thread/${tid}/title`)
+      .then(r => r.json())
+      .then((data: { title?: string }) => {
+        if (!cancelled && data?.title) setParticipants(windowKey, participants, data.title);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [threadId]);
+
+  const saveTitle = () => {
+    const tid = threadIdRef.current;
+    setEditingTitle(false);
+    if (!tid || tid <= 0) return;
+    fetch(`/api/chat/thread/${tid}/title`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: titleDraft }),
+    })
+      .then(r => r.json())
+      .then((data: { title?: string }) => { if (data?.title) setParticipants(windowKey, participants, data.title); })
+      .catch(() => {});
+  };
 
   const pushSystemLine = useCallback((text: string) => {
     sysIdRef.current += 1;
@@ -397,9 +428,35 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
         userSelect: "none",
       }} onClick={popout ? undefined : () => minimizeChat(windowKey, true)}>
         <span style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
-          <span className="yellow" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            [{title}]
-          </span>
+          {editingTitle && !popout ? (
+            <input
+              autoFocus
+              value={titleDraft}
+              onClick={e => e.stopPropagation()}
+              onChange={e => setTitleDraft(e.target.value)}
+              onKeyDown={e => {
+                e.stopPropagation();
+                if (e.key === "Enter") saveTitle();
+                if (e.key === "Escape") setEditingTitle(false);
+              }}
+              onBlur={saveTitle}
+              maxLength={128}
+              style={{
+                flex: 1, minWidth: 0, background: "#111", border: "1px solid #444",
+                color: "#ffff55", fontFamily: "TopazPlus_a1200, monospace",
+                fontSize: "16px", lineHeight: "16px", padding: "0 4px",
+              }}
+            />
+          ) : (
+            <span
+              className="yellow"
+              onClick={popout ? undefined : (e) => { e.stopPropagation(); setTitleDraft(title); setEditingTitle(true); }}
+              title={popout ? undefined : "Click to rename (only you see this name)"}
+              style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", cursor: popout ? "default" : "text" }}
+            >
+              [{title}]
+            </span>
+          )}
           {isGroup && (
             <span className="lightgrey" style={{ fontSize: "11px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {participants.map(p => p.nick).join(", ")}
