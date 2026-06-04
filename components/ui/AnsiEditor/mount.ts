@@ -1,16 +1,23 @@
 /**
  * AnsiEditor mount entry point.
  *
- * Mounts the vendored text0wnz engine into a host DOM element and returns a
- * typed handle for the embedding layer (React wrapper, tests, etc.).
+ * Injects the full text0wnz editor UI (toolbars + palette + canvas, from
+ * markup.ts) into a host DOM element, boots the engine against it via
+ * `bootstrapEditor`, and returns a typed handle for the embedding layer
+ * (React wrapper, tests, etc.).
  *
  * No React dependency — this module is pure DOM + engine.
+ *
+ * The editor's CSS (editor.css) is scoped under `.ansi-editor-root`, so the
+ * injected markup is wrapped in a `<div class="ansi-editor-root">`. The CSS is
+ * imported here (client-only) rather than globally so it cannot leak into the
+ * rest of the asciiarena (Bootstrap) site.
  */
 
-import State from "./engine/state.js";
-import { createTextArtCanvas } from "./engine/canvas.js";
-import { createDefaultPalette } from "./engine/palette.js";
+import "./editor.css";
+import { bootstrapEditor } from "./engine/bootstrap.js";
 import { encodeAnsBytes } from "./engine/file.js";
+import { EDITOR_MARKUP } from "./markup";
 
 // ─── Public API ──────────────────────────────────────────────────────────────
 
@@ -41,14 +48,15 @@ export interface EditorOpts {
 /**
  * Mount the ANSI editor engine into `container`.
  *
- * The engine's canvas hierarchy is created inside a child `<div>` so that
- * `destroy()` can cleanly remove it without touching other children of
- * `container`.
- *
- * Runtime note: `createTextArtCanvas` fires `readyCallback` after its own
- * internal initial font load completes (line 1941 of canvas.js). We then call
- * `setFont` to load the requested font and configure dimensions — matching the
- * upstream main.js init sequence exactly.
+ * Flow:
+ *   1. Inject the scoped editor markup into a fresh `.ansi-editor-root` wrapper
+ *      appended to `container`.
+ *   2. Boot the engine against that wrapper (`bootstrapEditor`). The engine
+ *      resolves its DOM via `getElementById` (the markup is now in the
+ *      document) and locks the canvas to the requested size + font.
+ *   3. Return an `EditorHandle`. `destroy()` runs the real bootstrap teardown
+ *      (detach listeners/timers, reset engine singletons) and then removes the
+ *      injected DOM, so a remount (React StrictMode) is clean.
  */
 export function initAnsiEditor(
   container: HTMLElement,
@@ -62,40 +70,36 @@ export function initAnsiEditor(
     onReady,
   } = opts;
 
-  // The engine appends its canvas elements into this wrapper div.
-  const wrapper = document.createElement("div");
-  container.appendChild(wrapper);
+  // Inject the editor UI inside a scoped wrapper so editor.css only applies here.
+  const root = document.createElement("div");
+  root.className = "ansi-editor-root";
+  root.innerHTML = EDITOR_MARKUP;
+  container.appendChild(root);
 
-  // Initialise the palette before creating the canvas (matches upstream order).
-  State.palette = createDefaultPalette();
-
-  // Create the canvas hierarchy. The ready callback fires after the engine's
-  // own default-font load; we then switch to the requested font and configure.
-  State.textArtCanvas = createTextArtCanvas(wrapper, () => {
-    // setFont is declared async but we intentionally do not await it here:
-    // the callback argument is called synchronously inside the font-load
-    // completion handler, so the configuration runs at the right moment.
-    // State.textArtCanvas was assigned synchronously above; the ! is safe here.
-    void State.textArtCanvas!.setFont(font, () => {
-      State.textArtCanvas!.resize(columns, rows);
-      State.textArtCanvas!.clear();
-      State.textArtCanvas!.setIceColors(iceColors);
-      onReady?.();
-    });
+  const boot = bootstrapEditor(root, {
+    columns,
+    rows,
+    font,
+    iceColors,
+    onReady,
   });
+
+  let destroyed = false;
 
   return {
     getAnsiBytes(): Promise<Uint8Array> {
       return encodeAnsBytes({ iceColors });
     },
 
-    loadAnsiBytes(_bytes: Uint8Array): void {
-      // TODO(phase 2): wire to engine loadAnsi via Load API in file.js
+    loadAnsiBytes(bytes: Uint8Array): void {
+      boot.load(bytes);
     },
 
     destroy(): void {
-      wrapper.remove();
-      // TODO(phase 2): also detach engine listeners (keyboard, resize, etc.)
+      if (destroyed) return;
+      destroyed = true;
+      boot.teardown();
+      root.remove();
     },
   };
 }
