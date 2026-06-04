@@ -4,17 +4,15 @@ import React, { useEffect, useRef, useState } from "react";
 import { useChatContext } from "@/components/chat/ChatContext";
 
 interface MessageSummary {
-  id: number;
-  thread: number;
-  from_id: number | null;
-  to_id: number | null;
-  postedto: string | null;
-  postername: string | null;
-  subject: string | null;
-  message: string | null;
-  new: number | null;
-  timestamp: number | null;
   total_count: number;
+  thread: number;
+  id: number;
+  from_id: number | null;
+  lastFromMe: boolean;
+  preview: string | null;
+  timestamp: number | null;
+  title: string;
+  unread: number;
 }
 
 interface ThreadMessage {
@@ -33,7 +31,7 @@ interface NewMsg {
   msgtext: string;
 }
 
-type ActiveTab = "inbox" | "outbox" | "new";
+type ActiveTab = "conversations" | "new";
 
 function formatDate(ts: number | null): string {
   if (!ts) return "";
@@ -49,8 +47,8 @@ interface Props {
 }
 
 export default function MessagesClient({ userId, userNick, initialReceiverId }: Props) {
-  const { openChat } = useChatContext();
-  const [activeTab, setActiveTab] = useState<ActiveTab>(initialReceiverId ? "new" : "inbox");
+  const { openChat, openThread } = useChatContext();
+  const [activeTab, setActiveTab] = useState<ActiveTab>(initialReceiverId ? "new" : "conversations");
   const [messages, setMessages] = useState<MessageSummary[]>([]);
   const [currentThread, setCurrentThread] = useState<ThreadMessage[]>([]);
   const [selectedThreadId, setSelectedThreadId] = useState<number | null>(null);
@@ -66,42 +64,39 @@ export default function MessagesClient({ userId, userNick, initialReceiverId }: 
   });
   const replyRef = useRef<HTMLTextAreaElement>(null);
 
-  async function loadBox(box: 1 | 2) {
+  async function loadConversations() {
     setLoadingMsgs(true);
     setMessages([]);
     setCurrentThread([]);
     setSelectedThreadId(null);
     try {
-      const res = await fetch(`/api/messages?box=${box}&page=1&pagesize=50`);
-      if (res.ok) {
-        const data = (await res.json()) as MessageSummary[];
-        setMessages(data);
-      }
+      const res = await fetch(`/api/messages?page=1&pagesize=50`);
+      if (res.ok) setMessages((await res.json()) as MessageSummary[]);
     } finally {
       setLoadingMsgs(false);
     }
   }
 
   useEffect(() => {
-    if (!initialReceiverId) loadBox(1);
+    if (!initialReceiverId) loadConversations();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialReceiverId]);
 
   useEffect(() => {
     if (!userId) return;
     const es = new EventSource(`/api/live?channel=user:${userId}:messages`);
     es.onmessage = () => {
-      if (activeTab === "inbox") loadBox(1);
+      if (activeTab === "conversations") loadConversations();
     };
     return () => es.close();
-  // loadBox captured at mount is fine — it only uses setState
+  // loadConversations captured at mount is fine — it only uses setState
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, activeTab]);
 
   function handleTabClick(tab: ActiveTab) {
     setActiveTab(tab);
     setStatusMsg("");
-    if (tab === "inbox") loadBox(1);
-    if (tab === "outbox") loadBox(2);
+    if (tab === "conversations") loadConversations();
     if (tab === "new") {
       setMessages([]);
       setCurrentThread([]);
@@ -109,14 +104,12 @@ export default function MessagesClient({ userId, userNick, initialReceiverId }: 
     }
   }
 
-  async function viewThread(threadId: number, subject: string, msg: MessageSummary) {
+  async function viewThread(threadId: number, title: string, msg: MessageSummary) {
     setLoadingThread(true);
     setSelectedThreadId(threadId);
-    setSelectedSubject(subject);
+    setSelectedSubject(title);
 
-    // Determine receiver: in inbox the sender is postername, we need their id.
-    // The API DELETE uses thread id, reply POST needs receiver user id.
-    // We use message id to get replyid from GET /api/messages/[id].
+    // Determine receiver for reply: use message id to get replyid from GET /api/messages/[id].
     try {
       const detailRes = await fetch(`/api/messages/${msg.id}`);
       if (detailRes.ok) {
@@ -148,6 +141,17 @@ export default function MessagesClient({ userId, userNick, initialReceiverId }: 
     await fetch(`/api/messages/${threadId}`, { method: "DELETE" });
     setMessages((prev) => prev.filter((m) => m.thread !== threadId));
     if (selectedThreadId === threadId) closeThread();
+  }
+
+  async function openInChat(threadId: number, title: string) {
+    try {
+      const list = (await (await fetch(`/api/chat/thread/${threadId}/members`)).json()) as { userId: number; nick: string }[];
+      const others = list
+        .filter((p) => p.userId !== parseInt(userId))
+        .map((p) => ({ id: p.userId, nick: p.nick }));
+      if (others.length === 1) openChat(others[0].id, others[0].nick, threadId);
+      else openThread(threadId, others, title, { startMinimized: false });
+    } catch { /* ignore */ }
   }
 
   async function sendReply() {
@@ -207,29 +211,17 @@ export default function MessagesClient({ userId, userNick, initialReceiverId }: 
     }
   }
 
-  const isInbox = activeTab === "inbox";
-
   return (
     <div className="col-lg-12">
       <ul className="nav nav-tabs apt-1 bg-secondary">
         <li className="nav-item">
           <a
-            className={`nav-link${activeTab === "inbox" ? " active" : ""}`}
+            className={`nav-link${activeTab === "conversations" ? " active" : ""}`}
             data-bs-toggle="tab"
             href="#"
-            onClick={(e) => { e.preventDefault(); handleTabClick("inbox"); }}
+            onClick={(e) => { e.preventDefault(); handleTabClick("conversations"); }}
           >
-            Inbox
-          </a>
-        </li>
-        <li className="nav-item">
-          <a
-            className={`nav-link${activeTab === "outbox" ? " active" : ""}`}
-            data-bs-toggle="tab"
-            href="#"
-            onClick={(e) => { e.preventDefault(); handleTabClick("outbox"); }}
-          >
-            Outbox
+            Conversations
           </a>
         </li>
         <li className="nav-item">
@@ -250,8 +242,8 @@ export default function MessagesClient({ userId, userNick, initialReceiverId }: 
         </div>
       )}
 
-      {/* Inbox / Outbox list — hidden while viewing a thread */}
-      {(activeTab === "inbox" || activeTab === "outbox") && selectedThreadId === null && (
+      {/* Conversations list — hidden while viewing a thread */}
+      {activeTab === "conversations" && selectedThreadId === null && (
         <div className="aml-1 amr-1">
           {loadingMsgs && (
             <div className="row bg-secondary apt-1 apb-1 apl-1">
@@ -263,48 +255,43 @@ export default function MessagesClient({ userId, userNick, initialReceiverId }: 
               <div className="col-12 lightgrey">No messages.</div>
             </div>
           )}
-          {messages.map((msg) => {
-            const nick = isInbox ? (msg.postername ?? "") : (msg.postedto ?? "");
-            const label = isInbox ? "From" : "To";
-            const peerId = isInbox ? msg.from_id : msg.to_id;
-            return (
-              <div
-                key={msg.id}
-                className="row bg-secondary apl-1 apr-1 apt-1 apb-1"
-                style={{ borderBottom: "1px solid #333" }}
-              >
-                <div className="col-7 text-truncate">{msg.subject ?? "(no subject)"}</div>
-                <div className="col-3 text-truncate yellow" title={`${label}: ${nick}`}>{nick}</div>
-                <div className="col-2 text-right lightgrey small">{formatDate(msg.timestamp)}</div>
-                <div className="col-12 apt-1">
-                  <input
-                    type="button"
-                    className="btn-big"
-                    value="View"
-                    onClick={() => viewThread(msg.thread, msg.subject ?? "", msg)}
-                  />
-                  {" "}
-                  {peerId && nick && (
-                    <>
-                      <input
-                        type="button"
-                        className="btn-big"
-                        value="Chat"
-                        onClick={() => openChat(peerId, nick, msg.thread)}
-                      />
-                      {" "}
-                    </>
-                  )}
-                  <input
-                    type="button"
-                    className="btn-big"
-                    value="Delete"
-                    onClick={() => deleteThread(msg.thread)}
-                  />
-                </div>
+          {messages.map((msg) => (
+            <div
+              key={msg.id}
+              className="row bg-secondary apl-1 apr-1 apt-1 apb-1"
+              style={{ borderBottom: "1px solid #333" }}
+            >
+              <div className="col-8 text-truncate">
+                {msg.title}
+                {msg.unread > 0 && (
+                  <span style={{ color: "#ff55ff" }}> ({msg.unread})</span>
+                )}
               </div>
-            );
-          })}
+              <div className="col-4 text-right lightgrey small">{formatDate(msg.timestamp)}</div>
+              <div className="col-12 apt-1">
+                <input
+                  type="button"
+                  className="btn-big"
+                  value="View"
+                  onClick={() => viewThread(msg.thread, msg.title, msg)}
+                />
+                {" "}
+                <input
+                  type="button"
+                  className="btn-big"
+                  value="Open in chat"
+                  onClick={() => openInChat(msg.thread, msg.title)}
+                />
+                {" "}
+                <input
+                  type="button"
+                  className="btn-big"
+                  value="Leave"
+                  onClick={() => deleteThread(msg.thread)}
+                />
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
