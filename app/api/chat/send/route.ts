@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { broadcast } from "@/lib/live";
 import { createNotification } from "@/lib/notifications";
+import { addParticipant, getActiveParticipants } from "@/lib/chatThreadDb";
 
 const schema = z.object({
   peerId: z.number().int().positive(),
@@ -24,57 +25,62 @@ export async function POST(request: NextRequest) {
   const fromId = parseInt(session.user.id);
   const fromNick = session.user.name ?? "";
 
+  let threadId: number;
+
   if (existingThreadId) {
-    // Reply to existing thread
-    await prisma.$executeRaw`
-      INSERT INTO messages (thread, from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
-      VALUES (
-        ${existingThreadId}, ${fromId}, ${peerId},
-        (SELECT nick FROM users WHERE id = ${peerId}),
-        (SELECT nick FROM users WHERE id = ${fromId}),
-        UNIX_TIMESTAMP(), 'Chat', ${message}, 1, 1
-      )
-    `;
-
-    broadcast(`thread:${existingThreadId}`, { type: "message" });
-    broadcast(`user:${peerId}:messages`, { type: "message", fromId, fromNick, threadId: existingThreadId });
-
-    if (peerId !== fromId) {
-      await createNotification(peerId, "notif-message", {
-        actorNick: fromNick,
-        targetUrl: `/messages?thread=${existingThreadId}`,
-      });
+    threadId = existingThreadId;
+    // to_id: the single peer for a 2-person thread, NULL for a group (3+ active).
+    // Two concrete branches because the group case also nulls `postedto`.
+    const active = await getActiveParticipants(threadId);
+    if (active.length > 2) {
+      await prisma.$executeRaw`
+        INSERT INTO messages (thread, from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
+        VALUES (
+          ${threadId}, ${fromId}, NULL, NULL,
+          (SELECT nick FROM users WHERE id = ${fromId}),
+          UNIX_TIMESTAMP(), 'Chat', ${message}, 1, 1
+        )`;
+    } else {
+      await prisma.$executeRaw`
+        INSERT INTO messages (thread, from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
+        VALUES (
+          ${threadId}, ${fromId}, ${peerId},
+          (SELECT nick FROM users WHERE id = ${peerId}),
+          (SELECT nick FROM users WHERE id = ${fromId}),
+          UNIX_TIMESTAMP(), 'Chat', ${message}, 1, 1
+        )`;
     }
-
-    return apiOk({ ok: true, threadId: existingThreadId });
+  } else {
+    // First message — create the thread, then its two participant rows.
+    threadId = await prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`
+        INSERT INTO messages (from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
+        VALUES (
+          ${fromId}, ${peerId},
+          (SELECT nick FROM users WHERE id = ${peerId}),
+          (SELECT nick FROM users WHERE id = ${fromId}),
+          UNIX_TIMESTAMP(), 'Chat', ${message}, 1, 1
+        )`;
+      const inserted = await tx.$queryRaw<[{ msgId: number }]>`SELECT LAST_INSERT_ID() AS msgId`;
+      const msgId = Number(inserted[0]?.msgId ?? 0);
+      if (!msgId) throw new Error("LAST_INSERT_ID returned 0");
+      await tx.$executeRaw`UPDATE messages SET thread = ${msgId} WHERE id = ${msgId}`;
+      return msgId;
+    });
+    await addParticipant(threadId, fromId);
+    await addParticipant(threadId, peerId);
   }
 
-  // First message — INSERT, then SELECT LAST_INSERT_ID(), then UPDATE thread = id.
-  // These three queries MUST share one MySQL connection or LAST_INSERT_ID() returns 0
-  // (it's connection-scoped). Without the transaction, Prisma's pool can hand each
-  // query a different connection and the thread id silently becomes 0.
-  const threadId = await prisma.$transaction(async (tx) => {
-    await tx.$executeRaw`
-      INSERT INTO messages (from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
-      VALUES (
-        ${fromId}, ${peerId},
-        (SELECT nick FROM users WHERE id = ${peerId}),
-        (SELECT nick FROM users WHERE id = ${fromId}),
-        UNIX_TIMESTAMP(), 'Chat', ${message}, 1, 1
-      )
-    `;
-    const inserted = await tx.$queryRaw<[{ msgId: number }]>`SELECT LAST_INSERT_ID() AS msgId`;
-    const msgId = Number(inserted[0]?.msgId ?? 0);
-    if (!msgId) throw new Error("LAST_INSERT_ID returned 0");
-    await tx.$executeRaw`UPDATE messages SET thread = ${msgId} WHERE id = ${msgId}`;
-    return msgId;
-  });
+  // Fan out to every active participant except the sender.
+  const active = await getActiveParticipants(threadId);
+  const recipients = active.map(p => p.userId).filter(id => id !== fromId);
+  // Legacy fallback: if participants weren't created, deliver to the peer.
+  const targets = recipients.length > 0 ? recipients : (peerId !== fromId ? [peerId] : []);
 
   broadcast(`thread:${threadId}`, { type: "message" });
-  broadcast(`user:${peerId}:messages`, { type: "message", fromId, fromNick, threadId });
-
-  if (peerId !== fromId) {
-    await createNotification(peerId, "notif-message", {
+  for (const rid of targets) {
+    broadcast(`user:${rid}:messages`, { type: "message", fromId, fromNick, threadId });
+    await createNotification(rid, "notif-message", {
       actorNick: fromNick,
       targetUrl: `/messages?thread=${threadId}`,
     });
