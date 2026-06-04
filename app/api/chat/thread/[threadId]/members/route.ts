@@ -59,7 +59,8 @@ export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ threadI
   const thread = await threadParam(ctx.params);
   const me = parseInt(session.user.id);
 
+  const meUser = await prisma.users.findUnique({ where: { id: me }, select: { nick: true } });
   await leaveThread(thread, me);
-  broadcast(`thread:${thread}`, { type: "member-left", userId: me });
+  broadcast(`thread:${thread}`, { type: "member-left", userId: me, nick: meUser?.nick ?? "" });
   return apiOk({ ok: true });
 }

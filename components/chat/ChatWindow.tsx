@@ -138,7 +138,7 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
           pushSystemLine(`${event.nick} joined`);
           refreshParticipants(tid);
         } else if (event.type === "member-left") {
-          pushSystemLine("a member left");
+          pushSystemLine(`${event.nick || "a member"} left`);
           refreshParticipants(tid);
         }
       } catch { /* ignore */ }
