@@ -3,7 +3,6 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { getMember } from "@/lib/chatThreadDb";
-import { isMessageVisible } from "@/lib/chatThread";
 
 export const dynamic = "force-dynamic";
 
@@ -29,15 +28,22 @@ export async function GET(
 
   // --- Participant path (group-aware) ---------------------------------------
   if (member) {
-    const rows = await prisma.$queryRaw<Row[]>`
-      SELECT id, thread, from_id, postername, postedto, message, timestamp, unread
-      FROM messages WHERE thread = ${thread}
-      ORDER BY id DESC LIMIT 200
-    `;
-    const visible = rows
-      .filter(r => isMessageVisible(member, r.timestamp ?? 0))
-      .slice(0, 30);
-    return apiOk(visible.map(r => {
+    // Visibility window enforced in SQL so LIMIT can't hide valid rows: a member
+    // who left while later messages piled up still gets their last 30 visible.
+    // (NULL-timestamp legacy rows fail `timestamp >= joinedAt` and are excluded;
+    // such rows are vanishingly rare and never carry chat content.)
+    const rows = member.leftAt == null
+      ? await prisma.$queryRaw<Row[]>`
+          SELECT id, thread, from_id, postername, postedto, message, timestamp, unread
+          FROM messages
+          WHERE thread = ${thread} AND timestamp >= ${member.joinedAt}
+          ORDER BY id DESC LIMIT 30`
+      : await prisma.$queryRaw<Row[]>`
+          SELECT id, thread, from_id, postername, postedto, message, timestamp, unread
+          FROM messages
+          WHERE thread = ${thread} AND timestamp >= ${member.joinedAt} AND timestamp <= ${member.leftAt}
+          ORDER BY id DESC LIMIT 30`;
+    return apiOk(rows.map(r => {
       const isOwn = r.from_id === userId || (r.from_id == null && r.postername === userNick);
       const unread = !isOwn && (r.timestamp ?? 0) > member.lastReadAt;
       return {
