@@ -2513,3 +2513,113 @@
 .ansi-editor-root #edit .asciiIcon {
   min-width: 0;
 }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   asciiarena CHANGE 3: 2-rows-x-8 palette block ABOVE the canvas.
+   The engine's canvas palette picker (#palettePicker, 2 cols x 8 rows) and its
+   fg/bg preview (#palettePreview) lived in the left 40px sidebar. We hide both
+   and instead render an HTML 2x8 swatch grid (built + wired in paletteBar.ts)
+   in #paletteBar, pinned full-width between the header and the viewport. The
+   absolute three-region layout (header top:0 / aside / viewport) is amended so
+   the bar occupies a 64px strip below the header and the aside + viewport start
+   below the bar. */
+
+/* --palette-size: height of the palette strip (8x16 grid: two 24px swatch rows
+   + padding). --content-top: where the aside + viewport begin. */
+.ansi-editor-root {
+  --palette-size: 64px;
+  --content-top: calc(var(--header-size) + var(--palette-size));
+}
+
+/* Hide the engine's canvas picker + preview — superseded by the HTML bar.
+   They stay in the DOM (the engine calls updatePalette on them) but take no
+   space and are not shown. */
+.ansi-editor-root #palettePicker,
+.ansi-editor-root #palettePreview {
+  display: none !important;
+}
+
+/* The palette strip: full width, directly under the header. */
+.ansi-editor-root #bodyContainer > #paletteBar {
+  position: absolute !important;
+  top: var(--header-size) !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: var(--palette-size) !important;
+  margin: 0 !important;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background-color: var(--color-bg, #1a1a1a);
+  border-bottom: 1px solid var(--color-lbl, #333);
+  z-index: 15;
+  overflow: hidden;
+}
+
+/* The 16 swatches as 2 rows x 8 columns. */
+.ansi-editor-root #paletteSwatches {
+  display: grid;
+  grid-template-columns: repeat(8, 24px);
+  grid-template-rows: repeat(2, 24px);
+  gap: 0;
+  flex: 0 0 auto;
+}
+.ansi-editor-root .paletteSwatch {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  margin: 0;
+  min-height: 0;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+}
+/* Foreground / background selection markers on the active swatches. */
+.ansi-editor-root .paletteSwatch.isFg {
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+  z-index: 2;
+}
+.ansi-editor-root .paletteSwatch.isBg {
+  outline: 2px dashed #000;
+  outline-offset: -4px;
+  z-index: 1;
+}
+
+/* Current fg/bg indicator: two overlapping chips (fg in front, bg behind),
+   mirroring the engine's #palettePreview overlap. */
+.ansi-editor-root #paletteCurrent {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+}
+.ansi-editor-root .paletteCurrentSwatch {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+}
+.ansi-editor-root #paletteBgChip {
+  top: 0;
+  right: 0;
+}
+.ansi-editor-root #paletteFgChip {
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+}
+
+/* Re-pin the aside + viewport to start below the palette strip (was
+   var(--header-size); now var(--content-top)). These override the earlier
+   absolute-layout block. */
+.ansi-editor-root #bodyContainer > aside {
+  top: var(--content-top) !important;
+}
+.ansi-editor-root #bodyContainer > #viewport {
+  top: var(--content-top) !important;
+}

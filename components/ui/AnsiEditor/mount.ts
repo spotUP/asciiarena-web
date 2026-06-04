@@ -19,6 +19,7 @@ import { bootstrapEditor } from "./engine/bootstrap.js";
 import { encodeAnsBytes } from "./engine/file.js";
 import { State } from "./engine/state.js";
 import { EDITOR_MARKUP } from "./markup";
+import { initPaletteBar, type PaletteApi } from "./paletteBar";
 
 // ─── Public API ──────────────────────────────────────────────────────────────
 
@@ -92,6 +93,14 @@ export function initAnsiEditor(
     onReady,
   });
 
+  // asciiarena CHANGE 3: build the 2x8 HTML palette bar above the canvas and
+  // wire it to the engine palette. bootstrapEditor sets State.palette
+  // synchronously, so it is ready here. The engine's own canvas picker is
+  // hidden in CSS; this bar is the live colour control.
+  const paletteBar = State.palette
+    ? initPaletteBar(root, State.palette as PaletteApi)
+    : { destroy: () => {} };
+
   let destroyed = false;
 
   return {
@@ -121,6 +130,7 @@ export function initAnsiEditor(
     destroy(): void {
       if (destroyed) return;
       destroyed = true;
+      paletteBar.destroy();
       boot.teardown();
       root.remove();
     },

@@ -257,6 +257,13 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 					<span class="asciiIcon" aria-hidden="true">[*]</span>
 				</div>
 			</aside>
+			<div id="paletteBar">
+				<div id="paletteSwatches" role="group" aria-label="Palette (left-click sets foreground, right-click sets background)"></div>
+				<div id="paletteCurrent">
+					<span class="paletteCurrentSwatch" id="paletteFgChip" title="Foreground"></span>
+					<span class="paletteCurrentSwatch" id="paletteBgChip" title="Background"></span>
+				</div>
+			</div>
 			<div id="viewport">
 				<div id="canvasContainer">
 					<div id="toolPreview" class="canvasOverlay"></div>
