@@ -19,8 +19,10 @@ export async function GET() {
   const session = await auth();
   if ((session?.user as { rank?: string } | undefined)?.rank !== "Admin") return apiError("Forbidden", 403);
 
-  const rows = await prisma.$queryRaw<{ id: number; ascii: string; kind: string }[]>`
-    SELECT logo_id AS id, ascii, kind FROM logos ORDER BY logo_id DESC LIMIT 100
+  const rows = await prisma.$queryRaw<
+    { id: number; author: string | null; ascii: string; kind: string; ansi_b64: string | null; font: string | null }[]
+  >`
+    SELECT logo_id AS id, author, ascii, kind, ansi_b64, font FROM logos ORDER BY logo_id DESC LIMIT 100
   `;
   return apiOk(rows);
 }

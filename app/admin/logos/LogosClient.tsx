@@ -2,12 +2,16 @@
 
 import { useState, useEffect, useRef } from "react";
 import DosSelect from "@/components/ui/DosSelect";
+import AnsiLogo from "@/components/ui/AnsiLogo";
 import { FONTS } from "@/lib/ansilove";
 
 interface Logo {
   id: number;
+  author: string | null;
   ascii: string;
   kind: string;
+  ansi_b64: string | null;
+  font: string | null;
 }
 
 export default function LogosClient() {
@@ -102,39 +106,62 @@ export default function LogosClient() {
         {msg && <span className={msg.ok ? "green" : "red"}>{msg.text}</span>}
       </div>
 
-      <div className="header col-lg-12 p-0 amb-1">
-        <h2 className="ap-1 bg-header">EXiSTiNG LOGOS</h2>
-      </div>
-      <div className="container-fluid bg-secondary apb-1 ap-1 amb-2">
-        {logos.length === 0 && <div className="lightgrey">No logos yet.</div>}
-        {logos.map(l => (
-          <div key={l.id} className="row amb-1 align-items-center">
-            <div className="col-10">
-              {l.kind === "ansi" ? (
-                <span className="green" style={{ fontFamily: "TopazPlus_a1200, monospace" }}>[ANSI logo #{l.id}]</span>
-              ) : (
-                <pre
-                  className="magenta"
-                  style={{
-                    fontFamily: "TopazPlus_a1200, monospace",
-                    fontSize: "16px",
-                    lineHeight: "16px",
-                    whiteSpace: "pre",
-                    overflow: "hidden",
-                    maxHeight: "128px",
-                    margin: 0,
-                  }}
-                >
-                  {l.ascii}
-                </pre>
-              )}
-            </div>
-            <div className="col-2">
-              <input type="button" className="btn-big" value="Delete" style={{ color: "#ff5555" }} onClick={() => del(l.id)} />
+      {logos.length === 0 && (
+        <>
+          <div className="header col-lg-12 p-0 amb-1">
+            <h2 className="ap-1 bg-header">EXiSTiNG LOGOS</h2>
+          </div>
+          <div className="container-fluid bg-secondary apb-1 ap-1 amb-2">
+            <div className="lightgrey">No logos yet.</div>
+          </div>
+        </>
+      )}
+
+      {/* One section per logo (header bar + bg-secondary panel), like the
+          stacked sections in the main page's middle column. */}
+      {logos.map(l => (
+        <div key={l.id}>
+          <div className="header col-lg-12 p-0 amb-1">
+            <h2 className="ap-1 bg-header">
+              LOGO #{l.id} &middot; {l.kind === "ansi" ? "ANSI" : "ASCII"}
+              {l.author ? ` · ${l.author}` : ""}
+            </h2>
+          </div>
+          <div className="container-fluid bg-secondary apb-1 ap-1 amb-2">
+            <div className="row align-items-center">
+              <div className="col-10" style={{ overflow: "hidden" }}>
+                {l.kind === "ansi" ? (
+                  l.ansi_b64 ? (
+                    <AnsiLogo ansiB64={l.ansi_b64} font={l.font} maxHeight={160} />
+                  ) : (
+                    <span className="red" style={{ fontFamily: "TopazPlus_a1200, monospace" }}>
+                      [ANSI logo #{l.id} — missing data]
+                    </span>
+                  )
+                ) : (
+                  <pre
+                    className="magenta"
+                    style={{
+                      fontFamily: "TopazPlus_a1200, monospace",
+                      fontSize: "16px",
+                      lineHeight: "16px",
+                      whiteSpace: "pre",
+                      overflow: "auto",
+                      maxHeight: "160px",
+                      margin: 0,
+                    }}
+                  >
+                    {l.ascii}
+                  </pre>
+                )}
+              </div>
+              <div className="col-2">
+                <input type="button" className="btn-big" value="Delete" style={{ color: "#ff5555" }} onClick={() => del(l.id)} />
+              </div>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </>
   );
 }
