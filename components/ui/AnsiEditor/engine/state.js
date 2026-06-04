@@ -951,16 +951,9 @@ const State = {
 	},
 	set title(value) {
 		stateManager.set('title', value);
-		if (
-			['fullscreen', 'standalone', 'minimal-ui'].some(
-				displayMode =>
-					window.matchMedia(`(display-mode: ${displayMode})`).matches,
-			)
-		) {
-			document.title = value;
-		} else {
-			document.title = `${value} [teXt0wnz]`;
-		}
+		// asciiarena embed: never hijack document.title. Upstream sets the page
+		// title to "<name> [teXt0wnz]" here; in an embedded editor that would
+		// clobber the host site's title, so we only store the value in state.
 	},
 	// URLs
 	get urlPrefix() {

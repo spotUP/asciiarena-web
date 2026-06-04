@@ -129,13 +129,31 @@ const Toolbar = (() => {
 		}
 	};
 
-	// Escape key - return to previous tool
+	// Escape key - return to previous tool.
+	// Guarded so it no-ops when no tool is registered (e.g. after reset()),
+	// which prevents the leaked module-level listener from throwing on the
+	// shared State singleton after an embedded editor has been torn down.
 	document.addEventListener('keydown', e => {
 		if (e.code === 'Escape') {
+			if (currentButton === undefined) return;
 			e.preventDefault();
 			returnToPreviousTool();
 		}
 	});
+
+	// reset — blur the active tool and clear the registry so a remounted
+	// embedded editor (e.g. React StrictMode double-mount) starts clean.
+	// Single source of truth for tool state, so teardown calls only this.
+	const reset = () => {
+		try {
+			blur();
+		} catch {
+			/* tools may reference already-reset State; best effort */
+		}
+		Object.keys(tools).forEach(id => delete tools[id]);
+		currentButton = undefined;
+		previousButton = undefined;
+	};
 
 	return {
 		add: add,
@@ -143,6 +161,7 @@ const Toolbar = (() => {
 		switchTool: switchTool,
 		returnToPreviousTool: returnToPreviousTool,
 		getCurrentTool: getCurrentTool,
+		reset: reset,
 	};
 })();
 
