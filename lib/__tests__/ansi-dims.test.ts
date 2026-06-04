@@ -69,17 +69,17 @@ describe("measureAsciiText", () => {
     expect(measureAsciiText("░▒▓█")).toEqual({ cols: 4, rows: 1, source: "measured" });
   });
 
-  it("accepts an 80x8 logo but flags one column/row over", () => {
+  it("accepts an 80x10 logo but flags one column/row over", () => {
     const ok = "X".repeat(80) + "\n";
-    expect(checkLogoDims(measureAsciiText(ok.repeat(8)))).toBeNull();
+    expect(checkLogoDims(measureAsciiText(ok.repeat(10)))).toBeNull();
     expect(checkLogoDims(measureAsciiText("X".repeat(81)))).toContain("columns wide");
-    expect(checkLogoDims(measureAsciiText("X\n".repeat(9)))).toContain("rows tall");
+    expect(checkLogoDims(measureAsciiText("X\n".repeat(11)))).toContain("rows tall");
   });
 });
 
 describe("checkLogoDims", () => {
-  it("accepts a normal banner (within 80x8)", () => {
-    expect(checkLogoDims({ cols: 80, rows: 8, source: "measured" })).toBeNull();
+  it("accepts a normal banner (within 80x10)", () => {
+    expect(checkLogoDims({ cols: 80, rows: 10, source: "measured" })).toBeNull();
   });
   it("rejects too-wide with a specific reason", () => {
     const reason = checkLogoDims({ cols: MAX_LOGO_COLS + 1, rows: 10, source: "measured" });

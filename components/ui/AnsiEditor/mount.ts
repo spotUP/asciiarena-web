@@ -30,7 +30,7 @@ export interface EditorHandle {
   loadAnsiBytes: (bytes: Uint8Array) => void;
   /**
    * True when the canvas holds no visible content — every cell is a space
-   * (char 32) or NUL (char 0). A blank 80x8 export is still ~782 bytes
+   * (char 32) or NUL (char 0). A blank 80x10 export is still ~782 bytes
    * (spaces + SAUCE), so byte length alone can't detect an empty logo; this
    * inspects the packed cell buffer directly.
    */
@@ -52,7 +52,7 @@ export interface EditorHandle {
 export interface EditorOpts {
   /** Canvas width in character columns. Default: 80 */
   columns?: number;
-  /** Canvas height in character rows. Default: 8 */
+  /** Canvas height in character rows. Default: 10 */
   rows?: number;
   /** Font name corresponding to a PNG under /ansi-editor/fonts/. Default: "Topaz+ 1200 8x16" */
   font?: string;
@@ -83,7 +83,7 @@ export function initAnsiEditor(
 ): EditorHandle {
   const {
     columns = 80,
-    rows = 8,
+    rows = 10,
     font = "Topaz+ 1200 8x16",
     iceColors = true,
     onReady,

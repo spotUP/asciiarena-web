@@ -399,7 +399,7 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
       setStatus({ msg: "Editor is still loading — try again.", ok: false });
       return;
     }
-    // A blank 80x8 export is still ~782 bytes (spaces + SAUCE), so reject an
+    // A blank 80x10 export is still ~960 bytes (spaces + SAUCE), so reject an
     // all-blank canvas explicitly rather than relying on byte length.
     if (editor.isEmpty()) {
       setStatus({ msg: "Draw something before submitting.", ok: false });
@@ -775,18 +775,19 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
             </Field>
             <Field label="Draw your logo" required>
               <div className="lightgrey amb-1" style={{ fontFamily: "TopazPlus_a1200, monospace", fontSize: "16px", lineHeight: "16px" }}>
-                Draw an 80 &times; 8 ANSI logo below — the header limit. Submit exports it as a .ans file.
+                Draw an 80 &times; 10 ANSI logo below — the header limit. Submit exports it as a .ans file.
               </div>
               {/* The editor sits flush at full width (its header was slimmed in
                   editor.css so it no longer needs ~980px). The fixed height
                   gives the editor's height:100% chain a definite box to resolve
-                  against AND fully contains the header + palette strip + tool
-                  sidebar + 80x8 canvas; editor.css clips overflow so nothing
-                  spills into the "Submit Logo" button below. 504px = DosSelect
-                  row (24) + the editor's min-height (480: header 43 + palette
-                  64 + the 373px tool column / 80x8 canvas content area).
-                  marginBottom keeps the green submit button clear of it. */}
-              <div style={{ width: "100%", height: 504, marginBottom: 16 }}>
+                  against AND fully contains the vertically-stacked sections:
+                  header + palette strip + 80x10 canvas + horizontal tool bar;
+                  editor.css clips overflow so nothing spills into the "Submit
+                  Logo" button below. 348px = DosSelect row (24) + the editor's
+                  min-height (323: header 43 + palette 64 + viewport 176 [640x160
+                  canvas + 16px margins] + tool bar 40). marginBottom keeps the
+                  green submit button clear of it. */}
+              <div style={{ width: "100%", height: 348, marginBottom: 16 }}>
                 <AnsiEditor ref={editorRef} />
               </div>
             </Field>

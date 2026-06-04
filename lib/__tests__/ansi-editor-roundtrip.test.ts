@@ -2,9 +2,9 @@
 //
 // The single most important interop guarantee in the project: the embedded
 // ANSI editor's `.ans` byte output must PASS the server-side logo validator
-// (measureAnsi + checkLogoDims) at the header limit of 80x8, AND survive a
+// (measureAnsi + checkLogoDims) at the header limit of 80x10, AND survive a
 // byte round-trip back through the engine's own decoder. If this breaks,
-// artists draw an 80x8 logo in the editor, hit save, and the server rejects
+// artists draw an 80x10 logo in the editor, hit save, and the server rejects
 // their own tool's output — a silent, infuriating failure.
 //
 // Strategy: we do NOT call createTextArtCanvas (it needs a real <canvas> 2d
@@ -20,7 +20,7 @@ import State from "@/components/ui/AnsiEditor/engine/state.js";
 import { measureAnsi, checkLogoDims } from "@/lib/ansiDims";
 
 const COLS = 80;
-const ROWS = 8;
+const ROWS = 10;
 const FONT_NAME = "Topaz+ 1200 8x16";
 
 // Cells are packed char<<8 | bg<<4 | fg (row-major, index = y*cols+x), exactly
@@ -37,14 +37,15 @@ interface KnownCell {
   bg: number;
 }
 
-// A handful of non-blank cells placed at corners/edges of the 80x8 grid so the
+// A handful of non-blank cells placed at corners/edges of the 80x10 grid so the
 // decoder must reproduce both content and position. fg/bg kept in 0..7 (no
-// bold/blink folding) so the decode comparison is unambiguous.
+// bold/blink folding) so the decode comparison is unambiguous. The last cell
+// sits on the final row (y=9) so the new 10-row height is exercised end to end.
 const KNOWN_CELLS: KnownCell[] = [
   { x: 0, y: 0, char: 65 /* 'A' */, fg: 7, bg: 1 },
   { x: 79, y: 0, char: 90 /* 'Z' */, fg: 2, bg: 0 },
   { x: 10, y: 3, char: 35 /* '#' */, fg: 3, bg: 4 },
-  { x: 0, y: 7, char: 66 /* 'B' */, fg: 6, bg: 0 },
+  { x: 0, y: 9, char: 66 /* 'B' */, fg: 6, bg: 0 },
 ];
 
 function buildImageData(): Uint16Array {
@@ -74,7 +75,7 @@ interface FakeFont {
   getLetterSpacing(): boolean;
 }
 
-describe("ANSI editor .ans round-trip + 80x8 server-validator guard", () => {
+describe("ANSI editor .ans round-trip + 80x10 server-validator guard", () => {
   const imageData = buildImageData();
 
   let prevCanvas: unknown;
@@ -117,7 +118,7 @@ describe("ANSI editor .ans round-trip + 80x8 server-validator guard", () => {
     State.font = prevFont as typeof State.font;
   });
 
-  it("produces .ans bytes that PASS the server logo validator at 80x8", async () => {
+  it("produces .ans bytes that PASS the server logo validator at 80x10", async () => {
     const bytes: Uint8Array = await encodeAnsBytes({
       title: "T",
       author: "A",
@@ -132,12 +133,12 @@ describe("ANSI editor .ans round-trip + 80x8 server-validator guard", () => {
 
     const dims = measureAnsi(bytes);
     expect(dims.cols).toBeLessThanOrEqual(80);
-    expect(dims.rows).toBeLessThanOrEqual(8);
+    expect(dims.rows).toBeLessThanOrEqual(10);
     // null = within the header limit; this is the load-bearing interop check.
     expect(checkLogoDims(dims)).toBeNull();
-    // SAUCE should declare exactly 80x8.
+    // SAUCE should declare exactly 80x10.
     expect(dims.cols).toBe(80);
-    expect(dims.rows).toBe(8);
+    expect(dims.rows).toBe(10);
   });
 
   it("round-trips: decoding the .ans reproduces the known cells", async () => {
@@ -151,7 +152,7 @@ describe("ANSI editor .ans round-trip + 80x8 server-validator guard", () => {
     const decoded = loadAnsi(bytes);
 
     expect(decoded.width).toBe(80);
-    expect(decoded.height).toBe(8);
+    expect(decoded.height).toBe(10);
 
     // decoded.data is a flat Uint8Array of [charCode, fg, bg] per cell.
     for (const c of KNOWN_CELLS) {

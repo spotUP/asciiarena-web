@@ -47,7 +47,7 @@ function parseSauce(bytes: Uint8Array): { cols: number; rows: number; trimTo: nu
 // `wrapWidth` models terminal auto-wrap. ANSI art (e.g. the embedded editor's
 // own `.ans` output) routinely emits one long stream of `wrapWidth` characters
 // per logical row with NO line terminators — every viewer wraps it at the
-// SAUCE-declared width. Without modelling that wrap, an 80x8 logo measures as
+// SAUCE-declared width. Without modelling that wrap, an 80x10 logo measures as
 // 640x1, so pass the SAUCE width here so the visible size matches reality.
 // When `wrapWidth` is 0 (no SAUCE) we don't wrap — plain text relies on LFs.
 function measureStripped(bytes: Uint8Array, wrapWidth = 0): { cols: number; rows: number } {
@@ -139,7 +139,7 @@ export function measureAsciiText(text: string): AnsiDims {
 // Header-logo limits. ANSI logos render in the rotating site header on every
 // page, so cap them to a sensible banner size. Tunable.
 export const MAX_LOGO_COLS = 80;
-export const MAX_LOGO_ROWS = 8;
+export const MAX_LOGO_ROWS = 10;
 
 // Returns a human-readable rejection reason, or null if the dimensions are OK.
 export function checkLogoDims(dims: AnsiDims): string | null {

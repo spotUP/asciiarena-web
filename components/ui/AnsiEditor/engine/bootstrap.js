@@ -15,7 +15,7 @@
  *       editor root is hovered/focused.
  *   (e) The `document.title` hijack is neutralized in state.js (see comment
  *       there) — the embed must not clobber the host page title.
- *   (f) The canvas is locked to a caller-provided size (default 80x8) and the
+ *   (f) The canvas is locked to a caller-provided size (default 80x10) and the
  *       Topaz+ font; the resize ("resolution") UI is hidden.
  *
  * Returns a teardown function that detaches listeners, cancels timers, and

@@ -2158,7 +2158,7 @@
   bottom: auto !important;
   width: 100% !important;
   height: 100% !important;
-  min-height: 480px;
+  min-height: 323px;
   overflow: hidden;
   contain: layout paint;
 }
@@ -2184,19 +2184,17 @@
 }
 
 /* asciiarena: imposed editor layout.
-   text0wnz lays out #bodyContainer's three regions (header / aside sidebar /
-   #viewport) with a mix of flex + float + viewport-relative offsets that do not
-   compose when the editor is embedded in a fixed-size host box (the viewport
-   overlapped the header, and the sidebar overlapped the viewport). Rather than
-   chase the upstream offsets, we pin the three regions deterministically:
+   text0wnz lays out #bodyContainer's regions (header / aside / #viewport) with a
+   mix of flex + float + viewport-relative offsets that do not compose when the
+   editor is embedded in a fixed-size host box. Rather than chase the upstream
+   offsets, we pin the regions deterministically. The base pins below give the
+   header its top strip; the CHANGE 1/CHANGE 3 blocks further down restack the
+   palette / viewport / horizontal tool bar (aside) vertically:
      - #bodyContainer is the positioning context (relative).
      - header  -> top strip, full width, var(--header-size) (43px) tall.
-     - aside   -> left column, below the header, 40px wide (the natural palette
-                  + tool-icon column width), full remaining height.
-     - #viewport -> fills everything below the header and right of the sidebar.
-   The 640x128 canvas sits top-left inside #viewport and scrolls if the host is
-   smaller. The header's toolbars need roughly 1000px of width to lay out
-   without wrapping, so the root carries a min-width to match the dev/host box. */
+     - #viewport -> full-width canvas region below the palette strip.
+     - aside   -> full-width single-row HORIZONTAL tool bar below the viewport.
+   The 640x160 (80x10) canvas sits at the top-left inside #viewport. */
 .ansi-editor-root {
   /* The editor is embedded in the Submit form's col-lg-8 (~820-880px). The
      header used to need ~980px, forcing horizontal scroll. The fit-to-840
@@ -2246,7 +2244,7 @@
    margin:16px auto; keep the top gap, drop the horizontal auto-centre so it
    anchors predictably at the left when the viewport is narrow). */
 .ansi-editor-root #canvasContainer {
-  margin: 16px auto 16px 16px;
+  margin: 8px auto 8px 16px;
 }
 /* file/edit dropdowns open DOWN from their header titles. #fileList anchors
    under the file title (left:0), #editList under the edit title. */
@@ -2526,9 +2524,13 @@
    below the bar. */
 
 /* --palette-size: height of the palette strip (8x16 grid: two 24px swatch rows
-   + padding). --content-top: where the aside + viewport begin. */
+   + padding). --content-top: where the viewport begins (below header+palette).
+   --viewport-size: the 80x10 canvas (640x160) + its 8px top/bottom margins.
+   --tool-size: the single-row HORIZONTAL tool bar pinned under the canvas. */
 .ansi-editor-root {
   --palette-size: 64px;
+  --viewport-size: 176px;
+  --tool-size: 40px;
   --content-top: calc(var(--header-size) + var(--palette-size));
 }
 
@@ -2615,14 +2617,53 @@
   z-index: 2;
 }
 
-/* Re-pin the aside + viewport to start below the palette strip (was
-   var(--header-size); now var(--content-top)). These override the earlier
-   absolute-layout block. */
-.ansi-editor-root #bodyContainer > aside {
-  top: var(--content-top) !important;
-}
+/* asciiarena CHANGE 1 (2026-06): HORIZONTAL tool bar UNDER the canvas.
+   The tool selector column used to be a tall LEFT <aside> beside the short
+   80x10 canvas, leaving a large empty gap under the canvas. Restack the three
+   content regions vertically instead:
+     - #viewport  -> full width, fixed --viewport-size tall, directly below the
+                     palette strip. Holds the 640x160 canvas.
+     - aside      -> full width, ONE-ROW horizontal tool bar (--tool-size tall),
+                     pinned directly below the viewport. The tool cells lay out
+                     left-to-right.
+   bottom:0 is dropped from both so heights are deterministic and the root can
+   shrink to exactly header+palette+viewport+toolbar with no empty space. */
 .ansi-editor-root #bodyContainer > #viewport {
   top: var(--content-top) !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: auto !important;
+  height: var(--viewport-size) !important;
+}
+.ansi-editor-root #bodyContainer > aside {
+  top: calc(var(--content-top) + var(--viewport-size)) !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: auto !important;
+  width: auto !important;
+  height: var(--tool-size) !important;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  padding-inline: 8px;
+  overflow: hidden !important;
+}
+/* Tool cells flow left-to-right; drop the auto horizontal centring that the
+   vertical column used. */
+.ansi-editor-root #bodyContainer > aside > div {
+  margin-inline: 0 !important;
+  flex: 0 0 auto;
+}
+/* Vertical separators between tool groups become thin vertical rules in the
+   horizontal bar. */
+.ansi-editor-root #bodyContainer > aside > .separator {
+  width: 1px !important;
+  height: 24px !important;
+  margin: 0 4px !important;
+  background-color: var(--color-lbl, #333);
 }
 
 /* asciiarena: the toolbar/menus/chrome should use the SITE font
@@ -2680,13 +2721,13 @@
 }
 
 /* PROBLEM 2 — definite, fully-contained editor height.
-   The root (position:relative, height:100%, min-height:480px above) resolves
+   The root (position:relative, height:100%, min-height:323px above) resolves
    against the host box. The Submit wrapper / dev host is sized to deliver the
-   full 480px so height:100% meets min-height exactly and the tool column +
-   80x8 canvas are contained. #bodyContainer clips so the absolutely-positioned
-   aside (bottom:0) and viewport can never spill past the editor into the
-   "Submit Logo" button below. --content-top offsets aside/viewport below
-   header+palette; bottom:0 ties them to the root's height. */
+   full 323px so height:100% meets min-height exactly and the stacked sections
+   (header + palette + 80x10 canvas + horizontal tool bar) are contained.
+   #bodyContainer clips so the absolutely-positioned regions can never spill
+   past the editor into the "Submit Logo" button below. --content-top offsets
+   the viewport below header+palette; the tool bar sits below the viewport. */
 .ansi-editor-root #bodyContainer {
   overflow: hidden !important;
 }
@@ -2705,21 +2746,60 @@
   pointer-events: none;
 }
 
-/* PROBLEM 3 — compact, consistent tool sidebar.
-   The aside is a tall single column of ASCII tool tokens. With the palette
-   canvases hidden it holds ~11 tool cells + 2 separators. Tighten each cell to
-   a uniform ~26px row (24px glyph + 2px block padding) and slim the separators
-   so the whole column fits the fixed content height without an internal
-   scrollbar. Keep overflow-y:auto as a safety net for very short hosts. */
+/* PROBLEM 3 — compact, consistent tool bar cells.
+   The aside is now a single horizontal row of ASCII tool tokens (CHANGE 1).
+   With the palette canvases hidden it holds ~11 tool cells + 2 separators.
+   Size each glyph cell to a uniform 30px square so they sit evenly across the
+   one-row bar; the separators are styled as vertical rules above. */
 .ansi-editor-root #bodyContainer > aside > div {
   padding-block: 2px !important;
   min-height: 0 !important;
 }
 .ansi-editor-root #bodyContainer > aside .asciiIcon {
-  height: 22px;
-  min-width: 24px;
-  width: 24px;
+  height: 28px;
+  min-width: 28px;
+  width: 28px;
 }
-.ansi-editor-root #bodyContainer > aside .separator {
-  margin: 2px auto !important;
+
+/* ───────────────────────────────────────────────────────────────────────────
+   asciiarena CHANGE 3 (2026-06): text-only, single-row SUB-toolbars.
+   When a tool is selected the engine shows a context sub-toolbar in the header
+   (#selectionToolbar / #shapesToolbar / #brushToolbar / #clipboardToolbar /
+   #fontToolbar / #viewportToolbar). Each button carries BOTH a boxy ASCII
+   glyph (.asciiIcon, e.g. "<|>", "[x]") and a text <kbd> label (e.g. "Mirror",
+   "Cut"). The owner wants these sub-toolbars TEXT-ONLY and constrained to a
+   single row. Hide the glyph spans and keep the <kbd> labels; pin the buttons
+   to one compact text row.
+
+   The MAIN tool-selector bar is the <aside> (CHANGE 1, horizontal under the
+   canvas) — it is NOT a sub-toolbar, so its ASCII tokens are untouched. */
+.ansi-editor-root #selectionToolbar .asciiIcon,
+.ansi-editor-root #shapesToolbar .asciiIcon,
+.ansi-editor-root #brushToolbar .asciiIcon,
+.ansi-editor-root #clipboardToolbar .asciiIcon,
+.ansi-editor-root #fontToolbar .asciiIcon,
+.ansi-editor-root #viewportToolbar .asciiIcon {
+  display: none !important;
+}
+/* One compact row of text: the button is just its <kbd> label now. Cap the
+   height to the header strip and align the label vertically. */
+.ansi-editor-root #selectionToolbar .toolButton,
+.ansi-editor-root #shapesToolbar .toolButton,
+.ansi-editor-root #brushToolbar .toolButton,
+.ansi-editor-root #clipboardToolbar .toolButton,
+.ansi-editor-root #fontToolbar .toolButton,
+.ansi-editor-root #viewportToolbar .toolButton {
+  height: var(--header-size) !important;
+  align-items: center;
+  white-space: nowrap;
+  padding-inline: 6px;
+}
+.ansi-editor-root #selectionToolbar .toolButton kbd,
+.ansi-editor-root #shapesToolbar .toolButton kbd,
+.ansi-editor-root #brushToolbar .toolButton kbd,
+.ansi-editor-root #clipboardToolbar .toolButton kbd,
+.ansi-editor-root #fontToolbar .toolButton kbd,
+.ansi-editor-root #viewportToolbar .toolButton kbd {
+  margin-inline: 0;
+  white-space: nowrap;
 }
