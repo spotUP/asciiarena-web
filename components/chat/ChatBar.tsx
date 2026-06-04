@@ -5,6 +5,7 @@ import { useChatContext, dmKey, threadKey } from "./ChatContext";
 import ChatWindow from "./ChatWindow";
 import { resolveDisplayTitle } from "@/lib/chatThread";
 import { playChatAlert, unlockChatAudio } from "@/lib/chatSound";
+import { usePoppedOutPeers } from "./popoutRegistry";
 
 interface Props {
   userId: string;
@@ -20,7 +21,7 @@ interface IncomingMessage {
 }
 
 export default function ChatBar({ userId, userNick }: Props) {
-  const { windows, openChat, openThread, minimizeChat } = useChatContext();
+  const { windows, openChat, openThread, minimizeChat, closeChat } = useChatContext();
   const [newNick, setNewNick] = useState("");
   const [newNickOpen, setNewNickOpen] = useState(false);
   const [newNickError, setNewNickError] = useState("");
@@ -28,7 +29,25 @@ export default function ChatBar({ userId, userNick }: Props) {
   const suggestDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const windowsRef = useRef(windows);
 
+  // Peers currently popped out into a separate OS window. For these we must NOT
+  // render or re-open a docked window — the popout owns that conversation, and a
+  // duplicate docked window would (a) twin the UI and (b) double up the
+  // thread SSE subscriptions, starving the popout's stream.
+  const poppedOutPeers = usePoppedOutPeers();
+  const poppedOutRef = useRef(poppedOutPeers);
+
   useEffect(() => { windowsRef.current = windows; }, [windows]);
+  useEffect(() => { poppedOutRef.current = poppedOutPeers; }, [poppedOutPeers]);
+
+  // If a docked DM window exists for a peer that is now popped out, tear it down
+  // so its EventSource subscriptions close and the popout regains its SSE budget.
+  useEffect(() => {
+    for (const w of windows) {
+      if (!w.isGroup && poppedOutPeers.has(String(w.peerId))) {
+        closeChat(w.key);
+      }
+    }
+  }, [windows, poppedOutPeers, closeChat]);
 
   // SSE listener for incoming messages and yells. A new message always
   // expands (or opens) the relevant chat window. A yell also opens/expands
@@ -43,8 +62,13 @@ export default function ChatBar({ userId, userNick }: Props) {
           const tid = event.threadId;
           const groupWin = tid ? wins.find(w => w.key === threadKey(tid)) : undefined;
           const dmWin = wins.find(w => w.key === dmKey(event.fromId!));
+          // The peer's chat is popped out into its own window — it handles this
+          // message via its own thread channel. Don't open/re-open a docked twin.
+          const peerPoppedOut = !groupWin && poppedOutRef.current.has(String(event.fromId));
           if (groupWin) {
             if (groupWin.minimized) minimizeChat(groupWin.key, false); // expand the group
+          } else if (peerPoppedOut) {
+            // no-op: the popout owns this conversation
           } else if (dmWin) {
             if (dmWin.minimized) minimizeChat(dmWin.key, false);       // expand the DM
           } else {
@@ -56,8 +80,12 @@ export default function ChatBar({ userId, userNick }: Props) {
           const wins = windowsRef.current;
           const groupWin = wins.find(w => w.key === threadKey(tid));
           const dmWin = event.fromId ? wins.find(w => w.key === dmKey(event.fromId!)) : undefined;
+          const peerPoppedOut = !groupWin && event.fromId != null && poppedOutRef.current.has(String(event.fromId));
           if (groupWin) {
             if (groupWin.minimized) minimizeChat(groupWin.key, false);
+            playChatAlert();
+          } else if (peerPoppedOut) {
+            // The popout window handles the flash/sound via its own thread channel.
             playChatAlert();
           } else if (dmWin) {
             if (dmWin.minimized) minimizeChat(dmWin.key, false);
@@ -128,7 +156,11 @@ export default function ChatBar({ userId, userNick }: Props) {
     }
   };
 
-  const expandedWindows = windows.filter(w => !w.minimized);
+  // Never render a docked window for a peer whose chat is popped out — the
+  // closeChat effect removes it from the store, but filter here too so there's
+  // no flash of a twin window before that state update commits.
+  const visibleWindows = windows.filter(w => !(!w.isGroup && poppedOutPeers.has(String(w.peerId))));
+  const expandedWindows = visibleWindows.filter(w => !w.minimized);
 
   return (
     <div style={{
@@ -240,7 +272,7 @@ export default function ChatBar({ userId, userNick }: Props) {
         {/* Minimized window tabs. A tab with unread messages blinks magenta
             and shows its count, and keeps doing so until you click it open —
             no timeout. Clicking re-expands the window. */}
-        {windows.filter(w => w.minimized).map(w => (
+        {visibleWindows.filter(w => w.minimized).map(w => (
           <button
             key={w.key}
             onClick={() => minimizeChat(w.key, false)}

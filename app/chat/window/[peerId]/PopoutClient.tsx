@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { ChatContextProvider, useChatContext } from "@/components/chat/ChatContext";
 import ChatWindow from "@/components/chat/ChatWindow";
+import { announcePopoutOpen, announcePopoutClose, HEARTBEAT_MS } from "@/components/chat/popoutRegistry";
 
 interface Props {
   peerId: number;
@@ -35,6 +36,23 @@ export default function PopoutClient({ peerId, peerNick, userId, userNick }: Pro
     document.body.style.overflow = "hidden";
     document.body.style.backgroundColor = "#111";
   }, [peerNick]);
+
+  // Register this peer as popped out so the main page suppresses its docked
+  // twin (and the duplicate SSE subscriptions that starve this window). We
+  // refresh on a heartbeat so a crash leaves a stale entry that the main page
+  // prunes, and announce-close on unmount AND beforeunload (the user closing
+  // the OS window) so the docked chat resumes normally afterwards.
+  useEffect(() => {
+    announcePopoutOpen(peerId);
+    const beat = setInterval(() => announcePopoutOpen(peerId), HEARTBEAT_MS);
+    const onUnload = () => announcePopoutClose(peerId);
+    window.addEventListener("beforeunload", onUnload);
+    return () => {
+      clearInterval(beat);
+      window.removeEventListener("beforeunload", onUnload);
+      announcePopoutClose(peerId);
+    };
+  }, [peerId]);
 
   return (
     <ChatContextProvider>

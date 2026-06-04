@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback, KeyboardEvent } from "react";
 import { useChatContext } from "./ChatContext";
 import { playChatAlert, unlockChatAudio } from "@/lib/chatSound";
 import { resolveDisplayTitle } from "@/lib/chatThread";
+import { announcePopoutOpen } from "./popoutRegistry";
 
 interface ChatMessage {
   id: number;
@@ -431,7 +432,13 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
       `chat_${peerId}`,
       "width=340,height=500,resizable=yes,scrollbars=no,menubar=no,toolbar=no,location=no,status=no"
     );
-    if (w) closeChat(windowKey);
+    if (w) {
+      // Announce immediately (don't wait for the popout window to mount) so the
+      // main page's user-channel listener can't re-open a docked twin in the
+      // race window before the popout registers itself.
+      announcePopoutOpen(peerId);
+      closeChat(windowKey);
+    }
   };
 
   if (minimized) return null; // ChatBar renders the tab; window is hidden
