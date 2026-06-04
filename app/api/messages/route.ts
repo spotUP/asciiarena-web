@@ -7,6 +7,7 @@ import { Prisma } from "@/lib/generated/prisma/client";
 import { broadcast } from "@/lib/live";
 import { resolveDisplayTitle } from "@/lib/chatThread";
 import { addParticipant } from "@/lib/chatThreadDb";
+import { createNotification } from "@/lib/notifications";
 
 const postSchema = z.object({
   subject: z.string().min(1).max(500),
@@ -87,21 +88,21 @@ export async function POST(request: NextRequest) {
 
   const fromId = parseInt(session.user.id);
 
-  await prisma.$executeRaw`
-    INSERT INTO messages (thread, from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
-    VALUES (
-      UNIX_TIMESTAMP() * 10000 + ${fromId},
-      ${fromId}, ${receiver},
-      (SELECT nick FROM users WHERE id = ${receiver}),
-      (SELECT nick FROM users WHERE id = ${fromId}),
-      UNIX_TIMESTAMP(), ${subject}, ${msgtext}, 1, 1
-    )
-  `;
-
-  const inserted = await prisma.$queryRaw<[{ threadId: number }]>`
-    SELECT thread AS threadId FROM messages WHERE id = LAST_INSERT_ID()
-  `;
-  const threadId = inserted[0]?.threadId;
+  const threadId = await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`
+      INSERT INTO messages (from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
+      VALUES (
+        ${fromId}, ${receiver},
+        (SELECT nick FROM users WHERE id = ${receiver}),
+        (SELECT nick FROM users WHERE id = ${fromId}),
+        UNIX_TIMESTAMP(), ${subject}, ${msgtext}, 1, 1
+      )`;
+    const inserted = await tx.$queryRaw<[{ msgId: number }]>`SELECT LAST_INSERT_ID() AS msgId`;
+    const msgId = Number(inserted[0]?.msgId ?? 0);
+    if (!msgId) throw new Error("LAST_INSERT_ID returned 0");
+    await tx.$executeRaw`UPDATE messages SET thread = ${msgId} WHERE id = ${msgId}`;
+    return msgId;
+  });
   const fromNick = session.user.name ?? "";
 
   if (threadId) {
@@ -110,6 +111,7 @@ export async function POST(request: NextRequest) {
   }
 
   broadcast(`user:${receiver}:messages`, { type: "message", fromId, fromNick, threadId });
+  await createNotification(receiver, "notif-message", { actorNick: fromNick, targetUrl: `/messages?thread=${threadId}` });
 
   return apiOk({ status: true, threadId });
 }

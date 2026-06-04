@@ -5,6 +5,7 @@ import { apiError, apiOk } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { broadcast } from "@/lib/live";
 import { getMember, getActiveParticipants, markRead } from "@/lib/chatThreadDb";
+import { createNotification } from "@/lib/notifications";
 
 interface ThreadMessageRow {
   id: number;
@@ -108,6 +109,7 @@ export async function POST(
   const targets = others.length ? others : (body.receiver ? [body.receiver] : []);
   for (const rid of targets) {
     broadcast(`user:${rid}:messages`, { type: "message", fromId, fromNick, threadId: thread });
+    await createNotification(rid, "notif-message", { actorNick: fromNick, targetUrl: `/messages?thread=${thread}` });
   }
   return apiOk({ status: true });
 }
