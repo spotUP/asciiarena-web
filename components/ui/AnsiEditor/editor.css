@@ -2658,3 +2658,68 @@
   cursor: default !important;
   pointer-events: none;
 }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   asciiarena LAYOUT CLEANUP (2026-06): the embedded editor's internal header
+   font UI is now redundant — the React DosSelect above the editor is the only
+   font picker. Hide it, give the editor root a definite height so its
+   header + palette strip + tool sidebar + canvas are fully contained
+   (overflow:hidden, nothing spills into the Submit form below), and tidy the
+   tool sidebar so all ~11 tool icons fit the height without scrolling.
+
+   PROBLEM 1 — hide redundant header font UI.
+   The F-key font-selector strip (#keyboardToolbar + its #fkey* preview canvases
+   and #fkeySetPrev/#fkeySetNext arrows) and the duplicate "Topaz+ 1200" font
+   chip (#currentFontDisplay) are superseded by the DosSelect. Hide them. The
+   small cursor position readout (#positionInfo) sits cleanly in the header and
+   is kept. File/Edit menus + resolution remain useful, so the header itself
+   stays (just slimmed of the font UI). */
+.ansi-editor-root #keyboardToolbar,
+.ansi-editor-root #currentFontDisplay {
+  display: none !important;
+}
+
+/* PROBLEM 2 — definite, fully-contained editor height.
+   The root (position:relative, height:100%, min-height:480px above) resolves
+   against the host box. The Submit wrapper / dev host is sized to deliver the
+   full 480px so height:100% meets min-height exactly and the tool column +
+   80x8 canvas are contained. #bodyContainer clips so the absolutely-positioned
+   aside (bottom:0) and viewport can never spill past the editor into the
+   "Submit Logo" button below. --content-top offsets aside/viewport below
+   header+palette; bottom:0 ties them to the root's height. */
+.ansi-editor-root #bodyContainer {
+  overflow: hidden !important;
+}
+
+/* The two <label> wrappers around the hidden #openFile / #customColor inputs
+   sit AFTER #bodyContainer as static inline-block siblings. Even at height:0
+   they establish a line box ~24px tall below the 480px #bodyContainer, which
+   showed up as root.scrollHeight (504) > clientHeight (480). They're triggered
+   programmatically by the engine (input.click()), so flow position is
+   irrelevant — pull them out of flow so they add no height. */
+.ansi-editor-root > label {
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none;
+}
+
+/* PROBLEM 3 — compact, consistent tool sidebar.
+   The aside is a tall single column of ASCII tool tokens. With the palette
+   canvases hidden it holds ~11 tool cells + 2 separators. Tighten each cell to
+   a uniform ~26px row (24px glyph + 2px block padding) and slim the separators
+   so the whole column fits the fixed content height without an internal
+   scrollbar. Keep overflow-y:auto as a safety net for very short hosts. */
+.ansi-editor-root #bodyContainer > aside > div {
+  padding-block: 2px !important;
+  min-height: 0 !important;
+}
+.ansi-editor-root #bodyContainer > aside .asciiIcon {
+  height: 22px;
+  min-width: 24px;
+  width: 24px;
+}
+.ansi-editor-root #bodyContainer > aside .separator {
+  margin: 2px auto !important;
+}
