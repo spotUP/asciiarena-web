@@ -8,10 +8,11 @@ import { broadcast } from "@/lib/live";
 import { resolveDisplayTitle } from "@/lib/chatThread";
 import { addParticipant } from "@/lib/chatThreadDb";
 import { createNotification } from "@/lib/notifications";
+import { normalizeMessageText } from "@/lib/normalizeText";
 
 const postSchema = z.object({
-  subject: z.string().min(1).max(500),
-  msgtext: z.string().min(1).max(10000),
+  subject: z.string().min(1).max(500).transform(normalizeMessageText),
+  msgtext: z.string().min(1).max(10000).transform(normalizeMessageText),
   receiver: z.number().int().positive(),
 });
 

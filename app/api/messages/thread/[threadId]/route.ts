@@ -6,6 +6,7 @@ import { Prisma } from "@/lib/generated/prisma/client";
 import { broadcast } from "@/lib/live";
 import { getMember, getActiveParticipants, markRead } from "@/lib/chatThreadDb";
 import { createNotification } from "@/lib/notifications";
+import { normalizeMessageText } from "@/lib/normalizeText";
 
 interface ThreadMessageRow {
   id: number;
@@ -84,8 +85,9 @@ export async function POST(
   const { threadId } = await params;
   const body = await request.json() as { thread?: number; subject?: string; msgtext?: string; receiver?: number };
   const thread = body.thread ?? parseInt(threadId);
-  const subject = body.subject?.trim() || "Re:";
+  const subject = normalizeMessageText(body.subject?.trim() ?? "").trim() || "Re:";
   if (!body.msgtext) return apiError("msgtext required", 400);
+  const msgtext = normalizeMessageText(body.msgtext);
   const fromId = parseInt(session.user.id);
   const fromNick = session.user.name ?? "";
 
@@ -97,12 +99,12 @@ export async function POST(
     await prisma.$executeRaw`
       INSERT INTO messages (thread, from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
       VALUES (${thread}, ${fromId}, NULL, NULL, (SELECT nick FROM users WHERE id = ${fromId}),
-              UNIX_TIMESTAMP(), ${subject}, ${body.msgtext}, 1, 1)`;
+              UNIX_TIMESTAMP(), ${subject}, ${msgtext}, 1, 1)`;
   } else {
     await prisma.$executeRaw`
       INSERT INTO messages (thread, from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
       VALUES (${thread}, ${fromId}, ${toId}, (SELECT nick FROM users WHERE id = ${toId}),
-              (SELECT nick FROM users WHERE id = ${fromId}), UNIX_TIMESTAMP(), ${subject}, ${body.msgtext}, 1, 1)`;
+              (SELECT nick FROM users WHERE id = ${fromId}), UNIX_TIMESTAMP(), ${subject}, ${msgtext}, 1, 1)`;
   }
 
   broadcast(`thread:${thread}`, { type: "message" });

@@ -6,10 +6,11 @@ import { apiError, apiOk } from "@/lib/utils";
 import { broadcast } from "@/lib/live";
 import { createNotification } from "@/lib/notifications";
 import { addParticipant, getActiveParticipants } from "@/lib/chatThreadDb";
+import { normalizeMessageText } from "@/lib/normalizeText";
 
 const schema = z.object({
   peerId: z.number().int().positive(),
-  message: z.string().min(1).max(10000),
+  message: z.string().min(1).max(10000).transform(normalizeMessageText),
   threadId: z.number().int().positive().optional(),
 });
 
