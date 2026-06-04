@@ -120,7 +120,9 @@ const AnsiEditor = forwardRef<AnsiEditorRef, AnsiEditorProps>(
       );
     }
 
-    return <div ref={hostRef} />;
+    // Fill the host box so the editor's `height:100%` chain has a definite
+    // height to resolve against (otherwise #bodyContainer collapses to 0).
+    return <div ref={hostRef} style={{ width: "100%", height: "100%" }} />;
   }
 );
 

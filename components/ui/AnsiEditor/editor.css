@@ -2168,3 +2168,129 @@
   width: 100%;
   height: 100%;
 }
+
+/* asciiarena: text0wnz positions toolbars/menus/overlays with position:fixed
+   (anchored to the viewport). Embedded, that scatters them across the page.
+   .ansi-editor-root is position:relative, so re-anchor every fixed editor
+   element to the editor box instead. */
+.ansi-editor-root .fixed,
+.ansi-editor-root #chatWindow,
+.ansi-editor-root dialog,
+.ansi-editor-root .overlay,
+.ansi-editor-root #customColor,
+.ansi-editor-root .floatingPanel,
+.ansi-editor-root #dragdrop {
+  position: absolute !important;
+}
+
+/* asciiarena: imposed editor layout.
+   text0wnz lays out #bodyContainer's three regions (header / aside sidebar /
+   #viewport) with a mix of flex + float + viewport-relative offsets that do not
+   compose when the editor is embedded in a fixed-size host box (the viewport
+   overlapped the header, and the sidebar overlapped the viewport). Rather than
+   chase the upstream offsets, we pin the three regions deterministically:
+     - #bodyContainer is the positioning context (relative).
+     - header  -> top strip, full width, var(--header-size) (43px) tall.
+     - aside   -> left column, below the header, 40px wide (the natural palette
+                  + tool-icon column width), full remaining height.
+     - #viewport -> fills everything below the header and right of the sidebar.
+   The 640x128 canvas sits top-left inside #viewport and scrolls if the host is
+   smaller. The header's toolbars need roughly 1000px of width to lay out
+   without wrapping, so the root carries a min-width to match the dev/host box. */
+.ansi-editor-root {
+  min-width: 980px;
+}
+.ansi-editor-root #bodyContainer {
+  position: relative !important;
+  overflow: hidden !important;
+}
+.ansi-editor-root #bodyContainer > header {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: auto !important;
+  height: var(--header-size) !important;
+  margin: 0 !important;
+  z-index: 20;
+}
+.ansi-editor-root #bodyContainer > aside {
+  position: absolute !important;
+  top: var(--header-size) !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  float: none !important;
+  width: 40px !important;
+  height: auto !important;
+  margin: 0 !important;
+  overflow: hidden auto;
+  z-index: 10;
+}
+.ansi-editor-root #bodyContainer > #viewport {
+  position: absolute !important;
+  top: var(--header-size) !important;
+  left: 40px !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  overflow: auto !important;
+  z-index: 5;
+}
+/* The canvas sits at the top-left of the viewport (text0wnz centres it with
+   margin:16px auto; keep the top gap, drop the horizontal auto-centre so it
+   anchors predictably at the left when the viewport is narrow). */
+.ansi-editor-root #canvasContainer {
+  margin: 16px auto 16px 16px;
+}
+/* file/edit dropdowns open DOWN from their header titles. #fileList anchors
+   under the file title (left:0), #editList under the edit title. */
+.ansi-editor-root #fileList {
+  left: 0;
+}
+
+/* asciiarena: the compiled (Tailwind-scoped) CSS double-prefixes every nested
+   rule with `.ansi-editor-root`, e.g. the upstream `header { svg { width:30px } }`
+   became `.ansi-editor-root header .ansi-editor-root svg`, which can never match
+   (there is only ONE .ansi-editor-root in the tree). The result: every icon SVG
+   falls back to the replaced-element default of 300x150 and the toolbars explode.
+   Re-impose the intended icon sizing with single-scope selectors. */
+.ansi-editor-root svg {
+  width: 30px;
+  height: 30px;
+}
+.ansi-editor-root header svg {
+  width: 30px;
+  height: 30px;
+  fill: var(--color-fg);
+}
+.ansi-editor-root header svg.sm {
+  width: 20px;
+  height: 20px;
+}
+.ansi-editor-root aside svg {
+  width: 30px;
+  height: 30px;
+  fill: #efefef;
+}
+.ansi-editor-root .toolButton svg {
+  margin-inline-end: 5px;
+}
+.ansi-editor-root .menuList svg,
+.ansi-editor-root dialog svg {
+  width: 20px;
+  height: 20px;
+}
+.ansi-editor-root #navDarkmode svg.sunAndMoon {
+  width: 24px;
+  height: 24px;
+}
+/* The header lays its three navs out with space-between; the middle nav holds
+   the toolbars. Keep it from growing taller than the header strip and clip any
+   overflow so a too-wide toolbar never bleeds over the canvas. */
+.ansi-editor-root #bodyContainer > header > nav {
+  align-items: center;
+  max-height: var(--header-size);
+  overflow: hidden;
+}
