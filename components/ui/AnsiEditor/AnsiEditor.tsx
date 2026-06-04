@@ -23,6 +23,11 @@ import type { EditorHandle } from "./mount";
 
 export interface AnsiEditorRef {
   getAnsiBytes: () => Promise<Uint8Array>;
+  /**
+   * True when the canvas is blank (every cell is a space). Lets callers
+   * reject an empty logo, since a blank export is still ~782 bytes.
+   */
+  isEmpty: () => boolean;
 }
 
 interface AnsiEditorProps {
@@ -107,6 +112,11 @@ const AnsiEditor = forwardRef<AnsiEditorRef, AnsiEditorProps>(
             throw new Error("AnsiEditor: editor not ready");
           }
           return handleRef.current.getAnsiBytes();
+        },
+        isEmpty: () => {
+          // No handle yet → nothing drawn → empty.
+          if (!handleRef.current) return true;
+          return handleRef.current.isEmpty();
         },
       }),
       []

@@ -17,6 +17,7 @@
 import "./editor.css";
 import { bootstrapEditor } from "./engine/bootstrap.js";
 import { encodeAnsBytes } from "./engine/file.js";
+import { State } from "./engine/state.js";
 import { EDITOR_MARKUP } from "./markup";
 
 // ─── Public API ──────────────────────────────────────────────────────────────
@@ -26,6 +27,13 @@ export interface EditorHandle {
   getAnsiBytes: () => Promise<Uint8Array>;
   /** Load .ans bytes into the editor canvas. */
   loadAnsiBytes: (bytes: Uint8Array) => void;
+  /**
+   * True when the canvas holds no visible content — every cell is a space
+   * (char 32) or NUL (char 0). A blank 80x8 export is still ~782 bytes
+   * (spaces + SAUCE), so byte length alone can't detect an empty logo; this
+   * inspects the packed cell buffer directly.
+   */
+  isEmpty: () => boolean;
   /** Tear down the editor and remove its DOM nodes from the host container. */
   destroy: () => void;
 }
@@ -93,6 +101,21 @@ export function initAnsiEditor(
 
     loadAnsiBytes(bytes: Uint8Array): void {
       boot.load(bytes);
+    },
+
+    isEmpty(): boolean {
+      const canvas = State.textArtCanvas;
+      if (!canvas || typeof canvas.getImageData !== "function") {
+        // No canvas yet → nothing has been drawn → treat as empty.
+        return true;
+      }
+      const cells = canvas.getImageData();
+      for (let i = 0; i < cells.length; i++) {
+        // Top byte is the char code; 0 (NUL) and 32 (space) are blank.
+        const charCode = cells[i] >> 8;
+        if (charCode !== 0 && charCode !== 32) return false;
+      }
+      return true;
     },
 
     destroy(): void {

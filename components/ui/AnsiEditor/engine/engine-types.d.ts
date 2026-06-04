@@ -23,5 +23,9 @@ export interface TextArtCanvas {
   getRows(): number;
   getIceColors(): boolean;
   getCurrentFontName(): string;
-  getImageData(): unknown;
+  /**
+   * The packed cell buffer: one Uint16 per cell, `cell >> 8` = char code,
+   * low byte = fg/bg colour nibbles. Length is columns*rows.
+   */
+  getImageData(): Uint16Array;
 }

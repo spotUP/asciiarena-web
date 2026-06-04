@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Combobox from "@/components/ui/Combobox";
 import DosSelect from "@/components/ui/DosSelect";
+import AnsiEditor, { type AnsiEditorRef } from "@/components/ui/AnsiEditor/AnsiEditor";
 import { FONTS } from "@/lib/ansilove";
-import { measureAsciiText, checkLogoDims, MAX_LOGO_COLS, MAX_LOGO_ROWS } from "@/lib/ansiDims";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -144,13 +144,9 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
 
   // Site logo form
   const [logoAuthor, setLogoAuthor] = useState("");
-  const [logoAscii, setLogoAscii] = useState("");
   const [logoAnsiFont, setLogoAnsiFont] = useState("");
   const logoAnsiRef = useRef<HTMLInputElement>(null);
-
-  // Live size of the ASCII logo against the 80x8 header limit.
-  const logoDims = useMemo(() => measureAsciiText(logoAscii), [logoAscii]);
-  const logoDimError = logoAscii.trim() ? checkLogoDims(logoDims) : null;
+  const editorRef = useRef<AnsiEditorRef>(null);
 
   // ── Hash sync ──────────────────────────────────────────────────────────────
 
@@ -398,22 +394,35 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
 
   async function handleLogoSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
-    if (!logoAscii.trim()) {
-      setStatus({ msg: "ASCII art is required.", ok: false });
+    const editor = editorRef.current;
+    if (!editor) {
+      setStatus({ msg: "Editor is still loading — try again.", ok: false });
       return;
     }
-    if (logoDimError) {
-      setStatus({ msg: logoDimError, ok: false });
+    // A blank 80x8 export is still ~782 bytes (spaces + SAUCE), so reject an
+    // all-blank canvas explicitly rather than relying on byte length.
+    if (editor.isEmpty()) {
+      setStatus({ msg: "Draw something before submitting.", ok: false });
       return;
     }
-    const r = await fetch("/api/logos", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ author: logoAuthor, ascii: logoAscii }),
-    });
+    const bytes = await editor.getAnsiBytes();
+    if (!bytes || bytes.length === 0) {
+      setStatus({ msg: "Could not read the canvas — try again.", ok: false });
+      return;
+    }
+    // POST as multipart, same shape as the .ans upload form below.
+    // Copy into a fresh ArrayBuffer-backed view so the File constructor's
+    // BlobPart type is satisfied (getAnsiBytes returns a generic Uint8Array).
+    const ansBuffer = new Uint8Array(bytes.length);
+    ansBuffer.set(bytes);
+    const fd = new FormData();
+    fd.append("ans", new File([ansBuffer], "logo.ans"));
+    fd.append("author", logoAuthor);
+    fd.append("font", "topaz+");
+    const r = await fetch("/api/logos", { method: "POST", body: fd });
     if (r.status === 201) {
       setStatus({ msg: "Logo submitted successfully!", ok: true });
-      setLogoAuthor(""); setLogoAscii("");
+      setLogoAuthor("");
     } else {
       const body = (await r.json().catch(() => ({}))) as { error?: string };
       setStatus({ msg: body.error ?? "Submit failed.", ok: false });
@@ -764,50 +773,19 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
             <Field label="Author">
               <input type="text" className="form-control w-100" value={logoAuthor} onChange={e => setLogoAuthor(e.target.value)} placeholder="Your handle" />
             </Field>
-            <Field label="ASCII Art" required>
+            <Field label="Draw your logo" required>
               <div className="lightgrey amb-1" style={{ fontFamily: "TopazPlus_a1200, monospace", fontSize: "16px", lineHeight: "16px" }}>
-                The box below is exactly {MAX_LOGO_COLS} &times; {MAX_LOGO_ROWS} characters — the header limit. Anything past
-                its edges is over the limit and will be rejected.
+                Draw an 80 &times; 8 ANSI logo below — the header limit. Submit exports it as a .ans file.
               </div>
-              {/* Horizontal scroll so the canvas keeps its true 80-col width on
-                  narrow screens instead of soft-wrapping (which would hide the
-                  real column count). */}
+              {/* The editor's toolbars need ~980px to lay out. The submit column
+                  is narrower (≈660-880px at lg), so allow horizontal scroll
+                  rather than letting the chrome wrap/overflow the page. The
+                  fixed height gives the editor's height:100% chain a definite
+                  box to resolve against (header + 80x8 viewport). */}
               <div style={{ overflowX: "auto", maxWidth: "100%" }}>
-                <textarea
-                  value={logoAscii}
-                  onChange={e => setLogoAscii(e.target.value)}
-                  placeholder="Paste your ASCII logo here..."
-                  cols={MAX_LOGO_COLS}
-                  rows={MAX_LOGO_ROWS}
-                  wrap="off"
-                  spellCheck={false}
-                  style={{
-                    // Exact 80x8 grid: 8px per char wide, 16px per row tall, no
-                    // padding so glyphs land on the cell grid.
-                    fontFamily: "TopazPlus_a1200, monospace",
-                    fontSize: "16px",
-                    lineHeight: "16px",
-                    whiteSpace: "pre",
-                    width: `${MAX_LOGO_COLS}ch`,
-                    height: `${MAX_LOGO_ROWS * 16}px`,
-                    padding: 0,
-                    margin: 0,
-                    resize: "none",
-                    overflow: "auto",
-                    boxSizing: "content-box",
-                    background: "#000000",
-                    color: "#ffffff",
-                    border: `2px solid ${logoDimError ? "#ff5555" : "#00aa00"}`,
-                    display: "block",
-                  }}
-                />
-              </div>
-              <div className="amt-1" style={{ fontFamily: "TopazPlus_a1200, monospace", fontSize: "16px", lineHeight: "16px" }}>
-                <span className={logoDimError ? "red" : "green"}>
-                  {logoDims.cols} &times; {logoDims.rows}
-                </span>
-                <span className="lightgrey"> / {MAX_LOGO_COLS} &times; {MAX_LOGO_ROWS} max</span>
-                {logoDimError && <span className="red"> &mdash; over the limit</span>}
+                <div style={{ minWidth: 980, height: 320 }}>
+                  <AnsiEditor ref={editorRef} />
+                </div>
               </div>
             </Field>
             <div className="amt-1">
@@ -815,8 +793,6 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
                 type="submit"
                 className="btn-big bg-green white"
                 value="Submit Logo"
-                disabled={!!logoDimError}
-                style={logoDimError ? { opacity: 0.5, cursor: "not-allowed" } : undefined}
               />
             </div>
           </form>
