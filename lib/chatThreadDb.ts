@@ -60,6 +60,56 @@ export async function addParticipant(threadId: number, userId: number): Promise<
   `;
 }
 
+// Rejoin a thread the user previously left: clear left_at but PRESERVE the
+// original joined_at, so the rejoined member regains their entire original
+// history window plus everything posted while they were gone. No-op if the row
+// is missing or already active. (addParticipant, by contrast, resets joined_at
+// for a fresh add — wrong for rejoin, which must restore the past.)
+export async function rejoinThread(threadId: number, userId: number): Promise<void> {
+  await prisma.$executeRaw`
+    UPDATE chat_participants SET left_at = NULL
+    WHERE thread_id = ${threadId} AND user_id = ${userId} AND left_at IS NOT NULL
+  `;
+}
+
+// Threads the user has LEFT (soft), newest activity first, each with the same
+// title inputs the active inbox uses. History rows are preserved, so a left
+// thread can still be read; this just surfaces it so the user can find it.
+export interface LeftThreadRow {
+  thread: number;
+  lastTimestamp: number | null;
+  overrideTitle: string | null;
+  firstSubject: string | null;
+  otherNicks: string | null;
+}
+export async function getLeftThreads(userId: number): Promise<LeftThreadRow[]> {
+  const rows = await prisma.$queryRaw<Array<{
+    thread: number; last_timestamp: number | null;
+    override_title: string | null; first_subject: string | null; other_nicks: string | null;
+  }>>`
+    SELECT
+      cp.thread_id AS thread,
+      (SELECT lm.timestamp FROM messages lm
+         WHERE lm.thread = cp.thread_id AND lm.timestamp >= cp.joined_at AND lm.timestamp <= cp.left_at
+         ORDER BY lm.id DESC LIMIT 1) AS last_timestamp,
+      cp.title AS override_title,
+      (SELECT fm.subject FROM messages fm WHERE fm.thread = cp.thread_id ORDER BY fm.id ASC LIMIT 1) AS first_subject,
+      (SELECT GROUP_CONCAT(u.nick ORDER BY pp.joined_at SEPARATOR 0x1f)
+         FROM chat_participants pp JOIN users u ON u.id = pp.user_id
+         WHERE pp.thread_id = cp.thread_id AND pp.user_id <> ${userId}) AS other_nicks
+    FROM chat_participants cp
+    WHERE cp.user_id = ${userId} AND cp.left_at IS NOT NULL
+    ORDER BY cp.left_at DESC
+  `;
+  return rows.map(r => ({
+    thread: Number(r.thread),
+    lastTimestamp: r.last_timestamp == null ? null : Number(r.last_timestamp),
+    overrideTitle: r.override_title,
+    firstSubject: r.first_subject,
+    otherNicks: r.other_nicks,
+  }));
+}
+
 export async function leaveThread(threadId: number, userId: number): Promise<void> {
   await prisma.$executeRaw`
     UPDATE chat_participants SET left_at = UNIX_TIMESTAMP()

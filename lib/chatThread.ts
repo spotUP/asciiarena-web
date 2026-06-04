@@ -52,3 +52,20 @@ export function resolveDisplayTitle(
   if (subject && subject.trim()) return subject;
   return defaultThreadTitle(otherNicks);
 }
+
+// A membership is "left" iff it carries a left_at timestamp. The inbox shows
+// active threads; the "Left chats" view shows left ones. One predicate so both
+// the list filter and the rejoin guard agree on what "left" means.
+export function isLeftMember(member: Pick<Member, "leftAt">): boolean {
+  return member.leftAt != null;
+}
+
+// Rejoin is a pure state transition on the participant row: clear left_at while
+// PRESERVING the original joined_at, so the rejoined user regains their whole
+// original history window plus everything posted since. (Contrast with a fresh
+// add, which starts joined_at "now" and would hide the past.) Idempotent: an
+// already-active member is returned unchanged.
+export function rejoinTransition(member: Member): Member {
+  if (member.leftAt == null) return member;
+  return { ...member, leftAt: null };
+}

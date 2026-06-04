@@ -6,7 +6,7 @@ import { apiError, apiOk } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { broadcast } from "@/lib/live";
 import { resolveDisplayTitle } from "@/lib/chatThread";
-import { addParticipant } from "@/lib/chatThreadDb";
+import { addParticipant, getLeftThreads } from "@/lib/chatThreadDb";
 import { createNotification } from "@/lib/notifications";
 import { normalizeMessageText } from "@/lib/normalizeText";
 
@@ -25,6 +25,29 @@ export async function GET(request: NextRequest) {
   const pagesize = Math.max(1, Math.min(200, parseInt(searchParams.get("pagesize") ?? "50") || 50));
   const offset = (page - 1) * pagesize;
   const me = parseInt(session.user.id);
+
+  // "Left chats" view: threads the user soft-left. History is preserved, so the
+  // user can find, read, and rejoin them. Same title resolution as the active
+  // inbox; no unread (a left member receives nothing until they rejoin).
+  if (searchParams.get("left") === "1") {
+    const left = await getLeftThreads(me);
+    return apiOk(left.map(r => {
+      const subject = r.firstSubject === "Chat" ? null : r.firstSubject;
+      const nicks = r.otherNicks ? r.otherNicks.split(String.fromCharCode(0x1f)) : [];
+      return {
+        total_count: left.length,
+        thread: r.thread,
+        id: r.thread,
+        from_id: null,
+        lastFromMe: false,
+        preview: null,
+        timestamp: r.lastTimestamp,
+        title: resolveDisplayTitle(r.overrideTitle, subject, nicks),
+        unread: 0,
+        left: true,
+      };
+    }));
+  }
 
   // Active-participant threads, each with its latest message visible to me, the
   // cursor-based unread count, and the raw inputs for title resolution. The
@@ -72,6 +95,7 @@ export async function GET(request: NextRequest) {
       timestamp: r.timestamp,
       title: resolveDisplayTitle(r.override_title, subject, nicks),
       unread: Number(r.unread),
+      left: false,
     };
   });
 

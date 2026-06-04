@@ -13,6 +13,7 @@ interface MessageSummary {
   timestamp: number | null;
   title: string;
   unread: number;
+  left?: boolean;
 }
 
 interface ThreadMessage {
@@ -50,6 +51,9 @@ export default function MessagesClient({ userId, userNick, initialReceiverId }: 
   const { openChat, openThread } = useChatContext();
   const [activeTab, setActiveTab] = useState<ActiveTab>(initialReceiverId ? "new" : "conversations");
   const [messages, setMessages] = useState<MessageSummary[]>([]);
+  const [showLeft, setShowLeft] = useState(false);
+  const [leftMessages, setLeftMessages] = useState<MessageSummary[]>([]);
+  const [loadingLeft, setLoadingLeft] = useState(false);
   const [currentThread, setCurrentThread] = useState<ThreadMessage[]>([]);
   const [selectedThreadId, setSelectedThreadId] = useState<number | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string>("");
@@ -137,10 +141,40 @@ export default function MessagesClient({ userId, userNick, initialReceiverId }: 
     setSelectedReceiverId(null);
   }
 
+  async function loadLeftConversations() {
+    setLoadingLeft(true);
+    try {
+      const res = await fetch(`/api/messages?left=1`);
+      if (res.ok) setLeftMessages((await res.json()) as MessageSummary[]);
+    } finally {
+      setLoadingLeft(false);
+    }
+  }
+
+  function toggleShowLeft() {
+    const next = !showLeft;
+    setShowLeft(next);
+    if (next) loadLeftConversations();
+  }
+
   async function deleteThread(threadId: number) {
     await fetch(`/api/messages/${threadId}`, { method: "DELETE" });
     setMessages((prev) => prev.filter((m) => m.thread !== threadId));
     if (selectedThreadId === threadId) closeThread();
+    // The thread is now a left chat; if the left list is showing, refresh it.
+    if (showLeft) loadLeftConversations();
+  }
+
+  async function rejoinThread(threadId: number) {
+    const res = await fetch(`/api/chat/thread/${threadId}/rejoin`, { method: "POST" });
+    if (res.ok) {
+      setLeftMessages((prev) => prev.filter((m) => m.thread !== threadId));
+      if (selectedThreadId === threadId) closeThread();
+      loadConversations();
+      setStatusMsg("Rejoined. The chat is back in your conversations.");
+    } else {
+      setStatusMsg("Could not rejoin that chat.");
+    }
   }
 
   async function openInChat(threadId: number, title: string) {
@@ -245,6 +279,58 @@ export default function MessagesClient({ userId, userNick, initialReceiverId }: 
       {/* Conversations list — hidden while viewing a thread */}
       {activeTab === "conversations" && selectedThreadId === null && (
         <div className="aml-1 amr-1">
+          <div className="row apt-1 apb-1">
+            <div className="col-12">
+              <input
+                type="button"
+                className="btn-big"
+                value={showLeft ? "Hide left chats" : "Show left chats"}
+                onClick={toggleShowLeft}
+              />
+            </div>
+          </div>
+          {showLeft && (
+            <div className="amb-1" style={{ border: "1px solid #333" }}>
+              <div className="row bg-header apl-1 apt-1 apb-1">
+                <div className="col-12 white">Chats you left</div>
+              </div>
+              {loadingLeft && (
+                <div className="row bg-secondary apt-1 apb-1 apl-1">
+                  <div className="col-12 lightgrey">Loading...</div>
+                </div>
+              )}
+              {!loadingLeft && leftMessages.length === 0 && (
+                <div className="row bg-secondary apt-1 apb-1 apl-1">
+                  <div className="col-12 lightgrey">You have not left any chats.</div>
+                </div>
+              )}
+              {leftMessages.map((msg) => (
+                <div
+                  key={`left-${msg.thread}`}
+                  className="row bg-secondary apl-1 apr-1 apt-1 apb-1"
+                  style={{ borderBottom: "1px solid #333" }}
+                >
+                  <div className="col-8 text-truncate">{msg.title}</div>
+                  <div className="col-4 text-right lightgrey small">{formatDate(msg.timestamp)}</div>
+                  <div className="col-12 apt-1">
+                    <input
+                      type="button"
+                      className="btn-big"
+                      value="Read history"
+                      onClick={() => viewThread(msg.thread, msg.title, msg)}
+                    />
+                    {" "}
+                    <input
+                      type="button"
+                      className="btn-big"
+                      value="Rejoin"
+                      onClick={() => rejoinThread(msg.thread)}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
           {loadingMsgs && (
             <div className="row bg-secondary apt-1 apb-1 apl-1">
               <div className="col-12 lightgrey">Loading...</div>
