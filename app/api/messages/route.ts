@@ -6,6 +6,7 @@ import { apiError, apiOk } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { broadcast } from "@/lib/live";
 import { resolveDisplayTitle } from "@/lib/chatThread";
+import { addParticipant } from "@/lib/chatThreadDb";
 
 const postSchema = z.object({
   subject: z.string().min(1).max(500),
@@ -102,6 +103,11 @@ export async function POST(request: NextRequest) {
   `;
   const threadId = inserted[0]?.threadId;
   const fromNick = session.user.name ?? "";
+
+  if (threadId) {
+    await addParticipant(threadId, fromId);
+    await addParticipant(threadId, receiver);
+  }
 
   broadcast(`user:${receiver}:messages`, { type: "message", fromId, fromNick, threadId });
 

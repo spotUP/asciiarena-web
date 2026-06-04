@@ -2,6 +2,8 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
+import { leaveThread } from "@/lib/chatThreadDb";
+import { broadcast } from "@/lib/live";
 
 interface MessageRow {
   id: number;
@@ -56,9 +58,10 @@ export async function DELETE(
   const threadId = parseInt(id);
   const userId = parseInt(session.user.id);
 
-  await prisma.$executeRaw`
-    DELETE FROM messages WHERE thread = ${threadId} AND to_id = ${userId}
-  `;
+  // "Delete" = leave the conversation (non-destructive; messages preserved for
+  // others). The [id] param is the thread id (the client passes threadId here).
+  await leaveThread(threadId, userId);
+  broadcast(`thread:${threadId}`, { type: "member-left", userId });
 
   return apiOk({ status: true });
 }
