@@ -32,7 +32,9 @@ export const FontCache = {
 				// Preload all common fonts
 				await Promise.all(
 					commonFonts.map(async fontName => {
-						const fontUrl = `${State.fontDir}${fontName}.png`;
+						// '+' in a path 404s behind the prod proxy even when %2B-encoded, so
+			// font files with '+' are stored with 'plus' on disk; map name -> file.
+			const fontUrl = `${State.fontDir}${fontName.replace(/\+/g, "plus")}.png`;
 
 						// Check if already cached
 						if (!(await cache.match(fontUrl))) {
@@ -50,7 +52,9 @@ export const FontCache = {
 		} else {
 			// For browsers without Cache API, use fetch and store in memory
 			commonFonts.forEach(fontName => {
-				const fontUrl = `${State.fontDir}${fontName}.png`;
+				// '+' in a path 404s behind the prod proxy even when %2B-encoded, so
+			// font files with '+' are stored with 'plus' on disk; map name -> file.
+			const fontUrl = `${State.fontDir}${fontName.replace(/\+/g, "plus")}.png`;
 
 				if (!this.memoryCache.has(fontName)) {
 					globalThis
@@ -71,7 +75,8 @@ export const FontCache = {
 	 * Get a font from cache
 	 */
 	async getFont(fontName) {
-		const fontUrl = `${State.fontDir}${fontName}.png`;
+		// '+' in a path 404s behind the prod proxy; '+' fonts stored with 'plus'.
+		const fontUrl = `${State.fontDir}${fontName.replace(/\+/g, "plus")}.png`;
 
 		if (this._hasCacheAPI()) {
 			try {

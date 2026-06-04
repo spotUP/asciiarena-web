@@ -809,7 +809,9 @@ const createFontSelect = (el, lbl, img, btn) => {
 				previewInfo.textContent = fontName + ' (not found)';
 				image.src = `${State.fontDir}missing.png`;
 			};
-			image.src = `${State.fontDir}${fontName}.png`;
+			// '+' in a path 404s behind the prod proxy; '+' fonts are stored
+			// with 'plus' on disk (see fontCache.js / font.js).
+			image.src = `${State.fontDir}${fontName.replace(/\+/g, "plus")}.png`;
 		}
 	}
 	// Listeners
