@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { revalidateTag } from "next/cache";
 import { processAnsiUpload } from "@/lib/logoUpload";
+import { measureAsciiText, checkLogoDims } from "@/lib/ansiDims";
 
 const postSchema = z.object({
   ascii: z.string().min(1),
@@ -48,6 +49,9 @@ export async function POST(request: NextRequest) {
   const postParsed = postSchema.safeParse(rawPostBody);
   if (!postParsed.success) return apiError("Invalid request: " + postParsed.error.issues[0]?.message, 400);
   if (!postParsed.data.ascii.trim()) return apiError("ascii content required", 400);
+
+  const dimError = checkLogoDims(measureAsciiText(postParsed.data.ascii));
+  if (dimError) return apiError(dimError, 400);
 
   await prisma.$executeRaw`INSERT INTO logos (ascii) VALUES (${postParsed.data.ascii})`;
   revalidateTag("site:logos", "default");

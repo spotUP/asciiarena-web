@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { measureAnsi, checkLogoDims, MAX_LOGO_COLS, MAX_LOGO_ROWS } from "@/lib/ansiDims";
+import { measureAnsi, measureAsciiText, checkLogoDims, MAX_LOGO_COLS, MAX_LOGO_ROWS } from "@/lib/ansiDims";
 
 const b = (s: string): Uint8Array => new Uint8Array(Buffer.from(s, "latin1"));
 
@@ -38,6 +38,32 @@ describe("measureAnsi", () => {
     const dims = measureAnsi(withSauce("HELLO", 2, 1));
     expect(dims.cols).toBe(5);
     expect(dims.rows).toBe(1);
+  });
+});
+
+describe("measureAsciiText", () => {
+  it("measures longest line as cols and line count as rows", () => {
+    expect(measureAsciiText("AB\nCDE")).toEqual({ cols: 3, rows: 2, source: "measured" });
+  });
+
+  it("ignores a single trailing newline's empty row", () => {
+    expect(measureAsciiText("AB\nCDE\n")).toEqual({ cols: 3, rows: 2, source: "measured" });
+  });
+
+  it("normalises CRLF line endings", () => {
+    expect(measureAsciiText("AB\r\nCDE")).toEqual({ cols: 3, rows: 2, source: "measured" });
+  });
+
+  it("counts CP437/box-drawing glyphs as one column each", () => {
+    // 4 box-drawing chars -> 4 cols, not their UTF-16 length
+    expect(measureAsciiText("░▒▓█")).toEqual({ cols: 4, rows: 1, source: "measured" });
+  });
+
+  it("accepts an 80x8 logo but flags one column/row over", () => {
+    const ok = "X".repeat(80) + "\n";
+    expect(checkLogoDims(measureAsciiText(ok.repeat(8)))).toBeNull();
+    expect(checkLogoDims(measureAsciiText("X".repeat(81)))).toContain("columns wide");
+    expect(checkLogoDims(measureAsciiText("X\n".repeat(9)))).toContain("rows tall");
   });
 });
 

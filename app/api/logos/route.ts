@@ -5,6 +5,7 @@ import { apiError, apiOk } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { revalidateTag } from "next/cache";
 import { processAnsiUpload } from "@/lib/logoUpload";
+import { measureAsciiText, checkLogoDims } from "@/lib/ansiDims";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -37,6 +38,9 @@ export async function POST(request: NextRequest) {
   const ascii = String(body.ascii ?? "");
 
   if (!ascii) return apiError("ascii is required", 400);
+
+  const dimError = checkLogoDims(measureAsciiText(ascii));
+  if (dimError) return apiError(dimError, 400);
 
   await prisma.$executeRaw(
     Prisma.sql`INSERT INTO logos (author, ascii) VALUES (${author}, ${ascii})`

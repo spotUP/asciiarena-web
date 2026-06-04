@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Combobox from "@/components/ui/Combobox";
 import DosSelect from "@/components/ui/DosSelect";
 import { FONTS } from "@/lib/ansilove";
+import { measureAsciiText, checkLogoDims, MAX_LOGO_COLS, MAX_LOGO_ROWS } from "@/lib/ansiDims";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -146,6 +147,10 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
   const [logoAscii, setLogoAscii] = useState("");
   const [logoAnsiFont, setLogoAnsiFont] = useState("");
   const logoAnsiRef = useRef<HTMLInputElement>(null);
+
+  // Live size of the ASCII logo against the 80x8 header limit.
+  const logoDims = useMemo(() => measureAsciiText(logoAscii), [logoAscii]);
+  const logoDimError = logoAscii.trim() ? checkLogoDims(logoDims) : null;
 
   // ── Hash sync ──────────────────────────────────────────────────────────────
 
@@ -395,6 +400,10 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
     e.preventDefault();
     if (!logoAscii.trim()) {
       setStatus({ msg: "ASCII art is required.", ok: false });
+      return;
+    }
+    if (logoDimError) {
+      setStatus({ msg: logoDimError, ok: false });
       return;
     }
     const r = await fetch("/api/logos", {
@@ -756,17 +765,59 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
               <input type="text" className="form-control w-100" value={logoAuthor} onChange={e => setLogoAuthor(e.target.value)} placeholder="Your handle" />
             </Field>
             <Field label="ASCII Art" required>
-              <textarea
-                className="form-control w-100"
-                value={logoAscii}
-                onChange={e => setLogoAscii(e.target.value)}
-                placeholder="Paste your ASCII logo here..."
-                rows={10}
-                style={{ fontFamily: "TopazPlus_a1200, monospace", whiteSpace: "pre" }}
-              />
+              <div className="lightgrey amb-1" style={{ fontFamily: "TopazPlus_a1200, monospace", fontSize: "16px", lineHeight: "16px" }}>
+                The box below is exactly {MAX_LOGO_COLS} &times; {MAX_LOGO_ROWS} characters — the header limit. Anything past
+                its edges is over the limit and will be rejected.
+              </div>
+              {/* Horizontal scroll so the canvas keeps its true 80-col width on
+                  narrow screens instead of soft-wrapping (which would hide the
+                  real column count). */}
+              <div style={{ overflowX: "auto", maxWidth: "100%" }}>
+                <textarea
+                  value={logoAscii}
+                  onChange={e => setLogoAscii(e.target.value)}
+                  placeholder="Paste your ASCII logo here..."
+                  cols={MAX_LOGO_COLS}
+                  rows={MAX_LOGO_ROWS}
+                  wrap="off"
+                  spellCheck={false}
+                  style={{
+                    // Exact 80x8 grid: 8px per char wide, 16px per row tall, no
+                    // padding so glyphs land on the cell grid.
+                    fontFamily: "TopazPlus_a1200, monospace",
+                    fontSize: "16px",
+                    lineHeight: "16px",
+                    whiteSpace: "pre",
+                    width: `${MAX_LOGO_COLS}ch`,
+                    height: `${MAX_LOGO_ROWS * 16}px`,
+                    padding: 0,
+                    margin: 0,
+                    resize: "none",
+                    overflow: "auto",
+                    boxSizing: "content-box",
+                    background: "#000000",
+                    color: "#ffffff",
+                    border: `2px solid ${logoDimError ? "#ff5555" : "#00aa00"}`,
+                    display: "block",
+                  }}
+                />
+              </div>
+              <div className="amt-1" style={{ fontFamily: "TopazPlus_a1200, monospace", fontSize: "16px", lineHeight: "16px" }}>
+                <span className={logoDimError ? "red" : "green"}>
+                  {logoDims.cols} &times; {logoDims.rows}
+                </span>
+                <span className="lightgrey"> / {MAX_LOGO_COLS} &times; {MAX_LOGO_ROWS} max</span>
+                {logoDimError && <span className="red"> &mdash; over the limit</span>}
+              </div>
             </Field>
             <div className="amt-1">
-              <input type="submit" className="btn-big bg-green white" value="Submit Logo" />
+              <input
+                type="submit"
+                className="btn-big bg-green white"
+                value="Submit Logo"
+                disabled={!!logoDimError}
+                style={logoDimError ? { opacity: 0.5, cursor: "not-allowed" } : undefined}
+              />
             </div>
           </form>
 

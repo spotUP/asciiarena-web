@@ -90,6 +90,18 @@ export function measureAnsi(bytes: Uint8Array): AnsiDims {
   return { cols: measured.cols, rows: measured.rows, source: "measured" };
 }
 
+// Measure plain ASCII-art text from the logo editor (a string, not bytes):
+// rows = line count, cols = the longest line's visible character count. Counts
+// Unicode code points so CP437/box-drawing glyphs each count as one column. A
+// single trailing newline doesn't add a phantom empty row.
+export function measureAsciiText(text: string): AnsiDims {
+  const lines = text.replace(/\r\n?/g, "\n").split("\n");
+  if (lines.length > 1 && lines[lines.length - 1] === "") lines.pop();
+  let cols = 0;
+  for (const line of lines) cols = Math.max(cols, [...line].length);
+  return { cols, rows: Math.max(1, lines.length), source: "measured" };
+}
+
 // Header-logo limits. ANSI logos render in the rotating site header on every
 // page, so cap them to a sensible banner size. Tunable.
 export const MAX_LOGO_COLS = 80;
