@@ -2448,3 +2448,21 @@
 .ansi-editor-root #palettePicker {
   height: 128px;
 }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   asciiarena CHANGE 1: font-name display must render on ONE line.
+   The header font-name chip (#currentFontDisplay kbd) holds strings like
+   "Topaz+ 1200" which wrapped across two lines (the chip had no nowrap and a
+   narrow box), pushing the header taller than the 43px strip and reading as a
+   broken two-line label. Force single-line and let the chip take the width it
+   needs. Additive override — appended last so it wins. */
+.ansi-editor-root #currentFontDisplay {
+  white-space: nowrap;
+  flex: 0 0 auto;
+  overflow: visible;
+}
+.ansi-editor-root #currentFontDisplay kbd {
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+}
