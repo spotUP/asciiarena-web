@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback, KeyboardEvent } from "react";
 import { useChatContext } from "./ChatContext";
 import { playChatAlert, unlockChatAudio } from "@/lib/chatSound";
+import { resolveDisplayTitle } from "@/lib/chatThread";
 
 interface ChatMessage {
   id: number;
@@ -37,16 +38,20 @@ function formatTime(ts: number | null): string {
 }
 
 export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title, participants, minimized, userId, userNick, popout = false }: Props) {
-  const { closeChat, minimizeChat, setThreadId, markRead, incrementUnread } = useChatContext();
+  const { closeChat, minimizeChat, setThreadId, markRead, incrementUnread, setParticipants } = useChatContext();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [peerDraft, setPeerDraft] = useState<{ nick: string; text: string } | null>(null);
   const [sending, setSending] = useState(false);
   const [flashing, setFlashing] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [addSearch, setAddSearch] = useState("");
+  const [addSuggestions, setAddSuggestions] = useState<Array<{ id: number; nick: string }>>([]);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const typingDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const addDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const esMessagesRef = useRef<EventSource | null>(null);
   const esTypingRef = useRef<EventSource | null>(null);
   const threadIdRef = useRef<number | null>(threadId);
@@ -162,6 +167,7 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
       if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
       if (typingDebounceRef.current) clearTimeout(typingDebounceRef.current);
       if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+      if (addDebounceRef.current) clearTimeout(addDebounceRef.current);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -214,6 +220,48 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
         body: JSON.stringify({ channel: `thread:${tid}:typing`, type: text ? "typing" : "clear", nick: userNick, draft: text.slice(0, 120) }),
       }).catch(() => {});
     }, 50);
+  };
+
+  const fetchAddSuggestions = (q: string) => {
+    if (addDebounceRef.current) clearTimeout(addDebounceRef.current);
+    if (q.length < 1) { setAddSuggestions([]); return; }
+    addDebounceRef.current = setTimeout(() => {
+      fetch(`/api/chat/users?q=${encodeURIComponent(q)}`)
+        .then(r => r.json())
+        .then((data: unknown) => {
+          if (Array.isArray(data)) setAddSuggestions(data as Array<{ id: number; nick: string }>);
+        })
+        .catch(() => {});
+    }, 150);
+  };
+
+  const selectAddMember = (s: { id: number; nick: string }) => {
+    const tid = threadIdRef.current;
+    if (!tid) return;
+    fetch(`/api/chat/thread/${tid}/members`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: s.id }),
+    })
+      .then(res => {
+        if (!res.ok) return;
+        return fetch(`/api/chat/thread/${tid}/members`)
+          .then(r => r.json())
+          .then((list: unknown) => {
+            if (!Array.isArray(list)) return;
+            const members = list as Array<{ userId: number; nick: string }>;
+            const others = members
+              .filter(p => p.userId !== parseInt(userId))
+              .map(p => ({ id: p.userId, nick: p.nick }));
+            setParticipants(windowKey, others, resolveDisplayTitle(null, null, others.map(o => o.nick)));
+          });
+      })
+      .catch(() => {})
+      .finally(() => {
+        setAddOpen(false);
+        setAddSearch("");
+        setAddSuggestions([]);
+      });
   };
 
   const sendMessage = async () => {
@@ -336,7 +384,7 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
             </span>
           )}
         </span>
-        <span style={{ display: "flex", gap: "4px", flexShrink: 0 }}>
+        <span style={{ display: "flex", gap: "4px", flexShrink: 0, position: "relative" }}>
           {threadId ? (
             <button onClick={(e) => { e.stopPropagation(); sendAlert(); }}
               title="Alert everyone in this chat"
@@ -344,6 +392,59 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
               !
             </button>
           ) : null}
+          {threadId ? (
+            <button
+              onClick={(e) => { e.stopPropagation(); setAddOpen(o => !o); setAddSearch(""); setAddSuggestions([]); }}
+              title="Add member to this chat"
+              style={{ background: "none", border: "none", color: "#aaa", cursor: "pointer", padding: "0 2px", fontFamily: "inherit" }}>
+              +
+            </button>
+          ) : null}
+          {addOpen && (
+            <div
+              style={{
+                position: "absolute", top: "100%", right: 0,
+                backgroundColor: "#212121", border: "1px solid #444",
+                padding: "6px", display: "flex", flexDirection: "column", gap: "4px",
+                minWidth: "160px", zIndex: 100,
+              }}
+              onMouseDown={e => e.stopPropagation()}
+            >
+              <input
+                type="text"
+                value={addSearch}
+                onChange={e => { setAddSearch(e.target.value); fetchAddSuggestions(e.target.value); }}
+                onKeyDown={e => {
+                  e.stopPropagation();
+                  if (e.key === "Escape") { setAddOpen(false); setAddSearch(""); setAddSuggestions([]); }
+                }}
+                placeholder="nick..."
+                autoFocus
+                style={{
+                  background: "#111", border: "1px solid #444", color: "#aaaaaa",
+                  fontFamily: "TopazPlus_a1200, monospace", fontSize: "16px", lineHeight: "16px",
+                  padding: "0 8px",
+                }}
+              />
+              {addSuggestions.length > 0 && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "1px", marginTop: "2px" }}>
+                  {addSuggestions.map(s => (
+                    <button
+                      key={s.id}
+                      onMouseDown={e => { e.preventDefault(); selectAddMember(s); }}
+                      style={{
+                        background: "#1a1a1a", border: "1px solid #333", color: "#ffff55",
+                        cursor: "pointer", fontFamily: "TopazPlus_a1200, monospace", fontSize: "13px",
+                        padding: "2px 4px", textAlign: "left",
+                      }}
+                    >
+                      {s.nick}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
           {!popout && !isGroup && (
             <button onClick={(e) => { e.stopPropagation(); openPopout(); }}
               title="Pop out to a separate window"
