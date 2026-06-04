@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { broadcast } from "@/lib/live";
+import { deriveThreadId } from "@/lib/threadId";
 
 const postSchema = z.object({
   comment: z.string().min(1).max(5000),
@@ -95,14 +96,25 @@ export async function POST(
       const subject = `New attachment on your request`;
       const msgtext = `${nick} attached a file (${filename}) to your request #${requestId}.`;
 
-      await prisma.$executeRaw`
-        INSERT INTO messages (thread, from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
-        SELECT IFNULL(MAX(thread) + 1, 1), ${userId}, ${authorId},
-               (SELECT nick FROM users WHERE id = ${authorId}),
-               (SELECT nick FROM users WHERE id = ${userId}),
-               UNIX_TIMESTAMP(), ${subject}, ${msgtext}, 1, 1
-        FROM messages
-      `;
+      // New thread id = the inserted message's own auto-increment id. Using
+      // IFNULL(MAX(thread)+1,1) here corrupted threading: max+1 is the value the
+      // next message's id (and thus a future "thread = own id" compose) will
+      // take, merging two unrelated conversations. Mirror the compose path:
+      // insert, then set thread = LAST_INSERT_ID() — unique, idempotent, never
+      // overflows the signed-INT thread column.
+      await prisma.$transaction(async (tx) => {
+        await tx.$executeRaw`
+          INSERT INTO messages (thread, from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
+          VALUES (
+            NULL, ${userId}, ${authorId},
+            (SELECT nick FROM users WHERE id = ${authorId}),
+            (SELECT nick FROM users WHERE id = ${userId}),
+            UNIX_TIMESTAMP(), ${subject}, ${msgtext}, 1, 1
+          )`;
+        const inserted = await tx.$queryRaw<[{ msgId: number | bigint }]>`SELECT LAST_INSERT_ID() AS msgId`;
+        const threadId = deriveThreadId(inserted[0]?.msgId ?? 0);
+        await tx.$executeRaw`UPDATE messages SET thread = ${threadId} WHERE id = ${threadId}`;
+      });
     }
   }
 
