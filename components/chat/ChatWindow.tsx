@@ -410,7 +410,7 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
                   ? (msg.postername ?? userNick)
                   : (msg.postername
                       ?? participants.find(p => p.id === msg.from_id)?.nick
-                      ?? title)}
+                      ?? "?")}
               </span>
               <span className="lightgrey" style={{ fontSize: "11px" }}>{formatTime(msg.timestamp)}</span>
               <div style={{ color: "#aaaaaa", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>

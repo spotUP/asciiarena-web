@@ -88,7 +88,10 @@ export function ChatContextProvider({ children }: { children: ReactNode }) {
           unread: startMinimized ? w.unread + initialUnread : 0,
         } : w);
       }
-      return capWindows([...prev, {
+      // Canonical key per thread: drop any other window already showing this
+      // thread (e.g. a DM p:-window with the same threadId) so we never twin it.
+      const deduped = prev.filter(w => w.threadId !== threadId);
+      return capWindows([...deduped, {
         key, threadId, isGroup: true, peerId: placeholderPeer, title, participants,
         minimized: startMinimized, unread: initialUnread,
       }]);
@@ -102,6 +105,7 @@ export function ChatContextProvider({ children }: { children: ReactNode }) {
   const minimizeChat = useCallback((key: string, minimized: boolean) => {
     setWindows(prev => {
       const w = prev.find(x => x.key === key);
+      // Snooze is DM-only by construction; groups never reach here because !w.isGroup guards it.
       if (w && !w.isGroup) { if (minimized) setSnooze(w.peerId); else clearSnooze(w.peerId); }
       return prev.map(x => x.key === key ? { ...x, minimized } : x);
     });
@@ -121,7 +125,11 @@ export function ChatContextProvider({ children }: { children: ReactNode }) {
 
   const setParticipants = useCallback((key: string, participants: ChatParticipant[], title: string) => {
     setWindows(prev => prev.map(w => w.key === key
-      ? { ...w, participants, title, isGroup: participants.length > 1, peerId: participants[0]?.id ?? w.peerId }
+      ? { ...w, participants, title,
+          // The key prefix is the source of truth for group-ness, not the mutable
+          // member count: a t:-keyed window stays a group even if it drops to 1.
+          isGroup: key.startsWith("t:") || participants.length > 1,
+          peerId: participants[0]?.id ?? w.peerId }
       : w));
   }, []);
 
