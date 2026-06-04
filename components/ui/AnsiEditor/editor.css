@@ -2294,3 +2294,82 @@
   max-height: var(--header-size);
   overflow: hidden;
 }
+
+/* asciiarena: double-prefix sweep for VISIBLE header chrome.
+   The Tailwind compile turned every upstream nested rule
+   `A { B { … } }` into `.ansi-editor-root A .ansi-editor-root B`, which can
+   never match (only one .ansi-editor-root exists). Several of those governed
+   header button / kbd / icon sizing, so the elements fell back to UA defaults
+   (e.g. the file/edit <button> stretched to ~256x48). Re-impose the intended
+   sizing with single-scope selectors. Additive — appended overrides only. */
+
+/* Header control heights: upstream `header { button/#resolution/#currentFontDisplay
+   { height: var(--header-size) } }` was double-prefixed and dead. Without it
+   these controls collapse to content height and sit misaligned in the strip.
+   Scoped to <nav>'s direct buttons so the menuTitle buttons (handled below at
+   a fixed 40x40) are left alone. */
+.ansi-editor-root #bodyContainer > header > nav > button,
+.ansi-editor-root #bodyContainer > header #resolution,
+.ansi-editor-root #bodyContainer > header #currentFontDisplay {
+  height: var(--header-size);
+}
+.ansi-editor-root #bodyContainer > header > nav > button:hover {
+  background-color: var(--color-hl);
+}
+
+/* File/Edit menu buttons: the upstream `.menuTitle { button { 40x40 } }`
+   double-prefixed to a dead selector, so the buttons rendered ~256x48.
+   Pin them back to the 40px icon square. The #id raises specificity above the
+   nav-button height rule, and flex-shrink:0 + align-self stops the parent
+   flex row from stretching them past 40px. */
+.ansi-editor-root .menuTitle button#file,
+.ansi-editor-root .menuTitle button#edit {
+  width: 40px;
+  height: 40px;
+  /* A site-wide `button { min-height: 48px }` leaks in and would override the
+     40px height; pin min-height down too. */
+  min-height: 40px;
+  flex: 0 0 auto;
+  align-self: center;
+  border: none;
+  background-color: transparent;
+  padding-right: 4px;
+}
+
+/* Resolution / font-name <kbd> chips: the highlight background + inline padding
+   lived in a double-prefixed `header { #resolution kbd { … } }` block. The pill
+   look was lost (bare text). Restore the chip styling and spacing. */
+.ansi-editor-root #resolution kbd,
+.ansi-editor-root #currentFontDisplay kbd {
+  background-color: var(--color-lbl);
+  padding-inline: 8px;
+  padding-block: 1px;
+}
+.ansi-editor-root #resolution kbd {
+  margin-right: 2px;
+}
+.ansi-editor-root #currentFontDisplay kbd {
+  margin-inline: 4px;
+}
+
+/* Left sidebar (aside) tool cells: the upstream `aside { > div { padding/hover } }`
+   double-prefixed and died, so the tool icons had no padding/hover affordance.
+   Re-impose the per-cell layout + hover. */
+.ansi-editor-root aside > div {
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-block: 4px;
+  text-align: center;
+}
+.ansi-editor-root aside > div:hover {
+  background-color: var(--color-hl);
+}
+
+/* Position info (cursor x/y readout): keep its small mono readout legible and
+   from collapsing — the upstream block survived single-prefixed, but pin the
+   min-width here so it doesn't jump around as the digits change. */
+.ansi-editor-root #positionInfo {
+  min-width: 50px;
+}
