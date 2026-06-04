@@ -1,0 +1,2170 @@
+/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+@layer properties;
+@layer theme, base, components, utilities;
+@layer theme {
+  :root, :host {
+    --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+      "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+    --color-gray-950: oklch(13% 0.028 261.692);
+    --color-black: #000;
+    --color-white: #fff;
+    --spacing: 0.25rem;
+    --container-3xs: 16rem;
+    --text-xs: 0.75rem;
+    --text-xs--line-height: calc(1 / 0.75);
+    --text-sm: 0.875rem;
+    --text-sm--line-height: calc(1.25 / 0.875);
+    --text-base: 1rem;
+    --text-base--line-height: calc(1.5 / 1);
+    --text-lg: 1.125rem;
+    --text-lg--line-height: calc(1.75 / 1.125);
+    --text-xl: 1.25rem;
+    --text-xl--line-height: calc(1.75 / 1.25);
+    --text-2xl: 1.5rem;
+    --text-2xl--line-height: calc(2 / 1.5);
+    --text-3xl: 1.875rem;
+    --text-3xl--line-height: calc(2.25 / 1.875);
+    --radius-xs: 0.125rem;
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --default-transition-duration: 150ms;
+    --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    --default-font-family: var(--font-sans);
+    --default-mono-font-family: var(--font-mono);
+    --color-lbl: var(--light-tools);
+    --color-header: var(--header);
+    --color-cyan: var(--cyan);
+    --color-purp: var(--light-purp);
+    --color-indigo: var(--indigo);
+    --color-cyber: var(--cyber);
+    --color-subtitle: var(--subtitle);
+    --color-chat: var(--chat);
+    --color-fg: var(--light-fg);
+    --color-editor: var(--light-editor);
+    --color-menu: var(--light-menu);
+    --color-panel: var(--light-panel);
+    --color-icon: var(--light-icon);
+    --color-icon-hover: var(--light-icon-hover);
+    --color-tools: var(--light-tools);
+    --color-hl: var(--light-hl);
+    --color-midnight: var(--midnight);
+    --color-file: var(--light-file);
+    --color-iron: var(--iron);
+    --color-thumb: var(--chat);
+  }
+}
+@layer base {
+  .ansi-editor-root *, .ansi-editor-root ::after, .ansi-editor-root ::before, .ansi-editor-root ::backdrop, .ansi-editor-root ::file-selector-button {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0 solid;
+  }
+  .ansi-editor-root, :host {
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    tab-size: 4;
+    font-family: var(--default-font-family, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");
+    font-feature-settings: var(--default-font-feature-settings, normal);
+    font-variation-settings: var(--default-font-variation-settings, normal);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ansi-editor-root hr {
+    height: 0;
+    color: inherit;
+    border-top-width: 1px;
+  }
+  .ansi-editor-root abbr:where([title]) {
+    -webkit-text-decoration: underline dotted;
+    text-decoration: underline dotted;
+  }
+  .ansi-editor-root h1, .ansi-editor-root h2, .ansi-editor-root h3, .ansi-editor-root h4, .ansi-editor-root h5, .ansi-editor-root h6 {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  .ansi-editor-root a {
+    color: inherit;
+    -webkit-text-decoration: inherit;
+    text-decoration: inherit;
+  }
+  .ansi-editor-root b, .ansi-editor-root strong {
+    font-weight: bolder;
+  }
+  .ansi-editor-root code, .ansi-editor-root kbd, .ansi-editor-root samp, .ansi-editor-root pre {
+    font-family: var(--default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);
+    font-feature-settings: var(--default-mono-font-feature-settings, normal);
+    font-variation-settings: var(--default-mono-font-variation-settings, normal);
+    font-size: 1em;
+  }
+  .ansi-editor-root small {
+    font-size: 80%;
+  }
+  .ansi-editor-root sub, .ansi-editor-root sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+  }
+  .ansi-editor-root sub {
+    bottom: -0.25em;
+  }
+  .ansi-editor-root sup {
+    top: -0.5em;
+  }
+  .ansi-editor-root table {
+    text-indent: 0;
+    border-color: inherit;
+    border-collapse: collapse;
+  }
+  .ansi-editor-root :-moz-focusring {
+    outline: auto;
+  }
+  .ansi-editor-root progress {
+    vertical-align: baseline;
+  }
+  .ansi-editor-root summary {
+    display: list-item;
+  }
+  .ansi-editor-root ol, .ansi-editor-root ul, .ansi-editor-root menu {
+    list-style: none;
+  }
+  .ansi-editor-root img, .ansi-editor-root svg, .ansi-editor-root video, .ansi-editor-root canvas, .ansi-editor-root audio, .ansi-editor-root iframe, .ansi-editor-root embed, .ansi-editor-root object {
+    display: block;
+    vertical-align: middle;
+  }
+  .ansi-editor-root img, .ansi-editor-root video {
+    max-width: 100%;
+    height: auto;
+  }
+  .ansi-editor-root button, .ansi-editor-root input, .ansi-editor-root select, .ansi-editor-root optgroup, .ansi-editor-root textarea, .ansi-editor-root ::file-selector-button {
+    font: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    border-radius: 0;
+    background-color: transparent;
+    opacity: 1;
+  }
+  .ansi-editor-root :where(select:is([multiple], [size])) optgroup {
+    font-weight: bolder;
+  }
+  .ansi-editor-root :where(select:is([multiple], [size])) optgroup option {
+    padding-inline-start: 20px;
+  }
+  .ansi-editor-root ::file-selector-button {
+    margin-inline-end: 4px;
+  }
+  .ansi-editor-root ::placeholder {
+    opacity: 1;
+  }
+  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {
+    .ansi-editor-root ::placeholder {
+      color: currentcolor;
+      @supports (color: color-mix(in lab, red, red)) {
+        color: color-mix(in oklab, currentcolor 50%, transparent);
+      }
+    }
+  }
+  .ansi-editor-root textarea {
+    resize: vertical;
+  }
+  .ansi-editor-root ::-webkit-search-decoration {
+    -webkit-appearance: none;
+  }
+  .ansi-editor-root ::-webkit-date-and-time-value {
+    min-height: 1lh;
+    text-align: inherit;
+  }
+  .ansi-editor-root ::-webkit-datetime-edit {
+    display: inline-flex;
+  }
+  .ansi-editor-root ::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+  }
+  .ansi-editor-root ::-webkit-datetime-edit, .ansi-editor-root ::-webkit-datetime-edit-year-field, .ansi-editor-root ::-webkit-datetime-edit-month-field, .ansi-editor-root ::-webkit-datetime-edit-day-field, .ansi-editor-root ::-webkit-datetime-edit-hour-field, .ansi-editor-root ::-webkit-datetime-edit-minute-field, .ansi-editor-root ::-webkit-datetime-edit-second-field, .ansi-editor-root ::-webkit-datetime-edit-millisecond-field, .ansi-editor-root ::-webkit-datetime-edit-meridiem-field {
+    padding-block: 0;
+  }
+  .ansi-editor-root ::-webkit-calendar-picker-indicator {
+    line-height: 1;
+  }
+  .ansi-editor-root :-moz-ui-invalid {
+    box-shadow: none;
+  }
+  .ansi-editor-root button, .ansi-editor-root input:where([type="button"], [type="reset"], [type="submit"]), .ansi-editor-root ::file-selector-button {
+    appearance: button;
+  }
+  .ansi-editor-root ::-webkit-inner-spin-button, .ansi-editor-root ::-webkit-outer-spin-button {
+    height: auto;
+  }
+  .ansi-editor-root [hidden]:where(:not([hidden="until-found"])) {
+    display: none !important;
+  }
+}
+@layer utilities {
+  .ansi-editor-root .invisible {
+    visibility: hidden;
+  }
+  .ansi-editor-root .visible {
+    visibility: visible;
+  }
+  .ansi-editor-root .absolute {
+    position: absolute;
+  }
+  .ansi-editor-root .fixed {
+    position: fixed;
+  }
+  .ansi-editor-root .relative {
+    position: relative;
+  }
+  .ansi-editor-root .static {
+    position: static;
+  }
+  .ansi-editor-root .isolate {
+    isolation: isolate;
+  }
+  .ansi-editor-root .container {
+    width: 100%;
+    @media (width >= 30rem) {
+      max-width: 30rem;
+    }
+    @media (width >= 40rem) {
+      max-width: 40rem;
+    }
+    @media (width >= 48rem) {
+      max-width: 48rem;
+    }
+    @media (width >= 64rem) {
+      max-width: 64rem;
+    }
+    @media (width >= 80rem) {
+      max-width: 80rem;
+    }
+    @media (width >= 100rem) {
+      max-width: 100rem;
+    }
+    @media (width >= 120rem) {
+      max-width: 120rem;
+    }
+  }
+  .ansi-editor-root .block {
+    display: block;
+  }
+  .ansi-editor-root .contents {
+    display: contents;
+  }
+  .ansi-editor-root .flex {
+    display: flex;
+  }
+  .ansi-editor-root .grid {
+    display: grid;
+  }
+  .ansi-editor-root .hidden {
+    display: none;
+  }
+  .ansi-editor-root .inline {
+    display: inline;
+  }
+  .ansi-editor-root .table {
+    display: table;
+  }
+  .ansi-editor-root .transform {
+    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
+  }
+  .ansi-editor-root .resize {
+    resize: both;
+  }
+  .ansi-editor-root .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ansi-editor-root .border {
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+  }
+  .ansi-editor-root .lowercase {
+    text-transform: lowercase;
+  }
+  .ansi-editor-root .uppercase {
+    text-transform: uppercase;
+  }
+  .ansi-editor-root .shadow {
+    --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .ansi-editor-root .outline {
+    outline-style: var(--tw-outline-style);
+    outline-width: 1px;
+  }
+  .ansi-editor-root .blur {
+    --tw-blur: blur(8px);
+    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
+  }
+  .ansi-editor-root .filter {
+    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
+  }
+  .ansi-editor-root .transition {
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, content-visibility, overlay, pointer-events;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+}
+:root {
+  overscroll-behavior: none;
+  overflow-x: clip;
+  overflow-x: hidden;
+  --light-fg: #fff;
+  --dark-fg: #efefef;
+  --light-editor: #404040;
+  --dark-editor: #222;
+  --light-menu: #4f4f4f;
+  --dark-menu: #333;
+  --light-file: #5f5f5f;
+  --dark-file: #444;
+  --light-panel: #3f3f3f;
+  --dark-panel: #444;
+  --light-icon: #fff;
+  --dark-icon: #efefef;
+  --light-icon-hover: #efefef;
+  --dark-icon-hover: #fff;
+  --light-tools: #303030;
+  --dark-tools: #4e4e4e;
+  --light-hl: #222;
+  --dark-hl: #000;
+  --light-purp: #611896;
+  --dark-purp: #6e2aa5;
+  --indigo: #6366f1;
+  --cyber: #00bad7;
+  --cyan: #22d3ee;
+  --header: #5f5f5f;
+  --subtitle: #999;
+  --chat: #ababab;
+  --silver: #c0c0c0;
+  --iron: #666;
+  --midnight: #000;
+  --header-size: 43px;
+  --icon-size: 46px;
+  --icon-size-sm: 36px;
+  --palette-width: 200px;
+  --palette-height: 53px;
+  --font-family: TopazPlus, ui-monospace, Consolas, SFMono-Regular, Menlo, Monaco,
+		'Liberation Mono', 'Courier New', monospace;
+}
+.ansi-editor-root .dark {
+  --color-lbl: var(--midnight);
+  --color-purp: var(--dark-purp);
+  --color-fg: var(--dark-fg);
+  --color-editor: var(--dark-editor);
+  --color-menu: var(--dark-menu);
+  --color-icon: var(--dark-icon);
+  --color-panel: var(--dark-panel);
+  --color-icon-hover: var(--dark-icon-hover);
+  --color-tools: var(--dark-tools);
+  --color-hl: var(--dark-hl);
+  --color-file: var(--dark-file);
+  --color-thumb: var(--dark-tools);
+  .ansi-editor-root dialog::backdrop {
+    background: radial-gradient(	circle,	rgba(0, 0, 0, 0.13) 0%,	rgba(0, 0, 0, 0.23) 50%,	rgba(0, 0, 0, 0.53) 100%	);
+  }
+}
+@font-face {
+  font-family: TopazPlus;
+  src: url('/ansi-editor/topazplus_1200.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@layer base {
+  .ansi-editor-root * {
+    font-family: var(--font-family);
+    -webkit-touch-callout: none !important;
+    user-select: none !important;
+    -ms-user-select: none !important;
+    -webkit-user-select: none !important;
+    font-weight: normal;
+    font-style: normal;
+    outline: none;
+    .ansi-editor-root &:focus {
+      outline: none;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ansi-editor-root * {
+      transition-property: all;
+      transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+      transition-duration: var(--tw-duration, var(--default-transition-duration));
+      --tw-ease: var(--ease-in-out);
+      transition-timing-function: var(--ease-in-out);
+    }
+    .ansi-editor-root canvas {
+      transition-property: none !important;
+    }
+  }
+  .ansi-editor-root .scrollable {
+    scrollbar-width: auto;
+    scrollbar-color: var(--menu) var(--editor);
+  }
+  .ansi-editor-root {
+    margin: calc(var(--spacing) * 0);
+    height: 100%;
+    width: 100%;
+  }
+  .ansi-editor-root {
+    position: fixed;
+    top: calc(var(--spacing) * 0);
+    right: calc(var(--spacing) * 0);
+    bottom: calc(var(--spacing) * 0);
+    left: calc(var(--spacing) * 0);
+    margin: calc(var(--spacing) * 0);
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background-color: var(--color-black);
+    .ansi-editor-root > div {
+      margin: calc(var(--spacing) * 0);
+      height: 100%;
+      width: 100%;
+    }
+  }
+  .ansi-editor-root img,	.ansi-editor-root svg {
+    user-select: none;
+    -moz-user-drag: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+  }
+  .ansi-editor-root kbd {
+    font-family: var(--font-family);
+  }
+  .ansi-editor-root a,	.ansi-editor-root a:visited {
+    color: var(--color-cyan);
+    text-decoration-thickness: 0px;
+    .ansi-editor-root &:hover {
+      background-color: var(--color-cyan);
+      color: var(--color-fg);
+    }
+  }
+  .ansi-editor-root #bodyContainer {
+    height: 100%;
+    width: 100%;
+    overflow-y: hidden;
+  }
+  .ansi-editor-root .loading * {
+    cursor: wait !important;
+  }
+  .ansi-editor-root h1 {
+    font-size: var(--text-3xl);
+    line-height: var(--tw-leading, var(--text-3xl--line-height));
+    color: var(--color-cyan);
+  }
+  .ansi-editor-root h2,	.ansi-editor-root section h2 {
+    font-size: var(--text-2xl);
+    line-height: var(--tw-leading, var(--text-2xl--line-height));
+    color: var(--color-cyan);
+  }
+  .ansi-editor-root header,	.ansi-editor-root aside,	.ansi-editor-root #positionInfo {
+    background-color: var(--color-menu);
+  }
+  .ansi-editor-root header {
+    display: flex;
+    height: var(--header-size);
+    width: 100%;
+    justify-content: space-between;
+    .ansi-editor-root &.dynamic {
+      -webkit-app-region: drag;
+      app-region: drag;
+      padding-left: calc(env(titlebar-area-x, 0px) + 2px);
+      padding-right: calc(env(titlebar-area-x, 0px) + 25px);
+    }
+    .ansi-editor-root * {
+      margin-block: auto;
+    }
+    .ansi-editor-root nav {
+      -webkit-app-region: no-drag;
+      app-region: no-drag;
+      .ansi-editor-root div {
+        display: flex;
+      }
+    }
+    .ansi-editor-root svg {
+      height: 30px;
+      width: 30px;
+      fill: var(--color-fg);
+    }
+    .ansi-editor-root button,	.ansi-editor-root #resolution,	.ansi-editor-root #currentFontDisplay {
+      height: var(--header-size);
+    }
+    .ansi-editor-root button:hover {
+      background-color: var(--color-hl);
+    }
+    .ansi-editor-root #resolution kbd {
+      margin-right: calc(var(--spacing) * 0.5);
+    }
+    .ansi-editor-root #currentFontDisplay kbd {
+      margin-inline: calc(var(--spacing) * 1);
+    }
+    .ansi-editor-root #resolution,	.ansi-editor-root #currentFontDisplay {
+      .ansi-editor-root &:hover {
+        .ansi-editor-root kbd {
+          background-color: var(--color-purp);
+        }
+      }
+    }
+  }
+  .ansi-editor-root #chatButton {
+    float: right;
+    color: var(--color-fg);
+    font-size: 10px;
+    line-height: 19px;
+    padding: 0px 8px;
+    .ansi-editor-root &.enabled,	.ansi-editor-root &.active {
+      background-color: var(--color-indigo);
+    }
+    .ansi-editor-root &.notification {
+      background-color: var(--color-purp) !important;
+    }
+    .ansi-editor-root &.active {
+      .ansi-editor-root #chatIconText {
+        display: none;
+      }
+      .ansi-editor-root #chatIconCloseText {
+        display: block;
+      }
+    }
+  }
+  .ansi-editor-root #aSize,	.ansi-editor-root #chatIconCloseText {
+    display: none;
+  }
+  .ansi-editor-root #chatWindow {
+    position: fixed;
+    top: var(--header-size);
+    right: calc(var(--spacing) * 0);
+    z-index: 30;
+    z-index: 50;
+    display: flex;
+    max-height: 100vh;
+    min-height: 300px;
+    width: 45vw;
+    max-width: 100%;
+    min-width: 30vw;
+    --tw-scale-y: 100%;
+    scale: var(--tw-scale-x) var(--tw-scale-y);
+    border-style: var(--tw-border-style);
+    border-width: 8px;
+    --tw-border-style: double;
+    border-style: double;
+    border-color: var(--color-iron);
+    background-color: var(--color-menu);
+    opacity: 100%;
+    transform-origin: top;
+    transition: scale 0.7s ease-out,	opacity 0.7s ease-out,	transform 0.7s ease-out;
+    .ansi-editor-root &.hide {
+      pointer-events: none;
+      display: flex !important;
+      --tw-scale-y: 0%;
+      scale: var(--tw-scale-x) var(--tw-scale-y);
+      opacity: 0%;
+    }
+    .ansi-editor-root #chatRoom {
+      display: flex;
+      height: 100%;
+      max-height: 50vh;
+      min-height: calc(var(--spacing) * 0);
+      width: 100%;
+      flex-direction: column;
+      .ansi-editor-root header,	.ansi-editor-root section,	.ansi-editor-root nav,	.ansi-editor-root article {
+        width: 100%;
+        flex-shrink: 0;
+      }
+      .ansi-editor-root header {
+        display: flex;
+        min-height: calc(var(--spacing) * 0);
+        width: 100%;
+        flex-direction: row;
+        place-content: space-between;
+        background-color: var(--color-header);
+        padding-right: calc(var(--spacing) * 0);
+        padding-left: calc(var(--spacing) * 2);
+        -webkit-user-select: none;
+        user-select: none;
+        flex-wrap: balance;
+        cursor: grab;
+        .ansi-editor-root h2 {
+          margin-top: calc(var(--spacing) * 1);
+          display: flex;
+          flex-grow: 1;
+          font-size: var(--text-2xl);
+          line-height: var(--tw-leading, var(--text-2xl--line-height));
+          color: var(--color-cyan);
+          -webkit-user-select: none;
+          user-select: none;
+          cursor: grab;
+        }
+        .ansi-editor-root button {
+          padding: calc(var(--spacing) * 0);
+          padding-bottom: calc(var(--spacing) * 0.5);
+          .ansi-editor-root svg {
+            color: var(--color-fg);
+          }
+        }
+        .ansi-editor-root #closeChat {
+          margin: auto;
+          display: flex;
+          flex-grow: 0;
+          cursor: pointer;
+          padding-inline: calc(var(--spacing) * 1.5);
+          color: var(--color-fg);
+          .ansi-editor-root &:hover svg {
+            fill: var(--color-cyan);
+          }
+        }
+        .ansi-editor-root #notificationSetting {
+          display: flex;
+          height: 20px;
+          flex-grow: 0;
+          color: var(--color-fg);
+          .ansi-editor-root label {
+            margin-right: calc(var(--spacing) * 2.5);
+            font-size: var(--text-base);
+            line-height: var(--tw-leading, var(--text-base--line-height));
+          }
+          .ansi-editor-root #notificationCheckbox {
+            margin-right: calc(var(--spacing) * 3);
+            .ansi-editor-root &:before {
+              position: relative;
+              display: block;
+              height: 17px;
+              width: 17px;
+              background-color: var(--color-midnight);
+              content: '';
+            }
+            .ansi-editor-root &:after {
+              position: relative;
+              top: -15px;
+              left: 2px;
+              display: block;
+              height: 13px;
+              width: 13px;
+              background-color: var(--color-midnight);
+              content: '';
+            }
+            .ansi-editor-root &:checked:after {
+              background-color: var(--color-cyber);
+              content: '';
+            }
+          }
+        }
+      }
+      .ansi-editor-root section {
+        display: flex;
+        min-height: 284px;
+        flex: 1;
+        flex-direction: row;
+        overflow-y: scroll;
+        .ansi-editor-root #userList,	.ansi-editor-root #messageWindow {
+          margin: calc(var(--spacing) * 0);
+          display: flex;
+          height: 100%;
+          max-height: 40vh;
+          flex-direction: column;
+          padding-top: calc(var(--spacing) * 2);
+          word-break: break-all;
+        }
+        .ansi-editor-root #userList {
+          width: calc(1 / 4 * 100%);
+          overflow: auto;
+          background-color: var(--color-menu);
+          padding-left: calc(var(--spacing) * 3);
+          color: var(--color-fg);
+          .ansi-editor-root .userName {
+            max-height: 25px;
+          }
+        }
+        .ansi-editor-root #messageWindow {
+          width: calc(3 / 4 * 100%);
+          overflow-y: scroll;
+          background-color: var(--color-editor);
+          .ansi-editor-root div {
+            display: inline-table;
+            padding-inline: calc(var(--spacing) * 2);
+            color: var(--color-chat);
+            .ansi-editor-root .handle {
+              color: var(--color-white);
+              .ansi-editor-root &:after {
+                content: ':';
+              }
+            }
+          }
+          .ansi-editor-root .log {
+            color: var(--color-header);
+          }
+        }
+      }
+      .ansi-editor-root nav {
+        flex-direction: row;
+        border-top-style: var(--tw-border-style);
+        border-top-width: 4px;
+        border-color: var(--color-hl);
+        background-color: var(--color-editor);
+        padding-left: calc(var(--spacing) * 2);
+        .ansi-editor-root * {
+          margin: calc(var(--spacing) * 0);
+          height: 25px;
+        }
+        .ansi-editor-root #handleInput {
+          display: flex;
+          width: calc(1 / 4 * 100%);
+          color: var(--color-cyber);
+        }
+        .ansi-editor-root .prompt {
+          margin-right: calc(var(--spacing) * 1);
+          display: flex;
+          flex-grow: 1;
+          .ansi-editor-root &::before {
+            content: '>';
+            color: var(--color-fg);
+          }
+        }
+        .ansi-editor-root #messageInput {
+          display: flex;
+          flex-grow: 1;
+          color: var(--color-fg);
+        }
+        .ansi-editor-root button {
+          display: flex;
+          background-color: var(--color-midnight);
+          padding-inline: calc(var(--spacing) * 2);
+          color: var(--color-fg);
+        }
+      }
+    }
+  }
+  .ansi-editor-root aside {
+    float: left;
+    width: 40px;
+    height: calc(100% - 40px);
+    .ansi-editor-root > canvas {
+      vertical-align: bottom;
+    }
+  }
+  .ansi-editor-root #palettePicker {
+    margin-top: 8px;
+  }
+  .ansi-editor-root #viewport {
+    background-color: var(--color-editor);
+    margin-left: 40px;
+    width: calc(100% - 40px);
+    height: calc(100% - 40px);
+    text-align: center;
+    overflow: auto;
+    user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+  }
+  .ansi-editor-root header nav {
+    display: flex;
+    width: auto;
+    flex-direction: row;
+    justify-content: flex-start;
+    .ansi-editor-root .enabled {
+      background-color: var(--color-black);
+    }
+  }
+  .ansi-editor-root #viewportToolbar,	.ansi-editor-root #clipboardToolbar,	.ansi-editor-root #fontToolbar,	.ansi-editor-root #brushToolbar,	.ansi-editor-root #shapesToolbar,	.ansi-editor-root #selectionToolbar {
+    display: none;
+    width: auto;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+  .ansi-editor-root #viewportToolbar {
+    .ansi-editor-root .toolButton kbd {
+      margin-inline: calc(var(--spacing) * 1);
+    }
+  }
+  .ansi-editor-root #navDarkmode > kbd {
+    width: max-content;
+  }
+  .ansi-editor-root .toolButton {
+    display: flex;
+    height: var(--header-size);
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    color: var(--color-white);
+    line-height: 20px;
+    padding-right: 5px;
+    .ansi-editor-root &:not(.toolbarDisplayed):hover {
+      background-color: var(--color-hl);
+    }
+    .ansi-editor-root &.enabled {
+      background-color: var(--color-indigo);
+    }
+    .ansi-editor-root svg {
+      margin-inline-end: 5px;
+    }
+    .ansi-editor-root kbd {
+      margin-block: auto;
+    }
+  }
+  .ansi-editor-root #brushToolbar {
+    min-width: 378px;
+  }
+  .ansi-editor-root #clipboardToolbar,	.ansi-editor-root #fontToolbar {
+    .ansi-editor-root .toolButton {
+      margin-right: calc(var(--spacing) * 1);
+    }
+  }
+  .ansi-editor-root #cut {
+    margin-left: 4px !important;
+  }
+  .ansi-editor-root #shapesToolbar {
+    min-width: 370px;
+  }
+  .ansi-editor-root #selectionToolbar {
+    .ansi-editor-root .toolButton {
+      margin: calc(var(--spacing) * 0);
+      display: flex;
+      height: var(--header-size);
+      flex-direction: column;
+      padding-inline: 5px;
+      .ansi-editor-root kbd,	.ansi-editor-root svg {
+        margin-inline: auto;
+        margin-block: calc(var(--spacing) * 0);
+        display: flex;
+      }
+      .ansi-editor-root kbd {
+        width: 100%;
+        text-align: center;
+        font-size: var(--text-xs);
+        line-height: var(--tw-leading, var(--text-xs--line-height));
+      }
+      .ansi-editor-root svg {
+        width: 24px;
+      }
+    }
+  }
+  .ansi-editor-root #keyboardToolbar {
+    display: flex;
+    font-size: var(--text-xs);
+    line-height: var(--tw-leading, var(--text-xs--line-height));
+    color: var(--color-fg);
+    .ansi-editor-root span {
+      margin-inline: calc(var(--spacing) * 1);
+      margin-block: auto;
+      display: flex;
+      flex-direction: column;
+      .ansi-editor-root &:hover canvas {
+        outline: 1px solid var(--cyber);
+      }
+      .ansi-editor-root canvas {
+        scale: 1 !important;
+        margin: auto;
+      }
+    }
+  }
+  .ansi-editor-root #navDarkmode,	.ansi-editor-root #zoomControl {
+    .ansi-editor-root &:hover,	.ansi-editor-root &:focus,	.ansi-editor-root &:focus-within {
+      background-color: transparent !important;
+    }
+  }
+  .ansi-editor-root #zoomControl {
+    .ansi-editor-root #zoomSlider {
+      max-width: 70px;
+      margin-inline: 4px;
+    }
+    .ansi-editor-root input[type='range'] {
+      appearance: none;
+      background-color: transparent;
+    }
+    .ansi-editor-root input[type='range']::-webkit-slider-thumb {
+      appearance: none;
+      background-color: transparent;
+    }
+    .ansi-editor-root input[type='range']:focus {
+      outline: none;
+    }
+    .ansi-editor-root input[type='range']::-webkit-slider-thumb {
+      cursor: ew-resize;
+      appearance: none;
+      border-bottom-left-radius: var(--radius-xs);
+      background-color: var(--color-thumb);
+      height: 26px;
+      width: 16px;
+      margin-top: -9px;
+      .ansi-editor-root &:hover {
+        background-color: var(--color-cyan);
+      }
+    }
+    .ansi-editor-root input[type='range']::-moz-range-thumb {
+      cursor: ew-resize;
+      border-bottom-left-radius: var(--radius-xs);
+      background-color: var(--color-thumb);
+      height: 25px;
+      width: 16px;
+      .ansi-editor-root &:hover {
+        background-color: var(--color-cyan);
+      }
+    }
+    .ansi-editor-root input[type='range']::-webkit-slider-runnable-track {
+      width: 100%;
+      cursor: ew-resize;
+      background-color: var(--color-midnight);
+      height: 8.4px;
+    }
+    .ansi-editor-root input[type='range']:active:-webkit-slider-runnable-track {
+      background-color: var(--color-tools);
+    }
+    .ansi-editor-root input[type='range']::-moz-range-track {
+      width: 100%;
+      cursor: ew-resize;
+      background-color: var(--color-midnight);
+      height: 8.4px;
+    }
+    .ansi-editor-root label {
+      padding: calc(var(--spacing) * 1);
+      font-size: var(--text-sm);
+      line-height: var(--tw-leading, var(--text-sm--line-height));
+      color: var(--color-fg);
+    }
+    .ansi-editor-root span {
+      margin-inline: calc(var(--spacing) * 0.5);
+      font-size: var(--text-sm);
+      line-height: var(--tw-leading, var(--text-sm--line-height));
+      color: var(--color-chat);
+    }
+  }
+  .ansi-editor-root #fkeySetPrev,	.ansi-editor-root #fkeySetNext {
+    height: calc(var(--header-size) - 8px);
+    .ansi-editor-root &:hover {
+      background: transparent;
+      .ansi-editor-root svg {
+        fill: var(--color-cyan);
+      }
+    }
+    .ansi-editor-root &:active svg {
+      fill: var(--color-cyber);
+    }
+    .ansi-editor-root svg {
+      width: 25px;
+      height: 25px;
+      margin-top: 5px;
+    }
+  }
+  .ansi-editor-root #aSize {
+    flex-direction: column;
+    .ansi-editor-root label {
+      padding-top: 2px;
+      padding-left: 4px;
+      text-align: left;
+      font-size: var(--text-xs);
+      line-height: var(--tw-leading, var(--text-xs--line-height));
+      color: var(--color-fg);
+    }
+    .ansi-editor-root select {
+      border-style: var(--tw-border-style);
+      border-width: 2px;
+      --tw-border-style: solid;
+      border-style: solid;
+      border-color: var(--color-midnight);
+      background-color: var(--color-purp);
+      padding: calc(var(--spacing) * 0);
+      padding-top: 3px;
+      padding-bottom: 2px;
+      font-size: var(--text-xs);
+      line-height: var(--tw-leading, var(--text-xs--line-height));
+      color: var(--color-fg);
+    }
+  }
+  .ansi-editor-root #currentFontDisplay {
+    user-select: none;
+  }
+  .ansi-editor-root #resolution {
+    display: flex;
+    flex-direction: row;
+    line-height: 20px;
+    .ansi-editor-root svg {
+      margin-top: 10px;
+    }
+  }
+  .ansi-editor-root header kbd {
+    color: rgb(200, 200, 200);
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .ansi-editor-root #resolution kbd,	.ansi-editor-root #currentFontDisplay kbd {
+    background-color: var(--color-lbl);
+    padding-inline: 8px;
+    padding-block: 1px;
+  }
+  .ansi-editor-root #positionInfo {
+    margin-right: calc(var(--spacing) * 1);
+    display: flex;
+    min-width: 50px;
+    flex-direction: row;
+    font-size: var(--text-xs);
+    line-height: var(--tw-leading, var(--text-xs--line-height));
+    color: var(--color-fg);
+    padding: 5px 2px 2px 3px;
+    word-spacing: -6px;
+  }
+  .ansi-editor-root #canvasContainer {
+    position: relative;
+    cursor: crosshair;
+    background-color: var(--color-black);
+    margin: 16px auto;
+    width: 640px;
+    box-shadow: 0px 4px 32px rgba(0, 0, 0, 0.7);
+    .ansi-editor-root canvas {
+      display: block;
+    }
+  }
+  .ansi-editor-root .canvasOverlay {
+    position: absolute;
+    top: calc(var(--spacing) * 0);
+    left: calc(var(--spacing) * 0);
+    z-index: 10;
+    display: none;
+    .ansi-editor-root &.enabled {
+      display: block;
+    }
+  }
+  .ansi-editor-root #grid {
+    border-right-style: var(--tw-border-style);
+    border-right-width: 1px;
+    border-bottom-style: var(--tw-border-style);
+    border-bottom-width: 1px;
+    border-color: #343434;
+  }
+  .ansi-editor-root canvas {
+    image-rendering: optimizeSpeed;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+  }
+  .ansi-editor-root header > div > div.button {
+    text-align: center;
+    font-size: var(--text-xs);
+    line-height: var(--tw-leading, var(--text-xs--line-height));
+    color: var(--color-fg);
+    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.7);
+  }
+  .ansi-editor-root aside {
+    .ansi-editor-root > div {
+      margin-inline: auto;
+      display: flex;
+      height: fit-content;
+      align-items: center;
+      justify-content: center;
+      padding-block: calc(var(--spacing) * 1);
+      text-align: center;
+      .ansi-editor-root &:hover {
+        background-color: var(--color-hl);
+      }
+    }
+    .ansi-editor-root svg {
+      width: 30px;
+      height: 30px;
+      fill: #efefef;
+    }
+    .ansi-editor-root .separator {
+      height: 1px;
+      padding: 0px;
+      margin: 4px auto;
+      width: 32px;
+      background-color: rgb(96, 96, 96);
+    }
+  }
+  .ansi-editor-root .toolbarDisplayed {
+    background-color: var(--color-indigo);
+  }
+  .ansi-editor-root aside > div {
+    .ansi-editor-root &.enabledParent,	.ansi-editor-root &.enabled {
+      background-color: var(--color-indigo);
+    }
+  }
+  .ansi-editor-root .menuTitle {
+    height: var(--header-size);
+    width: auto;
+    background-color: var(--color-menu);
+    color: var(--color-fg);
+    .ansi-editor-root button {
+      height: 40px;
+      width: 40px;
+      --tw-border-style: none;
+      border-style: none;
+      background-color: transparent;
+      padding-right: calc(var(--spacing) * 1);
+    }
+  }
+  .ansi-editor-root .menuList {
+    position: absolute;
+    z-index: 40;
+    display: inline;
+    height: fit-content;
+    width: 300px;
+    cursor: default;
+    border-style: var(--tw-border-style);
+    border-width: 4px;
+    --tw-border-style: solid;
+    border-style: solid;
+    border-color: var(--color-menu);
+    background-color: var(--color-file);
+    top: var(--header-size);
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);
+  }
+  .ansi-editor-root #editList {
+    left: 40px;
+  }
+  .ansi-editor-root .menuItem {
+    cursor: pointer;
+    padding-inline: calc(var(--spacing) * 1.5);
+    padding-block: calc(var(--spacing) * 1);
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    color: var(--color-fg);
+    .ansi-editor-root kbd {
+      margin-left: calc(var(--spacing) * 2.5);
+      background-color: var(--color-editor);
+      padding: calc(var(--spacing) * 1);
+      color: var(--color-fg);
+      font-size: 13px;
+    }
+  }
+  .ansi-editor-root .dark .menuItem kbd {
+    color: var(--color-tools);
+  }
+  .ansi-editor-root .menuList .separator {
+    margin: calc(var(--spacing) * 0.5);
+    height: 4px;
+    background-color: var(--color-menu);
+  }
+  .ansi-editor-root .menuItem {
+    .ansi-editor-root &:hover {
+      background-color: var(--color-indigo);
+      color: var(--color-white);
+    }
+    .ansi-editor-root &.disabled {
+      color: var(--color-editor);
+      cursor: default;
+      background-color: inherit;
+    }
+  }
+  .ansi-editor-root dialog {
+    position: fixed;
+    top: calc(1 / 2 * 100%);
+    left: calc(1 / 2 * 100%);
+    z-index: 50;
+    height: fit-content;
+    width: fit-content;
+    border-style: var(--tw-border-style);
+    border-width: 8px;
+    --tw-border-style: double;
+    border-style: double;
+    border-color: var(--color-iron);
+    background-color: var(--color-menu);
+    opacity: 0%;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -ms-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+    transform-origin: top;
+    transition: opacity 0.7s ease-out,	transform 0.7s ease-out;
+    .ansi-editor-root &[open] {
+      pointer-events: auto;
+      z-index: 50;
+      min-width: var(--container-3xs);
+      padding: calc(var(--spacing) * 1.5);
+      opacity: 100%;
+      @starting-style {
+        opacity: 1%;
+      }
+    }
+    .ansi-editor-root &.closing {
+      pointer-events: none;
+      opacity: 1%;
+      .ansi-editor-root &::backdrop {
+        opacity: 1%;
+      }
+    }
+    .ansi-editor-root &::backdrop {
+      background-color: var(--color-black);
+      opacity: 100%;
+      background: #000000;
+      background: radial-gradient(	circle,	rgba(0, 0, 0, 0.33) 0%,	rgba(0, 0, 0, 0.43) 50%,	rgba(0, 0, 0, 0.73) 100%	);
+      transition: opacity 0.7s ease-out;
+      @starting-style {
+        opacity: 1%;
+      }
+    }
+    .ansi-editor-root section {
+      display: flex;
+      height: fit-content;
+      width: fit-content;
+      flex-direction: column;
+      @media (width >= 120rem) {
+        font-size: var(--text-xl);
+        line-height: var(--tw-leading, var(--text-xl--line-height));
+      }
+      .ansi-editor-root .logo {
+        margin: auto;
+        max-width: 350px;
+      }
+      .ansi-editor-root img {
+        image-rendering: pixelated;
+      }
+      .ansi-editor-root button:has(svg) {
+        padding-top: calc(var(--spacing) * 2);
+        padding-right: calc(var(--spacing) * 2);
+        padding-bottom: calc(var(--spacing) * 1);
+        padding-left: calc(var(--spacing) * 1);
+      }
+      .ansi-editor-root button {
+        margin-right: calc(var(--spacing) * 6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--color-gray-950);
+        padding: calc(var(--spacing) * 2);
+        font-size: var(--text-xl);
+        line-height: var(--tw-leading, var(--text-xl--line-height));
+        color: var(--color-fg);
+        text-transform: uppercase;
+        @media (width >= 100rem) {
+          font-size: var(--text-2xl);
+          line-height: var(--tw-leading, var(--text-2xl--line-height));
+        }
+        .ansi-editor-root svg {
+          margin-right: calc(var(--spacing) * 2);
+          display: inline-flex;
+          height: 25px;
+          width: 25px;
+          flex-shrink: 0;
+          overflow: hidden;
+          fill: var(--color-fg);
+        }
+      }
+      .ansi-editor-root nav button:last-of-type {
+        margin-right: calc(var(--spacing) * 0) !important;
+      }
+    }
+    .ansi-editor-root .overlay {
+      position: fixed;
+      top: calc(var(--spacing) * 0);
+      right: calc(var(--spacing) * 0);
+      bottom: calc(var(--spacing) * 0);
+      left: calc(var(--spacing) * 0);
+      z-index: 60;
+      display: none;
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(	to bottom,	rgba(0, 0, 0, 0) 0px,	rgba(0, 0, 0, 0) 20px,	rgba(0, 0, 0, 0.8) 21px,	rgba(0, 0, 0, 0.2) 100%	);
+      .ansi-editor-root &.enabled {
+        display: block;
+      }
+    }
+    .ansi-editor-root section {
+      .ansi-editor-root p,	.ansi-editor-root h2,	.ansi-editor-root nav,	.ansi-editor-root article,	.ansi-editor-root blockquote {
+        display: flex;
+        height: auto;
+        width: 100%;
+        flex-direction: row;
+        padding: calc(var(--spacing) * 1);
+      }
+      .ansi-editor-root nav {
+        justify-content: flex-end;
+        .ansi-editor-root button:hover,	.ansi-editor-root button:focus {
+          background-color: var(--color-purp);
+        }
+      }
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ansi-editor-root dialog {
+      --tw-scale-y: 0%;
+      scale: var(--tw-scale-x) var(--tw-scale-y);
+      transition: scale 0.7s ease-out,	opacity 0.7s ease-out,	transform 0.7s ease-out;
+      .ansi-editor-root &[open] {
+        --tw-scale-y: 100%;
+        scale: var(--tw-scale-x) var(--tw-scale-y);
+        @starting-style {
+          --tw-scale-y: 0%;
+          scale: var(--tw-scale-x) var(--tw-scale-y);
+        }
+      }
+      .ansi-editor-root &.closing {
+        --tw-scale-y: 0%;
+        scale: var(--tw-scale-x) var(--tw-scale-y);
+      }
+    }
+  }
+  .ansi-editor-root #aboutModal,	.ansi-editor-root #resizeModal,	.ansi-editor-root #sauceModal,	.ansi-editor-root #loadingModal,	.ansi-editor-root #choiceModal,	.ansi-editor-root #updateModal,	.ansi-editor-root #warningModal,	.ansi-editor-root #tutorialsModal,	.ansi-editor-root #fontsModal {
+    display: flex;
+    height: fit-content;
+    min-height: calc(var(--spacing) * 0);
+    width: fit-content;
+    flex-direction: column;
+    .ansi-editor-root h1,	.ansi-editor-root h2,	.ansi-editor-root p,	.ansi-editor-root nav,	.ansi-editor-root article,	.ansi-editor-root blockquote {
+      display: flex;
+      height: auto;
+      width: 100%;
+      flex-direction: row;
+      padding: calc(var(--spacing) * 1);
+    }
+    .ansi-editor-root p {
+      display: inline;
+      max-width: 480px;
+      padding: calc(var(--spacing) * 4.5);
+      color: var(--color-fg);
+    }
+    .ansi-editor-root nav {
+      justify-content: flex-end;
+      background-color: var(--color-editor);
+      .ansi-editor-root button:hover,	.ansi-editor-root button:focus {
+        background-color: var(--color-purp);
+      }
+    }
+    .ansi-editor-root label {
+      color: var(--color-fg);
+    }
+    .ansi-editor-root h1,	.ansi-editor-root h2 {
+      font-size: var(--text-2xl);
+      line-height: var(--tw-leading, var(--text-2xl--line-height));
+      color: var(--color-cyan);
+    }
+    .ansi-editor-root input[type='text'],	.ansi-editor-root input[type='number'],	.ansi-editor-root textarea {
+      margin-block: calc(var(--spacing) * 2);
+      margin-right: calc(var(--spacing) * 2);
+      height: fit-content;
+      background-color: var(--color-midnight);
+      padding-inline: calc(var(--spacing) * 3);
+      padding-block: calc(var(--spacing) * 1);
+      color: var(--color-fg);
+    }
+  }
+  .ansi-editor-root #resizeModal {
+    .ansi-editor-root header,	.ansi-editor-root section,	.ansi-editor-root nav,	.ansi-editor-root article {
+      width: 100%;
+      flex-shrink: 0;
+    }
+    .ansi-editor-root header {
+      margin-block: calc(var(--spacing) * 2.5);
+      width: 100%;
+      flex-direction: row;
+      place-content: space-between;
+      padding-left: calc(var(--spacing) * 2);
+      .ansi-editor-root button {
+        padding: calc(var(--spacing) * 0);
+        padding-bottom: calc(var(--spacing) * 0.5);
+        .ansi-editor-root svg {
+          color: var(--color-fg);
+        }
+      }
+    }
+    .ansi-editor-root section {
+      display: flex;
+      min-height: calc(var(--spacing) * 0);
+      flex-direction: column;
+      .ansi-editor-root button {
+        margin-inline: auto;
+        margin-bottom: calc(var(--spacing) * 2);
+        width: calc(3 / 4 * 100%);
+        justify-content: flex-start;
+        background-color: var(--color-midnight);
+        padding: calc(var(--spacing) * 1.5);
+        padding-left: calc(var(--spacing) * 8);
+        text-align: left;
+      }
+    }
+    .ansi-editor-root article {
+      display: flex;
+      min-height: calc(var(--spacing) * 0);
+      width: 100%;
+      flex-direction: row;
+      justify-content: center;
+      background-color: var(--color-editor);
+      padding-block: calc(var(--spacing) * 6);
+      .ansi-editor-root label {
+        margin: calc(var(--spacing) * 2);
+        height: fit-content;
+        width: min-content;
+        padding-inline: calc(var(--spacing) * 5);
+        padding-block: calc(var(--spacing) * 0);
+      }
+      .ansi-editor-root input[type='text'],	.ansi-editor-root input[type='number'],	.ansi-editor-root textarea {
+        margin-block: calc(var(--spacing) * 2);
+        margin-right: calc(var(--spacing) * 2);
+        height: fit-content;
+        background-color: var(--color-midnight);
+        padding-inline: calc(var(--spacing) * 3);
+        padding-block: calc(var(--spacing) * 1);
+        color: var(--color-fg);
+      }
+    }
+    .ansi-editor-root nav {
+      margin-top: calc(var(--spacing) * 0.5);
+      width: auto;
+      justify-content: flex-end;
+      border-style: var(--tw-border-style);
+      border-width: 0px;
+      background-color: var(--color-menu);
+      .ansi-editor-root button {
+        margin: calc(var(--spacing) * 2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--color-midnight);
+        .ansi-editor-root svg {
+          margin-right: calc(var(--spacing) * 3.5);
+          width: 37px;
+          height: 37px;
+        }
+      }
+    }
+  }
+  .ansi-editor-root #fontsModal {
+    padding: calc(var(--spacing) * 5);
+    .ansi-editor-root #fontMeta {
+      padding-top: calc(var(--spacing) * 1.5);
+      padding-left: calc(var(--spacing) * 4);
+      font-size: var(--text-xl);
+      line-height: var(--tw-leading, var(--text-xl--line-height));
+      color: var(--color-subtitle);
+    }
+    .ansi-editor-root article {
+      .ansi-editor-root aside {
+        display: flex;
+        height: auto;
+        width: fit-content;
+        min-width: 107px;
+        flex-direction: column;
+        .ansi-editor-root img {
+          border-style: var(--tw-border-style);
+          border-width: 8px;
+          --tw-border-style: solid;
+          border-style: solid;
+          border-color: var(--color-black);
+          image-rendering: pixelated;
+          filter: brightness(1.5);
+        }
+      }
+      .ansi-editor-root aside:first-of-type {
+        background-color: var(--color-black);
+      }
+      .ansi-editor-root aside:last-of-type {
+        padding-right: calc(var(--spacing) * 0);
+      }
+    }
+    .ansi-editor-root nav {
+      margin-top: auto;
+      background-color: var(--color-menu);
+      padding-top: calc(var(--spacing) * 5);
+    }
+  }
+  .ansi-editor-root #fontSelect {
+    margin: calc(var(--spacing) * 0);
+    overflow-y: scroll;
+    background-color: var(--color-editor);
+    padding: calc(var(--spacing) * 0);
+    max-height: 21em;
+    min-width: 8em;
+  }
+  .ansi-editor-root #fontSelect::-webkit-scrollbar {
+    height: calc(var(--spacing) * 5);
+    width: calc(var(--spacing) * 5);
+  }
+  .ansi-editor-root #fontSelect::-webkit-scrollbar-thumb {
+    border-radius: 0;
+    background-color: var(--color-menu);
+  }
+  .ansi-editor-root #fontSelect::-webkit-scrollbar-track {
+    background-color: var(--color-editor);
+  }
+  .ansi-editor-root #fontSelect::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-file);
+  }
+  .ansi-editor-root #fontSelect::-webkit-scrollbar-button {
+    height: calc(var(--spacing) * 5);
+    width: calc(var(--spacing) * 5);
+    background-color: var(--color-editor);
+  }
+  .ansi-editor-root #fontSelect::-webkit-scrollbar-corner {
+    height: calc(var(--spacing) * 5);
+    width: calc(var(--spacing) * 5);
+    background-color: var(--color-editor);
+  }
+  .ansi-editor-root #fontSelect [role='option'] {
+    margin: calc(var(--spacing) * 0);
+    background-color: var(--color-editor);
+    color: var(--color-fg);
+    padding: 0.5em 1.55em;
+    cursor: pointer;
+  }
+  .ansi-editor-root #fontSelect [role='option'][aria-selected='true'] {
+    background-color: var(--color-cyber);
+    color: var(--color-midnight);
+  }
+  .ansi-editor-root .groupLabel {
+    margin: calc(var(--spacing) * 0);
+    cursor: default;
+    background-color: var(--color-midnight);
+    color: var(--color-cyan);
+    padding: 0.5em 0.75em;
+  }
+  .ansi-editor-root #fontPreviewInfo {
+    padding-left: calc(var(--spacing) * 4);
+    color: var(--color-chat);
+  }
+  .ansi-editor-root #sauceModal {
+    justify-content: space-between;
+    .ansi-editor-root article {
+      flex-direction: row;
+      padding-inline: calc(var(--spacing) * 12);
+      .ansi-editor-root label {
+        display: flex;
+        width: calc(1 / 5 * 100%);
+        justify-content: flex-end;
+        padding: 11px 0 0 10px !important;
+      }
+      .ansi-editor-root div {
+        display: flex;
+        flex-grow: 1;
+        justify-content: flex-start;
+        padding-inline: calc(var(--spacing) * 3);
+        .ansi-editor-root input {
+          background-color: var(--color-midnight);
+          padding: calc(var(--spacing) * 2);
+          color: var(--color-fg);
+          accent-color: var(--color-cyan);
+        }
+      }
+    }
+    .ansi-editor-root .lil {
+      padding-top: calc(var(--spacing) * 0) !important;
+    }
+    .ansi-editor-root nav {
+      padding: calc(var(--spacing) * 3);
+    }
+    .ansi-editor-root #sauceBytes {
+      margin: calc(var(--spacing) * 0);
+      border-style: var(--tw-border-style);
+      border-width: 0px;
+      background-color: transparent;
+      padding-top: calc(var(--spacing) * 0);
+      font-size: var(--text-lg);
+      line-height: var(--tw-leading, var(--text-lg--line-height));
+      color: var(--color-chat);
+    }
+  }
+  .ansi-editor-root #choiceModal {
+    .ansi-editor-root nav {
+      padding: calc(var(--spacing) * 2);
+      .ansi-editor-root button {
+        margin-right: calc(var(--spacing) * 6) !important;
+      }
+    }
+  }
+  .ansi-editor-root #warningModal,	.ansi-editor-root #updateModal,	.ansi-editor-root #aboutModal {
+    .ansi-editor-root header {
+      height: fit-content;
+      flex-direction: column;
+      background-color: var(--color-editor);
+      .ansi-editor-root h1 {
+        margin-left: calc(var(--spacing) * 2);
+      }
+      .ansi-editor-root h4 {
+        margin-left: calc(var(--spacing) * 3);
+        color: var(--color-chat);
+      }
+    }
+    .ansi-editor-root p {
+      margin-bottom: calc(var(--spacing) * 2);
+      padding-bottom: calc(var(--spacing) * 2);
+    }
+    .ansi-editor-root nav {
+      justify-content: space-evenly;
+      padding: calc(var(--spacing) * 2);
+    }
+  }
+  .ansi-editor-root #updateModal {
+    justify-self: center;
+    .ansi-editor-root h4 {
+      margin-bottom: calc(var(--spacing) * 4);
+      text-align: center;
+      font-size: var(--text-xl);
+      line-height: var(--tw-leading, var(--text-xl--line-height));
+      color: var(--color-cyber);
+    }
+    .ansi-editor-root p {
+      text-align: left;
+    }
+  }
+  .ansi-editor-root #loadingModal {
+    .ansi-editor-root nav {
+      background-color: transparent;
+      .ansi-editor-root button {
+        background-color: var(--color-tools);
+        color: var(--color-midnight);
+        .ansi-editor-root &:focus {
+          background-color: var(--color-tools);
+          color: var(--color-midnight);
+        }
+        .ansi-editor-root &:hover {
+          background-color: var(--color-purp);
+          color: var(--color-fg);
+          .ansi-editor-root svg {
+            fill: var(--color-fg);
+          }
+        }
+        .ansi-editor-root svg {
+          height: 25px;
+          fill: var(--color-midnight);
+        }
+      }
+    }
+  }
+  .ansi-editor-root #loadingModal {
+    cursor: progress;
+    .ansi-editor-root nav {
+      background-color: var(--color-editor);
+    }
+  }
+  .ansi-editor-root #tutorialsModal {
+    max-width: 756px;
+    min-width: 65%;
+    .ansi-editor-root header {
+      height: fit-content;
+      flex-direction: column;
+      background-color: var(--color-editor);
+      padding: calc(var(--spacing) * 4);
+      .ansi-editor-root h2 {
+        padding-left: 0;
+      }
+      .ansi-editor-root h3 {
+        text-align: justify;
+        color: var(--color-fg);
+        color: var(--color-subtitle);
+        .ansi-editor-root em {
+          color: var(--color-fg);
+        }
+      }
+    }
+    .ansi-editor-root article {
+      flex-direction: column;
+      .ansi-editor-root main {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        .ansi-editor-root &:hover {
+          .ansi-editor-root button {
+            position: relative;
+            display: flex;
+            width: 100%;
+            background-color: var(--color-purp);
+            margin-top: -50px;
+            padding-bottom: 10px;
+          }
+        }
+        .ansi-editor-root button {
+          display: none;
+        }
+        .ansi-editor-root img {
+          display: flex;
+          flex-grow: 1;
+          cursor: pointer;
+          image-rendering: pixelated;
+        }
+      }
+      .ansi-editor-root strong {
+        text-align: justify;
+        color: var(--color-fg);
+      }
+      .ansi-editor-root ul {
+        margin-block: calc(var(--spacing) * 4);
+        .ansi-editor-root li {
+          margin-left: calc(var(--spacing) * 2);
+          color: var(--color-subtitle);
+          .ansi-editor-root i {
+            font-style: italic;
+          }
+          .ansi-editor-root button:hover {
+            background-color: var(--color-purp);
+          }
+        }
+      }
+      .ansi-editor-root h2 {
+        padding-top: 6px;
+      }
+      .ansi-editor-root h3 {
+        margin-block: calc(var(--spacing) * 3);
+        display: flex;
+        font-size: var(--text-xl);
+        line-height: var(--tw-leading, var(--text-xl--line-height));
+        color: var(--color-fg);
+        .ansi-editor-root &::before {
+          display: inline-flex;
+          font-size: var(--text-lg);
+          line-height: var(--tw-leading, var(--text-lg--line-height));
+          color: var(--color-chat);
+          content: '▓▒░';
+          margin: -5px 5px 0 0;
+        }
+      }
+    }
+  }
+  .ansi-editor-root #customColor {
+    position: fixed;
+    top: 60px;
+    left: 40px;
+    height: calc(var(--spacing) * 0);
+    width: calc(var(--spacing) * 0);
+  }
+  .ansi-editor-root .floatingPanel {
+    position: fixed;
+    z-index: 30;
+    display: none;
+    cursor: move;
+    background-color: var(--color-panel);
+    padding-top: calc(var(--spacing) * 4);
+    padding-right: calc(var(--spacing) * 1);
+    padding-bottom: calc(var(--spacing) * 1);
+    padding-left: calc(var(--spacing) * 1);
+    transition-property: none !important;
+    box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.3);
+    .ansi-editor-root &.enabled {
+      display: block;
+    }
+    .ansi-editor-root div {
+      position: relative;
+      display: block;
+    }
+    .ansi-editor-root .hidePanel {
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      color: #efefef;
+      padding: 2px 5px;
+      font-size: 10px;
+      cursor: pointer;
+      .ansi-editor-root &:hover {
+        background: #000;
+      }
+    }
+    .ansi-editor-root canvas {
+      cursor: crosshair;
+      vertical-align: bottom;
+    }
+  }
+  .ansi-editor-root .toggleButtonContainer {
+    display: flex;
+    width: 120px;
+    flex-direction: row;
+    text-align: center;
+    margin: 0px auto;
+    color: rgb(200, 200, 200);
+    font-size: 14px;
+  }
+  .ansi-editor-root .toggleButton {
+    display: inline-flex;
+    width: 66px;
+    justify-content: center;
+    background-color: var(--color-menu);
+    padding: 2px;
+    .ansi-editor-root &.enabled {
+      background-color: var(--color-purp);
+    }
+    .ansi-editor-root &.left {
+      border-top-style: var(--tw-border-style);
+      border-top-width: 2px;
+      border-right-style: var(--tw-border-style);
+      border-right-width: 0px;
+      border-bottom-style: var(--tw-border-style);
+      border-bottom-width: 2px;
+      border-left-style: var(--tw-border-style);
+      border-left-width: 2px;
+      border-color: var(--color-black);
+    }
+    .ansi-editor-root &.right {
+      border-top-style: var(--tw-border-style);
+      border-top-width: 2px;
+      border-right-style: var(--tw-border-style);
+      border-right-width: 2px;
+      border-bottom-style: var(--tw-border-style);
+      border-bottom-width: 2px;
+      border-left-style: var(--tw-border-style);
+      border-left-width: 0px;
+      border-color: var(--color-black);
+    }
+  }
+  @keyframes blink {
+    50% {
+      border: 1px solid var(--silver);
+    }
+  }
+  .ansi-editor-root canvas {
+    .ansi-editor-root &.cursor,	.ansi-editor-root &.selectionCursor {
+      position: absolute;
+      z-index: 20;
+    }
+    .ansi-editor-root &.cursor {
+      border: 1px solid #555;
+      animation: blink 1.5s steps(1) infinite;
+    }
+  }
+  .ansi-editor-root #dragdrop {
+    pointer-events: none;
+    position: fixed;
+    inset: calc(var(--spacing) * 0);
+    top: calc(var(--spacing) * 0);
+    right: calc(var(--spacing) * 0);
+    bottom: calc(var(--spacing) * 0);
+    left: calc(var(--spacing) * 0);
+    z-index: 50;
+    display: none;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    background-color: var(--color-menu);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-menu) 90%, transparent);
+    }
+    .ansi-editor-root kbd {
+      margin: auto;
+      text-align: center;
+      font-size: 4rem;
+      color: var(--color-cyan);
+    }
+  }
+  .ansi-editor-root .ios header.dynamic {
+    padding-left: 75px;
+  }
+  .ansi-editor-root .includedForWebsocket {
+    display: none;
+  }
+  .ansi-editor-root aside svg,	.ansi-editor-root button,	.ansi-editor-root .button,	.ansi-editor-root .hover,	.ansi-editor-root .toggleButton,	.ansi-editor-root .toolButton,	.ansi-editor-root .menuItem:hover,	.ansi-editor-root .menuTitle:hover,	.ansi-editor-root .fkey,	.ansi-editor-root #resolution,	.ansi-editor-root #selectionToolbar .toolButton,	.ansi-editor-root #currentFontDisplay,	.ansi-editor-root #keyboardToolbar span,	.ansi-editor-root #chatButton {
+    cursor: pointer;
+  }
+}
+@layer components {
+  .ansi-editor-root .drag {
+    transition-property: none !important;
+  }
+  .ansi-editor-root .hide {
+    pointer-events: none !important;
+    display: none !important;
+  }
+  .ansi-editor-root .sunAndMoon {
+    .ansi-editor-root > :is(.moon, .sun, .sunBeams) {
+      transform-origin: center;
+    }
+    .ansi-editor-root > :is(.moon, .sun) {
+      fill: var(--color-icon);
+    }
+    .ansi-editor-root > .sunBeams {
+      stroke: var(--color-icon);
+      stroke-width: 0.125rem;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .ansi-editor-root > :is(.moon, .sun) {
+        .ansi-editor-root .darkmode:is(:hover, :focus-visible) > & {
+          fill: var(--color-icon-hover);
+        }
+      }
+      .ansi-editor-root > .sunBeams {
+        .ansi-editor-root .darkmode:is(:hover, :focus-visible) & {
+          stroke: var(--color-icon-hover);
+        }
+      }
+    }
+    .ansi-editor-root .dark & {
+      .ansi-editor-root & > .sun {
+        transform: scale(1.75);
+      }
+      .ansi-editor-root & > .sunBeams {
+        opacity: 0%;
+      }
+      .ansi-editor-root & > .moon > circle {
+        transform: translateX(7px);
+        @supports (cx: 1) {
+          transform: translateX(0);
+          cx: 7;
+        }
+      }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .ansi-editor-root > .sun {
+        transition: transform 0.5s var(--ease-elastic-1);
+      }
+      .ansi-editor-root > .sunBeams {
+        transition: transform 0.5s var(--ease-elastic-2),	opacity 0.5s var(--ease);
+      }
+      .ansi-editor-root .moon > circle {
+        transition: transform 0.25s var(--ease-out);
+        @supports (cx: 1) {
+          transition: cx 0.25s var(--ease-out);
+        }
+      }
+      .ansi-editor-root .dark & {
+        .ansi-editor-root > .sun {
+          transform: scale(1.75);
+          transition-timing-function: var(--ease);
+          transition-duration: 0.25s;
+        }
+        .ansi-editor-root > .sunBeams {
+          transform: rotateZ(-25deg);
+          transition-duration: 0.15s;
+        }
+        .ansi-editor-root > .moon > circle {
+          transition-delay: 0.25s;
+          transition-duration: 0.5s;
+        }
+      }
+    }
+  }
+  .ansi-editor-root #navDarkmode {
+    aspect-ratio: 1 / 1;
+    cursor: pointer;
+    background-image: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transition: transform 1s linear !important;
+    .ansi-editor-root svg {
+      stroke-linecap: round;
+    }
+  }
+}
+@property --tw-rotate-x {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-rotate-y {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-rotate-z {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-skew-x {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-skew-y {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-border-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
+@property --tw-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-inset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-ring-inset {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-offset-width {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --tw-ring-offset-color {
+  syntax: "*";
+  inherits: false;
+  initial-value: #fff;
+}
+@property --tw-ring-offset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-outline-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
+@property --tw-blur {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-brightness {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-contrast {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-grayscale {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-hue-rotate {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-invert {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-opacity {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-saturate {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-sepia {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-drop-shadow {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-drop-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-drop-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-drop-shadow-size {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ease {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-scale-x {
+  syntax: "*";
+  inherits: false;
+  initial-value: 1;
+}
+@property --tw-scale-y {
+  syntax: "*";
+  inherits: false;
+  initial-value: 1;
+}
+@property --tw-scale-z {
+  syntax: "*";
+  inherits: false;
+  initial-value: 1;
+}
+@layer properties {
+  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
+    .ansi-editor-root *, .ansi-editor-root ::before, .ansi-editor-root ::after, .ansi-editor-root ::backdrop {
+      --tw-rotate-x: initial;
+      --tw-rotate-y: initial;
+      --tw-rotate-z: initial;
+      --tw-skew-x: initial;
+      --tw-skew-y: initial;
+      --tw-border-style: solid;
+      --tw-shadow: 0 0 #0000;
+      --tw-shadow-color: initial;
+      --tw-shadow-alpha: 100%;
+      --tw-inset-shadow: 0 0 #0000;
+      --tw-inset-shadow-color: initial;
+      --tw-inset-shadow-alpha: 100%;
+      --tw-ring-color: initial;
+      --tw-ring-shadow: 0 0 #0000;
+      --tw-inset-ring-color: initial;
+      --tw-inset-ring-shadow: 0 0 #0000;
+      --tw-ring-inset: initial;
+      --tw-ring-offset-width: 0px;
+      --tw-ring-offset-color: #fff;
+      --tw-ring-offset-shadow: 0 0 #0000;
+      --tw-outline-style: solid;
+      --tw-blur: initial;
+      --tw-brightness: initial;
+      --tw-contrast: initial;
+      --tw-grayscale: initial;
+      --tw-hue-rotate: initial;
+      --tw-invert: initial;
+      --tw-opacity: initial;
+      --tw-saturate: initial;
+      --tw-sepia: initial;
+      --tw-drop-shadow: initial;
+      --tw-drop-shadow-color: initial;
+      --tw-drop-shadow-alpha: 100%;
+      --tw-drop-shadow-size: initial;
+      --tw-ease: initial;
+      --tw-scale-x: 1;
+      --tw-scale-y: 1;
+      --tw-scale-z: 1;
+    }
+  }
+}
+
+/* asciiarena: de-full-screen overrides (editor fills host, never covers page) */
+.ansi-editor-root {
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 480px;
+  overflow: hidden;
+  contain: layout paint;
+}
+.ansi-editor-root #bodyContainer {
+  position: relative !important;
+  inset: auto !important;
+  width: 100%;
+  height: 100%;
+}
