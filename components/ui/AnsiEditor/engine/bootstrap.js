@@ -454,17 +454,13 @@ export function bootstrapEditor(rootEl, opts = {}) {
 			'onOpenedFile',
 		];
 		fontDisplayEvents.forEach(e => addDocListener(e, updateFontDisplay));
-		if (fontDisplay) {
-			onClick(fontDisplay, () => {
-				State.menus.close();
-				$('changeFont').click();
-			});
-		}
-		onClick($('changeFont'), () => {
-			State.menus.close();
-			State.modal.open('fonts');
-			fontSelect.focus();
-		});
+		// asciiarena CHANGE: the text0wnz font MODAL is replaced by the React
+		// DosSelect font picker (see AnsiEditor.tsx). Do NOT wire the click
+		// handlers that open `#fontsModal` — the font display chip and the
+		// in-toolbar "Change Font" button are inert here (and hidden in CSS), so
+		// the only font UI is the DosSelect. The list/preview machinery above
+		// (createFontSelect, updateFontDisplay) is kept so onFontChange events
+		// still sync the header chip text in case it's ever shown.
 		onClick($('fontsApply'), async () => {
 			const selectedFont = fontSelect.getValue();
 			await State.textArtCanvas.setFont(selectedFont, () => State.modal.close());

@@ -35,6 +35,16 @@ export interface EditorHandle {
    * inspects the packed cell buffer directly.
    */
   isEmpty: () => boolean;
+  /**
+   * The curated list of font names the editor offers (the `data-value`s of the
+   * injected `#fontSelect` listbox). This is the same set the old font modal
+   * exposed; read from the DOM at mount so there's a single source of truth.
+   */
+  getFonts: () => string[];
+  /** The font the canvas is currently rendering in (e.g. "CP437 8x16"). */
+  getCurrentFont: () => string;
+  /** Switch the canvas to `name`; the engine re-renders in the new font. */
+  setFont: (name: string) => void;
   /** Tear down the editor and remove its DOM nodes from the host container. */
   destroy: () => void;
 }
@@ -101,11 +111,37 @@ export function initAnsiEditor(
     ? initPaletteBar(root, State.palette as PaletteApi)
     : { destroy: () => {} };
 
+  // The curated font set: the `data-value` of every option in the injected
+  // `#fontSelect` listbox. Read once at mount (the markup is now in the DOM)
+  // so the React picker and the engine share one source of truth.
+  const fontNames: string[] = Array.from(
+    root.querySelectorAll<HTMLElement>("#fontSelect [role='option']")
+  )
+    .map(el => el.getAttribute("data-value") ?? "")
+    .filter(name => name.length > 0);
+
   let destroyed = false;
 
   return {
     getAnsiBytes(): Promise<Uint8Array> {
       return encodeAnsBytes({ iceColors });
+    },
+
+    getFonts(): string[] {
+      return fontNames.slice();
+    },
+
+    getCurrentFont(): string {
+      const canvas = State.textArtCanvas;
+      if (!canvas || typeof canvas.getCurrentFontName !== "function") return "";
+      return canvas.getCurrentFontName();
+    },
+
+    setFont(name: string): void {
+      const canvas = State.textArtCanvas;
+      if (!canvas || typeof canvas.setFont !== "function") return;
+      // Engine re-renders the canvas in the new font; we don't need the callback.
+      void canvas.setFont(name, () => {});
     },
 
     loadAnsiBytes(bytes: Uint8Array): void {

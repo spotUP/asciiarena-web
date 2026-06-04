@@ -12,11 +12,13 @@
 
 import {
   forwardRef,
+  useCallback,
   useEffect,
   useImperativeHandle,
   useRef,
   useState,
 } from "react";
+import DosSelect from "@/components/ui/DosSelect";
 import type { EditorHandle } from "./mount";
 
 // ─── Public API ──────────────────────────────────────────────────────────────
@@ -28,6 +30,20 @@ export interface AnsiEditorRef {
    * reject an empty logo, since a blank export is still ~782 bytes.
    */
   isEmpty: () => boolean;
+  /** The curated list of font names the editor offers. */
+  getFonts: () => string[];
+  /** The font the canvas is currently rendering in. */
+  getCurrentFont: () => string;
+  /** Switch the canvas font (re-renders in the new font). */
+  setFont: (name: string) => void;
+}
+
+/**
+ * Build a DosSelect option from a font `data-value`. The engine's font names
+ * already double as human labels (e.g. "Topaz+ 1200 8x16"), so value === label.
+ */
+function fontOption(name: string): { value: string; label: string } {
+  return { value: name, label: name };
 }
 
 interface AnsiEditorProps {
@@ -41,6 +57,22 @@ const AnsiEditor = forwardRef<AnsiEditorRef, AnsiEditorProps>(
     const hostRef = useRef<HTMLDivElement>(null);
     const handleRef = useRef<EditorHandle | null>(null);
     const [failed, setFailed] = useState(false);
+    // Font-picker state, hydrated once the engine is ready. Empty until then
+    // so the (SSR-safe) initial render has nothing engine-specific in it.
+    const [fonts, setFonts] = useState<string[]>([]);
+    const [currentFont, setCurrentFont] = useState("");
+
+    // Stable wrapper so the mount effect (which intentionally has an empty dep
+    // array) can call the caller's onReady AND hydrate the picker without
+    // re-running and tearing down the canvas.
+    const handleReady = useCallback(() => {
+      const handle = handleRef.current;
+      if (handle) {
+        setFonts(handle.getFonts());
+        setCurrentFont(handle.getCurrentFont());
+      }
+      onReady?.();
+    }, [onReady]);
 
     useEffect(() => {
       // Cancelled flag guards the async-import race: if the component unmounts
@@ -67,7 +99,7 @@ const AnsiEditor = forwardRef<AnsiEditorRef, AnsiEditorProps>(
 
         let handle: EditorHandle;
         try {
-          handle = mod.initAnsiEditor(hostRef.current, { onReady });
+          handle = mod.initAnsiEditor(hostRef.current, { onReady: handleReady });
         } catch (err) {
           if (cancelled) return;
           console.error("[AnsiEditor] initAnsiEditor threw", err);
@@ -97,10 +129,10 @@ const AnsiEditor = forwardRef<AnsiEditorRef, AnsiEditorProps>(
           handleRef.current = null;
         }
       };
-      // onReady is intentionally excluded: re-running the effect when a
-      // caller changes the callback would destroy and re-create the canvas,
-      // which is almost never what's wanted.  Callers should stabilise the
-      // callback with useCallback.
+      // handleReady (and the onReady it wraps) is intentionally excluded:
+      // re-running the effect when a caller changes the callback would destroy
+      // and re-create the canvas, which is almost never what's wanted. Callers
+      // should stabilise their onReady with useCallback.
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -118,9 +150,21 @@ const AnsiEditor = forwardRef<AnsiEditorRef, AnsiEditorProps>(
           if (!handleRef.current) return true;
           return handleRef.current.isEmpty();
         },
+        getFonts: () => handleRef.current?.getFonts() ?? [],
+        getCurrentFont: () => handleRef.current?.getCurrentFont() ?? "",
+        setFont: (name: string) => {
+          handleRef.current?.setFont(name);
+          setCurrentFont(name);
+        },
       }),
       []
     );
+
+    // DosSelect onChange: switch the engine font and reflect it in the picker.
+    const handleFontChange = useCallback((name: string) => {
+      handleRef.current?.setFont(name);
+      setCurrentFont(name);
+    }, []);
 
     if (failed) {
       return (
@@ -130,9 +174,45 @@ const AnsiEditor = forwardRef<AnsiEditorRef, AnsiEditorProps>(
       );
     }
 
-    // Fill the host box so the editor's `height:100%` chain has a definite
-    // height to resolve against (otherwise #bodyContainer collapses to 0).
-    return <div ref={hostRef} style={{ width: "100%", height: "100%" }} />;
+    // A tidy font-picker row above the editor host: a "Font:" label plus the
+    // site's DosSelect, populated from the engine's curated font list. The
+    // weird text0wnz font modal is suppressed (see mount/editor.css), so this
+    // is the only font UI. Hidden until the engine is ready and the list is
+    // populated.
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        {fonts.length > 0 && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              height: "16px",
+              marginBottom: "8px",
+              flexShrink: 0,
+            }}
+          >
+            <span className="lightgrey">Font:</span>
+            <DosSelect
+              value={currentFont}
+              options={fonts.map(fontOption)}
+              onChange={handleFontChange}
+              width={304}
+            />
+          </div>
+        )}
+        {/* Fill the host box so the editor's `height:100%` chain has a definite
+            height to resolve against (otherwise #bodyContainer collapses to 0). */}
+        <div ref={hostRef} style={{ width: "100%", flex: 1, minHeight: 0 }} />
+      </div>
+    );
   }
 );
 

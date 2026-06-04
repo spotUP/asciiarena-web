@@ -2638,3 +2638,23 @@
   --font-family: TopazPlus_a1200, TopazPlus, Monaco, Menlo, monospace;
   font-family: TopazPlus_a1200, TopazPlus, Monaco, Menlo, monospace;
 }
+
+/* asciiarena: the text0wnz font MODAL is replaced by the React DosSelect font
+   picker (see AnsiEditor.tsx). The modal-opening click handlers are no-op'd in
+   bootstrap.js; these rules are defence-in-depth so the broken-looking modal
+   can never appear and the inert font controls don't invite clicks.
+   - #fontsModal: force-hidden even if some path calls dialog.showModal().
+   - #changeFont: the in-toolbar "Change Font" button (its #fontToolbar is
+     already display:none, but hide the button outright too).
+   - #currentFontDisplay: the header font chip is now inert (no click handler),
+     so drop the pointer affordance — it's a label, not a button. */
+.ansi-editor-root #fontsModal {
+  display: none !important;
+}
+.ansi-editor-root #changeFont {
+  display: none !important;
+}
+.ansi-editor-root #currentFontDisplay {
+  cursor: default !important;
+  pointer-events: none;
+}
