@@ -27,6 +27,9 @@ interface Props {
 export default function DosSelect({ value, options, onChange, width, placeholder, padded }: Props) {
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState("");
+  // Which row is highlighted. Inline styles override CSS :hover, so the hover
+  // bar has to be driven from state instead of the .dropdown-item:hover rule.
+  const [hovered, setHovered] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const filterRef = useRef<HTMLInputElement>(null);
   const current = options.find(o => o.value === value);
@@ -39,6 +42,7 @@ export default function DosSelect({ value, options, onChange, width, placeholder
   useEffect(() => {
     if (!open) return;
     setFilter("");
+    setHovered(null);
     const fid = setTimeout(() => filterRef.current?.focus(), 0);
     const h = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
@@ -127,7 +131,10 @@ export default function DosSelect({ value, options, onChange, width, placeholder
               }}
             />
           )}
-          <ul style={{ margin: 0, padding: 0, listStyle: "none", overflowY: "auto", flex: 1 }}>
+          <ul
+            onMouseLeave={() => setHovered(null)}
+            style={{ margin: 0, padding: 0, listStyle: "none", overflowY: "auto", flex: 1 }}
+          >
             {filtered.length === 0 ? (
               <li
                 style={{
@@ -146,15 +153,18 @@ export default function DosSelect({ value, options, onChange, width, placeholder
                 <button
                   type="button"
                   className="dropdown-item"
+                  onMouseEnter={() => setHovered(o.value)}
                   onClick={() => {
                     onChange(o.value);
                     setOpen(false);
                   }}
                   style={{
+                    // Highlight follows the mouse; with nothing hovered it rests
+                    // on the selected row.
                     width: "100%",
                     textAlign: "left",
                     border: 0,
-                    background: o.value === value ? "#888888" : "transparent",
+                    background: o.value === (hovered ?? value) ? "#888888" : "transparent",
                     fontFamily: "TopazPlus_a1200, monospace",
                     fontSize: "16px",
                     lineHeight: "16px",
