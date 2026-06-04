@@ -92,8 +92,8 @@ export function measureAnsi(bytes: Uint8Array): AnsiDims {
 
 // Header-logo limits. ANSI logos render in the rotating site header on every
 // page, so cap them to a sensible banner size. Tunable.
-export const MAX_LOGO_COLS = 100;
-export const MAX_LOGO_ROWS = 30;
+export const MAX_LOGO_COLS = 80;
+export const MAX_LOGO_ROWS = 8;
 
 // Returns a human-readable rejection reason, or null if the dimensions are OK.
 export function checkLogoDims(dims: AnsiDims): string | null {

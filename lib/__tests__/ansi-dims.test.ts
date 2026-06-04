@@ -42,8 +42,8 @@ describe("measureAnsi", () => {
 });
 
 describe("checkLogoDims", () => {
-  it("accepts a normal banner", () => {
-    expect(checkLogoDims({ cols: 80, rows: 20, source: "measured" })).toBeNull();
+  it("accepts a normal banner (within 80x8)", () => {
+    expect(checkLogoDims({ cols: 80, rows: 8, source: "measured" })).toBeNull();
   });
   it("rejects too-wide with a specific reason", () => {
     const reason = checkLogoDims({ cols: MAX_LOGO_COLS + 1, rows: 10, source: "measured" });
