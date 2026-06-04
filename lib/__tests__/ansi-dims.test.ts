@@ -33,11 +33,21 @@ describe("measureAnsi", () => {
     expect(dims).toEqual({ cols: 80, rows: 25, source: "sauce" });
   });
 
-  it("never reports below the actual measured size even if SAUCE under-declares", () => {
-    // content is 5 wide / 1 row, SAUCE wrongly says 2x1
-    const dims = measureAnsi(withSauce("HELLO", 2, 1));
-    expect(dims.cols).toBe(5);
-    expect(dims.rows).toBe(1);
+  it("auto-wraps a no-newline body at the SAUCE width (standard ANSI art)", () => {
+    // 160 chars, no line terminators, SAUCE declares 80 wide -> wraps to 80x2,
+    // NOT 160x1. This is how the embedded editor emits .ans and how every
+    // viewer renders it; measuring it as one giant row would wrongly reject
+    // an 80-col logo.
+    const dims = measureAnsi(withSauce("X".repeat(160), 80, 2));
+    expect(dims.cols).toBe(80);
+    expect(dims.rows).toBe(2);
+  });
+
+  it("never reports below the actual measured rows when SAUCE under-declares height", () => {
+    // Three explicit rows of content, but SAUCE wrongly claims 1 row tall.
+    const dims = measureAnsi(withSauce("AB\nCD\nEF", 2, 1));
+    expect(dims.cols).toBe(2);
+    expect(dims.rows).toBe(3);
   });
 });
 

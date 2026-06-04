@@ -1156,6 +1156,10 @@ const loadModule = () => {
 		file: file,
 		sauceToAppFont: sauceToAppFont,
 		appToSauceFont: appToSauceFont,
+		// Exposed for testability: the pure ANSI decoder. Used by the round-trip
+		// interop test to verify encodeAnsBytes output decodes back to the same
+		// drawing. No behaviour change to the in-app load path.
+		loadAnsi: loadAnsi,
 	};
 };
 
@@ -1725,5 +1729,11 @@ const Save = saveModule();
 // Headless .ans byte export (see saveModule). Returns a Promise<Uint8Array>.
 const encodeAnsBytes = Save.encodeAnsBytes;
 
-export { Load, Save, encodeAnsBytes };
+// Pure ANSI decoder, exposed for the round-trip interop test (see
+// lib/__tests__/ansi-editor-roundtrip.test.ts). Returns
+// { width, height, data, ... } where data is a Uint8Array of [char, fg, bg]
+// triplets, row-major.
+const loadAnsi = Load.loadAnsi;
+
+export { Load, Save, encodeAnsBytes, loadAnsi };
 export default { Load, Save };

@@ -43,12 +43,24 @@ function parseSauce(bytes: Uint8Array): { cols: number; rows: number; trimTo: nu
 }
 
 // Strip ANSI control sequences and measure visible columns/rows.
-function measureStripped(bytes: Uint8Array): { cols: number; rows: number } {
+//
+// `wrapWidth` models terminal auto-wrap. ANSI art (e.g. the embedded editor's
+// own `.ans` output) routinely emits one long stream of `wrapWidth` characters
+// per logical row with NO line terminators — every viewer wraps it at the
+// SAUCE-declared width. Without modelling that wrap, an 80x8 logo measures as
+// 640x1, so pass the SAUCE width here so the visible size matches reality.
+// When `wrapWidth` is 0 (no SAUCE) we don't wrap — plain text relies on LFs.
+function measureStripped(bytes: Uint8Array, wrapWidth = 0): { cols: number; rows: number } {
   let maxCols = 0;
   let col = 0;
   let rows = 1;
   let i = 0;
   const n = bytes.length;
+  // True after a printable char fills `wrapWidth`: the cursor is parked past
+  // the last column and the row break is DEFERRED until the next visible event
+  // (printable char or LF). This way an exact-width row followed by its own LF
+  // counts as one row, not two.
+  let pendingWrap = false;
   while (i < n) {
     const b = bytes[i];
     if (b === ESC) {
@@ -63,21 +75,43 @@ function measureStripped(bytes: Uint8Array): { cols: number; rows: number } {
       }
       continue;
     }
-    if (b === LF) { if (col > maxCols) maxCols = col; col = 0; rows++; i++; continue; }
+    if (b === LF) {
+      if (col > maxCols) maxCols = col;
+      col = 0;
+      rows++;
+      pendingWrap = false; // the explicit LF supplies the row break
+      i++;
+      continue;
+    }
     if (b === CR || b === EOF) { i++; continue; }
+    // A printable char arriving after a deferred wrap starts the next row.
+    if (pendingWrap) {
+      rows++;
+      pendingWrap = false;
+    }
     col++;
+    // Auto-wrap when a printable char fills the declared width.
+    if (wrapWidth > 0 && col === wrapWidth) {
+      if (col > maxCols) maxCols = col;
+      col = 0;
+      pendingWrap = true;
+    }
     i++;
   }
   if (col > maxCols) maxCols = col;
   // A trailing newline leaves an empty final row; don't count it.
-  if (col === 0 && rows > 1) rows--;
+  if (col === 0 && rows > 1 && !pendingWrap) rows--;
   return { cols: maxCols, rows };
 }
 
 export function measureAnsi(bytes: Uint8Array): AnsiDims {
   const sauce = parseSauce(bytes);
   const content = sauce ? bytes.subarray(0, sauce.trimTo) : bytes;
-  const measured = measureStripped(content);
+  // When SAUCE declares a width, use it as the auto-wrap column so a body with
+  // no line terminators (standard ANSI art) measures at its real wrapped size
+  // instead of one giant row.
+  const wrapWidth = sauce && sauce.cols > 0 ? sauce.cols : 0;
+  const measured = measureStripped(content, wrapWidth);
   // Prefer the artist's declared SAUCE dimensions when present and sane, but
   // never below what we actually measured (some files under-declare).
   if (sauce && sauce.cols > 0 && sauce.rows > 0) {
