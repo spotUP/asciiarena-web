@@ -2198,7 +2198,11 @@
    smaller. The header's toolbars need roughly 1000px of width to lay out
    without wrapping, so the root carries a min-width to match the dev/host box. */
 .ansi-editor-root {
-  min-width: 980px;
+  /* The editor is embedded in the Submit form's col-lg-8 (~820-880px). The
+     header used to need ~980px, forcing horizontal scroll. The fit-to-840
+     overrides at the bottom of this file shrink the header so the editor sits
+     flush in the column; the root no longer carries an oversized min-width. */
+  min-width: 0;
 }
 .ansi-editor-root #bodyContainer {
   position: relative !important;
@@ -2372,4 +2376,75 @@
    min-width here so it doesn't jump around as the digits change. */
 .ansi-editor-root #positionInfo {
   min-width: 50px;
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   asciiarena: FIT EDITOR TO THE SUBMIT-FORM COLUMN (≤840px, no horizontal
+   scroll). The header is the widest part; before these overrides it needed
+   ~980px and the embedding column (col-lg-8 ≈ 820-880px) horizontal-scrolled,
+   clipping the right-side font name / position readout.
+
+   The single biggest waste was the F-key strip's prev/next arrow buttons:
+   each rendered ~224px wide (the icon is only 30px — the bare <button> grew to
+   absorb flex slack) so the keyboardToolbar alone was 664px. Pinning those two
+   buttons to a 32px icon square reclaims ~380px and brings the header well
+   under 840px. The remaining navs (file/edit on the left, resolution / font
+   name / position on the right) already fit. We also let the header row wrap
+   as a safety net so nothing is ever clipped if a wider font name appears.
+   Additive — appended overrides only. */
+
+/* F-key strip prev/next arrows: pin to the 32px icon square so they stop
+   eating ~190px each of horizontal space. */
+.ansi-editor-root #keyboardToolbar > button#fkeySetPrev,
+.ansi-editor-root #keyboardToolbar > button#fkeySetNext {
+  width: 32px;
+  min-width: 32px;
+  flex: 0 0 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Keep the F-key spans from stretching so the "F1".."F12" labels stay readable
+   side by side. */
+.ansi-editor-root #keyboardToolbar > span {
+  flex: 0 0 auto;
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   asciiarena: PALETTE COLUMN — equal, aligned fg/bg swatches + tidy picker.
+
+   Root cause of the "fg/bg swatches are different sizes" report: the left
+   <aside> is 40px wide with `overflow: hidden auto`, and its stacked content
+   (preview + 16-colour picker + the tool-icon column) is taller than the
+   available height, so a vertical scrollbar appears and steals 8px. That drops
+   the aside's content width to 32px while the two palette <canvas> elements
+   keep their intrinsic 40px width — so their right 8px (including the picker's
+   bright right column and part of the fg/bg preview) is hidden UNDER the
+   scrollbar and they read as clipped / unequal.
+
+   Fix without touching engine .js: pin both palette canvases to the same CSS
+   width that fits inside the scrollbar (the aside content box), centred and
+   left-aligned identically. The canvases keep their pixel bitmaps; CSS just
+   scales them down crisply (image-rendering: pixelated is already set). Result:
+   the fg/bg preview pair and the picker grid are the same width, aligned, and
+   fully visible regardless of the scrollbar. */
+.ansi-editor-root #palettePreview,
+.ansi-editor-root #palettePicker {
+  /* 32px = the aside's content box once the 8px scrollbar is accounted for, so
+     neither canvas is ever hidden under the scrollbar. Same width => aligned. */
+  width: 32px;
+  margin-inline: auto;
+  display: block;
+}
+/* The preview is square (fg/bg overlap indicator): keep it square at the new
+   width so the two equal swatches stay equal on screen. */
+.ansi-editor-root #palettePreview {
+  height: 32px;
+}
+/* The picker is 2 cols x 8 rows; preserve its 1:4 aspect at the new width so
+   every swatch stays a uniform square. */
+.ansi-editor-root #palettePicker {
+  height: 128px;
 }

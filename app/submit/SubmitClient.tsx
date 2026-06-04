@@ -777,15 +777,13 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
               <div className="lightgrey amb-1" style={{ fontFamily: "TopazPlus_a1200, monospace", fontSize: "16px", lineHeight: "16px" }}>
                 Draw an 80 &times; 8 ANSI logo below — the header limit. Submit exports it as a .ans file.
               </div>
-              {/* The editor's toolbars need ~980px to lay out. The submit column
-                  is narrower (≈660-880px at lg), so allow horizontal scroll
-                  rather than letting the chrome wrap/overflow the page. The
-                  fixed height gives the editor's height:100% chain a definite
-                  box to resolve against (header + 80x8 viewport). */}
-              <div style={{ overflowX: "auto", maxWidth: "100%" }}>
-                <div style={{ minWidth: 980, height: 320 }}>
-                  <AnsiEditor ref={editorRef} />
-                </div>
+              {/* The editor now fits the submit column (its header was slimmed
+                  in editor.css so it no longer needs ~980px), so it sits flush
+                  at full width — no horizontal-scroll wrapper. The fixed height
+                  gives the editor's height:100% chain a definite box to resolve
+                  against (header + 80x8 viewport). */}
+              <div style={{ width: "100%", height: 320 }}>
+                <AnsiEditor ref={editorRef} />
               </div>
             </Field>
             <div className="amt-1">
