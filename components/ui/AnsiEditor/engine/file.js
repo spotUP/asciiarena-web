@@ -1227,7 +1227,10 @@ const saveModule = () => {
 		}
 	};
 
-	const createSauce = (datatype, filetype, filesize, doFlagsAndTInfoS) => {
+	// meta lets the headless export path supply title/author/group/comments
+	// explicitly. When undefined, fields fall back to the in-app #sauce* DOM
+	// inputs, so the existing download path behaves exactly as before.
+	const createSauce = (datatype, filetype, filesize, doFlagsAndTInfoS, meta) => {
 		const addText = (text, maxlength, index) => {
 			let i;
 			for (i = 0; i < maxlength; i += 1) {
@@ -1235,7 +1238,14 @@ const saveModule = () => {
 			}
 		};
 
-		const commentsText = $('sauceComments').value.trim();
+		const sauceTitle = meta ? meta.title || '' : $('sauceTitle').value;
+		const sauceAuthor = meta ? meta.author || '' : $('sauceAuthor').value;
+		const sauceGroup = meta ? meta.group || '' : $('sauceGroup').value;
+		const sauceComments = meta
+			? meta.comments || ''
+			: $('sauceComments').value;
+
+		const commentsText = sauceComments.trim();
 		const commentLines = commentsText ? commentsText.split('\n') : [];
 
 		let processedComments = '';
@@ -1271,9 +1281,9 @@ const saveModule = () => {
 		addText('SAUCE00', 7, 0);
 
 		// Title, Author, Group (padded)
-		const titleBytes = new TextEncoder().encode($('sauceTitle').value);
-		const authorBytes = new TextEncoder().encode($('sauceAuthor').value);
-		const groupBytes = new TextEncoder().encode($('sauceGroup').value);
+		const titleBytes = new TextEncoder().encode(sauceTitle);
+		const authorBytes = new TextEncoder().encode(sauceAuthor);
+		const groupBytes = new TextEncoder().encode(sauceGroup);
 
 		sauce.fill(0x20, 7, 42); // Clear title field
 		sauce.set(titleBytes.slice(0, 35), 7);
@@ -1323,7 +1333,11 @@ const saveModule = () => {
 		if (datatype !== 6 && doFlagsAndTInfoS) {
 			// Not XBIN
 			let flags = 0;
-			if (State.textArtCanvas.getIceColors()) {
+			const iceColors =
+				meta && meta.iceColors !== undefined
+					? meta.iceColors
+					: State.textArtCanvas.getIceColors();
+			if (iceColors) {
 				flags += 1;
 			}
 			if (State.font.getLetterSpacing()) {
@@ -1352,11 +1366,11 @@ const saveModule = () => {
 		return sauce;
 	};
 
-	const encodeANSi = async (
-		useUTF8,
-		blinkers = true,
-		stripEscapeCodes = false,
-	) => {
+	// Build the ANSI escape-coded body (array of byte values) for the current
+	// State.textArtCanvas content. Shared by the in-app download path
+	// (encodeANSi) and the headless byte export (encodeAnsBytes) so both emit
+	// byte-identical bodies.
+	const buildAnsiBody = (useUTF8, blinkers = true, stripEscapeCodes = false) => {
 		const ansiColor = binColor => {
 			switch (binColor) {
 				case 1:
@@ -1512,6 +1526,15 @@ const saveModule = () => {
 			output.push(27, 91, 48, 109); // ESC[0m
 		}
 
+		return output;
+	};
+
+	const encodeANSi = async (
+		useUTF8,
+		blinkers = true,
+		stripEscapeCodes = false,
+	) => {
+		const output = buildAnsiBody(useUTF8, blinkers, stripEscapeCodes);
 		const sauce = useUTF8 ? '' : createSauce(1, 1, output.length, true);
 		let fname;
 		if (stripEscapeCodes) {
@@ -1523,6 +1546,35 @@ const saveModule = () => {
 		}
 		await saveFile(new Uint8Array(output), sauce, fname);
 	};
+	// Headless .ans byte export. Produces the SAME byte format as the in-app
+	// non-UTF8 ANSI download (encodeANSi(false, ...)): the ANSI escape-coded
+	// body for the current State.textArtCanvas content, a 0x1a EOF marker, then
+	// a 128-byte SAUCE record. Unlike the download path, title/author/group/
+	// iceColors come from args (not the #sauce* DOM inputs), so it works in an
+	// embedded editor where those inputs do not exist. Returns a Uint8Array.
+	const encodeAnsBytes = async ({
+		title = '',
+		author = '',
+		group = '',
+		iceColors = true,
+	} = {}) => {
+		const output = buildAnsiBody(false, true, false);
+		const body = new Uint8Array(output);
+		const sauce = createSauce(1, 1, body.length, true, {
+			title,
+			author,
+			group,
+			comments: '',
+			iceColors,
+		});
+		// Assemble body + EOF (0x1a) + SAUCE, matching saveFile()'s layout.
+		const bytes = new Uint8Array(body.length + 1 + sauce.length);
+		bytes.set(body, 0);
+		bytes[body.length] = 0x1a; // EOF marker / separator
+		bytes.set(sauce, body.length + 1);
+		return bytes;
+	};
+
 	const ans = async () => {
 		await encodeANSi(false);
 	};
@@ -1658,6 +1710,7 @@ const saveModule = () => {
 	return {
 		ans: ans,
 		bin: bin,
+		encodeAnsBytes: encodeAnsBytes,
 		plainText: plainText,
 		png: png,
 		utf8: utf8,
@@ -1667,5 +1720,8 @@ const saveModule = () => {
 };
 const Save = saveModule();
 
-export { Load, Save };
+// Headless .ans byte export (see saveModule). Returns a Promise<Uint8Array>.
+const encodeAnsBytes = Save.encodeAnsBytes;
+
+export { Load, Save, encodeAnsBytes };
 export default { Load, Save };
