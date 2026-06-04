@@ -194,10 +194,18 @@ model lastusers {
 }
 
 model logos {
-  logo_id Int     @id @default(autoincrement())
-  author  String? @db.Char(60)
-  ascii   String  @db.MediumText
-  base64  Int?
+  logo_id  Int        @id @default(autoincrement())
+  author   String?    @db.Char(60)
+  ascii    String     @db.MediumText
+  base64   Int?
+  kind     logos_kind @default(ascii)
+  ansi_b64 String?    @db.MediumText
+  font     String?    @db.VarChar(32)
+}
+
+enum logos_kind {
+  ascii
+  ansi
 }
 
 model mags {

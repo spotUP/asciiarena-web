@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Combobox from "@/components/ui/Combobox";
+import { FONTS } from "@/lib/ansilove";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -142,6 +143,8 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
   // Site logo form
   const [logoAuthor, setLogoAuthor] = useState("");
   const [logoAscii, setLogoAscii] = useState("");
+  const [logoAnsiFont, setLogoAnsiFont] = useState("");
+  const logoAnsiRef = useRef<HTMLInputElement>(null);
 
   // ── Hash sync ──────────────────────────────────────────────────────────────
 
@@ -401,6 +404,27 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
     if (r.status === 201) {
       setStatus({ msg: "Logo submitted successfully!", ok: true });
       setLogoAuthor(""); setLogoAscii("");
+    } else {
+      const body = (await r.json().catch(() => ({}))) as { error?: string };
+      setStatus({ msg: body.error ?? "Submit failed.", ok: false });
+    }
+  }
+
+  async function handleAnsiLogoSubmit(e: React.SyntheticEvent) {
+    e.preventDefault();
+    const file = logoAnsiRef.current?.files?.[0];
+    if (!file) {
+      setStatus({ msg: "Choose a .ans file first.", ok: false });
+      return;
+    }
+    const fd = new FormData();
+    fd.append("ans", file);
+    fd.append("author", logoAuthor);
+    if (logoAnsiFont) fd.append("font", logoAnsiFont);
+    const r = await fetch("/api/logos", { method: "POST", body: fd });
+    if (r.status === 201) {
+      setStatus({ msg: "ANSI logo submitted successfully!", ok: true });
+      if (logoAnsiRef.current) logoAnsiRef.current.value = "";
     } else {
       const body = (await r.json().catch(() => ({}))) as { error?: string };
       setStatus({ msg: body.error ?? "Submit failed.", ok: false });
@@ -742,6 +766,27 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
             </Field>
             <div className="amt-1">
               <input type="submit" className="btn-big bg-green white" value="Submit Logo" />
+            </div>
+          </form>
+
+          <form onSubmit={handleAnsiLogoSubmit} className="container-fluid bg-secondary apb-1 ap-1 amb-2">
+            <div className="lightgrey amb-1">Or upload an ANSI logo (.ans):</div>
+            <Field label="ANSI file" required>
+              <input ref={logoAnsiRef} type="file" accept=".ans" className="lightgrey" />
+            </Field>
+            <Field label="Font">
+              <select
+                value={logoAnsiFont}
+                onChange={e => setLogoAnsiFont(e.target.value)}
+                className="form-control"
+                style={{ width: "auto" }}
+              >
+                <option value="">Auto (SAUCE)</option>
+                {FONTS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+              </select>
+            </Field>
+            <div className="amt-1">
+              <input type="submit" className="btn-big bg-green white" value="Submit ANSI Logo" />
             </div>
           </form>
         </>

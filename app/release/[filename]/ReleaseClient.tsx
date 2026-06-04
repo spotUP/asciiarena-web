@@ -10,6 +10,7 @@ import {
   editComment as editCommentAction,
   deleteComment as deleteCommentAction,
 } from "@/app/actions/collys";
+import { FONTS, ANSI_FONT_MAP, loadAnsiLove } from "@/lib/ansilove";
 
 const COLOR_OPTIONS = [
   { value: "#555555", label: "Bright Black" },
@@ -30,27 +31,6 @@ const COLOR_OPTIONS = [
   { value: "#aaaaaa", label: "Grey" },
 ];
 
-const FONTS = [
-  { value: "MicroKnight", label: "MicroKnight" },
-  { value: "MicroKnightPlus", label: "MicroKnight+" },
-  { value: "mOsOul", label: "mOsOul" },
-  { value: "P0T-NOoDLE", label: "P0T-NOoDLE" },
-  { value: "Topaz_a500", label: "A500 Topaz" },
-  { value: "TopazPlus_a500", label: "A500 Topaz+" },
-  { value: "Topaz_a1200", label: "A1200 Topaz" },
-  { value: "TopazPlus_a1200", label: "A1200 Topaz+" },
-];
-
-const ANSI_FONT_MAP: Record<string, string> = {
-  "MicroKnight": "microknight",
-  "MicroKnightPlus": "microknight+",
-  "mOsOul": "mosoul",
-  "P0T-NOoDLE": "pot-noodle",
-  "Topaz_a500": "topaz500",
-  "TopazPlus_a500": "topaz500+",
-  "Topaz_a1200": "topaz",
-  "TopazPlus_a1200": "topaz+",
-};
 
 interface Comment {
   id: number;
@@ -443,11 +423,9 @@ export default function ReleaseClient({
 
     const ansiFont = ANSI_FONT_MAP[font] ?? "mosoul";
 
-    function doRender() {
+    loadAnsiLove().then(api => {
       if (cancelled) return;
-      const w = window as Window & { AnsiLove?: { splitRender: (url: string, cb: (canvases: HTMLCanvasElement[]) => void, chunkSize: number, opts: Record<string, unknown>) => void } };
-      if (!w.AnsiLove) { setTimeout(doRender, 50); return; }
-      w.AnsiLove.splitRender(collyFileUrl, (canvases: HTMLCanvasElement[]) => {
+      api.splitRender(collyFileUrl, (canvases: HTMLCanvasElement[]) => {
         if (cancelled) return;
         canvases.forEach(canvas => {
           canvas.style.verticalAlign = "bottom";
@@ -457,14 +435,7 @@ export default function ReleaseClient({
         });
         if (loadingEl) loadingEl.style.display = "none";
       }, 100, { font: ansiFont, bits: "8", icecolors: 1, columns: 80, thumbnail: 0, filetype: "ans" });
-    }
-
-    if (!document.querySelector('script[src="/assets/js/ansilove.js"]')) {
-      const script = document.createElement("script");
-      script.src = "/assets/js/ansilove.js";
-      document.head.appendChild(script);
-    }
-    doRender();
+    }).catch(() => {});
 
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps

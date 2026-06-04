@@ -17,13 +17,25 @@ export type SiteLayoutProps = {
   children: React.ReactNode;
 };
 
+export type SiteLogo =
+  | { kind: "ascii"; ascii: string }
+  | { kind: "ansi"; ansiB64: string; font: string | null };
+
 const getLogos = unstable_cache(
-  async () => {
+  async (): Promise<SiteLogo[]> => {
     try {
-      const rows = await prisma.$queryRaw<Array<{ ascii: string }>>(
-        Prisma.sql`SELECT ascii FROM logos ORDER BY logo_id LIMIT 50`
+      const rows = await prisma.$queryRaw<Array<{
+        kind: string; ascii: string; ansi_b64: string | null; font: string | null;
+      }>>(
+        Prisma.sql`SELECT kind, ascii, ansi_b64, font FROM logos ORDER BY logo_id LIMIT 50`
       );
-      return rows.map((r) => r.ascii);
+      return rows.flatMap((r): SiteLogo[] => {
+        if (r.kind === "ansi") {
+          // Drop ANSI rows with no payload so the header never renders a blank slot.
+          return r.ansi_b64 ? [{ kind: "ansi", ansiB64: r.ansi_b64, font: r.font }] : [];
+        }
+        return [{ kind: "ascii", ascii: r.ascii }];
+      });
     } catch {
       return [];
     }
