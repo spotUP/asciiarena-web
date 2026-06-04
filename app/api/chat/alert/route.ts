@@ -6,7 +6,7 @@ import { apiError, apiOk } from "@/lib/utils";
 import { broadcast } from "@/lib/live";
 import { checkRateLimit } from "@/lib/rateLimit";
 import { alertRateLimitKey, buildAlertEvent } from "@/lib/chatAlert";
-import { isParticipant } from "@/lib/chatThreadDb";
+import { isParticipant, getActiveParticipants } from "@/lib/chatThreadDb";
 
 const schema = z.object({
   threadId: z.number().int().positive(),
@@ -42,5 +42,13 @@ export async function POST(request: NextRequest) {
   }
 
   broadcast(`thread:${threadId}`, buildAlertEvent(myId, myNick));
+
+  const active = await getActiveParticipants(threadId);
+  for (const p of active) {
+    if (p.userId !== myId) {
+      broadcast(`user:${p.userId}:messages`, { type: "alert", fromId: myId, fromNick: myNick, threadId });
+    }
+  }
+
   return apiOk({ ok: true });
 }

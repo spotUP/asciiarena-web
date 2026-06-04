@@ -163,8 +163,8 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
           }
         } else if (event.type === "alert") {
           // Ignore the echo of our own yell (we already played it on click).
+          // Sound is played once by ChatBar via the user channel; only flash here.
           if (event.fromId !== parseInt(userId)) {
-            playChatAlert();
             triggerFlash();
           }
         } else if (event.type === "member-joined") {

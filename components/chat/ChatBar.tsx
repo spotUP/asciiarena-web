@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { useChatContext, dmKey } from "./ChatContext";
+import { useChatContext, dmKey, threadKey } from "./ChatContext";
 import ChatWindow from "./ChatWindow";
-import { isSnoozed } from "@/lib/chat-snooze";
 import { resolveDisplayTitle } from "@/lib/chatThread";
+import { playChatAlert, unlockChatAudio } from "@/lib/chatSound";
 
 interface Props {
   userId: string;
@@ -19,10 +19,6 @@ interface IncomingMessage {
   byNick?: string;
 }
 
-// After you minimize a chat, new messages from that peer stay collapsed (just
-// the blinking unread tab) instead of popping the window open, for this long.
-const MINIMIZE_SNOOZE_MS = 30 * 60 * 1000; // 30 minutes
-
 export default function ChatBar({ userId, userNick }: Props) {
   const { windows, openChat, openThread, minimizeChat, incrementUnread } = useChatContext();
   const [newNick, setNewNick] = useState("");
@@ -34,36 +30,49 @@ export default function ChatBar({ userId, userNick }: Props) {
 
   useEffect(() => { windowsRef.current = windows; }, [windows]);
 
-  // SSE listener for incoming messages. A new message opens the chat docked at
-  // the bottom, expanded so the message is immediately visible — UNLESS you
-  // recently minimized that peer's window, in which case it stays collapsed
-  // (blinking unread tab) and doesn't pop open again for MINIMIZE_SNOOZE_MS.
+  // SSE listener for incoming messages and yells. A new message always
+  // expands (or opens) the relevant chat window. A yell also opens/expands
+  // and plays the X-Copy alert sound so it reaches you even with no window open.
   useEffect(() => {
     const es = new EventSource(`/api/live?channel=user:${userId}:messages`);
     es.onmessage = (e) => {
       try {
         const event = JSON.parse(e.data) as IncomingMessage;
         if (event.type === "message" && event.fromId && event.fromNick) {
-          const existingWindow = windowsRef.current.find(w => w.key === dmKey(event.fromId!));
-          if (existingWindow) {
-            if (existingWindow.minimized) {
-              if (isSnoozed(event.fromId, MINIMIZE_SNOOZE_MS)) {
-                // You minimized this recently — keep it collapsed; just bump
-                // the blinking unread count instead of popping it open.
-                incrementUnread(dmKey(event.fromId));
-              } else {
-                // Snooze expired — pop the collapsed tab back open.
-                minimizeChat(dmKey(event.fromId), false);
-              }
-            }
-            // Already expanded: its own thread SSE shows the message inline.
-          } else if (isSnoozed(event.fromId, MINIMIZE_SNOOZE_MS)) {
-            // No window yet (e.g. after a reload) but still snoozed — park a
-            // collapsed blinking tab instead of popping a window open.
-            openChat(event.fromId, event.fromNick, undefined, { startMinimized: true, unread: 1 });
+          const wins = windowsRef.current;
+          const tid = event.threadId;
+          const groupWin = tid ? wins.find(w => w.key === threadKey(tid)) : undefined;
+          const dmWin = wins.find(w => w.key === dmKey(event.fromId!));
+          if (groupWin) {
+            if (groupWin.minimized) minimizeChat(groupWin.key, false); // expand the group
+          } else if (dmWin) {
+            if (dmWin.minimized) minimizeChat(dmWin.key, false);       // expand the DM
           } else {
-            // First DM from this person this session — open it expanded.
-            openChat(event.fromId, event.fromNick);
+            openChat(event.fromId, event.fromNick);                    // new DM, expanded
+          }
+        } else if (event.type === "alert" && event.threadId && event.fromId !== parseInt(userId)) {
+          unlockChatAudio();
+          const tid = event.threadId;
+          const wins = windowsRef.current;
+          const groupWin = wins.find(w => w.key === threadKey(tid));
+          const dmWin = event.fromId ? wins.find(w => w.key === dmKey(event.fromId!)) : undefined;
+          if (groupWin) {
+            if (groupWin.minimized) minimizeChat(groupWin.key, false);
+            playChatAlert();
+          } else if (dmWin) {
+            if (dmWin.minimized) minimizeChat(dmWin.key, false);
+            playChatAlert();
+          } else {
+            // No window yet — fetch members to open the right one, then play.
+            fetch(`/api/chat/thread/${tid}/members`)
+              .then(r => r.json())
+              .then((list: { userId: number; nick: string }[]) => {
+                const others = list.filter(p => p.userId !== parseInt(userId)).map(p => ({ id: p.userId, nick: p.nick }));
+                if (others.length === 1) openChat(others[0].id, others[0].nick, tid);
+                else openThread(tid, others, resolveDisplayTitle(null, null, others.map(o => o.nick)), { startMinimized: false });
+                playChatAlert();
+              })
+              .catch(() => { playChatAlert(); });
           }
         } else if (event.type === "thread-added" && event.threadId) {
           fetch(`/api/chat/thread/${event.threadId}/members`)
