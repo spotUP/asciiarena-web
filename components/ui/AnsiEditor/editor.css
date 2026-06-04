@@ -2466,3 +2466,50 @@
   overflow: visible;
   text-overflow: clip;
 }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   asciiarena CHANGE 2: ASCII toolbar glyphs.
+   The graphical SVG toolbar icons were replaced in markup.ts with short ASCII
+   tokens wrapped in <span class="asciiIcon">. This is a text/BBS/ANSI themed
+   site, so monospace ASCII reads more in-theme than vector icons. The element
+   ids/classes/handlers are untouched (only the inner glyph changed), so every
+   tool still selects on click. Style the tokens so they sit where the 30px
+   icon square used to: monospace, centred, legible, non-selectable. */
+.ansi-editor-root .asciiIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  font-family: "Courier New", "DejaVu Sans Mono", monospace;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+}
+/* Left tool sidebar (40px column): tokens fill the 30px cell and inherit the
+   light icon colour the SVGs used (#efefef). */
+.ansi-editor-root aside .asciiIcon {
+  color: #efefef;
+  width: 30px;
+}
+/* Header tokens follow the header foreground colour. */
+.ansi-editor-root header .asciiIcon {
+  color: var(--color-fg);
+}
+/* The toolButton chips already carry a <kbd> text label beside the glyph; keep
+   a small gap, matching the old `svg { margin-inline-end: 5px }`. */
+.ansi-editor-root .toolButton .asciiIcon {
+  margin-inline-end: 5px;
+}
+/* F-key prev/next arrows and the file/edit/sauce menu tokens live in fixed
+   small buttons — let the token shrink to fit without forcing 30px. */
+.ansi-editor-root #fkeySetPrev .asciiIcon,
+.ansi-editor-root #fkeySetNext .asciiIcon,
+.ansi-editor-root #file .asciiIcon,
+.ansi-editor-root #edit .asciiIcon {
+  min-width: 0;
+}

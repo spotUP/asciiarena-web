@@ -16,31 +16,23 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 					<div id="fileNav">
 						<div id="fileMenu" class="menuTitle" tabindex="0">
 							<button id="file" aria-label="File Menu">
-								<svg alt="File" aria-label="File">
-									<use href="/ansi-editor/icons.svg#save"></use>
-								</svg>
+								<span class="asciiIcon" aria-hidden="true">File</span>
 							</button>
 						</div>
 						<div id="editMenu" class="menuTitle" tabindex="0">
 							<button id="edit" aria-label="Edit Menu">
-								<svg alt="Edit" aria-label="Edit">
-									<use href="/ansi-editor/icons.svg#settings"></use>
-								</svg>
+								<span class="asciiIcon" aria-hidden="true">Edit</span>
 							</button>
 						</div>
 					</div>
 					<button id="navSauce" aria-label="Sauce Menu">
-						<svg>
-							<use href="/ansi-editor/icons.svg#sauce"></use>
-						</svg>
+						<span class="asciiIcon" aria-hidden="true">[i]</span>
 					</button>
 				</nav>
 				<nav>
 					<div id="keyboardToolbar">
 						<button id="fkeySetPrev" aria-label="Previous">
-							<svg>
-								<use href="/ansi-editor/icons.svg#left"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">&lt;</span>
 						</button>
 						<span id="fkey0w">F1<canvas id="fkey0" class="fkey" height="0" width="0"></canvas></span>
 						<span id="fkey1w">F2<canvas id="fkey1" class="fkey" height="0" width="0"></canvas></span>
@@ -55,34 +47,24 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 						<span id="fkey10w">F11<canvas id="fkey10" class="fkey" height="0" width="0"></canvas></span>
 						<span id="fkey11w">F12<canvas id="fkey11" class="fkey" height="0" width="0"></canvas></span>
 						<button id="fkeySetNext" aria-label="Next">
-							<svg>
-								<use href="/ansi-editor/icons.svg#right"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">&gt;</span>
 						</button>
 					</div>
 					<div id="brushToolbar">
 						<div id="halfblock" class="toolButton">
-							<svg alt="Block" aria-label="Block (f)">
-								<use href="/ansi-editor/icons.svg#blockBrush"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">[#]</span>
 							<kbd>Block</kbd>
 						</div>
 						<div id="shadingBrush" class="toolButton">
-							<svg alt="Shading" aria-label="Shading (f)">
-								<use href="/ansi-editor/icons.svg#shadeBrush"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">[%]</span>
 							<kbd>Shading</kbd>
 						</div>
 						<div id="characterBrush" class="toolButton">
-							<svg alt="Character Brush" aria-label="Character Brush (b)">
-								<use href="/ansi-editor/icons.svg#character"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">[c]</span>
 							<kbd>Character</kbd>
 						</div>
 						<div id="attrib" class="toolButton">
-							<svg alt="Color" aria-label="Color">
-								<use href="/ansi-editor/icons.svg#roller"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">[~]</span>
 							<kbd>Color</kbd>
 						</div>
 						<div id="aSize">
@@ -110,70 +92,48 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 					<div id="selectionToolbar">
 						<div id="flipHorizontal" class="toolButton">
 							<kbd>Mirror</kbd>
-							<svg class="sm" alt="Flip Horizontal" aria-label="Flip Horizontal ([)">
-								<use href="/ansi-editor/icons.svg#fliph"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">&lt;|&gt;</span>
 						</div>
 						<div id="flipVertical" class="toolButton">
 							<kbd>Flip</kbd>
-							<svg class="sm" alt="Flip Vertical" aria-label="Flip Vertical (])">
-								<use href="/ansi-editor/icons.svg#flipv"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">^v</span>
 						</div>
 						<div id="moveBlocks" class="toolButton">
 							<kbd>Move</kbd>
-							<svg>
-								<use href="/ansi-editor/icons.svg#move"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">[+]</span>
 						</div>
 						<div id="cut" class="toolButton">
 							<kbd>Cut</kbd>
-							<svg transform="matrix(-1,0,0,1,0,0)">
-								<use href="/ansi-editor/icons.svg#cut"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">[x]</span>
 						</div>
 						<div id="delete" class="toolButton">
 							<kbd>Delete</kbd>
-							<svg>
-								<use href="/ansi-editor/icons.svg#delete"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">[-]</span>
 						</div>
 						<div id="copy" class="toolButton">
 							<kbd>Copy</kbd>
-							<svg>
-								<use href="/ansi-editor/icons.svg#copy"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">[=]</span>
 						</div>
 						<div id="paste" class="toolButton">
 							<kbd>Paste</kbd>
-							<svg>
-								<use href="/ansi-editor/icons.svg#paste"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">[v]</span>
 						</div>
 						<div id="systemPaste" class="toolButton">
 							<kbd>System</kbd>
-							<svg transform="rotate(90)">
-								<use href="/ansi-editor/icons.svg#paste"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">[V]</span>
 						</div>
 					</div>
 					<div id="shapesToolbar">
 						<div id="line" class="toolButton">
-							<svg alt="Line" aria-label="Line">
-								<use href="/ansi-editor/icons.svg#line"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">[/]</span>
 							<kbd>Line</kbd>
 						</div>
 						<div id="square" class="toolButton">
-							<svg alt="Square" aria-label="Square">
-								<use href="/ansi-editor/icons.svg#square"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">[]</span>
 							<kbd>Square</kbd>
 						</div>
 						<div id="circle" class="toolButton">
-							<svg alt="Circle" aria-label="Circle">
-								<use href="/ansi-editor/icons.svg#circle"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">(O)</span>
 							<kbd>Circle</kbd>
 						</div>
 						<div id="circleToolbar" class="hide"></div>
@@ -181,82 +141,48 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 					</div>
 					<div id="clipboardToolbar">
 						<div id="undo" class="toolButton">
-							<svg alt="Undo" aria-label="Undo">
-								<use href="/ansi-editor/icons.svg#undo"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">&lt;-</span>
 							<kbd>Undo</kbd>
 						</div>
 						<div id="redo" class="toolButton">
-							<svg alt="Redo" aria-label="Redo">
-								<use href="/ansi-editor/icons.svg#redo"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">-&gt;</span>
 							<kbd>Redo</kbd>
 						</div>
 					</div>
 					<div id="fontToolbar">
 						<div id="changeFont" class="toolButton">
-							<svg alt="Change Font" aria-label="Change Font">
-								<use href="/ansi-editor/icons.svg#font"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">[A]</span>
 							<kbd>Change Font</kbd>
 						</div>
 						<div id="navICE" class="toolButton">
-							<svg alt="Use iCE Colors" aria-label="Toggle iCE Colors">
-								<use href="/ansi-editor/icons.svg#ice"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">[!]</span>
 							<kbd>ICE Colors</kbd>
 						</div>
 						<div id="nav9pt" class="toolButton">
-							<svg alt="Use 9px Font" aria-label="Toggle 9px Font">
-								<use href="/ansi-editor/icons.svg#spacing"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">9px</span>
 							<kbd>9pt Font</kbd>
 						</div>
 					</div>
 					<div id="viewportToolbar">
 						<div id="zoomControl" class="toolButton">
-							<svg alt="Zoom" aria-label="Zoom (Ctrl +/-)">
-								<use href="/ansi-editor/icons.svg#zoom"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">[Q]</span>
 						</div>
 						<div id="navDarkmode" class="toolButton">
-							<svg class="sunAndMoon" aria-hidden="true" viewBox="1 0 24 24">
-								<mask id="moonMask" class="moon">
-									<rect fill="white" height="100%" width="100%" x="0" y="0"/>
-									<circle cx="0" cy="10" fill="black" r="6"/>
-								</mask>
-								<circle class="sun" cx="12" cy="12" fill="currentColor" mask="url(#moonMask)" r="6"/>
-								<g class="sunBeams" stroke="currentColor">
-									<line x1="12" x2="12" y1="1" y2="3"/>
-									<line x1="12" x2="12" y1="21" y2="23"/>
-									<line x1="4.22" x2="5.64" y1="4.22" y2="5.64"/>
-									<line x1="18.36" x2="19.78" y1="18.36" y2="19.78"/>
-									<line x1="1" x2="3" y1="12" y2="12"/>
-									<line x1="21" x2="23" y1="12" y2="12"/>
-									<line x1="4.22" x2="5.64" y1="19.78" y2="18.36"/>
-									<line x1="18.36" x2="19.78" y1="5.64" y2="4.22"/>
-								</g>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">[D]</span>
 							<kbd id="mode">Night</kbd>
 						</div>
 						<div id="navGrid" class="toolButton">
-							<svg alt="Toggle Grid (Ctrl-G)" aria-label="Toggle Grid (Ctrl-G)">
-								<use href="/ansi-editor/icons.svg#grid"></use>
-							</svg>
+							<span class="asciiIcon" aria-hidden="true">[#]</span>
 							<kbd>Grid</kbd>
 						</div>
 					</div>
 				</nav>
 				<nav>
 					<button id="networkButton" class="hide" aria-label="Join Collab">
-						<svg alt="Join Collab" aria-label="Join Collab">
-							<use href="/ansi-editor/icons.svg#group"></use>
-						</svg>
+						<span class="asciiIcon" aria-hidden="true">[@]</span>
 					</button>
 					<button id="chatButton" class="includedForWebsocket" aria-label="Chat">
-						<svg alt="Toggle Chat" aria-label="Toggle Chat">
-							<use href="/ansi-editor/icons.svg#group"></use>
-						</svg>
+						<span class="asciiIcon" aria-hidden="true">[T]</span>
 					</button>
 					<div id="chatWindow" class="hide">
 						<div id="chatRoom">
@@ -286,9 +212,7 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 						</div>
 					</div>
 					<div id="resolution">
-						<svg id="navRes" alt="Change Resolution" aria-label="Change Resolution">
-							<use href="/ansi-editor/icons.svg#resolution"></use>
-						</svg>
+						<span id="navRes" class="asciiIcon" aria-label="Change Resolution">[R]</span>
 						<kbd id="resolutionLabel">80x25</kbd>
 					</div>
 					<div id="currentFontDisplay">
@@ -300,57 +224,37 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 			<aside>
 				<canvas id="palettePreview" height="40" width="40"></canvas>
 				<canvas id="palettePicker" height="160" width="40"></canvas>
-				<div id="keyboard">
-					<svg alt="Keyboard" aria-label="Keyboard (k)">
-						<use href="/ansi-editor/icons.svg#keeb"></use>
-					</svg>
+				<div id="keyboard" aria-label="Keyboard (k)">
+					<span class="asciiIcon" aria-hidden="true">[K]</span>
 				</div>
-				<div id="brushes">
-					<svg alt="Brushes" aria-label="Brushes">
-						<use href="/ansi-editor/icons.svg#brush"></use>
-					</svg>
+				<div id="brushes" aria-label="Brushes">
+					<span class="asciiIcon" aria-hidden="true">[/]</span>
 				</div>
-				<div id="fill">
-					<svg alt="Fill" aria-label="Fill (n)">
-						<use href="/ansi-editor/icons.svg#fill"></use>
-					</svg>
+				<div id="fill" aria-label="Fill (n)">
+					<span class="asciiIcon" aria-hidden="true">[F]</span>
 				</div>
-				<div id="shapes">
-					<svg alt="Shapes" aria-label="Shapes">
-						<use href="/ansi-editor/icons.svg#shapes"></use>
-					</svg>
+				<div id="shapes" aria-label="Shapes">
+					<span class="asciiIcon" aria-hidden="true">[O]</span>
 				</div>
 				<div class="separator"></div>
-				<div id="selection">
-					<svg alt="Selection" aria-label="Selection">
-						<use href="/ansi-editor/icons.svg#select"></use>
-					</svg>
+				<div id="selection" aria-label="Selection">
+					<span class="asciiIcon" aria-hidden="true">[.]</span>
 				</div>
-				<div id="sample">
-					<svg alt="Sample" aria-label="Sample (alt)">
-						<use href="/ansi-editor/icons.svg#dropper"></use>
-					</svg>
+				<div id="sample" aria-label="Sample (alt)">
+					<span class="asciiIcon" aria-hidden="true">[i]</span>
 				</div>
-				<div id="mirror">
-					<svg alt="Mirror Mode" aria-label="Mirror Mode (Ctrl+M)">
-						<use href="/ansi-editor/icons.svg#mirror"></use>
-					</svg>
+				<div id="mirror" aria-label="Mirror Mode (Ctrl+M)">
+					<span class="asciiIcon" aria-hidden="true">&lt;&gt;</span>
 				</div>
 				<div class="separator"></div>
-				<div id="clipboard">
-					<svg alt="Undo" aria-label="Undo">
-						<use href="/ansi-editor/icons.svg#history"></use>
-					</svg>
+				<div id="clipboard" aria-label="Undo History">
+					<span class="asciiIcon" aria-hidden="true">[H]</span>
 				</div>
-				<div id="fonts">
-					<svg alt="Change Font" aria-label="Change Font">
-						<use href="/ansi-editor/icons.svg#font"></use>
-					</svg>
+				<div id="fonts" aria-label="Change Font">
+					<span class="asciiIcon" aria-hidden="true">[A]</span>
 				</div>
-				<div id="navView">
-					<svg alt="Viewport Options" aria-label="Viewport Options">
-						<use href="/ansi-editor/icons.svg#canvas"></use>
-					</svg>
+				<div id="navView" aria-label="Viewport Options">
+					<span class="asciiIcon" aria-hidden="true">[*]</span>
 				</div>
 			</aside>
 			<div id="viewport">
