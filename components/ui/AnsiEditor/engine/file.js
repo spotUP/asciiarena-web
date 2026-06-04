@@ -1241,9 +1241,7 @@ const saveModule = () => {
 		const sauceTitle = meta ? meta.title || '' : $('sauceTitle').value;
 		const sauceAuthor = meta ? meta.author || '' : $('sauceAuthor').value;
 		const sauceGroup = meta ? meta.group || '' : $('sauceGroup').value;
-		const sauceComments = meta
-			? meta.comments || ''
-			: $('sauceComments').value;
+		const sauceComments = meta ? (meta.comments || '') : $('sauceComments').value;
 
 		const commentsText = sauceComments.trim();
 		const commentLines = commentsText ? commentsText.split('\n') : [];
@@ -1535,6 +1533,7 @@ const saveModule = () => {
 		stripEscapeCodes = false,
 	) => {
 		const output = buildAnsiBody(useUTF8, blinkers, stripEscapeCodes);
+		// No meta -> SAUCE title/author/group/iceColors come from the DOM inputs (download path).
 		const sauce = useUTF8 ? '' : createSauce(1, 1, output.length, true);
 		let fname;
 		if (stripEscapeCodes) {
@@ -1556,7 +1555,10 @@ const saveModule = () => {
 		title = '',
 		author = '',
 		group = '',
-		iceColors = true,
+		// Defaults to the canvas's current iceColors so headless output is faithful
+		// when the caller omits this arg. Safe: encodeAnsBytes only runs after the
+		// canvas exists.
+		iceColors = State.textArtCanvas.getIceColors(),
 	} = {}) => {
 		const output = buildAnsiBody(false, true, false);
 		const body = new Uint8Array(output);
