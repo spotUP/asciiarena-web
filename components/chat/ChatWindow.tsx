@@ -182,6 +182,7 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
           // Sound is played once by ChatBar via the user channel; only flash here.
           if (event.fromId !== parseInt(userId)) {
             triggerFlash();
+            pushSystemLine(`${event.fromNick || "someone"} boinged ${formatTime(Math.floor(Date.now() / 1000))}!`);
           }
         } else if (event.type === "member-joined") {
           pushSystemLine(`${event.nick} joined`);
