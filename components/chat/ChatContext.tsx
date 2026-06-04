@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode } from "react";
 import { setSnooze, clearSnooze } from "@/lib/chat-snooze";
 
 export interface ChatParticipant { id: number; nick: string }
@@ -51,6 +51,7 @@ function capWindows(next: ChatWindowState[]): ChatWindowState[] {
 
 export function ChatContextProvider({ children }: { children: ReactNode }) {
   const [windows, setWindows] = useState<ChatWindowState[]>([]);
+  const skipNextPersist = useRef(true);
 
   // Restore the docked chats from a previous page/session on first mount.
   useEffect(() => {
@@ -63,8 +64,13 @@ export function ChatContextProvider({ children }: { children: ReactNode }) {
     } catch { /* ignore corrupt storage */ }
   }, []);
 
-  // Keep the dock persisted so chats survive navigation + reload.
+  // Keep the dock persisted so chats survive navigation + reload. Skip the very
+  // first run: on mount `windows` is still the empty initial state (the restore
+  // effect's setWindows hasn't committed yet), and writing it would clobber the
+  // saved dock before restore applies. After restore re-renders, this runs again
+  // with the real data.
   useEffect(() => {
+    if (skipNextPersist.current) { skipNextPersist.current = false; return; }
     if (typeof window === "undefined") return;
     try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(windows)); } catch { /* quota / disabled */ }
   }, [windows]);
