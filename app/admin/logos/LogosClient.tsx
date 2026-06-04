@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import DosSelect from "@/components/ui/DosSelect";
 import { FONTS } from "@/lib/ansilove";
 
 interface Logo {
@@ -88,15 +89,13 @@ export default function LogosClient() {
         <div className="lightgrey amb-1">Or upload an ANSI logo (.ans):</div>
         <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }} className="amb-1">
           <input ref={ansiInputRef} type="file" accept=".ans" className="lightgrey" />
-          <select
+          <DosSelect
+            padded
+            width={200}
             value={ansiFont}
-            onChange={e => setAnsiFont(e.target.value)}
-            className="form-control"
-            style={{ width: "auto" }}
-          >
-            <option value="">Auto (SAUCE)</option>
-            {FONTS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
-          </select>
+            options={[{ value: "", label: "Auto (SAUCE)" }, ...FONTS]}
+            onChange={setAnsiFont}
+          />
           <input type="button" className="btn-big" value="Upload ANSI Logo" onClick={addAnsi} />
         </div>
 

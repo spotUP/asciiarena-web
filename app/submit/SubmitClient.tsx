@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Combobox from "@/components/ui/Combobox";
+import DosSelect from "@/components/ui/DosSelect";
 import { FONTS } from "@/lib/ansilove";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -775,15 +776,13 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
               <input ref={logoAnsiRef} type="file" accept=".ans" className="lightgrey" />
             </Field>
             <Field label="Font">
-              <select
+              <DosSelect
+                padded
+                width={240}
                 value={logoAnsiFont}
-                onChange={e => setLogoAnsiFont(e.target.value)}
-                className="form-control"
-                style={{ width: "auto" }}
-              >
-                <option value="">Auto (SAUCE)</option>
-                {FONTS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
-              </select>
+                options={[{ value: "", label: "Auto (SAUCE)" }, ...FONTS]}
+                onChange={setLogoAnsiFont}
+              />
             </Field>
             <div className="amt-1">
               <input type="submit" className="btn-big bg-green white" value="Submit ANSI Logo" />
