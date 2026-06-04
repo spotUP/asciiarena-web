@@ -20,7 +20,7 @@ interface IncomingMessage {
 }
 
 export default function ChatBar({ userId, userNick }: Props) {
-  const { windows, openChat, openThread, minimizeChat, incrementUnread } = useChatContext();
+  const { windows, openChat, openThread, minimizeChat } = useChatContext();
   const [newNick, setNewNick] = useState("");
   const [newNickOpen, setNewNickOpen] = useState(false);
   const [newNickError, setNewNickError] = useState("");
@@ -86,7 +86,7 @@ export default function ChatBar({ userId, userNick }: Props) {
       } catch { /* ignore */ }
     };
     return () => es.close();
-  }, [userId, incrementUnread, minimizeChat, openChat, openThread]);
+  }, [userId, minimizeChat, openChat, openThread]);
 
   const fetchSuggestions = useCallback((q: string) => {
     if (suggestDebounceRef.current) clearTimeout(suggestDebounceRef.current);

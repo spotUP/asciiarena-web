@@ -50,6 +50,9 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
   const [addSuggestions, setAddSuggestions] = useState<Array<{ id: number; nick: string }>>([]);
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleDraft, setTitleDraft] = useState("");
+  const [size, setSize] = useState<{ width: number; msgHeight: number }>({ width: 480, msgHeight: 220 });
+  const sizeRef = useRef(size);
+  const resizeRef = useRef<{ startX: number; startY: number; w: number; h: number } | null>(null);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -69,6 +72,19 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
 
   useEffect(() => { threadIdRef.current = threadId; }, [threadId]);
   useEffect(() => { minimizedRef.current = minimized; }, [minimized]);
+  useEffect(() => { sizeRef.current = size; }, [size]);
+
+  // Load persisted size from localStorage on mount (docked only, SSR-safe)
+  useEffect(() => {
+    if (typeof window === "undefined" || popout) return;
+    try {
+      const saved = window.localStorage.getItem("asciiarena:chat:size");
+      if (saved) {
+        const s = JSON.parse(saved) as { width?: number; msgHeight?: number };
+        if (typeof s.width === "number" && typeof s.msgHeight === "number") setSize({ width: s.width, msgHeight: s.msgHeight });
+      }
+    } catch { /* ignore */ }
+  }, [popout]);
 
   // Fetch the resolved (per-user) title whenever the thread changes
   useEffect(() => {
@@ -264,6 +280,27 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
     el.scrollTop = el.scrollHeight;
   }, [messages, peerDraft]);
 
+  const onResizePointerDown = (e: React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    resizeRef.current = { startX: e.clientX, startY: e.clientY, w: size.width, h: size.msgHeight };
+  };
+  const onResizePointerMove = (e: React.PointerEvent) => {
+    if (!resizeRef.current) return;
+    const dx = e.clientX - resizeRef.current.startX;
+    const dy = e.clientY - resizeRef.current.startY;
+    // Anchored bottom-right: dragging LEFT (dx<0) widens, dragging UP (dy<0) heightens.
+    const width = Math.max(240, Math.min(900, resizeRef.current.w - dx));
+    const msgHeight = Math.max(120, Math.min(640, resizeRef.current.h - dy));
+    setSize({ width, msgHeight });
+  };
+  const onResizePointerUp = (_e: React.PointerEvent) => {
+    if (!resizeRef.current) return;
+    resizeRef.current = null;
+    try { window.localStorage.setItem("asciiarena:chat:size", JSON.stringify(sizeRef.current)); } catch { /* ignore */ }
+  };
+
   const broadcastTyping = (text: string) => {
     const tid = threadIdRef.current;
     if (!tid) return;
@@ -411,7 +448,8 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
       lineHeight: "16px",
     } : {
       // Inline dock
-      width: "240px",
+      position: "relative",
+      width: `${size.width}px`,
       display: "flex",
       flexDirection: "column",
       border: "1px solid #444",
@@ -420,6 +458,19 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
       fontSize: "13px",
       lineHeight: "16px",
     }}>
+      {!popout && (
+        <div
+          onPointerDown={onResizePointerDown}
+          onPointerMove={onResizePointerMove}
+          onPointerUp={onResizePointerUp}
+          title="Drag to resize"
+          style={{
+            position: "absolute", top: 0, left: 0, width: "14px", height: "14px",
+            cursor: "nwse-resize", zIndex: 2,
+            background: "linear-gradient(135deg, #666 0 40%, transparent 40%)",
+          }}
+        />
+      )}
       {/* Header */}
       <div style={{
         backgroundColor: flashing ? "#cc7722" : "#444",
@@ -557,7 +608,7 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
 
       {/* Messages */}
       <div ref={scrollRef} style={{
-        ...(popout ? { flex: 1, minHeight: 0 } : { height: "220px" }),
+        ...(popout ? { flex: 1, minHeight: 0 } : { height: `${size.msgHeight}px` }),
         overflowY: "auto",
         overflowX: "hidden",
         backgroundColor: "#212121",
