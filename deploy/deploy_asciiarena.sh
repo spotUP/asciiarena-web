@@ -1,41 +1,27 @@
 #!/usr/bin/env bash
 # Server-side deploy script — lives at ~/bin/deploy_asciiarena.sh on the server.
-# Triggered automatically by GitHub Actions on every push to the deploy branch.
-# Can also be run manually: ssh spot@<server> bash ~/bin/deploy_asciiarena.sh
+# Called by GitHub Actions AFTER the built artifact has already been rsynced.
+# The server never runs npm ci or npm run build — that happens on the CI runner.
 set -euo pipefail
 
 REPO=/var/www/asciiarena.se/nextjs-current
 SERVICE=asciiarena-next
-BRANCH=modernize/typescript-nextjs
-
-cd "$REPO"
-
-echo "[deploy] fetching latest code..."
-git fetch origin "$BRANCH"
-git reset --hard "origin/$BRANCH"
+NGINX_INCOMING=/tmp/asciiarena-nginx.conf
+NGINX_LIVE=/etc/nginx/sites-available/asciiarena.se
 
 echo "[deploy] syncing nginx config..."
-NGINX_CONF="$REPO/deploy/asciiarena.se-nginx.conf"
-if ! diff -q "$NGINX_CONF" /etc/nginx/sites-available/asciiarena.se > /dev/null 2>&1; then
-  sudo cp "$NGINX_CONF" /etc/nginx/sites-available/asciiarena.se
+if [ -f "$NGINX_INCOMING" ] && ! diff -q "$NGINX_INCOMING" "$NGINX_LIVE" > /dev/null 2>&1; then
+  sudo cp "$NGINX_INCOMING" "$NGINX_LIVE"
   sudo nginx -t && sudo systemctl reload nginx
   echo "[deploy] nginx config updated and reloaded"
 else
   echo "[deploy] nginx config unchanged"
 fi
 
-echo "[deploy] installing dependencies..."
-npm ci
-
-echo "[deploy] building..."
-npm run build
-
-echo "[deploy] updating server entrypoint..."
-cp .next/standalone/server.js server.js
-
 echo "[deploy] restarting service..."
 sudo systemctl restart "$SERVICE"
 sleep 4
+
 if sudo systemctl is-active --quiet "$SERVICE"; then
   echo "[deploy] OK: $SERVICE is running"
   for i in $(seq 1 20); do

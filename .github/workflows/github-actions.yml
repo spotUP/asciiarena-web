@@ -2,19 +2,60 @@ name: Asciiarena
 
 on:
   push:
+    branches:
+      - modernize/typescript-nextjs
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy via SSH
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Build
+        # Build on the CI runner — never on the live server.
+        # DATABASE_URL is unused during the build: the prisma schema uses
+        # @prisma/adapter-mariadb at runtime and has no datasource url field.
+        # NEXTAUTH vars are only needed at runtime; placeholders satisfy
+        # any compile-time references.
+        run: npm ci && npm run build
+        env:
+          DATABASE_URL: "mysql://build:build@localhost/build"
+          NEXTAUTH_URL: "https://asciiarena.se"
+          NEXTAUTH_SECRET: "build-placeholder"
+
+      - name: Deploy built artifact to server
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > /tmp/deploy_key
           chmod 600 /tmp/deploy_key
-          ssh -i /tmp/deploy_key \
-              -o StrictHostKeyChecking=no \
-              -o ConnectTimeout=10 \
-              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-              /home/${{ secrets.SSH_USER }}/bin/deploy_asciiarena.sh
+          SSH="ssh -i /tmp/deploy_key -o StrictHostKeyChecking=no"
+          RSYNC="rsync -az --delete -e '$SSH'"
+          SERVER="${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}"
+          DEST="/var/www/asciiarena.se/nextjs-current"
+
+          # Sync the standalone build output (server.js + .next/ + pruned node_modules/)
+          # --exclude .env so the server's production secrets are never touched
+          rsync -az --delete \
+            --exclude='.env' \
+            -e "ssh -i /tmp/deploy_key -o StrictHostKeyChecking=no" \
+            .next/standalone/ "$SERVER:$DEST/"
+
+          # Sync public/ (static assets served by Next.js and nginx)
+          rsync -az --delete \
+            -e "ssh -i /tmp/deploy_key -o StrictHostKeyChecking=no" \
+            public/ "$SERVER:$DEST/public/"
+
+          # Sync the nginx config (kept in the repo for version control)
+          scp -i /tmp/deploy_key -o StrictHostKeyChecking=no \
+            deploy/asciiarena.se-nginx.conf \
+            "$SERVER:/tmp/asciiarena-nginx.conf"
+
+          # Restart the service and reload nginx if config changed
+          $SSH "$SERVER" /home/${{ secrets.SSH_USER }}/bin/deploy_asciiarena.sh
+
           rm -f /tmp/deploy_key

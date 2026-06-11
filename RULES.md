@@ -57,11 +57,18 @@ ASCII art files are ISO-8859-1 / CP437, not UTF-8. When reading collection files
 
 ## Deployment notes
 
+- **Build happens on GitHub Actions** (CI runner), NOT on the live server. The server never
+  runs `npm ci` or `npm run build` — that would max out CPU and make the site unresponsive.
+- GitHub Actions builds the standalone output and rsyncs `.next/standalone/` + `public/`
+  to the server, then SSHs in to reload nginx (if config changed) and restart the service.
+- Deploys only trigger on pushes to `modernize/typescript-nextjs` — not on every branch push.
 - Static assets (`/assets/`, `/fonts/`, `/collections/`, `/apps/`, `/mags/`) served
-  directly by nginx from `/var/www/asciiarena.se/` — do NOT serve them from Next.js `public/`
+  directly by nginx — `/assets/` and `/fonts/` from `nextjs-current/` (git-tracked),
+  `/collections/`, `/apps/`, `/mags/` from `/var/www/asciiarena.se/` (large binaries, not git).
 - `public/` holds: `favicon.ico`, `favicon.png`, `manifest.json`, `assets/css/overrides.css`,
   `assets/js/bootstrap5.bundle.min.js`, `assets/js/bootstrap-colorselector-bs5.js`
-- `.env` on server at `/var/www/asciiarena.se/.env` — never commit secrets
+- `.env` on server at `/var/www/asciiarena.se/nextjs-current/.env` — never commit secrets,
+  never overwritten by deploy (rsync explicitly excludes `.env`)
 
 ## Uniform font size (terminal aesthetic)
 
