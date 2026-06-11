@@ -47,6 +47,24 @@ rsync_resilient -L \
   public/ \
   spot@97.75.89.139:/var/www/asciiarena.se/nextjs-current/public/
 
+echo "Syncing nginx config..."
+# Guard: if nginx config on server differs from repo, update + reload.
+# This prevents the old PHP config from silently reverting (it happened).
+ssh spot@97.75.89.139 "sudo cp /etc/nginx/sites-available/asciiarena.se /etc/nginx/sites-available/asciiarena.se.pre-deploy-backup 2>/dev/null || true"
+rsync_resilient \
+  deploy/asciiarena.se-nginx.conf \
+  spot@97.75.89.139:/tmp/asciiarena.se-nginx.conf
+ssh spot@97.75.89.139 "
+  if ! diff -q /tmp/asciiarena.se-nginx.conf /etc/nginx/sites-available/asciiarena.se > /dev/null 2>&1; then
+    echo '  nginx config changed, updating and reloading...'
+    sudo cp /tmp/asciiarena.se-nginx.conf /etc/nginx/sites-available/asciiarena.se
+    sudo nginx -t && sudo systemctl reload nginx
+    echo '  nginx reloaded.'
+  else
+    echo '  nginx config unchanged.'
+  fi
+"
+
 echo "Restarting service..."
 ssh spot@97.75.89.139 "sudo systemctl restart asciiarena-next && sleep 4 && systemctl is-active asciiarena-next"
 

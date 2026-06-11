@@ -34,7 +34,7 @@ Code comments and TypeScript source may use Unicode freely.
 - **JS**: Bootstrap 5 bundle (`/public/assets/js/bootstrap5.bundle.min.js`, NOT npm)
 - **DB**: MySQL 8 via Prisma 7 + `@prisma/adapter-mariadb`
 - **Auth**: NextAuth v5 with credentials provider (bcrypt, trustHost: true)
-- **Deploy**: Apache reverse proxy -> Next.js on port 3001, systemd service `asciiarena-next`
+- **Deploy**: nginx reverse proxy -> Next.js on port 3001, systemd service `asciiarena-next`
 
 ## CSS load order (critical)
 
@@ -57,8 +57,9 @@ ASCII art files are ISO-8859-1 / CP437, not UTF-8. When reading collection files
 
 ## Deployment notes
 
-- Static assets (`/assets/`, `/fonts/`, `/collections/`, `/apps/`, `/mags/`) served
-  directly by Apache — do NOT try to serve them from Next.js `public/`
+- Static assets (`/collections/`, `/apps/`, `/mags/`) served directly by nginx from
+  `/var/www/asciiarena.se/` — do NOT try to serve them from Next.js `public/`
+- `/assets/` and `/fonts/` are in Next.js `public/` and served by Next.js
 - `public/` holds: `favicon.ico`, `favicon.png`, `manifest.json`, `assets/css/overrides.css`,
   `assets/js/bootstrap5.bundle.min.js`, `assets/js/bootstrap-colorselector-bs5.js`
 - `.env` on server at `/var/www/asciiarena.se/.env` — never commit secrets
