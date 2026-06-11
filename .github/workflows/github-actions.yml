@@ -38,12 +38,18 @@ jobs:
           SERVER="${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}"
           DEST="/var/www/asciiarena.se/nextjs-current"
 
-          # Sync the standalone build output (server.js + .next/ + pruned node_modules/)
-          # --exclude .env so the server's production secrets are never touched
+          # Sync the standalone build output (server.js + .next/server/ + node_modules/)
+          # --exclude .env so the server's production secrets are never touched.
+          # Note: standalone intentionally omits .next/static/ — synced separately below.
           rsync -az --delete \
             --exclude='.env' \
             -e "ssh -i /tmp/deploy_key -o StrictHostKeyChecking=no" \
             .next/standalone/ "$SERVER:$DEST/"
+
+          # Sync .next/static/ (JS chunks, CSS) — NOT included in standalone output
+          rsync -az --delete \
+            -e "ssh -i /tmp/deploy_key -o StrictHostKeyChecking=no" \
+            .next/static/ "$SERVER:$DEST/.next/static/"
 
           # Sync public/ (static assets served by Next.js and nginx)
           rsync -az --delete \

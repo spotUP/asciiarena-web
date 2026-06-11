@@ -57,18 +57,33 @@ ASCII art files are ISO-8859-1 / CP437, not UTF-8. When reading collection files
 
 ## Deployment notes
 
-- **Build happens on GitHub Actions** (CI runner), NOT on the live server. The server never
-  runs `npm ci` or `npm run build` — that would max out CPU and make the site unresponsive.
-- GitHub Actions builds the standalone output and rsyncs `.next/standalone/` + `public/`
-  to the server, then SSHs in to reload nginx (if config changed) and restart the service.
-- Deploys only trigger on pushes to `modernize/typescript-nextjs` — not on every branch push.
-- Static assets (`/assets/`, `/fonts/`, `/collections/`, `/apps/`, `/mags/`) served
-  directly by nginx — `/assets/` and `/fonts/` from `nextjs-current/` (git-tracked),
-  `/collections/`, `/apps/`, `/mags/` from `/var/www/asciiarena.se/` (large binaries, not git).
-- `public/` holds: `favicon.ico`, `favicon.png`, `manifest.json`, `assets/css/overrides.css`,
-  `assets/js/bootstrap5.bundle.min.js`, `assets/js/bootstrap-colorselector-bs5.js`
-- `.env` on server at `/var/www/asciiarena.se/nextjs-current/.env` — never commit secrets,
-  never overwritten by deploy (rsync explicitly excludes `.env`)
+**NEVER run `npm ci` or `npm run build` on the live server.** It saturates the VPS CPU for
+5+ minutes, RSC navigation requests time out, and the site appears broken (clicks do nothing).
+Build always happens on the GitHub Actions ubuntu runner.
+
+**The three rsync targets** (all required — missing any one breaks the site):
+1. `.next/standalone/` → `nextjs-current/` — server entry point + server-side app files + pruned node_modules
+2. `.next/static/` → `nextjs-current/.next/static/` — client JS chunks + CSS (NOT included in standalone output)
+3. `public/` → `nextjs-current/public/` — favicon, Bootstrap JS/CSS, manifests
+
+**Deploys only trigger on `modernize/typescript-nextjs`** — never on feature branch pushes.
+
+**nginx config** lives in `deploy/asciiarena.se-nginx.conf` (source of truth). CI copies it to
+`/tmp/asciiarena-nginx.conf` and the server-side script applies it if changed. If nginx ever
+reverts to PHP config (Certbot cert renewal can do this), the next deploy fixes it.
+Emergency manual fix: `sudo cp nextjs-current/deploy/asciiarena.se-nginx.conf /etc/nginx/sites-available/asciiarena.se && sudo nginx -t && sudo systemctl reload nginx`
+
+**Certbot** must stay configured with `installer = nginx` (not `apache`) in
+`/etc/letsencrypt/renewal/asciiarena.se.conf` — verify with `sudo certbot renew --dry-run`.
+
+**`.env`** lives at `nextjs-current/.env` on the server — never in git, never overwritten by deploy
+(rsync explicitly excludes it). Contains DB, NextAuth, SMTP secrets.
+
+Static assets (`/assets/`, `/fonts/`, `/collections/`, `/apps/`, `/mags/`) served directly by
+nginx — `/assets/` and `/fonts/` from `nextjs-current/` (git-tracked), `/collections/` `/apps/`
+`/mags/` from `/var/www/asciiarena.se/` (large binaries outside git).
+
+Full post-mortem: `thoughts/shared/handoffs/2026-06-11_deploy-postmortem.md`
 
 ## Uniform font size (terminal aesthetic)
 
