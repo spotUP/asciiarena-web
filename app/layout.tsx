@@ -47,6 +47,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             lets the DOM parse first; Bootstrap then attaches its global
             click listeners for dropdowns/modals before user interaction. */}
         <script src="/assets/js/bootstrap5.bundle.min.js" defer />
+        {/* Reload on chunk load failure — happens when the browser has a cached
+            page from before a deploy and tries to lazy-load a chunk whose hash
+            no longer exists. A hard reload picks up the new manifest. */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          window.addEventListener('unhandledrejection', function(e) {
+            if (e.reason && (e.reason.name === 'ChunkLoadError' || (e.reason.message && e.reason.message.indexOf('Loading chunk') !== -1))) {
+              e.preventDefault();
+              window.location.reload();
+            }
+          });
+        ` }} />
       </head>
       <body suppressHydrationWarning>
         <ToastProvider>
