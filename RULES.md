@@ -68,6 +68,12 @@ Build always happens on the GitHub Actions ubuntu runner.
 
 **Deploys only trigger on `modernize/typescript-nextjs`** — never on feature branch pushes.
 
+**HTTP/2 is mandatory on the 443 listen directive** (`listen 443 ssl http2;`). The site holds
+7 concurrent SSE channels per tab; on HTTP/1.1 browsers cap at 6 connections per host, so the
+SSE streams exhaust the pool and ALL clicks and fetches hang -- links appear dead, widgets never
+load, while curl reports the server healthy. Verify after any nginx change:
+`curl -sI https://asciiarena.se/ | head -1` must print `HTTP/2 200`.
+
 **nginx config** lives in `deploy/asciiarena.se-nginx.conf` (source of truth). CI copies it to
 `/tmp/asciiarena-nginx.conf` and the server-side script applies it if changed. If nginx ever
 reverts to PHP config (Certbot cert renewal can do this), the next deploy fixes it.
@@ -84,6 +90,20 @@ nginx — `/assets/` and `/fonts/` from `nextjs-current/` (git-tracked), `/colle
 `/mags/` from `/var/www/asciiarena.se/` (large binaries outside git).
 
 Full post-mortem: `thoughts/shared/handoffs/2026-06-11_deploy-postmortem.md`
+
+## Next.js router footguns (each broke production once)
+
+- **Never call `router.replace("?")` or `router.push("?")`.** In the App Router a bare `"?"`
+  resolves to the root route `/`, not the current page -- it silently corrupts router state and
+  makes every subsequent `<Link>` click dead. For query-string-only URL sync use
+  `window.history.replaceState(null, "", window.location.pathname + (qs ? "?" + qs : ""))`.
+  Repo must stay clean: `grep -rn 'router\.replace.*"?"' app/ components/` returns nothing.
+- **Never return error sentinels (null/empty) from inside `unstable_cache`** -- the cache stores
+  whatever the function returns, so one transient upstream failure gets pinned for the whole
+  revalidate window. Throw on failure (thrown errors are never cached) and catch in the caller.
+
+Full debugging history: `thoughts/shared/handoffs/2026-06-11_deploy-postmortem.md` has a
+"clicks do nothing" diagnostic checklist covering all six root causes.
 
 ## Uniform font size (terminal aesthetic)
 
