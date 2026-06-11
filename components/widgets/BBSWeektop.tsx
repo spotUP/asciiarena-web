@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useScenewall } from "@/lib/useScenewall";
 
 interface StatItem { name: string; count: number }
 
@@ -23,15 +24,14 @@ function DotsLoader() {
   return <span className="lightgrey" style={{ fontFamily: "monospace", whiteSpace: "pre" }}>{FRAMES[frame]}</span>;
 }
 
-export default function BBSWeektop() {
-  const [items, setItems] = useState<StatItem[] | null>(null);
+// Module-level so the hook's effect dependency stays referentially stable.
+function parseStats(data: unknown): StatItem[] | null {
+  const stats = (data as { stats?: unknown })?.stats;
+  return Array.isArray(stats) ? (stats as StatItem[]) : null;
+}
 
-  useEffect(() => {
-    fetch("/api/scenewall?endpoint=bbs-weektop")
-      .then(r => r.json())
-      .then((data: { stats: StatItem[] } | null) => setItems(Array.isArray(data?.stats) ? data.stats : []))
-      .catch(() => setItems([]));
-  }, []);
+export default function BBSWeektop() {
+  const items = useScenewall("bbs-weektop", parseStats);
 
   return (
     <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2" style={{ paddingTop: "16px" }}>

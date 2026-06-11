@@ -1,6 +1,7 @@
 "use client";
-import React, { useEffect, useId, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ansiToHtml } from "@/lib/ansi";
+import { useScenewall } from "@/lib/useScenewall";
 
 interface WallPost { userName: string; comment: string; source: string }
 interface Draft { nick: string; text: string }
@@ -20,16 +21,22 @@ function loadPosts(set: (p: WallPost[]) => void) {
     .catch(() => {});
 }
 
+// Module-level so the hook's effect dependency stays referentially stable.
+function parsePosts(data: unknown): WallPost[] | null {
+  return Array.isArray(data) ? (data as WallPost[]) : null;
+}
+
 export default function GlobalWall({ isLoggedIn }: { isLoggedIn?: boolean }) {
-  const uid = useId().replace(/:/g, "");
   const [posts, setPosts] = useState<WallPost[]>([]);
+  // Initial load goes through the retrying hook (the upstream is slow and the
+  // first fetch after a deploy can fail); loadPosts() handles post-submit refresh.
+  const initialPosts = useScenewall("globalwall", parsePosts);
+  useEffect(() => { if (initialPosts) setPosts(initialPosts); }, [initialPosts]);
   const [error, setError] = useState("");
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
   const inputRef = useRef<HTMLInputElement>(null);
   const draftTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => { loadPosts(setPosts); }, [uid]);
 
   useEffect(() => {
     const es = new EventSource(`/api/live?channel=${CHANNEL}`);
