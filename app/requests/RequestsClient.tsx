@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import NewItemsPill from "@/components/ui/NewItemsPill";
 import SortHeader from "@/components/ui/SortHeader";
@@ -40,7 +40,6 @@ const VIEW_BUTTONS: { label: string; viewmode: number }[] = [
 
 export default function RequestsClient() {
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState(() => searchParams.get("sort") ?? "timestamp");
@@ -61,8 +60,8 @@ export default function RequestsClient() {
     if (f) params.set("filter", f);
     if (v !== 0) params.set("viewmode", String(v));
     const qs = params.toString();
-    router.replace(qs ? `?${qs}` : "?", { scroll: false });
-  }, [router]);
+    window.history.replaceState(null, "", window.location.pathname + (qs ? `?${qs}` : ""));
+  }, []);
 
   useEffect(() => {
     syncUrl(sort, asc, filter, viewmode);

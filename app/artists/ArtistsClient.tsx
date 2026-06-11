@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { urlsafe } from "@/lib/utils";
 import SortHeader from "@/components/ui/SortHeader";
@@ -26,7 +26,6 @@ const PAGE_SIZE = 120;
 
 export default function ArtistsClient({ initialSort, initialOrder }: ArtistsClientProps) {
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState(() => searchParams.get("sort") ?? initialSort);
@@ -45,8 +44,8 @@ export default function ArtistsClient({ initialSort, initialOrder }: ArtistsClie
     if (a !== "A") params.set("asc", a);
     if (f) params.set("filter", f);
     const qs = params.toString();
-    router.replace(qs ? `?${qs}` : "?", { scroll: false });
-  }, [router, initialSort]);
+    window.history.replaceState(null, "", window.location.pathname + (qs ? `?${qs}` : ""));
+  }, [initialSort]);
 
   useEffect(() => {
     syncUrl(sort, asc, filter);
