@@ -33,10 +33,13 @@ const fetchScenewall = unstable_cache(
         signal: ctrl.signal,
         headers: { "User-Agent": "Mozilla/5.0 (asciiarena widget proxy)", "Accept": "application/json" },
       });
-      if (!r.ok) return null;
+      // Throw (rather than return null) on failure: unstable_cache caches
+      // whatever the function RETURNS, including null — one failed upstream
+      // fetch (e.g. right after a service restart) would otherwise pin the
+      // widgets empty for the whole 5-minute revalidate window. A thrown
+      // error is never cached, so the next request retries immediately.
+      if (!r.ok) throw new Error(`scenewall ${endpoint}: HTTP ${r.status}`);
       return await r.json();
-    } catch {
-      return null;
     } finally {
       clearTimeout(timer);
     }
@@ -52,6 +55,11 @@ function isValidEndpoint(s: string | null): s is Endpoint {
 export async function GET(request: NextRequest) {
   const endpoint = request.nextUrl.searchParams.get("endpoint");
   if (!isValidEndpoint(endpoint)) return new Response("invalid endpoint", { status: 400 });
-  const data = await fetchScenewall(endpoint);
-  return Response.json(data ?? null);
+  try {
+    const data = await fetchScenewall(endpoint);
+    return Response.json(data ?? null);
+  } catch {
+    // Upstream failed this round; widgets render empty and the next request retries.
+    return Response.json(null);
+  }
 }
