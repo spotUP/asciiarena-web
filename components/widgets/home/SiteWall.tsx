@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { ansiToHtml } from "@/lib/ansi";
+import PrintLines from "@/components/ui/PrintLines";
 
 interface WallPost { tag: string | null; nick: string | null }
 interface Draft { nick: string; text: string }
@@ -9,6 +10,10 @@ interface LiveEvent { type: string; nick?: string; draft?: string; tag?: string 
 const WALL_ID = 1;
 const CHANNEL = `wall:${WALL_ID}`;
 const DRAFT_TTL = 4000;
+// The wall API returns up to 13 posts (ORDER BY id DESC LIMIT 13). Reserve
+// that many lines so the empty-on-load posts area holds its height instead
+// of popping in and pushing the rest of the page down.
+const WALL_POST_LIMIT = 13;
 
 export default function SiteWall({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [posts, setPosts] = useState<WallPost[]>([]);
@@ -102,23 +107,27 @@ export default function SiteWall({ isLoggedIn }: { isLoggedIn: boolean }) {
         <h2 className="apt-1 apb-1 bg-header">TAG THE aSCIIaRENA WALL</h2>
       </div>
       <div className="container-fluid m-0 p-0">
-        <div className="row m-0 p-0 bg-secondary apt-1 apb-1" style={{ paddingLeft: "8px" }}>
-          {posts.map((p, i) => (
-            <React.Fragment key={i}>
-              <div className="col-10 d-flex">
-                <span
-                  className="text-truncate"
-                  style={{ whiteSpace: "pre" }}
-                  dangerouslySetInnerHTML={{ __html: ansiToHtml(p.tag ?? "") }}
-                />
+        <div className="bg-secondary apt-1 apb-1" style={{ paddingLeft: "8px" }}>
+          {/* Each post is its own grid row so PrintLines can animate one line
+              at a time and reserve height. Live typing drafts stay below. */}
+          <PrintLines reserveLines={WALL_POST_LIMIT}>
+            {posts.map((p, i) => (
+              <div className="row m-0 p-0" key={i}>
+                <div className="col-10 d-flex">
+                  <span
+                    className="text-truncate"
+                    style={{ whiteSpace: "pre" }}
+                    dangerouslySetInnerHTML={{ __html: ansiToHtml(p.tag ?? "") }}
+                  />
+                </div>
+                <div className="col-2 text-right">
+                  <span className="lightpink">{p.nick ?? ""}</span>
+                </div>
               </div>
-              <div className="col-2 text-right">
-                <span className="lightpink">{p.nick ?? ""}</span>
-              </div>
-            </React.Fragment>
-          ))}
+            ))}
+          </PrintLines>
           {activeDrafts.map(d => (
-            <React.Fragment key={d.nick}>
+            <div className="row m-0 p-0" key={d.nick}>
               <div className="col-10 d-flex">
                 <span className="text-truncate lightgrey" style={{ whiteSpace: "pre" }}>
                   {d.text}<span className="cursor-block" />
@@ -127,7 +136,7 @@ export default function SiteWall({ isLoggedIn }: { isLoggedIn: boolean }) {
               <div className="col-2 text-right">
                 <span className="lightpink">{d.nick}</span>
               </div>
-            </React.Fragment>
+            </div>
           ))}
         </div>
 
