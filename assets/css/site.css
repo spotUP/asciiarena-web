@@ -122,6 +122,15 @@
   src: url('/assets/fonts/TopazPlus_a1200.woff2') format('woff2'),
   url('/assets/fonts/TopazPlus_a1200.woff') format('woff'),
   url('/assets/fonts/TopazPlus_a1200.ttf') format('truetype');
+  /* optional + the <link rel=preload> in app/layout.tsx: the woff2 is small
+     and preloaded, so Topaz almost always paints from the start. If it is
+     ever late, the browser keeps the fallback for that load WITHOUT swapping
+     -- no reflow either way. This removes the font-swap layout shift on
+     wrapped prose: the featured poll body rendered one line taller in the
+     fallback font, then reflowed shorter when Topaz arrived. ASCII art is
+     unaffected -- it lives in <pre> (no wrapping), so its height is
+     line-count fixed regardless of which font paints. */
+  font-display: optional;
   font-weight: normal;
   font-style: normal;
   -webkit-font-kerning: none;
