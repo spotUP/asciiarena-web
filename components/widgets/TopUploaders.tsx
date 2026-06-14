@@ -13,7 +13,7 @@ const getTopUploaders = unstable_cache(
       select: { id: true, nick: true, uploaded: true },
     }),
   ["top-uploaders"],
-  { revalidate: 600, tags: ["site:top-uploaders"] }
+  { revalidate: 631, tags: ["site:top-uploaders"] }
 );
 
 export default async function TopUploaders({ limit = 5 }: { limit?: number }) {

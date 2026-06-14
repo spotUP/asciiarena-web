@@ -16,7 +16,10 @@ const getLastCallers = unstable_cache(
     select: { id: true, user_id: true, nick: true, timestamp: true },
   }),
   ["last-callers"],
-  { revalidate: 60 }
+  // Staggered off the other widgets' TTLs so the homepage's cached widgets
+  // don't all revalidate in one burst every 60s (that synchronized stampede
+  // caused intermittent ~3s render spikes).
+  { revalidate: 71 }
 );
 
 export default async function LastCallers({ limit = 5 }: LastCallersProps) {

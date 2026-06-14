@@ -28,7 +28,7 @@ const getLatestCollys = unstable_cache(
           select: { id: true, filename: true, year: true, month: true, day: true, timestamp: true },
         }),
   ["latest-collys-widget"],
-  { revalidate: 60 },
+  { revalidate: 83 }, // staggered to avoid the synchronized 60s revalidation stampede
 );
 
 export default async function LatestCollys({ type, limit = 8 }: LatestCollysProps) {

@@ -13,7 +13,7 @@ const getTopArtists = unstable_cache(
     select: { id: true, nick: true, rating: true },
   }),
   ["top-artists-widget"],
-  { revalidate: 60 },
+  { revalidate: 113 }, // staggered to avoid the synchronized 60s revalidation stampede
 );
 
 export default async function TopArtists({ limit = 5 }: { limit?: number }) {

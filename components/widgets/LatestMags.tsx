@@ -15,7 +15,7 @@ const getLatestMags = unstable_cache(
     select: { id: true, filename: true, timestamp: true },
   }),
   ["latest-mags"],
-  { revalidate: 120, tags: ["site:latest-mags"] }
+  { revalidate: 163, tags: ["site:latest-mags"] }
 );
 
 export default async function LatestMags({ limit = 5 }: LatestMagsProps) {

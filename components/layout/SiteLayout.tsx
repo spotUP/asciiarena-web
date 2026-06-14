@@ -44,7 +44,7 @@ const getLogos = unstable_cache(
   // Busted via revalidateTag("site:logos") from app/api/admin/logos POST
   // and app/api/logos POST so freshly-submitted logos appear in rotation
   // without waiting up to 120s.
-  { revalidate: 120, tags: ["site:logos"] }
+  { revalidate: 181, tags: ["site:logos"] }
 );
 
 export default async function SiteLayout({ title, children }: SiteLayoutProps) {

@@ -47,11 +47,19 @@ function startCopperScroll(): () => void {
   const period = 10000;
   const start = performance.now();
   let raf = 0;
+  // Cache the .copper-gradient elements instead of re-querying the DOM on
+  // every frame (60x/sec, continuous). Re-query at most ~2x/sec so logos
+  // that slide in/out are still picked up without the per-frame query cost.
+  let els: NodeListOf<HTMLElement> = document.querySelectorAll<HTMLElement>(".copper-gradient");
+  let lastQuery = start;
   const tick = (now: number) => {
+    if (now - lastQuery > 500) {
+      els = document.querySelectorAll<HTMLElement>(".copper-gradient");
+      lastQuery = now;
+    }
     const t = ((now - start) % period) / period;
     const wave = (1 - Math.cos(2 * Math.PI * t)) / 2;
     const pos = (wave * 100).toFixed(2);
-    const els = document.querySelectorAll<HTMLElement>(".copper-gradient");
     for (const el of els) el.style.backgroundPosition = `0% ${pos}%`;
     raf = requestAnimationFrame(tick);
   };

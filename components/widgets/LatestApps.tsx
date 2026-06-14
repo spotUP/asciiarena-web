@@ -16,7 +16,7 @@ const getLatestApps = unstable_cache(
     select: { id: true, filename: true, timestamp: true },
   }),
   ["latest-apps"],
-  { revalidate: 120, tags: ["site:latest-apps"] }
+  { revalidate: 137, tags: ["site:latest-apps"] }
 );
 
 export default async function LatestApps({ limit = 5 }: LatestAppsProps) {

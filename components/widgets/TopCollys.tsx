@@ -19,7 +19,7 @@ const getTopCollys = unstable_cache(
     LIMIT ${limit}
   `),
   ["top-collys-widget"],
-  { revalidate: 60 },
+  { revalidate: 127 }, // staggered to avoid the synchronized 60s revalidation stampede
 );
 
 export default async function TopCollys({ limit = 5 }: { limit?: number }) {

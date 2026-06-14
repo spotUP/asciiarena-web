@@ -76,7 +76,12 @@ const getReleasesForHero = unstable_cache(
     return releases;
   },
   ["latest-releases-hero"],
-  { revalidate: 60 },
+  // 240s, not 60s: this is the heaviest homepage widget (DB query + up to 20
+  // .diz filesystem reads), and it backs BOTH the LATEST and RANDOM hero
+  // columns. Revalidating it 4x less often is the single biggest cut to the
+  // intermittent homepage render spike; the hero is decorative so 4-minute
+  // freshness is fine (the LATEST ADDED COLLYS sidebar covers new releases).
+  { revalidate: 240 },
 );
 
 export default async function LatestReleasesStatic({ columns = 2, random = false, header = "LATEST RELEASES" }: {

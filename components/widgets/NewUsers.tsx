@@ -12,7 +12,7 @@ const getNewUsers = unstable_cache(
     select: { id: true, nick: true, joined: true },
   }),
   ["new-users-widget"],
-  { revalidate: 60 },
+  { revalidate: 97 }, // staggered to avoid the synchronized 60s revalidation stampede
 );
 
 export default async function NewUsers() {

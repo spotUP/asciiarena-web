@@ -13,7 +13,7 @@ const getTopCrews = unstable_cache(
     select: { id: true, name: true, rating: true },
   }),
   ["top-crews-widget"],
-  { revalidate: 60 },
+  { revalidate: 149 }, // staggered to avoid the synchronized 60s revalidation stampede
 );
 
 export default async function TopCrews({ limit = 5 }: { limit?: number }) {

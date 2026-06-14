@@ -11,7 +11,7 @@ const getMostViewed = unstable_cache(
       select: { id: true, filename: true, view_counter: true },
     }),
   ["most-viewed-collys"],
-  { revalidate: 300, tags: ["site:most-viewed"] }
+  { revalidate: 311, tags: ["site:most-viewed"] }
 );
 
 export default async function MostViewedCollys({ limit = 5 }: { limit?: number }) {
