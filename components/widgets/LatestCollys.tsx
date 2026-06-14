@@ -2,6 +2,7 @@ import Link from "next/link";
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
+import PrintLines from "@/components/ui/PrintLines";
 
 export type LatestCollysProps = {
   type: "released" | "added";
@@ -52,6 +53,7 @@ export default async function LatestCollys({ type, limit = 8 }: LatestCollysProp
           </h2>
         </div>
         <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
+          <PrintLines>
           {collys.map((row) => {
             const filename = row.filename ?? "";
             const truncated = filename.length > 12 ? filename.substring(0, 12) : filename;
@@ -78,6 +80,7 @@ export default async function LatestCollys({ type, limit = 8 }: LatestCollysProp
               );
             }
           })}
+          </PrintLines>
         </div>
       </div>
     );
