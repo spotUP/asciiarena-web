@@ -9,6 +9,31 @@ export type LogoHeaderProps = {
   logos: SiteLogo[];
 };
 
+// The whole site is on a strict 8x16 grid, so an ASCII logo's height is its
+// line count x 16. ANSI logos render async to an <img>; we cap them at a
+// fixed height so they slot into the same frame.
+const GRID_ROW_PX = 16;
+const ANSI_LOGO_PX = 160;
+const MIN_FRAME_PX = 96;
+
+// Static header height = the tallest logo, computed from the logo data so it
+// is identical on the server and client (no hydration mismatch) and never
+// changes as logos rotate. Every logo is then vertically centred inside it,
+// which is what kills the first-paint height jump: the frame is already its
+// final height before any logo has rendered.
+function frameHeightPx(logos: SiteLogo[]): number {
+  let max = MIN_FRAME_PX;
+  for (const logo of logos) {
+    if (logo.kind === "ascii") {
+      const lines = logo.ascii.replace(/\n+$/, "").split("\n").length;
+      max = Math.max(max, lines * GRID_ROW_PX);
+    } else {
+      max = Math.max(max, ANSI_LOGO_PX);
+    }
+  }
+  return max;
+}
+
 // Smooth ping-pong copper-bar scroller. CSS animations on background-position
 // of background-clip:text elements are silently dropped by Chrome's
 // compositor, so the loop sets style.backgroundPosition directly each frame.
@@ -94,28 +119,30 @@ export default function LogoHeader({ logos }: LogoHeaderProps) {
 
   return (
     <div className="overflow-hidden d-none d-lg-block mx-auto" ref={containerRef}>
-      <div id="logoswitcher" className="logo-stack">
-        {shuffled.map((logo, i) => {
-          if (i !== current && i !== prev) return null;
-          return (
-            <div
-              key={i}
-              data-logo-idx={i}
-              className="logo nolink logo-slot"
-              style={{ whiteSpace: "pre" }}
-            >
-              <Link href="/" className="logo ascii">
-                {logo.kind === "ansi" ? (
-                  <AnsiLogo ansiB64={logo.ansiB64} font={logo.font} />
-                ) : (
-                  <pre className="copper-gradient" style={{ overflow: "hidden" }}>
-                    {logo.ascii}
-                  </pre>
-                )}
-              </Link>
-            </div>
-          );
-        })}
+      <div className="logo-header-frame" style={{ height: `${frameHeightPx(logos)}px` }}>
+        <div id="logoswitcher" className="logo-stack">
+          {shuffled.map((logo, i) => {
+            if (i !== current && i !== prev) return null;
+            return (
+              <div
+                key={i}
+                data-logo-idx={i}
+                className="logo nolink logo-slot"
+                style={{ whiteSpace: "pre" }}
+              >
+                <Link href="/" className="logo ascii">
+                  {logo.kind === "ansi" ? (
+                    <AnsiLogo ansiB64={logo.ansiB64} font={logo.font} maxHeight={ANSI_LOGO_PX} />
+                  ) : (
+                    <pre className="copper-gradient" style={{ overflow: "hidden" }}>
+                      {logo.ascii}
+                    </pre>
+                  )}
+                </Link>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { SkeletonLines } from "./Skeleton";
 
 export interface PrintLinesProps {
   children: React.ReactNode;
   /** Delay between line reveals. */
   lineDelayMs?: number;
-  /** Blank lines holding the widget height while children are still empty
+  /** Skeleton lines holding the widget height while children are still empty
       (client-fetching widgets pass their expected row count). */
   reserveLines?: number;
 }
@@ -31,13 +32,10 @@ export default function PrintLines({ children, lineDelayMs = 100, reserveLines =
   }, [printed, lines.length, lineDelayMs]);
 
   if (lines.length === 0 && reserveLines > 0) {
-    return (
-      <>
-        {Array.from({ length: reserveLines }, (_, i) => (
-          <div key={i} style={{ visibility: "hidden" }}>&nbsp;</div>
-        ))}
-      </>
-    );
+    // No data yet: hold the height with grey skeleton bars instead of blank
+    // space, so the loading state reads as intentional and nothing shifts
+    // when the real lines replace the skeleton.
+    return <SkeletonLines count={reserveLines} />;
   }
 
   return (

@@ -2560,3 +2560,38 @@ input::file-selector-button {
     animation: none;
   }
 }
+
+/* Skeleton loaders for widgets whose content streams in client-side
+   (the walls, the scenewall WEEKTOP widgets). Grey filled blocks on the
+   dark ANSI backdrop, each exactly one 8x16 grid row tall so swapping the
+   skeleton for real text causes no layout shift. A slow pulse reads as
+   "loading" rather than dead space. Used by components/ui/PrintLines.tsx
+   and components/ui/Skeleton.tsx. */
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 0.85; }
+}
+.skeleton-line {
+  height: 16px;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+}
+.skeleton-bar {
+  display: inline-block;
+  height: 12px;
+  background-color: #4a4a4a;
+  animation: skeletonPulse 1.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-bar { animation: none; }
+}
+
+/* Rotating logo header: a static-height box (sized server-side to the
+   tallest logo) with every logo vertically + horizontally centred, so the
+   header never changes height on first paint or as logos rotate. */
+.logo-header-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
