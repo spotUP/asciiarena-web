@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { urlsafe } from "@/lib/utils";
 import type { CedDocument, CedSessionsData } from "@/app/api/ced-sessions/route";
+import PrintLines from "@/components/ui/PrintLines";
 
 const SPECTATE_BASE = "https://hippoplayer.se/?spectate=";
 
@@ -51,6 +52,7 @@ export default function CedSessions() {
         <h2 className="ap-1 bg-header">EDITING IN CED</h2>
       </div>
       <div className="container col-12 apt-1 apb-1 m-0 p-0 bg-secondary">
+        <PrintLines>
         {documents.map(doc => (
           <div key={doc.id} className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
             <a
@@ -73,6 +75,7 @@ export default function CedSessions() {
             </span>
           </div>
         ))}
+        </PrintLines>
       </div>
     </div>
   );

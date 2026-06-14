@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useScenewall } from "@/lib/useScenewall";
+import PrintLines from "@/components/ui/PrintLines";
 
 interface StatItem { name: string; count: number }
 
@@ -13,22 +13,14 @@ function formatBytes(bytes: number): string {
   return bytes + " KB";
 }
 
-const FRAMES = ["...", ".. ", ".  ", ".. "];
-
-function DotsLoader() {
-  const [frame, setFrame] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => setFrame(f => (f + 1) % FRAMES.length), 350);
-    return () => clearInterval(t);
-  }, []);
-  return <span className="lightgrey" style={{ fontFamily: "monospace", whiteSpace: "pre" }}>{FRAMES[frame]}</span>;
-}
-
 // Module-level so the hook's effect dependency stays referentially stable.
 function parseStats(data: unknown): StatItem[] | null {
   const stats = (data as { stats?: unknown })?.stats;
   return Array.isArray(stats) ? (stats as StatItem[]) : null;
 }
+
+// The upstream always returns 5 entries (Count=5 in lib/scenewall.ts).
+const EXPECTED_LINES = 5;
 
 export default function Weektop() {
   const items = useScenewall("weektop", parseStats);
@@ -40,15 +32,14 @@ export default function Weektop() {
       </div>
       <div className="container-fluid p-0 pl-lg-2 pr-lg-2 bg-secondary">
         <div className="row m-0 px-0 bg-secondary apb-1" style={{ paddingTop: "16px" }}>
-          {items === null && (
-            <div className="col-lg-12 p-0 pl-lg-2 pr-lg-2" style={{ paddingTop: "16px" }}><DotsLoader /></div>
-          )}
-          {items?.map((item, i) => (
-            <div key={i} className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
-              <span className="yellow text-truncate">{item.name}</span>
-              <span className="text-truncate">{formatBytes(item.count)}</span>
-            </div>
-          ))}
+          <PrintLines reserveLines={EXPECTED_LINES}>
+            {items?.map((item, i) => (
+              <div key={i} className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
+                <span className="yellow text-truncate">{item.name}</span>
+                <span className="text-truncate">{formatBytes(item.count)}</span>
+              </div>
+            ))}
+          </PrintLines>
         </div>
       </div>
     </div>

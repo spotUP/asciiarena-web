@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { unstable_cache } from "next/cache";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
+import PrintLines from "@/components/ui/PrintLines";
 
 const getMostViewed = unstable_cache(
   async (limit: number) => prisma.collys.findMany({
@@ -25,6 +26,7 @@ export default async function MostViewedCollys({ limit = 5 }: { limit?: number }
           <h2 className="ap-1 bg-header">MOST VIEWED COLLYS</h2>
         </div>
         <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
+          <PrintLines>
           {rows.map((row) => {
             const filename = row.filename ?? "";
             const truncated =
@@ -41,6 +43,7 @@ export default async function MostViewedCollys({ limit = 5 }: { limit?: number }
               </div>
             );
           })}
+          </PrintLines>
         </div>
       </div>
     );

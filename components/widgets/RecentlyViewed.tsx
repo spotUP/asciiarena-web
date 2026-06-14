@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import PrintLines from "@/components/ui/PrintLines";
 
 export default function RecentlyViewed() {
   const [items, setItems] = useState<Array<{ filename: string; name: string }>>([]);
@@ -16,11 +17,13 @@ export default function RecentlyViewed() {
         <h2 className="ap-1 am-0 bg-header">RECENTLY VIEWED</h2>
       </div>
       <div className="col-12 bg-secondary ap-1 apb-1">
+        <PrintLines>
         {items.map(r => (
           <div key={r.filename} className="text-truncate" style={{ height: "16px", lineHeight: "16px", fontFamily: "TopazPlus_a1200, monospace", fontSize: "16px" }}>
             <Link prefetch={false} className="magenta" href={`/release/${r.filename}`}>{r.name ?? r.filename}</Link>
           </div>
         ))}
+        </PrintLines>
       </div>
     </div>
   );

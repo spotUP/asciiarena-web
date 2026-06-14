@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { formatBytes } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
+import PrintLines from "@/components/ui/PrintLines";
 
 const getArenaStats = unstable_cache(
   async () => {
@@ -33,6 +34,7 @@ export default async function ArenaStats() {
           <h2 className="ap-1 bg-header">aSCIIaRENA STATS</h2>
         </div>
         <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary" style={{ minHeight: "112px" }}>
+          <PrintLines>
           <div className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
             <span className="white text-truncate">Collys Online:</span>
             <span className="text-truncate">{collysCount}</span>
@@ -49,6 +51,7 @@ export default async function ArenaStats() {
             <span className="white text-truncate">Comments:</span>
             <span className="text-truncate">{commentsCount}</span>
           </div>
+          </PrintLines>
         </div>
       </div>
     );

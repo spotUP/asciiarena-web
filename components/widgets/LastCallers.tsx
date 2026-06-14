@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
 import Script from "next/script";
 import { unstable_cache } from "next/cache";
+import PrintLines from "@/components/ui/PrintLines";
 
 export type LastCallersProps = {
   limit?: number;
@@ -29,6 +30,7 @@ export default async function LastCallers({ limit = 5 }: LastCallersProps) {
             <h2 className="ap-1 bg-header">LAST CALLERS</h2>
           </div>
           <div className="container col-12 apt-1 apb-1 m-0 p-0 bg-secondary">
+            <PrintLines>
             {rows.map((row) => {
               const utc = new Date(row.timestamp * 1000).toISOString();
               const fallbackTime = new Date(row.timestamp * 1000)
@@ -52,6 +54,7 @@ export default async function LastCallers({ limit = 5 }: LastCallersProps) {
                 </div>
               );
             })}
+            </PrintLines>
           </div>
         </div>
         <Script id="lastcallers-localtime" strategy="afterInteractive">{`

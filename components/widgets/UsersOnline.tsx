@@ -2,6 +2,7 @@ import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
+import PrintLines from "@/components/ui/PrintLines";
 
 const getUsersOnline = unstable_cache(
   async () => {
@@ -31,11 +32,13 @@ export default async function UsersOnline() {
           <h2 className="ap-1 bg-header">USERS ONLINE</h2>
         </div>
         <div className="container col-12 p-0 m-0 apt-1 bg-secondary" style={{ minHeight: "112px" }}>
+          <PrintLines>
           {activeUsers.map((row) => (
             <div key={row.id} className="col-lg-12">
               <a className="yellow" href={`/member/${urlsafe(row.nick ?? "")}`}>{row.nick}</a>
             </div>
           ))}
+          </PrintLines>
           <div className="col-lg-12 apt-1 p-0 pl-lg-2 pr-lg-2">
             <span>{anonymousOnline} anonymous online</span>
           </div>

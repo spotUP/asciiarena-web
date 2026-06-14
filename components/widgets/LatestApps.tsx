@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { unstable_cache } from "next/cache";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
+import PrintLines from "@/components/ui/PrintLines";
 
 export type LatestAppsProps = {
   limit?: number;
@@ -31,6 +32,7 @@ export default async function LatestApps({ limit = 5 }: LatestAppsProps) {
           </h2>
         </div>
         <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
+          <PrintLines>
           {rows.map((row) => {
             const filename = row.filename ?? "";
             const truncated = filename.length > 12 ? filename.substring(0, 12) : filename;
@@ -44,6 +46,7 @@ export default async function LatestApps({ limit = 5 }: LatestAppsProps) {
               </div>
             );
           })}
+          </PrintLines>
         </div>
       </div>
     );

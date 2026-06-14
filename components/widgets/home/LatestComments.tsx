@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { urlsafe } from "@/lib/utils";
+import PrintLines from "@/components/ui/PrintLines";
 
 interface CommentRow { filename: string; nick: string; comment: string }
 
@@ -40,6 +41,7 @@ export default function LatestComments() {
             <span className="white float-right">NiCK</span>
           </div>
         </div>
+        <PrintLines>
         {rows.map((row, i) => (
           <div className="row" key={i}>
             <div className="col-sm-7 cyan text-truncate">
@@ -53,6 +55,7 @@ export default function LatestComments() {
             </div>
           </div>
         ))}
+        </PrintLines>
       </div>
     </div>
   );

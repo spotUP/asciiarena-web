@@ -2540,3 +2540,23 @@ input::file-selector-button {
 
 
 
+
+/* Widget line-by-line print animation (components/ui/PrintLines.tsx).
+   Lines start visibility:hidden (height + bg preserved), then each revealed
+   line runs printLineFlash once: saturate(0) brightness(10) blows every text
+   color out to white regardless of the child span colors, then fades to the
+   element's natural color. */
+@keyframes printLineFlash {
+  0%   { filter: saturate(0) brightness(10); }
+  100% { filter: none; }
+}
+
+.print-line {
+  animation: printLineFlash 0.45s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .print-line {
+    animation: none;
+  }
+}

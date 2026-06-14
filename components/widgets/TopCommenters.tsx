@@ -4,6 +4,7 @@ import { urlsafe } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { unstable_cache } from "next/cache";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
+import PrintLines from "@/components/ui/PrintLines";
 
 type TopCommenter = { topcommentators: number; nick: string; user_id: number };
 
@@ -35,6 +36,7 @@ export default async function TopCommenters({ limit = 5 }: { limit?: number }) {
           <h2 className="ap-1 bg-header">TOP COMMENTERS</h2>
         </div>
         <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
+          <PrintLines>
           {rows.map((row) => (
             <div
               key={row.user_id}
@@ -46,6 +48,7 @@ export default async function TopCommenters({ limit = 5 }: { limit?: number }) {
               <span className="text-truncate">{Number(row.topcommentators)}</span>
             </div>
           ))}
+          </PrintLines>
         </div>
       </div>
     );

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { parseNowPlaying, type NowPlayingEntry } from "@/lib/nowPlaying";
+import PrintLines from "@/components/ui/PrintLines";
 
 // Live "now playing in HippoPlayer" feed. Polls the cached proxy at
 // /api/now-playing every 30s (HippoPlayer heartbeats every 30s, so 30s polling
@@ -37,6 +38,7 @@ export default function NowPlaying() {
         <h2 className="ap-1 bg-header">PLAYING IN HIPPOPLAYER</h2>
       </div>
       <div className="container col-12 apt-1 apb-1 m-0 p-0 bg-secondary">
+        <PrintLines>
         {entries.map(entry => {
           const label = entry.title || entry.author || "Unknown track";
           return (
@@ -62,6 +64,7 @@ export default function NowPlaying() {
             </div>
           );
         })}
+        </PrintLines>
       </div>
     </div>
   );

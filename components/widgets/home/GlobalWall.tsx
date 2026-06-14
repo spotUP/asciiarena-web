@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ansiToHtml } from "@/lib/ansi";
 import { useScenewall } from "@/lib/useScenewall";
+import PrintLines from "@/components/ui/PrintLines";
 
 interface WallPost { userName: string; comment: string; source: string }
 interface Draft { nick: string; text: string }
@@ -13,6 +14,8 @@ interface LiveEvent { type: string; nick?: string; draft?: string }
 // typing — only people on this site, while we share the SSE channel.
 const CHANNEL = "globalwall:1";
 const DRAFT_TTL = 4000;
+// The upstream returns itemcount=15 (see lib/scenewall.ts globalwall URL).
+const EXPECTED_LINES = 15;
 
 function loadPosts(set: (p: WallPost[]) => void) {
   fetch("/api/scenewall?endpoint=globalwall")
@@ -109,23 +112,27 @@ export default function GlobalWall({ isLoggedIn }: { isLoggedIn?: boolean }) {
         </h2>
       </div>
       <div className="container-fluid m-0 p-0">
-        <div className="row m-0 p-0 bg-secondary apt-1 apb-1" style={{ paddingLeft: "8px" }}>
-          {posts.map((p, i) => (
-            <React.Fragment key={i}>
-              <div className="col-10 d-flex">
-                <span
-                  className="text-truncate"
-                  style={{ whiteSpace: "pre" }}
-                  dangerouslySetInnerHTML={{ __html: ansiToHtml(p.comment) }}
-                />
+        <div className="bg-secondary apt-1 apb-1" style={{ paddingLeft: "8px" }}>
+          {/* Each post is its own grid row so PrintLines can animate one line
+              at a time. Live typing drafts stay below, outside the animation. */}
+          <PrintLines reserveLines={EXPECTED_LINES}>
+            {posts.map((p, i) => (
+              <div className="row m-0 p-0" key={i}>
+                <div className="col-10 d-flex">
+                  <span
+                    className="text-truncate"
+                    style={{ whiteSpace: "pre" }}
+                    dangerouslySetInnerHTML={{ __html: ansiToHtml(p.comment) }}
+                  />
+                </div>
+                <div className="col-2 text-right">
+                  <span className="lightpink">{p.userName}</span>
+                </div>
               </div>
-              <div className="col-2 text-right">
-                <span className="lightpink">{p.userName}</span>
-              </div>
-            </React.Fragment>
-          ))}
+            ))}
+          </PrintLines>
           {activeDrafts.map(d => (
-            <React.Fragment key={d.nick}>
+            <div className="row m-0 p-0" key={d.nick}>
               <div className="col-10 d-flex">
                 <span className="text-truncate lightgrey" style={{ whiteSpace: "pre" }}>
                   {d.text}<span className="cursor-block" />
@@ -134,7 +141,7 @@ export default function GlobalWall({ isLoggedIn }: { isLoggedIn?: boolean }) {
               <div className="col-2 text-right">
                 <span className="lightpink">{d.nick}</span>
               </div>
-            </React.Fragment>
+            </div>
           ))}
         </div>
 

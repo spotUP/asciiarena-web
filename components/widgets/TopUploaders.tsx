@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { urlsafe, formatBytes } from "@/lib/utils";
 import { unstable_cache } from "next/cache";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
+import PrintLines from "@/components/ui/PrintLines";
 
 const getTopUploaders = unstable_cache(
   async (limit: number) => prisma.users.findMany({
@@ -26,6 +27,7 @@ export default async function TopUploaders({ limit = 5 }: { limit?: number }) {
           <h2 className="ap-1 bg-header">TOP UPLOADERS</h2>
         </div>
         <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
+          <PrintLines>
           {rows.map((row) => {
             const nick = row.nick ?? "";
             const kb = formatBytes(row.uploaded ?? 0);
@@ -41,6 +43,7 @@ export default async function TopUploaders({ limit = 5 }: { limit?: number }) {
               </div>
             );
           })}
+          </PrintLines>
         </div>
       </div>
     );

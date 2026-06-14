@@ -3,6 +3,7 @@ import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/generated/prisma/client";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
+import PrintLines from "@/components/ui/PrintLines";
 
 type TopColly = { filename: string; rating: number };
 
@@ -31,6 +32,7 @@ export default async function TopCollys({ limit = 5 }: { limit?: number }) {
           <h2 className="ap-1 bg-header">TOP {limit} COLLYS</h2>
         </div>
         <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
+          <PrintLines>
           {rows.map((row) => {
             const filename = row.filename ?? "";
             const rating = Number(row.rating).toFixed(1);
@@ -41,6 +43,7 @@ export default async function TopCollys({ limit = 5 }: { limit?: number }) {
               </div>
             );
           })}
+          </PrintLines>
         </div>
       </div>
     );

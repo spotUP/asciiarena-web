@@ -3,6 +3,7 @@ import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
+import PrintLines from "@/components/ui/PrintLines";
 
 const getTopCrews = unstable_cache(
   async (limit: number) => prisma.crews.findMany({
@@ -26,6 +27,7 @@ export default async function TopCrews({ limit = 5 }: { limit?: number }) {
           <h2 className="ap-1 bg-header">TOP {limit} CREWS</h2>
         </div>
         <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
+          <PrintLines>
           {rows.map((row) => {
             const name = row.name ?? "";
             const rating = Number(row.rating ?? 0).toFixed(1);
@@ -41,6 +43,7 @@ export default async function TopCrews({ limit = 5 }: { limit?: number }) {
               </div>
             );
           })}
+          </PrintLines>
         </div>
       </div>
     );

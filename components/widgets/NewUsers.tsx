@@ -3,6 +3,7 @@ import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
+import PrintLines from "@/components/ui/PrintLines";
 
 const getNewUsers = unstable_cache(
   async () => prisma.users.findMany({
@@ -25,6 +26,7 @@ export default async function NewUsers() {
           <h2 className="ap-1 bg-header">NEW USERS</h2>
         </div>
         <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
+          <PrintLines>
           {rows.map((row) => {
             // users.joined is sometimes a unix timestamp (numeric string),
             // sometimes a "YYYY-MM-DD" string (newer rows). Number(joined)
@@ -53,6 +55,7 @@ export default async function NewUsers() {
               </div>
             );
           })}
+          </PrintLines>
         </div>
       </div>
     );
