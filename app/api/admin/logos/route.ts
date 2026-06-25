@@ -6,6 +6,7 @@ import { apiError, apiOk } from "@/lib/utils";
 import { revalidateTag } from "next/cache";
 import { processAnsiUpload } from "@/lib/logoUpload";
 import { measureAsciiText, checkLogoDims } from "@/lib/ansiDims";
+import { readLogoAuthor } from "@/lib/logo-author";
 
 const postSchema = z.object({
   ascii: z.string().min(1),
@@ -37,10 +38,11 @@ export async function POST(request: NextRequest) {
     const form = await request.formData();
     const file = form.get("ans");
     if (!(file instanceof File)) return apiError("An .ans file is required", 400);
+    const author = readLogoAuthor(form);
     const fontValue = form.get("font");
     const result = await processAnsiUpload(file, typeof fontValue === "string" ? fontValue : null);
     if ("error" in result) return apiError(result.error, 400);
-    await prisma.$executeRaw`INSERT INTO logos (ascii, kind, ansi_b64, font) VALUES ('', 'ansi', ${result.upload.ansiB64}, ${result.upload.font})`;
+    await prisma.$executeRaw`INSERT INTO logos (author, ascii, kind, ansi_b64, font) VALUES (${author}, '', 'ansi', ${result.upload.ansiB64}, ${result.upload.font})`;
     revalidateTag("site:logos", "default");
     return apiOk({ status: true }, 201);
   }
@@ -49,11 +51,12 @@ export async function POST(request: NextRequest) {
   const postParsed = postSchema.safeParse(rawPostBody);
   if (!postParsed.success) return apiError("Invalid request: " + postParsed.error.issues[0]?.message, 400);
   if (!postParsed.data.ascii.trim()) return apiError("ascii content required", 400);
+  const author = readLogoAuthor(rawPostBody);
 
   const dimError = checkLogoDims(measureAsciiText(postParsed.data.ascii));
   if (dimError) return apiError(dimError, 400);
 
-  await prisma.$executeRaw`INSERT INTO logos (ascii) VALUES (${postParsed.data.ascii})`;
+  await prisma.$executeRaw`INSERT INTO logos (author, ascii) VALUES (${author}, ${postParsed.data.ascii})`;
   revalidateTag("site:logos", "default");
   return apiOk({ status: true }, 201);
 }

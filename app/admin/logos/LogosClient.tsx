@@ -17,6 +17,7 @@ interface Logo {
 export default function LogosClient() {
   const [logos, setLogos] = useState<Logo[]>([]);
   const [ascii, setAscii] = useState("");
+  const [logoAuthor, setLogoAuthor] = useState("");
   const [ansiFont, setAnsiFont] = useState("");
   const ansiInputRef = useRef<HTMLInputElement>(null);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
@@ -34,9 +35,9 @@ export default function LogosClient() {
     const res = await fetch("/api/admin/logos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ascii }),
+      body: JSON.stringify({ ascii, author: logoAuthor }),
     });
-    if (res.ok) { setAscii(""); flash("Added!", true); load(); }
+    if (res.ok) { setAscii(""); setLogoAuthor(""); flash("Added!", true); load(); }
     else { const e = await res.json().catch(() => ({})); flash(e.error ?? "Failed.", false); }
   };
 
@@ -45,10 +46,12 @@ export default function LogosClient() {
     if (!file) { flash("Choose a .ans file first.", false); return; }
     const fd = new FormData();
     fd.append("ans", file);
+    fd.append("author", logoAuthor);
     if (ansiFont) fd.append("font", ansiFont);
     const res = await fetch("/api/admin/logos", { method: "POST", body: fd });
     if (res.ok) {
       if (ansiInputRef.current) ansiInputRef.current.value = "";
+      setLogoAuthor("");
       flash("ANSI logo added!", true);
       load();
     } else {
@@ -74,6 +77,15 @@ export default function LogosClient() {
       </div>
 
       <div className="container-fluid bg-secondary apb-1 ap-1 amb-2">
+        <div className="amb-1">
+          <input
+            type="text"
+            className="form-control w-100"
+            value={logoAuthor}
+            onChange={e => setLogoAuthor(e.target.value)}
+            placeholder="Artist handle"
+          />
+        </div>
         <div className="amb-1">
           <textarea
             className="form-control w-100"

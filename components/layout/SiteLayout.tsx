@@ -1,7 +1,6 @@
 import Script from "next/script";
 import type { Session } from "next-auth";
 import { unstable_cache } from "next/cache";
-import { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/db";
 import { getSession as auth } from "@/lib/session";
 import Navbar from "./Navbar";
@@ -11,6 +10,7 @@ import LeftSidebar from "./LeftSidebar";
 import RightSidebar from "./RightSidebar";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
 import ModemAnim from "./ModemAnim";
+import { buildLogoHeaderRowsQuery } from "@/lib/logo-header-query";
 
 export type SiteLayoutProps = {
   title?: string | string[];
@@ -27,7 +27,7 @@ const getLogos = unstable_cache(
       const rows = await prisma.$queryRaw<Array<{
         kind: string; ascii: string; ansi_b64: string | null; font: string | null;
       }>>(
-        Prisma.sql`SELECT kind, ascii, ansi_b64, font FROM logos ORDER BY logo_id LIMIT 50`
+        buildLogoHeaderRowsQuery(50)
       );
       return rows.flatMap((r): SiteLogo[] => {
         if (r.kind === "ansi") {

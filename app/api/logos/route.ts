@@ -6,6 +6,7 @@ import { Prisma } from "@/lib/generated/prisma/client";
 import { revalidateTag } from "next/cache";
 import { processAnsiUpload } from "@/lib/logoUpload";
 import { measureAsciiText, checkLogoDims } from "@/lib/ansiDims";
+import { readLogoAuthor } from "@/lib/logo-author";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest) {
     const fontValue = form.get("font");
     const result = await processAnsiUpload(file, typeof fontValue === "string" ? fontValue : null);
     if ("error" in result) return apiError(result.error, 400);
-    const author = String(form.get("author") ?? "").trim();
+    const author = readLogoAuthor(form);
     await prisma.$executeRaw(
       Prisma.sql`INSERT INTO logos (author, ascii, kind, ansi_b64, font) VALUES (${author}, '', 'ansi', ${result.upload.ansiB64}, ${result.upload.font})`
     );
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
     return apiError("Invalid JSON body", 400);
   }
 
-  const author = String(body.author ?? "").trim();
+  const author = readLogoAuthor(body);
   const ascii = String(body.ascii ?? "");
 
   if (!ascii) return apiError("ascii is required", 400);
