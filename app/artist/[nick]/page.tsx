@@ -120,6 +120,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
   const userId = session?.user?.id ? Number(session.user.id) : null;
   const isUnclaimed = artist.user_id === null;
   const canClaim = !!userId && isUnclaimed;
+  const isAdmin = session?.user?.rank === "Admin";
 
   // Resolve the requested sort for the initial server render. The ordering
   // rules themselves live in lib/release-sort (the ArtistReleases client
@@ -251,6 +252,13 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
       {canClaim && (
         <div className="col-lg-12 pl-0 apt-1">
           <ClaimArtistButton artistNick={artist.nick ?? ""} />
+        </div>
+      )}
+      {isAdmin && (
+        <div className="col-lg-12 pl-0 apt-1">
+          <Link className="btn-big" href={`/admin/artists?q=${encodeURIComponent(artist.nick ?? "")}`}>
+            Edit Artist Profile
+          </Link>
         </div>
       )}
       <div className="col-lg-12 pl-0">

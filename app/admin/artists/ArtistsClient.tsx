@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 
 interface Artist {
@@ -32,14 +32,21 @@ export default function ArtistsClient() {
     setTimeout(() => setMsg(null), 3000);
   };
 
-  const search = async () => {
-    if (!query.trim()) return;
-    const rows = await fetch(`/api/admin/artists?q=${encodeURIComponent(query)}`)
+  const search = useCallback(async (nextQuery: string) => {
+    if (!nextQuery.trim()) return;
+    const rows = await fetch(`/api/admin/artists?q=${encodeURIComponent(nextQuery)}`)
       .then(r => r.json())
       .catch(() => []);
     setResults(rows);
     setEdits({});
-  };
+  }, []);
+
+  useEffect(() => {
+    const initialQuery = new URLSearchParams(window.location.search).get("q") ?? "";
+    if (!initialQuery.trim()) return;
+    setQuery(initialQuery);
+    void search(initialQuery);
+  }, [search]);
 
   const edit = (id: number, field: string, value: string) =>
     setEdits(prev => ({ ...prev, [id]: { ...prev[id], [field]: value } }));
@@ -82,11 +89,11 @@ export default function ArtistsClient() {
             className="form-control"
             value={query}
             onChange={e => setQuery(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && search()}
+            onKeyDown={e => e.key === "Enter" && search(query)}
             placeholder="Search by nick..."
             style={{ width: "320px" }}
           />
-          <input type="button" className="btn-big" value="Search" onClick={search} />
+          <input type="button" className="btn-big" value="Search" onClick={() => search(query)} />
           <Msg msg={msg} />
         </div>
 

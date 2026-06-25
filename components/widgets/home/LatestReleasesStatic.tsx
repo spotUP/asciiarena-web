@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
-import { Prisma } from "@/lib/generated/prisma/client";
+import { buildLatestReleaseRowsQuery } from "@/lib/home-latest-releases-query";
 import { readFileSync, existsSync } from "fs";
 import path from "path";
 
@@ -32,22 +32,9 @@ function readDiz(filePath: string): string | null {
 // pre-rendered hero in <1ms instead of paying the full I/O tax.
 const getReleasesForHero = unstable_cache(
   async (random: boolean, columns: number, collectionsPath: string, magsPath: string, appsPath: string) => {
-    const orderClause = random
-      ? Prisma.raw("ORDER BY RAND()")
-      : Prisma.raw("ORDER BY a.fyear DESC, a.fmonth DESC, a.fday DESC");
-
     let rows: ReleaseRow[] = [];
     try {
-      rows = await prisma.$queryRaw<ReleaseRow[]>(Prisma.sql`
-        SELECT * FROM (
-          SELECT 'C' AS type, filename,
-            year AS fyear, month AS fmonth, day AS fday
-          FROM collys
-          LIMIT 20
-        ) a
-        ${orderClause}
-        LIMIT 20
-      `);
+      rows = await prisma.$queryRaw<ReleaseRow[]>(buildLatestReleaseRowsQuery(random));
     } catch {
       return [];
     }
