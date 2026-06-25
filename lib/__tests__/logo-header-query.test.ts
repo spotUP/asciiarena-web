@@ -17,12 +17,12 @@ function normalizeSql(query: unknown): string {
 }
 
 describe("buildLogoHeaderRowsQuery", () => {
-  it("keeps the newest logos in the rotation before limiting the set", () => {
-    const query = buildLogoHeaderRowsQuery(50);
+  it("samples all logos in newest-first order without a hard limit", () => {
+    const query = buildLogoHeaderRowsQuery();
     const sql = normalizeSql(query);
 
-    expect(sql).toMatch(/FROM logos ORDER BY logo_id DESC LIMIT \?/);
-    expect(sql).not.toMatch(/ORDER BY logo_id LIMIT \?/);
-    expect(renderValues(query)).toEqual([50]);
+    expect(sql).toMatch(/FROM logos ORDER BY logo_id DESC/);
+    expect(sql).not.toMatch(/LIMIT \?/);
+    expect(renderValues(query)).toEqual([]);
   });
 });

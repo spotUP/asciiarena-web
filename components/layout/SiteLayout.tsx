@@ -27,7 +27,7 @@ const getLogos = unstable_cache(
       const rows = await prisma.$queryRaw<Array<{
         kind: string; ascii: string; ansi_b64: string | null; font: string | null;
       }>>(
-        buildLogoHeaderRowsQuery(50)
+        buildLogoHeaderRowsQuery()
       );
       return rows.flatMap((r): SiteLogo[] => {
         if (r.kind === "ansi") {
