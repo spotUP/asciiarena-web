@@ -101,7 +101,7 @@ export default function CollysClient() {
       .catch(() => []);
     setResults(rows);
     setEdits({});
-    const exact = rows.find((row: Colly) => row.filename.toLowerCase() === trimmed.toLowerCase());
+    const exact = rows.find((row: Colly) => row.filename.trim().toLowerCase() === trimmed.toLowerCase());
     setSelectedId(exact?.id ?? null);
   }, []);
 
