@@ -119,6 +119,54 @@ export function releaseTextEncoding(
     : "auto";
 }
 
+// ANSI 8-color palette matching the site's retro aesthetic
+const ANSI_COLORS: Record<string, string> = {
+  "0":  "",         // reset
+  "30": "#111111",  // black
+  "31": "#ff5555",  // red
+  "32": "#55ff55",  // green
+  "33": "#ffff55",  // yellow
+  "34": "#5555ff",  // blue
+  "35": "#ff55ff",  // magenta
+  "36": "#55ffff",  // cyan
+  "37": "#aaaaaa",  // white/grey
+};
+
+/**
+ * Convert ANSI SGR escape codes (ESC[...m) to HTML <span> elements.
+ * Safe to call on already-HTML-escaped text — ESC, [, digits, and ;
+ * are never HTML-escaped. Each color span auto-closes on the next code
+ * or at end of input — no color leaking.
+ */
+export function convertAnsiCodes(html: string): string {
+  if (html.indexOf("\x1b") === -1) return html;
+
+  let open = false;
+  const result = html.replace(
+    /\x1b\[(\d+)m/g,
+    (_match, code: string) => {
+      const color = ANSI_COLORS[code];
+      if (code === "0") {
+        // Reset
+        const close = open ? "</span>" : "";
+        open = false;
+        return close;
+      }
+      if (!color) return ""; // unsupported code, strip it
+      const close = open ? "</span>" : "";
+      open = true;
+      return `${close}<span style="color:${color}">`;
+    },
+  );
+
+  return open ? result + "</span>" : result;
+}
+
+/** Return true if the text contains ANSI escape codes (ESC[...m). */
+export function hasAnsiCodes(text: string): boolean {
+  return /\x1b\[\d+m/.test(text);
+}
+
 export function releaseViewerType(type: string | null | undefined): string {
   const normalizedType = (type ?? "ASCII").trim().toUpperCase();
   return isCp437ReleaseType(normalizedType) ? "ASCII" : normalizedType;

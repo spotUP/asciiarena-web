@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
-import { encodeReleaseText, releaseTextEncoding, releaseViewerType, stripFileIdDiz } from "@/lib/releaseText";
+import { encodeReleaseText, releaseTextEncoding, releaseViewerType, stripFileIdDiz, convertAnsiCodes, hasAnsiCodes } from "@/lib/releaseText";
 import { convertPcbColors, hasPcbCodes } from "@/lib/pcbColors";
 import { getSession as auth } from "@/lib/session";
 import { urlsafe, formatBytes, decodeParam } from "@/lib/utils";
@@ -142,6 +142,12 @@ export default async function ReleasePage({ params }: PageProps) {
       const stripped = stripFileIdDiz(fileContent);
       fileContent = stripped.content;
       embeddedDiz = stripped.dizText;
+    }
+    // Convert ANSI escape codes to HTML spans — handles "broken" collys
+    // that have ANSI codes but no resets, since each code auto-closes the
+    // previous span (no color leaking).
+    if (hasAnsiCodes(fileContent)) {
+      fileContent = convertAnsiCodes(fileContent);
     }
     if (hasPcbCodes(fileContent)) {
       fileContent = convertPcbColors(fileContent);
