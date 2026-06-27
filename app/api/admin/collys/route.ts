@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
               FROM collys_crews cc JOIN crews cr ON cr.id = cc.crew_id
               WHERE cc.colly_id = c.id) AS crews,
              COUNT(*) OVER() AS total_count
-      FROM collys WHERE filename LIKE ${like} OR name LIKE ${like}
+      FROM collys c WHERE filename LIKE ${like} OR name LIKE ${like}
       ORDER BY filename ASC LIMIT 50
     `;
   } else {

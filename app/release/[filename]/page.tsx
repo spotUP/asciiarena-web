@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
+import { encodeReleaseText, releaseTextEncoding, releaseViewerType } from "@/lib/releaseText";
 import { getSession as auth } from "@/lib/session";
 import { urlsafe, formatBytes, decodeParam } from "@/lib/utils";
 import ReleaseClient from "./ReleaseClient";
@@ -16,21 +17,8 @@ interface PageProps {
   params: Promise<{ filename: string }>;
 }
 
-// Matches PHP's encodeFileText() — handles Latin-1/CP437 ASCII art files
-function encodeFileText(filePath: string): string {
-  const buf = readFileSync(filePath);
-  let text: string;
-  try {
-    const decoder = new TextDecoder("utf-8", { fatal: true });
-    text = decoder.decode(buf);
-  } catch {
-    // Not valid UTF-8 — treat as Latin-1 (ISO-8859-1), same as PHP's utf8_encode()
-    text = Array.from(buf as Uint8Array).map(b => String.fromCharCode(b)).join("");
-  }
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+function encodeFileText(filePath: string, encoding = releaseTextEncoding(null, null)): string {
+  return encodeReleaseText(readFileSync(filePath), encoding);
 }
 
 const MONTHS = [
@@ -138,7 +126,9 @@ export default async function ReleasePage({ params }: PageProps) {
   const filePath = path.join(collectionsPath, dirname, filename);
   const dizPath = `${filePath}.diz`;
   const fallbackDizPath = path.join(collectionsPath, "file_id.diz.txt");
-  const type = (colly.type ?? "ASCII").toUpperCase();
+  const storedType = (colly.type ?? "ASCII").toUpperCase();
+  const textEncoding = releaseTextEncoding(storedType, colly.broken_comment);
+  const type = releaseViewerType(storedType);
 
   // .diz file preview for summary card
   let dizContent = "";
@@ -151,7 +141,7 @@ export default async function ReleasePage({ params }: PageProps) {
   // ASCII file content
   let fileContent = "";
   if (type === "ASCII" && existsSync(filePath)) {
-    try { fileContent = encodeFileText(filePath); } catch { fileContent = ""; }
+    try { fileContent = encodeFileText(filePath, textEncoding); } catch { fileContent = ""; }
   }
 
   // User viewer preferences (fetched in batch 2 as userPrefs)
