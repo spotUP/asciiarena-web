@@ -886,6 +886,20 @@ export default function ReleaseClient({
         </div>
       )}
 
+      {/* Archive download — shown instead of viewer for .LHA/.ZIP etc. */}
+      {isArchive && (
+        <div className="bg-secondary amb-1 ap-2" style={{ textAlign: "center" }}>
+          <div className="lightgrey amb-1">This is an archive file. Click below to download.</div>
+          <input
+            type="button"
+            className="btn-big"
+            value={`Download ${filename}`}
+            onClick={doDownload}
+            style={{ fontSize: "16px", padding: "12px 24px" }}
+          />
+        </div>
+      )}
+
       {/* Comments list */}
       <div id="comments">
         {/* Add comment form — always visible for logged-in users.
