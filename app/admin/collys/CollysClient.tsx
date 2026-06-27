@@ -86,6 +86,7 @@ export default function CollysClient() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [edits, setEdits] = useState<Record<number, Partial<Colly>>>({});
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
+  const [dizContent, setDizContent] = useState("");
 
   const flash = (text: string, ok: boolean) => {
     setMsg({ text, ok });
@@ -167,6 +168,15 @@ export default function CollysClient() {
   };
 
   const selected = selectedId !== null ? results.find(c => c.id === selectedId) ?? null : null;
+
+  // Fetch .diz content when a colly is selected
+  useEffect(() => {
+    if (!selected) { setDizContent(""); return; }
+    fetch(`/api/admin/collys/diz?filename=${encodeURIComponent(selected.filename)}`)
+      .then(r => r.json())
+      .then(d => setDizContent(d.content ?? ""))
+      .catch(() => setDizContent(""));
+  }, [selected]);
 
   return (
     <>
@@ -278,6 +288,33 @@ export default function CollysClient() {
               <div className="col-3 lightgrey">FILE ID</div>
               <div className="col-9">
                 <input type="text" className="form-control w-100" value={edits[selected.id]?.file_id ?? selected.file_id ?? ""} onChange={e => edit(selected.id, "file_id", e.target.value)} />
+              </div>
+            </div>
+            <div className="row amb-1">
+              <div className="col-3 lightgrey">FILE_ID.DIZ</div>
+              <div className="col-9">
+                <textarea
+                  className="form-control w-100"
+                  rows={8}
+                  style={{ fontFamily: "TopazPlus_a1200, monospace", fontSize: "16px", lineHeight: "1", whiteSpace: "pre", overflowWrap: "normal", overflowX: "auto" }}
+                  value={dizContent}
+                  onChange={e => setDizContent(e.target.value)}
+                />
+                <div style={{ marginTop: "4px" }}>
+                  <input
+                    type="button"
+                    className="btn-big"
+                    value="Save DIZ"
+                    onClick={async () => {
+                      await fetch("/api/admin/collys/diz", {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ filename: selected.filename, content: dizContent }),
+                      });
+                      flash("DIZ saved!", true);
+                    }}
+                  />
+                </div>
               </div>
             </div>
             <div className="row amb-1 align-items-center">
