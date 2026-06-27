@@ -151,11 +151,11 @@ export default async function ReleasePage({ params }: PageProps) {
   // embedded markers, then the global fallback.
   let dizContent = "";
   if (existsSync(dizPath)) {
-    try { dizContent = encodeFileText(dizPath); } catch { dizContent = ""; }
+    try { dizContent = encodeFileText(dizPath, textEncoding); } catch { dizContent = ""; }
   } else if (embeddedDiz) {
     dizContent = embeddedDiz;
   } else if (existsSync(fallbackDizPath)) {
-    try { dizContent = encodeFileText(fallbackDizPath); } catch { dizContent = ""; }
+    try { dizContent = encodeFileText(fallbackDizPath, textEncoding); } catch { dizContent = ""; }
   }
   if (hasPcbCodes(dizContent)) {
     dizContent = convertPcbColors(dizContent);
