@@ -9,10 +9,15 @@ import { broadcast } from "@/lib/live";
 
 const patchSchema = z.object({
   id: z.number().int().positive(),
+  filename: z.string().max(60).optional(),
   name: z.string().max(500).optional(),
   year: z.number().int().nullable().optional(),
   month: z.number().int().nullable().optional(),
+  day: z.number().int().nullable().optional(),
   type: z.string().max(50).optional(),
+  file_id: z.string().max(60).nullable().optional(),
+  artistNames: z.array(z.string().trim().min(1).max(100)).optional(),
+  crewNames: z.array(z.string().trim().min(1).max(200)).optional(),
   broken: z.number().int().optional(),
   broken_comment: z.string().max(1000).nullable().optional(),
 });
@@ -28,7 +33,11 @@ interface CollyRow {
   name: string | null;
   year: number | null;
   month: number | null;
+  day: number | null;
   type: string | null;
+  file_id: string | null;
+  artists: string | null;
+  crews: string | null;
   broken: number | null;
   broken_comment: string | null;
   uploader: string | null;
@@ -47,14 +56,26 @@ export async function GET(request: NextRequest) {
 
   if (broken) {
     rows = await prisma.$queryRaw<CollyRow[]>`
-      SELECT id, filename, name, year, month, type, broken, broken_comment, uploader,
+      SELECT id, filename, name, year, month, day, type, file_id, broken, broken_comment, uploader,
+             (SELECT GROUP_CONCAT(a.nick ORDER BY a.nick SEPARATOR ', ')
+              FROM artists_collys ac JOIN artists a ON a.id = ac.artist_id
+              WHERE ac.colly_id = collys.id) AS artists,
+             (SELECT GROUP_CONCAT(cr.name ORDER BY cr.name SEPARATOR ', ')
+              FROM collys_crews cc JOIN crews cr ON cr.id = cc.crew_id
+              WHERE cc.colly_id = collys.id) AS crews,
              COUNT(*) OVER() AS total_count
       FROM collys WHERE broken > 0 ORDER BY broken DESC LIMIT 100
     `;
   } else if (q) {
     const like = `%${q}%`;
     rows = await prisma.$queryRaw<CollyRow[]>`
-      SELECT id, filename, name, year, month, type, broken, broken_comment, uploader,
+      SELECT id, filename, name, year, month, day, type, file_id, broken, broken_comment, uploader,
+             (SELECT GROUP_CONCAT(a.nick ORDER BY a.nick SEPARATOR ', ')
+              FROM artists_collys ac JOIN artists a ON a.id = ac.artist_id
+              WHERE ac.colly_id = c.id) AS artists,
+             (SELECT GROUP_CONCAT(cr.name ORDER BY cr.name SEPARATOR ', ')
+              FROM collys_crews cc JOIN crews cr ON cr.id = cc.crew_id
+              WHERE cc.colly_id = c.id) AS crews,
              COUNT(*) OVER() AS total_count
       FROM collys WHERE filename LIKE ${like} OR name LIKE ${like}
       ORDER BY filename ASC LIMIT 50
@@ -73,18 +94,41 @@ export async function PATCH(request: NextRequest) {
   const rawPatchBody = await request.json().catch(() => ({}));
   const patchParsed = patchSchema.safeParse(rawPatchBody);
   if (!patchParsed.success) return apiError("Invalid request: " + patchParsed.error.issues[0]?.message, 400);
-  const { id, name, year, month, type, broken, broken_comment } = patchParsed.data;
+  const { id, filename, name, year, month, day, type, file_id, artistNames, crewNames, broken, broken_comment } = patchParsed.data;
 
   await prisma.$executeRaw`
     UPDATE collys SET
+      filename = COALESCE(${filename ?? null}, filename),
       name = COALESCE(${name ?? null}, name),
       year = COALESCE(${year ?? null}, year),
       month = COALESCE(${month ?? null}, month),
+      day = COALESCE(${day ?? null}, day),
       type = COALESCE(${type ?? null}, type),
-      broken = ${broken ?? 0},
+      file_id = COALESCE(${file_id ?? null}, file_id),
+      broken = COALESCE(${broken ?? null}, broken),
       broken_comment = ${broken_comment ?? null}
     WHERE id = ${id}
   `;
+
+  if (artistNames) {
+    await prisma.$executeRaw`DELETE FROM artists_collys WHERE colly_id = ${id}`;
+    for (const artistName of artistNames) {
+      await prisma.$executeRaw`
+        INSERT IGNORE INTO artists_collys (artist_id, colly_id)
+        SELECT artists.id, ${id} FROM artists WHERE artists.nick = ${artistName}
+      `;
+    }
+  }
+
+  if (crewNames) {
+    await prisma.$executeRaw`DELETE FROM collys_crews WHERE colly_id = ${id}`;
+    for (const crewName of crewNames) {
+      await prisma.$executeRaw`
+        INSERT IGNORE INTO collys_crews (colly_id, crew_id)
+        SELECT ${id}, crews.id FROM crews WHERE crews.name = ${crewName}
+      `;
+    }
+  }
 
   // Whenever broken state could have changed, ping the moderation badge so
   // it re-fetches its count. Cheap signal — receivers just re-poll.

@@ -9,9 +9,21 @@ interface Colly {
   filename: string;
   name: string | null;
   year: number | null;
+  month: number | null;
+  day: number | null;
   type: string | null;
+  file_id: string | null;
+  artists: string | null;
+  crews: string | null;
   broken?: number;
   broken_comment?: string | null;
+}
+
+function splitNames(value: string | null | undefined): string[] {
+  return (value ?? "")
+    .split(",")
+    .map(part => part.trim())
+    .filter(Boolean);
 }
 
 function Msg({ msg }: { msg: { text: string; ok: boolean } | null }) {
@@ -69,17 +81,29 @@ export default function CollysClient() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         id: colly.id,
+        filename: e.filename ?? colly.filename,
         name: e.name ?? colly.name,
         year: e.year ?? colly.year,
+        month: e.month ?? colly.month,
+        day: e.day ?? colly.day,
         type: e.type ?? colly.type,
+        file_id: e.file_id ?? colly.file_id,
+        artistNames: splitNames((e.artists ?? colly.artists) as string | null),
+        crewNames: splitNames((e.crews ?? colly.crews) as string | null),
       }),
     });
     flash("Saved!", true);
     setResults(prev => prev.map(row => row.id === colly.id ? {
       ...row,
+      filename: e.filename ?? colly.filename,
       name: e.name ?? colly.name,
       year: e.year ?? colly.year,
+      month: e.month ?? colly.month,
+      day: e.day ?? colly.day,
       type: e.type ?? colly.type,
+      file_id: e.file_id ?? colly.file_id,
+      artists: (e.artists ?? colly.artists) as string | null,
+      crews: (e.crews ?? colly.crews) as string | null,
     } : row));
   };
 
@@ -122,9 +146,9 @@ export default function CollysClient() {
             <div className="row lightgrey amb-1" style={{ borderBottom: "1px solid #444" }}>
               <div className="col-3">FILENAME</div>
               <div className="col-4">NAME</div>
-              <div className="col-1">YEAR</div>
+              <div className="col-2">DATE</div>
               <div className="col-1">TYPE</div>
-              <div className="col-3">ACTIONS</div>
+              <div className="col-2">ACTIONS</div>
             </div>
             {results.map(c => (
               <div key={c.id} className="row amb-1 align-items-center">
@@ -132,9 +156,11 @@ export default function CollysClient() {
                   <Link className="magenta" href={`/release/${c.filename}`}>{c.filename}</Link>
                 </div>
                 <div className="col-4 text-truncate lightgrey">{c.name ?? ""}</div>
-                <div className="col-1 lightgrey">{c.year ?? ""}</div>
+                <div className="col-2 lightgrey">
+                  {[c.year || null, c.month || null, c.day || null].filter(Boolean).join("-")}
+                </div>
                 <div className="col-1 lightgrey">{c.type ?? ""}</div>
-                <div className="col-3" style={{ display: "flex", gap: "8px" }}>
+                <div className="col-2" style={{ display: "flex", gap: "8px" }}>
                   <input type="button" className="btn-big" value={selectedId === c.id ? "Selected" : "Edit"} onClick={() => setSelectedId(c.id)} />
                   <input type="button" className="btn-big" value="Delete" style={{ color: "#ff5555" }} onClick={() => del(c.id)} />
                 </div>
@@ -154,7 +180,7 @@ export default function CollysClient() {
             <div className="row amb-1">
               <div className="col-3 lightgrey">FILENAME</div>
               <div className="col-9">
-                <Link className="magenta" href={`/release/${selected.filename}`}>{selected.filename}</Link>
+                <input type="text" className="form-control w-100" value={edits[selected.id]?.filename ?? selected.filename} onChange={e => edit(selected.id, "filename", e.target.value)} />
               </div>
             </div>
             <div className="row amb-1 align-items-center">
@@ -164,15 +190,39 @@ export default function CollysClient() {
               </div>
             </div>
             <div className="row amb-1 align-items-center">
-              <div className="col-3 lightgrey">YEAR</div>
-              <div className="col-9">
+              <div className="col-3 lightgrey">RELEASE DATE</div>
+              <div className="col-3">
                 <input type="number" className="form-control w-100" value={edits[selected.id]?.year ?? selected.year ?? ""} onChange={e => edit(selected.id, "year", parseInt(e.target.value) || null)} />
+              </div>
+              <div className="col-3">
+                <input type="number" className="form-control w-100" value={edits[selected.id]?.month ?? selected.month ?? ""} onChange={e => edit(selected.id, "month", parseInt(e.target.value) || null)} />
+              </div>
+              <div className="col-3">
+                <input type="number" className="form-control w-100" value={edits[selected.id]?.day ?? selected.day ?? ""} onChange={e => edit(selected.id, "day", parseInt(e.target.value) || null)} />
               </div>
             </div>
             <div className="row amb-1 align-items-center">
               <div className="col-3 lightgrey">TYPE</div>
               <div className="col-9">
                 <input type="text" className="form-control w-100" value={edits[selected.id]?.type ?? selected.type ?? ""} onChange={e => edit(selected.id, "type", e.target.value)} />
+              </div>
+            </div>
+            <div className="row amb-1 align-items-center">
+              <div className="col-3 lightgrey">FILE ID</div>
+              <div className="col-9">
+                <input type="text" className="form-control w-100" value={edits[selected.id]?.file_id ?? selected.file_id ?? ""} onChange={e => edit(selected.id, "file_id", e.target.value)} />
+              </div>
+            </div>
+            <div className="row amb-1 align-items-center">
+              <div className="col-3 lightgrey">ARTISTS</div>
+              <div className="col-9">
+                <input type="text" className="form-control w-100" value={edits[selected.id]?.artists ?? selected.artists ?? ""} onChange={e => edit(selected.id, "artists", e.target.value)} />
+              </div>
+            </div>
+            <div className="row amb-1 align-items-center">
+              <div className="col-3 lightgrey">CREWS</div>
+              <div className="col-9">
+                <input type="text" className="form-control w-100" value={edits[selected.id]?.crews ?? selected.crews ?? ""} onChange={e => edit(selected.id, "crews", e.target.value)} />
               </div>
             </div>
             <div className="row amb-1">
