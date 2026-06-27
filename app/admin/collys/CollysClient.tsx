@@ -249,23 +249,26 @@ export default function CollysClient() {
             </div>
             <div className="row amb-1 align-items-center">
               <div className="col-3 lightgrey">RELEASE DATE</div>
-              <div className="col-3">
-                <select className="form-select w-100" value={edits[selected.id]?.year ?? selected.year ?? ""} onChange={e => edit(selected.id, "year", e.target.value ? parseInt(e.target.value) : null)}>
-                  <option value="">Year</option>
-                  {Array.from({ length: 50 }, (_, i) => 1990 + i).map(y => <option key={y} value={y}>{y}</option>)}
-                </select>
-              </div>
-              <div className="col-3">
-                <select className="form-select w-100" value={edits[selected.id]?.month ?? selected.month ?? ""} onChange={e => edit(selected.id, "month", e.target.value ? parseInt(e.target.value) : null)}>
-                  <option value="">Month</option>
-                  {["January","February","March","April","May","June","July","August","September","October","November","December"].map((m, i) => <option key={i+1} value={i+1}>{m}</option>)}
-                </select>
-              </div>
-              <div className="col-3">
-                <select className="form-select w-100" value={edits[selected.id]?.day ?? selected.day ?? ""} onChange={e => edit(selected.id, "day", e.target.value ? parseInt(e.target.value) : null)}>
-                  <option value="">Day</option>
-                  {Array.from({ length: 31 }, (_, i) => i + 1).map(d => <option key={d} value={d}>{d}</option>)}
-                </select>
+              <div className="col-9">
+                <input
+                  type="date"
+                  className="date-dos"
+                  value={(() => {
+                    const y = edits[selected.id]?.year ?? selected.year;
+                    const m = edits[selected.id]?.month ?? selected.month;
+                    const d = edits[selected.id]?.day ?? selected.day;
+                    if (!y || !m || !d) return "";
+                    return `${String(y).padStart(4, "0")}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+                  })()}
+                  onChange={e => {
+                    const v = e.target.value;
+                    if (!v) { edit(selected.id, "year", null); edit(selected.id, "month", null); edit(selected.id, "day", null); return; }
+                    const [y, m, d] = v.split("-");
+                    edit(selected.id, "year", parseInt(y) || null);
+                    edit(selected.id, "month", parseInt(m) || null);
+                    edit(selected.id, "day", parseInt(d) || null);
+                  }}
+                />
               </div>
             </div>
             <div className="row amb-1 align-items-center">

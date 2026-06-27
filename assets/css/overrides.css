@@ -145,6 +145,46 @@ button.dropdown-item {
 .form-check-input { background-color: #444 !important; border-color: #666 !important; }
 .form-check-input:checked { background-color: #ff55ff !important; border-color: #ff55ff !important; }
 
+/* ── Retro 386-styled native date picker ─────────────────── */
+.date-dos {
+  /* Match .form-control exactly */
+  display: block;
+  width: 100%;
+  padding: 6px 12px;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-size: 16px;
+  font-weight: normal;
+  line-height: 16px;
+  color: rgba(255,255,255,0.7);
+  background-color: #212121;
+  border: 1px solid #555555;
+  border-radius: 0;
+  color-scheme: dark;
+  cursor: pointer;
+}
+.date-dos:focus {
+  background-color: #212121;
+  color: rgba(255,255,255,0.7);
+  border-color: #ff55ff;
+  box-shadow: none;
+  outline: none;
+}
+.date-dos::-webkit-calendar-picker-indicator {
+  filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(274deg) brightness(119%) contrast(119%);
+  cursor: pointer;
+  opacity: 1;
+}
+.date-dos::-webkit-datetime-edit-fields-wrapper { padding: 0; }
+.date-dos::-webkit-datetime-edit-text { color: #ff55ff; padding: 0 2px; }
+.date-dos::-webkit-datetime-edit-month-field,
+.date-dos::-webkit-datetime-edit-day-field,
+.date-dos::-webkit-datetime-edit-year-field { color: #aaaaaa; }
+.date-dos::-webkit-datetime-edit-month-field:focus,
+.date-dos::-webkit-datetime-edit-day-field:focus,
+.date-dos::-webkit-datetime-edit-year-field:focus {
+  background-color: #ff55ff; color: #111; border-radius: 0;
+}
+
 /* Sort buttons */
 .sort-btn { background: none; border: none; color: inherit; cursor: pointer; font: inherit; padding: 0; }
 .sort-btn:hover { text-decoration: underline; }
