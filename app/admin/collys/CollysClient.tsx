@@ -294,9 +294,10 @@ export default function CollysClient() {
               <div className="col-3 lightgrey">FILE_ID.DIZ</div>
               <div className="col-9">
                 <textarea
-                  className="form-control w-100"
-                  rows={8}
-                  style={{ fontFamily: "TopazPlus_a1200, monospace", fontSize: "16px", lineHeight: "1", whiteSpace: "pre", overflowWrap: "normal", overflowX: "auto" }}
+                  className="form-control"
+                  rows={15}
+                  cols={45}
+                  style={{ fontFamily: "TopazPlus_a1200, monospace", fontSize: "16px", lineHeight: "1", whiteSpace: "pre", overflowWrap: "normal" }}
                   value={dizContent}
                   onChange={e => setDizContent(e.target.value)}
                 />
