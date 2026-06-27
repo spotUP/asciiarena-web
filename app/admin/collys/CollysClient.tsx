@@ -67,7 +67,7 @@ function NamePicker({ label, names, onAdd, onRemove }: {
         ))}
       </div>
       <div style={{ display: "flex", gap: "8px" }}>
-        <select className="form-select" value={pick} onChange={e => setPick(e.target.value)} style={{ flex: 1 }}>
+        <select className="form-select w-100" value={pick} onChange={e => setPick(e.target.value)}>
           <option value="">Select {label}...</option>
           {options.filter(o => !names.includes(displayName(o))).map(o => (
             <option key={o.id} value={displayName(o)}>{displayName(o)}</option>
