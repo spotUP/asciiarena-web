@@ -497,6 +497,9 @@ export default function ReleaseClient({
   useEffect(() => {
     if (!collyVisible || type !== "ASCII") return;
     const handler = (e: KeyboardEvent) => {
+      // Don't fire shortcuts when typing in form fields
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (e.target as HTMLElement)?.isContentEditable) return;
       if (section !== null) return;
       if (e.key === "f") { setIsFullscreen(f => !f); }
       else if (e.key === "d") { doDownload(); }
