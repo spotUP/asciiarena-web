@@ -239,14 +239,26 @@ export default function CollysClient() {
             </div>
             <div className="row amb-1 align-items-center">
               <div className="col-3 lightgrey">RELEASE DATE</div>
-              <div className="col-3">
-                <input type="number" className="form-control w-100" value={edits[selected.id]?.year ?? selected.year ?? ""} onChange={e => edit(selected.id, "year", parseInt(e.target.value) || null)} />
-              </div>
-              <div className="col-3">
-                <input type="number" className="form-control w-100" value={edits[selected.id]?.month ?? selected.month ?? ""} onChange={e => edit(selected.id, "month", parseInt(e.target.value) || null)} />
-              </div>
-              <div className="col-3">
-                <input type="number" className="form-control w-100" value={edits[selected.id]?.day ?? selected.day ?? ""} onChange={e => edit(selected.id, "day", parseInt(e.target.value) || null)} />
+              <div className="col-9">
+                <input
+                  type="date"
+                  className="form-control w-100 date-dos"
+                  value={(() => {
+                    const y = edits[selected.id]?.year ?? selected.year;
+                    const m = edits[selected.id]?.month ?? selected.month;
+                    const d = edits[selected.id]?.day ?? selected.day;
+                    if (!y || !m || !d) return "";
+                    return `${String(y).padStart(4, "0")}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+                  })()}
+                  onChange={e => {
+                    const v = e.target.value;
+                    if (!v) { edit(selected.id, "year", null); edit(selected.id, "month", null); edit(selected.id, "day", null); return; }
+                    const [y, m, d] = v.split("-");
+                    edit(selected.id, "year", parseInt(y) || null);
+                    edit(selected.id, "month", parseInt(m) || null);
+                    edit(selected.id, "day", parseInt(d) || null);
+                  }}
+                />
               </div>
             </div>
             <div className="row amb-1 align-items-center">
