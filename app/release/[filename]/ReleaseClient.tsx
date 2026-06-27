@@ -10,6 +10,7 @@ import {
   editComment as editCommentAction,
   deleteComment as deleteCommentAction,
 } from "@/app/actions/collys";
+import { buildAdminCollyEditHref } from "@/app/admin/collys/editHref";
 import { FONTS, ANSI_FONT_MAP, loadAnsiLove } from "@/lib/ansilove";
 
 const COLOR_OPTIONS = [
@@ -786,7 +787,7 @@ export default function ReleaseClient({
               <input type="button" className="btn-big" value={fav ? "Remove favourite" : "Favourite"} onClick={toggleFav} />
               <input type="button" className="btn-big" value="Report Broken" onClick={() => { setSection("broken"); setCollyVisible(false); }} />
               {isAdmin && (
-                <input type="button" className="btn-big" value="Edit" onClick={() => { window.location.href = `/admin#colly?getcollyname=${filename}`; }} />
+                <input type="button" className="btn-big" value="Edit" onClick={() => { window.location.href = buildAdminCollyEditHref(filename); }} />
               )}
             </>
           )}

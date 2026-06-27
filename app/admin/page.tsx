@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/generated/prisma/client";
 import Link from "next/link";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
+import LegacyHashRedirect from "./LegacyHashRedirect";
 
 interface StatRow { cnt: bigint | number }
 
@@ -60,6 +61,7 @@ export default async function AdminDashboard() {
 
   return (
     <>
+      <LegacyHashRedirect />
       <LiveRefresh channel="site:releases" />
       <LiveRefresh channel="site:users" />
       <LiveRefresh channel="site:requests" />
@@ -72,7 +74,7 @@ export default async function AdminDashboard() {
         <StatCard label="TOTAL USERS"       value={stats.users}      href="/admin/users" />
         <StatCard label="ACTIVE 30D"        value={stats.activeUsers} />
         <StatCard label="TOTAL COLLYS"      value={stats.collys}     href="/admin/collys" />
-        <StatCard label="BROKEN COLLYS"     value={stats.broken}     href="/admin/collys" warn />
+        <StatCard label="BROKEN COLLYS"     value={stats.broken}     href="/admin/broken-collys" warn />
         <StatCard label="OPEN REQUESTS"     value={stats.pending}    href="/admin/requests" warn />
         <StatCard label="UNCLAIMED ARTISTS" value={stats.unclaimed}  href="/admin/artists" />
       </div>
