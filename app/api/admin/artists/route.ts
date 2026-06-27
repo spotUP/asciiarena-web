@@ -23,6 +23,13 @@ export async function GET(request: NextRequest) {
   if ((session?.user as { rank?: string } | undefined)?.rank !== "Admin") return apiError("Forbidden", 403);
 
   const q = request.nextUrl.searchParams.get("q") ?? "";
+  // ?q=* returns all artists for dropdown pickers
+  if (q === "*") {
+    const rows = await prisma.$queryRaw<{ id: number; nick: string }[]>`
+      SELECT id, nick FROM artists ORDER BY nick ASC
+    `;
+    return apiOk(rows);
+  }
   if (!q) return apiOk([]);
 
   const like = `%${q}%`;

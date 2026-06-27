@@ -35,6 +35,50 @@ function Msg({ msg }: { msg: { text: string; ok: boolean } | null }) {
   );
 }
 
+interface NameOption { id: number; name?: string; nick?: string }
+
+function NamePicker({ label, names, onAdd, onRemove }: {
+  label: string;
+  names: string[];
+  onAdd: (name: string) => void;
+  onRemove: (name: string) => void;
+}) {
+  const [options, setOptions] = useState<NameOption[]>([]);
+  const [pick, setPick] = useState("");
+
+  useEffect(() => {
+    const ep = label === "artist" ? "/api/admin/artists?q=*" : "/api/admin/crews?q=*";
+    fetch(ep).then(r => r.json()).then(setOptions).catch(() => setOptions([]));
+  }, [label]);
+
+  const displayName = (o: NameOption) => o.nick ?? o.name ?? "";
+
+  return (
+    <div>
+      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "4px" }}>
+        {names.map(n => (
+          <span key={n} style={{
+            background: "#333", padding: "2px 8px", display: "inline-flex",
+            alignItems: "center", gap: "6px"
+          }}>
+            {n}
+            <span onClick={() => onRemove(n)} style={{ cursor: "pointer", color: "#ff5555" }}>x</span>
+          </span>
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: "8px" }}>
+        <select className="form-select" value={pick} onChange={e => setPick(e.target.value)} style={{ flex: 1 }}>
+          <option value="">Select {label}...</option>
+          {options.filter(o => !names.includes(displayName(o))).map(o => (
+            <option key={o.id} value={displayName(o)}>{displayName(o)}</option>
+          ))}
+        </select>
+        <input type="button" className="btn-big" value="Add" onClick={() => { if (pick) { onAdd(pick); setPick(""); } }} />
+      </div>
+    </div>
+  );
+}
+
 export default function CollysClient() {
   const searchParams = useSearchParams();
   const [query, setQuery] = useState("");
@@ -242,13 +286,35 @@ export default function CollysClient() {
             <div className="row amb-1 align-items-center">
               <div className="col-3 lightgrey">ARTISTS</div>
               <div className="col-9">
-                <input type="text" className="form-control w-100" value={edits[selected.id]?.artists ?? selected.artists ?? ""} onChange={e => edit(selected.id, "artists", e.target.value)} />
+                <NamePicker
+                  label="artist"
+                  names={splitNames((edits[selected.id]?.artists ?? selected.artists) as string | null)}
+                  onAdd={name => {
+                    const cur = splitNames((edits[selected.id]?.artists ?? selected.artists) as string | null);
+                    if (!cur.includes(name)) edit(selected.id, "artists", [...cur, name].join(", "));
+                  }}
+                  onRemove={name => {
+                    const cur = splitNames((edits[selected.id]?.artists ?? selected.artists) as string | null);
+                    edit(selected.id, "artists", cur.filter(n => n !== name).join(", "));
+                  }}
+                />
               </div>
             </div>
             <div className="row amb-1 align-items-center">
               <div className="col-3 lightgrey">CREWS</div>
               <div className="col-9">
-                <input type="text" className="form-control w-100" value={edits[selected.id]?.crews ?? selected.crews ?? ""} onChange={e => edit(selected.id, "crews", e.target.value)} />
+                <NamePicker
+                  label="crew"
+                  names={splitNames((edits[selected.id]?.crews ?? selected.crews) as string | null)}
+                  onAdd={name => {
+                    const cur = splitNames((edits[selected.id]?.crews ?? selected.crews) as string | null);
+                    if (!cur.includes(name)) edit(selected.id, "crews", [...cur, name].join(", "));
+                  }}
+                  onRemove={name => {
+                    const cur = splitNames((edits[selected.id]?.crews ?? selected.crews) as string | null);
+                    edit(selected.id, "crews", cur.filter(n => n !== name).join(", "));
+                  }}
+                />
               </div>
             </div>
             <div className="row amb-1">
