@@ -924,6 +924,9 @@ export default function ReleaseClient({
       {/* Archive viewer — renders each file in the archive using AnsiLove */}
       {isArchive && archiveFiles.length > 0 && (
         <div>
+          <div className="bg-secondary amb-1 ap-1" style={{ textAlign: "center" }}>
+            <input type="button" className="btn-big" value={`Download ${filename}`} onClick={doDownload} style={{ fontSize: "16px", padding: "12px 24px" }} />
+          </div>
           {archiveFiles.map(entry => (
             <div key={entry} style={{ marginBottom: "16px" }}>
               <div className="header bg-header col-12 ap-1">{entry.split("/").pop()}</div>
