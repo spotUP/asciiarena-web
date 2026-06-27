@@ -1,5 +1,9 @@
 export type ReleaseTextEncoding = "auto" | "cp437";
 
+// Markers that some .TXT files embed to inline their file_id.diz content.
+export const BEGIN_FILE_ID_DIZ = "@BEGIN_FILE_ID.DIZ";
+export const END_FILE_ID_DIZ = "@END_FILE_ID.DIZ";
+
 const CP437_HIGH_CODEPOINTS = [
   0x00c7, 0x00fc, 0x00e9, 0x00e2, 0x00e4, 0x00e0, 0x00e5, 0x00e7,
   0x00ea, 0x00eb, 0x00e8, 0x00ef, 0x00ee, 0x00ec, 0x00c4, 0x00c5,
@@ -24,6 +28,30 @@ export function decodeCp437Bytes(bytes: Uint8Array): string {
     if (byte < 0x80) return String.fromCharCode(byte);
     return String.fromCodePoint(CP437_HIGH_CODEPOINTS[byte - 0x80]);
   }).join("");
+}
+
+export interface FileIdDizResult {
+  /** The text with the @BEGIN_FILE_ID.DIZ ... @END_FILE_ID.DIZ block removed. */
+  content: string;
+  /** The text between the markers, or null if no markers were found. */
+  dizText: string | null;
+}
+
+/** Strip embedded file_id.diz markers and return the extracted content.
+ *  Safe to call on HTML-escaped text — the markers contain no HTML special chars. */
+export function stripFileIdDiz(text: string): FileIdDizResult {
+  const beginIdx = text.indexOf(BEGIN_FILE_ID_DIZ);
+  const endIdx = text.indexOf(END_FILE_ID_DIZ);
+  if (beginIdx === -1 || endIdx === -1 || endIdx <= beginIdx) {
+    return { content: text, dizText: null };
+  }
+  const dizStart = beginIdx + BEGIN_FILE_ID_DIZ.length;
+  const dizText = text.substring(dizStart, endIdx).trim();
+  let endMarkerEnd = endIdx + END_FILE_ID_DIZ.length;
+  // eat any trailing CR/LF so the surrounding text doesn't get a phantom blank line
+  if (text[endMarkerEnd] === "\r") endMarkerEnd++;
+  if (text[endMarkerEnd] === "\n") endMarkerEnd++;
+  return { content: text.substring(0, beginIdx) + text.substring(endMarkerEnd), dizText: dizText || null };
 }
 
 export function decodeReleaseText(bytes: Uint8Array, encoding: ReleaseTextEncoding): string {

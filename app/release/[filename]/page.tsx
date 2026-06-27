@@ -6,7 +6,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
-import { encodeReleaseText, releaseTextEncoding, releaseViewerType } from "@/lib/releaseText";
+import { encodeReleaseText, releaseTextEncoding, releaseViewerType, stripFileIdDiz } from "@/lib/releaseText";
+import { convertPcbColors, hasPcbCodes } from "@/lib/pcbColors";
 import { getSession as auth } from "@/lib/session";
 import { urlsafe, formatBytes, decodeParam } from "@/lib/utils";
 import ReleaseClient from "./ReleaseClient";
@@ -130,18 +131,34 @@ export default async function ReleasePage({ params }: PageProps) {
   const textEncoding = releaseTextEncoding(storedType, colly.broken_comment);
   const type = releaseViewerType(storedType);
 
-  // .diz file preview for summary card
+  // ASCII file content — read first so we can extract embedded file_id.diz
+  let fileContent = "";
+  let embeddedDiz: string | null = null;
+  if (type === "ASCII" && existsSync(filePath)) {
+    try { fileContent = encodeFileText(filePath, textEncoding); } catch { fileContent = ""; }
+    if (fileContent) {
+      // Strip @BEGIN_FILE_ID.DIZ ... @END_FILE_ID.DIZ block (PHP cmds.php behaviour)
+      const stripped = stripFileIdDiz(fileContent);
+      fileContent = stripped.content;
+      embeddedDiz = stripped.dizText;
+    }
+    if (hasPcbCodes(fileContent)) {
+      fileContent = convertPcbColors(fileContent);
+    }
+  }
+
+  // .diz file preview for summary card — prefer separate .diz, fall back to
+  // embedded markers, then the global fallback.
   let dizContent = "";
   if (existsSync(dizPath)) {
     try { dizContent = encodeFileText(dizPath); } catch { dizContent = ""; }
+  } else if (embeddedDiz) {
+    dizContent = embeddedDiz;
   } else if (existsSync(fallbackDizPath)) {
     try { dizContent = encodeFileText(fallbackDizPath); } catch { dizContent = ""; }
   }
-
-  // ASCII file content
-  let fileContent = "";
-  if (type === "ASCII" && existsSync(filePath)) {
-    try { fileContent = encodeFileText(filePath, textEncoding); } catch { fileContent = ""; }
+  if (hasPcbCodes(dizContent)) {
+    dizContent = convertPcbColors(dizContent);
   }
 
   // User viewer preferences (fetched in batch 2 as userPrefs)
