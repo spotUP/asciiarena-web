@@ -1,5 +1,14 @@
 /* ── Loads last — overrides bootstrap5, site.css, 386.css ── */
 
+/* Force TopazPlus for CP437 block-element characters (U+2580–U+259F).
+   mOsOul renders them shorter than the full cell height, leaving gaps
+   between rows in ASCII art. TopazPlus has proper full-height blocks. */
+@font-face {
+  font-family: 'mOsOul';
+  src: url('/assets/fonts/TopazPlus_a1200.woff2') format('woff2');
+  unicode-range: U+2580-259F;
+}
+
 .blink { animation: blink 1s step-end infinite; }
 
 .cursor-block {
