@@ -88,6 +88,8 @@ export default function CollysClient() {
         day: e.day ?? colly.day,
         type: e.type ?? colly.type,
         file_id: e.file_id ?? colly.file_id,
+        broken: e.broken ?? colly.broken,
+        broken_comment: e.broken_comment ?? colly.broken_comment,
         artistNames: splitNames((e.artists ?? colly.artists) as string | null),
         crewNames: splitNames((e.crews ?? colly.crews) as string | null),
       }),
@@ -102,6 +104,8 @@ export default function CollysClient() {
       day: e.day ?? colly.day,
       type: e.type ?? colly.type,
       file_id: e.file_id ?? colly.file_id,
+      broken: e.broken ?? colly.broken,
+      broken_comment: e.broken_comment ?? colly.broken_comment,
       artists: (e.artists ?? colly.artists) as string | null,
       crews: (e.crews ?? colly.crews) as string | null,
     } : row));
@@ -204,13 +208,35 @@ export default function CollysClient() {
             <div className="row amb-1 align-items-center">
               <div className="col-3 lightgrey">TYPE</div>
               <div className="col-9">
-                <input type="text" className="form-control w-100" value={edits[selected.id]?.type ?? selected.type ?? ""} onChange={e => edit(selected.id, "type", e.target.value)} />
+                <select className="form-select w-100" value={edits[selected.id]?.type ?? selected.type ?? ""} onChange={e => edit(selected.id, "type", e.target.value)}>
+                  <option value="ASCII">ASCII</option>
+                  <option value="ANSI">ANSI</option>
+                  <option value="ARCHIVE">ARCHIVE</option>
+                  <option value="CP437">CP437</option>
+                  <option value="PC">PC</option>
+                  <option value="PC ASCII">PC ASCII</option>
+                </select>
               </div>
             </div>
             <div className="row amb-1 align-items-center">
               <div className="col-3 lightgrey">FILE ID</div>
               <div className="col-9">
                 <input type="text" className="form-control w-100" value={edits[selected.id]?.file_id ?? selected.file_id ?? ""} onChange={e => edit(selected.id, "file_id", e.target.value)} />
+              </div>
+            </div>
+            <div className="row amb-1 align-items-center">
+              <div className="col-3 lightgrey">BROKEN</div>
+              <div className="col-9">
+                <select className="form-select w-100" value={edits[selected.id]?.broken ?? selected.broken ?? 0} onChange={e => edit(selected.id, "broken", parseInt(e.target.value))}>
+                  <option value={0}>No</option>
+                  <option value={1}>Yes</option>
+                </select>
+              </div>
+            </div>
+            <div className="row amb-1 align-items-center">
+              <div className="col-3 lightgrey">BROKEN NOTE</div>
+              <div className="col-9">
+                <input type="text" className="form-control w-100" value={edits[selected.id]?.broken_comment ?? selected.broken_comment ?? ""} onChange={e => edit(selected.id, "broken_comment", e.target.value)} />
               </div>
             </div>
             <div className="row amb-1 align-items-center">
