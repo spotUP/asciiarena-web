@@ -120,16 +120,28 @@ export function releaseTextEncoding(
 }
 
 // ANSI 8-color palette matching the site's retro aesthetic
-const ANSI_COLORS: Record<string, string> = {
-  "0":  "",         // reset
-  "30": "#111111",  // black
-  "31": "#ff5555",  // red
-  "32": "#55ff55",  // green
-  "33": "#ffff55",  // yellow
-  "34": "#5555ff",  // blue
-  "35": "#ff55ff",  // magenta
-  "36": "#55ffff",  // cyan
-  "37": "#aaaaaa",  // white/grey
+const ANSI_FG_COLORS: Record<string, string> = {
+  "undefined": "", // initial state
+  "0":  "",        // reset
+  "30": "#111111", // black
+  "31": "#ff5555", // red
+  "32": "#55ff55", // green
+  "33": "#ffff55", // yellow
+  "34": "#5555ff", // blue
+  "35": "#ff55ff", // magenta
+  "36": "#55ffff", // cyan
+  "37": "#aaaaaa", // white/grey
+};
+const ANSI_BG_COLORS: Record<string, string> = {
+  "undefined": "",
+  "40": "#111111", // black bg
+  "41": "#ff5555", // red bg
+  "42": "#55ff55", // green bg
+  "43": "#ffff55", // yellow bg
+  "44": "#5555ff", // blue bg
+  "45": "#ff55ff", // magenta bg
+  "46": "#55ffff", // cyan bg
+  "47": "#aaaaaa", // white/grey bg
 };
 
 /**
@@ -142,20 +154,28 @@ export function convertAnsiCodes(html: string): string {
   if (html.indexOf("\x1b") === -1) return html;
 
   let open = false;
+  let fg = "undefined";
+  let bg = "undefined";
   const result = html.replace(
     /\x1b\[(\d+)m/g,
     (_match, code: string) => {
-      const color = ANSI_COLORS[code];
       if (code === "0") {
-        // Reset
+        fg = "undefined"; bg = "undefined";
         const close = open ? "</span>" : "";
         open = false;
         return close;
       }
-      if (!color) return ""; // unsupported code, strip it
+      const fgColor = ANSI_FG_COLORS[code];
+      const bgColor = ANSI_BG_COLORS[code];
+      if (fgColor !== undefined) fg = code;
+      if (bgColor !== undefined) bg = code;
+      if (fgColor === undefined && bgColor === undefined) return ""; // unsupported, strip
       const close = open ? "</span>" : "";
+      const fgc = ANSI_FG_COLORS[fg] || "inherit";
+      const bgc = ANSI_BG_COLORS[bg] || "inherit";
+      const style = `color:${fgc};background-color:${bgc}`;
       open = true;
-      return `${close}<span style="color:${color}">`;
+      return `${close}<span style="${style}">`;
     },
   );
 
