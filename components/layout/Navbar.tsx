@@ -181,7 +181,6 @@ export default function Navbar({ session }: NavbarProps) {
                 </a>
                 <div className="dropdown-menu dropdown-menu-end dropdown-menu-fix bg-red ascii" aria-labelledby="admin-dropdown">
                   <Link prefetch={false} className="dropdown-item ascii" href="/admin">Dashboard</Link>
-                  <Link prefetch={false} className="dropdown-item ascii" href="/admin/collys">Collys (incl. broken)</Link>
                   <Link prefetch={false} className="dropdown-item ascii" href="/admin/users">Users</Link>
                   <Link prefetch={false} className="dropdown-item ascii" href="/admin/users/inactive">Inactive Users</Link>
                   <Link prefetch={false} className="dropdown-item ascii" href="/admin/artists">Artists</Link>
