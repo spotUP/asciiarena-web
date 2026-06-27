@@ -223,6 +223,7 @@ function ColorSwatch({ current, onChange }: { current: string; onChange: (v: str
 
 function ArchiveEntryRenderer({ filename, entry, ansiFont }: { filename: string; entry: string; ansiFont: string }) {
   const ref = useRef<HTMLDivElement>(null);
+  const isAnsi = entry.toLowerCase().endsWith(".ans");
 
   useEffect(() => {
     const el = ref.current;
@@ -230,20 +231,30 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont }: { filename: string;
     el.innerHTML = '<span style="animation:blink 2s linear infinite">.LOADiNG.</span>';
 
     const url = `/api/collys/archive?filename=${encodeURIComponent(filename)}&entry=${encodeURIComponent(entry)}`;
-    loadAnsiLove().then(api => {
-      api.render(url, (canvas: HTMLCanvasElement) => {
-        el.innerHTML = "";
-        canvas.style.verticalAlign = "bottom";
-        canvas.style.margin = "0 auto";
-        canvas.style.display = "block";
-        el.appendChild(canvas);
-      }, { font: ansiFont, bits: "8", icecolors: 1, columns: 80, thumbnail: 0, filetype: "ans" });
-    }).catch(() => {
-      el.textContent = "Failed to render";
-    });
-  }, [filename, entry, ansiFont]);
 
-  return <div ref={ref} style={{ display: "flex", justifyContent: "center", backgroundColor: "#000", minHeight: "32px" }} />;
+    if (isAnsi) {
+      loadAnsiLove().then(api => {
+        api.render(url, (canvas: HTMLCanvasElement) => {
+          el.innerHTML = "";
+          canvas.style.verticalAlign = "bottom";
+          canvas.style.margin = "0 auto";
+          canvas.style.display = "block";
+          el.appendChild(canvas);
+        }, { font: ansiFont, bits: "8", icecolors: 1, columns: 80, thumbnail: 0, filetype: "ans" });
+      }).catch(() => {
+        el.textContent = "Failed to render";
+      });
+    } else {
+      // ASCII/text files — fetch and render in a <pre>
+      fetch(url).then(r => r.text()).then(text => {
+        el.innerHTML = `<pre style="font-family:${ansiFont},TopazPlus_a1200,monospace;font-size:16px;line-height:1;color:#aaaaaa;white-space:pre;background:#000;margin:0;padding:8px;overflow-x:auto">${text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</pre>`;
+      }).catch(() => {
+        el.textContent = "Failed to load";
+      });
+    }
+  }, [filename, entry, ansiFont, isAnsi]);
+
+  return <div ref={ref} style={{ backgroundColor: "#000", minHeight: "32px" }} />;
 }
 
 export default function ReleaseClient({

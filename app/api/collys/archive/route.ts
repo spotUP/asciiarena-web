@@ -30,8 +30,10 @@ function parseLhaList(output: string): string[] {
     const m = line.match(/\s+(\S+)$/);
     if (m) {
       const name = m[1];
-      // Skip directories
+      // Skip directories and non-renderable files
       if (name.endsWith("/")) continue;
+      const ext = name.toLowerCase().split(".").pop() ?? "";
+      if (!["ans", "asc", "txt"].includes(ext)) continue;
       files.push(name);
     }
   }
@@ -51,8 +53,9 @@ export async function GET(request: NextRequest) {
   // List files in archive
   if (!entry) {
     try {
-      const output = execSync(`${LHA_BIN} l "${fp}"`, { encoding: "utf-8", timeout: 10000 });
-      const files = parseLhaList(output);
+      const output = execSync(`${LHA_BIN} l "${fp}"`, { encoding: "buffer", timeout: 10000 });
+      const listing = output.toString("latin1");
+      const files = parseLhaList(listing);
       return apiOk({ files });
     } catch (e) {
       return apiError("Failed to list archive: " + String(e), 500);
