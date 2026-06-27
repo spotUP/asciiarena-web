@@ -218,7 +218,7 @@ export default async function ReleasePage({ params }: PageProps) {
                 ? artists.map((a, i) => (
                   <span key={a?.id ?? i}>
                     {i > 0 && " & "}
-                    <Link className="green" href={`/artist/${urlsafe(a?.nick ?? "")}`}>{a?.nick}</Link>
+                    <Link className="green" href={`/artist/${a?.artisturl ?? ""}`}>{a?.nick}</Link>
                   </span>
                 ))
                 : "-"}

@@ -9,6 +9,7 @@ import { ensureCrewId } from "@/lib/ensureEntity";
 interface ArtistRow {
   id: number;
   nick: string;
+  artisturl: string;
   crews: string | null;
   rating: number | null;
   country: string | null;
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     // No filter: fast direct count + correlated subquery only for visible page rows
     const [dataRows, [countRow]] = await Promise.all([
       prisma.$queryRaw<ArtistRow[]>`
-        SELECT a.id, a.nick, a.rating, a.country,
+        SELECT a.id, a.nick, a.artisturl, a.rating, a.country,
           COALESCE((SELECT GROUP_CONCAT(m.crew ORDER BY m.crew SEPARATOR ',')
                     FROM member_of m WHERE m.nick = a.nick), '') AS crews
         FROM artists a
@@ -58,11 +59,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const like = likeParam;
     const [dataRows, countRows] = await Promise.all([
       prisma.$queryRaw<ArtistRow[]>`
-        SELECT s.id, s.nick, s.crews, s.rating, s.country FROM (
-          SELECT a.id, a.nick, a.rating, a.country,
+        SELECT s.id, s.nick, s.artisturl, s.crews, s.rating, s.country FROM (
+          SELECT a.id, a.nick, a.artisturl, a.rating, a.country,
             COALESCE(GROUP_CONCAT(m.crew ORDER BY m.crew SEPARATOR ','), '') AS crews
           FROM artists a LEFT JOIN member_of m ON a.nick = m.nick
-          GROUP BY a.id, a.nick, a.rating, a.country
+          GROUP BY a.id, a.nick, a.artisturl, a.rating, a.country
         ) s
         WHERE s.nick LIKE ${like} OR s.crews LIKE ${like}
         ORDER BY ${orderCol} ${orderDir}
@@ -81,7 +82,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
 
   const result = rows.map((row) => ({
-    url: `/artist/${urlsafe(row.nick)}`,
+    url: `/artist/${row.artisturl || urlsafe(row.nick)}`,
     id: Number(row.id),
     nick: row.nick,
     crews: row.crews ?? "",

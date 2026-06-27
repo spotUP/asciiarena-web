@@ -29,7 +29,7 @@ async function getTopArtists(n: number) {
     where: { rating: { gt: 0 } },
     orderBy: { rating: "desc" },
     take: n,
-    select: { id: true, nick: true, rating: true },
+    select: { id: true, nick: true, rating: true, artisturl: true },
   });
 }
 
@@ -165,7 +165,7 @@ export default async function StatsPage({
             {artists.map(row => (
               <Row
                 key={row.id}
-                left={<Link className="green text-truncate" href={`/artist/${urlsafe(row.nick ?? "")}`}>{row.nick}</Link>}
+                left={<Link className="green text-truncate" href={`/artist/${row.artisturl}`}>{row.nick}</Link>}
                 right={`${Number(row.rating ?? 0).toFixed(1)} PTS`}
               />
             ))}
