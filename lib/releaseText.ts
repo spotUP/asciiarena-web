@@ -97,7 +97,10 @@ export function encodeReleaseText(bytes: Uint8Array, encoding: ReleaseTextEncodi
   // which creates visible gaps between rows of CP437 block art.
   const raw = decodeReleaseText(bytes, encoding)
     .replace(/\r\n/g, "\n")
-    .replace(/\r/g, "\n");
+    .replace(/\r/g, "\n")
+    // Strip control characters (except \t \n) that can confuse
+    // HTML parsers or cause unexpected vertical spacing in <pre>.
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "");
   return escapeHtmlText(raw);
 }
 
