@@ -145,32 +145,6 @@ button.dropdown-item {
 .form-check-input { background-color: #444 !important; border-color: #666 !important; }
 .form-check-input:checked { background-color: #ff55ff !important; border-color: #ff55ff !important; }
 
-/* ── Retro DOS-styled native date picker ──────────────────── */
-.date-dos {
-  color-scheme: dark;
-  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace !important;
-  font-size: 16px !important;
-  line-height: 16px !important;
-  letter-spacing: 1px;
-  cursor: pointer;
-}
-/* The calendar dropdown icon — tint it magenta to match the theme */
-.date-dos::-webkit-calendar-picker-indicator {
-  filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(274deg) brightness(119%) contrast(119%);
-  cursor: pointer;
-}
-/* Dark-themed calendar popup (works in Chromium) */
-.date-dos::-webkit-datetime-edit-fields-wrapper { padding: 0; }
-.date-dos::-webkit-datetime-edit-text { color: #ff55ff; padding: 0 2px; }
-.date-dos::-webkit-datetime-edit-month-field,
-.date-dos::-webkit-datetime-edit-day-field,
-.date-dos::-webkit-datetime-edit-year-field { color: #aaaaaa; }
-.date-dos::-webkit-datetime-edit-month-field:focus,
-.date-dos::-webkit-datetime-edit-day-field:focus,
-.date-dos::-webkit-datetime-edit-year-field:focus {
-  background: #ff55ff; color: #111;
-}
-
 /* Sort buttons */
 .sort-btn { background: none; border: none; color: inherit; cursor: pointer; font: inherit; padding: 0; }
 .sort-btn:hover { text-decoration: underline; }
