@@ -58,7 +58,25 @@ export function decodeReleaseText(bytes: Uint8Array, encoding: ReleaseTextEncodi
   if (encoding === "cp437") return decodeCp437Bytes(bytes);
 
   try {
-    return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    const utf8 = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    // CP437 files with box-drawing / block chars (0xC0-0xDF) often form
+    // accidental valid UTF-8 sequences: e.g. ╒═ (0xD5 0xCD) decodes as a
+    // single 2-byte character instead of two glyphs, shifting art left.
+    // Heuristic: if ≥80% of the high bytes survived as distinct non-ASCII
+    // chars, it's genuine UTF-8. If multi-byte sequences consumed many
+    // high bytes, it's CP437 in disguise — re-decode as CP437.
+    const highByteCount = bytes.reduce((c, b) => c + (b >= 0x80 ? 1 : 0), 0);
+    // Only re-decode when there are enough high bytes to be confident
+    // it's an art file, not a UTF-8 snippet like "café".
+    if (highByteCount >= 16) {
+      const nonAsciiChars = [...utf8].filter(c => c.codePointAt(0)! >= 0x80).length;
+      // Each valid multi-byte UTF-8 sequence turns 2-4 high bytes into 1 char.
+      // If we lost >20% of them, it's CP437 box-art in disguise, not UTF-8.
+      if (nonAsciiChars < highByteCount * 0.8) {
+        return decodeCp437Bytes(bytes);
+      }
+    }
+    return utf8;
   } catch {
     // Not valid UTF-8 — nearly all non-UTF-8 ASCII art files from the
     // BBS era use CP437 (block/box-drawing glyphs), not Latin-1.

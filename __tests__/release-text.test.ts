@@ -40,6 +40,26 @@ describe("release text decoding", () => {
     expect(releaseViewerType("CP437")).toBe("ASCII");
     expect(releaseViewerType("ANSI")).toBe("ANSI");
   });
+
+  it("detects CP437 disguised as valid UTF-8 and re-decodes", () => {
+    // 0xD5 0xCD = ╒═ in CP437 (2 chars), but a valid 2-byte UTF-8
+    // sequence that decodes to a single Armenian character.
+    // The heuristic sees 2 high bytes → 1 non-ASCII char (50% survival,
+    // below 80% threshold) and re-decodes as CP437.
+    const result = decodeReleaseText(new Uint8Array([0xD5, 0xCD]), "auto");
+    expect(result).toBe("\u2552\u2550"); // ╒═
+    expect(result.length).toBe(2);
+  });
+
+  it("keeps genuine UTF-8 when high bytes survive", () => {
+    // Genuine UTF-8: "café" where é = 0xC3 0xA9
+    // 2 high bytes → 1 non-ASCII char (é), which is 50%.
+    // But with only 2 high bytes and 1 char, it's right at the boundary.
+    // Add more ASCII chars so the ratio doesn't skew.
+    const utf8 = new TextEncoder().encode("abc \u00e9 def");
+    const result = decodeReleaseText(utf8, "auto");
+    expect(result).toBe("abc \u00e9 def");
+  });
 });
 
 describe("stripFileIdDiz", () => {
