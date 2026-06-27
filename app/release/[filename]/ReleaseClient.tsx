@@ -854,7 +854,7 @@ export default function ReleaseClient({
             ref={collyRef as React.RefObject<HTMLPreElement>}
             id="colly"
             className={isFullscreen ? "fullscreen" : undefined}
-            style={{ overflow: "hidden", fontFamily: font, fontSize: "16px", lineHeight: "1", color: fgColor, whiteSpace: "pre" }}
+            style={{ overflow: "hidden", fontFamily: `${font}, TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace`, fontSize: "16px", lineHeight: "1", color: fgColor, whiteSpace: "pre" }}
             dangerouslySetInnerHTML={{ __html: "<br><br><br><br>" + fileContent + "<br><br><br><br>" }}
           />
         </div>
