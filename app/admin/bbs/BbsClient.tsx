@@ -53,6 +53,7 @@ export default function BbsClient() {
         sysop: e.sysop ?? b.sysop ?? "",
         address: e.address ?? b.address ?? "",
         software: e.software ?? b.software ?? "",
+        online: e.online ?? b.online ?? 0,
       }),
     });
     flash("Saved!", true);
@@ -96,7 +97,8 @@ export default function BbsClient() {
               <div className="col-2">SYSOP</div>
               <div className="col-3">ADDRESS</div>
               <div className="col-2">SOFTWARE</div>
-              <div className="col-3">ACTIONS</div>
+              <div className="col-1">ONLINE</div>
+              <div className="col-2">ACTIONS</div>
             </div>
             {results.map(b => {
               const e = edits[b.id] ?? {};
@@ -111,6 +113,12 @@ export default function BbsClient() {
                   </div>
                   <div className="col-2">
                     <input type="text" className="form-control w-100" value={e.software ?? b.software ?? ""} onChange={ev => edit(b.id, "software", ev.target.value)} />
+                  </div>
+                  <div className="col-2">
+                    <select className="form-select w-100" value={e.online ?? b.online ?? 0} onChange={ev => edit(b.id, "online", String(parseInt(ev.target.value)))}>
+                      <option value={0}>Offline</option>
+                      <option value={1}>Online</option>
+                    </select>
                   </div>
                   <div className="col-3" style={{ display: "flex", gap: "8px" }}>
                     <input type="button" className="btn-big" value="Save" onClick={() => save(b)} />

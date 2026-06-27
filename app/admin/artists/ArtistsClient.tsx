@@ -2,6 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { COUNTRIES } from "@/lib/countries";
+
+const ACTIVE_OPTIONS = ["yes", "no", "ex-member"];
 
 interface Artist {
   id: number;
@@ -114,10 +117,16 @@ export default function ArtistsClient() {
                     <Link className="magenta" href={`/artist/${a.artisturl}`}>{a.nick}</Link>
                   </div>
                   <div className="col-2">
-                    <input type="text" className="form-control w-100" value={e.active ?? a.active ?? ""} onChange={ev => edit(a.id, "active", ev.target.value)} placeholder="active/ex-member" />
+                    <select className="form-select w-100" value={e.active ?? a.active ?? ""} onChange={ev => edit(a.id, "active", ev.target.value)}>
+                      <option value="">-</option>
+                      {ACTIVE_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                    </select>
                   </div>
                   <div className="col-2">
-                    <input type="text" className="form-control w-100" value={e.country ?? a.country ?? ""} onChange={ev => edit(a.id, "country", ev.target.value)} placeholder="Country" />
+                    <select className="form-select w-100" value={e.country ?? a.country ?? ""} onChange={ev => edit(a.id, "country", ev.target.value)}>
+                      <option value="">-</option>
+                      {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
                   </div>
                   <div className="col-3">
                     <input type="text" className="form-control w-100" value={e.www ?? a.www ?? ""} onChange={ev => edit(a.id, "www", ev.target.value)} placeholder="Website" />

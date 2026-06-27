@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 
+const ACTIVE_OPTIONS = ["Yes", "No", "ex-member"];
+
 interface Crew {
   id: number;
   name: string;
@@ -115,7 +117,10 @@ export default function CrewsClient() {
                     <input type="text" className="form-control w-100" value={e.acronym ?? c.acronym ?? ""} onChange={ev => edit(c.id, "acronym", ev.target.value)} />
                   </div>
                   <div className="col-2">
-                    <input type="text" className="form-control w-100" value={e.active ?? c.active ?? ""} onChange={ev => edit(c.id, "active", ev.target.value)} placeholder="active/ex" />
+                    <select className="form-select w-100" value={e.active ?? c.active ?? ""} onChange={ev => edit(c.id, "active", ev.target.value)}>
+                      <option value="">-</option>
+                      {ACTIVE_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                    </select>
                   </div>
                   <div className="col-2">
                     <input type="text" className="form-control w-100" value={e.www ?? c.www ?? ""} onChange={ev => edit(c.id, "www", ev.target.value)} placeholder="Website" />
