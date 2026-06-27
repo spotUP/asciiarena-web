@@ -436,7 +436,13 @@ export default function ReleaseClient({
         });
         if (loadingEl) loadingEl.style.display = "none";
       }, 100, { font: ansiFont, bits: "8", icecolors: 1, columns: 80, thumbnail: 0, filetype: "ans" });
-    }).catch(() => {});
+    }).catch((err: unknown) => {
+      if (loadingEl) {
+        loadingEl.textContent = "Failed to load ANSI renderer.";
+        loadingEl.style.color = "#ff5555";
+      }
+      console.error("AnsiLove render failed:", err);
+    });
 
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
