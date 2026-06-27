@@ -19,9 +19,10 @@ describe("release text decoding", () => {
     expect(decoded).toBe("\u2584\u2588\u2588\u2588\u2580\u2593\u2590\u258c");
   });
 
-  it("keeps normal invalid UTF-8 fallback as Latin-1", () => {
+  it("falls back to CP437 for non-UTF-8 bytes (BBS-era block art)", () => {
+    // 0xDC 0xDB 0xDF = ▄ █ ▀ in CP437, not Ü Û ß in Latin-1
     expect(decodeReleaseText(new Uint8Array([0xdc, 0xdb, 0xdf]), "auto"))
-      .toBe("\u00dc\u00db\u00df");
+      .toBe("\u2584\u2588\u2580");
   });
 
   it("HTML-escapes decoded release text", () => {

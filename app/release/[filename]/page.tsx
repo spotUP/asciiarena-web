@@ -134,6 +134,7 @@ export default async function ReleasePage({ params }: PageProps) {
   // ASCII file content — read first so we can extract embedded file_id.diz
   let fileContent = "";
   let embeddedDiz: string | null = null;
+  let hasPcb = false;
   if (type === "ASCII" && existsSync(filePath)) {
     try { fileContent = encodeFileText(filePath, textEncoding); } catch { fileContent = ""; }
     if (fileContent) {
@@ -144,6 +145,7 @@ export default async function ReleasePage({ params }: PageProps) {
     }
     if (hasPcbCodes(fileContent)) {
       fileContent = convertPcbColors(fileContent);
+      hasPcb = true;
     }
   }
 
@@ -170,6 +172,9 @@ export default async function ReleasePage({ params }: PageProps) {
     if (userPrefs.def_fg_col && userPrefs.def_fg_col.length > 1) fgcolor = userPrefs.def_fg_col;
     if (userPrefs.def_bg_col && userPrefs.def_bg_col.length > 1) bgcolor = userPrefs.def_bg_col;
   }
+  // PCB-coloured collys use exact background colours per span; the
+  // wrapper <pre> must be black so the gaps look correct.
+  if (hasPcb) bgcolor = "#000000";
 
   const isArchive = type === "ARCHIVE";
   const collyId = Number(colly.id);

@@ -60,7 +60,9 @@ export function decodeReleaseText(bytes: Uint8Array, encoding: ReleaseTextEncodi
   try {
     return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
   } catch {
-    return Array.from(bytes, byte => String.fromCharCode(byte)).join("");
+    // Not valid UTF-8 — nearly all non-UTF-8 ASCII art files from the
+    // BBS era use CP437 (block/box-drawing glyphs), not Latin-1.
+    return decodeCp437Bytes(bytes);
   }
 }
 
