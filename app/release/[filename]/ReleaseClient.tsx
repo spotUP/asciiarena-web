@@ -221,6 +221,31 @@ function ColorSwatch({ current, onChange }: { current: string; onChange: (v: str
   );
 }
 
+function ArchiveEntryRenderer({ filename, entry, ansiFont }: { filename: string; entry: string; ansiFont: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.innerHTML = '<span style="animation:blink 2s linear infinite">.LOADiNG.</span>';
+
+    const url = `/api/collys/archive?filename=${encodeURIComponent(filename)}&entry=${encodeURIComponent(entry)}`;
+    loadAnsiLove().then(api => {
+      api.render(url, (canvas: HTMLCanvasElement) => {
+        el.innerHTML = "";
+        canvas.style.verticalAlign = "bottom";
+        canvas.style.margin = "0 auto";
+        canvas.style.display = "block";
+        el.appendChild(canvas);
+      }, { font: ansiFont, bits: "8", icecolors: 1, columns: 80, thumbnail: 0, filetype: "ans" });
+    }).catch(() => {
+      el.textContent = "Failed to render";
+    });
+  }, [filename, entry, ansiFont]);
+
+  return <div ref={ref} style={{ display: "flex", justifyContent: "center", backgroundColor: "#000", minHeight: "32px" }} />;
+}
+
 export default function ReleaseClient({
   collyId, filename, collyFileUrl, userNick, isAdmin,
   isFavourited, initBgColor, initFgColor, initFont,
@@ -242,6 +267,7 @@ export default function ReleaseClient({
   const [viewCount, setViewCount] = useState(initialViewCount);
   const [favCount, setFavCount] = useState(initialFavCount);
   const [downloadCount, setDownloadCount] = useState(initialDownloadCount);
+  const [archiveFiles, setArchiveFiles] = useState<string[]>([]);
   const [copyImageLabel, setCopyImageLabel] = useState("Copy as image");
   const [, startTransition] = useTransition();
 
@@ -447,6 +473,15 @@ export default function ReleaseClient({
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type, collyVisible, font, collyFileUrl]);
+
+  // List archive files when viewing an archive colly
+  useEffect(() => {
+    if (!isArchive || !collyVisible) return;
+    fetch(`/api/collys/archive?filename=${encodeURIComponent(filename)}`)
+      .then(r => r.json())
+      .then(d => setArchiveFiles(d.files ?? []))
+      .catch(() => setArchiveFiles([]));
+  }, [isArchive, collyVisible, filename]);
 
   // Auto-fit on mobile
   useEffect(() => {
@@ -886,17 +921,25 @@ export default function ReleaseClient({
         </div>
       )}
 
-      {/* Archive download — shown instead of viewer for .LHA/.ZIP etc. */}
-      {isArchive && (
+      {/* Archive viewer — renders each file in the archive using AnsiLove */}
+      {isArchive && archiveFiles.length > 0 && (
+        <div>
+          {archiveFiles.map(entry => (
+            <div key={entry} style={{ marginBottom: "16px" }}>
+              <div className="header bg-header col-12 ap-1">{entry.split("/").pop()}</div>
+              <ArchiveEntryRenderer
+                filename={filename}
+                entry={entry}
+                ansiFont={ANSI_FONT_MAP[font] ?? "mosoul"}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+      {isArchive && archiveFiles.length === 0 && (
         <div className="bg-secondary amb-1 ap-2" style={{ textAlign: "center" }}>
-          <div className="lightgrey amb-1">This is an archive file. Click below to download.</div>
-          <input
-            type="button"
-            className="btn-big"
-            value={`Download ${filename}`}
-            onClick={doDownload}
-            style={{ fontSize: "16px", padding: "12px 24px" }}
-          />
+          <div className="lightgrey amb-1">This archive contains no displayable files.</div>
+          <input type="button" className="btn-big" value={`Download ${filename}`} onClick={doDownload} style={{ fontSize: "16px", padding: "12px 24px" }} />
         </div>
       )}
 
