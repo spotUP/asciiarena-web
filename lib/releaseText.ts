@@ -92,7 +92,13 @@ export function escapeHtmlText(text: string): string {
 }
 
 export function encodeReleaseText(bytes: Uint8Array, encoding: ReleaseTextEncoding): string {
-  return escapeHtmlText(decodeReleaseText(bytes, encoding));
+  // Normalise DOS line endings — \r\n or standalone \r → \n.
+  // Some browsers render \r inside <pre> as an extra blank line,
+  // which creates visible gaps between rows of CP437 block art.
+  const raw = decodeReleaseText(bytes, encoding)
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n");
+  return escapeHtmlText(raw);
 }
 
 export function isCp437ReleaseType(type: string | null | undefined): boolean {

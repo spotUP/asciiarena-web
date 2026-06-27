@@ -206,7 +206,7 @@ export default async function ReleasePage({ params }: PageProps) {
           {/* Left: .diz file preview */}
           <div className="animate__animated animate__backInLeft col-lg-8 d-flex justify-content-center justify-content-lg-start" style={{ position: "relative", top: "-16px" }}>
             <span>
-              <pre className="magenta apt-1" dangerouslySetInnerHTML={{ __html: dizContent }} />
+              <pre className="magenta apt-1" style={{ lineHeight: "1" }} dangerouslySetInnerHTML={{ __html: dizContent }} />
             </span>
           </div>
 

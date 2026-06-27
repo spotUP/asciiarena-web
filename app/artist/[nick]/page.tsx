@@ -7,6 +7,7 @@ import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { getSession as auth } from "@/lib/session";
 import { urlsafe, decodeParam, formatBytes } from "@/lib/utils";
+import { encodeReleaseText } from "@/lib/releaseText";
 import { normalizeOrder } from "@/lib/sort-headers";
 import { type ReleaseSortKey } from "@/lib/release-sort";
 import ArtistReleases from "./ArtistReleases";
@@ -33,10 +34,7 @@ function readReleaseDiz(filename: string): string | null {
   const dizPath = path.join(collectionsPath, dirname, `${filename}.diz`);
   try {
     if (!existsSync(dizPath)) return null;
-    return readFileSync(dizPath).toString("latin1")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+    return encodeReleaseText(readFileSync(dizPath), "auto");
   } catch {
     return null;
   }
@@ -292,6 +290,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
                   <span>
                     <pre
                       className="magenta apt-1"
+                      style={{ lineHeight: "1" }}
                       dangerouslySetInnerHTML={{ __html: dizContent }}
                     />
                   </span>
