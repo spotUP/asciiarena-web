@@ -22,6 +22,19 @@ function hasBinaryExtension(name: string): boolean {
   return BINARY_EXTENSIONS.has(ext);
 }
 
+// file_id.diz is the pack's BBS descriptor, not artwork — never list it among
+// the rendered art entries.
+function isDescriptorFile(name: string): boolean {
+  return (name.split("/").pop() ?? "").toLowerCase() === "file_id.diz";
+}
+
+function isArtCandidate(name: string): boolean {
+  if (name.endsWith("/")) return false;          // directory
+  if (hasBinaryExtension(name)) return false;     // known binary blob
+  if (isDescriptorFile(name)) return false;       // file_id.diz descriptor
+  return true;
+}
+
 export const LHA_BIN = process.env.LHA_BIN ?? "/usr/bin/lha";
 export const COLLECTIONS_PATH = process.env.COLLECTIONS_PATH ?? path.join(process.cwd(), "collections");
 
@@ -53,10 +66,10 @@ export function parseLhaList(output: string): string[] {
     const m = line.match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2}\s+(\d{4}|\d{2}:\d{2})\s+(.+)$/);
     if (m) {
       const name = m[3];
-      if (name.endsWith("/")) continue;
-      // Keep every non-binary file as a candidate — art has no fixed extension
-      // (logos are named e.g. "bis.2kADbig"). Content is validated downstream.
-      if (hasBinaryExtension(name)) continue;
+      // Keep every non-binary, non-descriptor file as a candidate — art has no
+      // fixed extension (logos are named e.g. "bis.2kADbig"). Content is
+      // validated downstream.
+      if (!isArtCandidate(name)) continue;
       files.push(name);
     }
   }
@@ -90,8 +103,7 @@ export function parseLhaListWithSizes(output: string): LhaEntry[] {
     const m = line.match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2}\s+(\d{4}|\d{2}:\d{2})\s+(.+)$/);
     if (m) {
       const name = m[3];
-      if (name.endsWith("/")) continue;
-      if (hasBinaryExtension(name)) continue;
+      if (!isArtCandidate(name)) continue;
       entries.push({ name, size });
     }
   }
