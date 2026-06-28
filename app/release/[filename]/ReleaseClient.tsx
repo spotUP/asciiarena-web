@@ -293,7 +293,7 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont }: { filename: string;
     return () => { cancelled = true; };
   }, [filename, entry, ansiFont]);
 
-  return <div ref={hostRef} style={{ backgroundColor: "#000", overflow: "visible", textAlign: "center" }} />;
+  return <div ref={hostRef} style={{ backgroundColor: "#000", overflow: "visible", textAlign: "center", padding: "16px 0" }} />;
 }
 
 export default function ReleaseClient({
