@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { convertPcbColors, hasPcbCodes } from "@/lib/pcbColors";
 import { convertAnsiCodes, hasAnsiCodes, escapeHtmlText } from "@/lib/releaseText";
+import Cp437DizPreview from "@/components/release/Cp437DizPreview";
 
 interface Colly {
   id: number;
@@ -101,6 +102,8 @@ export default function CollysClient() {
   const [edits, setEdits] = useState<Record<number, Partial<Colly>>>({});
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
   const [dizContent, setDizContent] = useState("");
+  const [dizCp437, setDizCp437] = useState(false);
+  const [dizB64, setDizB64] = useState<string | null>(null);
   const [showDizPreview, setShowDizPreview] = useState(false);
 
   const dizPreviewHtml = useMemo(() => {
@@ -207,11 +210,11 @@ export default function CollysClient() {
 
   // Fetch .diz content when a colly is selected
   useEffect(() => {
-    if (!selected) { setDizContent(""); return; }
+    if (!selected) { setDizContent(""); setDizCp437(false); setDizB64(null); return; }
     fetch(`/api/admin/collys/diz?filename=${encodeURIComponent(selected.filename)}`)
       .then(r => r.json())
-      .then(d => setDizContent(d.content ?? ""))
-      .catch(() => setDizContent(""));
+      .then(d => { setDizContent(d.content ?? ""); setDizCp437(!!d.cp437); setDizB64(d.b64 ?? null); })
+      .catch(() => { setDizContent(""); setDizCp437(false); setDizB64(null); });
   }, [selected]);
 
   return (
@@ -368,20 +371,28 @@ export default function CollysClient() {
                 </div>
                 {showDizPreview && dizContent && (
                   <div style={{ marginTop: "8px" }}>
-                    <pre
-                      style={{
-                        background: "#111111",
-                        color: "#AAAAAA",
-                        fontFamily: "TopazPlus_a1200, monospace",
-                        fontSize: "16px",
-                        lineHeight: "1",
-                        whiteSpace: "pre",
-                        overflowX: "auto",
-                        padding: "8px",
-                        border: "1px solid #444",
-                      }}
-                      dangerouslySetInnerHTML={{ __html: dizPreviewHtml.html }}
-                    />
+                    {dizCp437 && dizB64 ? (
+                      // PC/CP437 block art renders gap-free via AnsiLove (matches
+                      // the public viewer). Reflects the saved file.
+                      <div style={{ background: "#111111", padding: "8px", border: "1px solid #444" }}>
+                        <Cp437DizPreview bytesB64={dizB64} />
+                      </div>
+                    ) : (
+                      <pre
+                        style={{
+                          background: "#111111",
+                          color: "#AAAAAA",
+                          fontFamily: "TopazPlus_a1200, monospace",
+                          fontSize: "16px",
+                          lineHeight: "1",
+                          whiteSpace: "pre",
+                          overflowX: "auto",
+                          padding: "8px",
+                          border: "1px solid #444",
+                        }}
+                        dangerouslySetInnerHTML={{ __html: dizPreviewHtml.html }}
+                      />
+                    )}
                   </div>
                 )}
               </div>

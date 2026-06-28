@@ -3,6 +3,7 @@ import { existsSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
+import { decodeReleaseText, looksLikeCp437Art } from "@/lib/releaseText";
 
 function dizPath(filename: string): string {
   const collectionsPath = process.env.COLLECTIONS_PATH ?? path.join(process.cwd(), "collections");
@@ -22,14 +23,13 @@ export async function GET(request: NextRequest) {
 
   try {
     const bytes = readFileSync(fp);
-    // Return raw text for editing (not HTML-escaped)
-    let text: string;
-    try {
-      text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
-    } catch {
-      text = new TextDecoder("latin1").decode(bytes);
-    }
-    return apiOk({ content: text });
+    // Decode with the same charset logic as the public viewer: PC/CP437 block
+    // art is detected by content and decoded as CP437 (block glyphs) instead of
+    // Latin-1, which rendered 0xDB/0xDC/0xDF as ÛÜß garbage. Also return the raw
+    // bytes (base64) + flag so the editor can preview CP437 art via AnsiLove.
+    const content = decodeReleaseText(new Uint8Array(bytes), "auto");
+    const cp437 = looksLikeCp437Art(new Uint8Array(bytes));
+    return apiOk({ content, cp437, b64: cp437 ? bytes.toString("base64") : null });
   } catch {
     return apiOk({ content: "" });
   }
