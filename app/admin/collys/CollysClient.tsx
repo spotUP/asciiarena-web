@@ -1,8 +1,10 @@
 "use client";
 
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { convertPcbColors, hasPcbCodes } from "@/lib/pcbColors";
+import { convertAnsiCodes, hasAnsiCodes, escapeHtmlText } from "@/lib/releaseText";
 
 interface Colly {
   id: number;
@@ -87,6 +89,18 @@ export default function CollysClient() {
   const [edits, setEdits] = useState<Record<number, Partial<Colly>>>({});
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
   const [dizContent, setDizContent] = useState("");
+  const [showDizPreview, setShowDizPreview] = useState(false);
+
+  const dizPreviewHtml = useMemo(() => {
+    if (!dizContent) return { html: "", hasPcb: false, hasAnsi: false };
+    const escaped = escapeHtmlText(dizContent);
+    let html = escaped;
+    const hasAnsi = hasAnsiCodes(html);
+    if (hasAnsi) html = convertAnsiCodes(html);
+    const hasPcb = hasPcbCodes(html);
+    if (hasPcb) html = convertPcbColors(html);
+    return { html, hasPcb, hasAnsi };
+  }, [dizContent]);
 
   const flash = (text: string, ok: boolean) => {
     setMsg({ text, ok });
@@ -291,7 +305,15 @@ export default function CollysClient() {
               </div>
             </div>
             <div className="row amb-1">
-              <div className="col-3 lightgrey">FILE_ID.DIZ</div>
+              <div className="col-3 lightgrey">
+                FILE_ID.DIZ
+                {(dizPreviewHtml.hasPcb || dizPreviewHtml.hasAnsi) && (
+                  <div style={{ marginTop: "4px" }}>
+                    {dizPreviewHtml.hasPcb && <span style={{ background: "#55FFFF", color: "#000", padding: "1px 4px", marginRight: "4px", fontSize: "11px" }}>PCB</span>}
+                    {dizPreviewHtml.hasAnsi && <span style={{ background: "#FF55FF", color: "#000", padding: "1px 4px", fontSize: "11px" }}>ANSI</span>}
+                  </div>
+                )}
+              </div>
               <div className="col-9">
                 <textarea
                   className="form-control"
@@ -301,7 +323,7 @@ export default function CollysClient() {
                   value={dizContent}
                   onChange={e => setDizContent(e.target.value)}
                 />
-                <div style={{ marginTop: "4px" }}>
+                <div style={{ marginTop: "4px", display: "flex", gap: "8px", alignItems: "center" }}>
                   <input
                     type="button"
                     className="btn-big"
@@ -315,7 +337,31 @@ export default function CollysClient() {
                       flash("DIZ saved!", true);
                     }}
                   />
+                  <input
+                    type="button"
+                    className="btn-big"
+                    value={showDizPreview ? "Hide Preview" : "Preview"}
+                    onClick={() => setShowDizPreview(p => !p)}
+                  />
                 </div>
+                {showDizPreview && dizContent && (
+                  <div style={{ marginTop: "8px" }}>
+                    <pre
+                      style={{
+                        background: "#111111",
+                        color: "#AAAAAA",
+                        fontFamily: "TopazPlus_a1200, monospace",
+                        fontSize: "16px",
+                        lineHeight: "1",
+                        whiteSpace: "pre",
+                        overflowX: "auto",
+                        padding: "8px",
+                        border: "1px solid #444",
+                      }}
+                      dangerouslySetInnerHTML={{ __html: dizPreviewHtml.html }}
+                    />
+                  </div>
+                )}
               </div>
             </div>
             <div className="row amb-1 align-items-center">

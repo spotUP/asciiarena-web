@@ -39,10 +39,10 @@ export default function AdminNav() {
             style={{
               background: isActive ? "#212121" : "transparent",
               color: isActive ? "#ffff55" : "#aaaaaa",
-              padding: "0 16px",
+              padding: "0 10px",
               height: "16px",
               lineHeight: "16px",
-              fontSize: "16px",
+              fontSize: "15px",
               fontFamily: "inherit",
               textDecoration: "none",
             }}
