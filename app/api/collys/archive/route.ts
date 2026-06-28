@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
       if (data[i] === 0x0A) { nl++; if (nl === 3) { cut = i + 1; break; } }
     }
     let content = data.subarray(cut);
-    const isRenderable = /\.(ans|asc)$/i.test(entry);
+    const isRenderable = /\.(ans|asc|txt)$/i.test(entry);
 
     // Convert 8-bit CSI (0x9B) to 7-bit ESC[ (0x1B 0x5B).
     // AnsiLove only recognises "ESC[" (27, 0x5B), so single-byte CSI

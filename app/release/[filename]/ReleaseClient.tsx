@@ -232,8 +232,8 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont }: { filename: string;
   const [totalFrames, setTotalFrames] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  // .asc files in archives often contain ANSI codes too (e.g. dVS-rlf.asc)
-  const isAnsi = /\.(ans|asc)$/i.test(entry);
+  // .asc and .txt files in archives often contain ANSI codes + CP437 art too
+  const isAnsi = /\.(ans|asc|txt)$/i.test(entry);
 
   const stopPlayback = useCallback(() => {
     setPlaying(false);
