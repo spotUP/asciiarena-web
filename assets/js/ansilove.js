@@ -2044,6 +2044,38 @@ var AnsiLove = (function () {
                             case "K": // Clear to the end of line.
                                 clearScreen((x - 1) * font.width, (y - 1) * font.height, canvas.width - (x - 1) * font.width, font.height);
                                 break;
+                            case "S": // Scroll Up — shift content up, clear bottom.
+                                var suLines = values[0] || 1;
+                                var suShift = font.height * suLines;
+                                if (suShift < canvas.height) {
+                                    ctx.drawImage(canvas, 0, suShift, canvas.width, canvas.height - suShift, 0, 0, canvas.width, canvas.height - suShift);
+                                    bufferCtx.clearRect(0, 0, canvas.width, canvas.height);
+                                    bufferCtx.drawImage(blinkCanvas[0], 0, suShift, canvas.width, canvas.height - suShift, 0, 0, canvas.width, canvas.height - suShift);
+                                    blinkCtx[0].clearRect(0, 0, canvas.width, canvas.height);
+                                    blinkCtx[0].drawImage(buffer, 0, 0);
+                                    bufferCtx.clearRect(0, 0, canvas.width, canvas.height);
+                                    bufferCtx.drawImage(blinkCanvas[1], 0, suShift, canvas.width, canvas.height - suShift, 0, 0, canvas.width, canvas.height - suShift);
+                                    blinkCtx[1].clearRect(0, 0, canvas.width, canvas.height);
+                                    blinkCtx[1].drawImage(buffer, 0, 0);
+                                    clearScreen(0, canvas.height - suShift, canvas.width, suShift);
+                                }
+                                break;
+                            case "T": // Scroll Down — shift content down, clear top.
+                                var sdLines = values[0] || 1;
+                                var sdShift = font.height * sdLines;
+                                if (sdShift < canvas.height) {
+                                    ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height - sdShift, 0, sdShift, canvas.width, canvas.height - sdShift);
+                                    bufferCtx.clearRect(0, 0, canvas.width, canvas.height);
+                                    bufferCtx.drawImage(blinkCanvas[0], 0, 0, canvas.width, canvas.height - sdShift, 0, sdShift, canvas.width, canvas.height - sdShift);
+                                    blinkCtx[0].clearRect(0, 0, canvas.width, canvas.height);
+                                    blinkCtx[0].drawImage(buffer, 0, 0);
+                                    bufferCtx.clearRect(0, 0, canvas.width, canvas.height);
+                                    bufferCtx.drawImage(blinkCanvas[1], 0, 0, canvas.width, canvas.height - sdShift, 0, sdShift, canvas.width, canvas.height - sdShift);
+                                    blinkCtx[1].clearRect(0, 0, canvas.width, canvas.height);
+                                    blinkCtx[1].drawImage(buffer, 0, 0);
+                                    clearScreen(0, 0, canvas.width, sdShift);
+                                }
+                                break;
                             case "m": // Attribute setting codes.
                                 for (j = 0; j < values.length; ++j) {
                                     if (values[j] >= 30 && values[j] <= 37) {

@@ -11,7 +11,7 @@ import {
   deleteComment as deleteCommentAction,
 } from "@/app/actions/collys";
 import { buildAdminCollyEditHref } from "@/app/admin/collys/editHref";
-import { FONTS, ANSI_FONT_MAP, loadAnsiLove } from "@/lib/ansilove";
+import { FONTS, ANSI_FONT_MAP, loadAnsiLove, type AnsiLoveController } from "@/lib/ansilove";
 
 const COLOR_OPTIONS = [
   { value: "#555555", label: "Bright Black" },
@@ -221,47 +221,34 @@ function ColorSwatch({ current, onChange }: { current: string; onChange: (v: str
   );
 }
 
-// Frame advance interval (ms) when auto-playing multi-page ANSI.
-const ANIMATION_FRAME_MS = 120;
+// ANSI animation baud rate — standard BBS speed.
+const ANIMATION_BAUD = 14400;
 
 function ArchiveEntryRenderer({ filename, entry, ansiFont }: { filename: string; entry: string; ansiFont: string }) {
   const hostRef = useRef<HTMLDivElement>(null);
-  const framesRef = useRef<HTMLCanvasElement[]>([]);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [currentFrame, setCurrentFrame] = useState(0);
-  const [totalFrames, setTotalFrames] = useState(0);
+  const controllerRef = useRef<AnsiLoveController | null>(null);
+  const [ready, setReady] = useState(false);
   const [playing, setPlaying] = useState(false);
-  const [loaded, setLoaded] = useState(false);
   // .asc files in archives often contain ANSI codes too (e.g. dVS-rlf.asc)
   const isAnsi = /\.(ans|asc)$/i.test(entry);
 
-  const stopPlayback = useCallback(() => {
-    setPlaying(false);
-    if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
+  const handlePlay = useCallback(() => {
+    try {
+      controllerRef.current?.play(ANIMATION_BAUD, () => setPlaying(false));
+      setPlaying(true);
+    } catch { /* controller not ready yet */ }
   }, []);
 
-  useEffect(() => () => stopPlayback(), [stopPlayback]);
+  const handleStop = useCallback(() => {
+    try { controllerRef.current?.stop(); } catch { /* ignore */ }
+    setPlaying(false);
+  }, []);
 
-  // Frame advance during playback
-  useEffect(() => {
-    if (!playing || totalFrames <= 1) return;
-    timerRef.current = setTimeout(() => {
-      setCurrentFrame(f => (f + 1) % totalFrames);
-    }, ANIMATION_FRAME_MS);
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [playing, currentFrame, totalFrames]);
+  useEffect(() => () => { try { controllerRef.current?.stop(); } catch { /* ignore */ } }, []);
 
-  // Show the active frame
-  useEffect(() => {
-    framesRef.current.forEach((canvas, i) => {
-      canvas.style.display = i === currentFrame ? "block" : "none";
-    });
-  }, [currentFrame]);
-
-  // Initial load — splitRender handles a wider set of ANSI escape codes than
-  // animate()'s terminal emulator (the parser supports screen clears, cursor
-  // positioning, and more). Multi-page files (with ESC[2J) are split into
-  // separate canvases; single-page files render as one static image.
+  // animate() replays ANSI escape codes in real-time as a terminal emulator.
+  // The archive API converts 8-bit CSI to 7-bit ESC[, and the vendored
+  // ansilove.js now supports ESC[S (Scroll Up) and ESC[T (Scroll Down).
   useEffect(() => {
     const el = hostRef.current;
     if (!el) return;
@@ -271,21 +258,17 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont }: { filename: string;
 
     if (isAnsi) {
       loadAnsiLove().then(api => {
-        api.splitRender(url, (canvases: HTMLCanvasElement[]) => {
+        const controller = api.animate(url, (canvas) => {
           el.innerHTML = "";
-          framesRef.current = canvases;
-          setTotalFrames(canvases.length);
-          setCurrentFrame(0);
-          setLoaded(true);
-          canvases.forEach((canvas, i) => {
-            canvas.style.verticalAlign = "bottom";
-            canvas.style.margin = "0 auto";
-            canvas.style.display = i === 0 ? "block" : "none";
-            el.appendChild(canvas);
-          });
-        }, 27, { font: ansiFont, bits: "8", icecolors: 1, columns: 80, filetype: "ans" }, () => {
+          canvas.style.verticalAlign = "bottom";
+          canvas.style.margin = "0 auto";
+          canvas.style.display = "block";
+          el.appendChild(canvas);
+          setReady(true);
+        }, { font: ansiFont, bits: "8", icecolors: 1, columns: 80, filetype: "ans" }, () => {
           el.textContent = "Failed to render";
         });
+        controllerRef.current = controller;
       }).catch(() => {
         el.textContent = "Failed to render";
       });
@@ -302,14 +285,9 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont }: { filename: string;
   return (
     <div>
       <div ref={hostRef} style={{ backgroundColor: "#000", minHeight: "32px" }} />
-      {isAnsi && loaded && totalFrames > 1 && (
+      {isAnsi && ready && (
         <div style={{ textAlign: "center", padding: "6px 0", backgroundColor: "#111" }}>
-          <input type="button" className="btn-big" value="First" onClick={() => { stopPlayback(); setCurrentFrame(0); }} />
-          <input type="button" className="btn-big" value="Prev" onClick={() => { stopPlayback(); setCurrentFrame(f => (f - 1 + totalFrames) % totalFrames); }} />
-          <input type="button" className="btn-big" value={playing ? "Pause" : "Play"} onClick={() => setPlaying(p => !p)} />
-          <input type="button" className="btn-big" value="Next" onClick={() => { stopPlayback(); setCurrentFrame(f => (f + 1) % totalFrames); }} />
-          <input type="button" className="btn-big" value="Last" onClick={() => { stopPlayback(); setCurrentFrame(totalFrames - 1); }} />
-          <span className="lightgrey" style={{ marginLeft: "8px", verticalAlign: "middle" }}>{currentFrame + 1} / {totalFrames}</span>
+          <input type="button" className="btn-big" value={playing ? "Stop" : "Play"} onClick={playing ? handleStop : handlePlay} />
         </div>
       )}
     </div>
