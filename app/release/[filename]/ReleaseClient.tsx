@@ -221,12 +221,44 @@ function ColorSwatch({ current, onChange }: { current: string; onChange: (v: str
   );
 }
 
+const ANIMATION_FRAME_MS = 120;
+
 function ArchiveEntryRenderer({ filename, entry, ansiFont }: { filename: string; entry: string; ansiFont: string }) {
-  const ref = useRef<HTMLDivElement>(null);
+  const hostRef = useRef<HTMLDivElement>(null);
+  const framesRef = useRef<HTMLCanvasElement[]>([]);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [currentFrame, setCurrentFrame] = useState(0);
+  const [totalFrames, setTotalFrames] = useState(0);
+  const [playing, setPlaying] = useState(false);
   const isAnsi = entry.toLowerCase().endsWith(".ans");
 
+  const stopPlayback = useCallback(() => {
+    setPlaying(false);
+    if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => () => stopPlayback(), [stopPlayback]);
+
+  // Frame advance timer during playback
   useEffect(() => {
-    const el = ref.current;
+    if (!playing || totalFrames <= 1) return;
+    timerRef.current = setTimeout(() => {
+      setCurrentFrame(f => (f + 1) % totalFrames);
+    }, ANIMATION_FRAME_MS);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [playing, currentFrame, totalFrames]);
+
+  // Show only the active frame canvas
+  useEffect(() => {
+    framesRef.current.forEach((canvas, i) => {
+      canvas.style.display = i === currentFrame ? "block" : "none";
+    });
+  }, [currentFrame]);
+
+  // Initial load — use splitRender to capture all frames from the ANSI
+  useEffect(() => {
+    const el = hostRef.current;
     if (!el) return;
     el.innerHTML = '<span style="animation:blink 2s linear infinite">.LOADiNG.</span>';
 
@@ -234,13 +266,18 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont }: { filename: string;
 
     if (isAnsi) {
       loadAnsiLove().then(api => {
-        api.render(url, (canvas: HTMLCanvasElement) => {
+        api.splitRender(url, (canvases: HTMLCanvasElement[]) => {
           el.innerHTML = "";
-          canvas.style.verticalAlign = "bottom";
-          canvas.style.margin = "0 auto";
-          canvas.style.display = "block";
-          el.appendChild(canvas);
-        }, { font: ansiFont, bits: "8", icecolors: 1, columns: 80, thumbnail: 0, filetype: "ans" });
+          framesRef.current = canvases;
+          setTotalFrames(canvases.length);
+          setCurrentFrame(0);
+          canvases.forEach((canvas, i) => {
+            canvas.style.verticalAlign = "bottom";
+            canvas.style.margin = "0 auto";
+            canvas.style.display = i === 0 ? "block" : "none";
+            el.appendChild(canvas);
+          });
+        }, 100, { font: ansiFont, bits: "8", icecolors: 1, columns: 80, thumbnail: 0, filetype: "ans" });
       }).catch(() => {
         el.textContent = "Failed to render";
       });
@@ -252,9 +289,24 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont }: { filename: string;
         el.textContent = "Failed to load";
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filename, entry, ansiFont, isAnsi]);
 
-  return <div ref={ref} style={{ backgroundColor: "#000", minHeight: "32px" }} />;
+  return (
+    <div>
+      <div ref={hostRef} style={{ backgroundColor: "#000", minHeight: "32px" }} />
+      {totalFrames > 1 && (
+        <div style={{ textAlign: "center", padding: "6px 0", backgroundColor: "#111" }}>
+          <input type="button" className="btn-big" value="First" onClick={() => { stopPlayback(); setCurrentFrame(0); }} />
+          <input type="button" className="btn-big" value="Prev" onClick={() => { stopPlayback(); setCurrentFrame(f => (f - 1 + totalFrames) % totalFrames); }} />
+          <input type="button" className="btn-big" value={playing ? "Pause" : "Play"} onClick={() => setPlaying(p => !p)} />
+          <input type="button" className="btn-big" value="Next" onClick={() => { stopPlayback(); setCurrentFrame(f => (f + 1) % totalFrames); }} />
+          <input type="button" className="btn-big" value="Last" onClick={() => { stopPlayback(); setCurrentFrame(totalFrames - 1); }} />
+          <span className="lightgrey" style={{ marginLeft: "8px", verticalAlign: "middle" }}>{currentFrame + 1} / {totalFrames}</span>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function ReleaseClient({
