@@ -11,7 +11,7 @@ import {
   deleteComment as deleteCommentAction,
 } from "@/app/actions/collys";
 import { buildAdminCollyEditHref } from "@/app/admin/collys/editHref";
-import { FONTS, ANSI_FONT_MAP, loadAnsiLove, type AnsiLoveController } from "@/lib/ansilove";
+import { FONTS, ANSI_FONT_MAP, loadAnsiLove } from "@/lib/ansilove";
 
 const COLOR_OPTIONS = [
   { value: "#555555", label: "Bright Black" },
@@ -221,31 +221,46 @@ function ColorSwatch({ current, onChange }: { current: string; onChange: (v: str
   );
 }
 
-const ANIMATION_BAUD = 14400;
+// ANSI animation: split at terminal screen height (25 rows) so screen clears
+// and row-count boundaries each start a new frame. The default splitRows is 27.
+const ANIMATION_FRAME_MS = 120;
+const SPLIT_ROWS = 25;
 
 function ArchiveEntryRenderer({ filename, entry, ansiFont }: { filename: string; entry: string; ansiFont: string }) {
   const hostRef = useRef<HTMLDivElement>(null);
-  const controllerRef = useRef<AnsiLoveController | null>(null);
-  const [ready, setReady] = useState(false);
+  const framesRef = useRef<HTMLCanvasElement[]>([]);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [currentFrame, setCurrentFrame] = useState(0);
+  const [totalFrames, setTotalFrames] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const isAnsi = entry.toLowerCase().endsWith(".ans");
 
-  const handlePlay = useCallback(() => {
-    try {
-      controllerRef.current?.play(ANIMATION_BAUD, () => setPlaying(false));
-      setPlaying(true);
-    } catch { /* controller not yet initialised */ }
-  }, []);
-
-  const handleStop = useCallback(() => {
-    try { controllerRef.current?.stop(); } catch { /* ignore */ }
+  const stopPlayback = useCallback(() => {
     setPlaying(false);
+    if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
   }, []);
 
   // Cleanup on unmount
-  useEffect(() => () => { try { controllerRef.current?.stop(); } catch { /* ignore */ } }, []);
+  useEffect(() => () => stopPlayback(), [stopPlayback]);
 
-  // Initial load — use animate() for real terminal-like ANSI playback
+  // Frame advance timer during playback
+  useEffect(() => {
+    if (!playing || totalFrames <= 1) return;
+    timerRef.current = setTimeout(() => {
+      setCurrentFrame(f => (f + 1) % totalFrames);
+    }, ANIMATION_FRAME_MS);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [playing, currentFrame, totalFrames]);
+
+  // Show only the active frame
+  useEffect(() => {
+    framesRef.current.forEach((canvas, i) => {
+      canvas.style.display = i === currentFrame ? "block" : "none";
+    });
+  }, [currentFrame]);
+
+  // Initial load — splitRender at screen-height detects screen clears as frame boundaries
   useEffect(() => {
     const el = hostRef.current;
     if (!el) return;
@@ -255,17 +270,21 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont }: { filename: string;
 
     if (isAnsi) {
       loadAnsiLove().then(api => {
-        const controller = api.animate(url, (canvas) => {
+        api.splitRender(url, (canvases: HTMLCanvasElement[]) => {
           el.innerHTML = "";
-          canvas.style.verticalAlign = "bottom";
-          canvas.style.margin = "0 auto";
-          canvas.style.display = "block";
-          el.appendChild(canvas);
-          setReady(true);
-        }, { font: ansiFont, bits: "8", icecolors: 1, columns: 80, filetype: "ans" }, () => {
+          framesRef.current = canvases;
+          setTotalFrames(canvases.length);
+          setCurrentFrame(0);
+          setLoaded(true);
+          canvases.forEach((canvas, i) => {
+            canvas.style.verticalAlign = "bottom";
+            canvas.style.margin = "0 auto";
+            canvas.style.display = i === 0 ? "block" : "none";
+            el.appendChild(canvas);
+          });
+        }, SPLIT_ROWS, { font: ansiFont, bits: "8", icecolors: 1, columns: 80, filetype: "ans" }, () => {
           el.textContent = "Failed to render";
         });
-        controllerRef.current = controller;
       }).catch(() => {
         el.textContent = "Failed to render";
       });
@@ -283,9 +302,14 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont }: { filename: string;
   return (
     <div>
       <div ref={hostRef} style={{ backgroundColor: "#000", minHeight: "32px" }} />
-      {isAnsi && ready && (
+      {isAnsi && loaded && totalFrames > 1 && (
         <div style={{ textAlign: "center", padding: "6px 0", backgroundColor: "#111" }}>
-          <input type="button" className="btn-big" value={playing ? "Stop" : "Play"} onClick={playing ? handleStop : handlePlay} />
+          <input type="button" className="btn-big" value="First" onClick={() => { stopPlayback(); setCurrentFrame(0); }} />
+          <input type="button" className="btn-big" value="Prev" onClick={() => { stopPlayback(); setCurrentFrame(f => (f - 1 + totalFrames) % totalFrames); }} />
+          <input type="button" className="btn-big" value={playing ? "Pause" : "Play"} onClick={() => setPlaying(p => !p)} />
+          <input type="button" className="btn-big" value="Next" onClick={() => { stopPlayback(); setCurrentFrame(f => (f + 1) % totalFrames); }} />
+          <input type="button" className="btn-big" value="Last" onClick={() => { stopPlayback(); setCurrentFrame(totalFrames - 1); }} />
+          <span className="lightgrey" style={{ marginLeft: "8px", verticalAlign: "middle" }}>{currentFrame + 1} / {totalFrames}</span>
         </div>
       )}
     </div>
