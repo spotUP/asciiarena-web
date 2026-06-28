@@ -104,6 +104,17 @@ describe("release text decoding", () => {
     expect(looksLikeCp437Art(new Uint8Array([0xb0, 0xb1, 0xb2]))).toBe(false);
     expect(looksLikeCp437Art(new Uint8Array([0xb0, 0xb1, 0xb2, 0xdb, 0xdc, 0xdf]))).toBe(true);
   });
+
+  it("treats large plain-ASCII art with a few stray block bytes as NOT CP437", () => {
+    // Like m's-odds.txt: a big ASCII file with a handful of incidental high
+    // bytes (well under the density threshold) must not be read as block art.
+    const big = new Uint8Array(20000).fill(0x20); // 20 KB of spaces
+    for (let i = 0; i < 30; i++) big[i] = 0xdb;    // 30 block bytes = 0.15%
+    expect(looksLikeCp437Art(big)).toBe(false);
+    // A dense block-art file of the same size IS CP437.
+    const dense = new Uint8Array(20000).fill(0xb1); // 100% shade glyphs
+    expect(looksLikeCp437Art(dense)).toBe(true);
+  });
 });
 
 describe("stripFileIdDiz", () => {

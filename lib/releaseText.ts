@@ -71,14 +71,20 @@ export function decodeLatin1Bytes(bytes: Uint8Array): string {
 const CP437_BLOCK_BYTES = new Set([0xb0, 0xb1, 0xb2, 0xdb, 0xdc, 0xdd, 0xde, 0xdf]);
 
 /** True when the bytes contain enough CP437 shade/block glyphs to be PC block
- *  art rather than Amiga Latin-1 text. Used to disambiguate untyped ("auto")
- *  releases whose stored type doesn't reveal the charset. */
+ *  art rather than Amiga Latin-1 / plain ASCII text. Used to disambiguate
+ *  untyped ("auto") releases whose stored type doesn't reveal the charset.
+ *
+ *  Uses DENSITY, not a raw count: real CP437 art is dense with shade/block
+ *  glyphs (typically 20-45%), whereas a large plain-ASCII art file can pick up
+ *  a handful of incidental high bytes (e.g. m's-odds.txt: 33 in 155 KB, 0.02%)
+ *  that a low absolute threshold would misread as block art. */
 export function looksLikeCp437Art(bytes: Uint8Array): boolean {
+  if (bytes.length === 0) return false;
   let n = 0;
   for (let i = 0; i < bytes.length; i++) {
-    if (CP437_BLOCK_BYTES.has(bytes[i]) && ++n >= 6) return true;
+    if (CP437_BLOCK_BYTES.has(bytes[i])) n++;
   }
-  return false;
+  return n >= 6 && n >= bytes.length * 0.02;
 }
 
 export function decodeReleaseText(bytes: Uint8Array, encoding: ReleaseTextEncoding): string {

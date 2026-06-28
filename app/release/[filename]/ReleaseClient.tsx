@@ -12,6 +12,7 @@ import {
 } from "@/app/actions/collys";
 import { buildAdminCollyEditHref } from "@/app/admin/collys/editHref";
 import { FONTS, ANSI_FONT_MAP, loadAnsiLove } from "@/lib/ansilove";
+import { looksLikeCp437Art, decodeReleaseText } from "@/lib/releaseText";
 
 const COLOR_OPTIONS = [
   { value: "#555555", label: "Bright Black" },
@@ -250,13 +251,15 @@ function recolorMonochromeCanvas(canvas: HTMLCanvasElement, fgHex: string, bgHex
   ctx.putImageData(img, 0, 0);
 }
 
-function ArchiveEntryRenderer({ filename, entry, ansiFont }: { filename: string; entry: string; ansiFont: string }) {
+function ArchiveEntryRenderer({ filename, entry, ansiFont, fgColor, bgColor }: { filename: string; entry: string; ansiFont: string; fgColor: string; bgColor: string }) {
   const hostRef = useRef<HTMLDivElement>(null);
 
-  // Render each archive entry through AnsiLove — the same pipeline the main
-  // colly viewer uses — so ANSI colour codes (ESC[..m) become real colours
-  // instead of literal grey text. The archive API serves raw CP437 bytes with
-  // 8-bit CSI (0x9B) already normalised to ESC[ for AnsiLove.
+  // Pick the renderer by CONTENT, not file extension:
+  //  - ANSI (has ESC[ codes)        -> AnsiLove, keep the file's own colours
+  //  - CP437 block art (no escapes) -> AnsiLove (IBM font) recoloured to theme
+  //  - plain ASCII / Latin-1 text   -> themed <pre>; AnsiLove would draw it as
+  //    flat grey-on-black, so plain text is never sent through AnsiLove.
+  // The archive API already normalises 8-bit CSI (0x9B) to ESC[.
   useEffect(() => {
     const el = hostRef.current;
     if (!el) return;
@@ -264,34 +267,45 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont }: { filename: string;
     el.innerHTML = '<span style="animation:blink 2s linear infinite">.LOADiNG.</span>';
 
     const url = `/api/collys/archive?filename=${encodeURIComponent(filename)}&entry=${encodeURIComponent(entry)}`;
-    // .ans/.ansi/.asc carry ANSI escapes; .txt/.nfo are usually plain CP437
-    // art. The ANSI parser handles both — plain text simply has no escapes —
-    // so only .txt/.nfo use the ascii parser to avoid mis-reading stray bytes.
-    const ext = entry.toLowerCase().split(".").pop() ?? "";
-    const filetype = ext === "txt" || ext === "nfo" ? "txt" : "ans";
-
     const fail = () => { if (!cancelled) el.textContent = "Failed to render"; };
 
-    loadAnsiLove().then(api => {
+    fetch(url).then(r => r.arrayBuffer()).then(buf => {
       if (cancelled) return;
-      // Do NOT force a column count. Archive art varies in width (e.g.
-      // confs.ansi is 153 columns) — letting AnsiLove use the SAUCE width or
-      // its default avoids the wrapping that previously hid all but the last
-      // few lines. splitRender tiles tall files into stacked canvases.
-      api.splitRender(url, (canvases: HTMLCanvasElement[]) => {
-        if (cancelled) return;
+      const bytes = new Uint8Array(buf);
+      const hasEsc = bytes.includes(0x1b);
+      const isCp437 = !hasEsc && looksLikeCp437Art(bytes);
+
+      // Plain text — render as themed text, not an AnsiLove canvas.
+      if (!hasEsc && !isCp437) {
+        el.style.backgroundColor = bgColor;
+        const pre = document.createElement("pre");
+        pre.textContent = decodeReleaseText(bytes, "auto");
+        pre.style.cssText = `font-family:${ansiFont},TopazPlus_a1200,monospace;font-size:16px;line-height:1;color:${fgColor};background:transparent;white-space:pre;margin:0;display:inline-block;text-align:left;overflow-x:auto`;
         el.innerHTML = "";
-        canvases.forEach(canvas => {
+        el.appendChild(pre);
+        return;
+      }
+
+      el.style.backgroundColor = isCp437 ? bgColor : "#000";
+      loadAnsiLove().then(api => {
+        if (cancelled) return;
+        const opts = isCp437
+          ? { font: "80x25", bits: "8", icecolors: 1, thumbnail: 0, filetype: "ascii" }
+          : { font: ansiFont, bits: "8", icecolors: 1, thumbnail: 0, filetype: "ans" };
+        api.renderBytes(bytes, (canvas: HTMLCanvasElement) => {
+          if (cancelled) return;
+          if (isCp437) recolorMonochromeCanvas(canvas, fgColor, bgColor);
           canvas.style.display = "block";
           canvas.style.margin = "0 auto";
           canvas.style.verticalAlign = "bottom";
+          el.innerHTML = "";
           el.appendChild(canvas);
-        });
-      }, 100, { font: ansiFont, bits: "8", icecolors: 1, thumbnail: 0, filetype }, fail);
+        }, opts, fail);
+      }).catch(fail);
     }).catch(fail);
 
     return () => { cancelled = true; };
-  }, [filename, entry, ansiFont]);
+  }, [filename, entry, ansiFont, fgColor, bgColor]);
 
   return <div ref={hostRef} style={{ backgroundColor: "#000", overflow: "visible", textAlign: "center", padding: "16px 0" }} />;
 }
@@ -1003,6 +1017,8 @@ export default function ReleaseClient({
             filename={filename}
             entry={extractedEntry}
             ansiFont={ANSI_FONT_MAP[font] ?? "mosoul"}
+            fgColor={fgColor}
+            bgColor={bgColor}
           />
         </div>
       )}
@@ -1020,6 +1036,8 @@ export default function ReleaseClient({
                 filename={filename}
                 entry={entry}
                 ansiFont={ANSI_FONT_MAP[font] ?? "mosoul"}
+                fgColor={fgColor}
+                bgColor={bgColor}
               />
             </div>
           ))}
@@ -1065,8 +1083,8 @@ export default function ReleaseClient({
         {commentsLoaded && comments.length > 0 && comments.map(c => (
           <div key={c.id}>
             <div className="header bg-header col-12 ap-1 text-truncate">
-              <span> BY:</span><span className="yellow">{c.nick}</span>
-              <span> DATE:</span><span className="white">{c.time}</span>
+              <span> BY: </span><span className="yellow">{c.nick}</span>
+              <span> DATE: </span><span className="white">{c.time}</span>
               {c.rating != null && <><span className="yellow"> RATING:</span><span className="white"> {Number(c.rating).toFixed(1)}</span></>}
             </div>
             <div className="bg-secondary col-12 ap-1 amb-1">
@@ -1093,7 +1111,7 @@ export default function ReleaseClient({
       {Object.values(drafts).filter(d => d.text && d.nick !== userNick).map(d => (
         <div key={d.nick}>
           <div className="header bg-header col-12 ap-1 text-truncate">
-            <span> BY:</span><span className="yellow">{d.nick}</span>
+            <span> BY: </span><span className="yellow">{d.nick}</span>
             <span className="lightgrey"> (typing...)</span>
           </div>
           <div className="bg-secondary col-12 ap-1 amb-1">
