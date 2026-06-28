@@ -87,6 +87,22 @@ export function looksLikeCp437Art(bytes: Uint8Array): boolean {
   return n >= 6 && n >= bytes.length * 0.02;
 }
 
+/** True when the bytes look like renderable text / ASCII / ANSI / CP437 art
+ *  rather than a binary blob (image, music module, executable, archive).
+ *  Detection is by CONTENT, not filename: binary files contain NUL bytes and
+ *  many non-text control characters; text art does not. Allows TAB/LF/VT/FF/CR
+ *  and ESC (ANSI sequences). */
+export function isRenderableArt(bytes: Uint8Array): boolean {
+  if (bytes.length === 0) return false;
+  let ctrl = 0;
+  for (let i = 0; i < bytes.length; i++) {
+    const b = bytes[i];
+    if (b === 0) return false; // a NUL byte means binary
+    if (b < 0x20 && b !== 9 && b !== 10 && b !== 11 && b !== 12 && b !== 13 && b !== 27) ctrl++;
+  }
+  return ctrl <= bytes.length * 0.02;
+}
+
 export function decodeReleaseText(bytes: Uint8Array, encoding: ReleaseTextEncoding): string {
   if (encoding === "cp437") return decodeCp437Bytes(bytes);
 

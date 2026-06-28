@@ -12,7 +12,7 @@ import {
 } from "@/app/actions/collys";
 import { buildAdminCollyEditHref } from "@/app/admin/collys/editHref";
 import { FONTS, ANSI_FONT_MAP, loadAnsiLove } from "@/lib/ansilove";
-import { looksLikeCp437Art, decodeReleaseText } from "@/lib/releaseText";
+import { looksLikeCp437Art, decodeReleaseText, isRenderableArt } from "@/lib/releaseText";
 
 const COLOR_OPTIONS = [
   { value: "#555555", label: "Bright Black" },
@@ -253,8 +253,10 @@ function recolorMonochromeCanvas(canvas: HTMLCanvasElement, fgHex: string, bgHex
 
 function ArchiveEntryRenderer({ filename, entry, ansiFont, fgColor, bgColor }: { filename: string; entry: string; ansiFont: string; fgColor: string; bgColor: string }) {
   const hostRef = useRef<HTMLDivElement>(null);
+  const [hidden, setHidden] = useState(false);
 
   // Pick the renderer by CONTENT, not file extension:
+  //  - binary (image/module/exe)    -> hidden entirely (not art)
   //  - ANSI (has ESC[ codes)        -> AnsiLove, keep the file's own colours
   //  - CP437 block art (no escapes) -> AnsiLove (IBM font) recoloured to theme
   //  - plain ASCII / Latin-1 text   -> themed <pre>; AnsiLove would draw it as
@@ -272,6 +274,8 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont, fgColor, bgColor }: {
     fetch(url).then(r => r.arrayBuffer()).then(buf => {
       if (cancelled) return;
       const bytes = new Uint8Array(buf);
+      // Not renderable art (binary blob) — drop the whole entry.
+      if (!isRenderableArt(bytes)) { setHidden(true); return; }
       const hasEsc = bytes.includes(0x1b);
       const isCp437 = !hasEsc && looksLikeCp437Art(bytes);
 
@@ -307,7 +311,13 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont, fgColor, bgColor }: {
     return () => { cancelled = true; };
   }, [filename, entry, ansiFont, fgColor, bgColor]);
 
-  return <div ref={hostRef} style={{ backgroundColor: "#000", overflow: "visible", textAlign: "center", padding: "16px 0" }} />;
+  if (hidden) return null;
+  return (
+    <div style={{ marginBottom: "16px", overflow: "visible" }}>
+      <div className="header bg-header col-12 ap-1">{entry.split("/").pop()}</div>
+      <div ref={hostRef} style={{ backgroundColor: "#000", overflow: "visible", textAlign: "center", padding: "16px 0" }} />
+    </div>
+  );
 }
 
 export default function ReleaseClient({
@@ -1008,19 +1018,16 @@ export default function ReleaseClient({
         </div>
       )}
 
-      {/* Archive hero — the largest renderable entry, shown prominently and
-          rendered via AnsiLove (it is filtered out of the browser list below). */}
+      {/* Archive hero — the largest renderable entry, shown prominently
+          (it is filtered out of the browser list below). */}
       {isArchive && extractedEntry && (
-        <div style={{ marginBottom: "16px", overflow: "visible" }}>
-          <div className="header bg-header col-12 ap-1">{extractedEntry.split("/").pop()}</div>
-          <ArchiveEntryRenderer
-            filename={filename}
-            entry={extractedEntry}
-            ansiFont={ANSI_FONT_MAP[font] ?? "mosoul"}
-            fgColor={fgColor}
-            bgColor={bgColor}
-          />
-        </div>
+        <ArchiveEntryRenderer
+          filename={filename}
+          entry={extractedEntry}
+          ansiFont={ANSI_FONT_MAP[font] ?? "mosoul"}
+          fgColor={fgColor}
+          bgColor={bgColor}
+        />
       )}
 
       {/* Archive viewer — renders each file in the archive using AnsiLove */}
@@ -1030,16 +1037,14 @@ export default function ReleaseClient({
             <input type="button" className="btn-big" value={`Download ${filename}`} onClick={doDownload} style={{ fontSize: "16px", padding: "12px 24px" }} />
           </div>
           {archiveFiles.map(entry => (
-            <div key={entry} style={{ marginBottom: "16px", overflow: "visible" }}>
-              <div className="header bg-header col-12 ap-1">{entry.split("/").pop()}</div>
-              <ArchiveEntryRenderer
-                filename={filename}
-                entry={entry}
-                ansiFont={ANSI_FONT_MAP[font] ?? "mosoul"}
-                fgColor={fgColor}
-                bgColor={bgColor}
-              />
-            </div>
+            <ArchiveEntryRenderer
+              key={entry}
+              filename={filename}
+              entry={entry}
+              ansiFont={ANSI_FONT_MAP[font] ?? "mosoul"}
+              fgColor={fgColor}
+              bgColor={bgColor}
+            />
           ))}
         </div>
       )}

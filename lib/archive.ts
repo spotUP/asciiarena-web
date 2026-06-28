@@ -2,6 +2,25 @@ import { execSync } from "child_process";
 import { existsSync } from "fs";
 import path from "path";
 import { filterAdFiles, isAdFile } from "./archive-ad-filter";
+import { isRenderableArt } from "./releaseText";
+
+// Known binary file types. This is ONLY a cheap pre-filter so we don't extract
+// large image/audio/archive blobs just to reject them — art is never found by
+// extension, it's confirmed by content (isRenderableArt). Files with any other
+// extension (or none, e.g. "bis.2kADbig") are kept as candidates and validated
+// by content.
+const BINARY_EXTENSIONS = new Set([
+  "png", "jpg", "jpeg", "gif", "bmp", "iff", "ilbm", "lbm", "pcx", "tga", "webp", "ico",
+  "mod", "xm", "s3m", "it", "mp3", "ogg", "wav", "aiff", "mid", "med", "okt",
+  "exe", "com", "dll", "prg", "adf", "img", "rom", "o", "so",
+  "zip", "lha", "lzh", "rar", "gz", "bz2", "7z", "arj", "tar", "z",
+  "pdf", "ttf", "otf", "fon", "woff", "woff2",
+]);
+
+function hasBinaryExtension(name: string): boolean {
+  const ext = name.toLowerCase().split(".").pop() ?? "";
+  return BINARY_EXTENSIONS.has(ext);
+}
 
 export const LHA_BIN = process.env.LHA_BIN ?? "/usr/bin/lha";
 export const COLLECTIONS_PATH = process.env.COLLECTIONS_PATH ?? path.join(process.cwd(), "collections");
@@ -35,8 +54,9 @@ export function parseLhaList(output: string): string[] {
     if (m) {
       const name = m[3];
       if (name.endsWith("/")) continue;
-      const ext = name.toLowerCase().split(".").pop() ?? "";
-      if (!["ans", "ansi", "asc", "nfo", "txt"].includes(ext)) continue;
+      // Keep every non-binary file as a candidate — art has no fixed extension
+      // (logos are named e.g. "bis.2kADbig"). Content is validated downstream.
+      if (hasBinaryExtension(name)) continue;
       files.push(name);
     }
   }
@@ -71,8 +91,7 @@ export function parseLhaListWithSizes(output: string): LhaEntry[] {
     if (m) {
       const name = m[3];
       if (name.endsWith("/")) continue;
-      const ext = name.toLowerCase().split(".").pop() ?? "";
-      if (!["ans", "ansi", "asc", "nfo", "txt"].includes(ext)) continue;
+      if (hasBinaryExtension(name)) continue;
       entries.push({ name, size });
     }
   }
@@ -127,17 +146,20 @@ export function extractFirstRenderable(filename: string): ArchiveContent | null 
     const entries = parseLhaListWithSizes(listing);
     if (entries.length === 0) return null;
 
-    // Pick the largest renderable file — actual ASCII art is orders of
-    // magnitude bigger than BBS ad screens or design templates.
-    const entry = entries[0].name;
-    const data = execSync(`${LHA_BIN} pq "${fp}" "${entry}"`, {
-      encoding: "buffer",
-      timeout: 10000,
-      maxBuffer: 10 * 1024 * 1024,
-    });
-
-    // `lha pq` (quiet) writes the raw file with no header — use it as-is.
-    return { data, entry };
+    // Walk candidates largest-first and return the first whose CONTENT is
+    // actually renderable art (extension is not trusted). `lha pq` (quiet)
+    // writes the raw file with no header — use it as-is.
+    for (const { name } of entries) {
+      try {
+        const data = execSync(`${LHA_BIN} pq "${fp}" "${name}"`, {
+          encoding: "buffer",
+          timeout: 10000,
+          maxBuffer: 10 * 1024 * 1024,
+        });
+        if (isRenderableArt(new Uint8Array(data))) return { data, entry: name };
+      } catch { /* unreadable/oversized — skip to next candidate */ }
+    }
+    return null;
   } catch {
     return null;
   }

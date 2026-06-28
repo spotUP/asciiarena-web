@@ -7,6 +7,7 @@ import {
   releaseViewerType,
   stripFileIdDiz,
   looksLikeCp437Art,
+  isRenderableArt,
   BEGIN_FILE_ID_DIZ,
   END_FILE_ID_DIZ,
 } from "@/lib/releaseText";
@@ -103,6 +104,26 @@ describe("release text decoding", () => {
   it("looksLikeCp437Art needs several block glyphs (avoids false positives)", () => {
     expect(looksLikeCp437Art(new Uint8Array([0xb0, 0xb1, 0xb2]))).toBe(false);
     expect(looksLikeCp437Art(new Uint8Array([0xb0, 0xb1, 0xb2, 0xdb, 0xdc, 0xdf]))).toBe(true);
+  });
+
+  it("isRenderableArt accepts text art by content, regardless of filename", () => {
+    // Plain ASCII logo (like bis.2kADbig: no recognised extension).
+    expect(isRenderableArt(new TextEncoder().encode("  _____/\\\n /     \\ \n"))).toBe(true);
+    // ANSI art (ESC sequences allowed).
+    expect(isRenderableArt(new Uint8Array([0x1b, 0x5b, 0x33, 0x32, 0x6d, 0x41, 0x0a]))).toBe(true);
+    // CP437 block art (high bytes are fine).
+    expect(isRenderableArt(new Uint8Array([0xdb, 0xdc, 0xdf, 0x0a]))).toBe(true);
+  });
+
+  it("isRenderableArt rejects binary blobs (NUL / stray control bytes)", () => {
+    // A NUL byte => binary (image/module/executable).
+    expect(isRenderableArt(new Uint8Array([0x41, 0x00, 0x42]))).toBe(false);
+    // PNG header begins with 0x89 'PNG' then a NUL-laden body.
+    const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d]);
+    expect(isRenderableArt(png)).toBe(false);
+    // Dense non-text control bytes => binary.
+    expect(isRenderableArt(new Uint8Array(100).fill(0x07))).toBe(false);
+    expect(isRenderableArt(new Uint8Array())).toBe(false);
   });
 
   it("treats large plain-ASCII art with a few stray block bytes as NOT CP437", () => {
