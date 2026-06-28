@@ -69,12 +69,20 @@ export async function GET(request: NextRequest) {
       timeout: 10000,
       maxBuffer: 10 * 1024 * 1024, // 10MB max
     });
-    // Strip the first 3 lines which are lha header info (matching PHP: sed 1,3d)
-    const text = data.toString("latin1");
-    const lines = text.split("\n");
-    const content = lines.slice(3).join("\n");
+    // Strip the first 3 header lines that lha pq prints before the raw file.
+    // Work at the byte level — converting through a JS string and back via
+    // new Response(string) double-encodes bytes 0x80+ to UTF-8, corrupting
+    // ANSI escape sequences (CSI 0x9B becomes C2 9B, etc.).
+    let nl = 0, cut = 0;
+    for (let i = 0; i < data.length; i++) {
+      if (data[i] === 0x0A) { nl++; if (nl === 3) { cut = i + 1; break; } }
+    }
+    const content = data.subarray(cut);
+    const isAnsi = entry.toLowerCase().endsWith(".ans");
     return new Response(content, {
-      headers: { "Content-Type": "text/plain; charset=iso-8859-1" },
+      headers: {
+        "Content-Type": isAnsi ? "application/octet-stream" : "text/plain; charset=iso-8859-1",
+      },
     });
   } catch (e) {
     return apiError("Failed to extract file: " + String(e), 500);
