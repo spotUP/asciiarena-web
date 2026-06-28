@@ -77,8 +77,32 @@ export async function GET(request: NextRequest) {
     for (let i = 0; i < data.length; i++) {
       if (data[i] === 0x0A) { nl++; if (nl === 3) { cut = i + 1; break; } }
     }
-    const content = data.subarray(cut);
+    let content = data.subarray(cut);
     const isAnsi = entry.toLowerCase().endsWith(".ans");
+
+    // Convert 8-bit CSI (0x9B) to 7-bit ESC[ (0x1B 0x5B).
+    // AnsiLove only recognises "ESC[" (27, 0x5B), so single-byte CSI
+    // codes render as literal text instead of ANSI control sequences.
+    if (isAnsi) {
+      let csiCount = 0;
+      for (let i = 0; i < content.length; i++) {
+        if (content[i] === 0x9B) csiCount++;
+      }
+      if (csiCount > 0) {
+        const converted = Buffer.alloc(content.length + csiCount);
+        let j = 0;
+        for (let i = 0; i < content.length; i++) {
+          if (content[i] === 0x9B) {
+            converted[j++] = 0x1B;
+            converted[j++] = 0x5B;
+          } else {
+            converted[j++] = content[i];
+          }
+        }
+        content = converted;
+      }
+    }
+
     return new Response(content, {
       headers: {
         "Content-Type": isAnsi ? "application/octet-stream" : "text/plain; charset=iso-8859-1",
