@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
-import { encodeReleaseText, releaseTextEncoding, releaseViewerType, stripFileIdDiz, convertAnsiCodes, hasAnsiCodes } from "@/lib/releaseText";
+import { encodeReleaseText, releaseTextEncoding, releaseViewerType, stripFileIdDiz, convertAnsiCodes, hasAnsiCodes, looksLikeCp437Art } from "@/lib/releaseText";
 import { convertPcbColors, hasPcbCodes } from "@/lib/pcbColors";
 import { extractFirstRenderable } from "@/lib/archive";
 import { getSession as auth } from "@/lib/session";
@@ -131,6 +131,14 @@ export default async function ReleasePage({ params }: PageProps) {
   const storedType = (colly.type ?? "ASCII").toUpperCase();
   const textEncoding = releaseTextEncoding(storedType, colly.broken_comment);
   const type = releaseViewerType(storedType);
+
+  // PC/CP437 block art is often stored under a generic "ASCII" type. Detect it
+  // by content so it both decodes as CP437 and renders on the gap-free AnsiLove
+  // canvas viewer (the Amiga text <pre> leaves gaps between rows of block art).
+  let isCp437 = textEncoding === "cp437";
+  if (!isCp437 && type === "ASCII" && existsSync(filePath)) {
+    try { isCp437 = looksLikeCp437Art(readFileSync(filePath)); } catch { /* keep false */ }
+  }
 
   // ASCII file content — read first so we can extract embedded file_id.diz
   let fileContent = "";
@@ -340,7 +348,7 @@ export default async function ReleasePage({ params }: PageProps) {
         fileContent={fileContent}
         extractedEntry={extractedEntry}
         type={type}
-        isCp437={textEncoding === "cp437"}
+        isCp437={isCp437}
         collyTitle={colly.name ?? filename}
         siteUrl={process.env.NEXTAUTH_URL ?? "https://asciiarena.se"}
         initialViewCount={Number(colly.view_counter ?? 0)}

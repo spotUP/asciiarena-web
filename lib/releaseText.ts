@@ -62,6 +62,25 @@ export function decodeLatin1Bytes(bytes: Uint8Array): string {
   return s;
 }
 
+// CP437 shade/block glyphs: ░▒▓ (0xB0-0xB2) and █▄▌▐▀ (0xDB-0xDF). These are
+// the unmistakable signature of PC/CP437 block art and essentially never appear
+// in bulk in Amiga Latin-1 text (where they'd be °±² and ÛÜÝÞß). NOTE: 0xB4 (´)
+// and other box-drawing bytes are deliberately excluded — they double as common
+// Latin-1 punctuation/letters and would misclassify Amiga art (e.g. the
+// `´and the odds?´` diz).
+const CP437_BLOCK_BYTES = new Set([0xb0, 0xb1, 0xb2, 0xdb, 0xdc, 0xdd, 0xde, 0xdf]);
+
+/** True when the bytes contain enough CP437 shade/block glyphs to be PC block
+ *  art rather than Amiga Latin-1 text. Used to disambiguate untyped ("auto")
+ *  releases whose stored type doesn't reveal the charset. */
+export function looksLikeCp437Art(bytes: Uint8Array): boolean {
+  let n = 0;
+  for (let i = 0; i < bytes.length; i++) {
+    if (CP437_BLOCK_BYTES.has(bytes[i]) && ++n >= 6) return true;
+  }
+  return false;
+}
+
 export function decodeReleaseText(bytes: Uint8Array, encoding: ReleaseTextEncoding): string {
   if (encoding === "cp437") return decodeCp437Bytes(bytes);
 
@@ -86,12 +105,12 @@ export function decodeReleaseText(bytes: Uint8Array, encoding: ReleaseTextEncodi
     }
     return utf8;
   } catch {
-    // Not valid UTF-8. aSCIIaRENA is an Amiga-first site: "auto" (non-PC)
-    // releases are Amiga / ASCII art using the Latin-1 high range — e.g.
-    // 0xB4 ´ and 0xF7 ÷ as decoration — NOT CP437 box-drawing. Decoding
-    // these as CP437 turns ´/÷ into ┤/≈ and mangles the art. Genuine PC /
-    // CP437 art is explicitly typed and handled by the "cp437" branch above.
-    return decodeLatin1Bytes(bytes);
+    // Not valid UTF-8. The stored type doesn't always reveal the charset, so
+    // disambiguate by content: PC/CP437 block art is full of shade/block glyphs
+    // (░▒▓█▄▀); decode it as CP437. Everything else is Amiga Latin-1 — decoding
+    // that as CP437 turns ´/÷ into ┤/≈ and mangles the art (e.g. the m's-odds
+    // file_id.diz). Explicitly-typed PC art took the "cp437" branch above.
+    return looksLikeCp437Art(bytes) ? decodeCp437Bytes(bytes) : decodeLatin1Bytes(bytes);
   }
 }
 

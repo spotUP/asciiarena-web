@@ -6,6 +6,7 @@ import {
   releaseTextEncoding,
   releaseViewerType,
   stripFileIdDiz,
+  looksLikeCp437Art,
   BEGIN_FILE_ID_DIZ,
   END_FILE_ID_DIZ,
 } from "@/lib/releaseText";
@@ -84,6 +85,24 @@ describe("release text decoding", () => {
     const utf8 = new TextEncoder().encode("abc \u00e9 def");
     const result = decodeReleaseText(utf8, "auto");
     expect(result).toBe("abc \u00e9 def");
+  });
+
+  it("auto-detects untyped CP437 block art by content and decodes as CP437", () => {
+    // PC art stored under a generic "ASCII" type: a run of shade/block glyphs
+    // is unmistakably CP437, so decode it as CP437 even in "auto" mode.
+    const art = new Uint8Array([0xb0, 0xb1, 0xb2, 0xdb, 0xdc, 0xdf, 0xdb, 0xb2]);
+    expect(decodeReleaseText(art, "auto")).toBe(decodeCp437Bytes(art));
+    expect(decodeReleaseText(art, "auto")).toContain("\u2588"); // full block, not Latin-1
+  });
+
+  it("does NOT misread sparse Latin-1 decoration (the diz) as CP437 art", () => {
+    // 0xB4 / 0xF7 are Latin-1 punctuation, not block glyphs \u2014 stay Latin-1.
+    expect(looksLikeCp437Art(new Uint8Array([0xb4, 0xf7, 0xb4]))).toBe(false);
+  });
+
+  it("looksLikeCp437Art needs several block glyphs (avoids false positives)", () => {
+    expect(looksLikeCp437Art(new Uint8Array([0xb0, 0xb1, 0xb2]))).toBe(false);
+    expect(looksLikeCp437Art(new Uint8Array([0xb0, 0xb1, 0xb2, 0xdb, 0xdc, 0xdf]))).toBe(true);
   });
 });
 
