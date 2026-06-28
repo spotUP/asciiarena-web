@@ -60,7 +60,11 @@ export default function Cp437DizPreview({ bytesB64, fg = "#ff55ff" }: Cp437DizPr
           }
           try { setSrc(canvas.toDataURL("image/png")); } catch { /* tainted canvas */ }
         },
-        { font: "80x25", bits: "8", icecolors: 1, filetype: "ascii" },
+        // "diz" trims trailing empty columns to the file_id.diz content width
+        // (<=45 cols), so the preview renders at native size in the card column
+        // instead of being padded to 80 cols and downscaled (which looked
+        // distorted under image-rendering: pixelated).
+        { font: "80x25", bits: "8", icecolors: 1, filetype: "diz" },
         () => { /* render failure — leave empty */ },
       );
     }).catch(() => { /* AnsiLove failed to load — leave empty */ });
