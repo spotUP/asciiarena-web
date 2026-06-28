@@ -22,16 +22,17 @@ function hasBinaryExtension(name: string): boolean {
   return BINARY_EXTENSIONS.has(ext);
 }
 
-// file_id.diz is the pack's BBS descriptor, not artwork — never list it among
-// the rendered art entries.
+// Descriptor / scene-info files, not artwork: file_id.diz (BBS descriptor) and
+// any .nfo (group info) — never list them among the rendered art entries.
 function isDescriptorFile(name: string): boolean {
-  return (name.split("/").pop() ?? "").toLowerCase() === "file_id.diz";
+  const base = (name.split("/").pop() ?? "").toLowerCase();
+  return base === "file_id.diz" || base.endsWith(".nfo");
 }
 
 function isArtCandidate(name: string): boolean {
   if (name.endsWith("/")) return false;          // directory
   if (hasBinaryExtension(name)) return false;     // known binary blob
-  if (isDescriptorFile(name)) return false;       // file_id.diz descriptor
+  if (isDescriptorFile(name)) return false;       // file_id.diz / *.nfo
   return true;
 }
 
