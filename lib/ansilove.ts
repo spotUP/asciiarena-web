@@ -3,6 +3,12 @@
 // is injected lazily on first use and shared across the page (logo header +
 // release/colly viewer) via the memoized promise below.
 
+export interface AnsiLoveController {
+  play: (baud: number, callback?: () => void, clearScreen?: boolean) => void;
+  stop: () => void;
+  load: (url: string, callback?: (sauce: unknown) => void, callbackFail?: () => void) => void;
+}
+
 export interface AnsiLoveApi {
   render: (
     url: string,
@@ -23,6 +29,17 @@ export interface AnsiLoveApi {
     opts: Record<string, unknown>,
     fail?: () => void,
   ) => void;
+  animate: (
+    url: string,
+    cb: (canvas: HTMLCanvasElement, sauce: unknown) => void,
+    opts: Record<string, unknown>,
+    fail?: () => void,
+  ) => AnsiLoveController;
+  animateBytes: (
+    bytes: Uint8Array,
+    cb: (canvas: HTMLCanvasElement, sauce: unknown) => void,
+    opts: Record<string, unknown>,
+  ) => AnsiLoveController;
 }
 
 const SCRIPT_SRC = "/assets/js/ansilove.js";
