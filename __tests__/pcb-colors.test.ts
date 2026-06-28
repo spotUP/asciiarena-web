@@ -34,29 +34,29 @@ describe("convertPcbColors", () => {
   it("converts single @X code to span", () => {
     const result = convertPcbColors("@X03hello");
     expect(result).toBe(
-      '<span style="color:#00AAAA;background-color:#000000">hello</span>',
+      '<span style="color:#00AAAA;background-color:#000000;line-height:1">hello</span>',
     );
   });
 
   it("closes previous span on new colour code", () => {
     const result = convertPcbColors("@X03hello@X05world");
     expect(result).toBe(
-      '<span style="color:#00AAAA;background-color:#000000">hello</span>' +
-      '<span style="color:#AA00AA;background-color:#000000">world</span>',
+      '<span style="color:#00AAAA;background-color:#000000;line-height:1">hello</span>' +
+      '<span style="color:#AA00AA;background-color:#000000;line-height:1">world</span>',
     );
   });
 
   it("uses background colour from first hex digit", () => {
     const result = convertPcbColors("@X3Btest");
     expect(result).toBe(
-      '<span style="color:#55FFFF;background-color:#00AAAA">test</span>',
+      '<span style="color:#55FFFF;background-color:#00AAAA;line-height:1">test</span>',
     );
   });
 
   it("handles lowercase hex digits", () => {
     const result = convertPcbColors("@X0dtest");
     expect(result).toBe(
-      '<span style="color:#FF55FF;background-color:#000000">test</span>',
+      '<span style="color:#FF55FF;background-color:#000000;line-height:1">test</span>',
     );
   });
 
@@ -79,14 +79,14 @@ describe("convertPcbColors", () => {
   it("handles text before first code", () => {
     const result = convertPcbColors("before @X03after");
     expect(result).toBe(
-      'before <span style="color:#00AAAA;background-color:#000000">after</span>',
+      'before <span style="color:#00AAAA;background-color:#000000;line-height:1">after</span>',
     );
   });
 
   it("handles text after last code", () => {
     const result = convertPcbColors("@X03hello world");
     expect(result).toBe(
-      '<span style="color:#00AAAA;background-color:#000000">hello world</span>',
+      '<span style="color:#00AAAA;background-color:#000000;line-height:1">hello world</span>',
     );
   });
 

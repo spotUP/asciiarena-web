@@ -53,7 +53,7 @@ export function convertPcbColors(html: string): string {
       const fg = PCB_COLORS[fgHex.toUpperCase()] ?? "#AAAAAA";
       const close = open ? "</span>" : "";
       open = true;
-      return `${close}<span style="color:${fg};background-color:${bg}">`;
+      return `${close}<span style="color:${fg};background-color:${bg};line-height:1">`;
     },
   );
 

@@ -173,7 +173,7 @@ export function convertAnsiCodes(html: string): string {
       const close = open ? "</span>" : "";
       const fgc = ANSI_FG_COLORS[fg] || "inherit";
       const bgc = ANSI_BG_COLORS[bg] || "inherit";
-      const style = `color:${fgc};background-color:${bgc}`;
+      const style = `color:${fgc};background-color:${bgc};line-height:1`;
       open = true;
       return `${close}<span style="${style}">`;
     },
