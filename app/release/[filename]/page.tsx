@@ -165,25 +165,14 @@ export default async function ReleasePage({ params }: PageProps) {
   }
 
   // For archives, try to extract a renderable ASCII file so it can be
-  // displayed inline in the main viewer (with colour controls, fullscreen,
-  // etc.) instead of only showing the archive file browser. The archive
-  // file listing still appears below when isArchive stays true.
+  // displayed prominently as a "hero" above the archive file browser. The
+  // client renders it through AnsiLove — the same pixel-perfect path as the
+  // other entries — rather than decoding it to text (which mangles ANSI/CP437
+  // art). We only need its entry name here; the client fetches the bytes.
   let extractedEntry: string | null = null;
-  if (type === "ARCHIVE" && !fileContent) {
+  if (type === "ARCHIVE") {
     const extracted = extractFirstRenderable(filename);
-    if (extracted) {
-      extractedEntry = extracted.entry;
-      try {
-        fileContent = encodeReleaseText(new Uint8Array(extracted.data), textEncoding);
-        if (hasAnsiCodes(fileContent)) {
-          fileContent = convertAnsiCodes(fileContent);
-        }
-        if (hasPcbCodes(fileContent)) {
-          fileContent = convertPcbColors(fileContent);
-          hasPcb = true;
-        }
-      } catch { /* leave fileContent empty */ }
-    }
+    if (extracted) extractedEntry = extracted.entry;
   }
 
   // .diz file preview for summary card — prefer separate .diz, fall back to

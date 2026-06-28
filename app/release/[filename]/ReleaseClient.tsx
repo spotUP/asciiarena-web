@@ -994,6 +994,19 @@ export default function ReleaseClient({
         </div>
       )}
 
+      {/* Archive hero — the largest renderable entry, shown prominently and
+          rendered via AnsiLove (it is filtered out of the browser list below). */}
+      {isArchive && extractedEntry && (
+        <div style={{ marginBottom: "16px", overflow: "visible" }}>
+          <div className="header bg-header col-12 ap-1">{extractedEntry.split("/").pop()}</div>
+          <ArchiveEntryRenderer
+            filename={filename}
+            entry={extractedEntry}
+            ansiFont={ANSI_FONT_MAP[font] ?? "mosoul"}
+          />
+        </div>
+      )}
+
       {/* Archive viewer — renders each file in the archive using AnsiLove */}
       {isArchive && archiveFiles.length > 0 && (
         <div>
