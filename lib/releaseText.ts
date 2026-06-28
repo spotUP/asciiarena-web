@@ -54,6 +54,14 @@ export function stripFileIdDiz(text: string): FileIdDizResult {
   return { content: text.substring(0, beginIdx) + text.substring(endMarkerEnd), dizText: dizText || null };
 }
 
+/** Decode bytes as Latin-1 (ISO-8859-1): every byte maps 1:1 to its codepoint.
+ *  This is the Amiga / non-PC high range (e.g. 0xB4 ´, 0xF7 ÷). */
+export function decodeLatin1Bytes(bytes: Uint8Array): string {
+  let s = "";
+  for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+  return s;
+}
+
 export function decodeReleaseText(bytes: Uint8Array, encoding: ReleaseTextEncoding): string {
   if (encoding === "cp437") return decodeCp437Bytes(bytes);
 
@@ -78,9 +86,12 @@ export function decodeReleaseText(bytes: Uint8Array, encoding: ReleaseTextEncodi
     }
     return utf8;
   } catch {
-    // Not valid UTF-8 — nearly all non-UTF-8 ASCII art files from the
-    // BBS era use CP437 (block/box-drawing glyphs), not Latin-1.
-    return decodeCp437Bytes(bytes);
+    // Not valid UTF-8. aSCIIaRENA is an Amiga-first site: "auto" (non-PC)
+    // releases are Amiga / ASCII art using the Latin-1 high range — e.g.
+    // 0xB4 ´ and 0xF7 ÷ as decoration — NOT CP437 box-drawing. Decoding
+    // these as CP437 turns ´/÷ into ┤/≈ and mangles the art. Genuine PC /
+    // CP437 art is explicitly typed and handled by the "cp437" branch above.
+    return decodeLatin1Bytes(bytes);
   }
 }
 

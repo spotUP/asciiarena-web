@@ -19,10 +19,27 @@ describe("release text decoding", () => {
     expect(decoded).toBe("\u2584\u2588\u2588\u2588\u2580\u2593\u2590\u258c");
   });
 
-  it("falls back to CP437 for non-UTF-8 bytes (BBS-era block art)", () => {
+  it("still decodes block art as CP437 when the release is typed PC/CP437", () => {
     // 0xDC 0xDB 0xDF = ▄ █ ▀ in CP437, not Ü Û ß in Latin-1
-    expect(decodeReleaseText(new Uint8Array([0xdc, 0xdb, 0xdf]), "auto"))
+    expect(decodeReleaseText(new Uint8Array([0xdc, 0xdb, 0xdf]), "cp437"))
       .toBe("\u2584\u2588\u2580");
+  });
+
+  it("decodes non-UTF-8 'auto' (Amiga) text as Latin-1, not CP437", () => {
+    // aSCIIaRENA is Amiga-first: in "auto" mode 0xB4 0xF7 are acute + division
+    // (Latin-1 decoration), not CP437 box/approx glyphs. PC art uses "cp437".
+    expect(decodeReleaseText(new Uint8Array([0xb4, 0xf7]), "auto"))
+      .toBe("\u00b4\u00f7");
+  });
+
+  it("renders the m's-odds file_id.diz decoration as Amiga Latin-1", () => {
+    // Regression: 0xB4 and 0xF7 were mangled into box/approx glyphs by the
+    // global CP437 fallback added in 0249030. Amiga colly \u2014 must be Latin-1.
+    const bytes = new Uint8Array([
+      0xf7, 0x65, 0xf7, 0x20, 0xb4, 0x61, 0x6e, 0x64, 0x20,
+      0x74, 0x68, 0x65, 0x20, 0x6f, 0x64, 0x64, 0x73, 0x3f, 0xb4,
+    ]);
+    expect(decodeReleaseText(bytes, "auto")).toBe("\u00f7e\u00f7 \u00b4and the odds?\u00b4");
   });
 
   it("HTML-escapes decoded release text", () => {
@@ -41,14 +58,22 @@ describe("release text decoding", () => {
     expect(releaseViewerType("ANSI")).toBe("ANSI");
   });
 
-  it("detects CP437 disguised as valid UTF-8 and re-decodes", () => {
-    // 0xD5 0xCD = ╒═ in CP437 (2 chars), but a valid 2-byte UTF-8
-    // sequence that decodes to a single Armenian character.
-    // The heuristic sees 2 high bytes → 1 non-ASCII char (50% survival,
-    // below 80% threshold) and re-decodes as CP437.
+  it("decodes invalid-UTF-8 'auto' bytes as Latin-1 (not CP437)", () => {
+    // 0xD5 0xCD is NOT valid UTF-8 (0xCD is not a continuation byte), so it
+    // hits the fallback. On an Amiga-first site that fallback is Latin-1:
+    // 0xD5 0xCD = Õ Í, not CP437 ╒═.
     const result = decodeReleaseText(new Uint8Array([0xD5, 0xCD]), "auto");
-    expect(result).toBe("\u2552\u2550"); // ╒═
-    expect(result.length).toBe(2);
+    expect(result).toBe("ÕÍ");
+  });
+
+  it("re-decodes genuine CP437-disguised-as-UTF-8 art (heuristic, >=16 high bytes)", () => {
+    // 0xC3 0xA9 is a valid UTF-8 'e-acute'. 16 such pairs are valid UTF-8 but
+    // only 16 non-ASCII chars from 32 high bytes (50% < 80% threshold), so the
+    // heuristic treats it as CP437 art and re-decodes byte-per-byte.
+    const bytes = new Uint8Array(Array.from({ length: 16 }, () => [0xc3, 0xa9]).flat());
+    const result = decodeReleaseText(bytes, "auto");
+    expect(result).toBe(decodeCp437Bytes(bytes));
+    expect(result.length).toBe(32);
   });
 
   it("keeps genuine UTF-8 when high bytes survive", () => {
