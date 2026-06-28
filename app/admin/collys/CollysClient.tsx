@@ -30,10 +30,22 @@ function splitNames(value: string | null | undefined): string[] {
 
 function Msg({ msg }: { msg: { text: string; ok: boolean } | null }) {
   if (!msg) return null;
+  // Fixed floating toast so it is visible no matter where the page is
+  // scrolled — the Save buttons sit far below the top of the list.
   return (
-    <span className={msg.ok ? "green" : "red"} style={{ marginLeft: "8px" }}>
-      {msg.text}
-    </span>
+    <div
+      style={{
+        position: "fixed",
+        bottom: "16px",
+        right: "16px",
+        zIndex: 9999,
+        padding: "8px 16px",
+        backgroundColor: "#111111",
+        border: `1px solid ${msg.ok ? "#55ff55" : "#ff5555"}`,
+      }}
+    >
+      <span className={msg.ok ? "green" : "red"}>{msg.text}</span>
+    </div>
   );
 }
 
@@ -135,24 +147,34 @@ export default function CollysClient() {
 
   const save = async (colly: Colly) => {
     const e = edits[colly.id] ?? {};
-    await fetch("/api/admin/collys", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: colly.id,
-        filename: e.filename ?? colly.filename,
-        name: e.name ?? colly.name,
-        year: e.year ?? colly.year,
-        month: e.month ?? colly.month,
-        day: e.day ?? colly.day,
-        type: e.type ?? colly.type,
-        file_id: e.file_id ?? colly.file_id,
-        broken: e.broken ?? colly.broken,
-        broken_comment: e.broken_comment ?? colly.broken_comment,
-        artistNames: splitNames((e.artists ?? colly.artists) as string | null),
-        crewNames: splitNames((e.crews ?? colly.crews) as string | null),
-      }),
-    });
+    let res: Response;
+    try {
+      res = await fetch("/api/admin/collys", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: colly.id,
+          filename: e.filename ?? colly.filename,
+          name: e.name ?? colly.name,
+          year: e.year ?? colly.year,
+          month: e.month ?? colly.month,
+          day: e.day ?? colly.day,
+          type: e.type ?? colly.type,
+          file_id: e.file_id ?? colly.file_id,
+          broken: e.broken ?? colly.broken,
+          broken_comment: e.broken_comment ?? colly.broken_comment,
+          artistNames: splitNames((e.artists ?? colly.artists) as string | null),
+          crewNames: splitNames((e.crews ?? colly.crews) as string | null),
+        }),
+      });
+    } catch {
+      flash("Save failed — network error", false);
+      return;
+    }
+    if (!res.ok) {
+      flash(`Save failed (${res.status})`, false);
+      return;
+    }
     flash("Saved!", true);
     setResults(prev => prev.map(row => row.id === colly.id ? {
       ...row,
