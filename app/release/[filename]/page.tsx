@@ -9,6 +9,7 @@ import { prisma } from "@/lib/db";
 import { encodeReleaseText, releaseTextEncoding, releaseViewerType, stripFileIdDiz, convertAnsiCodes, hasAnsiCodes, looksLikeCp437Art } from "@/lib/releaseText";
 import { convertPcbColors, hasPcbCodes } from "@/lib/pcbColors";
 import { extractFirstRenderable } from "@/lib/archive";
+import Cp437DizPreview from "@/components/release/Cp437DizPreview";
 import { getSession as auth } from "@/lib/session";
 import { urlsafe, formatBytes, decodeParam } from "@/lib/utils";
 import ReleaseClient from "./ReleaseClient";
@@ -189,6 +190,19 @@ export default async function ReleasePage({ params }: PageProps) {
     dizContent = convertPcbColors(dizContent);
   }
 
+  // PC/CP437 block-art dizzes render gappy in the Amiga webfont, so render them
+  // through AnsiLove instead (same as the colly). Only file-based dizzes carry
+  // raw bytes; embedded dizzes are already decoded text and fall back to <pre>.
+  let dizCp437B64: string | null = null;
+  {
+    let dizBytes: Buffer | null = null;
+    if (existsSync(dizPath)) { try { dizBytes = readFileSync(dizPath); } catch { dizBytes = null; } }
+    else if (!embeddedDiz && existsSync(fallbackDizPath)) { try { dizBytes = readFileSync(fallbackDizPath); } catch { dizBytes = null; } }
+    if (dizBytes && looksLikeCp437Art(new Uint8Array(dizBytes))) {
+      dizCp437B64 = dizBytes.toString("base64");
+    }
+  }
+
   // User viewer preferences (fetched in batch 2 as userPrefs)
   let font = "mOsOul";
   let fgcolor = "#FF55FF";
@@ -232,7 +246,11 @@ export default async function ReleasePage({ params }: PageProps) {
           {/* Left: .diz file preview */}
           <div className="animate__animated animate__backInLeft col-lg-8 d-flex justify-content-center justify-content-lg-start" style={{ position: "relative", top: "-16px" }}>
             <span>
-              <pre className="magenta apt-1" style={{ lineHeight: "1" }} dangerouslySetInnerHTML={{ __html: dizContent }} />
+              {dizCp437B64 ? (
+                <Cp437DizPreview bytesB64={dizCp437B64} />
+              ) : (
+                <pre className="magenta apt-1" style={{ lineHeight: "1" }} dangerouslySetInnerHTML={{ __html: dizContent }} />
+              )}
             </span>
           </div>
 
