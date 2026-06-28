@@ -8,6 +8,7 @@ import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { encodeReleaseText, releaseTextEncoding, releaseViewerType, stripFileIdDiz, convertAnsiCodes, hasAnsiCodes } from "@/lib/releaseText";
 import { convertPcbColors, hasPcbCodes } from "@/lib/pcbColors";
+import { extractFirstRenderable } from "@/lib/archive";
 import { getSession as auth } from "@/lib/session";
 import { urlsafe, formatBytes, decodeParam } from "@/lib/utils";
 import ReleaseClient from "./ReleaseClient";
@@ -152,6 +153,28 @@ export default async function ReleasePage({ params }: PageProps) {
     if (hasPcbCodes(fileContent)) {
       fileContent = convertPcbColors(fileContent);
       hasPcb = true;
+    }
+  }
+
+  // For archives, try to extract a renderable ASCII file so it can be
+  // displayed inline in the main viewer (with colour controls, fullscreen,
+  // etc.) instead of only showing the archive file browser. The archive
+  // file listing still appears below when isArchive stays true.
+  let extractedEntry: string | null = null;
+  if (type === "ARCHIVE" && !fileContent) {
+    const extracted = extractFirstRenderable(filename);
+    if (extracted) {
+      extractedEntry = extracted.entry;
+      try {
+        fileContent = encodeReleaseText(new Uint8Array(extracted.data), textEncoding);
+        if (hasAnsiCodes(fileContent)) {
+          fileContent = convertAnsiCodes(fileContent);
+        }
+        if (hasPcbCodes(fileContent)) {
+          fileContent = convertPcbColors(fileContent);
+          hasPcb = true;
+        }
+      } catch { /* leave fileContent empty */ }
     }
   }
 
@@ -315,7 +338,9 @@ export default async function ReleasePage({ params }: PageProps) {
         initFont={font}
         isArchive={isArchive}
         fileContent={fileContent}
+        extractedEntry={extractedEntry}
         type={type}
+        isCp437={textEncoding === "cp437"}
         collyTitle={colly.name ?? filename}
         siteUrl={process.env.NEXTAUTH_URL ?? "https://asciiarena.se"}
         initialViewCount={Number(colly.view_counter ?? 0)}
