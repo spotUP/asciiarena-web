@@ -13,6 +13,7 @@ import {
 import { buildAdminCollyEditHref } from "@/app/admin/collys/editHref";
 import { FONTS, ANSI_FONT_MAP, loadAnsiLove, type AnsiLoveController } from "@/lib/ansilove";
 import { looksLikeCp437Art, decodeReleaseText, isRenderableArt, isAnsiAnimation } from "@/lib/releaseText";
+import { animateScroll } from "@/lib/animateScroll";
 
 const COLOR_OPTIONS = [
   { value: "#555555", label: "Bright Black" },
@@ -165,23 +166,6 @@ function buildLogoIndex(html: string, sections: LogoSection[]): LogoIndexEntry[]
     if (preceding) label = extractDividerLabel(lines.slice(preceding.startLine, preceding.endLine + 1));
     return { section, label: label || `Logo ${n + 1}` };
   });
-}
-
-function animateScroll(
-  el: HTMLElement, target: number, duration: number, onComplete?: () => void
-): number {
-  const from = el.scrollTop;
-  const delta = target - from;
-  const t0 = performance.now();
-  const ease = (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-  let raf: number;
-  const tick = (now: number) => {
-    const p = Math.min((now - t0) / duration, 1);
-    el.scrollTop = from + delta * ease(p);
-    if (p < 1) { raf = requestAnimationFrame(tick); } else { onComplete?.(); }
-  };
-  raf = requestAnimationFrame(tick);
-  return raf;
 }
 
 function ColorSwatch({ current, onChange }: { current: string; onChange: (v: string) => void }) {
@@ -441,8 +425,11 @@ export default function ReleaseClient({
   const [autoplay, setAutoplay] = useState(false);
   const [autoplayIndex, setAutoplayIndex] = useState(0);
   const autoplayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const autoplayRafRef   = useRef<number | null>(null);
+  const autoplayRafRef   = useRef<(() => void) | null>(null);
   const isAutoScrolling  = useRef(false);
+  // Grace timer that keeps isAutoScrolling true briefly after an animation ends,
+  // so trailing (async) programmatic scroll events aren't read as user scrolls.
+  const autoScrollClearRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const sections  = useMemo(() => detectLogoSections(fileContent), [fileContent]);
   const logoIndex = useMemo(() => buildLogoIndex(fileContent, sections), [fileContent, sections]);
@@ -688,7 +675,8 @@ export default function ReleaseClient({
     setAutoplay(false);
     setAutoplayIndex(0);
     if (autoplayTimerRef.current) { clearTimeout(autoplayTimerRef.current); autoplayTimerRef.current = null; }
-    if (autoplayRafRef.current)   { cancelAnimationFrame(autoplayRafRef.current); autoplayRafRef.current = null; }
+    if (autoplayRafRef.current)   { autoplayRafRef.current(); autoplayRafRef.current = null; }
+    if (autoScrollClearRef.current) { clearTimeout(autoScrollClearRef.current); autoScrollClearRef.current = null; }
     isAutoScrolling.current = false;
   }, []);
 
@@ -776,13 +764,21 @@ export default function ReleaseClient({
     const hold     = Math.min(4000 + Math.max(0, logoSection.lineCount - 20) * 15, 8000);
     const scrollMs = 700;
 
-    if (autoplayRafRef.current)   cancelAnimationFrame(autoplayRafRef.current);
+    if (autoplayRafRef.current)   { autoplayRafRef.current(); autoplayRafRef.current = null; }
     if (autoplayTimerRef.current) clearTimeout(autoplayTimerRef.current);
 
     isAutoScrolling.current = true;
+    if (autoScrollClearRef.current) { clearTimeout(autoScrollClearRef.current); autoScrollClearRef.current = null; }
     autoplayRafRef.current = animateScroll(scrollEl, target, scrollMs, () => {
-      isAutoScrolling.current = false;
-      autoplayRafRef.current  = null;
+      autoplayRafRef.current = null;
+      // Hold the guard up briefly past the animation: the final programmatic
+      // scrollTop write dispatches its scroll event asynchronously, so clearing
+      // synchronously here would let it trip the user-scroll detector and stop
+      // autoplay after a single section.
+      autoScrollClearRef.current = setTimeout(() => {
+        isAutoScrolling.current = false;
+        autoScrollClearRef.current = null;
+      }, 200);
     });
 
     autoplayTimerRef.current = setTimeout(() => {
@@ -792,7 +788,8 @@ export default function ReleaseClient({
 
     return () => {
       if (autoplayTimerRef.current) clearTimeout(autoplayTimerRef.current);
-      if (autoplayRafRef.current)   cancelAnimationFrame(autoplayRafRef.current);
+      if (autoplayRafRef.current)   { autoplayRafRef.current(); autoplayRafRef.current = null; }
+      if (autoScrollClearRef.current) { clearTimeout(autoScrollClearRef.current); autoScrollClearRef.current = null; }
       isAutoScrolling.current = false;
     };
   }, [autoplay, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen]);
