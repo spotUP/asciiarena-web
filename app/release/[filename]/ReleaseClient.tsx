@@ -1102,7 +1102,7 @@ export default function ReleaseClient({
       {/* Hidden SVG warp filter for the flaky-VHS bend (driven in groove autoplay). */}
       <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
         <filter id="vhsWarp" x="-50%" y="-50%" width="200%" height="200%">
-          <feTurbulence ref={warpTurbRef} type="fractalNoise" baseFrequency="0 0.02" numOctaves={2} seed={1} result="n" />
+          <feTurbulence ref={warpTurbRef} type="fractalNoise" baseFrequency="0 0.005" numOctaves={1} seed={1} result="n" />
           <feDisplacementMap ref={warpDispRef} in="SourceGraphic" in2="n" scale={0} xChannelSelector="R" yChannelSelector="G" />
         </filter>
       </svg>
