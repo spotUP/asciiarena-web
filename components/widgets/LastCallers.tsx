@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
-import { unstable_cache } from "next/cache";
 import PrintLines from "@/components/ui/PrintLines";
 import RelativeTime from "@/components/widgets/RelativeTime";
 
@@ -9,18 +8,17 @@ export type LastCallersProps = {
   limit?: number;
 };
 
-const getLastCallers = unstable_cache(
-  async (limit: number) => prisma.lastusers.findMany({
+// Not cached: it must reflect a fresh login immediately (a 71s cache made it
+// look stale right after logging in). It's a single indexed ORDER BY ... LIMIT 5
+// query, so running it per render is cheap — unlike the heavier widgets whose
+// caches exist to avoid a synchronized revalidation stampede.
+async function getLastCallers(limit: number) {
+  return prisma.lastusers.findMany({
     orderBy: { timestamp: "desc" },
     take: limit,
     select: { id: true, user_id: true, nick: true, timestamp: true },
-  }),
-  ["last-callers"],
-  // Staggered off the other widgets' TTLs so the homepage's cached widgets
-  // don't all revalidate in one burst every 60s (that synchronized stampede
-  // caused intermittent ~3s render spikes).
-  { revalidate: 71 }
-);
+  });
+}
 
 export default async function LastCallers({ limit = 5 }: LastCallersProps) {
   try {
