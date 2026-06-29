@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
-import Script from "next/script";
 import { unstable_cache } from "next/cache";
 import PrintLines from "@/components/ui/PrintLines";
+import LocalTime from "@/components/widgets/LocalTime";
 
 export type LastCallersProps = {
   limit?: number;
@@ -34,44 +34,24 @@ export default async function LastCallers({ limit = 5 }: LastCallersProps) {
           </div>
           <div className="container col-12 apt-1 apb-1 m-0 p-0 bg-secondary">
             <PrintLines>
-            {rows.map((row) => {
-              const utc = new Date(row.timestamp * 1000).toISOString();
-              const fallbackTime = new Date(row.timestamp * 1000)
-                .toISOString()
-                .substring(11, 16);
-              return (
-                <div
-                  key={row.id}
-                  className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between"
+            {rows.map((row) => (
+              <div
+                key={row.id}
+                className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between"
+              >
+                <Link
+                  prefetch={false}
+                  className="yellow text-truncate"
+                  href={`/member/${urlsafe(row.nick)}`}
                 >
-                  <Link
-                    prefetch={false}
-                    className="yellow text-truncate"
-                    href={`/member/${urlsafe(row.nick)}`}
-                  >
-                    {row.nick}
-                  </Link>
-                  <span className="lastcall-time text-truncate" data-utc={utc}>
-                    {fallbackTime}
-                  </span>
-                </div>
-              );
-            })}
+                  {row.nick}
+                </Link>
+                <LocalTime unix={row.timestamp} className="text-truncate" />
+              </div>
+            ))}
             </PrintLines>
           </div>
         </div>
-        <Script id="lastcallers-localtime" strategy="afterInteractive">{`
-          (function() {
-            document.querySelectorAll(".lastcall-time").forEach(function(el) {
-              var utc = el.getAttribute("data-utc");
-              if (!utc) return;
-              var d = new Date(utc);
-              var h = ("0" + d.getHours()).slice(-2);
-              var m = ("0" + d.getMinutes()).slice(-2);
-              el.textContent = h + ":" + m;
-            });
-          })();
-        `}</Script>
       </>
     );
   } catch {
