@@ -251,9 +251,27 @@ function recolorMonochromeCanvas(canvas: HTMLCanvasElement, fgHex: string, bgHex
   ctx.putImageData(img, 0, 0);
 }
 
-function ArchiveEntryRenderer({ filename, entry, ansiFont, fgColor, bgColor }: { filename: string; entry: string; ansiFont: string; fgColor: string; bgColor: string }) {
+function ArchiveEntryRenderer({ filename, entry, ansiFont, fgColor, bgColor, isAdmin, initialAdminHidden }: { filename: string; entry: string; ansiFont: string; fgColor: string; bgColor: string; isAdmin: boolean; initialAdminHidden: boolean }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const [hidden, setHidden] = useState(false);
+  const [adminHidden, setAdminHidden] = useState(initialAdminHidden);
+  const [busy, setBusy] = useState(false);
+
+  // Admins can hide unrelated entries (persisted); visitors then never receive
+  // them. Hidden entries reach admins flagged, rendered dimmed with "Unhide".
+  const toggleAdminHidden = async () => {
+    const next = !adminHidden;
+    setBusy(true);
+    try {
+      const res = await fetch("/api/admin/collys/archive-hide", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename, entry, hidden: next }),
+      });
+      if (res.ok) setAdminHidden(next);
+    } catch { /* leave state unchanged on failure */ }
+    setBusy(false);
+  };
 
   // Pick the renderer by CONTENT, not file extension:
   //  - binary (image/module/exe)    -> hidden entirely (not art)
@@ -313,8 +331,20 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont, fgColor, bgColor }: {
 
   if (hidden) return null;
   return (
-    <div style={{ marginBottom: "16px", overflow: "visible" }}>
-      <div className="header bg-header col-12 ap-1">{entry.split("/").pop()}</div>
+    <div style={{ marginBottom: "16px", overflow: "visible", opacity: adminHidden ? 0.4 : 1 }}>
+      <div className="header bg-header col-12 ap-1" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px" }}>
+        <span className="text-truncate">{entry.split("/").pop()}{adminHidden ? " (hidden)" : ""}</span>
+        {isAdmin && (
+          <input
+            type="button"
+            className="btn-big"
+            value={adminHidden ? "Unhide" : "Hide"}
+            onClick={toggleAdminHidden}
+            disabled={busy}
+            style={{ flexShrink: 0 }}
+          />
+        )}
+      </div>
       <div ref={hostRef} style={{ backgroundColor: "#000", overflow: "visible", textAlign: "center", padding: "16px 0" }} />
     </div>
   );
@@ -342,6 +372,7 @@ export default function ReleaseClient({
   const [favCount, setFavCount] = useState(initialFavCount);
   const [downloadCount, setDownloadCount] = useState(initialDownloadCount);
   const [archiveFiles, setArchiveFiles] = useState<string[]>([]);
+  const [hiddenEntries, setHiddenEntries] = useState<Set<string>>(new Set());
   const [copyImageLabel, setCopyImageLabel] = useState("Copy as image");
   const [, startTransition] = useTransition();
 
@@ -573,8 +604,11 @@ export default function ReleaseClient({
         const files: string[] = d.files ?? [];
         // Don't show the entry that was already extracted for inline display
         setArchiveFiles(extractedEntry ? files.filter(f => f !== extractedEntry) : files);
+        // Admins get the hidden list back so hidden entries render dimmed with
+        // an "Unhide" control; visitors never receive hidden entries at all.
+        setHiddenEntries(new Set<string>(d.hidden ?? []));
       })
-      .catch(() => setArchiveFiles([]));
+      .catch(() => { setArchiveFiles([]); setHiddenEntries(new Set<string>()); });
   }, [isArchive, collyVisible, filename, extractedEntry]);
 
   // Auto-fit on mobile
@@ -1027,6 +1061,8 @@ export default function ReleaseClient({
           ansiFont={ANSI_FONT_MAP[font] ?? "mosoul"}
           fgColor={fgColor}
           bgColor={bgColor}
+          isAdmin={isAdmin}
+          initialAdminHidden={hiddenEntries.has(extractedEntry)}
         />
       )}
 
@@ -1044,6 +1080,8 @@ export default function ReleaseClient({
               ansiFont={ANSI_FONT_MAP[font] ?? "mosoul"}
               fgColor={fgColor}
               bgColor={bgColor}
+              isAdmin={isAdmin}
+              initialAdminHidden={hiddenEntries.has(entry)}
             />
           ))}
         </div>

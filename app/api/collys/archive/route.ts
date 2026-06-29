@@ -1,8 +1,10 @@
 import { NextRequest } from "next/server";
 import { execSync } from "child_process";
 import { existsSync } from "fs";
+import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { LHA_BIN, archivePath, parseLhaList, normalizeCsi } from "@/lib/archive";
+import { getHiddenEntries } from "@/lib/archiveHidden";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -20,7 +22,13 @@ export async function GET(request: NextRequest) {
       const output = execSync(`${LHA_BIN} l "${fp}"`, { encoding: "buffer", timeout: 10000 });
       const listing = output.toString("latin1");
       const files = parseLhaList(listing);
-      return apiOk({ files });
+      const hidden = getHiddenEntries(filename);
+      // Admins see every entry (with the hidden ones flagged so they can
+      // unhide); everyone else only sees the entries that aren't hidden.
+      const session = await auth();
+      const isAdmin = (session?.user as { rank?: string } | undefined)?.rank === "Admin";
+      if (isAdmin) return apiOk({ files, hidden });
+      return apiOk({ files: files.filter(f => !hidden.includes(f)) });
     } catch (e) {
       return apiError("Failed to list archive: " + String(e), 500);
     }

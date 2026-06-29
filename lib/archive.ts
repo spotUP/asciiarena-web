@@ -3,6 +3,7 @@ import { existsSync } from "fs";
 import path from "path";
 import { filterAdFiles, isAdFile } from "./archive-ad-filter";
 import { isRenderableArt } from "./releaseText";
+import { getHiddenEntries } from "./archiveHidden";
 
 // Known binary file types. This is ONLY a cheap pre-filter so we don't extract
 // large image/audio/archive blobs just to reject them — art is never found by
@@ -156,7 +157,8 @@ export function extractFirstRenderable(filename: string): ArchiveContent | null 
 
   try {
     const listing = execSync(`${LHA_BIN} l "${fp}"`, { encoding: "buffer", timeout: 10000 }).toString("latin1");
-    const entries = parseLhaListWithSizes(listing);
+    const hidden = new Set(getHiddenEntries(filename));
+    const entries = parseLhaListWithSizes(listing).filter(e => !hidden.has(e.name));
     if (entries.length === 0) return null;
 
     // Walk candidates largest-first and return the first whose CONTENT is
