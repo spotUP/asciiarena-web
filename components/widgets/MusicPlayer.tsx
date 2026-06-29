@@ -83,7 +83,7 @@ export default function MusicPlayer() {
         let sum = 0, n = 0;
         for (let b = lo; b < hi && b < bins; b++) { sum += data[b]; n++; }
         const v = n ? sum / n / 255 : 0;
-        const level = Math.round(Math.pow(v, 0.7) * rows);
+        const level = Math.round(Math.pow(v, 0.9) * rows); // mild lift, avoids saturating to the top
         for (let r = 0; r < level; r++) ctx.fillRect(i * barW, cssH - (r + 1) * 16, barW, 15);
       }
     };
@@ -164,7 +164,7 @@ export default function MusicPlayer() {
           {error && <div style={{ color: "#ff5555", marginBottom: "6px" }}>{error}</div>}
 
           {/* FFT block visualizer (8x16 grid) */}
-          <canvas ref={canvasRef} style={{ display: "block", width: "100%", height: "80px", marginBottom: "8px", background: "#111", imageRendering: "pixelated" }} />
+          <canvas ref={canvasRef} style={{ display: "block", width: "100%", height: "48px", marginBottom: "8px", background: "#111", imageRendering: "pixelated" }} />
 
           {/* Transport */}
           <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
