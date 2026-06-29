@@ -343,6 +343,9 @@ export default function ReleaseClient({
   const autoplayRafRef   = useRef<(() => void) | null>(null);
   const beatRafRef       = useRef<number | null>(null);
   const isAutoScrolling  = useRef(false);
+  // SVG warp-filter primitives, animated for the flaky-VHS bend on big beats.
+  const warpDispRef = useRef<SVGFEDisplacementMapElement | null>(null);
+  const warpTurbRef = useRef<SVGFETurbulenceElement | null>(null);
   // Grace timer that keeps isAutoScrolling true briefly after an animation ends,
   // so trailing (async) programmatic scroll events aren't read as user scrolls.
   const autoScrollClearRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -760,7 +763,7 @@ export default function ReleaseClient({
     const startT = performance.now();
     const minDwell = 2200;
     const maxDwell = 7000;
-    let baseline = 0, glow = 0, surge = 0, glitch = 0;
+    let baseline = 0, glow = 0, surge = 0, glitch = 0, warp = 0, lastWarp = 0;
     let base = scrollEl.scrollTop; // eases toward the logo's centred position
     isAutoScrolling.current = true;
 
@@ -778,14 +781,28 @@ export default function ReleaseClient({
       glow = glow * 0.6 + Math.min(flux * 2.5 + Math.max(0, eGlow - baseline) * 3, 0.8) * 0.4;
       const beat = detector.detect(flux, now);
       if (beat) { surge += 22; glitch = 1; } // bounce + glitch burst on the kick
+      // A bigger, rarer warp on strong beats -> a flaky-VHS bend (gated so the
+      // expensive SVG filter only runs in short bursts).
+      if (beat && flux > 0.12 && now - lastWarp > 1400) { warp = 1; lastWarp = now; }
       surge *= 0.82;                          // and settle back
       glitch *= 0.8;                          // glitch decays over ~150ms
+      warp *= 0.85;                           // warp settles over ~0.4s
 
       // Music-synced glitch: RGB/chromatic split + VHS horizontal jitter + a
       // skew/contrast hit, fired on each kick and decaying. The text-shadow
       // (a full text repaint) only runs during the short burst, so it stays
       // smooth between beats.
-      pre.style.filter = `brightness(${(1 + glow).toFixed(2)})` + (glitch > 0.6 ? " contrast(1.5)" : "");
+      const useWarp = warp > 0.03;
+      pre.style.filter = `brightness(${(1 + glow).toFixed(2)})`
+        + (useWarp ? " url(#vhsWarp)" : "")
+        + (glitch > 0.6 ? " contrast(1.5)" : "");
+      if (useWarp) {
+        warpDispRef.current?.setAttribute("scale", (warp * 26).toFixed(1));
+        // jump the noise so the bend wobbles like unstable VHS tracking
+        warpTurbRef.current?.setAttribute("seed", String(Math.floor(now / 45) % 200));
+      } else {
+        warpDispRef.current?.setAttribute("scale", "0");
+      }
       if (glitch > 0.05) {
         const split = (2 + glitch * 7).toFixed(1);
         const jitter = ((Math.random() - 0.5) * glitch * 12).toFixed(1);
@@ -812,6 +829,7 @@ export default function ReleaseClient({
       scrollEl.style.scrollBehavior = prevBehavior;
       const el = collyRef.current as HTMLElement | null;
       if (el) { el.style.filter = ""; el.style.textShadow = ""; el.style.transform = ""; }
+      warpDispRef.current?.setAttribute("scale", "0");
       isAutoScrolling.current = false;
     };
   }, [autoplay, musicGroove, musicIsPlaying, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen, getMusicAnalyser]);
@@ -1077,6 +1095,13 @@ export default function ReleaseClient({
 
       {/* ASCII text viewer — Amiga ASCII collys + archive-extracted content.
           PC/CP437 art skips this and renders on the canvas viewer below. */}
+      {/* Hidden SVG warp filter for the flaky-VHS bend (driven in groove autoplay). */}
+      <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
+        <filter id="vhsWarp" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence ref={warpTurbRef} type="fractalNoise" baseFrequency="0 0.018" numOctaves={1} seed={1} result="n" />
+          <feDisplacementMap ref={warpDispRef} in="SourceGraphic" in2="n" scale={0} xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </svg>
       {!useCanvasViewer && (type === "ASCII" || !!fileContent) && collyVisible && (
         <div style={{ position: "relative" }}>
         <div
