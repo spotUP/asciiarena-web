@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
     start(ctrl) {
       ctrl.enqueue(encoder.encode(": keepalive\n\n"));
       unsubscribe = subscribe(channel, ctrl);
+      if (channel === "site:activity") console.log(`[activitydbg] SSE subscribe site:activity pid=${process.pid} subs=${subscriberCount(channel)}`);
       broadcast(channel, { type: "watching", count: subscriberCount(channel) });
       pingInterval = setInterval(() => {
         try {

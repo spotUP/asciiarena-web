@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { broadcast, type LiveEvent } from "@/lib/live";
+import { broadcast, subscriberCount, type LiveEvent } from "@/lib/live";
 import type { ActivityType } from "@/lib/activity-types";
 
 export { ACTIVITY_TYPES, ACTIVITY_LABELS, type ActivityType } from "@/lib/activity-types";
@@ -28,11 +28,13 @@ export async function broadcastActivityIfAllowed(
       where: { id: userId },
       select: { activity_hidden_types: true },
     });
-    if (!u) return;
+    if (!u) { console.log(`[activitydbg] user ${userId} not found`); return; }
     const hidden = parseHidden(u.activity_hidden_types);
-    if (hidden.has(type)) return;
+    if (hidden.has(type)) { console.log(`[activitydbg] type ${type} hidden for ${userId} (hidden=${u.activity_hidden_types})`); return; }
+    console.log(`[activitydbg] broadcasting ${type} for ${userId} -> site:activity subs=${subscriberCount("site:activity")} pid=${process.pid}`);
     broadcast("site:activity", event);
-  } catch {
+  } catch (e) {
+    console.log(`[activitydbg] error: ${e instanceof Error ? e.message : String(e)}`);
     // Don't let a broadcast failure surface as a user-visible error.
   }
 }
