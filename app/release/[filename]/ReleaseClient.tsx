@@ -652,8 +652,8 @@ export default function ReleaseClient({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collyVisible, type, section, autoplay, stopAutoplay, startAutoplay, setIndexOpen]);
 
-  // Step-and-centre autoplay (groove OFF). Groove mode is a continuous
-  // music-driven scroll handled by the effect below.
+  // Step-and-centre autoplay (groove OFF). Groove mode centres each logo too,
+  // but bounces it to the beat — handled by the effect below.
   useEffect(() => {
     if (!autoplay || !collyVisible) return;
     if (musicGroove) return;
@@ -715,41 +715,67 @@ export default function ReleaseClient({
     };
   }, [autoplay, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen, musicGroove]);
 
-  // Groove autoplay: one continuous scroll whose speed RIDES the music. Each
-  // frame the scroll advances by base + low-mid energy + a decaying surge on
-  // every kick, so you literally see the groove in the motion; the logo also
-  // glows on transients. Loops back to the top at the end.
+  // Groove autoplay: centre each logo (scroll-to-logo, like normal autoplay),
+  // but ride the music while it's held — the view eases in to the logo, bounces
+  // on every kick (so you see the groove in the motion), the logo glows on
+  // transients, and it advances to the next logo on a beat after a short dwell.
   useEffect(() => {
     if (!autoplay || !musicGroove || !collyVisible || !musicIsPlaying) return;
+    if (autoplayIndex >= sections.length) { stopAutoplay(); return; }
     const analyser = getMusicAnalyser();
-    if (!analyser) return;
-    const scrollEl: HTMLElement | null = isFullscreen ? document.documentElement : collyDivRef.current;
-    if (!scrollEl) return;
+    const pre = collyRef.current as HTMLElement | null;
+    if (!analyser || !pre) return;
+
+    const lineHeight = parseFloat(getComputedStyle(pre).lineHeight) || 16;
+    const SPACERS = 4;
+    const preRect = pre.getBoundingClientRect();
+    let scrollEl: HTMLElement;
+    let viewH: number;
+    let maxScroll: number;
+    let originTop: number;
+    if (isFullscreen) {
+      scrollEl = document.documentElement;
+      viewH = window.innerHeight;
+      maxScroll = document.documentElement.scrollHeight - viewH;
+      originTop = preRect.top + document.documentElement.scrollTop;
+    } else {
+      const container = collyDivRef.current;
+      if (!container) return;
+      scrollEl = container;
+      viewH = container.clientHeight;
+      maxScroll = container.scrollHeight - viewH;
+      originTop = preRect.top - container.getBoundingClientRect().top + container.scrollTop;
+    }
+    const target = computeScrollTarget(sections[autoplayIndex], { spacers: SPACERS, lineHeight, viewH, originTop, maxScroll });
 
     const prevBehavior = scrollEl.style.scrollBehavior;
-    scrollEl.style.scrollBehavior = "auto"; // our per-frame writes must be instant
+    scrollEl.style.scrollBehavior = "auto"; // per-frame writes must be instant
     const freq = new Uint8Array(analyser.frequencyBinCount);
     const detector = new BeatDetector({ sensitivity: 1.25, refractoryMs: 130, floor: 0.01, windowSize: 32 });
+    const startT = performance.now();
+    const minDwell = 2200;
+    const maxDwell = 7000;
     let baseline = 0, glow = 0, surge = 0;
+    let base = scrollEl.scrollTop; // eases toward the logo's centred position
     isAutoScrolling.current = true;
 
     const tick = (now: number) => {
+      const dt = now - startT;
+      base += (target - base) * 0.16; // ease in to the centred logo
       analyser.getByteFrequencyData(freq);
-      const e = lowBandEnergy(freq, 24); // low-mid loudness 0..1
+      const e = lowBandEnergy(freq, 24);
       baseline = baseline === 0 ? e : baseline * 0.95 + e * 0.05;
-      // logo glow on energy above baseline
       glow = glow * 0.6 + Math.min(Math.max(0, e - baseline) * 5, 0.7) * 0.4;
-      const pre = collyRef.current as HTMLElement | null;
-      if (pre) pre.style.filter = `brightness(${(1 + glow).toFixed(2)})`;
-      // kick surge -> a push in the scroll on the beat
-      if (detector.detect(e, now)) surge += 22;
-      surge *= 0.82;
-      const speed = Math.min(0.6 + e * 16 + surge, 48); // px this frame
-      const viewH = isFullscreen ? window.innerHeight : (collyDivRef.current?.clientHeight ?? 0);
-      const max = scrollEl.scrollHeight - viewH;
-      let next = scrollEl.scrollTop + speed;
-      if (max > 0 && next >= max) next = 0; // loop
-      scrollEl.scrollTop = next;
+      pre.style.filter = `brightness(${(1 + glow).toFixed(2)})`;
+      const beat = detector.detect(e, now);
+      if (beat) surge += 22;          // bounce on the kick
+      surge *= 0.82;                  // and settle back
+      scrollEl.scrollTop = Math.max(0, Math.min(base + surge, maxScroll));
+      if ((beat && dt >= minDwell) || dt >= maxDwell) {
+        beatRafRef.current = null;
+        setAutoplayIndex(i => i + 1);
+        return;
+      }
       beatRafRef.current = requestAnimationFrame(tick);
     };
     beatRafRef.current = requestAnimationFrame(tick);
@@ -760,7 +786,7 @@ export default function ReleaseClient({
       if (collyRef.current) (collyRef.current as HTMLElement).style.filter = "";
       isAutoScrolling.current = false;
     };
-  }, [autoplay, musicGroove, musicIsPlaying, isFullscreen, collyVisible, getMusicAnalyser]);
+  }, [autoplay, musicGroove, musicIsPlaying, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen, getMusicAnalyser]);
 
   useEffect(() => {
     if (!autoplay) return;
