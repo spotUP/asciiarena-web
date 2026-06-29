@@ -334,6 +334,7 @@ export default function ReleaseClient({
 
   const [autoplay, setAutoplay] = useState(false);
   const [autoplayIndex, setAutoplayIndex] = useState(0);
+  const autoplayDirRef = useRef(1); // +1 forward, -1 backward (ping-pong loop)
   // Groove mode: advance the slideshow on the music's beat instead of a timer.
   const [musicGroove, setMusicGroove] = useState(false);
   const { getAnalyser: getMusicAnalyser, playRandom: playRandomMusic, isPlaying: musicIsPlaying } = useMusic();
@@ -602,12 +603,28 @@ export default function ReleaseClient({
 
   const startAutoplay = useCallback(() => {
     if (collyDivRef.current) collyDivRef.current.scrollTop = 0;
+    autoplayDirRef.current = 1;
     setIsFullscreen(true);
     setAutoplayIndex(0);
     setAutoplay(true);
     // Groove mode: make sure a tune is playing so beats can drive the slideshow.
     if (musicGroove && !musicPlayingRef.current) void playRandomMusic();
   }, [musicGroove, playRandomMusic]);
+
+  // Advance to the next logo, ping-ponging at the ends so autoplay loops forever
+  // (forward to the last logo, then backward to the first, and so on).
+  const advanceAutoplay = useCallback(() => {
+    setAutoplayIndex((i) => {
+      const n = sections.length;
+      if (n <= 1) return 0;
+      let dir = autoplayDirRef.current;
+      let next = i + dir;
+      if (next >= n) { dir = -1; next = i - 1; }
+      else if (next < 0) { dir = 1; next = i + 1; }
+      autoplayDirRef.current = dir;
+      return Math.max(0, Math.min(next, n - 1));
+    });
+  }, [sections.length]);
 
   const scrollToSection = useCallback((section: LogoSection) => {
     const pre = collyRef.current as HTMLElement | null;
@@ -652,9 +669,9 @@ export default function ReleaseClient({
   useEffect(() => {
     if (!autoplay || !collyVisible) return;
     if (musicGroove) return;
-    if (autoplayIndex >= sections.length) { stopAutoplay(); return; }
+    if (!sections.length) { stopAutoplay(); return; }
 
-    const logoSection = sections[autoplayIndex];
+    const logoSection = sections[Math.min(autoplayIndex, sections.length - 1)];
     const pre         = collyRef.current as HTMLElement | null;
     if (!pre) return;
 
@@ -688,7 +705,7 @@ export default function ReleaseClient({
 
     autoplayTimerRef.current = setTimeout(() => {
       autoplayTimerRef.current = null;
-      setAutoplayIndex(i => i + 1);
+      advanceAutoplay();
     }, scrollMs + hold);
 
     return () => {
@@ -697,7 +714,7 @@ export default function ReleaseClient({
       if (autoScrollClearRef.current) { clearTimeout(autoScrollClearRef.current); autoScrollClearRef.current = null; }
       isAutoScrolling.current = false;
     };
-  }, [autoplay, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen, musicGroove]);
+  }, [autoplay, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen, musicGroove, advanceAutoplay]);
 
   // Groove autoplay: centre each logo (scroll-to-logo, like normal autoplay),
   // but ride the music while it's held — the view eases in to the logo, bounces
@@ -705,7 +722,7 @@ export default function ReleaseClient({
   // transients, and it advances to the next logo on a beat after a short dwell.
   useEffect(() => {
     if (!autoplay || !musicGroove || !collyVisible || !musicIsPlaying) return;
-    if (autoplayIndex >= sections.length) { stopAutoplay(); return; }
+    if (!sections.length) { stopAutoplay(); return; }
     const analyser = getMusicAnalyser();
     const pre = collyRef.current as HTMLElement | null;
     if (!analyser || !pre) return;
@@ -721,7 +738,7 @@ export default function ReleaseClient({
     const viewH = stage.clientHeight;
     const maxScroll = stage.scrollHeight - viewH;
     const originTop = preRect.top - stage.getBoundingClientRect().top + stage.scrollTop;
-    const target = computeScrollTarget(sections[autoplayIndex], { spacers: SPACERS, lineHeight, viewH, originTop, maxScroll });
+    const target = computeScrollTarget(sections[Math.min(autoplayIndex, sections.length - 1)], { spacers: SPACERS, lineHeight, viewH, originTop, maxScroll });
 
     const prevBehavior = scrollEl.style.scrollBehavior;
     scrollEl.style.scrollBehavior = "auto"; // per-frame writes must be instant
@@ -808,7 +825,7 @@ export default function ReleaseClient({
       scrollEl.scrollTop = Math.max(0, Math.min(base + surge, maxScroll));
       if ((kick && dt >= minDwell) || dt >= maxDwell) {
         beatRafRef.current = null;
-        setAutoplayIndex(i => i + 1);
+        advanceAutoplay();
         return;
       }
       beatRafRef.current = requestAnimationFrame(tick);
@@ -824,7 +841,7 @@ export default function ReleaseClient({
       warpDispRef.current?.setAttribute("scale", "0");
       isAutoScrolling.current = false;
     };
-  }, [autoplay, musicGroove, musicIsPlaying, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen, getMusicAnalyser]);
+  }, [autoplay, musicGroove, musicIsPlaying, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen, getMusicAnalyser, advanceAutoplay]);
 
   // Stop autoplay if the user scrolls the colly themselves. #colly-div is the
   // scroller in both modes now.
