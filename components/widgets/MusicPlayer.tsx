@@ -69,12 +69,12 @@ export default function MusicPlayer() {
       const bins = analyser.frequencyBinCount;
       const data = new Uint8Array(bins);
       analyser.getByteFrequencyData(data);
-      // Spectrum on the site's 8x16 grid: 8px-wide columns touching (no gap),
-      // height in stacked 8x16 blocks. Log frequency scale (bass spread,
-      // treble compressed) fills the width; gamma lift so quiet bands show.
+      // Spectrum: 8px-wide columns touching (no gap), smooth per-column height
+      // on a log frequency scale (bass spread, treble compressed). Smooth (not
+      // 16px-stepped) heights keep a proper tapering shape — quantizing to a few
+      // 16px blocks collapses loud tunes into solid horizontal bars.
       const barW = 8;
       const nBars = Math.max(1, Math.floor(cssW / barW));
-      const rows = Math.max(1, Math.floor(cssH / 16));
       const minBin = 1, maxBin = Math.min(bins - 1, 220);
       ctx.fillStyle = "#ff55ff";
       for (let i = 0; i < nBars; i++) {
@@ -83,8 +83,8 @@ export default function MusicPlayer() {
         let sum = 0, n = 0;
         for (let b = lo; b < hi && b < bins; b++) { sum += data[b]; n++; }
         const v = n ? sum / n / 255 : 0;
-        const level = Math.round(Math.pow(v, 0.9) * rows); // mild lift, avoids saturating to the top
-        for (let r = 0; r < level; r++) ctx.fillRect(i * barW, cssH - (r + 1) * 16, barW, 15);
+        const h = Math.max(1, Math.pow(v, 0.7) * cssH);
+        ctx.fillRect(i * barW, cssH - h, barW, h);
       }
     };
     draw();
