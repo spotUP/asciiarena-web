@@ -755,7 +755,7 @@ export default function ReleaseClient({
     const startT = performance.now();
     const minDwell = 2200;
     const maxDwell = 7000;
-    let baseline = 0, glow = 0, surge = 0;
+    let baseline = 0, glow = 0, surge = 0, glitch = 0;
     let base = scrollEl.scrollTop; // eases toward the logo's centred position
     isAutoScrolling.current = true;
 
@@ -766,10 +766,27 @@ export default function ReleaseClient({
       const e = lowBandEnergy(freq, 24);
       baseline = baseline === 0 ? e : baseline * 0.95 + e * 0.05;
       glow = glow * 0.6 + Math.min(Math.max(0, e - baseline) * 5, 0.7) * 0.4;
-      pre.style.filter = `brightness(${(1 + glow).toFixed(2)})`;
       const beat = detector.detect(e, now);
-      if (beat) surge += 22;          // bounce on the kick
-      surge *= 0.82;                  // and settle back
+      if (beat) { surge += 22; glitch = 1; } // bounce + glitch burst on the kick
+      surge *= 0.82;                          // and settle back
+      glitch *= 0.8;                          // glitch decays over ~150ms
+
+      // Music-synced glitch: RGB/chromatic split + VHS horizontal jitter + a
+      // skew/contrast hit, fired on each kick and decaying. The text-shadow
+      // (a full text repaint) only runs during the short burst, so it stays
+      // smooth between beats.
+      pre.style.filter = `brightness(${(1 + glow).toFixed(2)})` + (glitch > 0.6 ? " contrast(1.5)" : "");
+      if (glitch > 0.05) {
+        const split = (2 + glitch * 7).toFixed(1);
+        const jitter = ((Math.random() - 0.5) * glitch * 12).toFixed(1);
+        const skew = (glitch > 0.45 ? (Math.random() - 0.5) * glitch * 1.5 : 0).toFixed(2);
+        pre.style.textShadow = `${split}px 0 rgba(255,0,90,0.55), -${split}px 0 rgba(0,210,255,0.55)`;
+        pre.style.transform = `translateX(${jitter}px) skewX(${skew}deg)`;
+      } else if (pre.style.textShadow) {
+        pre.style.textShadow = "";
+        pre.style.transform = "";
+      }
+
       scrollEl.scrollTop = Math.max(0, Math.min(base + surge, maxScroll));
       if ((beat && dt >= minDwell) || dt >= maxDwell) {
         beatRafRef.current = null;
@@ -783,7 +800,8 @@ export default function ReleaseClient({
     return () => {
       if (beatRafRef.current != null) { cancelAnimationFrame(beatRafRef.current); beatRafRef.current = null; }
       scrollEl.style.scrollBehavior = prevBehavior;
-      if (collyRef.current) (collyRef.current as HTMLElement).style.filter = "";
+      const el = collyRef.current as HTMLElement | null;
+      if (el) { el.style.filter = ""; el.style.textShadow = ""; el.style.transform = ""; }
       isAutoScrolling.current = false;
     };
   }, [autoplay, musicGroove, musicIsPlaying, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen, getMusicAnalyser]);
