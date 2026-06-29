@@ -2,9 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { animateScroll } from "@/lib/animateScroll";
-import { computeMarkerPositions, type LogoIndexEntry } from "@/lib/logoSections";
+import { type LogoIndexEntry } from "@/lib/logoSections";
 
 export const MINIMAP_WIDTH = 88; // px — keep in sync with the container's right padding
+
+const LENS_A = 20; // peak extra weight at the cursor (magnification strength)
+const LENS_SIGMA = 14; // rows — how wide the lens spreads
 
 interface Props {
   /** The scroll container (#colly-div). */
@@ -19,23 +22,32 @@ interface Props {
   fgColor: string;
 }
 
-// A text-editor-style minimap: the whole colly rendered tiny (a dot per
-// non-space char) so you see the actual document shape, with a draggable
-// viewport thumb, click/drag-to-scroll, and a hover label for the nearest logo.
+interface Model {
+  yEdges: Float32Array; // output Y (css px) for each rendered row edge, length R+1
+  R: number; // total rendered rows
+  lineHeight: number;
+  cssH: number;
+}
+
+// A text-editor-style minimap with a fisheye lens: the whole colly is painted
+// tiny (a dot per non-space char), but rows near the cursor bulge larger so you
+// can make out individual logos to aim at, while the ends stay compressed.
 export default function LogoMinimap({ containerRef, preRef, entries, spacers, fgColor }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const modelRef = useRef<Model | null>(null);
+  const focusRef = useRef<number | null>(null); // focus row (lens centre), null = no lens
+  const draggingRef = useRef(false);
+  const drawRafRef = useRef<number | null>(null);
+  const scrollRafRef = useRef<number | null>(null);
   const [thumb, setThumb] = useState<{ top: number; height: number } | null>(null);
   const [hover, setHover] = useState<{ idx: number; y: number } | null>(null);
-  const dragging = useRef(false);
-  const rafRef = useRef<number | null>(null);
 
   const lineHeight = useCallback(() => {
     const pre = preRef.current;
     return (pre && parseFloat(getComputedStyle(pre).lineHeight)) || 16;
   }, [preRef]);
 
-  // Paint the thumbnail. Each non-space char becomes a tiny rect, positioned by
-  // the same line/column grid the <pre> uses, scaled to the track.
+  // Build the row->Y warp for the current focus and paint the thumbnail.
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
     const c = containerRef.current;
@@ -56,42 +68,91 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, fg
     const lines = text.split("\n");
     const lh = lineHeight();
     const scrollHeight = c.scrollHeight || 1;
+    const R = Math.max(1, Math.round(scrollHeight / lh));
+    const focus = focusRef.current;
+
+    // Weight each rendered row: uniform, plus a Gaussian bump at the cursor.
+    const yEdges = new Float32Array(R + 1);
+    let sum = 0;
+    const weights = new Float32Array(R);
+    for (let r = 0; r < R; r++) {
+      let w = 1;
+      if (focus != null) {
+        const d = r - focus;
+        w += LENS_A * Math.exp(-(d * d) / (2 * LENS_SIGMA * LENS_SIGMA));
+      }
+      weights[r] = w;
+      sum += w;
+    }
+    const scale = cssH / (sum || 1);
+    for (let r = 0; r < R; r++) yEdges[r + 1] = yEdges[r] + weights[r] * scale;
+    yEdges[R] = cssH;
+    modelRef.current = { yEdges, R, lineHeight: lh, cssH };
+
     let maxCols = 1;
     for (const l of lines) if (l.length > maxCols) maxCols = Math.min(l.length, 240);
-
     const scaleX = cssW / maxCols;
-    const pxPerLine = (lh / scrollHeight) * cssH; // height of one text row on the track
     const dotW = Math.max(0.6, scaleX);
-    const dotH = Math.max(0.6, pxPerLine);
 
     ctx.fillStyle = fgColor;
     ctx.globalAlpha = 0.85;
     for (let i = 0; i < lines.length; i++) {
+      const r = spacers + i;
+      if (r >= R) break;
+      const yTop = yEdges[r];
+      const h = Math.max(0.6, yEdges[r + 1] - yTop);
       const line = lines[i];
-      const y = (spacers + i) * pxPerLine;
-      if (y > cssH) break;
       for (let j = 0; j < line.length && j < maxCols; j++) {
         const ch = line.charCodeAt(j);
-        if (ch === 32 || ch === 9) continue; // space / tab
-        ctx.fillRect(j * scaleX, y, dotW, dotH);
+        if (ch === 32 || ch === 9) continue;
+        ctx.fillRect(j * scaleX, yTop, dotW, h);
       }
     }
     ctx.globalAlpha = 1;
   }, [containerRef, preRef, lineHeight, spacers, fgColor]);
 
+  // Interpolated output Y for a fractional rendered row.
+  const yAtRow = (m: Model, rowFloat: number) => {
+    const r = Math.max(0, Math.min(rowFloat, m.R));
+    const i = Math.min(Math.floor(r), m.R - 1);
+    const frac = r - i;
+    return m.yEdges[i] + (m.yEdges[i + 1] - m.yEdges[i]) * frac;
+  };
+
+  // Inverse: which rendered row sits at output Y (binary search the warp).
+  const rowAtY = (m: Model, y: number) => {
+    const yy = Math.max(0, Math.min(y, m.cssH));
+    let lo = 0;
+    let hi = m.R;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (m.yEdges[mid + 1] < yy) lo = mid + 1;
+      else hi = mid;
+    }
+    const span = m.yEdges[lo + 1] - m.yEdges[lo] || 1;
+    return lo + (yy - m.yEdges[lo]) / span;
+  };
+
   const updateThumb = useCallback(() => {
     const c = containerRef.current;
-    const canvas = canvasRef.current;
-    if (!c || !canvas) return;
-    const cssH = canvas.clientHeight;
-    const scrollHeight = c.scrollHeight || 1;
-    setThumb({
-      top: (c.scrollTop / scrollHeight) * cssH,
-      height: Math.max(16, (c.clientHeight / scrollHeight) * cssH),
-    });
+    const m = modelRef.current;
+    if (!c || !m) return;
+    const topRow = c.scrollTop / m.lineHeight;
+    const botRow = (c.scrollTop + c.clientHeight) / m.lineHeight;
+    const top = yAtRow(m, topRow);
+    setThumb({ top, height: Math.max(8, yAtRow(m, botRow) - top) });
   }, [containerRef]);
 
-  // Redraw on mount and whenever the container/content resizes (font load) or fg changes.
+  const scheduleDraw = useCallback(() => {
+    if (drawRafRef.current != null) return;
+    drawRafRef.current = requestAnimationFrame(() => {
+      drawRafRef.current = null;
+      draw();
+      updateThumb();
+    });
+  }, [draw, updateThumb]);
+
+  // Redraw on mount and whenever the container/content resizes or fg changes.
   useEffect(() => {
     draw();
     updateThumb();
@@ -117,68 +178,75 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, fg
     const c = containerRef.current;
     if (!c) return;
     const onScroll = () => {
-      if (rafRef.current != null) return;
-      rafRef.current = requestAnimationFrame(() => {
-        rafRef.current = null;
+      if (scrollRafRef.current != null) return;
+      scrollRafRef.current = requestAnimationFrame(() => {
+        scrollRafRef.current = null;
         updateThumb();
       });
     };
     c.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       c.removeEventListener("scroll", onScroll);
-      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+      if (scrollRafRef.current != null) cancelAnimationFrame(scrollRafRef.current);
     };
   }, [containerRef, updateThumb]);
 
-  // Map a pointer Y on the track to a scroll position (centred on the cursor).
   const scrollToPointer = useCallback(
     (clientY: number, smooth: boolean) => {
       const c = containerRef.current;
       const canvas = canvasRef.current;
-      if (!c || !canvas) return;
+      const m = modelRef.current;
+      if (!c || !canvas || !m) return;
       const rect = canvas.getBoundingClientRect();
-      const frac = Math.max(0, Math.min((clientY - rect.top) / rect.height, 1));
-      const target = Math.max(0, Math.min(frac * c.scrollHeight - c.clientHeight / 2, c.scrollHeight - c.clientHeight));
+      const row = rowAtY(m, clientY - rect.top);
+      const target = Math.max(0, Math.min(row * m.lineHeight - c.clientHeight / 2, c.scrollHeight - c.clientHeight));
       if (smooth) animateScroll(c, target, 350);
       else c.scrollTop = target;
     },
     [containerRef],
   );
 
-  const onPointerDown = (e: React.PointerEvent) => {
-    dragging.current = true;
-    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
-    scrollToPointer(e.clientY, false);
-  };
-  const onPointerMove = (e: React.PointerEvent) => {
-    if (dragging.current) {
-      scrollToPointer(e.clientY, false);
-      return;
-    }
-    // Hover: show the nearest logo's label.
+  const setFocusFromPointer = (clientY: number) => {
     const canvas = canvasRef.current;
-    const c = containerRef.current;
-    if (!canvas || !c || entries.length === 0) return;
+    const m = modelRef.current;
+    if (!canvas || !m) return;
     const rect = canvas.getBoundingClientRect();
-    const y = e.clientY - rect.top;
-    const tops = computeMarkerPositions(
-      entries.map((en) => en.section),
-      { spacers, lineHeight: lineHeight(), scrollHeight: c.scrollHeight || 1, trackHeight: rect.height },
-    );
+    // Centre the lens on the linear position under the cursor (stable to track).
+    focusRef.current = ((clientY - rect.top) / rect.height) * m.R;
+    scheduleDraw();
+    // Hover label: nearest logo to the row currently under the cursor.
+    const row = rowAtY(m, clientY - rect.top) - spacers;
     let best = 0;
     let bestD = Infinity;
-    tops.forEach((t, i) => {
-      const d = Math.abs(t - y);
+    entries.forEach((e, i) => {
+      const { inkTop, inkBottom } = e.section;
+      const d = row >= inkTop && row <= inkBottom ? 0 : Math.min(Math.abs(row - inkTop), Math.abs(row - inkBottom));
       if (d < bestD) {
         bestD = d;
         best = i;
       }
     });
-    setHover({ idx: best, y: tops[best] });
+    setHover({ idx: best, y: clientY - rect.top });
+  };
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    draggingRef.current = true;
+    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+    setFocusFromPointer(e.clientY);
+    scrollToPointer(e.clientY, false);
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    setFocusFromPointer(e.clientY);
+    if (draggingRef.current) scrollToPointer(e.clientY, false);
   };
   const endDrag = (e: React.PointerEvent) => {
-    dragging.current = false;
+    draggingRef.current = false;
     (e.target as HTMLElement).releasePointerCapture?.(e.pointerId);
+  };
+  const onLeave = () => {
+    focusRef.current = null;
+    setHover(null);
+    scheduleDraw();
   };
 
   if (entries.length < 2) return null;
@@ -189,7 +257,7 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, fg
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endDrag}
-      onPointerLeave={() => setHover(null)}
+      onPointerLeave={onLeave}
       style={{
         position: "absolute",
         top: 0,
