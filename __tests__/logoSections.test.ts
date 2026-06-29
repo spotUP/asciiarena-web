@@ -82,7 +82,41 @@ const LOGO_B = colly(
 );
 const WITH_DIVIDERS = colly(DIVIDER, "", LOGO_A, "", DIVIDER, "", LOGO_B, "", DIVIDER, "");
 
+// A divider frame repeated between logos, GLUED to each following logo with no
+// blank line (the hos-afro case). The frame shape recurs across islands; the
+// interior name text varies. Autoplay must scroll past the divider to each
+// logo, so the divider rows must not appear in any section.
+const DIVIDER_TOP = (name: string) => `+-+-+ ${name} +-+-+`; // names same length -> same shape
+const DIVIDER_BOT = "+------------------+";
+const GLUED_DIVIDERS = colly(
+  DIVIDER_TOP("LOGOONE1"),
+  DIVIDER_BOT,
+  "/\\/\\/\\ ___ /\\/\\/\\ ___ /\\",
+  "|  |  | /   \\ |  |  | /   \\|",
+  "|__|__| \\___/ |__|__| \\___/|",
+  "",
+  DIVIDER_TOP("LOGOTWO2"),
+  DIVIDER_BOT,
+  "_____ /\\ _____ /\\ _____ /\\__",
+  "|   |/  \\|   |/  \\|   |/   \\",
+  "|___|\\__/|___|\\__/|___|\\___/",
+  "",
+  DIVIDER_TOP("LOGOTRE3"),
+  DIVIDER_BOT,
+  "  __/\\__  __/\\__  __/\\__  _",
+  " /      \\/      \\/      \\/ ",
+  " \\______/\\______/\\______/\\ ",
+  "",
+);
+
 describe("detectLogoSections", () => {
+  it("scrolls past a repeated divider glued to each logo (no pause on dividers)", () => {
+    const secs = detectLogoSections(GLUED_DIVIDERS);
+    expect(secs).toHaveLength(3); // the three logos, not the dividers
+    expect(secs.map((s) => s.startLine)).toEqual([2, 8, 14]); // each starts at its logo art
+    expect(secs.every((s) => s.lineCount === 3)).toBe(true); // divider rows excluded
+  });
+
   it("merges a logo split by a single internal blank line into one section", () => {
     const secs = detectLogoSections(SPLIT_LOGO);
     expect(secs).toHaveLength(1);

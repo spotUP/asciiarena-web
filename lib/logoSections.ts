@@ -70,26 +70,31 @@ interface Island {
   kind: IslandKind;
 }
 
+type RawIsland = Omit<Island, "fp" | "kind">;
+
+function islandFromRange(metas: LineMeta[], start: number, end: number): RawIsland {
+  const blockMetas = metas.slice(start, end + 1);
+  let left = Infinity;
+  let right = -1;
+  let maxWidth = 0;
+  for (const m of blockMetas) {
+    if (m.left >= 0 && m.left < left) left = m.left;
+    if (m.right > right) right = m.right;
+    if (m.width > maxWidth) maxWidth = m.width;
+  }
+  return { startLine: start, endLine: end, metas: blockMetas, left: left === Infinity ? 0 : left, right, maxWidth };
+}
+
 // Split the text into maximal runs of non-blank lines.
-function scanIslands(lines: string[], metas: LineMeta[]): Omit<Island, "fp" | "kind">[] {
-  const out: Omit<Island, "fp" | "kind">[] = [];
+function scanIslands(metas: LineMeta[]): RawIsland[] {
+  const out: RawIsland[] = [];
   let i = 0;
-  while (i < lines.length) {
-    while (i < lines.length && metas[i].blank) i++;
-    if (i >= lines.length) break;
+  while (i < metas.length) {
+    while (i < metas.length && metas[i].blank) i++;
+    if (i >= metas.length) break;
     const start = i;
-    while (i < lines.length && !metas[i].blank) i++;
-    const end = i - 1;
-    const blockMetas = metas.slice(start, end + 1);
-    let left = Infinity;
-    let right = -1;
-    let maxWidth = 0;
-    for (const m of blockMetas) {
-      if (m.left >= 0 && m.left < left) left = m.left;
-      if (m.right > right) right = m.right;
-      if (m.width > maxWidth) maxWidth = m.width;
-    }
-    out.push({ startLine: start, endLine: end, metas: blockMetas, left: left === Infinity ? 0 : left, right, maxWidth });
+    while (i < metas.length && !metas[i].blank) i++;
+    out.push(islandFromRange(metas, start, i - 1));
   }
   return out;
 }
@@ -112,9 +117,44 @@ export function detectLogoSections(html: string): LogoSection[] {
   const metas = lines.map(lineMeta);
   const pageWidth = metas.reduce((m, x) => Math.max(m, x.width), 0) || 1;
 
-  const raw = scanIslands(lines, metas);
+  // A divider frame recurs *between* logos, so its line shapes show up in many
+  // separate islands (interior text varies but `norm` flattens it); logo art
+  // lines are unique. Count how many distinct islands each shape appears in —
+  // not raw occurrences, so a logo with an internally-repeated row isn't
+  // mistaken for a divider. A shape present in >=3 islands is a divider row,
+  // even when the divider is glued to a logo with no blank line (which is why
+  // fingerprinting the island as a whole missed it: the logo's varying line
+  // made the fingerprint unique).
+  const shapes = lines.map((l, i) => (metas[i].blank ? "" : norm(l)));
+  const rawAll = scanIslands(metas);
+  const shapeIslandCount = new Map<string, number>();
+  for (const isl of rawAll) {
+    const seen = new Set<string>();
+    for (let r = isl.startLine; r <= isl.endLine; r++) {
+      const sh = shapes[r];
+      if (sh && !seen.has(sh)) {
+        seen.add(sh);
+        shapeIslandCount.set(sh, (shapeIslandCount.get(sh) ?? 0) + 1);
+      }
+    }
+  }
+  const STRUCT_MIN = 3;
+  const structural = shapes.map((sh) => sh !== "" && (shapeIslandCount.get(sh) ?? 0) >= STRUCT_MIN);
 
-  // Fingerprint every island; any shape that repeats 2+ times is a divider frame.
+  // Trim divider rows glued to the top/bottom of each island, and drop islands
+  // that are entirely divider rows. Edge-trimming (vs removing every structural
+  // line) keeps textured logos with internal repeats intact.
+  const raw: RawIsland[] = [];
+  for (const isl of rawAll) {
+    let s = isl.startLine;
+    let e = isl.endLine;
+    while (s <= e && structural[s]) s++;
+    while (e >= s && structural[e]) e--;
+    if (s <= e) raw.push(islandFromRange(metas, s, e));
+  }
+
+  // Fingerprint remaining islands; any that still repeats 2+ times (a divider
+  // that appears only twice, below STRUCT_MIN, and is blank-separated) is a divider.
   const fpCount = new Map<string, number>();
   const fps = raw.map((isl) => norm(lines[isl.startLine]) + "|" + norm(lines[isl.endLine]));
   fps.forEach((fp) => fpCount.set(fp, (fpCount.get(fp) ?? 0) + 1));
@@ -122,9 +162,6 @@ export function detectLogoSections(html: string): LogoSection[] {
   const islands: Island[] = raw.map((isl, n) => {
     const fp = fps[n];
     const everyLineFrame = isl.metas.every((m) => m.distinct <= 2);
-    // Repeating shapes and pure frames are dividers; everything else is a logo
-    // candidate. Short narrow text labels are not special-cased here — they fail
-    // the width/height gate below, which is the single place that decision lives.
     const kind: IslandKind = (fpCount.get(fp) ?? 0) >= 2 || everyLineFrame ? "divider" : "logo";
     return { ...isl, fp, kind };
   });
