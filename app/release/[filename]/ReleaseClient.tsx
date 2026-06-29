@@ -707,33 +707,26 @@ export default function ReleaseClient({
     const advance = () => setAutoplayIndex(i => i + 1);
 
     if (analyser) {
-      // Groove mode: the logo pulses on every kick (so it feels alive between
-      // changes) and advances after a few beats — beat-locked, not on a flat
-      // timer. Falls back to a max dwell if the music has no clear beat.
-      const detector = new BeatDetector({ sensitivity: 1.28, refractoryMs: 130, floor: 0.015, windowSize: 32 });
+      // Groove mode: the logo's brightness tracks the live music energy every
+      // frame, so it visibly breathes/pulses with the track (this peaks on
+      // kicks on beat-heavy tunes and still moves on sparse ones — robust to
+      // tune variety). Advance lands on the next detected beat after a short
+      // dwell, with a max-dwell fallback.
+      const detector = new BeatDetector({ sensitivity: 1.25, refractoryMs: 130, floor: 0.01, windowSize: 32 });
       const startT = performance.now();
-      const minDwell = scrollMs + 900;
-      const maxDwell = scrollMs + 6000;
-      const BEATS_TO_ADVANCE = 4;
-      let beats = 0;
+      const minDwell = scrollMs + 1600;
+      const maxDwell = scrollMs + 5000;
       const freq = new Uint8Array(analyser.frequencyBinCount);
-      // Brightness flash on each kick — feels alive, and (unlike a transform)
-      // never shifts the centred logo.
-      const pulse = () => {
-        const el = collyRef.current as HTMLElement | null;
-        if (!el) return;
-        el.style.transition = "filter 60ms ease-out";
-        el.style.filter = "brightness(1.7)";
-        window.setTimeout(() => {
-          const e = collyRef.current as HTMLElement | null;
-          if (e) e.style.filter = "";
-        }, 80);
-      };
+      let energySm = 0; // smoothed energy for a steady baseline glow
       const tick = (now: number) => {
         const dt = now - startT;
         analyser.getByteFrequencyData(freq);
-        if (detector.detect(lowBandEnergy(freq, 10), now)) { beats++; pulse(); }
-        if ((beats >= BEATS_TO_ADVANCE && dt >= minDwell) || dt >= maxDwell) {
+        const e = lowBandEnergy(freq, 24); // low-mid loudness, 0..1
+        energySm = energySm * 0.6 + e * 0.4;
+        const el = collyRef.current as HTMLElement | null;
+        if (el) el.style.filter = `brightness(${(1 + energySm * 1.2).toFixed(2)})`;
+        const beat = detector.detect(e, now);
+        if ((beat && dt >= minDwell) || dt >= maxDwell) {
           beatRafRef.current = null;
           advance();
           return;
