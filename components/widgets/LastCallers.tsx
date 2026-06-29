@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
 import { unstable_cache } from "next/cache";
 import PrintLines from "@/components/ui/PrintLines";
-import LocalTime from "@/components/widgets/LocalTime";
+import RelativeTime from "@/components/widgets/RelativeTime";
 
 export type LastCallersProps = {
   limit?: number;
@@ -46,7 +46,7 @@ export default async function LastCallers({ limit = 5 }: LastCallersProps) {
                 >
                   {row.nick}
                 </Link>
-                <LocalTime unix={row.timestamp} className="text-truncate" />
+                <RelativeTime unix={row.timestamp} className="text-truncate" />
               </div>
             ))}
             </PrintLines>

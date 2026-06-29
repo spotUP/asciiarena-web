@@ -79,3 +79,23 @@ export function apiError(msg: string, status = 400) {
 export function apiOk(data: unknown, status = 200) {
   return NextResponse.json(data, { status });
 }
+
+// Compact relative time ("now", "5m", "2h", "3d", "2w", "4mo", "1y") for the
+// elapsed time since a Unix timestamp (seconds). `nowMs` is injected so it's
+// pure and testable. Used by the Last Callers widget — relative time is always
+// monotonic in a newest-first list and sidesteps timezone confusion entirely.
+export function formatRelativeTime(unixSeconds: number, nowMs: number): string {
+  const diff = Math.max(0, Math.floor(nowMs / 1000) - Math.floor(unixSeconds));
+  if (diff < 60) return diff <= 1 ? "now" : `${diff}s`;
+  const m = Math.floor(diff / 60);
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(diff / 3600);
+  if (h < 24) return `${h}h`;
+  const d = Math.floor(diff / 86400);
+  if (d < 7) return `${d}d`;
+  const w = Math.floor(diff / 604800);
+  if (w < 5) return `${w}w`;
+  const mo = Math.floor(diff / 2592000);
+  if (mo < 12) return `${mo}mo`;
+  return `${Math.floor(diff / 31536000)}y`;
+}
