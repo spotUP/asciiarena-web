@@ -787,15 +787,16 @@ export default function ReleaseClient({
       warp *= 0.9;        // warp lingers longer (~0.7s) so the bend reads
       sparkle *= 0.75;
 
-      // glow: gentle loudness breathing + a small treble sparkle pop (toned down)
-      glow = glow * 0.6 + Math.min(Math.max(0, eGlow - baseline) * 2 + sparkle * 0.3, 0.5) * 0.4;
+      // glow: very gentle loudness breathing + a tiny treble sparkle (kept
+      // subtle — the bright flashes were annoying)
+      glow = glow * 0.6 + Math.min(Math.max(0, eGlow - baseline) * 1.1 + sparkle * 0.1, 0.16) * 0.4;
 
       const useWarp = warp > 0.02;
       stage.style.filter = `brightness(${(1 + glow).toFixed(2)})`
         + (useWarp ? " url(#vhsWarp)" : "")
         + (glitch > 0.7 ? " contrast(1.3)" : "");
       if (useWarp) {
-        warpDispRef.current?.setAttribute("scale", (warp * 70).toFixed(1)); // much stronger bend
+        warpDispRef.current?.setAttribute("scale", (warp * 35).toFixed(1)); // half-strength bend
         warpTurbRef.current?.setAttribute("seed", String(Math.floor(now / 60) % 200));
       } else {
         warpDispRef.current?.setAttribute("scale", "0");
