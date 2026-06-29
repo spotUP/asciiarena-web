@@ -751,7 +751,8 @@ export default function ReleaseClient({
     const prevBehavior = scrollEl.style.scrollBehavior;
     scrollEl.style.scrollBehavior = "auto"; // per-frame writes must be instant
     const freq = new Uint8Array(analyser.frequencyBinCount);
-    const detector = new BeatDetector({ sensitivity: 1.25, refractoryMs: 130, floor: 0.01, windowSize: 32 });
+    // Narrow low band (~kick) for beat detection; wide band for the glow.
+    const detector = new BeatDetector({ sensitivity: 1.18, refractoryMs: 120, floor: 0.012, windowSize: 36 });
     const startT = performance.now();
     const minDwell = 2200;
     const maxDwell = 7000;
@@ -763,10 +764,11 @@ export default function ReleaseClient({
       const dt = now - startT;
       base += (target - base) * 0.16; // ease in to the centred logo
       analyser.getByteFrequencyData(freq);
-      const e = lowBandEnergy(freq, 24);
-      baseline = baseline === 0 ? e : baseline * 0.95 + e * 0.05;
-      glow = glow * 0.6 + Math.min(Math.max(0, e - baseline) * 5, 0.7) * 0.4;
-      const beat = detector.detect(e, now);
+      const eGlow = lowBandEnergy(freq, 24); // wide low-mid loudness for the glow
+      const eKick = lowBandEnergy(freq, 5);  // narrow low band for the kick
+      baseline = baseline === 0 ? eGlow : baseline * 0.95 + eGlow * 0.05;
+      glow = glow * 0.6 + Math.min(Math.max(0, eGlow - baseline) * 5, 0.7) * 0.4;
+      const beat = detector.detect(eKick, now);
       if (beat) { surge += 22; glitch = 1; } // bounce + glitch burst on the kick
       surge *= 0.82;                          // and settle back
       glitch *= 0.8;                          // glitch decays over ~150ms
