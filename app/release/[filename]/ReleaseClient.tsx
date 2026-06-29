@@ -18,6 +18,7 @@ import {
   detectLogoSections,
   buildLogoIndex,
   computeScrollTarget,
+  pingPongNext,
   type LogoSection,
 } from "@/lib/logoSections";
 import LogoMinimap, { MINIMAP_WIDTH } from "./LogoMinimap";
@@ -615,14 +616,9 @@ export default function ReleaseClient({
   // (forward to the last logo, then backward to the first, and so on).
   const advanceAutoplay = useCallback(() => {
     setAutoplayIndex((i) => {
-      const n = sections.length;
-      if (n <= 1) return 0;
-      let dir = autoplayDirRef.current;
-      let next = i + dir;
-      if (next >= n) { dir = -1; next = i - 1; }
-      else if (next < 0) { dir = 1; next = i + 1; }
-      autoplayDirRef.current = dir;
-      return Math.max(0, Math.min(next, n - 1));
+      const r = pingPongNext(i, autoplayDirRef.current, sections.length);
+      autoplayDirRef.current = r.dir;
+      return r.index;
     });
   }, [sections.length]);
 

@@ -281,6 +281,18 @@ export function buildLogoIndex(html: string, sections: LogoSection[]): LogoIndex
   });
 }
 
+// Ping-pong index stepping for looping autoplay: advance by dir, reversing at
+// either end so it bounces forward-then-backward forever. Returns the next
+// index and the (possibly flipped) direction.
+export function pingPongNext(i: number, dir: number, n: number): { index: number; dir: number } {
+  if (n <= 1) return { index: 0, dir };
+  let d = dir;
+  let next = i + d;
+  if (next >= n) { d = -1; next = i - 1; }
+  else if (next < 0) { d = 1; next = i + 1; }
+  return { index: Math.max(0, Math.min(next, n - 1)), dir: d };
+}
+
 // Pure geometry for centring a logo's ink box vertically in the viewport.
 // Extracted so it can be unit-tested without a DOM.
 //

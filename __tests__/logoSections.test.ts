@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "fs";
 import { join } from "path";
-import { detectLogoSections, computeScrollTarget } from "@/lib/logoSections";
+import { detectLogoSections, computeScrollTarget, pingPongNext } from "@/lib/logoSections";
 
 const colly = (...lines: string[]) => lines.join("\n");
 
@@ -164,6 +164,32 @@ describe("detectLogoSections", () => {
       expect(s.startLine).toBeGreaterThan(prevEnd); // ordered, non-overlapping
       prevEnd = s.endLine;
     }
+  });
+});
+
+describe("pingPongNext", () => {
+  it("advances forward in the middle", () => {
+    expect(pingPongNext(2, 1, 5)).toEqual({ index: 3, dir: 1 });
+  });
+
+  it("reverses at the last logo (forward -> backward)", () => {
+    expect(pingPongNext(4, 1, 5)).toEqual({ index: 3, dir: -1 });
+  });
+
+  it("reverses at the first logo (backward -> forward)", () => {
+    expect(pingPongNext(0, -1, 5)).toEqual({ index: 1, dir: 1 });
+  });
+
+  it("loops forever (a full there-and-back cycle never stops)", () => {
+    let i = 0, dir = 1;
+    const seen: number[] = [];
+    for (let s = 0; s < 8; s++) { const r = pingPongNext(i, dir, 3); i = r.index; dir = r.dir; seen.push(i); }
+    // 0 ->1->2->1->0->1->2->1->0  (bounces between 0 and 2 indefinitely)
+    expect(seen).toEqual([1, 2, 1, 0, 1, 2, 1, 0]);
+  });
+
+  it("stays put for a single-logo colly", () => {
+    expect(pingPongNext(0, 1, 1)).toEqual({ index: 0, dir: 1 });
   });
 });
 
