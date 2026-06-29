@@ -1622,13 +1622,11 @@ input[type="password"]:active {
   content: "Alert" !important;
 }
 
+/* Fullscreen just enlarges the art; the #colly-div container becomes the
+   fixed, viewport-sized stage (see ReleaseClient) so SVG filters can render. */
 .fullscreen{
-  position: absolute !important;
-  top:0;
   font-size: 32px !important;
   line-height: 32px !important;
-  z-index: 999998 !important;
-  width: 80vw !important;
 }
 
 #blacker{

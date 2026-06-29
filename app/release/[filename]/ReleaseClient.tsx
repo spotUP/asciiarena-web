@@ -601,7 +601,7 @@ export default function ReleaseClient({
   }, []);
 
   const startAutoplay = useCallback(() => {
-    document.documentElement.scrollTop = 0;
+    if (collyDivRef.current) collyDivRef.current.scrollTop = 0;
     setIsFullscreen(true);
     setAutoplayIndex(0);
     setAutoplay(true);
@@ -611,24 +611,16 @@ export default function ReleaseClient({
 
   const scrollToSection = useCallback((section: LogoSection) => {
     const pre = collyRef.current as HTMLElement | null;
-    if (!pre) return;
+    const container = collyDivRef.current;
+    if (!pre || !container) return;
     const lineHeight = parseFloat(getComputedStyle(pre).lineHeight) || 16;
     const SPACERS    = 4;
     const preRect = pre.getBoundingClientRect();
-    if (isFullscreen) {
-      const viewH  = window.innerHeight;
-      const originTop = preRect.top + document.documentElement.scrollTop;
-      const target = computeScrollTarget(section, { spacers: SPACERS, lineHeight, viewH, originTop, maxScroll: document.documentElement.scrollHeight - viewH });
-      animateScroll(document.documentElement, target, 500);
-    } else {
-      const container = collyDivRef.current;
-      if (!container) return;
-      const viewH  = container.clientHeight;
-      const originTop = preRect.top - container.getBoundingClientRect().top + container.scrollTop;
-      const target = computeScrollTarget(section, { spacers: SPACERS, lineHeight, viewH, originTop, maxScroll: container.scrollHeight - viewH });
-      animateScroll(container, target, 500);
-    }
-  }, [isFullscreen]);
+    const viewH  = container.clientHeight;
+    const originTop = preRect.top - container.getBoundingClientRect().top + container.scrollTop;
+    const target = computeScrollTarget(section, { spacers: SPACERS, lineHeight, viewH, originTop, maxScroll: container.scrollHeight - viewH });
+    animateScroll(container, target, 500);
+  }, []);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -669,24 +661,13 @@ export default function ReleaseClient({
     const lineHeight = parseFloat(getComputedStyle(pre).lineHeight) || 16;
     const SPACERS    = 4;
 
+    // #colly-div is the scroller in both modes (fixed viewport stage in fullscreen).
+    const scrollEl = collyDivRef.current;
+    if (!scrollEl) return;
     const preRect = pre.getBoundingClientRect();
-    let scrollEl: HTMLElement;
-    let viewH: number;
-    let maxScroll: number;
-    let originTop: number;
-    if (isFullscreen) {
-      scrollEl  = document.documentElement;
-      viewH     = window.innerHeight;
-      maxScroll = document.documentElement.scrollHeight - viewH;
-      originTop = preRect.top + document.documentElement.scrollTop;
-    } else {
-      const container = collyDivRef.current;
-      if (!container) return;
-      scrollEl  = container;
-      viewH     = container.clientHeight;
-      maxScroll = container.scrollHeight - viewH;
-      originTop = preRect.top - container.getBoundingClientRect().top + container.scrollTop;
-    }
+    const viewH = scrollEl.clientHeight;
+    const maxScroll = scrollEl.scrollHeight - viewH;
+    const originTop = preRect.top - scrollEl.getBoundingClientRect().top + scrollEl.scrollTop;
 
     const target   = computeScrollTarget(logoSection, { spacers: SPACERS, lineHeight, viewH, originTop, maxScroll });
     const hold     = Math.min(4000 + Math.max(0, logoSection.lineCount - 20) * 15, 8000);
@@ -731,24 +712,15 @@ export default function ReleaseClient({
 
     const lineHeight = parseFloat(getComputedStyle(pre).lineHeight) || 16;
     const SPACERS = 4;
+    // #colly-div is the scroller AND the filter stage (viewport-sized, so the
+    // warp/glow filters actually render — they're dropped on the huge <pre>).
+    const stage = collyDivRef.current;
+    if (!stage) return;
+    const scrollEl = stage;
     const preRect = pre.getBoundingClientRect();
-    let scrollEl: HTMLElement;
-    let viewH: number;
-    let maxScroll: number;
-    let originTop: number;
-    if (isFullscreen) {
-      scrollEl = document.documentElement;
-      viewH = window.innerHeight;
-      maxScroll = document.documentElement.scrollHeight - viewH;
-      originTop = preRect.top + document.documentElement.scrollTop;
-    } else {
-      const container = collyDivRef.current;
-      if (!container) return;
-      scrollEl = container;
-      viewH = container.clientHeight;
-      maxScroll = container.scrollHeight - viewH;
-      originTop = preRect.top - container.getBoundingClientRect().top + container.scrollTop;
-    }
+    const viewH = stage.clientHeight;
+    const maxScroll = stage.scrollHeight - viewH;
+    const originTop = preRect.top - stage.getBoundingClientRect().top + stage.scrollTop;
     const target = computeScrollTarget(sections[autoplayIndex], { spacers: SPACERS, lineHeight, viewH, originTop, maxScroll });
 
     const prevBehavior = scrollEl.style.scrollBehavior;
@@ -792,10 +764,12 @@ export default function ReleaseClient({
       // skew/contrast hit, fired on each kick and decaying. The text-shadow
       // (a full text repaint) only runs during the short burst, so it stays
       // smooth between beats.
+      // Filter/warp/transform go on the viewport-sized STAGE (renders); the
+      // RGB split is text-shadow on the pre (needs the glyphs).
       const useWarp = warp > 0.03;
-      pre.style.filter = `brightness(${(1 + glow).toFixed(2)})`
+      stage.style.filter = `brightness(${(1 + glow).toFixed(2)})`
         + (useWarp ? " url(#vhsWarp)" : "")
-        + (glitch > 0.6 ? " contrast(1.5)" : "");
+        + (glitch > 0.6 ? " contrast(1.4)" : "");
       if (useWarp) {
         warpDispRef.current?.setAttribute("scale", (warp * 26).toFixed(1));
         // jump the noise so the bend wobbles like unstable VHS tracking
@@ -808,10 +782,10 @@ export default function ReleaseClient({
         const jitter = ((Math.random() - 0.5) * glitch * 12).toFixed(1);
         const skew = (glitch > 0.45 ? (Math.random() - 0.5) * glitch * 1.5 : 0).toFixed(2);
         pre.style.textShadow = `${split}px 0 rgba(255,0,90,0.55), -${split}px 0 rgba(0,210,255,0.55)`;
-        pre.style.transform = `translateX(${jitter}px) skewX(${skew}deg)`;
+        stage.style.transform = `translateX(${jitter}px) skewX(${skew}deg)`;
       } else if (pre.style.textShadow) {
         pre.style.textShadow = "";
-        pre.style.transform = "";
+        stage.style.transform = "";
       }
 
       scrollEl.scrollTop = Math.max(0, Math.min(base + surge, maxScroll));
@@ -827,22 +801,21 @@ export default function ReleaseClient({
     return () => {
       if (beatRafRef.current != null) { cancelAnimationFrame(beatRafRef.current); beatRafRef.current = null; }
       scrollEl.style.scrollBehavior = prevBehavior;
-      const el = collyRef.current as HTMLElement | null;
-      if (el) { el.style.filter = ""; el.style.textShadow = ""; el.style.transform = ""; }
+      stage.style.filter = "";
+      stage.style.transform = "";
+      if (collyRef.current) (collyRef.current as HTMLElement).style.textShadow = "";
       warpDispRef.current?.setAttribute("scale", "0");
       isAutoScrolling.current = false;
     };
   }, [autoplay, musicGroove, musicIsPlaying, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen, getMusicAnalyser]);
 
+  // Stop autoplay if the user scrolls the colly themselves. #colly-div is the
+  // scroller in both modes now.
   useEffect(() => {
     if (!autoplay) return;
-    const onScroll = () => { if (!isAutoScrolling.current) stopAutoplay(); };
-    if (isFullscreen) {
-      window.addEventListener("scroll", onScroll, { passive: true });
-      return () => window.removeEventListener("scroll", onScroll);
-    }
     const container = collyDivRef.current;
     if (!container) return;
+    const onScroll = () => { if (!isAutoScrolling.current) stopAutoplay(); };
     container.addEventListener("scroll", onScroll, { passive: true });
     return () => container.removeEventListener("scroll", onScroll);
   }, [autoplay, stopAutoplay, isFullscreen]);
@@ -1107,7 +1080,16 @@ export default function ReleaseClient({
         <div
           ref={collyDivRef}
           id="colly-div"
-          style={{ display: "flex", justifyContent: "center", alignItems: "flex-start", overflowY: "scroll", overflowX: "hidden", height: "100vh", backgroundColor: bgColor, margin: 0, padding: 0, paddingRight: !isFullscreen && type === "ASCII" && logoIndex.length > 1 ? `${MINIMAP_WIDTH}px` : 0 }}
+          style={{
+            display: "flex", justifyContent: "center", alignItems: "flex-start",
+            overflowY: "scroll", overflowX: "hidden", height: "100vh",
+            backgroundColor: bgColor, margin: 0, padding: 0,
+            paddingRight: !isFullscreen && type === "ASCII" && logoIndex.length > 1 ? `${MINIMAP_WIDTH}px` : 0,
+            // Fullscreen: become the fixed, viewport-sized stage so CSS/SVG
+            // filters (the groove warp/glow) render — they're dropped on the
+            // full-height <pre>.
+            ...(isFullscreen ? { position: "fixed" as const, top: 0, left: 0, width: "100vw", height: "100vh", zIndex: 999998 } : {}),
+          }}
         >
           {indexOpen && logoIndex.length > 0 && (
             <div style={{
