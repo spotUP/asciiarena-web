@@ -1134,27 +1134,26 @@ export default function ReleaseClient({
           </div>
 
           {/* Clickable index of all entries — jump to (and render) any one.
-              Styled like the "More by" sidebar widget: 3-column magenta links. */}
-          <div className="bg-secondary amb-1 ap-1">
-            <div className="row">
-              {archiveFiles.map((entry, i) => (
-                <div key={entry} className="col-12 col-sm-6 col-md-4 text-truncate apl-1 apb-1">
-                  <button
-                    type="button"
-                    className={hiddenEntries.has(entry) ? "lightgrey" : "magenta"}
-                    title={entry}
-                    onClick={() => document.getElementById(`archive-entry-${i}`)?.scrollIntoView({ block: "start" })}
-                    style={{
-                      background: "transparent", border: "none", padding: 0, cursor: "pointer",
-                      fontFamily: "inherit", fontSize: "inherit", textAlign: "left",
-                      width: "100%", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-                    }}
-                  >
-                    {hiddenEntries.has(entry) ? "[hidden] " : ""}{entry.split("/").pop()}
-                  </button>
-                </div>
-              ))}
-            </div>
+              Magenta hover links like the sidebar widgets, 3 compact columns. */}
+          <div className="bg-secondary amb-1 ap-1" style={{ columns: "260px 3", columnGap: "16px" }}>
+            {archiveFiles.map((entry, i) => (
+              <button
+                key={entry}
+                type="button"
+                className={hiddenEntries.has(entry) ? "lightgrey" : "magenta"}
+                title={entry}
+                onClick={() => document.getElementById(`archive-entry-${i}`)?.scrollIntoView({ block: "start" })}
+                style={{
+                  display: "block", width: "100%", breakInside: "avoid",
+                  background: "transparent", border: "none", cursor: "pointer",
+                  padding: 0, margin: 0, lineHeight: "1.5", textAlign: "left",
+                  fontFamily: "inherit", fontSize: "inherit",
+                  whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                }}
+              >
+                {hiddenEntries.has(entry) ? "[hidden] " : ""}{entry.split("/").pop()}
+              </button>
+            ))}
           </div>
 
           {archiveFiles.map((entry, i) => (
