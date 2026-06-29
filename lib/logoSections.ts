@@ -296,3 +296,18 @@ export function computeScrollTarget(
   const boxH = (s.inkBottom - s.inkTop + 1) * o.lineHeight;
   return Math.max(0, Math.min(boxTop - (o.viewH - boxH) / 2, o.maxScroll));
 }
+
+// Pure geometry for the scrollbar minimap: map each logo's ink-box centre to a
+// pixel offset on a track of height trackHeight, proportional to where the logo
+// sits in the full scroll content. Extracted so it can be unit-tested.
+export function computeMarkerPositions(
+  sections: Pick<LogoSection, "inkTop" | "inkBottom">[],
+  o: { spacers: number; lineHeight: number; scrollHeight: number; trackHeight: number },
+): number[] {
+  const denom = o.scrollHeight || 1;
+  return sections.map((s) => {
+    const centrePx = (o.spacers + (s.inkTop + s.inkBottom) / 2) * o.lineHeight;
+    const top = (centrePx / denom) * o.trackHeight;
+    return Math.max(0, Math.min(top, o.trackHeight));
+  });
+}

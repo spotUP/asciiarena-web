@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "fs";
 import { join } from "path";
-import { detectLogoSections, computeScrollTarget } from "@/lib/logoSections";
+import { detectLogoSections, computeScrollTarget, computeMarkerPositions } from "@/lib/logoSections";
 
 const colly = (...lines: string[]) => lines.join("\n");
 
@@ -183,6 +183,33 @@ describe("computeScrollTarget", () => {
 
   it("clamps to maxScroll for a logo past the bottom", () => {
     expect(computeScrollTarget({ inkTop: 5000, inkBottom: 5010 }, opts)).toBe(10000);
+  });
+
+  it("computeMarkerPositions places markers proportional to scroll position", () => {
+    // scrollHeight 1000px, track 100px, lineHeight 10, spacers 0.
+    // A logo centred at line 50 -> 500px -> 50% -> 50px on the track.
+    const tops = computeMarkerPositions([{ inkTop: 48, inkBottom: 52 }], {
+      spacers: 0,
+      lineHeight: 10,
+      scrollHeight: 1000,
+      trackHeight: 100,
+    });
+    expect(tops[0]).toBe(50);
+  });
+
+  it("computeMarkerPositions keeps markers ordered and clamped to the track", () => {
+    const tops = computeMarkerPositions(
+      [
+        { inkTop: 0, inkBottom: 2 },
+        { inkTop: 40, inkBottom: 60 },
+        { inkTop: 900, inkBottom: 999 },
+      ],
+      { spacers: 4, lineHeight: 16, scrollHeight: 1000 * 16, trackHeight: 200 },
+    );
+    expect(tops[0]).toBeLessThan(tops[1]);
+    expect(tops[1]).toBeLessThan(tops[2]);
+    expect(Math.min(...tops)).toBeGreaterThanOrEqual(0);
+    expect(Math.max(...tops)).toBeLessThanOrEqual(200);
   });
 
   it("offsets by the pre's origin so logos don't land low (fullscreen offset bug)", () => {

@@ -20,6 +20,7 @@ import {
   computeScrollTarget,
   type LogoSection,
 } from "@/lib/logoSections";
+import LogoMinimap from "./LogoMinimap";
 
 const COLOR_OPTIONS = [
   { value: "#555555", label: "Bright Black" },
@@ -961,6 +962,7 @@ export default function ReleaseClient({
       {/* ASCII text viewer — Amiga ASCII collys + archive-extracted content.
           PC/CP437 art skips this and renders on the canvas viewer below. */}
       {!useCanvasViewer && (type === "ASCII" || !!fileContent) && collyVisible && (
+        <div style={{ position: "relative" }}>
         <div
           ref={collyDivRef}
           id="colly-div"
@@ -1000,6 +1002,16 @@ export default function ReleaseClient({
             style={{ overflow: "hidden", fontFamily: `${font}, TopazPlus_a1200, "Courier New", Consolas, monospace`, fontSize: "16px", lineHeight: "1", color: fgColor, whiteSpace: "pre", fontFeatureSettings: "normal", fontKerning: "none", textRendering: "optimizeSpeed" }}
             dangerouslySetInnerHTML={{ __html: "<br><br><br><br>" + fileContent + "<br><br><br><br>" }}
           />
+        </div>
+        {!isFullscreen && type === "ASCII" && (
+          <LogoMinimap
+            containerRef={collyDivRef}
+            preRef={collyRef}
+            entries={logoIndex}
+            spacers={4}
+            onJump={scrollToSection}
+          />
+        )}
         </div>
       )}
 
