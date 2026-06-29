@@ -22,6 +22,7 @@ export const WIDGET_KEYS = [
   "activity_feed",
   "ced_sessions",
   "now_playing",
+  "music_player",
   "last_callers",
   "poll_latest_closed",
   "latest_collys_released",
@@ -56,6 +57,7 @@ export const WIDGET_LABELS: Record<WidgetKey, string> = {
   activity_feed: "Live Feed",
   ced_sessions: "Editing in CED",
   now_playing: "Playing in HippoPlayer",
+  music_player: "Modland Music Player",
   last_callers: "Last Callers",
   latest_collys_released: "New Collys",
   latest_collys_added: "Latest Added Collys",
@@ -82,7 +84,7 @@ export const WIDGET_GROUPS: { label: string; keys: WidgetKey[] }[] = [
   {
     label: "Left sidebar",
     keys: [
-      "users_online", "activity_feed", "ced_sessions", "now_playing", "last_callers",
+      "users_online", "activity_feed", "ced_sessions", "now_playing", "music_player", "last_callers",
       "poll_latest_closed",
       "latest_collys_released", "latest_collys_added", "latest_mags",
       "latest_apps", "new_users", "weektop",

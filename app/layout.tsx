@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ChatProvider from "@/components/chat/ChatProvider";
 import { ChatContextProvider } from "@/components/chat/ChatContext";
+import MusicProvider from "@/components/music/MusicProvider";
 import CaretOverlay from "@/components/ui/CaretOverlay";
 import { ToastProvider } from "@/components/ui/ToastProvider";
 import "@/app/globals.css";
@@ -61,10 +62,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body suppressHydrationWarning>
         <ToastProvider>
-          <ChatContextProvider>
-            {children}
-            <ChatProvider />
-          </ChatContextProvider>
+          <MusicProvider>
+            <ChatContextProvider>
+              {children}
+              <ChatProvider />
+            </ChatContextProvider>
+          </MusicProvider>
         </ToastProvider>
         <CaretOverlay />
       </body>

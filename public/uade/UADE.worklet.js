@@ -1,0 +1,2368 @@
+/**
+ * UADE.worklet.js — AudioWorklet processor for UADE exotic Amiga format playback
+ *
+ * Runs inside an AudioWorkletGlobalScope (separate thread from main JS).
+ * Communicates with UADEEngine.ts via port messages.
+ *
+ * Message protocol (from main thread):
+ *   { type: 'init', sampleRate, wasmBinary }
+ *   { type: 'load', buffer: ArrayBuffer, filenameHint: string }
+ *   { type: 'play' }
+ *   { type: 'stop' }
+ *   { type: 'pause' }
+ *   { type: 'setSubsong', index: number }
+ *   { type: 'setLooping', value: boolean }
+ *   { type: 'dispose' }
+ *
+ * Messages sent to main thread:
+ *   { type: 'ready' }                            — WASM initialized
+ *   { type: 'loaded', player, formatName, subsongCount, minSubsong, maxSubsong }
+ *   { type: 'error', message }                   — Load/init error
+ *   { type: 'songEnd' }                          — Song playback finished
+ *   { type: 'position', subsong, position }      — Periodic position update
+ */
+
+class UADEProcessor extends AudioWorkletProcessor {
+  constructor() {
+    super();
+
+    this._wasm = null;         // Emscripten module instance
+    this._ready = false;
+    this._playing = false;
+    this._paused = false;
+    this._lastData = null;       // Last loaded file bytes (for subsong re-scan)
+    this._lastHint = '';
+    this._currentSubsong = 0;    // Last requested subsong index (preserved across reloads)
+    this._companionFiles = new Map();  // filename → Uint8Array, survives WASM reinit
+
+    // Float32 output buffers allocated in WASM heap
+    this._outL = null;
+    this._outR = null;
+    this._outFrames = 256;    // Larger than 128 to handle render calls > quantum size
+    this._needsReload = false; // Set after stop so next play() reloads from _lastData
+    this._lastLoadFailed = false; // Set when _uade_wasm_load returns non-zero (unsupported file)
+    this._wasmCorrupted = false;  // Set when WASM abort/malloc failure — forces full reinit
+
+    // Live tick capture: drain tick snapshots during playback for pattern reconstruction
+    this._liveTickCapture = false;     // Enabled via 'enableLiveTickCapture' message
+    this._liveTickDrainBuf = null;     // WASM-heap buffer for draining (allocated once)
+    this._lastTickDrain = 0;           // currentTime of last drain
+
+    this.port.onmessage = (event) => this._handleMessage(event.data);
+  }
+
+  async _handleMessage(data) {
+    switch (data.type) {
+      case 'init':
+        await this._init(data.sampleRate, data.wasmBinary, data.jsCode);
+        break;
+
+      case 'load':
+        await this._load(data.buffer, data.filenameHint, data.subsong || 0, data.skipScan || false, data.scanTimeoutSec);
+        break;
+
+      case 'reinit':
+        // Preemptive reinit — called from import dialog to avoid delay during playback
+        if ((this._hasRendered || this._lastLoadFailed || this._wasmCorrupted) && this._wasmBinary) {
+          if (this._wasmCorrupted) {
+            // True corruption — hard reinit
+            console.log('[UADE.worklet] Preemptive hard reinit (corrupted)');
+            this._wasm = null;
+            this._ready = false;
+            this._hasRendered = false;
+            this._lastLoadFailed = false;
+            this._wasmCorrupted = false;
+            await this._init(this._sampleRate, this._wasmBinary, null);
+          } else {
+            // Soft reset — no new memory
+            console.log('[UADE.worklet] Preemptive soft reset');
+            try {
+              const ret = this._wasm._uade_wasm_full_reset();
+              if (ret !== 0) {
+                console.warn('[UADE.worklet] Soft reset failed, falling back to hard reinit');
+                this._wasm = null;
+                this._ready = false;
+                await this._init(this._sampleRate, this._wasmBinary, null);
+              }
+              this._hasRendered = false;
+              this._lastLoadFailed = false;
+            } catch (e) {
+              console.warn('[UADE.worklet] Soft reset threw, hard reinit');
+              this._wasm = null;
+              this._ready = false;
+              this._hasRendered = false;
+              this._lastLoadFailed = false;
+              this._wasmCorrupted = false;
+              await this._init(this._sampleRate, this._wasmBinary, null);
+            }
+          }
+        }
+        break;
+
+      case 'addCompanionFile':
+        this._addCompanionFile(data.filename, data.buffer);
+        break;
+
+      case 'play':
+        // If the song was stopped (or ended), reload it from _lastData before playing.
+        // _uade_wasm_stop() tears down the WASM player state; just setting _playing=true
+        // would cause _uade_wasm_render() to return 0 (ended) immediately → silence.
+        if (this._needsReload && this._lastData && this._wasm && this._ready) {
+          try {
+            this._wasm._uade_wasm_stop();
+            const reloadRet = this._loadIntoWasm(this._lastData, this._lastHint);
+            if (reloadRet !== 0) {
+              console.error('[UADE.worklet] Failed to reload song for play (ret=' + reloadRet + ')');
+              this._lastLoadFailed = true;
+              this.port.postMessage({ type: 'error', message: 'Failed to reload song for playback' });
+              break;
+            }
+            if (this._currentSubsong > 0) {
+              this._wasm._uade_wasm_set_subsong(this._currentSubsong);
+            }
+            this._needsReload = false;
+          } catch (reloadErr) {
+            console.error('[UADE.worklet] Reload threw:', reloadErr.message || reloadErr);
+            if (!this._wasmCorrupted) this._lastLoadFailed = true;
+            this.port.postMessage({ type: 'error', message: 'Failed to reload song for playback' });
+            break;
+          }
+        }
+        this._playing = true;
+        this._paused = false;
+        break;
+
+      case 'stop':
+        if (this._wasm && this._ready) {
+          this._wasm._uade_wasm_stop();
+        }
+        this._playing = false;
+        this._paused = false;
+        this._needsReload = true; // Next play() must reload — stop tears down WASM state
+        break;
+
+      case 'pause':
+        this._paused = !this._paused;
+        break;
+
+      case 'setSubsong':
+        if (this._wasm && this._ready) {
+          this._currentSubsong = data.index;
+          this._wasm._uade_wasm_set_subsong(data.index);
+        }
+        break;
+
+      case 'setLooping':
+        if (this._wasm && this._ready) {
+          this._wasm._uade_wasm_set_looping(data.value ? 1 : 0);
+        }
+        break;
+
+      case 'dispose':
+        if (this._wasm && this._ready) {
+          this._wasm._uade_wasm_cleanup();
+        }
+        this._ready = false;
+        this._playing = false;
+        break;
+
+      case 'renderFull':
+        this._renderFullSong(data.subsong);
+        break;
+
+      case 'scanSubsong':
+        this._scanSubsong(data.subsong);
+        break;
+
+      case 'isolateChannel':
+        this._scanInstrumentIsolated(data.channelIndex, data.durationMs || 30000);
+        break;
+
+      case 'setInstrumentSample': {
+        if (!this._wasm || !this._ready) {
+          console.warn('[UADE.worklet] setInstrumentSample called before WASM ready — ignoring');
+          break;
+        }
+        if (!this._wasm._uade_wasm_write_memory) {
+          console.warn('[UADE.worklet] _uade_wasm_write_memory not available in this WASM build');
+          break;
+        }
+        const { samplePtr, pcmData } = data;
+        const bytes = new Uint8Array(pcmData);
+        const buf = this._wasm._malloc(bytes.byteLength);
+        if (!buf) {
+          console.error('[UADE.worklet] malloc failed for sample write-back (' + bytes.byteLength + ' bytes)');
+          break;
+        }
+        this._wasm.HEAPU8.set(bytes, buf);
+        this._wasm._uade_wasm_write_memory(samplePtr, buf, bytes.byteLength);
+        this._wasm._free(buf);
+        console.log('[UADE.worklet] Wrote ' + bytes.byteLength + ' bytes to chip RAM @ 0x' + samplePtr.toString(16));
+        break;
+      }
+
+      case 'readString': {
+        // Read a null-terminated string from Amiga chip RAM.
+        // Responds with { type: 'readStringResult', requestId, value } on success
+        // or { type: 'readStringError', requestId, message } on failure.
+        const { requestId, addr, maxLen = 22 } = data;
+        if (!this._wasm || !this._ready) {
+          this.port.postMessage({ type: 'readStringError', requestId, message: 'WASM not ready' });
+          break;
+        }
+        if (!this._wasm._uade_wasm_read_string) {
+          this.port.postMessage({ type: 'readStringError', requestId, message: '_uade_wasm_read_string not in WASM build' });
+          break;
+        }
+        const clampedLen = Math.min(Math.max(maxLen, 1), 256);
+        const strBuf = this._wasm._malloc(clampedLen + 1);
+        if (!strBuf) {
+          this.port.postMessage({ type: 'readStringError', requestId, message: 'malloc failed' });
+          break;
+        }
+        this._wasm._uade_wasm_read_string(addr, strBuf, clampedLen + 1);
+        // Read back from WASM heap as UTF-8 string
+        let str = '';
+        for (let i = 0; i < clampedLen; i++) {
+          const c = this._wasm.HEAPU8[strBuf + i];
+          if (c === 0) break;
+          str += String.fromCharCode(c);
+        }
+        this._wasm._free(strBuf);
+        this.port.postMessage({ type: 'readStringResult', requestId, value: str });
+        break;
+      }
+
+      case 'scanMemory': {
+        // Scan Amiga chip RAM for a magic byte sequence.
+        // Responds with { type: 'scanMemoryResult', requestId, addr } (addr=-1 if not found)
+        // or { type: 'scanMemoryError', requestId, message } on failure.
+        const { requestId, magic, searchLen = 524288 } = data;
+        if (!this._wasm || !this._ready) {
+          this.port.postMessage({ type: 'scanMemoryError', requestId, message: 'WASM not ready' });
+          break;
+        }
+        if (!this._wasm._uade_wasm_read_memory) {
+          this.port.postMessage({ type: 'scanMemoryError', requestId, message: '_uade_wasm_read_memory not available' });
+          break;
+        }
+        const magicBytes = new Uint8Array(magic);
+        const mLen = magicBytes.length;
+        if (mLen === 0) {
+          this.port.postMessage({ type: 'scanMemoryResult', requestId, addr: 0 });
+          break;
+        }
+        // Read chip RAM in 4KB chunks and search for the magic sequence
+        const CHUNK_SIZE = 4096;
+        const readBuf = this._wasm._malloc(CHUNK_SIZE + mLen);
+        if (!readBuf) {
+          this.port.postMessage({ type: 'scanMemoryError', requestId, message: 'malloc failed' });
+          break;
+        }
+        let foundAddr = -1;
+        outer: for (let base = 0; base < searchLen; base += CHUNK_SIZE) {
+          const toRead = Math.min(CHUNK_SIZE + mLen - 1, searchLen - base);
+          if (toRead < mLen) break;
+          this._wasm._uade_wasm_read_memory(base, readBuf, toRead);
+          const chunk = this._wasm.HEAPU8;
+          for (let i = 0; i <= toRead - mLen; i++) {
+            let match = true;
+            for (let j = 0; j < mLen; j++) {
+              if (chunk[readBuf + i + j] !== magicBytes[j]) { match = false; break; }
+            }
+            if (match) { foundAddr = base + i; break outer; }
+          }
+        }
+        this._wasm._free(readBuf);
+        this.port.postMessage({ type: 'scanMemoryResult', requestId, addr: foundAddr });
+        break;
+      }
+
+      case 'readMemory': {
+        const { requestId, addr, length } = data;
+        if (!this._wasm || !this._ready) {
+          this.port.postMessage({ type: 'readMemoryError', requestId, error: 'WASM not ready' });
+          break;
+        }
+        try {
+          const ptr = this._wasm._malloc(length);
+          if (!ptr) {
+            this.port.postMessage({ type: 'readMemoryError', requestId, error: 'malloc failed' });
+            break;
+          }
+          this._wasm._uade_wasm_read_memory(addr, ptr, length);
+          const result = new Uint8Array(this._wasm.HEAPU8.buffer, ptr, length).slice();
+          this._wasm._free(ptr);
+          this.port.postMessage({ type: 'readMemoryResult', requestId, data: result.buffer }, [result.buffer]);
+        } catch (e) {
+          this.port.postMessage({ type: 'readMemoryError', requestId, error: String(e) });
+        }
+        break;
+      }
+      case 'writeMemory': {
+        const { requestId, addr, data: writeData } = data;
+        if (!this._wasm || !this._ready) {
+          this.port.postMessage({ type: 'writeMemoryError', requestId, error: 'WASM not ready' });
+          break;
+        }
+        try {
+          const bytes = new Uint8Array(writeData);
+          const ptr = this._wasm._malloc(bytes.length);
+          if (!ptr) {
+            this.port.postMessage({ type: 'writeMemoryError', requestId, error: 'malloc failed' });
+            break;
+          }
+          this._wasm.HEAPU8.set(bytes, ptr);
+          this._wasm._uade_wasm_write_memory(addr, ptr, bytes.length);
+          this._wasm._free(ptr);
+          this.port.postMessage({ type: 'writeMemoryResult', requestId });
+        } catch (e) {
+          this.port.postMessage({ type: 'writeMemoryError', requestId, error: String(e) });
+        }
+        break;
+      }
+
+      case 'enablePaulaLog': {
+        const { enable } = data;
+        if (!this._wasm || !this._ready) {
+          console.warn('[UADE.worklet] enablePaulaLog called before WASM ready — ignoring');
+          break;
+        }
+        if (!this._wasm._uade_wasm_enable_paula_log) {
+          console.warn('[UADE.worklet] _uade_wasm_enable_paula_log not in WASM build — ignoring');
+          break;
+        }
+        this._wasm._uade_wasm_enable_paula_log(enable ? 1 : 0);
+        break;
+      }
+
+      case 'getPaulaLog': {
+        const { requestId } = data;
+        if (!this._wasm || !this._ready) {
+          this.port.postMessage({ type: 'paulaLogError', requestId, error: 'WASM not ready' });
+          break;
+        }
+        if (!this._wasm._uade_wasm_get_paula_log) {
+          this.port.postMessage({ type: 'paulaLogError', requestId, error: '_uade_wasm_get_paula_log not in WASM build' });
+          break;
+        }
+        try {
+          const maxEntries = 512;
+          const ptr = this._wasm._malloc(maxEntries * 3 * 4); // 3 uint32 per entry
+          if (!ptr) {
+            this.port.postMessage({ type: 'paulaLogError', requestId, error: 'malloc failed' });
+            break;
+          }
+          const count = this._wasm._uade_wasm_get_paula_log(ptr, maxEntries);
+          const raw = new Uint32Array(this._wasm.HEAPU8.buffer, ptr, count * 3);
+          const entries = [];
+          for (let i = 0; i < count; i++) {
+            const w0 = raw[i * 3 + 0];
+            entries.push({
+              channel:    (w0 >>> 24) & 0xFF,
+              reg:        (w0 >>> 16) & 0xFF,
+              value:      w0 & 0xFFFF,
+              sourceAddr: raw[i * 3 + 1],
+              tick:       raw[i * 3 + 2],
+            });
+          }
+          this._wasm._free(ptr);
+          this.port.postMessage({ type: 'paulaLogResult', requestId, entries });
+        } catch (e) {
+          this.port.postMessage({ type: 'paulaLogError', requestId, error: String(e) });
+        }
+        break;
+      }
+
+      case 'enableTickSnapshots': {
+        const { enable } = data;
+        if (!this._wasm || !this._ready) {
+          console.warn('[UADE.worklet] enableTickSnapshots called before WASM ready — ignoring');
+          break;
+        }
+        if (!this._wasm._uade_wasm_enable_tick_snapshots) {
+          console.warn('[UADE.worklet] _uade_wasm_enable_tick_snapshots not in WASM build — ignoring');
+          break;
+        }
+        this._wasm._uade_wasm_enable_tick_snapshots(enable ? 1 : 0);
+        break;
+      }
+      case 'resetTickSnapshots': {
+        if (!this._wasm || !this._ready) break;
+        this._wasm?._uade_wasm_reset_tick_snapshots?.();
+        break;
+      }
+      case 'getTickSnapshots': {
+        const { requestId } = data;
+        if (!this._wasm || !this._ready) {
+          this.port.postMessage({ type: 'tickSnapshotsError', requestId, error: 'WASM not ready' });
+          break;
+        }
+        if (!this._wasm._uade_wasm_get_tick_snapshots) {
+          this.port.postMessage({ type: 'tickSnapshotsError', requestId, error: '_uade_wasm_get_tick_snapshots not in WASM build' });
+          break;
+        }
+        try {
+          const maxSnaps = 4096;
+          const wordsPerSnap = 13;
+          const ptr = this._wasm._malloc(maxSnaps * wordsPerSnap * 4);
+          if (!ptr) {
+            this.port.postMessage({ type: 'tickSnapshotsError', requestId, error: 'malloc failed' });
+            break;
+          }
+          const count = this._wasm._uade_wasm_get_tick_snapshots(ptr, maxSnaps);
+          const raw = new Uint32Array(this._wasm.HEAPU8.buffer, ptr, count * wordsPerSnap);
+          const snapshots = [];
+          for (let i = 0; i < count; i++) {
+            const base = i * wordsPerSnap;
+            const channels = [];
+            for (let ch = 0; ch < 4; ch++) {
+              const w0 = raw[base + 1 + ch * 3 + 0];
+              const w1 = raw[base + 1 + ch * 3 + 1];
+              const w2 = raw[base + 1 + ch * 3 + 2];
+              channels.push({
+                period:    (w0 >>> 16) & 0xFFFF,
+                volume:    w0 & 0xFFFF,
+                lc:        w1,
+                len:       (w2 >>> 8) & 0xFFFF,
+                dmaEn:     (w2 >>> 1) & 1,
+                triggered: w2 & 1,
+              });
+            }
+            snapshots.push({ tick: raw[base], channels });
+          }
+          this._wasm._free(ptr);
+          this.port.postMessage({ type: 'tickSnapshotsResult', requestId, snapshots });
+        } catch (e) {
+          this.port.postMessage({ type: 'tickSnapshotsError', requestId, error: String(e) });
+        }
+        break;
+      }
+
+      case 'setMuteMask': {
+        const { mask } = data;
+        if (this._wasm && this._wasm._uade_wasm_mute_channels) {
+          this._wasm._uade_wasm_mute_channels(mask & 0x0F);
+        }
+        break;
+      }
+
+      // --- Per-channel effect isolation ---
+      case 'addIsolation': {
+        const { slotIndex, channelMask } = data;
+        if (slotIndex >= 0 && slotIndex < 4) {
+          this._isolationSlots[slotIndex] = { channelMask };
+          this.port.postMessage({ type: 'isolationReady', slotIndex, channelMask });
+        }
+        break;
+      }
+      case 'removeIsolation': {
+        if (data.slotIndex >= 0 && data.slotIndex < 4) {
+          this._isolationSlots[data.slotIndex] = null;
+        }
+        break;
+      }
+      case 'diagIsolation': {
+        const activeSlots = this._isolationSlots
+          .map((s, i) => s ? { slot: i, mask: '0x' + s.channelMask.toString(16) } : null)
+          .filter(Boolean);
+        this.port.postMessage({ type: 'diagIsolation', slots: activeSlots });
+        break;
+      }
+
+      // --- Per-channel dub sends — Paula has 4 channels; indices >=4 are no-ops.
+      case 'dubChannelEnable': {
+        const ch = data.channel ?? data.val?.channel;
+        if (typeof ch === 'number' && ch >= 0 && ch < 4) {
+          this._dubChannelEnabled[ch] = true;
+        }
+        break;
+      }
+      case 'dubChannelDisable': {
+        const ch = data.channel ?? data.val?.channel;
+        if (typeof ch === 'number' && ch >= 0 && ch < 4) {
+          this._dubChannelEnabled[ch] = false;
+        }
+        break;
+      }
+      case 'dubChannelDisableAll': {
+        for (let i = 0; i < 4; i++) this._dubChannelEnabled[i] = false;
+        break;
+      }
+      case 'diagDub': {
+        this.port.postMessage({
+          type: 'diagDub',
+          dubChannelEnabled: [...this._dubChannelEnabled],
+          activeCount: this._dubChannelEnabled.filter(Boolean).length,
+          paulaChannels: 4,
+        });
+        break;
+      }
+
+      case 'enableOsc':
+        this._oscEnabled = true;
+        this._oscLastSendTime = 0;
+        // Allocate per-channel snapshot buffers (4 Paula channels, 256 samples each)
+        this._oscSnapshots = [
+          new Int16Array(256), new Int16Array(256),
+          new Int16Array(256), new Int16Array(256),
+        ];
+        this._oscWritePos = 0;
+        break;
+
+      case 'disableOsc':
+        this._oscEnabled = false;
+        this._oscSnapshots = null;
+        break;
+
+      case 'enableLiveTickCapture': {
+        const { enable } = data;
+        this._liveTickCapture = !!enable;
+        if (this._wasm && this._wasm._uade_wasm_enable_tick_snapshots) {
+          this._wasm._uade_wasm_enable_tick_snapshots(enable ? 1 : 0);
+          if (enable) {
+            this._wasm._uade_wasm_reset_tick_snapshots?.();
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  async _init(sampleRate, wasmBinary, jsCode) {
+    console.log('[UADE.worklet] _init called, sampleRate=' + sampleRate +
+      ', wasmBinary=' + (wasmBinary ? wasmBinary.byteLength + ' bytes' : 'null') +
+      ', jsCode=' + (jsCode ? jsCode.length + ' chars' : 'null'));
+    try {
+      // Polyfill browser globals for Emscripten in worklet context.
+      // AudioWorkletGlobalScope is neither a Worker nor a Window, so
+      // Emscripten's environment detection fails. We polyfill the globals
+      // it checks for so it recognizes this as a "worker" environment.
+      if (!globalThis.self) {
+        globalThis.self = globalThis;
+      }
+      // Emscripten checks `typeof importScripts === 'function'` to detect
+      // worker environment. AudioWorklet doesn't have importScripts.
+      if (typeof globalThis.importScripts === 'undefined') {
+        globalThis.importScripts = function() {
+          console.warn('[UADE.worklet] importScripts called (no-op in AudioWorklet)');
+        };
+      }
+      // Emscripten also checks `globalThis.WorkerGlobalScope` to confirm
+      // it's running in a web/worker context. AudioWorklet lacks this.
+      if (!globalThis.WorkerGlobalScope) {
+        globalThis.WorkerGlobalScope = true;
+      }
+      if (typeof globalThis.document === 'undefined') {
+        globalThis.document = {
+          createElement: () => ({
+            setAttribute: () => {},
+            appendChild: () => {},
+            style: {},
+            addEventListener: () => {},
+          }),
+          head: { appendChild: () => {} },
+          body: { appendChild: () => {} },
+          createTextNode: () => ({}),
+          getElementById: () => null,
+          querySelector: () => null,
+        };
+      }
+      if (typeof globalThis.location === 'undefined') {
+        globalThis.location = { href: '.', pathname: '/' };
+      }
+      if (typeof globalThis.performance === 'undefined') {
+        globalThis.performance = { now: () => Date.now() };
+      }
+      // TextEncoder polyfill — not available in AudioWorkletGlobalScope
+      if (typeof globalThis.TextEncoder === 'undefined') {
+        globalThis.TextEncoder = class {
+          encode(str) {
+            const buf = new Uint8Array(str.length * 3);
+            let pos = 0;
+            for (let i = 0; i < str.length; i++) {
+              let c = str.charCodeAt(i);
+              if (c < 0x80) {
+                buf[pos++] = c;
+              } else if (c < 0x800) {
+                buf[pos++] = 0xc0 | (c >> 6);
+                buf[pos++] = 0x80 | (c & 0x3f);
+              } else {
+                buf[pos++] = 0xe0 | (c >> 12);
+                buf[pos++] = 0x80 | ((c >> 6) & 0x3f);
+                buf[pos++] = 0x80 | (c & 0x3f);
+              }
+            }
+            return buf.slice(0, pos);
+          }
+        };
+      }
+      // TextDecoder polyfill — needed by Emscripten's UTF8ToString
+      if (typeof globalThis.TextDecoder === 'undefined') {
+        globalThis.TextDecoder = class {
+          decode(buf) {
+            const bytes = new Uint8Array(buf.buffer || buf, buf.byteOffset || 0, buf.byteLength || buf.length);
+            let str = '';
+            for (let i = 0; i < bytes.length; i++) {
+              const b = bytes[i];
+              if (b < 0x80) {
+                if (b === 0) break;
+                str += String.fromCharCode(b);
+              } else if (b < 0xe0) {
+                str += String.fromCharCode(((b & 0x1f) << 6) | (bytes[++i] & 0x3f));
+              } else {
+                str += String.fromCharCode(((b & 0x0f) << 12) | ((bytes[++i] & 0x3f) << 6) | (bytes[++i] & 0x3f));
+              }
+            }
+            return str;
+          }
+        };
+      }
+
+      // Execute Emscripten JS via Function constructor (importScripts not available in AudioWorklet)
+      if (jsCode && typeof globalThis.createUADE === 'undefined') {
+        console.log('[UADE.worklet] Executing Emscripten JS via new Function()...');
+        const wrappedCode = jsCode + '\nreturn createUADE;';
+        const factory = new Function(wrappedCode);
+        const result = factory();
+        if (typeof result === 'function') {
+          globalThis.createUADE = result;
+          console.log('[UADE.worklet] createUADE factory installed');
+        } else {
+          console.error('[UADE.worklet] new Function() did not return a function, got:', typeof result);
+        }
+      }
+
+      if (!globalThis.createUADE) {
+        throw new Error('createUADE factory not available (jsCode=' + (jsCode ? 'present' : 'missing') + ')');
+      }
+
+      // Pre-compile the WASM module on first init (slow ~2s).
+      // On reinit, reuse the compiled module (fast ~50ms).
+      if (!this._compiledModule && wasmBinary) {
+        this.port.postMessage({ type: 'initProgress', phase: 'compiling', progress: 10 });
+        console.log('[UADE.worklet] Compiling WASM module (' + wasmBinary.byteLength + ' bytes)...');
+        const t0 = performance.now();
+        this._compiledModule = await WebAssembly.compile(wasmBinary);
+        console.log('[UADE.worklet] WASM compiled in ' + Math.round(performance.now() - t0) + 'ms');
+        this.port.postMessage({ type: 'initProgress', phase: 'compiled', progress: 50 });
+      }
+
+      // Instantiate using pre-compiled module (fast) or raw binary (first time fallback)
+      this._lastAbortReason = null;
+      const self = this;
+      const emscriptenOpts = {
+        onAbort(reason) {
+          console.error('[UADE.worklet] WASM aborted:', reason);
+          self._lastAbortReason = reason;
+        },
+        print(text) {
+          console.log('[UADE-stdout]', text);
+        },
+        printErr(text) {
+          console.error('[UADE-stderr]', text);
+        },
+      };
+      if (this._compiledModule) {
+        // Fast path: instantiate from pre-compiled module
+        emscriptenOpts.instantiateWasm = (imports, successCallback) => {
+          WebAssembly.instantiate(this._compiledModule, imports).then(instance => {
+            successCallback(instance);
+          });
+          return {};
+        };
+      } else if (wasmBinary) {
+        emscriptenOpts.wasmBinary = wasmBinary;
+      }
+      this.port.postMessage({ type: 'initProgress', phase: 'instantiating', progress: 60 });
+      const t1 = performance.now();
+      this._wasm = await globalThis.createUADE(emscriptenOpts);
+      console.log('[UADE.worklet] WASM instantiated in ' + Math.round(performance.now() - t1) + 'ms');
+      this.port.postMessage({ type: 'initProgress', phase: 'instantiated', progress: 80 });
+
+      // Allocate float32 buffers in WASM heap for audio output
+      const frameBytes = this._outFrames * 4;  // float32
+      this._ptrL = this._wasm._malloc(frameBytes);
+      this._ptrR = this._wasm._malloc(frameBytes);
+
+      // Per-channel isolation buffers (4 Paula channels)
+      this._chPtrs = [
+        this._wasm._malloc(frameBytes),
+        this._wasm._malloc(frameBytes),
+        this._wasm._malloc(frameBytes),
+        this._wasm._malloc(frameBytes),
+      ];
+      this._isolationSlots = [null, null, null, null];
+      // Per-channel dub-send flags — Paula has 4 channels so the API caps at 4
+      // even though the worklet exposes 32 outputs for consistency with
+      // LibOpenMPT (DUB_OUTPUT_BASE=5, MAX_DUB_CHANNELS=32). Indices ≥4 are
+      // no-ops on UADE. See src/engine/tone/ChannelRoutedEffects.ts.
+      this._dubChannelEnabled = [false, false, false, false];
+
+      // Initialize UADE engine
+      const ret = this._wasm._uade_wasm_init(sampleRate || 44100);
+      if (ret !== 0) {
+        throw new Error('uade_wasm_init failed with code ' + ret);
+      }
+
+      console.log('[UADE.worklet] UADE engine initialized successfully');
+      this._wasmBinary = wasmBinary; // Keep for reinit after load failure
+      this._sampleRate = sampleRate || 44100;
+      this._ready = true;
+      this.port.postMessage({ type: 'initProgress', phase: 'ready', progress: 100 });
+      this.port.postMessage({ type: 'ready' });
+    } catch (err) {
+      let errMsg;
+      if (err instanceof Error) {
+        errMsg = err.message + (err.stack ? '\n' + err.stack : '');
+      } else if (typeof err === 'string') {
+        errMsg = err;
+      } else if (err && typeof err === 'object') {
+        errMsg = err.message || err.what || err.status || JSON.stringify(err);
+      } else {
+        errMsg = String(err);
+      }
+      console.error('[UADE.worklet] Init failed:', errMsg);
+      this.port.postMessage({ type: 'error', message: errMsg });
+    }
+  }
+
+  _addCompanionFile(filename, buffer) {
+    // Always cache companion files so they survive WASM reinit
+    const data = new Uint8Array(buffer);
+    this._companionFiles.set(filename, data.slice(0));
+
+    if (!this._wasm || !this._ready) {
+      console.log('[UADE.worklet] addCompanionFile cached (WASM not ready yet): ' + filename);
+      return;
+    }
+    const ptr = this._wasm._malloc(data.byteLength);
+    if (!ptr) {
+      console.error('[UADE.worklet] malloc failed for companion file: ' + filename);
+      return;
+    }
+    this._wasm.HEAPU8.set(data, ptr);
+
+    const nameLen = filename.length * 3 + 1;
+    const namePtr = this._wasm._malloc(nameLen);
+    if (!namePtr) {
+      this._wasm._free(ptr);
+      console.error('[UADE.worklet] malloc failed for companion filename');
+      return;
+    }
+    this._wasm.stringToUTF8(filename, namePtr, nameLen);
+
+    const ret = this._wasm._uade_wasm_add_extra_file(namePtr, ptr, data.byteLength);
+    this._wasm._free(ptr);
+    this._wasm._free(namePtr);
+
+    if (ret === 0) {
+      console.log('[UADE.worklet] Companion file written: ' + filename + ' (' + data.byteLength + ' bytes)');
+    } else {
+      console.error('[UADE.worklet] Failed to write companion file: ' + filename);
+    }
+  }
+
+  /** Re-register all cached companion files into a freshly initialized WASM instance */
+  _restoreCompanionFiles() {
+    if (!this._wasm || !this._ready || this._companionFiles.size === 0) return;
+    for (const [filename, data] of this._companionFiles) {
+      const ptr = this._wasm._malloc(data.byteLength);
+      if (!ptr) { console.error('[UADE.worklet] malloc failed restoring companion: ' + filename); continue; }
+      this._wasm.HEAPU8.set(data, ptr);
+      const nameLen = filename.length * 3 + 1;
+      const namePtr = this._wasm._malloc(nameLen);
+      if (!namePtr) { this._wasm._free(ptr); continue; }
+      this._wasm.stringToUTF8(filename, namePtr, nameLen);
+      const ret = this._wasm._uade_wasm_add_extra_file(namePtr, ptr, data.byteLength);
+      this._wasm._free(ptr);
+      this._wasm._free(namePtr);
+      if (ret === 0) {
+        console.log('[UADE.worklet] Restored companion: ' + filename + ' (' + data.byteLength + ' bytes)');
+      }
+    }
+  }
+
+  _loadIntoWasm(data, filenameHint) {
+    // Strip directory components — UADE MEMFS only has /uade/ flat dir;
+    // paths like "paranoimia/cust.paranoimia" cause "Cannot write to MEMFS".
+    const basename = filenameHint.includes('/') ? filenameHint.split('/').pop() : filenameHint;
+
+    let ptr = 0, hintPtr = 0;
+    try {
+      ptr = this._wasm._malloc(data.byteLength);
+      if (!ptr) throw new Error('malloc failed for file data (' + data.byteLength + ' bytes)');
+      this._wasm.HEAPU8.set(data, ptr);
+
+      const hintLen = basename.length * 3 + 1;
+      hintPtr = this._wasm._malloc(hintLen);
+      if (!hintPtr) throw new Error('malloc failed for filename hint');
+      this._wasm.stringToUTF8(basename, hintPtr, hintLen);
+
+      this._lastAbortReason = null;
+      const ret = this._wasm._uade_wasm_load(ptr, data.byteLength, hintPtr);
+
+      this._wasm._free(ptr);
+      this._wasm._free(hintPtr);
+      return ret;
+    } catch (err) {
+      // Clean up any allocated memory on failure
+      try { if (ptr) this._wasm._free(ptr); } catch { /* wasm may be dead */ }
+      try { if (hintPtr) this._wasm._free(hintPtr); } catch { /* wasm may be dead */ }
+      // WASM abort/malloc failure = real corruption → needs full reinit
+      this._wasmCorrupted = true;
+      throw err;
+    }
+  }
+
+  async _load(buffer, filenameHint, subsongIndex = 0, skipScan = false, scanTimeoutSec = undefined) {
+    if (!this._wasm || !this._ready) {
+      this.port.postMessage({ type: 'error', message: 'WASM not ready' });
+      return;
+    }
+
+    try {
+      console.log('[UADE.worklet] _load called: ' + filenameHint + ' (' + buffer.byteLength + ' bytes)');
+
+      const data = new Uint8Array(buffer);
+      // Keep a copy so _scanSubsong() can reload without transferring back from main thread
+      this._lastData = data;
+      this._lastHint = filenameHint;
+      // Reset UADE state when needed. UADE's protocol state machine gets stuck
+      // after "score died" errors — _uade_wasm_stop() alone is NOT enough.
+      //
+      // Two reset strategies:
+      //   1. Soft reset (preferred): _uade_wasm_full_reset() — destroys and
+      //      recreates the UADE engine state within the SAME Emscripten module.
+      //      Zero new memory allocation. Handles load failures + normal reloads.
+      //   2. Hard reinit (fallback): create entirely new Emscripten instance.
+      //      Only needed after true WASM corruption (abort/malloc failure).
+      //      Each instance is ~2.5MB that can't be GC'd from the worklet thread.
+      const needsReset = this._wasmCorrupted || this._lastLoadFailed || this._hasRendered;
+      if (needsReset) {
+        if (this._wasmCorrupted) {
+          // True corruption (WASM abort/malloc failure) — must recreate module
+          console.log('[UADE.worklet] Hard reinit (WASM corrupted)...');
+          try {
+            if (this._wasm) {
+              try { if (this._ptrL) this._wasm._free(this._ptrL); } catch { /* */ }
+              try { if (this._ptrR) this._wasm._free(this._ptrR); } catch { /* */ }
+              this._ptrL = null;
+              this._ptrR = null;
+            }
+            this._wasm = null;
+            this._ready = false;
+            this._hasRendered = false;
+            this._wasmCorrupted = false;
+            this._lastLoadFailed = false;
+            await this._init(this._sampleRate, this._wasmBinary, null);
+            if (!this._wasm || !this._ready) {
+              this.port.postMessage({ type: 'error', message: 'WASM reinit failed' });
+              return;
+            }
+            this._restoreCompanionFiles();
+          } catch (reinitErr) {
+            console.error('[UADE.worklet] Hard reinit failed:', reinitErr.message);
+            this.port.postMessage({ type: 'error', message: 'WASM reinit failed: ' + reinitErr.message });
+            return;
+          }
+        } else {
+          // Normal case: soft reset — reuse same WASM module, zero new memory
+          const reason = this._lastLoadFailed ? 'load-failed' : 'rendered';
+          console.log('[UADE.worklet] Soft reset (' + reason + ')...');
+          try {
+            const resetRet = this._wasm._uade_wasm_full_reset();
+            if (resetRet !== 0) {
+              console.error('[UADE.worklet] Soft reset failed (ret=' + resetRet + '), falling back to hard reinit');
+              // Fall back to hard reinit
+              this._wasm = null;
+              this._ready = false;
+              await this._init(this._sampleRate, this._wasmBinary, null);
+              if (!this._wasm || !this._ready) {
+                this.port.postMessage({ type: 'error', message: 'WASM reinit failed after soft reset failure' });
+                return;
+              }
+            }
+            this._hasRendered = false;
+            this._lastLoadFailed = false;
+            // Companion files survive soft reset (same MEMFS instance)
+          } catch (softErr) {
+            console.error('[UADE.worklet] Soft reset threw:', softErr.message || softErr);
+            // Soft reset exception = corruption, fall back to hard reinit
+            this._wasmCorrupted = true;
+            try {
+              this._wasm = null;
+              this._ready = false;
+              this._hasRendered = false;
+              this._wasmCorrupted = false;
+              this._lastLoadFailed = false;
+              await this._init(this._sampleRate, this._wasmBinary, null);
+              if (!this._wasm || !this._ready) {
+                this.port.postMessage({ type: 'error', message: 'WASM reinit failed' });
+                return;
+              }
+              this._restoreCompanionFiles();
+            } catch (reinitErr) {
+              console.error('[UADE.worklet] Hard reinit after soft reset failure:', reinitErr.message);
+              this.port.postMessage({ type: 'error', message: 'WASM reinit failed: ' + reinitErr.message });
+              return;
+            }
+          }
+        }
+      }
+
+
+      let ret = this._loadIntoWasm(data, filenameHint);
+      console.log('[UADE.worklet] _uade_wasm_load returned: ' + ret);
+
+      if (ret !== 0) {
+        this._lastLoadFailed = true;
+        const abortInfo = this._lastAbortReason ? ' (abort: ' + this._lastAbortReason + ')' : '';
+        console.error('[UADE.worklet] _uade_wasm_load failed with ret=' + ret + abortInfo);
+        this.port.postMessage({
+          type: 'error',
+          message: 'UADE could not play: ' + filenameHint + ' (ret=' + ret + ')' + abortInfo
+        });
+        return;
+      }
+
+      // Successful load — reset reinit counter
+      this._reinitCount = 0;
+
+      // Read back metadata
+      const nameBuf = this._wasm._malloc(256);
+      this._wasm._uade_wasm_get_player_name(nameBuf, 256);
+      const player = this._wasm.UTF8ToString(nameBuf);
+
+      this._wasm._uade_wasm_get_format_name(nameBuf, 256);
+      const formatName = this._wasm.UTF8ToString(nameBuf);
+      this._wasm._free(nameBuf);
+
+      const minSubsong = this._wasm._uade_wasm_get_subsong_min();
+      const maxSubsong = this._wasm._uade_wasm_get_subsong_max();
+      const subsongCount = this._wasm._uade_wasm_get_subsong_count();
+
+      // Fast-scan the entire song to extract pattern data before playback.
+      // skipScan=true is used for formats (e.g. compiled 68k replayers) where the
+      // scan crashes or corrupts engine state. scanTimeoutSec overrides the default
+      // 600s limit — use 30s for FORCE_CLASSIC formats that loop but don't crash.
+      let scanResult = null;
+      let isEnhanced = false;
+      let scanData = [];
+      if (!skipScan) {
+        const effectiveTimeout = (typeof scanTimeoutSec === 'number') ? scanTimeoutSec : 600;
+        // Enable tick snapshots during short scan so we capture note triggers
+        const isShortScanMode = typeof scanTimeoutSec === 'number' && scanTimeoutSec < 600;
+        if (isShortScanMode && this._wasm._uade_wasm_enable_tick_snapshots) {
+          this._wasm._uade_wasm_enable_tick_snapshots(1);
+        }
+        console.log('[UADE.worklet] Starting song scan (timeout=' + effectiveTimeout + 's)...');
+        const scanStart = performance.now();
+        scanResult = this._scanSong(subsongIndex, effectiveTimeout);
+        isEnhanced = !!(scanResult && scanResult.isEnhanced);
+        scanData = isEnhanced ? scanResult.rows : (scanResult ?? []);
+        const scanDuration = Math.round(performance.now() - scanStart);
+        console.log('[UADE.worklet] Scan complete: ' + (isEnhanced ? 'enhanced' : 'basic') +
+          ', ' + (Array.isArray(scanData) ? scanData.length : 0) + ' rows, ' +
+          (isEnhanced ? Object.keys(scanResult.samples || {}).length + ' samples, ' : '') +
+          scanDuration + 'ms');
+      } else {
+        console.log('[UADE.worklet] Skipping song scan (skipScan=true, compiled replayer)');
+      }
+
+      // Reload the song for playback (scan consumed the song state).
+      // Not needed when skipScan=true since the song state is untouched.
+      let shortScanTickData = null;
+      if (!skipScan) {
+        const isShortScan = typeof scanTimeoutSec === 'number' && scanTimeoutSec < 600;
+
+        if (isShortScan) {
+          // Short scan (compiled 68k replayers): the scan consumed the song state and
+          // a simple stop+reload leaves UADE's IPC/state machine corrupted. We need a
+          // full WASM reinit to get a clean playback start.
+          // First, extract tick snapshots before reinit destroys the ring buffer.
+          if (this._wasm._uade_wasm_get_tick_snapshots) {
+            const maxDrain = 32768;
+            const wordsPerSnap = 13;
+            const tickBuf = this._wasm._malloc(maxDrain * wordsPerSnap * 4);
+            if (tickBuf) {
+              const count = this._wasm._uade_wasm_get_tick_snapshots(tickBuf, maxDrain);
+              if (count > 0) {
+                const raw = new Uint32Array(this._wasm.HEAPU8.buffer, tickBuf, count * wordsPerSnap);
+                shortScanTickData = [];
+                for (let i = 0; i < count; i++) {
+                  const base = i * wordsPerSnap;
+                  const channels = [];
+                  for (let ch = 0; ch < 4; ch++) {
+                    const w0 = raw[base + 1 + ch * 3 + 0];
+                    const w1 = raw[base + 1 + ch * 3 + 1];
+                    const w2 = raw[base + 1 + ch * 3 + 2];
+                    channels.push({
+                      period:    (w0 >>> 16) & 0xFFFF,
+                      volume:    w0 & 0xFFFF,
+                      lc:        w1,
+                      len:       (w2 >>> 8) & 0xFFFF,
+                      dmaEn:     (w2 >>> 1) & 1,
+                      triggered: w2 & 1,
+                    });
+                  }
+                  shortScanTickData.push({ tick: raw[base], channels });
+                }
+                console.log('[UADE.worklet] Short scan captured ' + shortScanTickData.length + ' tick snapshots');
+              }
+              this._wasm._free(tickBuf);
+            }
+          }
+
+          // Soft reset for clean playback (no new WASM memory)
+          console.log('[UADE.worklet] Short scan: soft reset for clean playback...');
+          let resetOk = false;
+          try {
+            const resetRet = this._wasm._uade_wasm_full_reset();
+            resetOk = (resetRet === 0);
+          } catch { /* fall through to hard reinit */ }
+          if (!resetOk) {
+            console.warn('[UADE.worklet] Soft reset failed after short scan, hard reinit');
+            this._wasm = null;
+            this._ready = false;
+            await this._init(this._sampleRate, this._wasmBinary, null);
+            if (!this._wasm || !this._ready) {
+              this.port.postMessage({ type: 'error', message: 'WASM reinit after short scan failed' });
+              return;
+            }
+            this._restoreCompanionFiles();
+          }
+          this._hasRendered = false;
+          this._lastLoadFailed = false;
+
+          const ret2 = this._loadIntoWasm(data, filenameHint);
+          if (ret2 !== 0) {
+            console.warn('[UADE.worklet] Reload after reinit failed (ret=' + ret2 + ')');
+          }
+          this._wasm._uade_wasm_set_looping(1);
+        } else {
+          // Normal scan: simple stop+reload (song completed naturally)
+          this._wasm._uade_wasm_stop();
+          const ret2 = this._loadIntoWasm(data, filenameHint);
+          if (ret2 !== 0) {
+            console.warn('[UADE.worklet] Reload after scan failed (ret=' + ret2 + '), scan data still valid');
+          }
+        }
+      } else {
+        // Compiled replayers (skipScan=true) should loop indefinitely.
+        // Explicitly enable looping here because a previous scan (of a different
+        // format) may have called _uade_wasm_set_looping(0), leaving UADE in
+        // non-looping mode. Without this, modules that emit a song-end signal
+        // (e.g. Steve Turner .jpo) stop after one play and produce silence.
+        this._wasm._uade_wasm_set_looping(1);
+      }
+
+      // Apply subsong index (for both normal and skipScan modes).
+      this._currentSubsong = subsongIndex;
+      if (subsongIndex > 0) {
+        this._wasm._uade_wasm_set_subsong(subsongIndex);
+      }
+
+      this._playing = false;
+
+      // Build message payload
+      const msg = {
+        type: 'loaded',
+        player: player || 'Unknown',
+        formatName: formatName || 'Unknown',
+        minSubsong,
+        maxSubsong,
+        subsongCount,
+        scanData,
+      };
+
+      // Include enhanced scan extras if available
+      if (isEnhanced) {
+        msg.enhancedScan = {
+          samples: scanResult.samples,
+          tempoChanges: scanResult.tempoChanges,
+          bpm: scanResult.bpm,
+          speed: scanResult.speed,
+          firstTick: scanResult.firstTick ?? 0,
+          warnings: scanResult.warnings || [],
+        };
+      }
+
+      // Include tick snapshots from short scan (captured before reset)
+      if (shortScanTickData && shortScanTickData.length > 0) {
+        msg.shortScanTicks = shortScanTickData;
+      }
+
+      this.port.postMessage(msg);
+    } catch (err) {
+      // If _wasmCorrupted was set by _loadIntoWasm catch, keep it.
+      // Otherwise mark as soft failure (file unsupported, not WASM corruption).
+      if (!this._wasmCorrupted) this._lastLoadFailed = true;
+      let errMsg;
+      if (err instanceof Error) {
+        errMsg = err.message + (err.stack ? '\n' + err.stack : '');
+      } else if (typeof err === 'string') {
+        errMsg = err;
+      } else if (err && typeof err === 'object') {
+        errMsg = err.message || err.what || err.status || JSON.stringify(err);
+      } else {
+        errMsg = String(err);
+      }
+      console.error('[UADE.worklet] Load error:', errMsg);
+      this.port.postMessage({ type: 'error', message: 'UADE could not play: ' + this._lastHint + ' (' + errMsg + ')' });
+    }
+  }
+
+  /**
+   * Fast-scan the entire song by rendering silently at max speed.
+   * Captures Paula channel state at regular row intervals (~5292 frames at 125BPM/speed 6).
+   * Returns array of rows, each containing 4 channels of {period, volume, samplePtr}.
+   */
+  _scanSong(subsongIndex = 0, maxSeconds = 600) {
+    // Try enhanced scan first; fall back to basic scan if new WASM exports aren't available
+    if (typeof this._wasm._uade_wasm_get_channel_extended === 'function') {
+      return this._scanSongEnhanced(subsongIndex, maxSeconds);
+    }
+    return this._scanSongBasic(maxSeconds);
+  }
+
+  /**
+   * Basic scan — original row-based scan for older WASM builds without extended exports.
+   */
+  _scanSongBasic(maxSeconds = 600) {
+    const CHUNK = 256;
+    const FRAMES_PER_ROW = Math.round((sampleRate || 44100) * 2.5 * 6 / 125); // ~5292
+    const MAX_ROWS = 64 * 256; // 256 patterns max
+    const MAX_SECONDS = maxSeconds;
+    const maxFrames = (sampleRate || 44100) * MAX_SECONDS;
+
+    // Ensure channel snapshot buffer exists
+    if (this._channelBuf === undefined) {
+      this._channelBuf = this._wasm._malloc(64);
+    }
+
+    // Allocate temp audio buffers (we discard the audio)
+    const tmpL = this._wasm._malloc(CHUNK * 4);
+    const tmpR = this._wasm._malloc(CHUNK * 4);
+
+    const rows = [];
+    const prevPeriods = [0, 0, 0, 0];
+    const rowAccum = [null, null, null, null];
+    let frameSinceRow = 0;
+    let totalFrames = 0;
+
+    this._wasm._uade_wasm_set_looping(0);
+
+    while (rows.length < MAX_ROWS && totalFrames < maxFrames) {
+      const ret = this._wasm._uade_wasm_render(tmpL, tmpR, CHUNK);
+      if (ret <= 0) break;
+      totalFrames += ret;
+      frameSinceRow += ret;
+
+      this._wasm._uade_wasm_get_channel_snapshot(this._channelBuf);
+      const snap = new Uint32Array(this._wasm.HEAPU8.buffer, this._channelBuf, 16);
+
+      for (let i = 0; i < 4; i++) {
+        const base = i * 4;
+        const per = snap[base];
+        const vol = snap[base + 1];
+        const dma = snap[base + 2];
+        const lc = snap[base + 3];
+        const triggered = per !== prevPeriods[i] && per > 0 && dma;
+
+        if (triggered) {
+          rowAccum[i] = { period: per, volume: vol, samplePtr: lc };
+        } else if (!rowAccum[i] && dma && per > 0) {
+          rowAccum[i] = { period: 0, volume: vol, samplePtr: 0 };
+        }
+        prevPeriods[i] = per;
+      }
+
+      if (frameSinceRow >= FRAMES_PER_ROW) {
+        frameSinceRow -= FRAMES_PER_ROW;
+        rows.push(rowAccum.map(acc => acc
+          ? { period: acc.period, volume: acc.volume, samplePtr: acc.samplePtr }
+          : { period: 0, volume: 0, samplePtr: 0 }
+        ));
+        for (let i = 0; i < 4; i++) rowAccum[i] = null;
+      }
+    }
+
+    this._wasm._free(tmpL);
+    this._wasm._free(tmpR);
+
+    return rows;
+  }
+
+  /**
+   * Enhanced scan — uses extended channel state + CIA timers + memory reads.
+   *
+   * Captures per-tick snapshots at high resolution, extracts sample PCM data
+   * directly from Amiga chip RAM, detects tempo from CIA timers, and post-processes
+   * to detect effects (vibrato, portamento, arpeggio, volume slides).
+   *
+   * Returns: { rows, samples, tempoChanges, isEnhanced }
+   *   rows[]: per-row data with 4 channels of { period, volume, samplePtr, sampleStart, sampleLen, effTyp, eff }
+   *   samples: { [samplePtr]: { pcm: Uint8Array, length, loopStart, loopLength, typicalPeriod } }
+   *   tempoChanges: [{ row, bpm, speed }]
+   */
+  _scanSongEnhanced(subsongIndex = 0, maxSeconds = 600) {
+    // Seek to the requested subsong before scanning
+    if (subsongIndex > 0) {
+      this._wasm._uade_wasm_set_subsong(subsongIndex);
+    }
+
+    const CHUNK = 128;  // Smaller chunks = higher tick resolution
+    const MAX_SECONDS = maxSeconds;
+    const sr = sampleRate || 44100;
+    const maxFrames = sr * MAX_SECONDS;
+    const MAX_ROWS = 64 * 256;
+
+    // Allocate WASM buffers
+    const extBufSize = 128; // 4 channels * 8 uint32 = 128 bytes
+    const ciaBufSize = 20;  // 5 uint32 = 20 bytes
+    const extBuf = this._wasm._malloc(extBufSize);
+    const ciaBuf = this._wasm._malloc(ciaBufSize);
+    const tmpL = this._wasm._malloc(CHUNK * 4);
+    const tmpR = this._wasm._malloc(CHUNK * 4);
+
+    // For memory reads (sample extraction)
+    const MEM_READ_BUF_SIZE = 131072; // 128KB max sample read
+    const memBuf = this._wasm._malloc(MEM_READ_BUF_SIZE);
+
+    // Tick snapshot accumulator
+    const tickSnapshots = [];
+    const sampleCache = new Map(); // samplePtr → { pcm, length, loopStart, loopLength, typicalPeriod }
+
+    // Track previous state for change detection
+    const prevPeriods = [0, 0, 0, 0];
+    const prevVolumes = [0, 0, 0, 0];
+    const prevSamplePtrs = [0, 0, 0, 0];
+    let prevCiaBTA = 0;
+
+    let totalFrames = 0;
+
+    this._wasm._uade_wasm_set_looping(0);
+
+    // Phase 1: Capture per-tick snapshots at high resolution
+    while (tickSnapshots.length < MAX_ROWS * 20 && totalFrames < maxFrames) {
+      const ret = this._wasm._uade_wasm_render(tmpL, tmpR, CHUNK);
+      if (ret <= 0) break;
+      totalFrames += CHUNK;
+
+      // Read extended channel state
+      this._wasm._uade_wasm_get_channel_extended(extBuf);
+      const ext = new Uint32Array(this._wasm.HEAPU8.buffer, extBuf, 32);
+
+      // Read CIA state for tempo
+      this._wasm._uade_wasm_get_cia_state(ciaBuf);
+      const cia = new Uint32Array(this._wasm.HEAPU8.buffer, ciaBuf, 5);
+
+      const tickChannels = [];
+      for (let ch = 0; ch < 4; ch++) {
+        const base = ch * 8;
+        const per = ext[base + 0];
+        const vol = ext[base + 1];
+        const dma = ext[base + 2];
+        const lc = ext[base + 3];    // sample start address (lc register)
+        const pt = ext[base + 4];    // current playback pointer
+        const len = ext[base + 5];   // sample length in words
+        const wper = ext[base + 6];  // pending period
+        const wlen = ext[base + 7];  // pending length
+
+        // Detect new sample pointer — extract PCM from Amiga memory.
+        // Don't cache yet if PCM is all-zero (chip RAM not yet initialized by
+        // the player — common in macro-based formats like FC2 where waveform
+        // data is written a few ticks after the DMA address is first set).
+        // By leaving it uncached, we re-try on the next encounter when the
+        // data should be populated.
+        if (lc > 0 && len > 0 && dma && !sampleCache.has(lc)) {
+          const byteLen = Math.min(len * 2, MEM_READ_BUF_SIZE);
+          if (byteLen > 4) { // Skip tiny samples (likely loop stubs)
+            this._wasm._uade_wasm_read_memory(lc, memBuf, byteLen);
+            const pcm = new Uint8Array(byteLen);
+            pcm.set(new Uint8Array(this._wasm.HEAPU8.buffer, memBuf, byteLen));
+
+            // Skip all-zero PCM — memory not yet written by the player
+            const hasNonZero = pcm.some(b => b !== 0);
+            if (hasNonZero) {
+              // Detect loop: if wlen > 1 and sample re-triggers with same lc
+              // Most Amiga formats: loop start is at (lc), loop length is (wlen) words
+              // We'll store wlen for now and refine during post-processing.
+              // Clamp loopLength to byteLen — wlen from DMA can exceed extracted bytes
+              // when the sample was truncated by MEM_READ_BUF_SIZE.
+              const rawLoopLen0 = wlen > 1 ? wlen * 2 : 0;
+              sampleCache.set(lc, {
+                pcm,
+                length: byteLen,
+                loopStart: 0,  // Refined later
+                loopLength: rawLoopLen0 > 0 ? Math.min(rawLoopLen0, byteLen) : 0,
+                typicalPeriod: per > 0 ? per : 428, // Default to C-2 if unknown
+              });
+            }
+          }
+        }
+
+        // Update typical period for known samples
+        if (lc > 0 && per > 0 && sampleCache.has(lc)) {
+          const cached = sampleCache.get(lc);
+          if (cached.typicalPeriod === 428 && per !== 428) {
+            cached.typicalPeriod = per;
+          }
+        }
+
+        // Detect loop reload: lc changed while DMA was active.
+        // The new lc is the loop-start address; offset from the original sample start
+        // gives us the loop start in bytes within the cached PCM buffer.
+        const prevLc = prevSamplePtrs[ch];
+        if (prevLc !== lc && prevLc > 0 && lc > 0 && dma) {
+          const prevSample = sampleCache.get(prevLc);
+          if (prevSample && prevSample.loopStart === 0 && lc >= prevLc) {
+            const relLoopStart = lc - prevLc;
+            if (relLoopStart < prevSample.length) {
+              prevSample.loopStart = relLoopStart;
+              // Clamp loopLength so loopStart + loopLength never exceeds extracted PCM.
+              const rawLoopLen1 = wlen > 1 ? wlen * 2 : 0;
+              prevSample.loopLength = rawLoopLen1 > 0
+                ? Math.min(rawLoopLen1, prevSample.length - relLoopStart)
+                : 0;
+            }
+          }
+        }
+
+        const triggered = per !== prevPeriods[ch] && per > 0 && dma;
+        const sampleChanged = lc !== prevSamplePtrs[ch] && lc > 0;
+
+        tickChannels.push({
+          period: per,
+          volume: vol,
+          dma,
+          samplePtr: lc,
+          sampleStart: pt,
+          sampleLen: len,
+          triggered,
+          sampleChanged,
+        });
+
+        prevPeriods[ch] = per;
+        prevVolumes[ch] = vol;
+        prevSamplePtrs[ch] = lc;
+      }
+
+      // CIA-B Timer A drives BPM in most Amiga formats
+      const ciaBTA = cia[2];
+      const vblankHz = cia[4] || 50;
+      const ciaChanged = ciaBTA !== prevCiaBTA && ciaBTA > 0;
+      prevCiaBTA = ciaBTA;
+
+      // CIA-A tick count: increments once per musical tick (via hook in cia.c).
+      // Present in WASM builds after Phase 1 rebuild; gracefully absent otherwise.
+      const ciaATick = this._wasm._uade_wasm_get_tick_count
+        ? this._wasm._uade_wasm_get_tick_count()
+        : 0;
+
+      tickSnapshots.push({
+        channels: tickChannels,
+        ciaBTA,
+        vblankHz,
+        ciaChanged,
+        frame: totalFrames,
+        ciaATick,
+      });
+    }
+
+    // Free WASM buffers
+    this._wasm._free(extBuf);
+    this._wasm._free(ciaBuf);
+    this._wasm._free(tmpL);
+    this._wasm._free(tmpR);
+    this._wasm._free(memBuf);
+
+    // Phase 2: Determine row boundaries and BPM from CIA timers
+    // BPM = (vblankHz * 2.5 * PAL_CLOCK_CONSTANT) / ciaBTA  or heuristic
+    // For CIA timer: BPM ≈ 1773447 / (ciaBTA + 1)  [PAL systems]
+    // For VBlank-based: fixed 125 BPM at speed 6
+
+    const warnings = []; // Degradation notices collected during scan
+
+    // Detect BPM from most common CIA-B Timer A value.
+    // ciaReliable=true when CIA-B is actually driving BPM (most MOD/XM/S3M formats).
+    // ciaReliable=false when the format uses VBlank/CIA-A timing (FC2, etc.) — in
+    // that case CIA-B holds an OS or unrelated value, and trigger-based speed
+    // estimation is also unreliable (FC2 macros cycle sample pointers every VBlank).
+    let detectedBPM = 125;
+    let detectedSpeed = 6;
+    let ciaReliable = false;
+    const ciaCounts = new Map();
+    for (const tick of tickSnapshots) {
+      if (tick.ciaBTA > 0) {
+        ciaCounts.set(tick.ciaBTA, (ciaCounts.get(tick.ciaBTA) || 0) + 1);
+      }
+    }
+    if (ciaCounts.size > 0) {
+      // Find most common CIA timer value
+      let maxCount = 0;
+      let dominantCIA = 0;
+      for (const [val, count] of ciaCounts) {
+        if (count > maxCount) { maxCount = count; dominantCIA = val; }
+      }
+      if (dominantCIA > 0) {
+        const rawBPM = Math.round(1773447 / (dominantCIA + 1));
+        if (rawBPM >= 32 && rawBPM <= 999) {
+          detectedBPM = rawBPM;
+          ciaReliable = true;
+        }
+        // else: CIA-B timer not used for music timing; keep defaults BPM=125, speed=6
+      }
+    }
+
+    // Estimate speed from sample pointer change intervals when CIA-B drives BPM.
+    // Use sampleChanged (DMA address changed) rather than triggered (period changed):
+    // arpeggio only cycles the period — it never changes the DMA sample address, so
+    // sampleChanged fires only on genuine new note starts regardless of arpeggio.
+    if (ciaReliable) {
+      const triggerFrames = [];
+      let lastTriggerFrame = 0;
+      for (let i = 0; i < tickSnapshots.length; i++) {
+        const tick = tickSnapshots[i];
+        const anyTrigger = tick.channels.some(ch => ch.sampleChanged);
+        if (anyTrigger) {
+          if (lastTriggerFrame > 0) {
+            triggerFrames.push(tick.frame - lastTriggerFrame);
+          }
+          lastTriggerFrame = tick.frame;
+        }
+      }
+      if (triggerFrames.length > 10) {
+        triggerFrames.sort((a, b) => a - b);
+        const medianInterval = triggerFrames[Math.floor(triggerFrames.length / 2)];
+        // speed = interval * BPM / (sr * 2.5)
+        const estimatedSpeed = Math.round(medianInterval * detectedBPM / (sr * 2.5));
+        if (estimatedSpeed >= 1 && estimatedSpeed <= 31) {
+          detectedSpeed = estimatedSpeed;
+        }
+      }
+    }
+
+    // VBlank-based BPM estimation for formats where CIA-B doesn't drive timing.
+    // For PAL Amiga: 50 Hz VBlank; NTSC: 60 Hz. Speed = VBlanks between note triggers.
+    if (!ciaReliable) {
+      const vblankHz = tickSnapshots[0]?.vblankHz || 50;
+      const vblankInterval = Math.round(sr / vblankHz);
+
+      // Method 1: CIA-A tick rate.
+      // CIA-A Timer A fires at the music tick rate for many VBlank-based formats
+      // (the player programs CIA-A as the speed counter, firing N times per VBlank).
+      // Derive speed = CIA-A ticks per VBlank elapsed.
+      const ciaA0 = tickSnapshots[0]?.ciaATick || 0;
+      const ciaALast = tickSnapshots[tickSnapshots.length - 1]?.ciaATick || 0;
+      const ciaARange = ciaALast - ciaA0;
+      const firstFrame = tickSnapshots[0]?.frame || 0;
+      const lastFrame2 = tickSnapshots[tickSnapshots.length - 1]?.frame || firstFrame;
+      const vblanksElapsed = (lastFrame2 - firstFrame) / vblankInterval;
+      let ciaASpeed = 0;
+      if (ciaARange >= 100 && vblanksElapsed >= 100) {
+        const ciaAPerVblank = ciaARange / vblanksElapsed;
+        const rounded = Math.round(ciaAPerVblank);
+        // Accept if close to an integer (< 0.2 fractional error) and within sane range.
+        if (rounded >= 1 && rounded <= 31 && Math.abs(ciaAPerVblank - rounded) < 0.2) {
+          ciaASpeed = rounded;
+        }
+      }
+
+      // Method 2: Sample pointer change intervals.
+      // Use sampleChanged (lc register changes) rather than triggered (period changes).
+      // Arpeggio modulations only change the period — they NEVER change the DMA sample
+      // address. So sampleChanged fires only on genuine new note starts, not on arpeggio
+      // ticks, giving accurate inter-note intervals for speed estimation.
+      const triggerFrames = [];
+      let lastTriggerFrame = 0;
+      for (let i = 0; i < tickSnapshots.length; i++) {
+        const tick = tickSnapshots[i];
+        const anyTrigger = tick.channels.some(ch => ch.sampleChanged);
+        if (anyTrigger) {
+          if (lastTriggerFrame > 0) {
+            triggerFrames.push(tick.frame - lastTriggerFrame);
+          }
+          lastTriggerFrame = tick.frame;
+        }
+      }
+      let sampleSpeed = 0;
+      if (triggerFrames.length > 5) {
+        triggerFrames.sort((a, b) => a - b);
+        const median = triggerFrames[Math.floor(triggerFrames.length / 2)];
+        const s = Math.max(1, Math.min(31, Math.round(median / vblankInterval)));
+        if (s >= 1 && s <= 31) {
+          sampleSpeed = s;
+        }
+      }
+
+      // Prefer CIA-A derived speed (most accurate), then sample-pointer speed, then default.
+      const finalSpeed = ciaASpeed || sampleSpeed || 6;
+      // BPM = vblankHz * 2.5 (ProTracker formula: tick_rate = BPM * 2/5, so BPM = vblankHz * 5/2).
+      // Speed is a separate parameter; dividing by speed here was incorrect.
+      // PAL 50 Hz → 125 BPM, NTSC 60 Hz → 150 BPM.
+      const finalBPM = Math.max(32, Math.min(999, Math.round(vblankHz * 2.5)));
+      if (ciaASpeed || sampleSpeed) {
+        detectedSpeed = finalSpeed;
+        detectedBPM = finalBPM;
+        warnings.push('CIA unreliable — VBlank BPM estimated: ' + detectedBPM + ' BPM / speed ' + detectedSpeed);
+      } else {
+        warnings.push('CIA unreliable — tempo unknown, defaulted to 125 BPM / speed 6');
+      }
+    }
+
+    const actualFPR = Math.round(sr * 2.5 * detectedSpeed / detectedBPM);
+
+    // Determine whether CIA-A tick count is a reliable row-boundary signal.
+    // It's reliable when CIA-A timer is actively firing (tick count advanced
+    // by at least detectedSpeed * 20 ticks across the scan).
+    const firstCiaATick = tickSnapshots[0]?.ciaATick || 0;
+    const lastCiaATick = tickSnapshots[tickSnapshots.length - 1]?.ciaATick || 0;
+    const ciaATickRange = lastCiaATick - firstCiaATick;
+    const ciaAReliable = ciaATickRange >= detectedSpeed * 20;
+
+    // Phase 3: Group tick snapshots into rows and detect effects
+    const rows = [];
+    const tempoChanges = [];
+    let frameSinceRow = 0;
+    let currentRowTicks = []; // Ticks within current row
+    let currentBPM = detectedBPM;
+    // CIA-A tick tracking for tick-based row boundaries
+    let prevCiaARow = -1; // Last row index derived from CIA-A tick count
+
+    // Fingerprint-based loop detection: stops scanning when the song loops back.
+    // Uses a sliding window of LOOP_WINDOW consecutive row fingerprints.
+    // Each fingerprint encodes all 4 channel periods + samplePtrs.
+    const LOOP_WINDOW = 16;
+    const LOOP_MIN_ROWS = 128; // Don't check until at least 2 patterns of data
+    const _fpHistory = []; // Per-row fingerprint strings
+    const _seenWindows = new Set(); // Registered window keys
+
+    for (let i = 0; i < tickSnapshots.length && rows.length < MAX_ROWS; i++) {
+      const tick = tickSnapshots[i];
+      currentRowTicks.push(tick);
+      frameSinceRow += CHUNK;
+
+      // Detect tempo changes
+      if (tick.ciaChanged && tick.ciaBTA > 0) {
+        const newBPM = Math.round(1773447 / (tick.ciaBTA + 1));
+        if (newBPM >= 32 && newBPM <= 999 && newBPM !== currentBPM) {
+          currentBPM = newBPM;
+          tempoChanges.push({ row: rows.length, bpm: newBPM, speed: detectedSpeed });
+        }
+      }
+
+      // Determine if a row boundary occurred.
+      // Primary: CIA-A tick count (exact hardware boundary, when reliable).
+      // Fallback: frame counting (heuristic, always available).
+      let rowBoundary = false;
+      if (ciaAReliable) {
+        const ciaARow = Math.floor((tick.ciaATick - firstCiaATick) / detectedSpeed);
+        if (ciaARow > prevCiaARow) {
+          rowBoundary = true;
+          prevCiaARow = ciaARow;
+          frameSinceRow = 0; // Keep frame counter in sync
+        }
+      } else if (frameSinceRow >= actualFPR) {
+        rowBoundary = true;
+        frameSinceRow -= actualFPR;
+      }
+
+      if (rowBoundary) {
+        rows.push(this._processRowTicks(currentRowTicks));
+        currentRowTicks = [];
+
+        // Build fingerprint for the row just pushed
+        const _row = rows[rows.length - 1];
+        const _fp = _row.map(ch => `${ch.period | 0},${ch.samplePtr | 0},${ch.volume | 0}`).join('|');
+        _fpHistory.push(_fp);
+
+        if (_fpHistory.length >= LOOP_WINDOW) {
+          const _windowKey = _fpHistory.slice(-LOOP_WINDOW).join('\n');
+          if (_fpHistory.length > LOOP_MIN_ROWS && _seenWindows.has(_windowKey)) {
+            // Detected a loop: this exact sequence of rows was seen before — stop scanning
+            break;
+          }
+          // Register the window ending one row earlier to avoid same-position false positives
+          if (_fpHistory.length > LOOP_WINDOW) {
+            _seenWindows.add(_fpHistory.slice(-LOOP_WINDOW - 1, -1).join('\n'));
+          }
+        }
+      }
+    }
+
+    // Emit final partial row if significant
+    if (currentRowTicks.length > 2) {
+      rows.push(this._processRowTicks(currentRowTicks));
+    }
+
+    // Convert sample cache to transferable format
+    const samples = {};
+    for (const [ptr, data] of sampleCache) {
+      samples[ptr] = {
+        pcm: data.pcm, // Uint8Array (transferable)
+        length: data.length,
+        loopStart: data.loopStart,
+        loopLength: data.loopLength,
+        typicalPeriod: data.typicalPeriod,
+      };
+    }
+
+    return {
+      rows, // Enhanced rows compatible with basic scan format
+      samples,
+      tempoChanges,
+      bpm: detectedBPM,
+      speed: detectedSpeed,
+      firstTick: firstCiaATick,
+      warnings,
+      isEnhanced: true,
+    };
+  }
+
+  /**
+   * Process accumulated tick snapshots within a single row to detect effects.
+   * Returns array of 4 channel entries with note, volume, sample, and detected effects.
+   */
+  _processRowTicks(ticks) {
+    if (!ticks.length) {
+      return [
+        { period: 0, volume: 0, samplePtr: 0, sampleStart: 0, sampleLen: 0, effTyp: 0, eff: 0 },
+        { period: 0, volume: 0, samplePtr: 0, sampleStart: 0, sampleLen: 0, effTyp: 0, eff: 0 },
+        { period: 0, volume: 0, samplePtr: 0, sampleStart: 0, sampleLen: 0, effTyp: 0, eff: 0 },
+        { period: 0, volume: 0, samplePtr: 0, sampleStart: 0, sampleLen: 0, effTyp: 0, eff: 0 },
+      ];
+    }
+
+    const result = [];
+
+    for (let ch = 0; ch < 4; ch++) {
+      // Collect per-tick data for this channel
+      const periods = [];
+      const volumes = [];
+      let bestPeriod = 0;
+      let bestVolume = 0;
+      let bestSamplePtr = 0;
+      let bestSampleStart = 0;
+      let bestSampleLen = 0;
+      let triggered = false;
+
+      for (const tick of ticks) {
+        const c = tick.channels[ch];
+        if (c.period > 0) periods.push(c.period);
+        volumes.push(c.volume);
+
+        if (c.triggered || c.sampleChanged) {
+          triggered = true;
+          bestPeriod = c.period;
+          bestVolume = c.volume;
+          bestSamplePtr = c.samplePtr;
+          bestSampleStart = c.sampleStart;
+          bestSampleLen = c.sampleLen;
+        }
+      }
+
+      // If no trigger, use most recent non-zero values
+      if (!triggered) {
+        bestPeriod = 0; // No note
+        bestVolume = volumes.length > 0 ? volumes[0] : 0;
+        if (ticks[0].channels[ch].dma && ticks[0].channels[ch].period > 0) {
+          bestSamplePtr = ticks[0].channels[ch].samplePtr;
+        }
+      }
+
+      // Detect effects from tick-by-tick period/volume changes
+      let effTyp = 0;
+      let eff = 0;
+
+      if (periods.length >= 3) {
+        // Check for arpeggio: detect repeating period cycles of length 1, 2, or 3.
+        // Most Amiga arpeggios run every 1 or 2 ticks (not just 3).
+        const uniquePeriods = [...new Set(periods)];
+        for (const cycleLen of [1, 2, 3]) {
+          if (effTyp !== 0) break;
+          if (periods.length < cycleLen + 1) continue;
+          const cycle = periods.slice(0, cycleLen);
+          // Verify the rest of the period array repeats this cycle
+          let repeating = true;
+          for (let t = cycleLen; t < periods.length; t++) {
+            if (periods[t] !== cycle[t % cycleLen]) { repeating = false; break; }
+          }
+          if (!repeating) continue;
+          // Found a repeating cycle — convert to semitone offsets from base period
+          const sortedCycle = [...new Set(cycle)].sort((a, b) => a - b);
+          if (sortedCycle.length < 2) continue; // All same period = no arpeggio
+          const base = sortedCycle[0];
+          const semi1 = Math.round(12 * Math.log2(base / sortedCycle[Math.min(1, sortedCycle.length - 1)]));
+          const semi2 = sortedCycle.length >= 3 ? Math.round(12 * Math.log2(base / sortedCycle[2])) : 0;
+          if (Math.abs(semi1) > 0 && Math.abs(semi1) <= 15 &&
+              Math.abs(semi2) >= 0 && Math.abs(semi2) <= 15) {
+            effTyp = 0; // Arpeggio (effect 0)
+            eff = (Math.abs(semi1) << 4) | Math.abs(semi2);
+          }
+        }
+
+        // Check for portamento: linear period change
+        if (effTyp === 0 && uniquePeriods.length >= 2) {
+          const first = periods[0];
+          const last = periods[periods.length - 1];
+          const diff = last - first;
+
+          // Check if consistently moving in one direction
+          let monotonic = true;
+          for (let t = 1; t < periods.length; t++) {
+            if (diff > 0 && periods[t] < periods[t - 1] - 2) { monotonic = false; break; }
+            if (diff < 0 && periods[t] > periods[t - 1] + 2) { monotonic = false; break; }
+          }
+
+          if (monotonic && Math.abs(diff) > 2) {
+            const rate = Math.min(255, Math.abs(Math.round(diff / periods.length)));
+            if (diff < 0) {
+              // Period decreasing = pitch going up = Portamento Up (1xx)
+              effTyp = 1;
+              eff = rate;
+            } else {
+              // Period increasing = pitch going down = Portamento Down (2xx)
+              effTyp = 2;
+              eff = rate;
+            }
+          }
+        }
+
+        // Check for vibrato: period oscillating around center
+        if (effTyp === 0 && periods.length >= 4) {
+          const avg = periods.reduce((a, b) => a + b, 0) / periods.length;
+          let crossings = 0;
+          for (let t = 1; t < periods.length; t++) {
+            if ((periods[t - 1] - avg) * (periods[t] - avg) < 0) crossings++;
+          }
+          if (crossings >= 2) {
+            // Oscillating — likely vibrato
+            const maxDev = Math.max(...periods.map(p => Math.abs(p - avg)));
+            const depth = Math.min(15, Math.round(maxDev / 4));
+            const speed = Math.min(15, Math.round(crossings * 2));
+            if (depth > 0) {
+              effTyp = 4; // Vibrato
+              eff = (speed << 4) | depth;
+            }
+          }
+        }
+      }
+
+      // Check for volume slide
+      if (effTyp === 0 && volumes.length >= 3) {
+        const first = volumes[0];
+        const last = volumes[volumes.length - 1];
+        const vdiff = last - first;
+        if (Math.abs(vdiff) > 2) {
+          const rate = Math.min(15, Math.abs(Math.round(vdiff / volumes.length)));
+          if (rate > 0) {
+            effTyp = 0x0A; // Volume slide
+            eff = vdiff > 0 ? (rate << 4) : rate; // Up: x0, Down: 0x
+          }
+        }
+      }
+
+      // Check for note delay (0xED): note triggers later than tick 0.
+      // Signature: no trigger at tick 0, trigger appears at tick N > 0.
+      if (effTyp === 0 && ticks.length >= 2) {
+        let firstTriggerTick = -1;
+        for (let t = 0; t < ticks.length; t++) {
+          if (ticks[t].channels[ch].triggered) {
+            firstTriggerTick = t;
+            break;
+          }
+        }
+        if (firstTriggerTick > 0 && firstTriggerTick <= 15) {
+          // Confirm tick 0 had no active DMA or different period
+          const ch0 = ticks[0].channels[ch];
+          if (!ch0.triggered && ch0.period === 0) {
+            effTyp = 0xE; // Extended effect
+            eff = (0xD << 4) | firstTriggerTick; // EDx = note delay
+          }
+        }
+      }
+
+      // Check for note cut (0xEC): volume drops to 0 at a specific tick mid-row.
+      // Signature: volume > 0 in early ticks, then 0 for all remaining ticks.
+      if (effTyp === 0 && volumes.length >= 3) {
+        let cutTick = -1;
+        for (let t = 1; t < volumes.length; t++) {
+          if (volumes[t - 1] > 0 && volumes[t] === 0) {
+            cutTick = t;
+            break;
+          }
+        }
+        if (cutTick > 0 && cutTick <= 15) {
+          // Verify all remaining ticks are 0
+          let allZeroAfter = true;
+          for (let t = cutTick; t < volumes.length; t++) {
+            if (volumes[t] !== 0) { allZeroAfter = false; break; }
+          }
+          if (allZeroAfter) {
+            effTyp = 0xE; // Extended effect
+            eff = (0xC << 4) | Math.min(15, cutTick); // ECx = note cut at tick x
+          }
+        }
+      }
+
+      // Check for fine portamento up/down (0xE1/0xE2): a one-time very small
+      // period change that happens at tick 0 only (subsequent ticks hold the
+      // new period constant).
+      if (effTyp === 0 && periods.length >= 2) {
+        const p0 = periods[0];
+        const p1 = periods[1];
+        const pLast = periods[periods.length - 1];
+        const delta = p0 - p1; // positive = period decreased = pitch up
+        if (Math.abs(delta) > 0 && Math.abs(delta) <= 8 && pLast === p1) {
+          // Check all ticks after tick 1 hold the same period
+          let steady = true;
+          for (let t = 2; t < periods.length; t++) {
+            if (Math.abs(periods[t] - p1) > 2) { steady = false; break; }
+          }
+          if (steady) {
+            const fineAmt = Math.min(15, Math.abs(delta));
+            if (delta > 0) {
+              // Period decreased = pitch went up = fine portamento up (E1x)
+              effTyp = 0xE;
+              eff = (0x1 << 4) | fineAmt;
+            } else {
+              // Period increased = pitch went down = fine portamento down (E2x)
+              effTyp = 0xE;
+              eff = (0x2 << 4) | fineAmt;
+            }
+          }
+        }
+      }
+
+      result.push({
+        period: bestPeriod,
+        volume: bestVolume,
+        samplePtr: bestSamplePtr,
+        sampleStart: bestSampleStart,
+        sampleLen: bestSampleLen,
+        effTyp,
+        eff,
+      });
+    }
+
+    return result;
+  }
+
+  /**
+   * Re-scan a specific subsong without re-transferring the file data.
+   * Reloads from this._lastData, seeks to the requested subsong, runs the
+   * enhanced scan, then reloads again for normal playback.
+   * Posts { type: 'subsongScanned', subsong, scanResult } on success,
+   * or { type: 'subsongScanError', subsong, message } on failure.
+   */
+  _scanSubsong(subsong) {
+    if (!this._wasm || !this._ready) {
+      this.port.postMessage({ type: 'subsongScanError', subsong, message: 'WASM not ready' });
+      return;
+    }
+    if (!this._lastData || !this._lastHint) {
+      this.port.postMessage({ type: 'subsongScanError', subsong, message: 'No file loaded' });
+      return;
+    }
+
+    try {
+      // Stop current playback and reload for scanning
+      this._wasm._uade_wasm_stop();
+      const ret = this._loadIntoWasm(this._lastData, this._lastHint);
+      if (ret !== 0) {
+        this.port.postMessage({ type: 'subsongScanError', subsong, message: 'Reload failed (ret=' + ret + ')' });
+        return;
+      }
+
+      const scanResult = this._scanSongEnhanced(subsong);
+
+      // Reload for playback (scan consumed the WASM state)
+      this._wasm._uade_wasm_stop();
+      const ret2 = this._loadIntoWasm(this._lastData, this._lastHint);
+      if (ret2 !== 0) {
+        console.warn('[UADE.worklet] Post-scan reload failed (ret=' + ret2 + ')');
+      }
+      this._playing = false;
+
+      this.port.postMessage({
+        type: 'subsongScanned',
+        subsong,
+        scanResult: {
+          rows: scanResult.rows,
+          samples: scanResult.samples,
+          tempoChanges: scanResult.tempoChanges,
+          bpm: scanResult.bpm,
+          speed: scanResult.speed,
+          firstTick: scanResult.firstTick ?? 0,
+          warnings: scanResult.warnings || [],
+        },
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.port.postMessage({ type: 'subsongScanError', subsong, message: msg });
+    }
+  }
+
+  /**
+   * Render a single Paula channel in isolation.
+   *
+   * channelIndex: 0-3 (Paula channel to isolate)
+   * durationMs: how many milliseconds of audio to render
+   *
+   * Reloads the song, mutes all other channels, renders durationMs of audio,
+   * resets the mute mask, reloads for playback, then posts a message:
+   *   { type: 'instrumentIsolated', channelIndex, pcm: Float32Array }
+   *
+   * Paula channel routing: Ch0→Left, Ch3→Left; Ch1→Right, Ch2→Right.
+   * Returns the contributing output buffer (L for Ch0/Ch3, R for Ch1/Ch2).
+   */
+  _scanInstrumentIsolated(channelIndex, durationMs) {
+    if (!this._wasm || !this._ready) {
+      this.port.postMessage({ type: 'instrumentIsolatedError', channelIndex, message: 'WASM not ready' });
+      return;
+    }
+    if (!this._lastData || !this._lastHint) {
+      this.port.postMessage({ type: 'instrumentIsolatedError', channelIndex, message: 'No file loaded' });
+      return;
+    }
+    if (channelIndex < 0 || channelIndex > 3) {
+      this.port.postMessage({ type: 'instrumentIsolatedError', channelIndex, message: 'Invalid channel index' });
+      return;
+    }
+
+    try {
+      // Reload so we start from the beginning
+      this._wasm._uade_wasm_stop();
+      const ret = this._loadIntoWasm(this._lastData, this._lastHint);
+      if (ret !== 0) {
+        this.port.postMessage({ type: 'instrumentIsolatedError', channelIndex, message: 'Reload failed (ret=' + ret + ')' });
+        return;
+      }
+
+      const sr = sampleRate || 44100;
+      const totalFrames = Math.ceil((durationMs / 1000) * sr);
+      const CHUNK = 4096;
+
+      // Mute all channels except channelIndex
+      const muteMask = (1 << channelIndex) & 0x0F;
+      this._wasm._uade_wasm_mute_channels(muteMask);
+
+      // Allocate render buffers
+      const tmpL = this._wasm._malloc(CHUNK * 4);
+      const tmpR = this._wasm._malloc(CHUNK * 4);
+
+      // Ch0 and Ch3 → Left; Ch1 and Ch2 → Right
+      const useRight = (channelIndex === 1 || channelIndex === 2);
+
+      const pcm = new Float32Array(totalFrames);
+      let framesWritten = 0;
+
+      this._wasm._uade_wasm_set_looping(0);
+
+      while (framesWritten < totalFrames) {
+        const chunk = Math.min(CHUNK, totalFrames - framesWritten);
+        const renderRet = this._wasm._uade_wasm_render(tmpL, tmpR, chunk);
+        if (renderRet <= 0) break;
+
+        const src = useRight
+          ? new Float32Array(this._wasm.HEAPU8.buffer, tmpR, chunk)
+          : new Float32Array(this._wasm.HEAPU8.buffer, tmpL, chunk);
+
+        pcm.set(src, framesWritten);
+        framesWritten += chunk;
+      }
+
+      this._wasm._free(tmpL);
+      this._wasm._free(tmpR);
+
+      // Reset mute mask — all channels active
+      this._wasm._uade_wasm_mute_channels(0x0F);
+
+      // Reload for normal playback
+      this._wasm._uade_wasm_stop();
+      const ret2 = this._loadIntoWasm(this._lastData, this._lastHint);
+      if (ret2 !== 0) {
+        console.warn('[UADE.worklet] Post-isolate reload failed (ret=' + ret2 + ')');
+      }
+      this._playing = false;
+
+      this.port.postMessage({
+        type: 'instrumentIsolated',
+        channelIndex,
+        pcm: pcm.buffer,
+        sampleRate: sr,
+        framesWritten,
+      }, [pcm.buffer]);
+
+    } catch (err) {
+      // Ensure mute mask is always reset on error
+      if (this._wasm) this._wasm._uade_wasm_mute_channels(0x0F);
+      const msg = err instanceof Error ? err.message : String(err);
+      this.port.postMessage({ type: 'instrumentIsolatedError', channelIndex, message: msg });
+    }
+  }
+
+  /**
+   * Render the entire song to a WAV audio buffer.
+   * Used for pre-rendering UADE modules for DJ playback.
+   */
+  _renderFullSong(subsong) {
+    if (!this._wasm || !this._ready) {
+      this.port.postMessage({ type: 'renderError', message: 'WASM not ready' });
+      return;
+    }
+
+    try {
+      // Switch to specified subsong if provided
+      if (subsong !== undefined && subsong !== null) {
+        this._wasm._uade_wasm_set_subsong(subsong);
+      }
+
+      const sampleRate = this._wasm.HEAPU32[0] || 44100; // Read from WASM if available
+      const CHUNK = 4096;
+      const MAX_SECONDS = 600; // 10 minute safety limit
+      const maxFrames = sampleRate * MAX_SECONDS;
+
+      // Allocate temp render buffers
+      const tmpL = this._wasm._malloc(CHUNK * 4);
+      const tmpR = this._wasm._malloc(CHUNK * 4);
+
+      // Collect rendered audio
+      const audioChunks = [];
+      let totalFrames = 0;
+
+      // Disable looping for full render
+      this._wasm._uade_wasm_set_looping(0);
+
+      // Render loop
+      while (totalFrames < maxFrames) {
+        const ret = this._wasm._uade_wasm_render(tmpL, tmpR, CHUNK);
+        if (ret <= 0) break; // Song ended
+
+        // Copy audio to JS arrays
+        const leftData = new Float32Array(ret);
+        const rightData = new Float32Array(ret);
+        const heapL = new Float32Array(this._wasm.HEAPF32.buffer, tmpL, ret);
+        const heapR = new Float32Array(this._wasm.HEAPF32.buffer, tmpR, ret);
+        leftData.set(heapL);
+        rightData.set(heapR);
+
+        audioChunks.push({ left: leftData, right: rightData });
+        totalFrames += ret;
+      }
+
+      this._wasm._free(tmpL);
+      this._wasm._free(tmpR);
+
+      if (totalFrames === 0) {
+        this.port.postMessage({ type: 'renderError', message: 'No audio rendered' });
+        return;
+      }
+
+      // Concatenate all chunks into single buffers
+      const leftChannel = new Float32Array(totalFrames);
+      const rightChannel = new Float32Array(totalFrames);
+      let offset = 0;
+      for (const chunk of audioChunks) {
+        leftChannel.set(chunk.left, offset);
+        rightChannel.set(chunk.right, offset);
+        offset += chunk.left.length;
+      }
+
+      // Encode to WAV
+      const wavBuffer = this._encodeWAV(leftChannel, rightChannel, sampleRate);
+
+      // Send back to main thread
+      this.port.postMessage(
+        { type: 'renderComplete', audioBuffer: wavBuffer },
+        [wavBuffer] // Transfer ownership
+      );
+
+    } catch (err) {
+      let errMsg = err instanceof Error ? err.message : String(err);
+      console.error('[UADE.worklet] Render error:', errMsg);
+      this.port.postMessage({ type: 'renderError', message: errMsg });
+    }
+  }
+
+  /**
+   * Encode stereo float32 PCM to WAV format (16-bit PCM).
+   */
+  _encodeWAV(leftChannel, rightChannel, sampleRate) {
+    const numChannels = 2;
+    const numFrames = leftChannel.length;
+    const bytesPerSample = 2; // 16-bit
+    const dataSize = numFrames * numChannels * bytesPerSample;
+    const buffer = new ArrayBuffer(44 + dataSize);
+    const view = new DataView(buffer);
+
+    // WAV header
+    let offset = 0;
+
+    // "RIFF" chunk descriptor
+    view.setUint32(offset, 0x52494646, false); offset += 4; // "RIFF"
+    view.setUint32(offset, 36 + dataSize, true); offset += 4; // File size - 8
+    view.setUint32(offset, 0x57415645, false); offset += 4; // "WAVE"
+
+    // "fmt " sub-chunk
+    view.setUint32(offset, 0x666d7420, false); offset += 4; // "fmt "
+    view.setUint32(offset, 16, true); offset += 4; // Sub-chunk size (16 for PCM)
+    view.setUint16(offset, 1, true); offset += 2; // Audio format (1 = PCM)
+    view.setUint16(offset, numChannels, true); offset += 2; // Num channels
+    view.setUint32(offset, sampleRate, true); offset += 4; // Sample rate
+    view.setUint32(offset, sampleRate * numChannels * bytesPerSample, true); offset += 4; // Byte rate
+    view.setUint16(offset, numChannels * bytesPerSample, true); offset += 2; // Block align
+    view.setUint16(offset, bytesPerSample * 8, true); offset += 2; // Bits per sample
+
+    // "data" sub-chunk
+    view.setUint32(offset, 0x64617461, false); offset += 4; // "data"
+    view.setUint32(offset, dataSize, true); offset += 4; // Data size
+
+    // Audio data (interleaved 16-bit PCM)
+    for (let i = 0; i < numFrames; i++) {
+      // Clamp and convert to 16-bit signed integer
+      const left = Math.max(-1, Math.min(1, leftChannel[i]));
+      const right = Math.max(-1, Math.min(1, rightChannel[i]));
+      view.setInt16(offset, left * 0x7FFF, true); offset += 2;
+      view.setInt16(offset, right * 0x7FFF, true); offset += 2;
+    }
+
+    return buffer;
+  }
+
+  process(_inputs, outputs) {
+    const outL = outputs[0][0];
+    const outR = outputs[0][1] || outputs[0][0];  // Mono fallback
+    const frames = outL.length;  // Usually 128
+
+    if (!this._ready || !this._playing || this._paused || !this._wasm) {
+      // Silence
+      outL.fill(0);
+      if (outR !== outL) outR.fill(0);
+      return true;
+    }
+
+    try {
+      // Render audio into WASM-allocated float32 buffers
+      this._hasRendered = true;
+      const ret = this._wasm._uade_wasm_render(this._ptrL, this._ptrR, frames);
+
+      if (ret === 0) {
+        // Song ended — mark needsReload so play() reloads from beginning
+        this._playing = false;
+        this._needsReload = true;
+        this.port.postMessage({ type: 'songEnd' });
+        outL.fill(0);
+        if (outR !== outL) outR.fill(0);
+        return true;
+      }
+
+      if (ret < 0) {
+        // Error — silence and continue
+        outL.fill(0);
+        if (outR !== outL) outR.fill(0);
+        return true;
+      }
+
+      // Copy float32 from WASM heap to Web Audio output buffers
+      const heapF32 = this._wasm.HEAPF32;
+      const baseL = this._ptrL >> 2;  // Convert byte offset to float32 index
+      const baseR = this._ptrR >> 2;
+
+      for (let i = 0; i < frames; i++) {
+        outL[i] = heapF32[baseL + i];
+        if (outR !== outL) outR[i] = heapF32[baseR + i];
+      }
+
+      // --- Per-channel audio capture (isolation + dub + oscilloscope) ---
+      const hasIsolation = this._isolationSlots && this._isolationSlots.some(s => s !== null);
+      const hasDub = this._dubChannelEnabled && this._dubChannelEnabled.some(Boolean);
+      const needsPerChannel = hasIsolation || hasDub || this._oscEnabled;
+      // DUB_OUTPUT_BASE matches ChannelRoutedEffects.ts (= 1 + MAX_ISOLATION_SLOTS)
+      const DUB_OUTPUT_BASE = 5;
+      if (needsPerChannel && this._wasm._uade_wasm_read_channel_samples && this._chPtrs) {
+        // Read per-channel audio captured during the render pass
+        const chFrames = this._wasm._uade_wasm_read_channel_samples(
+          this._chPtrs[0], this._chPtrs[1], this._chPtrs[2], this._chPtrs[3], frames
+        );
+        if (chFrames > 0) {
+          const chBases = this._chPtrs.map(p => p >> 2);
+
+          // Route to dub-send outputs — one output per Paula channel. Mono-
+          // mixed into both stereo sides (the tap is downstream and the
+          // channel's dub send is a mono path through the DubBus anyway).
+          if (hasDub) {
+            for (let ch = 0; ch < 4; ch++) {
+              if (!this._dubChannelEnabled[ch]) continue;
+              const slotOut = outputs[DUB_OUTPUT_BASE + ch];
+              if (!slotOut || slotOut.length === 0) continue;
+              const sL = slotOut[0];
+              const sR = slotOut[1] || slotOut[0];
+              const chBase = chBases[ch];
+              for (let i = 0; i < chFrames; i++) {
+                const sample = heapF32[chBase + i];
+                sL[i] = sample;
+                if (sR !== sL) sR[i] = sample;
+              }
+            }
+          }
+
+          // Route to isolation slot outputs
+          if (hasIsolation) {
+            for (let s = 0; s < 4; s++) {
+              const slot = this._isolationSlots[s];
+              if (!slot) continue;
+              const slotOut = outputs[s + 1];
+              if (!slotOut || slotOut.length === 0) continue;
+              const sL = slotOut[0];
+              const sR = slotOut[1] || slotOut[0];
+              sL.fill(0);
+              sR.fill(0);
+              // Mix channels in this slot's mask to stereo using Amiga panning
+              // Paula: ch0+ch3 = left, ch1+ch2 = right
+              for (let ch = 0; ch < 4; ch++) {
+                if (!(slot.channelMask & (1 << ch))) continue;
+                const isLeft = (ch === 0 || ch === 3);
+                const chBase = chBases[ch];
+                for (let i = 0; i < chFrames; i++) {
+                  const sample = heapF32[chBase + i];
+                  if (isLeft) sL[i] += sample; else sR[i] += sample;
+                }
+              }
+            }
+          }
+
+          // Capture per-channel oscilloscope snapshots
+          if (this._oscEnabled && this._oscSnapshots) {
+            for (let ch = 0; ch < 4; ch++) {
+              const chBase = chBases[ch];
+              const snap = this._oscSnapshots[ch];
+              let wp = this._oscWritePos;
+              for (let i = 0; i < chFrames; i++) {
+                // Convert float (-1..1) to Int16 (-32768..32767)
+                snap[wp] = Math.max(-32768, Math.min(32767, (heapF32[chBase + i] * 32767) | 0));
+                wp = (wp + 1) & 255; // wrap at 256
+              }
+              // Only update write pos after last channel (all channels use same write pos)
+              if (ch === 3) this._oscWritePos = wp;
+            }
+
+            // Send oscilloscope data at ~30fps
+            if (currentTime - this._oscLastSendTime > 0.033) {
+              this._oscLastSendTime = currentTime;
+              // Copy snapshots for transfer (reorder from write position for contiguous waveform)
+              const out = new Array(4);
+              for (let ch = 0; ch < 4; ch++) {
+                const snap = this._oscSnapshots[ch];
+                const wp = this._oscWritePos;
+                const copy = new Int16Array(256);
+                for (let i = 0; i < 256; i++) {
+                  copy[i] = snap[(wp + i) & 255];
+                }
+                out[ch] = copy;
+              }
+              this.port.postMessage({ type: 'oscData', channels: out }, out.map(a => a.buffer));
+            }
+          }
+        }
+      }
+
+      // Read Paula channel state for live pattern display (~20Hz)
+      if (this._channelBuf === undefined) {
+        this._channelBuf = this._wasm._malloc(64); // 4 channels * 4 fields * 4 bytes
+        this._prevPeriods = [0, 0, 0, 0];
+        this._lastChannelPost = 0;
+      }
+
+      this._wasm._uade_wasm_get_channel_snapshot(this._channelBuf);
+      const snap = new Uint32Array(this._wasm.HEAPU8.buffer, this._channelBuf, 16);
+
+      // Post at ~20Hz (every ~50ms), not every render call
+      if (currentTime - this._lastChannelPost > 0.05) {
+        const channels = [];
+        for (let i = 0; i < 4; i++) {
+          const base = i * 4;
+          const period = snap[base];
+          channels.push({
+            period: period,
+            volume: snap[base + 1],
+            dma: snap[base + 2],
+            triggered: period !== this._prevPeriods[i] && period > 0 && snap[base + 2],
+            samplePtr: snap[base + 3],
+          });
+          this._prevPeriods[i] = period;
+        }
+
+        const totalFrames = this._wasm._uade_wasm_get_total_frames();
+        this.port.postMessage({
+          type: 'channels',
+          channels,
+          totalFrames
+        });
+
+        // Post position update with CIA tick count for audio/visual sync
+        this.port.postMessage({
+          type: 'position',
+          tickCount: this._wasm._uade_wasm_get_tick_count(),
+          totalFrames,
+          audioTime: currentTime
+        });
+
+        // Post per-channel VU levels derived from Paula volume registers
+        const levels = new Float32Array(4);
+        for (let i = 0; i < 4; i++) {
+          levels[i] = channels[i].dma ? channels[i].volume / 64.0 : 0;
+        }
+        this.port.postMessage({ type: 'chLevels', levels });
+
+        this._lastChannelPost = currentTime;
+      }
+
+      // Live tick capture: drain tick snapshot ring buffer every ~500ms
+      if (this._liveTickCapture && this._wasm._uade_wasm_get_tick_snapshots &&
+          currentTime - this._lastTickDrain > 0.5) {
+        this._lastTickDrain = currentTime;
+        const maxDrain = 4096;
+        const wordsPerSnap = 13;
+        if (!this._liveTickDrainBuf) {
+          this._liveTickDrainBuf = this._wasm._malloc(maxDrain * wordsPerSnap * 4);
+        }
+        if (this._liveTickDrainBuf) {
+          const count = this._wasm._uade_wasm_get_tick_snapshots(this._liveTickDrainBuf, maxDrain);
+          if (count > 0) {
+            const raw = new Uint32Array(this._wasm.HEAPU8.buffer, this._liveTickDrainBuf, count * wordsPerSnap);
+            const snapshots = [];
+            for (let i = 0; i < count; i++) {
+              const base = i * wordsPerSnap;
+              const channels = [];
+              for (let ch = 0; ch < 4; ch++) {
+                const w0 = raw[base + 1 + ch * 3 + 0];
+                const w1 = raw[base + 1 + ch * 3 + 1];
+                const w2 = raw[base + 1 + ch * 3 + 2];
+                channels.push({
+                  period:    (w0 >>> 16) & 0xFFFF,
+                  volume:    w0 & 0xFFFF,
+                  lc:        w1,
+                  len:       (w2 >>> 8) & 0xFFFF,
+                  dmaEn:     (w2 >>> 1) & 1,
+                  triggered: w2 & 1,
+                });
+              }
+              snapshots.push({ tick: raw[base], channels });
+            }
+            this.port.postMessage({ type: 'liveTickBatch', snapshots });
+          }
+        }
+      }
+    } catch (err) {
+      outL.fill(0);
+      if (outR !== outL) outR.fill(0);
+    }
+
+    return true;  // Keep processor alive
+  }
+}
+
+registerProcessor('uade-processor', UADEProcessor);

@@ -4,6 +4,7 @@ import { getHiddenWidgets } from "@/lib/widgets";
 import UsersOnlineLive from "@/components/widgets/UsersOnlineLive";
 import CedSessions from "@/components/widgets/CedSessions";
 import NowPlaying from "@/components/widgets/NowPlaying";
+import MusicPlayer from "@/components/widgets/MusicPlayer";
 import ActivityFeed from "@/components/widgets/ActivityFeed";
 import LastCallers from "@/components/widgets/LastCallers";
 import PollSidebarLatest from "@/components/widgets/PollSidebarLatest";
@@ -23,6 +24,7 @@ export default async function LeftSidebar() {
       {!hidden.has("activity_feed") && <ActivityFeed />}
       {!hidden.has("ced_sessions") && <CedSessions />}
       {!hidden.has("now_playing") && <NowPlaying />}
+      {!hidden.has("music_player") && <MusicPlayer />}
       {!hidden.has("last_callers") && <Suspense fallback={null}><LastCallers limit={5} /></Suspense>}
       {!hidden.has("poll_latest_closed") && <Suspense fallback={null}><PollSidebarLatest /></Suspense>}
       {!hidden.has("latest_collys_released") && <Suspense fallback={null}><LatestCollys type="released" limit={8} /></Suspense>}
