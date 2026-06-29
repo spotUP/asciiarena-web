@@ -11,8 +11,8 @@ import {
   deleteComment as deleteCommentAction,
 } from "@/app/actions/collys";
 import { buildAdminCollyEditHref } from "@/app/admin/collys/editHref";
-import { FONTS, ANSI_FONT_MAP, loadAnsiLove } from "@/lib/ansilove";
-import { looksLikeCp437Art, decodeReleaseText, isRenderableArt } from "@/lib/releaseText";
+import { FONTS, ANSI_FONT_MAP, loadAnsiLove, type AnsiLoveController } from "@/lib/ansilove";
+import { looksLikeCp437Art, decodeReleaseText, isRenderableArt, isAnsiAnimation } from "@/lib/releaseText";
 
 const COLOR_OPTIONS = [
   { value: "#555555", label: "Bright Black" },
@@ -253,9 +253,20 @@ function recolorMonochromeCanvas(canvas: HTMLCanvasElement, fgHex: string, bgHex
 
 function ArchiveEntryRenderer({ filename, entry, ansiFont, fgColor, bgColor, isAdmin, initialAdminHidden }: { filename: string; entry: string; ansiFont: string; fgColor: string; bgColor: string; isAdmin: boolean; initialAdminHidden: boolean }) {
   const hostRef = useRef<HTMLDivElement>(null);
+  const animRef = useRef<AnsiLoveController | null>(null);
   const [hidden, setHidden] = useState(false);
   const [adminHidden, setAdminHidden] = useState(initialAdminHidden);
   const [busy, setBusy] = useState(false);
+  const [isAnim, setIsAnim] = useState(false);
+  const [playing, setPlaying] = useState(false);
+
+  const ANIM_BAUD = 14400;
+  const togglePlay = () => {
+    const ctrl = animRef.current;
+    if (!ctrl) return;
+    if (playing) { ctrl.stop(); setPlaying(false); }
+    else { ctrl.play(ANIM_BAUD, () => { if (animRef.current) animRef.current.play(ANIM_BAUD, () => {}, true); }, true); setPlaying(true); }
+  };
 
   // Admins can hide unrelated entries (persisted); visitors then never receive
   // them. Hidden entries reach admins flagged, rendered dimmed with "Unhide".
@@ -308,9 +319,27 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont, fgColor, bgColor, isA
         return;
       }
 
+      // ANSI animation — play it over time with animate() instead of drawing
+      // the final (overlapping) frame statically.
+      const animated = hasEsc && isAnsiAnimation(bytes);
       el.style.backgroundColor = isCp437 ? bgColor : "#000";
       loadAnsiLove().then(api => {
         if (cancelled) return;
+        if (animated) {
+          setIsAnim(true);
+          const ctrl = api.animateBytes(bytes, (canvas: HTMLCanvasElement) => {
+            if (cancelled) return;
+            el.innerHTML = "";
+            canvas.style.display = "block";
+            canvas.style.margin = "0 auto";
+            el.appendChild(canvas);
+            const loop = () => { if (animRef.current && !cancelled) animRef.current.play(ANIM_BAUD, loop, true); };
+            ctrl.play(ANIM_BAUD, loop, true);
+            setPlaying(true);
+          }, { font: ansiFont, bits: "8", icecolors: 1, filetype: "ans" });
+          animRef.current = ctrl;
+          return;
+        }
         const opts = isCp437
           ? { font: "80x25", bits: "8", icecolors: 1, thumbnail: 0, filetype: "ascii" }
           : { font: ansiFont, bits: "8", icecolors: 1, thumbnail: 0, filetype: "ans" };
@@ -326,7 +355,7 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont, fgColor, bgColor, isA
       }).catch(fail);
     }).catch(fail);
 
-    return () => { cancelled = true; };
+    return () => { cancelled = true; if (animRef.current) animRef.current.stop(); };
   }, [filename, entry, ansiFont, fgColor, bgColor]);
 
   if (hidden) return null;
@@ -334,6 +363,15 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont, fgColor, bgColor, isA
     <div style={{ marginBottom: "16px", overflow: "visible", opacity: adminHidden ? 0.4 : 1 }}>
       <div className="header bg-header col-12 ap-1" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px" }}>
         <span className="text-truncate">{entry.split("/").pop()}{adminHidden ? " (hidden)" : ""}</span>
+        {isAnim && (
+          <input
+            type="button"
+            className="btn-big"
+            value={playing ? "Pause" : "Play"}
+            onClick={togglePlay}
+            style={{ flexShrink: 0 }}
+          />
+        )}
         {isAdmin && (
           <input
             type="button"

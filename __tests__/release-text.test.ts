@@ -8,9 +8,12 @@ import {
   stripFileIdDiz,
   looksLikeCp437Art,
   isRenderableArt,
+  isAnsiAnimation,
   BEGIN_FILE_ID_DIZ,
   END_FILE_ID_DIZ,
 } from "@/lib/releaseText";
+
+const esc = (s: string) => new TextEncoder().encode(s.replace(/\\e/g, "\x1b"));
 
 describe("release text decoding", () => {
   it("decodes PC charset block art bytes as CP437 glyphs", () => {
@@ -113,6 +116,17 @@ describe("release text decoding", () => {
     expect(isRenderableArt(new Uint8Array([0x1b, 0x5b, 0x33, 0x32, 0x6d, 0x41, 0x0a]))).toBe(true);
     // CP437 block art (high bytes are fine).
     expect(isRenderableArt(new Uint8Array([0xdb, 0xdc, 0xdf, 0x0a]))).toBe(true);
+  });
+
+  it("isAnsiAnimation detects cursor-repositioning animations, not static art", () => {
+    // Many absolute cursor positions (ESC[r;cH) => animation (like PLANE_LOVE).
+    let anim = "";
+    for (let i = 0; i < 12; i++) anim += `\\e[${i + 1};5HX`;
+    expect(isAnsiAnimation(esc(anim))).toBe(true);
+    // Static ANSI art: colour codes + newlines, no repositioning.
+    expect(isAnsiAnimation(esc("\\e[32mhello\\n\\e[36mworld\\n"))).toBe(false);
+    // A couple of positions is not enough (below threshold).
+    expect(isAnsiAnimation(esc("\\e[1;1Hhi\\e[2;1Hyo"))).toBe(false);
   });
 
   it("isRenderableArt rejects binary blobs (NUL / stray control bytes)", () => {

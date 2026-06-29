@@ -103,6 +103,32 @@ export function isRenderableArt(bytes: Uint8Array): boolean {
   return ctrl <= bytes.length * 0.02;
 }
 
+/** Heuristic: an ANSI animation repositions the cursor over time to redraw —
+ *  absolute positioning (ESC[r;cH/f), cursor-up (ESC[nA), save/restore
+ *  (ESC[s / ESC[u) or full screen clears (ESC[2J) — unlike static art, which
+ *  draws top-to-bottom. Many such sequences ⇒ play it with AnsiLove animate()
+ *  instead of drawing the final (overlapping) frame statically. */
+export function isAnsiAnimation(bytes: Uint8Array): boolean {
+  let signals = 0;
+  for (let i = 0; i + 1 < bytes.length; i++) {
+    if (bytes[i] !== 0x1b || bytes[i + 1] !== 0x5b) continue; // ESC[
+    let j = i + 2;
+    let params = "";
+    while (j < bytes.length && ((bytes[j] >= 0x30 && bytes[j] <= 0x39) || bytes[j] === 0x3b)) {
+      params += String.fromCharCode(bytes[j]);
+      j++;
+    }
+    const fin = bytes[j];
+    // A=up, H/f=absolute position, s=save, u=restore, J(param 2)=clear screen
+    if (fin === 0x41 || fin === 0x48 || fin === 0x66 || fin === 0x73 || fin === 0x75 ||
+        (fin === 0x4a && params === "2")) {
+      if (++signals >= 8) return true;
+    }
+    i = j;
+  }
+  return false;
+}
+
 export function decodeReleaseText(bytes: Uint8Array, encoding: ReleaseTextEncoding): string {
   if (encoding === "cp437") return decodeCp437Bytes(bytes);
 
