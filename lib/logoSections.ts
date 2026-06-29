@@ -125,7 +125,11 @@ export function detectLogoSections(html: string): LogoSection[] {
   // even when the divider is glued to a logo with no blank line (which is why
   // fingerprinting the island as a whole missed it: the logo's varying line
   // made the fingerprint unique).
-  const shapes = lines.map((l, i) => (metas[i].blank ? "" : norm(l)));
+  // Structural signature is tolerant to horizontal position and whitespace runs
+  // so a divider frame still matches across occurrences even when it shifts
+  // sideways or its rule rows flex in length to fit different interior text.
+  const structSig = (s: string) => s.trim().replace(/\s+/g, " ").replace(/\S/g, "#");
+  const shapes = lines.map((l, i) => (metas[i].blank ? "" : structSig(l)));
   const rawAll = scanIslands(metas);
   const shapeIslandCount = new Map<string, number>();
   for (const isl of rawAll) {
@@ -141,11 +145,20 @@ export function detectLogoSections(html: string): LogoSection[] {
   const STRUCT_MIN = 3;
   const structural = shapes.map((sh) => sh !== "" && (shapeIslandCount.get(sh) ?? 0) >= STRUCT_MIN);
 
-  // Trim divider rows glued to the top/bottom of each island, and drop islands
-  // that are entirely divider rows. Edge-trimming (vs removing every structural
-  // line) keeps textured logos with internal repeats intact.
+  // Classify each island by how much of it is repeating divider-frame rows:
+  //  - Mostly frame (>= half the rows): it's a divider, even when its interior
+  //    caption/counter text varies between occurrences (so those interior rows
+  //    aren't structural). Drop it whole — edge-trimming would leave the varying
+  //    caption behind as a false logo (the bug with framed "name boxes").
+  //  - Some frame at the edges only: a divider glued to a real logo. Edge-trim
+  //    the frame rows and keep the art (this preserves textured logos with
+  //    internal repeats, which edge-trimming leaves untouched).
   const raw: RawIsland[] = [];
   for (const isl of rawAll) {
+    const lc = isl.endLine - isl.startLine + 1;
+    let structCount = 0;
+    for (let r = isl.startLine; r <= isl.endLine; r++) if (structural[r]) structCount++;
+    if (structCount * 2 >= lc) continue; // majority frame -> whole block is a divider
     let s = isl.startLine;
     let e = isl.endLine;
     while (s <= e && structural[s]) s++;

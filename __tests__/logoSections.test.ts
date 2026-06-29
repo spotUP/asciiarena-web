@@ -109,7 +109,54 @@ const GLUED_DIVIDERS = colly(
   "",
 );
 
+// A repeating "name box" divider: an identical colon-frame whose interior text
+// (logo name + a backwards counter, e.g. "3o ! NAME : o3") changes every time,
+// whose rule rows flex in length to fit the name, and which shifts sideways
+// between occurrences. The frame motif is "the same" to a human but never
+// byte-identical — the regression that detected these boxes as logos.
+const NAMEBOX = (name: string, c: string, pad: string) => colly(
+  pad + "|: :::::|",
+  pad + ".      |: :::::|",
+  pad + c + "o ! " + name + " : o" + c,
+  pad + "_ ___ " + "_".repeat(name.length) + " _ _",
+  pad + "|: :::::|",
+  pad + " : .::::!",
+  pad + "!: :::::|",
+);
+const NB_LOGO_1 = colly(
+  "_/\\__ ___ AAA ___ __/\\_",
+  "|  | /   \\ |  | /   \\| |",
+  "|__| \\___/ |__| \\___/|_|",
+  "|  | /   \\ |  | /   \\| |",
+  "|__| \\___/ |__| \\___/|_|",
+);
+const NB_LOGO_2 = colly(
+  "/\\__ ___ BBB ___ _/\\__",
+  "|  |/   \\|  |/   \\|  ||",
+  "|__|\\___/|__|\\___/|__||",
+  "|  |/   \\|  |/   \\|  ||",
+  "|__|\\___/|__|\\___/|__||",
+);
+const FLEXED_NAMEBOXES = colly(
+  NAMEBOX("BROWALLIA", "3", ""), "",
+  NB_LOGO_1, "",
+  NAMEBOX("NUKLEUS", "2", "    "), "",
+  NB_LOGO_2, "",
+  NAMEBOX("DIVINE", "1", "        "), "",
+);
+
 describe("detectLogoSections", () => {
+  it("ignores repeating framed name-box dividers (varying text, flexing/shifting frame)", () => {
+    const secs = detectLogoSections(FLEXED_NAMEBOXES);
+    expect(secs).toHaveLength(2); // the two real logos, not the three name boxes
+    const text = (s: { startLine: number; endLine: number }) =>
+      FLEXED_NAMEBOXES.split("\n").slice(s.startLine, s.endLine + 1).join("\n");
+    for (const s of secs) {
+      expect(text(s)).not.toMatch(/BROWALLIA|NUKLEUS|DIVINE/); // no divider interior survived
+      expect(text(s)).not.toMatch(/\bo[0-9]\b/); // no backwards counter survived
+    }
+  });
+
   it("scrolls past a repeated divider glued to each logo (no pause on dividers)", () => {
     const secs = detectLogoSections(GLUED_DIVIDERS);
     expect(secs).toHaveLength(3); // the three logos, not the dividers
