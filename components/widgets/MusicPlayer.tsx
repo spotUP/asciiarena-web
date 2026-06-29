@@ -6,6 +6,35 @@ import { isUadePlayable, type ModlandFile } from "@/lib/modland";
 
 const basename = (p: string) => p.split("/").pop() || p;
 
+// Block-ANSI volume bar: a row of 8x16-style cells, magenta when filled.
+// Click or drag to set the level.
+function VolumeBar({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
+  const CELLS = 16;
+  const filled = Math.round(value * CELLS);
+  const setFromX = (clientX: number) => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    onChange(Math.max(0, Math.min((clientX - r.left) / r.width, 1)));
+  };
+  return (
+    <div
+      ref={ref}
+      title="Volume"
+      onPointerDown={(e) => { dragging.current = true; (e.target as HTMLElement).setPointerCapture?.(e.pointerId); setFromX(e.clientX); }}
+      onPointerMove={(e) => { if (dragging.current) setFromX(e.clientX); }}
+      onPointerUp={(e) => { dragging.current = false; (e.target as HTMLElement).releasePointerCapture?.(e.pointerId); }}
+      style={{ flex: 1, minWidth: 0, marginLeft: "4px", display: "flex", gap: "1px", height: "16px", cursor: "pointer", touchAction: "none" }}
+    >
+      {Array.from({ length: CELLS }).map((_, i) => (
+        <div key={i} style={{ flex: 1, background: i < filled ? "#ff55ff" : "#333" }} />
+      ))}
+    </div>
+  );
+}
+
 // Minimal Modland music player widget. Backed by the persistent MusicProvider
 // engine, so playback continues across (client-side) navigation.
 export default function MusicPlayer() {
@@ -138,12 +167,7 @@ export default function MusicPlayer() {
             <button type="button" style={btn} onClick={toggle} disabled={!track} title="Play/Pause">{isPlaying ? "Pause" : "Play"}</button>
             <button type="button" style={btn} onClick={stop} disabled={!track} title="Stop">Stop</button>
             <button type="button" style={btn} onClick={() => playRandom()} title="Random tune">Random</button>
-            <input
-              type="range" min={0} max={1} step={0.05} value={volume}
-              onChange={(e) => setVolume(parseFloat(e.target.value))}
-              title="Volume"
-              style={{ flex: 1, minWidth: 0, marginLeft: "4px", accentColor: "#ff55ff" }}
-            />
+            <VolumeBar value={volume} onChange={setVolume} />
           </div>
         </div>
       </div>
