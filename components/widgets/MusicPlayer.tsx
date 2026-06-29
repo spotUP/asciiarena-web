@@ -73,7 +73,7 @@ export default function MusicPlayer() {
       // frequency scale (bass spread out, treble compressed) so the bars fill
       // the strip; smooth height (no row banding) with a gamma lift so quiet
       // bands still register.
-      const barW = 6;
+      const barW = 8; // 8px grid cell (7px bar + 1px gap)
       const nBars = Math.max(1, Math.floor(cssW / barW));
       const minBin = 1, maxBin = Math.min(bins - 1, 220);
       ctx.fillStyle = "#ff55ff";
