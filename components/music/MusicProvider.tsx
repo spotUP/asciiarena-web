@@ -75,7 +75,10 @@ export default function MusicProvider({ children }: { children: React.ReactNode 
       setTrack({ title: file.filename, format: file.format, path: file.full_path });
       setIsPlaying(true);
       return true;
-    } catch {
+    } catch (e) {
+      // Rate limiting is fatal for this attempt — propagate so callers stop
+      // retrying (and hammering the shared upstream) and show a clear message.
+      if (e instanceof Error && /rate limit/i.test(e.message)) throw e;
       return false;
     }
   }, []);
@@ -83,9 +86,13 @@ export default function MusicProvider({ children }: { children: React.ReactNode 
   const playFile = useCallback(async (file: ModlandFile) => {
     setLoading(true);
     setError(null);
-    const ok = await tryLoad(file);
-    if (!ok) setError("Couldn't play this tune");
-    setLoading(false);
+    try {
+      if (!(await tryLoad(file))) setError("Couldn't play this tune");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Playback failed");
+    } finally {
+      setLoading(false);
+    }
   }, [tryLoad]);
 
   const playRandom = useCallback(async () => {
