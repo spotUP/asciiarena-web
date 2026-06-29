@@ -1,11 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { chooseRandomFormat, randomOffset, UADE_RANDOM_FORMATS, type ModlandFormatCount } from "@/lib/modland";
+import { chooseRandomFormat, randomOffset, UADE_RANDOM_DENY, type ModlandFormatCount } from "@/lib/modland";
 
-// Realistic-ish counts (Protracker dwarfs the rest; TFMX is tiny). Includes a
-// PC format that must never be chosen, since UADE can't play it.
+// Realistic-ish counts (Protracker dwarfs the rest; TFMX is tiny). Includes PC
+// formats that must never be chosen (UADE can't play them) and some niche Amiga
+// formats that must be reachable (they're only excluded by an allowlist).
 const COUNTS: ModlandFormatCount[] = [
   { format: "Protracker", count: 80591 },
-  { format: "Fasttracker 2", count: 44239 }, // PC — not in the allowlist
+  { format: "Fasttracker 2", count: 44239 }, // PC — denied
+  { format: "Impulsetracker", count: 25553 }, // PC — denied
   { format: "OctaMED MMD1", count: 2722 },
   { format: "Soundtracker", count: 1864 },
   { format: "OctaMED MMD0", count: 1443 },
@@ -14,6 +16,8 @@ const COUNTS: ModlandFormatCount[] = [
   { format: "Delitracker Custom", count: 748 },
   { format: "TFMX", count: 736 },
   { format: "Oktalyzer", count: 448 },
+  { format: "Richard Joseph", count: 154 }, // niche Amiga player — must be reachable
+  { format: "David Whittaker", count: 121 }, // niche Amiga player — must be reachable
 ];
 
 function distribution(counts: ModlandFormatCount[], n = 2000): Record<string, number> {
@@ -26,10 +30,17 @@ function distribution(counts: ModlandFormatCount[], n = 2000): Record<string, nu
 }
 
 describe("chooseRandomFormat", () => {
-  it("never picks a format outside the UADE allowlist", () => {
+  it("never picks a PC format UADE can't play", () => {
     const d = distribution(COUNTS);
     expect(d["Fasttracker 2"]).toBeUndefined();
-    for (const f of Object.keys(d)) expect(UADE_RANDOM_FORMATS).toContain(f);
+    expect(d["Impulsetracker"]).toBeUndefined();
+    for (const f of Object.keys(d)) expect(UADE_RANDOM_DENY.has(f.toLowerCase())).toBe(false);
+  });
+
+  it("includes niche Amiga formats, not just a curated few", () => {
+    const d = distribution(COUNTS);
+    expect(d["Richard Joseph"]).toBeGreaterThan(0);
+    expect(d["David Whittaker"]).toBeGreaterThan(0);
   });
 
   it("favors the largest format but does not let it dominate everything", () => {

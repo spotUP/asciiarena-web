@@ -44,15 +44,21 @@ export function isUadePlayable(f: ModlandFile): boolean {
   return true;
 }
 
-// Confirmed UADE-playable Amiga formats for "random". (PC trackers are excluded
-// — UADE can't play them.) Random picks across all of these, weighted by how
-// many modules each has, so the mix reflects the real library instead of
-// over-serving tiny formats.
+// Formats UADE CANNOT play — PC trackers and Atari-Falcon/PC formats. Random
+// draws from every other Modland format (UADE handles ~130 Amiga formats), so
+// the denylist is tiny and the pool is huge.
+export const UADE_RANDOM_DENY = new Set([
+  "fasttracker 2", "fasttracker", "impulsetracker", "screamtracker 3", "screamtracker 2",
+  "multitracker", "composer 669", "ultratracker", "openmpt mptm", "farandole composer",
+  "digital tracker dtm", "digital tracker mod", "graoumf tracker", "graoumf tracker 2",
+  "tcb tracker",
+]);
+
+// Small reliable fallback pool, used only if the per-format counts can't be
+// fetched (so random still works without the weighting data).
 export const UADE_RANDOM_FORMATS = [
-  "Protracker", "Soundtracker", "Noisetracker",
-  "OctaMED MMD0", "OctaMED MMD1", "OctaMED MMD2", "OctaMED MMD3",
-  "AHX", "TFMX", "Delitracker Custom", "Oktalyzer", "SoundFX",
-  "Sonic Arranger", "Quartet ST", "Future Composer 1.3", "Future Composer 1.4",
+  "Protracker", "Soundtracker", "OctaMED MMD1", "AHX", "TFMX",
+  "Delitracker Custom", "IFF-SMUS", "Future Composer 1.4",
 ];
 
 export interface ModlandFormatCount {
@@ -72,7 +78,8 @@ export async function getModlandFormats(): Promise<ModlandFormatCount[]> {
   }
 }
 
-// Pick a random UADE-playable format, weighted by sqrt(count). sqrt dampens the
+// Pick a random UADE-playable format, weighted by sqrt(count). The pool is every
+// Modland format except the PC/Falcon ones UADE can't play. sqrt dampens the
 // weighting so giant formats (Protracker ~80k) stay the plurality without
 // drowning out everything else, while tiny formats (TFMX ~700) become rare
 // instead of equally likely. `rand` is a 0..1 value (injected for testing).
@@ -80,8 +87,7 @@ export function chooseRandomFormat(
   counts: ModlandFormatCount[],
   rand: number,
 ): ModlandFormatCount | null {
-  const allow = new Set(UADE_RANDOM_FORMATS);
-  const pool = counts.filter((c) => allow.has(c.format) && c.count > 0);
+  const pool = counts.filter((c) => c.count > 0 && !UADE_RANDOM_DENY.has(c.format.toLowerCase()));
   if (!pool.length) return null;
   const weights = pool.map((c) => Math.sqrt(c.count));
   const total = weights.reduce((a, b) => a + b, 0);
