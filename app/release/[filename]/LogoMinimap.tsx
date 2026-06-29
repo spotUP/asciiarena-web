@@ -8,34 +8,42 @@ export const MINIMAP_WIDTH = 88; // px — keep in sync with the container's rig
 
 const LENS_A = 20; // peak extra weight at the cursor (magnification strength)
 const LENS_SIGMA = 14; // rows — how wide the lens spreads
+const BANDS = 240; // vertical slices used to render the warped source image
+const MAX_COLS = 240;
+const MAX_SRC_H = 16000; // cap the offscreen source height (memory)
 
 interface Props {
-  /** The scroll container (#colly-div). */
   containerRef: React.RefObject<HTMLDivElement | null>;
-  /** The <pre> (#colly) — read for text + rendered line height. */
   preRef: React.RefObject<HTMLElement | null>;
-  /** Logos, for the hover label. */
   entries: LogoIndexEntry[];
-  /** Blank-line spacers prepended to the rendered content (the <br> prefix). */
   spacers: number;
-  /** Foreground colour to paint the thumbnail with (redraws when it changes). */
   fgColor: string;
 }
 
-interface Model {
-  yEdges: Float32Array; // output Y (css px) for each rendered row edge, length R+1
+interface Source {
+  canvas: HTMLCanvasElement;
+  srcW: number;
+  ch: number; // source pixels per text row
   R: number; // total rendered rows
+  lineHeight: number; // live <pre> line height (px)
+}
+
+interface Model {
+  yEdges: Float32Array; // output Y (css px) per rendered-row edge, length R+1
+  R: number;
   lineHeight: number;
   cssH: number;
 }
 
-// A text-editor-style minimap with a fisheye lens: the whole colly is painted
-// tiny (a dot per non-space char), but rows near the cursor bulge larger so you
-// can make out individual logos to aim at, while the ends stay compressed.
+// A text-editor-style minimap with a fisheye lens. The whole colly is rendered
+// once to a high-resolution offscreen canvas (actual glyphs), then sampled into
+// the visible strip with smoothing — so it reads like a real zoomed document
+// rather than blocky dots. Rows near the cursor bulge larger; the ends compress.
 export default function LogoMinimap({ containerRef, preRef, entries, spacers, fgColor }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const sourceRef = useRef<Source | null>(null);
   const modelRef = useRef<Model | null>(null);
-  const focusRef = useRef<number | null>(null); // focus row (lens centre), null = no lens
+  const focusRef = useRef<number | null>(null);
   const draggingRef = useRef(false);
   const drawRafRef = useRef<number | null>(null);
   const scrollRafRef = useRef<number | null>(null);
@@ -47,12 +55,51 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, fg
     return (pre && parseFloat(getComputedStyle(pre).lineHeight)) || 16;
   }, [preRef]);
 
-  // Build the row->Y warp for the current focus and paint the thumbnail.
-  const draw = useCallback(() => {
-    const canvas = canvasRef.current;
+  // Render the colly to an offscreen canvas at a real (small) font size. Costly,
+  // so only rebuilt on mount / resize / font / colour change — never on hover.
+  const buildSource = useCallback(() => {
     const c = containerRef.current;
     const pre = preRef.current;
-    if (!canvas || !c || !pre) return;
+    if (!c || !pre) return;
+    const lh = lineHeight();
+    const R = Math.max(1, Math.round((c.scrollHeight || 1) / lh));
+    const ch = Math.min(8, Math.max(3, Math.floor(MAX_SRC_H / R)));
+    const fontFamily = getComputedStyle(pre).fontFamily;
+    const lines = (pre.textContent || "").split("\n");
+    let maxCols = 1;
+    for (const l of lines) maxCols = Math.max(maxCols, Math.min(l.length, MAX_COLS));
+
+    const probe = document.createElement("canvas").getContext("2d");
+    if (!probe) return;
+    probe.font = `${ch}px ${fontFamily}`;
+    const cw = probe.measureText("M").width || ch * 0.6;
+    const srcW = Math.max(1, Math.ceil(maxCols * cw));
+    const srcH = Math.max(1, Math.ceil(R * ch));
+
+    const off = sourceRef.current?.canvas ?? document.createElement("canvas");
+    off.width = srcW;
+    off.height = srcH;
+    const octx = off.getContext("2d");
+    if (!octx) return;
+    octx.clearRect(0, 0, srcW, srcH);
+    octx.font = `${ch}px ${fontFamily}`;
+    octx.textBaseline = "top";
+    octx.fillStyle = fgColor;
+    for (let i = 0; i < lines.length; i++) {
+      const r = spacers + i;
+      if (r >= R) break;
+      const line = lines[i];
+      if (line.trim() !== "") octx.fillText(line.length > MAX_COLS ? line.slice(0, MAX_COLS) : line, 0, r * ch);
+    }
+    sourceRef.current = { canvas: off, srcW, ch, R, lineHeight: lh };
+  }, [containerRef, preRef, lineHeight, spacers, fgColor]);
+
+  // Build the row->Y warp for the current focus, then sample the source image
+  // into the strip band by band (smoothed).
+  const draw = useCallback(() => {
+    const canvas = canvasRef.current;
+    const src = sourceRef.current;
+    if (!canvas || !src) return;
     const cssW = canvas.clientWidth;
     const cssH = canvas.clientHeight;
     if (cssW === 0 || cssH === 0) return;
@@ -63,15 +110,11 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, fg
     if (!ctx) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, cssW, cssH);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
 
-    const text = pre.textContent || "";
-    const lines = text.split("\n");
-    const lh = lineHeight();
-    const scrollHeight = c.scrollHeight || 1;
-    const R = Math.max(1, Math.round(scrollHeight / lh));
+    const { R, ch } = src;
     const focus = focusRef.current;
-
-    // Weight each rendered row: uniform, plus a Gaussian bump at the cursor.
     const yEdges = new Float32Array(R + 1);
     let sum = 0;
     const weights = new Float32Array(R);
@@ -87,39 +130,36 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, fg
     const scale = cssH / (sum || 1);
     for (let r = 0; r < R; r++) yEdges[r + 1] = yEdges[r] + weights[r] * scale;
     yEdges[R] = cssH;
-    modelRef.current = { yEdges, R, lineHeight: lh, cssH };
+    modelRef.current = { yEdges, R, lineHeight: src.lineHeight, cssH };
 
-    let maxCols = 1;
-    for (const l of lines) if (l.length > maxCols) maxCols = Math.min(l.length, 240);
-    const scaleX = cssW / maxCols;
-    const dotW = Math.max(0.6, scaleX);
-
-    ctx.fillStyle = fgColor;
-    ctx.globalAlpha = 0.85;
-    for (let i = 0; i < lines.length; i++) {
-      const r = spacers + i;
-      if (r >= R) break;
-      const yTop = yEdges[r];
-      const h = Math.max(0.6, yEdges[r + 1] - yTop);
-      const line = lines[i];
-      for (let j = 0; j < line.length && j < maxCols; j++) {
-        const ch = line.charCodeAt(j);
-        if (ch === 32 || ch === 9) continue;
-        ctx.fillRect(j * scaleX, yTop, dotW, h);
+    const rowAt = (y: number) => {
+      const yy = Math.max(0, Math.min(y, cssH));
+      let lo = 0;
+      let hi = R;
+      while (lo < hi) {
+        const mid = (lo + hi) >> 1;
+        if (yEdges[mid + 1] < yy) lo = mid + 1;
+        else hi = mid;
       }
-    }
-    ctx.globalAlpha = 1;
-  }, [containerRef, preRef, lineHeight, spacers, fgColor]);
+      const span = yEdges[lo + 1] - yEdges[lo] || 1;
+      return lo + (yy - yEdges[lo]) / span;
+    };
 
-  // Interpolated output Y for a fractional rendered row.
+    for (let b = 0; b < BANDS; b++) {
+      const outY0 = (b * cssH) / BANDS;
+      const outY1 = ((b + 1) * cssH) / BANDS;
+      const sy0 = rowAt(outY0) * ch;
+      const sy1 = rowAt(outY1) * ch;
+      const sh = Math.max(0.5, sy1 - sy0);
+      ctx.drawImage(src.canvas, 0, sy0, src.srcW, sh, 0, outY0, cssW, outY1 - outY0);
+    }
+  }, []);
+
   const yAtRow = (m: Model, rowFloat: number) => {
     const r = Math.max(0, Math.min(rowFloat, m.R));
     const i = Math.min(Math.floor(r), m.R - 1);
-    const frac = r - i;
-    return m.yEdges[i] + (m.yEdges[i + 1] - m.yEdges[i]) * frac;
+    return m.yEdges[i] + (m.yEdges[i + 1] - m.yEdges[i]) * (r - i);
   };
-
-  // Inverse: which rendered row sits at output Y (binary search the warp).
   const rowAtY = (m: Model, y: number) => {
     const yy = Math.max(0, Math.min(y, m.cssH));
     let lo = 0;
@@ -137,10 +177,9 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, fg
     const c = containerRef.current;
     const m = modelRef.current;
     if (!c || !m) return;
-    const topRow = c.scrollTop / m.lineHeight;
-    const botRow = (c.scrollTop + c.clientHeight) / m.lineHeight;
-    const top = yAtRow(m, topRow);
-    setThumb({ top, height: Math.max(8, yAtRow(m, botRow) - top) });
+    const top = yAtRow(m, c.scrollTop / m.lineHeight);
+    const bot = yAtRow(m, (c.scrollTop + c.clientHeight) / m.lineHeight);
+    setThumb({ top, height: Math.max(8, bot - top) });
   }, [containerRef]);
 
   const scheduleDraw = useCallback(() => {
@@ -152,14 +191,16 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, fg
     });
   }, [draw, updateThumb]);
 
-  // Redraw on mount and whenever the container/content resizes or fg changes.
+  // Mount + resize/font/colour: rebuild source, then redraw.
   useEffect(() => {
+    buildSource();
     draw();
     updateThumb();
     const c = containerRef.current;
     const pre = preRef.current;
     if (!c) return;
     const onResize = () => {
+      buildSource();
       draw();
       updateThumb();
     };
@@ -171,9 +212,9 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, fg
       ro.disconnect();
       window.removeEventListener("resize", onResize);
     };
-  }, [draw, updateThumb, containerRef, preRef]);
+  }, [buildSource, draw, updateThumb, containerRef, preRef]);
 
-  // Track scrolling (rAF-throttled) for the thumb.
+  // Scroll: just move the thumb (rAF-throttled).
   useEffect(() => {
     const c = containerRef.current;
     if (!c) return;
@@ -211,10 +252,8 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, fg
     const m = modelRef.current;
     if (!canvas || !m) return;
     const rect = canvas.getBoundingClientRect();
-    // Centre the lens on the linear position under the cursor (stable to track).
     focusRef.current = ((clientY - rect.top) / rect.height) * m.R;
     scheduleDraw();
-    // Hover label: nearest logo to the row currently under the cursor.
     const row = rowAtY(m, clientY - rect.top) - spacers;
     let best = 0;
     let bestD = Infinity;
