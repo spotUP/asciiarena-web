@@ -21,6 +21,8 @@ import {
   type LogoSection,
 } from "@/lib/logoSections";
 import LogoMinimap, { MINIMAP_WIDTH } from "./LogoMinimap";
+import { useMusic } from "@/components/music/MusicProvider";
+import { BeatDetector, lowBandEnergy } from "@/lib/uade/beatDetector";
 
 const COLOR_OPTIONS = [
   { value: "#555555", label: "Bright Black" },
@@ -332,8 +334,14 @@ export default function ReleaseClient({
 
   const [autoplay, setAutoplay] = useState(false);
   const [autoplayIndex, setAutoplayIndex] = useState(0);
+  // Groove mode: advance the slideshow on the music's beat instead of a timer.
+  const [musicGroove, setMusicGroove] = useState(false);
+  const { getAnalyser: getMusicAnalyser, playRandom: playRandomMusic, isPlaying: musicIsPlaying } = useMusic();
+  const musicPlayingRef = useRef(false);
+  useEffect(() => { musicPlayingRef.current = musicIsPlaying; }, [musicIsPlaying]);
   const autoplayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoplayRafRef   = useRef<(() => void) | null>(null);
+  const beatRafRef       = useRef<number | null>(null);
   const isAutoScrolling  = useRef(false);
   // Grace timer that keeps isAutoScrolling true briefly after an animation ends,
   // so trailing (async) programmatic scroll events aren't read as user scrolls.
@@ -584,6 +592,7 @@ export default function ReleaseClient({
     setAutoplayIndex(0);
     if (autoplayTimerRef.current) { clearTimeout(autoplayTimerRef.current); autoplayTimerRef.current = null; }
     if (autoplayRafRef.current)   { autoplayRafRef.current(); autoplayRafRef.current = null; }
+    if (beatRafRef.current != null) { cancelAnimationFrame(beatRafRef.current); beatRafRef.current = null; }
     if (autoScrollClearRef.current) { clearTimeout(autoScrollClearRef.current); autoScrollClearRef.current = null; }
     isAutoScrolling.current = false;
   }, []);
@@ -593,7 +602,9 @@ export default function ReleaseClient({
     setIsFullscreen(true);
     setAutoplayIndex(0);
     setAutoplay(true);
-  }, []);
+    // Groove mode: make sure a tune is playing so beats can drive the slideshow.
+    if (musicGroove && !musicPlayingRef.current) void playRandomMusic();
+  }, [musicGroove, playRandomMusic]);
 
   const scrollToSection = useCallback((section: LogoSection) => {
     const pre = collyRef.current as HTMLElement | null;
@@ -692,18 +703,45 @@ export default function ReleaseClient({
       }, 200);
     });
 
-    autoplayTimerRef.current = setTimeout(() => {
-      autoplayTimerRef.current = null;
-      setAutoplayIndex(i => i + 1);
-    }, scrollMs + hold);
+    const advance = () => setAutoplayIndex(i => i + 1);
+    const analyser = musicGroove && musicPlayingRef.current ? getMusicAnalyser() : null;
+
+    if (analyser) {
+      // Groove mode: hold each logo at least until the scroll settles + a short
+      // dwell, then advance on the next kick-drum beat; fall back to a max dwell
+      // if the music has no clear beat for a while.
+      const detector = new BeatDetector();
+      const startT = performance.now();
+      const minDwell = scrollMs + 1400;
+      const maxDwell = scrollMs + 7000;
+      const freq = new Uint8Array(analyser.frequencyBinCount);
+      const tick = (now: number) => {
+        const dt = now - startT;
+        analyser.getByteFrequencyData(freq);
+        const beat = detector.detect(lowBandEnergy(freq), now);
+        if (dt >= minDwell && (beat || dt >= maxDwell)) {
+          beatRafRef.current = null;
+          advance();
+          return;
+        }
+        beatRafRef.current = requestAnimationFrame(tick);
+      };
+      beatRafRef.current = requestAnimationFrame(tick);
+    } else {
+      autoplayTimerRef.current = setTimeout(() => {
+        autoplayTimerRef.current = null;
+        advance();
+      }, scrollMs + hold);
+    }
 
     return () => {
       if (autoplayTimerRef.current) clearTimeout(autoplayTimerRef.current);
+      if (beatRafRef.current != null) { cancelAnimationFrame(beatRafRef.current); beatRafRef.current = null; }
       if (autoplayRafRef.current)   { autoplayRafRef.current(); autoplayRafRef.current = null; }
       if (autoScrollClearRef.current) { clearTimeout(autoScrollClearRef.current); autoScrollClearRef.current = null; }
       isAutoScrolling.current = false;
     };
-  }, [autoplay, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen]);
+  }, [autoplay, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen, musicGroove, getMusicAnalyser]);
 
   useEffect(() => {
     if (!autoplay) return;
@@ -879,6 +917,11 @@ export default function ReleaseClient({
               <input type="button" className="btn-big"
                 value={autoplay ? "Stop" : "Autoplay"}
                 onClick={() => autoplay ? stopAutoplay() : (startAutoplay())} />
+              <input type="button" className="btn-big"
+                value={musicGroove ? "Groove: ON" : "Groove: OFF"}
+                title="Advance logos to the beat of the music (starts a random Modland tune if nothing is playing)"
+                style={musicGroove ? { color: "#ff55ff", borderColor: "#ff55ff" } : undefined}
+                onClick={() => setMusicGroove(g => !g)} />
               {autoplay && (
                 <span className="lightgrey">{autoplayIndex + 1} / {sections.length}</span>
               )}
