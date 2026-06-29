@@ -1146,7 +1146,9 @@ export default function ReleaseClient({
                 style={{
                   display: "block", width: "100%", breakInside: "avoid",
                   background: "transparent", border: "none", cursor: "pointer",
-                  padding: 0, margin: 0, lineHeight: "1.5", textAlign: "left",
+                  // Override the global 48px button min-height so rows stay compact.
+                  minHeight: 0, height: "auto",
+                  padding: 0, margin: 0, lineHeight: "1.6", textAlign: "left",
                   fontFamily: "inherit", fontSize: "inherit",
                   whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
                 }}
