@@ -44,10 +44,62 @@ export function isUadePlayable(f: ModlandFile): boolean {
   return true;
 }
 
-// Confirmed UADE-playable formats (with healthy module counts) for "random".
+// Confirmed UADE-playable Amiga formats for "random". (PC trackers are excluded
+// — UADE can't play them.) Random picks across all of these, weighted by how
+// many modules each has, so the mix reflects the real library instead of
+// over-serving tiny formats.
 export const UADE_RANDOM_FORMATS = [
-  "Protracker", "Soundtracker", "AHX", "TFMX", "Delitracker Custom", "OctaMED MMD1",
+  "Protracker", "Soundtracker", "Noisetracker",
+  "OctaMED MMD0", "OctaMED MMD1", "OctaMED MMD2", "OctaMED MMD3",
+  "AHX", "TFMX", "Delitracker Custom", "Oktalyzer", "SoundFX",
+  "Sonic Arranger", "Quartet ST", "Future Composer 1.3", "Future Composer 1.4",
 ];
+
+export interface ModlandFormatCount {
+  format: string;
+  count: number;
+}
+
+/** Per-format module counts from the upstream index (for weighting random). */
+export async function getModlandFormats(): Promise<ModlandFormatCount[]> {
+  try {
+    const r = await fetch("/api/modland/formats");
+    if (!r.ok) return [];
+    const j = await r.json();
+    return Array.isArray(j.formats) ? (j.formats as ModlandFormatCount[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+// Pick a random UADE-playable format, weighted by sqrt(count). sqrt dampens the
+// weighting so giant formats (Protracker ~80k) stay the plurality without
+// drowning out everything else, while tiny formats (TFMX ~700) become rare
+// instead of equally likely. `rand` is a 0..1 value (injected for testing).
+export function chooseRandomFormat(
+  counts: ModlandFormatCount[],
+  rand: number,
+): ModlandFormatCount | null {
+  const allow = new Set(UADE_RANDOM_FORMATS);
+  const pool = counts.filter((c) => allow.has(c.format) && c.count > 0);
+  if (!pool.length) return null;
+  const weights = pool.map((c) => Math.sqrt(c.count));
+  const total = weights.reduce((a, b) => a + b, 0);
+  let x = rand * total;
+  for (let i = 0; i < pool.length; i++) {
+    x -= weights[i];
+    if (x <= 0) return pool[i];
+  }
+  return pool[pool.length - 1];
+}
+
+// A random offset spanning the WHOLE format (not just the first page), so random
+// reaches the entire catalog. Returns the start of a `limit`-sized window.
+export function randomOffset(count: number, limit: number, rand: number): number {
+  if (count <= limit) return 0;
+  const maxStart = count - limit;
+  return Math.min(maxStart, Math.floor(rand * (maxStart + 1)));
+}
 
 export async function searchModland(params: {
   q?: string;

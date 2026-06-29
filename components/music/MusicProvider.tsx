@@ -8,8 +8,12 @@ import {
   downloadTFMXCompanion,
   downloadUADECompanions,
   isUadePlayable,
+  getModlandFormats,
+  chooseRandomFormat,
+  randomOffset,
   UADE_RANDOM_FORMATS,
   type ModlandFile,
+  type ModlandFormatCount,
   type ModlandSearchResult,
 } from "@/lib/modland";
 
@@ -50,6 +54,8 @@ export default function MusicProvider({ children }: { children: React.ReactNode 
   const [volume, setVolumeState] = useState(0.7);
   // Guards against an out-of-order load (user clicks B while A is still loading).
   const loadSeq = useRef(0);
+  // Per-format catalog counts, fetched once and reused to weight random picks.
+  const formatsRef = useRef<ModlandFormatCount[] | null>(null);
 
   const search = useCallback((q: string) => searchModland({ q, limit: 40 }), []);
 
@@ -99,12 +105,20 @@ export default function MusicProvider({ children }: { children: React.ReactNode 
     setLoading(true);
     setError(null);
     try {
+      // Per-format counts (cached) let us pick a format weighted by catalog size
+      // and span its FULL offset range — so random actually covers the whole
+      // Modland library instead of the first page of a few formats.
+      if (!formatsRef.current) formatsRef.current = await getModlandFormats();
+      const counts = formatsRef.current;
+      const LIMIT = 50;
       // Keep trying random UADE-playable picks until one actually plays —
       // some Modland files are broken or need formats UADE doesn't support.
       for (let attempt = 0; attempt < 12; attempt++) {
-        const format = UADE_RANDOM_FORMATS[Math.floor(Math.random() * UADE_RANDOM_FORMATS.length)];
-        const offset = Math.floor(Math.random() * 400);
-        const res = await searchModland({ format, limit: 50, offset });
+        const chosen = counts.length ? chooseRandomFormat(counts, Math.random()) : null;
+        const format = chosen?.format ?? UADE_RANDOM_FORMATS[Math.floor(Math.random() * UADE_RANDOM_FORMATS.length)];
+        const count = chosen?.count ?? 500;
+        const offset = randomOffset(count, LIMIT, Math.random());
+        const res = await searchModland({ format, limit: LIMIT, offset });
         const playable = res.results.filter(isUadePlayable);
         if (!playable.length) continue;
         const pick = playable[Math.floor(Math.random() * playable.length)];
