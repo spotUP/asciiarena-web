@@ -62,7 +62,9 @@ class UadePlayer {
       gain.gain.value = this._volume;
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 1024;
-      analyser.smoothingTimeConstant = 0.6;
+      // Low smoothing keeps kick transients sharp so beat detection (groove
+      // autoplay) reliably fires; the FFT bars just read a touch livelier.
+      analyser.smoothingTimeConstant = 0.2;
       this.gain = gain;
       this.analyser = analyser;
       // output 0 (main mix) -> gain -> analyser -> speakers
