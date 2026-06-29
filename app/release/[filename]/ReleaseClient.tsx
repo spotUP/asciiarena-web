@@ -652,8 +652,11 @@ export default function ReleaseClient({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collyVisible, type, section, autoplay, stopAutoplay, startAutoplay, setIndexOpen]);
 
+  // Step-and-centre autoplay (groove OFF). Groove mode is a continuous
+  // music-driven scroll handled by the effect below.
   useEffect(() => {
     if (!autoplay || !collyVisible) return;
+    if (musicGroove) return;
     if (autoplayIndex >= sections.length) { stopAutoplay(); return; }
 
     const logoSection = sections[autoplayIndex];
@@ -684,8 +687,7 @@ export default function ReleaseClient({
 
     const target   = computeScrollTarget(logoSection, { spacers: SPACERS, lineHeight, viewH, originTop, maxScroll });
     const hold     = Math.min(4000 + Math.max(0, logoSection.lineCount - 20) * 15, 8000);
-    const analyser = musicGroove && musicPlayingRef.current ? getMusicAnalyser() : null;
-    const scrollMs = analyser ? 420 : 700; // snappier landing in groove mode
+    const scrollMs = 700;
 
     if (autoplayRafRef.current)   { autoplayRafRef.current(); autoplayRafRef.current = null; }
     if (autoplayTimerRef.current) clearTimeout(autoplayTimerRef.current);
@@ -694,67 +696,71 @@ export default function ReleaseClient({
     if (autoScrollClearRef.current) { clearTimeout(autoScrollClearRef.current); autoScrollClearRef.current = null; }
     autoplayRafRef.current = animateScroll(scrollEl, target, scrollMs, () => {
       autoplayRafRef.current = null;
-      // Hold the guard up briefly past the animation: the final programmatic
-      // scrollTop write dispatches its scroll event asynchronously, so clearing
-      // synchronously here would let it trip the user-scroll detector and stop
-      // autoplay after a single section.
       autoScrollClearRef.current = setTimeout(() => {
         isAutoScrolling.current = false;
         autoScrollClearRef.current = null;
       }, 200);
     });
 
-    const advance = () => setAutoplayIndex(i => i + 1);
-
-    if (analyser) {
-      // Groove mode: the logo's brightness tracks the live music energy every
-      // frame, so it visibly breathes/pulses with the track (this peaks on
-      // kicks on beat-heavy tunes and still moves on sparse ones — robust to
-      // tune variety). Advance lands on the next detected beat after a short
-      // dwell, with a max-dwell fallback.
-      const detector = new BeatDetector({ sensitivity: 1.25, refractoryMs: 130, floor: 0.01, windowSize: 32 });
-      const startT = performance.now();
-      const minDwell = scrollMs + 1600;
-      const maxDwell = scrollMs + 5000;
-      const freq = new Uint8Array(analyser.frequencyBinCount);
-      let baseline = 0; // slow-moving energy floor
-      let glow = 0; // smoothed glow amount above baseline
-      const tick = (now: number) => {
-        const dt = now - startT;
-        analyser.getByteFrequencyData(freq);
-        const e = lowBandEnergy(freq, 24); // low-mid loudness, 0..1
-        baseline = baseline === 0 ? e : baseline * 0.95 + e * 0.05;
-        // Glow only on energy ABOVE the baseline, so the logo rests at normal
-        // brightness and punches up on beats/transients instead of staying lit.
-        const target = Math.min(Math.max(0, e - baseline) * 5, 0.7);
-        glow = glow * 0.5 + target * 0.5;
-        const el = collyRef.current as HTMLElement | null;
-        if (el) el.style.filter = `brightness(${(1 + glow).toFixed(2)})`;
-        const beat = detector.detect(e, now);
-        if ((beat && dt >= minDwell) || dt >= maxDwell) {
-          beatRafRef.current = null;
-          advance();
-          return;
-        }
-        beatRafRef.current = requestAnimationFrame(tick);
-      };
-      beatRafRef.current = requestAnimationFrame(tick);
-    } else {
-      autoplayTimerRef.current = setTimeout(() => {
-        autoplayTimerRef.current = null;
-        advance();
-      }, scrollMs + hold);
-    }
+    autoplayTimerRef.current = setTimeout(() => {
+      autoplayTimerRef.current = null;
+      setAutoplayIndex(i => i + 1);
+    }, scrollMs + hold);
 
     return () => {
       if (autoplayTimerRef.current) clearTimeout(autoplayTimerRef.current);
-      if (beatRafRef.current != null) { cancelAnimationFrame(beatRafRef.current); beatRafRef.current = null; }
       if (autoplayRafRef.current)   { autoplayRafRef.current(); autoplayRafRef.current = null; }
       if (autoScrollClearRef.current) { clearTimeout(autoScrollClearRef.current); autoScrollClearRef.current = null; }
+      isAutoScrolling.current = false;
+    };
+  }, [autoplay, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen, musicGroove]);
+
+  // Groove autoplay: one continuous scroll whose speed RIDES the music. Each
+  // frame the scroll advances by base + low-mid energy + a decaying surge on
+  // every kick, so you literally see the groove in the motion; the logo also
+  // glows on transients. Loops back to the top at the end.
+  useEffect(() => {
+    if (!autoplay || !musicGroove || !collyVisible || !musicIsPlaying) return;
+    const analyser = getMusicAnalyser();
+    if (!analyser) return;
+    const scrollEl: HTMLElement | null = isFullscreen ? document.documentElement : collyDivRef.current;
+    if (!scrollEl) return;
+
+    const prevBehavior = scrollEl.style.scrollBehavior;
+    scrollEl.style.scrollBehavior = "auto"; // our per-frame writes must be instant
+    const freq = new Uint8Array(analyser.frequencyBinCount);
+    const detector = new BeatDetector({ sensitivity: 1.25, refractoryMs: 130, floor: 0.01, windowSize: 32 });
+    let baseline = 0, glow = 0, surge = 0;
+    isAutoScrolling.current = true;
+
+    const tick = (now: number) => {
+      analyser.getByteFrequencyData(freq);
+      const e = lowBandEnergy(freq, 24); // low-mid loudness 0..1
+      baseline = baseline === 0 ? e : baseline * 0.95 + e * 0.05;
+      // logo glow on energy above baseline
+      glow = glow * 0.6 + Math.min(Math.max(0, e - baseline) * 5, 0.7) * 0.4;
+      const pre = collyRef.current as HTMLElement | null;
+      if (pre) pre.style.filter = `brightness(${(1 + glow).toFixed(2)})`;
+      // kick surge -> a push in the scroll on the beat
+      if (detector.detect(e, now)) surge += 22;
+      surge *= 0.82;
+      const speed = Math.min(0.6 + e * 16 + surge, 48); // px this frame
+      const viewH = isFullscreen ? window.innerHeight : (collyDivRef.current?.clientHeight ?? 0);
+      const max = scrollEl.scrollHeight - viewH;
+      let next = scrollEl.scrollTop + speed;
+      if (max > 0 && next >= max) next = 0; // loop
+      scrollEl.scrollTop = next;
+      beatRafRef.current = requestAnimationFrame(tick);
+    };
+    beatRafRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      if (beatRafRef.current != null) { cancelAnimationFrame(beatRafRef.current); beatRafRef.current = null; }
+      scrollEl.style.scrollBehavior = prevBehavior;
       if (collyRef.current) (collyRef.current as HTMLElement).style.filter = "";
       isAutoScrolling.current = false;
     };
-  }, [autoplay, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen, musicGroove, getMusicAnalyser]);
+  }, [autoplay, musicGroove, musicIsPlaying, isFullscreen, collyVisible, getMusicAnalyser]);
 
   useEffect(() => {
     if (!autoplay) return;
