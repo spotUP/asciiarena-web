@@ -684,7 +684,8 @@ export default function ReleaseClient({
 
     const target   = computeScrollTarget(logoSection, { spacers: SPACERS, lineHeight, viewH, originTop, maxScroll });
     const hold     = Math.min(4000 + Math.max(0, logoSection.lineCount - 20) * 15, 8000);
-    const scrollMs = 700;
+    const analyser = musicGroove && musicPlayingRef.current ? getMusicAnalyser() : null;
+    const scrollMs = analyser ? 420 : 700; // snappier landing in groove mode
 
     if (autoplayRafRef.current)   { autoplayRafRef.current(); autoplayRafRef.current = null; }
     if (autoplayTimerRef.current) clearTimeout(autoplayTimerRef.current);
@@ -704,22 +705,35 @@ export default function ReleaseClient({
     });
 
     const advance = () => setAutoplayIndex(i => i + 1);
-    const analyser = musicGroove && musicPlayingRef.current ? getMusicAnalyser() : null;
 
     if (analyser) {
-      // Groove mode: hold each logo at least until the scroll settles + a short
-      // dwell, then advance on the next kick-drum beat; fall back to a max dwell
-      // if the music has no clear beat for a while.
-      const detector = new BeatDetector();
+      // Groove mode: the logo pulses on every kick (so it feels alive between
+      // changes) and advances after a few beats — beat-locked, not on a flat
+      // timer. Falls back to a max dwell if the music has no clear beat.
+      const detector = new BeatDetector({ sensitivity: 1.28, refractoryMs: 130, floor: 0.015, windowSize: 32 });
       const startT = performance.now();
-      const minDwell = scrollMs + 1400;
-      const maxDwell = scrollMs + 7000;
+      const minDwell = scrollMs + 900;
+      const maxDwell = scrollMs + 6000;
+      const BEATS_TO_ADVANCE = 4;
+      let beats = 0;
       const freq = new Uint8Array(analyser.frequencyBinCount);
+      // Brightness flash on each kick — feels alive, and (unlike a transform)
+      // never shifts the centred logo.
+      const pulse = () => {
+        const el = collyRef.current as HTMLElement | null;
+        if (!el) return;
+        el.style.transition = "filter 60ms ease-out";
+        el.style.filter = "brightness(1.7)";
+        window.setTimeout(() => {
+          const e = collyRef.current as HTMLElement | null;
+          if (e) e.style.filter = "";
+        }, 80);
+      };
       const tick = (now: number) => {
         const dt = now - startT;
         analyser.getByteFrequencyData(freq);
-        const beat = detector.detect(lowBandEnergy(freq), now);
-        if (dt >= minDwell && (beat || dt >= maxDwell)) {
+        if (detector.detect(lowBandEnergy(freq, 10), now)) { beats++; pulse(); }
+        if ((beats >= BEATS_TO_ADVANCE && dt >= minDwell) || dt >= maxDwell) {
           beatRafRef.current = null;
           advance();
           return;
@@ -739,6 +753,7 @@ export default function ReleaseClient({
       if (beatRafRef.current != null) { cancelAnimationFrame(beatRafRef.current); beatRafRef.current = null; }
       if (autoplayRafRef.current)   { autoplayRafRef.current(); autoplayRafRef.current = null; }
       if (autoScrollClearRef.current) { clearTimeout(autoScrollClearRef.current); autoScrollClearRef.current = null; }
+      if (collyRef.current) (collyRef.current as HTMLElement).style.filter = "";
       isAutoScrolling.current = false;
     };
   }, [autoplay, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen, musicGroove, getMusicAnalyser]);
