@@ -796,9 +796,10 @@ export default function ReleaseClient({
       glow = glow * 0.6 + Math.min(Math.max(0, eGlow - baseline) * 1.1 + sparkle * 0.1, 0.16) * 0.4;
 
       const useWarp = warp > 0.02;
-      // No brightness on the stage (that faded the background). Warp/contrast
-      // only; the glow now fades the FOREGROUND colour toward white instead.
-      stage.style.filter = (useWarp ? "url(#vhsWarp)" : "") + (glitch > 0.7 ? " contrast(1.3)" : "");
+      // Only the warp (a displacement, no colour change) touches the stage, so
+      // the background never pulses. The glow pulses the FOREGROUND colour
+      // instead (below); the glitch punch lives in the RGB split + jitter.
+      stage.style.filter = useWarp ? "url(#vhsWarp)" : "";
       const t = Math.min(glow * 2.6, 0.45);
       pre.style.color = `rgb(${Math.round(fr + (255 - fr) * t)},${Math.round(fgc + (255 - fgc) * t)},${Math.round(fb + (255 - fb) * t)})`;
       if (useWarp) {
