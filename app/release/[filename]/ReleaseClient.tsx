@@ -751,8 +751,12 @@ export default function ReleaseClient({
     const prevBehavior = scrollEl.style.scrollBehavior;
     scrollEl.style.scrollBehavior = "auto"; // per-frame writes must be instant
     const freq = new Uint8Array(analyser.frequencyBinCount);
-    // Narrow low band (~kick) for beat detection; wide band for the glow.
-    const detector = new BeatDetector({ sensitivity: 1.18, refractoryMs: 120, floor: 0.012, windowSize: 36 });
+    const prevFreq = new Uint8Array(analyser.frequencyBinCount);
+    // Spectral-flux onset detection: Amiga mods are dense/steady, so "energy
+    // above average" barely triggers — but the sum of positive frame-to-frame
+    // bin increases (flux) spikes hard on note/drum onsets. Feed flux to the
+    // detector (peaks ~14x its mean) for clean, musical beats.
+    const detector = new BeatDetector({ sensitivity: 2.5, refractoryMs: 180, floor: 0.006, windowSize: 43 });
     const startT = performance.now();
     const minDwell = 2200;
     const maxDwell = 7000;
@@ -764,11 +768,15 @@ export default function ReleaseClient({
       const dt = now - startT;
       base += (target - base) * 0.16; // ease in to the centred logo
       analyser.getByteFrequencyData(freq);
-      const eGlow = lowBandEnergy(freq, 24); // wide low-mid loudness for the glow
-      const eKick = lowBandEnergy(freq, 5);  // narrow low band for the kick
+      // spectral flux over low-mid bins = onset strength this frame
+      let flux = 0;
+      for (let i = 1; i <= 40; i++) { const d = freq[i] - prevFreq[i]; if (d > 0) flux += d; prevFreq[i] = freq[i]; }
+      flux /= 40 * 255;
+      const eGlow = lowBandEnergy(freq, 24); // wide low-mid loudness
       baseline = baseline === 0 ? eGlow : baseline * 0.95 + eGlow * 0.05;
-      glow = glow * 0.6 + Math.min(Math.max(0, eGlow - baseline) * 5, 0.7) * 0.4;
-      const beat = detector.detect(eKick, now);
+      // glow punches on onsets (flux) plus a gentle loudness component
+      glow = glow * 0.6 + Math.min(flux * 2.5 + Math.max(0, eGlow - baseline) * 3, 0.8) * 0.4;
+      const beat = detector.detect(flux, now);
       if (beat) { surge += 22; glitch = 1; } // bounce + glitch burst on the kick
       surge *= 0.82;                          // and settle back
       glitch *= 0.8;                          // glitch decays over ~150ms
