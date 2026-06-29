@@ -71,8 +71,6 @@ class UadePlayer {
       node.connect(gain, 0);
       gain.connect(analyser);
       analyser.connect(ctx.destination);
-      // Debug aid for tuning beat detection from the page console / tests.
-      (window as unknown as { __uadeAnalyser?: AnalyserNode }).__uadeAnalyser = analyser;
 
       node.port.onmessage = (e) => this.onMessage(e.data);
       node.onprocessorerror = () => {

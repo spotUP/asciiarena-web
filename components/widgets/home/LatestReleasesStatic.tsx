@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { buildLatestReleaseRowsQuery } from "@/lib/home-latest-releases-query";
@@ -96,7 +97,9 @@ export default async function LatestReleasesStatic({ columns = 2, random = false
           >
             <div className="row animate__animated animate__backInUp">
               <pre>
-                <a href={url} className="ascii magenta" dangerouslySetInnerHTML={{ __html: content }} />
+                {/* Next <Link> = client-side nav, so background music keeps
+                    playing across the colly click (a plain <a> full-reloads). */}
+                <Link prefetch={false} href={url} className="ascii magenta" dangerouslySetInnerHTML={{ __html: content }} />
               </pre>
             </div>
           </div>

@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { urlsafe } from "@/lib/utils";
 import PrintLines from "@/components/ui/PrintLines";
@@ -45,13 +46,13 @@ export default function LatestComments() {
         {rows.map((row, i) => (
           <div className="row" key={i}>
             <div className="col-sm-7 cyan text-truncate">
-              <a className="cyan" href={`/release/${row.filename}`}>{row.comment}</a>
+              <Link prefetch={false} className="cyan" href={`/release/${row.filename}`}>{row.comment}</Link>
             </div>
             <div className="col-6 col-sm-3 mb-4 mb-sm-0 text-truncate">
-              <a className="magenta text-truncate" href={`/release/${row.filename}`}>{row.filename}</a>
+              <Link prefetch={false} className="magenta text-truncate" href={`/release/${row.filename}`}>{row.filename}</Link>
             </div>
             <div className="col-6 col-sm-2 mb-4 mb-sm-0 text-truncate">
-              <a className="yellow text-truncate float-right" href={`/member/${urlsafe(row.nick)}`}>{row.nick}</a>
+              <Link prefetch={false} className="yellow text-truncate float-right" href={`/member/${urlsafe(row.nick)}`}>{row.nick}</Link>
             </div>
           </div>
         ))}
