@@ -727,15 +727,21 @@ export default function ReleaseClient({
     scrollEl.style.scrollBehavior = "auto"; // per-frame writes must be instant
     const freq = new Uint8Array(analyser.frequencyBinCount);
     const prevFreq = new Uint8Array(analyser.frequencyBinCount);
-    // Spectral-flux onset detection: Amiga mods are dense/steady, so "energy
-    // above average" barely triggers — but the sum of positive frame-to-frame
-    // bin increases (flux) spikes hard on note/drum onsets. Feed flux to the
-    // detector (peaks ~14x its mean) for clean, musical beats.
-    const detector = new BeatDetector({ sensitivity: 2.5, refractoryMs: 180, floor: 0.006, windowSize: 43 });
+    // Per-band spectral-flux onset detection so different instruments drive
+    // different effects (bass != snare != hats). Flux = sum of positive
+    // frame-to-frame bin increases in the band.
+    const bandFlux = (lo: number, hi: number) => {
+      let f = 0;
+      for (let i = lo; i < hi; i++) { const d = freq[i] - prevFreq[i]; if (d > 0) f += d; }
+      return f / ((hi - lo) * 255);
+    };
+    const kickDet = new BeatDetector({ sensitivity: 2.2, refractoryMs: 200, floor: 0.006, windowSize: 43 }); // bass/kick
+    const midDet  = new BeatDetector({ sensitivity: 2.6, refractoryMs: 150, floor: 0.005, windowSize: 43 }); // snare/mid
+    const highDet = new BeatDetector({ sensitivity: 3.0, refractoryMs: 110, floor: 0.004, windowSize: 43 }); // hats/treble
     const startT = performance.now();
     const minDwell = 2200;
     const maxDwell = 7000;
-    let baseline = 0, glow = 0, surge = 0, glitch = 0, warp = 0, lastWarp = 0;
+    let baseline = 0, glow = 0, surge = 0, glitch = 0, warp = 0, lastWarp = 0, sparkle = 0;
     let base = scrollEl.scrollTop; // eases toward the logo's centred position
     isAutoScrolling.current = true;
 
@@ -743,53 +749,64 @@ export default function ReleaseClient({
       const dt = now - startT;
       base += (target - base) * 0.16; // ease in to the centred logo
       analyser.getByteFrequencyData(freq);
-      // spectral flux over low-mid bins = onset strength this frame
-      let flux = 0;
-      for (let i = 1; i <= 40; i++) { const d = freq[i] - prevFreq[i]; if (d > 0) flux += d; prevFreq[i] = freq[i]; }
-      flux /= 40 * 255;
-      const eGlow = lowBandEnergy(freq, 24); // wide low-mid loudness
-      baseline = baseline === 0 ? eGlow : baseline * 0.95 + eGlow * 0.05;
-      // glow punches on onsets (flux) plus a gentle loudness component
-      glow = glow * 0.6 + Math.min(flux * 2.5 + Math.max(0, eGlow - baseline) * 3, 0.8) * 0.4;
-      const beat = detector.detect(flux, now);
-      if (beat) { surge += 22; glitch = 1; } // bounce + glitch burst on the kick
-      // A bigger, rarer warp on strong beats -> a flaky-VHS bend (gated so the
-      // expensive SVG filter only runs in short bursts).
-      if (beat && flux > 0.12 && now - lastWarp > 1400) { warp = 1; lastWarp = now; }
-      surge *= 0.82;                          // and settle back
-      glitch *= 0.8;                          // glitch decays over ~150ms
-      warp *= 0.85;                           // warp settles over ~0.4s
+      // Per-band onset strength (compute before updating prevFreq).
+      const kf = bandFlux(1, 6);    // bass / kick
+      const mf = bandFlux(8, 40);   // snare / mids
+      const hf = bandFlux(60, 180); // hats / treble
+      for (let i = 1; i < 180; i++) prevFreq[i] = freq[i];
 
-      // Music-synced glitch: RGB/chromatic split + VHS horizontal jitter + a
-      // skew/contrast hit, fired on each kick and decaying. The text-shadow
-      // (a full text repaint) only runs during the short burst, so it stays
-      // smooth between beats.
-      // Filter/warp/transform go on the viewport-sized STAGE (renders); the
-      // RGB split is text-shadow on the pre (needs the glyphs).
+      const eGlow = lowBandEnergy(freq, 24);
+      baseline = baseline === 0 ? eGlow : baseline * 0.95 + eGlow * 0.05;
+
+      const kick = kickDet.detect(kf, now);
+      const mid  = midDet.detect(mf, now);
+      const high = highDet.detect(hf, now);
+
+      // Bass/kick -> scroll bounce, the flaky-VHS warp (gated, rare), and the
+      // logo advance. Snare/mid -> RGB chromatic split + horizontal jitter.
+      // Hats/treble -> brightness sparkle + vertical shimmer.
+      if (kick) surge += 22;
+      if (kick && kf > 0.12 && now - lastWarp > 1400) { warp = 1; lastWarp = now; }
+      if (mid) glitch = 1;
+      if (high) sparkle = 1;
+      surge *= 0.82;
+      glitch *= 0.8;
+      warp *= 0.85;
+      sparkle *= 0.75;
+
+      // glow: gentle loudness breathing + a treble sparkle pop
+      glow = glow * 0.6 + Math.min(Math.max(0, eGlow - baseline) * 3 + sparkle * 0.5, 0.8) * 0.4;
+
       const useWarp = warp > 0.03;
       stage.style.filter = `brightness(${(1 + glow).toFixed(2)})`
         + (useWarp ? " url(#vhsWarp)" : "")
         + (glitch > 0.6 ? " contrast(1.4)" : "");
       if (useWarp) {
         warpDispRef.current?.setAttribute("scale", (warp * 26).toFixed(1));
-        // jump the noise so the bend wobbles like unstable VHS tracking
         warpTurbRef.current?.setAttribute("seed", String(Math.floor(now / 45) % 200));
       } else {
         warpDispRef.current?.setAttribute("scale", "0");
       }
+
+      // RGB split (mid) lives on the pre; the stage transform combines the
+      // mid horizontal jitter/skew with the treble vertical shimmer.
       if (glitch > 0.05) {
         const split = (2 + glitch * 7).toFixed(1);
-        const jitter = ((Math.random() - 0.5) * glitch * 12).toFixed(1);
-        const skew = (glitch > 0.45 ? (Math.random() - 0.5) * glitch * 1.5 : 0).toFixed(2);
         pre.style.textShadow = `${split}px 0 rgba(255,0,90,0.55), -${split}px 0 rgba(0,210,255,0.55)`;
-        stage.style.transform = `translateX(${jitter}px) skewX(${skew}deg)`;
       } else if (pre.style.textShadow) {
         pre.style.textShadow = "";
+      }
+      if (glitch > 0.05 || sparkle > 0.05) {
+        const jx = ((Math.random() - 0.5) * glitch * 12).toFixed(1);
+        const jy = ((Math.random() - 0.5) * sparkle * 7).toFixed(1);
+        const sk = (glitch > 0.45 ? (Math.random() - 0.5) * glitch * 1.5 : 0).toFixed(2);
+        stage.style.transform = `translate(${jx}px, ${jy}px) skewX(${sk}deg)`;
+      } else if (stage.style.transform) {
         stage.style.transform = "";
       }
 
       scrollEl.scrollTop = Math.max(0, Math.min(base + surge, maxScroll));
-      if ((beat && dt >= minDwell) || dt >= maxDwell) {
+      if ((kick && dt >= minDwell) || dt >= maxDwell) {
         beatRafRef.current = null;
         setAutoplayIndex(i => i + 1);
         return;
