@@ -757,6 +757,10 @@ export default function ReleaseClient({
     let baseline = 0, glow = 0, surge = 0, glitch = 0, warp = 0, lastWarp = 0, sparkle = 0;
     let base = scrollEl.scrollTop; // eases toward the logo's centred position
     isAutoScrolling.current = true;
+    // Foreground colour to pulse toward white on the glow (bg is left untouched).
+    const fgM = /^#?([0-9a-f]{6})$/i.exec(fgColor.trim());
+    const fgN = fgM ? parseInt(fgM[1], 16) : 0xff55ff;
+    const fr = (fgN >> 16) & 255, fgc = (fgN >> 8) & 255, fb = fgN & 255;
 
     const tick = (now: number) => {
       const dt = now - startT;
@@ -792,9 +796,11 @@ export default function ReleaseClient({
       glow = glow * 0.6 + Math.min(Math.max(0, eGlow - baseline) * 1.1 + sparkle * 0.1, 0.16) * 0.4;
 
       const useWarp = warp > 0.02;
-      stage.style.filter = `brightness(${(1 + glow).toFixed(2)})`
-        + (useWarp ? " url(#vhsWarp)" : "")
-        + (glitch > 0.7 ? " contrast(1.3)" : "");
+      // No brightness on the stage (that faded the background). Warp/contrast
+      // only; the glow now fades the FOREGROUND colour toward white instead.
+      stage.style.filter = (useWarp ? "url(#vhsWarp)" : "") + (glitch > 0.7 ? " contrast(1.3)" : "");
+      const t = Math.min(glow * 2.6, 0.45);
+      pre.style.color = `rgb(${Math.round(fr + (255 - fr) * t)},${Math.round(fgc + (255 - fgc) * t)},${Math.round(fb + (255 - fb) * t)})`;
       if (useWarp) {
         warpDispRef.current?.setAttribute("scale", (warp * 35).toFixed(1)); // half-strength bend
         warpTurbRef.current?.setAttribute("seed", String(Math.floor(now / 60) % 200));
@@ -834,11 +840,11 @@ export default function ReleaseClient({
       scrollEl.style.scrollBehavior = prevBehavior;
       stage.style.filter = "";
       stage.style.transform = "";
-      if (collyRef.current) (collyRef.current as HTMLElement).style.textShadow = "";
+      if (collyRef.current) { const e = collyRef.current as HTMLElement; e.style.textShadow = ""; e.style.color = fgColor; }
       warpDispRef.current?.setAttribute("scale", "0");
       isAutoScrolling.current = false;
     };
-  }, [autoplay, musicGroove, musicIsPlaying, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen, getMusicAnalyser, advanceAutoplay]);
+  }, [autoplay, musicGroove, musicIsPlaying, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen, getMusicAnalyser, advanceAutoplay, fgColor]);
 
   // Stop autoplay if the user scrolls the colly themselves. #colly-div is the
   // scroller in both modes now.
