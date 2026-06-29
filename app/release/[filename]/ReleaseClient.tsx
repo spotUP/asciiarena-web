@@ -599,15 +599,18 @@ export default function ReleaseClient({
     if (!pre) return;
     const lineHeight = parseFloat(getComputedStyle(pre).lineHeight) || 16;
     const SPACERS    = 4;
+    const preRect = pre.getBoundingClientRect();
     if (isFullscreen) {
       const viewH  = window.innerHeight;
-      const target = computeScrollTarget(section, { spacers: SPACERS, lineHeight, viewH, maxScroll: document.documentElement.scrollHeight - viewH });
+      const originTop = preRect.top + document.documentElement.scrollTop;
+      const target = computeScrollTarget(section, { spacers: SPACERS, lineHeight, viewH, originTop, maxScroll: document.documentElement.scrollHeight - viewH });
       animateScroll(document.documentElement, target, 500);
     } else {
       const container = collyDivRef.current;
       if (!container) return;
       const viewH  = container.clientHeight;
-      const target = computeScrollTarget(section, { spacers: SPACERS, lineHeight, viewH, maxScroll: container.scrollHeight - viewH });
+      const originTop = preRect.top - container.getBoundingClientRect().top + container.scrollTop;
+      const target = computeScrollTarget(section, { spacers: SPACERS, lineHeight, viewH, originTop, maxScroll: container.scrollHeight - viewH });
       animateScroll(container, target, 500);
     }
   }, [isFullscreen]);
@@ -648,22 +651,26 @@ export default function ReleaseClient({
     const lineHeight = parseFloat(getComputedStyle(pre).lineHeight) || 16;
     const SPACERS    = 4;
 
+    const preRect = pre.getBoundingClientRect();
     let scrollEl: HTMLElement;
     let viewH: number;
     let maxScroll: number;
+    let originTop: number;
     if (isFullscreen) {
       scrollEl  = document.documentElement;
       viewH     = window.innerHeight;
       maxScroll = document.documentElement.scrollHeight - viewH;
+      originTop = preRect.top + document.documentElement.scrollTop;
     } else {
       const container = collyDivRef.current;
       if (!container) return;
       scrollEl  = container;
       viewH     = container.clientHeight;
       maxScroll = container.scrollHeight - viewH;
+      originTop = preRect.top - container.getBoundingClientRect().top + container.scrollTop;
     }
 
-    const target   = computeScrollTarget(logoSection, { spacers: SPACERS, lineHeight, viewH, maxScroll });
+    const target   = computeScrollTarget(logoSection, { spacers: SPACERS, lineHeight, viewH, originTop, maxScroll });
     const hold     = Math.min(4000 + Math.max(0, logoSection.lineCount - 20) * 15, 8000);
     const scrollMs = 700;
 
@@ -713,6 +720,11 @@ export default function ReleaseClient({
   useEffect(() => {
     if (!collyVisible && autoplay) stopAutoplay();
   }, [collyVisible, autoplay, stopAutoplay]);
+
+  // Autoplay runs in fullscreen; leaving fullscreen (button or `f` key) ends it.
+  useEffect(() => {
+    if (autoplay && !isFullscreen) stopAutoplay();
+  }, [autoplay, isFullscreen, stopAutoplay]);
 
   const fitColly = () => {
     const pre = collyRef.current;

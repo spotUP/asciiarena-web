@@ -283,11 +283,16 @@ export function buildLogoIndex(html: string, sections: LogoSection[]): LogoIndex
 
 // Pure geometry for centring a logo's ink box vertically in the viewport.
 // Extracted so it can be unit-tested without a DOM.
+//
+// originTop is the scroll-content Y of the <pre>'s top. In fullscreen the <pre>
+// is absolutely positioned inside a positioned ancestor, so its content does
+// NOT start at scroll origin 0 — measuring it (vs assuming 0) is what keeps
+// logos centred instead of landing low on the screen.
 export function computeScrollTarget(
   s: Pick<LogoSection, "inkTop" | "inkBottom">,
-  o: { spacers: number; lineHeight: number; viewH: number; maxScroll: number },
+  o: { spacers: number; lineHeight: number; viewH: number; maxScroll: number; originTop?: number },
 ): number {
-  const boxTop = (o.spacers + s.inkTop) * o.lineHeight;
+  const boxTop = (o.originTop ?? 0) + (o.spacers + s.inkTop) * o.lineHeight;
   const boxH = (s.inkBottom - s.inkTop + 1) * o.lineHeight;
   return Math.max(0, Math.min(boxTop - (o.viewH - boxH) / 2, o.maxScroll));
 }

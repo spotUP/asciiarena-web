@@ -184,4 +184,13 @@ describe("computeScrollTarget", () => {
   it("clamps to maxScroll for a logo past the bottom", () => {
     expect(computeScrollTarget({ inkTop: 5000, inkBottom: 5010 }, opts)).toBe(10000);
   });
+
+  it("offsets by the pre's origin so logos don't land low (fullscreen offset bug)", () => {
+    const base = computeScrollTarget({ inkTop: 50, inkBottom: 60 }, opts);
+    const shifted = computeScrollTarget({ inkTop: 50, inkBottom: 60 }, { ...opts, originTop: 426 });
+    expect(shifted).toBe(base + 426); // the pre's document offset is added to the target
+    // ink-box centre still lands at the viewport centre, now measured from origin
+    const boxCentrePx = 426 + (opts.spacers + 50) * 16 + ((60 - 50 + 1) * 16) / 2;
+    expect(shifted + opts.viewH / 2).toBe(boxCentrePx);
+  });
 });
