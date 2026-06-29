@@ -1143,15 +1143,22 @@ export default function ReleaseClient({
               onClick={() => setArchiveIndexOpen(o => !o)}
             />
             {archiveIndexOpen && (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "8px" }}>
+              <div style={{ marginTop: "8px", columns: "260px 3", columnGap: "24px" }}>
                 {archiveFiles.map((entry, i) => (
                   <button
                     key={entry}
-                    className="btn-big bg-header grey-text text-truncate"
-                    style={{ maxWidth: "240px" }}
                     title={entry}
-                    onClick={() => document.getElementById(`archive-entry-${i}`)?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                    onClick={() => document.getElementById(`archive-entry-${i}`)?.scrollIntoView({ block: "start" })}
+                    style={{
+                      display: "block", width: "100%", textAlign: "left",
+                      breakInside: "avoid", background: "transparent", border: "none",
+                      cursor: "pointer", padding: "2px 4px",
+                      fontFamily: "monospace", fontSize: "13px",
+                      color: hiddenEntries.has(entry) ? "#666666" : "#aaaaaa",
+                      whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                    }}
                   >
+                    <span style={{ color: "#555555", marginRight: "8px" }}>{i + 1}</span>
                     {hiddenEntries.has(entry) ? "[hidden] " : ""}{entry.split("/").pop()}
                   </button>
                 ))}
