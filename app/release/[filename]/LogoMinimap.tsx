@@ -1,28 +1,32 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { animateScroll } from "@/lib/animateScroll";
 import { computeMarkerPositions, type LogoIndexEntry } from "@/lib/logoSections";
+
+export const MINIMAP_WIDTH = 88; // px — keep in sync with the container's right padding
 
 interface Props {
   /** The scroll container (#colly-div). */
   containerRef: React.RefObject<HTMLDivElement | null>;
-  /** The <pre> (#colly) — read for its rendered line height. */
+  /** The <pre> (#colly) — read for text + rendered line height. */
   preRef: React.RefObject<HTMLElement | null>;
-  /** Logos to mark, with labels. */
+  /** Logos, for the hover label. */
   entries: LogoIndexEntry[];
   /** Blank-line spacers prepended to the rendered content (the <br> prefix). */
   spacers: number;
-  /** Jump-to-logo (smooth-centres in the container). */
-  onJump: (section: LogoIndexEntry["section"]) => void;
+  /** Foreground colour to paint the thumbnail with (redraws when it changes). */
+  fgColor: string;
 }
 
-// A vertical scrollbar-side minimap: one clickable tick per logo at its true
-// scroll position, a viewport thumb, an active highlight, and a hover label.
-export default function LogoMinimap({ containerRef, preRef, entries, spacers, onJump }: Props) {
-  const [tops, setTops] = useState<number[]>([]);
+// A text-editor-style minimap: the whole colly rendered tiny (a dot per
+// non-space char) so you see the actual document shape, with a draggable
+// viewport thumb, click/drag-to-scroll, and a hover label for the nearest logo.
+export default function LogoMinimap({ containerRef, preRef, entries, spacers, fgColor }: Props) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [thumb, setThumb] = useState<{ top: number; height: number } | null>(null);
-  const [active, setActive] = useState(0);
-  const [hover, setHover] = useState<number | null>(null);
+  const [hover, setHover] = useState<{ idx: number; y: number } | null>(null);
+  const dragging = useRef(false);
   const rafRef = useRef<number | null>(null);
 
   const lineHeight = useCallback(() => {
@@ -30,55 +34,73 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, on
     return (pre && parseFloat(getComputedStyle(pre).lineHeight)) || 16;
   }, [preRef]);
 
-  const recompute = useCallback(() => {
+  // Paint the thumbnail. Each non-space char becomes a tiny rect, positioned by
+  // the same line/column grid the <pre> uses, scaled to the track.
+  const draw = useCallback(() => {
+    const canvas = canvasRef.current;
     const c = containerRef.current;
-    if (!c) return;
-    const lh = lineHeight();
-    const trackHeight = c.clientHeight;
-    const scrollHeight = c.scrollHeight || 1;
-    setTops(computeMarkerPositions(entries.map((e) => e.section), { spacers, lineHeight: lh, scrollHeight, trackHeight }));
-  }, [containerRef, entries, spacers, lineHeight]);
+    const pre = preRef.current;
+    if (!canvas || !c || !pre) return;
+    const cssW = canvas.clientWidth;
+    const cssH = canvas.clientHeight;
+    if (cssW === 0 || cssH === 0) return;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(cssW * dpr);
+    canvas.height = Math.round(cssH * dpr);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, cssW, cssH);
 
-  const updateScrollState = useCallback(() => {
+    const text = pre.textContent || "";
+    const lines = text.split("\n");
+    const lh = lineHeight();
+    const scrollHeight = c.scrollHeight || 1;
+    let maxCols = 1;
+    for (const l of lines) if (l.length > maxCols) maxCols = Math.min(l.length, 240);
+
+    const scaleX = cssW / maxCols;
+    const pxPerLine = (lh / scrollHeight) * cssH; // height of one text row on the track
+    const dotW = Math.max(0.6, scaleX);
+    const dotH = Math.max(0.6, pxPerLine);
+
+    ctx.fillStyle = fgColor;
+    ctx.globalAlpha = 0.85;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const y = (spacers + i) * pxPerLine;
+      if (y > cssH) break;
+      for (let j = 0; j < line.length && j < maxCols; j++) {
+        const ch = line.charCodeAt(j);
+        if (ch === 32 || ch === 9) continue; // space / tab
+        ctx.fillRect(j * scaleX, y, dotW, dotH);
+      }
+    }
+    ctx.globalAlpha = 1;
+  }, [containerRef, preRef, lineHeight, spacers, fgColor]);
+
+  const updateThumb = useCallback(() => {
     const c = containerRef.current;
-    if (!c) return;
-    const trackHeight = c.clientHeight;
+    const canvas = canvasRef.current;
+    if (!c || !canvas) return;
+    const cssH = canvas.clientHeight;
     const scrollHeight = c.scrollHeight || 1;
     setThumb({
-      top: (c.scrollTop / scrollHeight) * trackHeight,
-      height: Math.max(16, (c.clientHeight / scrollHeight) * trackHeight),
+      top: (c.scrollTop / scrollHeight) * cssH,
+      height: Math.max(16, (c.clientHeight / scrollHeight) * cssH),
     });
-    // Active logo = the one whose ink box contains the viewport centre line.
-    const lh = lineHeight();
-    const centreLine = (c.scrollTop + c.clientHeight / 2) / lh - spacers;
-    let best = 0;
-    let bestDist = Infinity;
-    entries.forEach((e, i) => {
-      const { inkTop, inkBottom } = e.section;
-      if (centreLine >= inkTop && centreLine <= inkBottom) {
-        best = i;
-        bestDist = -1;
-      } else if (bestDist !== -1) {
-        const dist = Math.min(Math.abs(centreLine - inkTop), Math.abs(centreLine - inkBottom));
-        if (dist < bestDist) {
-          bestDist = dist;
-          best = i;
-        }
-      }
-    });
-    setActive(best);
-  }, [containerRef, entries, spacers, lineHeight]);
+  }, [containerRef]);
 
-  // Recompute on mount, on container/content resize, and when the logo set changes.
+  // Redraw on mount and whenever the container/content resizes (font load) or fg changes.
   useEffect(() => {
-    recompute();
-    updateScrollState();
+    draw();
+    updateThumb();
     const c = containerRef.current;
     const pre = preRef.current;
     if (!c) return;
     const onResize = () => {
-      recompute();
-      updateScrollState();
+      draw();
+      updateThumb();
     };
     const ro = new ResizeObserver(onResize);
     ro.observe(c);
@@ -88,9 +110,9 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, on
       ro.disconnect();
       window.removeEventListener("resize", onResize);
     };
-  }, [recompute, updateScrollState, containerRef, preRef]);
+  }, [draw, updateThumb, containerRef, preRef]);
 
-  // Track scrolling (rAF-throttled) for the thumb + active highlight.
+  // Track scrolling (rAF-throttled) for the thumb.
   useEffect(() => {
     const c = containerRef.current;
     if (!c) return;
@@ -98,7 +120,7 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, on
       if (rafRef.current != null) return;
       rafRef.current = requestAnimationFrame(() => {
         rafRef.current = null;
-        updateScrollState();
+        updateThumb();
       });
     };
     c.addEventListener("scroll", onScroll, { passive: true });
@@ -106,80 +128,102 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, on
       c.removeEventListener("scroll", onScroll);
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
     };
-  }, [containerRef, updateScrollState]);
+  }, [containerRef, updateThumb]);
+
+  // Map a pointer Y on the track to a scroll position (centred on the cursor).
+  const scrollToPointer = useCallback(
+    (clientY: number, smooth: boolean) => {
+      const c = containerRef.current;
+      const canvas = canvasRef.current;
+      if (!c || !canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const frac = Math.max(0, Math.min((clientY - rect.top) / rect.height, 1));
+      const target = Math.max(0, Math.min(frac * c.scrollHeight - c.clientHeight / 2, c.scrollHeight - c.clientHeight));
+      if (smooth) animateScroll(c, target, 350);
+      else c.scrollTop = target;
+    },
+    [containerRef],
+  );
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    dragging.current = true;
+    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+    scrollToPointer(e.clientY, false);
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (dragging.current) {
+      scrollToPointer(e.clientY, false);
+      return;
+    }
+    // Hover: show the nearest logo's label.
+    const canvas = canvasRef.current;
+    const c = containerRef.current;
+    if (!canvas || !c || entries.length === 0) return;
+    const rect = canvas.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const tops = computeMarkerPositions(
+      entries.map((en) => en.section),
+      { spacers, lineHeight: lineHeight(), scrollHeight: c.scrollHeight || 1, trackHeight: rect.height },
+    );
+    let best = 0;
+    let bestD = Infinity;
+    tops.forEach((t, i) => {
+      const d = Math.abs(t - y);
+      if (d < bestD) {
+        bestD = d;
+        best = i;
+      }
+    });
+    setHover({ idx: best, y: tops[best] });
+  };
+  const endDrag = (e: React.PointerEvent) => {
+    dragging.current = false;
+    (e.target as HTMLElement).releasePointerCapture?.(e.pointerId);
+  };
 
   if (entries.length < 2) return null;
 
   return (
     <div
-      aria-label="Logo navigation"
+      aria-label="Logo minimap"
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={endDrag}
+      onPointerLeave={() => setHover(null)}
       style={{
         position: "absolute",
         top: 0,
         right: 0,
-        width: "16px",
+        width: `${MINIMAP_WIDTH}px`,
         height: "100%",
         zIndex: 60,
-        background: "rgba(17,17,17,0.55)",
+        background: "rgba(17,17,17,0.6)",
         borderLeft: "1px solid #333",
+        cursor: "pointer",
+        touchAction: "none",
       }}
     >
+      <canvas ref={canvasRef} style={{ display: "block", width: "100%", height: "100%" }} />
       {thumb && (
         <div
           style={{
             position: "absolute",
+            left: 0,
             right: 0,
-            width: "16px",
             top: `${thumb.top}px`,
             height: `${thumb.height}px`,
-            background: "rgba(255,85,255,0.12)",
+            background: "rgba(255,85,255,0.14)",
+            border: "1px solid rgba(255,85,255,0.5)",
             pointerEvents: "none",
           }}
         />
       )}
-      {entries.map((entry, i) => (
-        <button
-          key={i}
-          type="button"
-          title={entry.label}
-          onClick={() => onJump(entry.section)}
-          onMouseEnter={() => setHover(i)}
-          onMouseLeave={() => setHover((h) => (h === i ? null : h))}
-          style={{
-            position: "absolute",
-            right: 0,
-            top: `${tops[i] ?? 0}px`,
-            transform: "translateY(-50%)",
-            width: "16px",
-            height: "12px",
-            minHeight: 0,
-            margin: 0,
-            padding: 0,
-            border: "none",
-            background: "transparent",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end",
-          }}
-        >
-          <span
-            style={{
-              display: "block",
-              width: i === active ? "12px" : "8px",
-              height: "2px",
-              marginRight: "2px",
-              background: i === active ? "#ff55ff" : hover === i ? "#aaaaaa" : "#555555",
-            }}
-          />
-        </button>
-      ))}
-      {hover != null && tops[hover] != null && (
+      {hover && (
         <span
           style={{
             position: "absolute",
-            right: "20px",
-            top: `${tops[hover]}px`,
+            right: `${MINIMAP_WIDTH + 4}px`,
+            top: `${hover.y}px`,
             transform: "translateY(-50%)",
             background: "rgba(0,0,0,0.9)",
             color: "#aaaaaa",
@@ -192,8 +236,8 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, on
             zIndex: 61,
           }}
         >
-          <span style={{ color: "#555", marginRight: "8px" }}>{hover + 1}</span>
-          {entries[hover].label}
+          <span style={{ color: "#555", marginRight: "8px" }}>{hover.idx + 1}</span>
+          {entries[hover.idx].label}
         </span>
       )}
     </div>

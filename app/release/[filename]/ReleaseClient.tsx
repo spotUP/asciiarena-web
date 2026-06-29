@@ -20,7 +20,7 @@ import {
   computeScrollTarget,
   type LogoSection,
 } from "@/lib/logoSections";
-import LogoMinimap from "./LogoMinimap";
+import LogoMinimap, { MINIMAP_WIDTH } from "./LogoMinimap";
 
 const COLOR_OPTIONS = [
   { value: "#555555", label: "Bright Black" },
@@ -966,7 +966,7 @@ export default function ReleaseClient({
         <div
           ref={collyDivRef}
           id="colly-div"
-          style={{ display: "flex", justifyContent: "center", alignItems: "flex-start", overflowY: "scroll", overflowX: "hidden", height: "100vh", backgroundColor: bgColor, margin: 0, padding: 0 }}
+          style={{ display: "flex", justifyContent: "center", alignItems: "flex-start", overflowY: "scroll", overflowX: "hidden", height: "100vh", backgroundColor: bgColor, margin: 0, padding: 0, paddingRight: !isFullscreen && type === "ASCII" && logoIndex.length > 1 ? `${MINIMAP_WIDTH}px` : 0 }}
         >
           {indexOpen && logoIndex.length > 0 && (
             <div style={{
@@ -1009,7 +1009,7 @@ export default function ReleaseClient({
             preRef={collyRef}
             entries={logoIndex}
             spacers={4}
-            onJump={scrollToSection}
+            fgColor={fgColor}
           />
         )}
         </div>
