@@ -1140,17 +1140,17 @@ export default function ReleaseClient({
               <button
                 key={entry}
                 type="button"
-                className={hiddenEntries.has(entry) ? "lightgrey" : "magenta"}
+                className={`text-truncate ${hiddenEntries.has(entry) ? "lightgrey" : "magenta"}`}
                 title={entry}
                 onClick={() => document.getElementById(`archive-entry-${i}`)?.scrollIntoView({ block: "start" })}
                 style={{
                   display: "block", width: "100%", breakInside: "avoid",
                   background: "transparent", border: "none", cursor: "pointer",
-                  // Override the global 48px button min-height so rows stay compact.
+                  // Match the sidebar widgets: 16px line, override the global 48px
+                  // button min-height, 8px left padding.
                   minHeight: 0, height: "auto",
-                  padding: 0, margin: 0, lineHeight: "1.6", textAlign: "left",
+                  margin: 0, padding: "0 0 0 8px", lineHeight: "16px", textAlign: "left",
                   fontFamily: "inherit", fontSize: "inherit",
-                  whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
                 }}
               >
                 {hiddenEntries.has(entry) ? "[hidden] " : ""}{entry.split("/").pop()}
