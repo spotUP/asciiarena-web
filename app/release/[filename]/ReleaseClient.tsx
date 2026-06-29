@@ -735,9 +735,9 @@ export default function ReleaseClient({
       for (let i = lo; i < hi; i++) { const d = freq[i] - prevFreq[i]; if (d > 0) f += d; }
       return f / ((hi - lo) * 255);
     };
-    const kickDet = new BeatDetector({ sensitivity: 2.2, refractoryMs: 200, floor: 0.006, windowSize: 43 }); // bass/kick
-    const midDet  = new BeatDetector({ sensitivity: 2.6, refractoryMs: 150, floor: 0.005, windowSize: 43 }); // snare/mid
-    const highDet = new BeatDetector({ sensitivity: 3.0, refractoryMs: 110, floor: 0.004, windowSize: 43 }); // hats/treble
+    const kickDet = new BeatDetector({ sensitivity: 2.2, refractoryMs: 200, floor: 0.006, windowSize: 43 }); // bass/kick (drives the scroll)
+    const midDet  = new BeatDetector({ sensitivity: 3.6, refractoryMs: 360, floor: 0.008, windowSize: 43 }); // snare/mid (occasional)
+    const highDet = new BeatDetector({ sensitivity: 4.2, refractoryMs: 320, floor: 0.006, windowSize: 43 }); // hats/treble (occasional)
     const startT = performance.now();
     const minDwell = 2200;
     const maxDwell = 7000;
@@ -765,41 +765,41 @@ export default function ReleaseClient({
       // Bass/kick -> scroll bounce, the flaky-VHS warp (gated, rare), and the
       // logo advance. Snare/mid -> RGB chromatic split + horizontal jitter.
       // Hats/treble -> brightness sparkle + vertical shimmer.
-      if (kick) surge += 22;
-      if (kick && kf > 0.12 && now - lastWarp > 1400) { warp = 1; lastWarp = now; }
+      if (kick) surge += 22;                                  // scroll bounce (kept punchy)
+      if (kick && kf > 0.07 && now - lastWarp > 900) { warp = 1; lastWarp = now; } // warp more often
       if (mid) glitch = 1;
       if (high) sparkle = 1;
       surge *= 0.82;
       glitch *= 0.8;
-      warp *= 0.85;
+      warp *= 0.9;        // warp lingers longer (~0.7s) so the bend reads
       sparkle *= 0.75;
 
-      // glow: gentle loudness breathing + a treble sparkle pop
-      glow = glow * 0.6 + Math.min(Math.max(0, eGlow - baseline) * 3 + sparkle * 0.5, 0.8) * 0.4;
+      // glow: gentle loudness breathing + a small treble sparkle pop (toned down)
+      glow = glow * 0.6 + Math.min(Math.max(0, eGlow - baseline) * 2 + sparkle * 0.3, 0.5) * 0.4;
 
-      const useWarp = warp > 0.03;
+      const useWarp = warp > 0.02;
       stage.style.filter = `brightness(${(1 + glow).toFixed(2)})`
         + (useWarp ? " url(#vhsWarp)" : "")
-        + (glitch > 0.6 ? " contrast(1.4)" : "");
+        + (glitch > 0.7 ? " contrast(1.3)" : "");
       if (useWarp) {
-        warpDispRef.current?.setAttribute("scale", (warp * 26).toFixed(1));
-        warpTurbRef.current?.setAttribute("seed", String(Math.floor(now / 45) % 200));
+        warpDispRef.current?.setAttribute("scale", (warp * 70).toFixed(1)); // much stronger bend
+        warpTurbRef.current?.setAttribute("seed", String(Math.floor(now / 60) % 200));
       } else {
         warpDispRef.current?.setAttribute("scale", "0");
       }
 
-      // RGB split (mid) lives on the pre; the stage transform combines the
-      // mid horizontal jitter/skew with the treble vertical shimmer.
+      // RGB split (mid) on the pre + a subtle combined jitter on the stage. Both
+      // toned down so they punctuate rather than run constantly.
       if (glitch > 0.05) {
-        const split = (2 + glitch * 7).toFixed(1);
-        pre.style.textShadow = `${split}px 0 rgba(255,0,90,0.55), -${split}px 0 rgba(0,210,255,0.55)`;
+        const split = (1 + glitch * 4).toFixed(1);
+        pre.style.textShadow = `${split}px 0 rgba(255,0,90,0.5), -${split}px 0 rgba(0,210,255,0.5)`;
       } else if (pre.style.textShadow) {
         pre.style.textShadow = "";
       }
       if (glitch > 0.05 || sparkle > 0.05) {
-        const jx = ((Math.random() - 0.5) * glitch * 12).toFixed(1);
-        const jy = ((Math.random() - 0.5) * sparkle * 7).toFixed(1);
-        const sk = (glitch > 0.45 ? (Math.random() - 0.5) * glitch * 1.5 : 0).toFixed(2);
+        const jx = ((Math.random() - 0.5) * glitch * 7).toFixed(1);
+        const jy = ((Math.random() - 0.5) * sparkle * 4).toFixed(1);
+        const sk = (glitch > 0.5 ? (Math.random() - 0.5) * glitch * 1.2 : 0).toFixed(2);
         stage.style.transform = `translate(${jx}px, ${jy}px) skewX(${sk}deg)`;
       } else if (stage.style.transform) {
         stage.style.transform = "";
@@ -1087,8 +1087,8 @@ export default function ReleaseClient({
           PC/CP437 art skips this and renders on the canvas viewer below. */}
       {/* Hidden SVG warp filter for the flaky-VHS bend (driven in groove autoplay). */}
       <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
-        <filter id="vhsWarp" x="-20%" y="-20%" width="140%" height="140%">
-          <feTurbulence ref={warpTurbRef} type="fractalNoise" baseFrequency="0 0.018" numOctaves={1} seed={1} result="n" />
+        <filter id="vhsWarp" x="-50%" y="-50%" width="200%" height="200%">
+          <feTurbulence ref={warpTurbRef} type="fractalNoise" baseFrequency="0 0.02" numOctaves={2} seed={1} result="n" />
           <feDisplacementMap ref={warpDispRef} in="SourceGraphic" in2="n" scale={0} xChannelSelector="R" yChannelSelector="G" />
         </filter>
       </svg>
