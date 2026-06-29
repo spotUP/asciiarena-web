@@ -83,6 +83,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session;
     },
   },
+  events: {
+    // Record the sign-in as a "call" so the Last Callers widget reflects real
+    // recent logins (the table was previously never written, so it only showed
+    // stale legacy data). One row per user: replace any prior row, stamp now.
+    async signIn({ user }) {
+      try {
+        const uid = user?.id ? parseInt(user.id, 10) : NaN;
+        if (!Number.isFinite(uid)) return;
+        const nick = (user?.name ?? "").slice(0, 60);
+        const crew = ((user as { crew?: string | null }).crew ?? "").slice(0, 60);
+        const timestamp = Math.floor(Date.now() / 1000);
+        await prisma.lastusers.deleteMany({ where: { user_id: uid } });
+        await prisma.lastusers.create({ data: { user_id: uid, nick, crew, timestamp } });
+        // The widget's cache (unstable_cache, 71s TTL) picks this up on its next
+        // revalidate — within ~71s.
+      } catch {
+        /* never block login on a callers-log write */
+      }
+    },
+  },
   pages: {
     signIn: "/login",
   },
