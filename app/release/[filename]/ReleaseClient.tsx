@@ -14,6 +14,12 @@ import { buildAdminCollyEditHref } from "@/app/admin/collys/editHref";
 import { FONTS, ANSI_FONT_MAP, loadAnsiLove, type AnsiLoveController } from "@/lib/ansilove";
 import { looksLikeCp437Art, decodeReleaseText, isRenderableArt, isAnsiAnimation } from "@/lib/releaseText";
 import { animateScroll } from "@/lib/animateScroll";
+import {
+  detectLogoSections,
+  buildLogoIndex,
+  computeScrollTarget,
+  type LogoSection,
+} from "@/lib/logoSections";
 
 const COLOR_OPTIONS = [
   { value: "#555555", label: "Bright Black" },
@@ -68,105 +74,6 @@ interface Props {
 }
 
 type Section = null | "add-comment" | "edit-comment" | "broken";
-
-interface LogoSection { startLine: number; endLine: number; lineCount: number }
-
-function detectLogoSections(html: string): LogoSection[] {
-  const text = html.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
-  const lines = text.split("\n");
-  // Normalize a line to its shape: replace every non-space char with '#', trim trailing spaces.
-  // Two lines with the same frame art produce the same fingerprint regardless of interior text.
-  const norm = (s: string) => s.replace(/[^\s]/g, "#").trimEnd();
-
-  interface Island { startLine: number; endLine: number; lineCount: number; fp: string }
-  const islands: Island[] = [];
-  let i = 0;
-  while (i < lines.length) {
-    while (i < lines.length && lines[i].trim() === "") i++;
-    if (i >= lines.length) break;
-    const start = i;
-    while (i < lines.length && lines[i].trim() !== "") i++;
-    const lineCount = i - start;
-    if (lineCount >= 5) {
-      // Fingerprint = normalized first + last line. Divider frames repeat across the colly;
-      // logos are each unique, so unique fingerprint → logo, repeated fingerprint → divider.
-      const fp = norm(lines[start]) + "|" + norm(lines[i - 1]);
-      islands.push({ startLine: start, endLine: i - 1, lineCount, fp });
-    }
-  }
-
-  // Count fingerprint occurrences — any that appear 2+ times are the repeating divider template.
-  const fpCount = new Map<string, number>();
-  islands.forEach(isl => fpCount.set(isl.fp, (fpCount.get(isl.fp) ?? 0) + 1));
-
-  return islands
-    .filter(isl => (fpCount.get(isl.fp) ?? 0) < 2)
-    .map(({ startLine, endLine, lineCount }) => ({ startLine, endLine, lineCount }));
-}
-
-interface LogoIndexEntry { section: LogoSection; label: string }
-
-// Frame lines use ≤2 distinct non-space chars (e.g. "mmMMMMMMMMMMMMMmm" = {m,M}).
-// Content lines have ≥3 distinct non-space chars.
-function extractDividerLabel(divLines: string[]): string {
-  const contentLines = divLines.filter(l => {
-    const nonSpace = l.replace(/\s/g, "");
-    return nonSpace.length >= 2 && new Set(nonSpace).size >= 3;
-  });
-  if (!contentLines.length) return "";
-
-  // Collapse spaced-letter sequences: "s u b l i m e" -> "sublime"
-  const compact = (s: string) => {
-    s = s.replace(/ {2,}/g, " ");
-    let prev: string;
-    do { prev = s; s = s.replace(/([a-zA-Z0-9_]) ([a-zA-Z0-9_])/g, "$1$2"); } while (s !== prev);
-    return s.trim();
-  };
-  const strip = (s: string) =>
-    s.replace(/^[^a-zA-Z0-9]+/, "").replace(/[^a-zA-Z0-9]+$/, "").trim();
-
-  // Prefer colon lines: "logo_name : sublime" or "|: ..domination.. :|"
-  for (const line of contentLines) {
-    let idx = -1;
-    while ((idx = line.indexOf(":", idx + 1)) >= 0) {
-      const label = compact(strip(line.slice(idx + 1)));
-      if (label.replace(/[^a-zA-Z]/g, "").length >= 2) return label.slice(0, 36);
-    }
-  }
-
-  // Fallback: first content line with actual letters
-  for (const line of contentLines) {
-    const label = compact(strip(line));
-    if (label.replace(/[^a-zA-Z]/g, "").length >= 2) return label.slice(0, 36);
-  }
-  return "";
-}
-
-function buildLogoIndex(html: string, sections: LogoSection[]): LogoIndexEntry[] {
-  if (!sections.length) return [];
-  const text = html.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
-  const lines = text.split("\n");
-
-  interface RawIsland { startLine: number; endLine: number }
-  const all: RawIsland[] = [];
-  let i = 0;
-  while (i < lines.length) {
-    while (i < lines.length && lines[i].trim() === "") i++;
-    if (i >= lines.length) break;
-    const start = i;
-    while (i < lines.length && lines[i].trim() !== "") i++;
-    all.push({ startLine: start, endLine: i - 1 });
-  }
-
-  return sections.map((section, n) => {
-    const preceding = all
-      .filter(isl => isl.endLine < section.startLine)
-      .sort((a, b) => b.endLine - a.endLine)[0];
-    let label = "";
-    if (preceding) label = extractDividerLabel(lines.slice(preceding.startLine, preceding.endLine + 1));
-    return { section, label: label || `Logo ${n + 1}` };
-  });
-}
 
 function ColorSwatch({ current, onChange }: { current: string; onChange: (v: string) => void }) {
   const [open, setOpen] = useState(false);
@@ -692,17 +599,15 @@ export default function ReleaseClient({
     if (!pre) return;
     const lineHeight = parseFloat(getComputedStyle(pre).lineHeight) || 16;
     const SPACERS    = 4;
-    const sectionTop = (SPACERS + section.startLine) * lineHeight;
-    const sectionH   = section.lineCount * lineHeight;
     if (isFullscreen) {
       const viewH  = window.innerHeight;
-      const target = Math.max(0, Math.min(sectionTop - (viewH - sectionH) / 2, document.documentElement.scrollHeight - viewH));
+      const target = computeScrollTarget(section, { spacers: SPACERS, lineHeight, viewH, maxScroll: document.documentElement.scrollHeight - viewH });
       animateScroll(document.documentElement, target, 500);
     } else {
       const container = collyDivRef.current;
       if (!container) return;
       const viewH  = container.clientHeight;
-      const target = Math.max(0, Math.min(sectionTop - (viewH - sectionH) / 2, container.scrollHeight - viewH));
+      const target = computeScrollTarget(section, { spacers: SPACERS, lineHeight, viewH, maxScroll: container.scrollHeight - viewH });
       animateScroll(container, target, 500);
     }
   }, [isFullscreen]);
@@ -742,8 +647,6 @@ export default function ReleaseClient({
 
     const lineHeight = parseFloat(getComputedStyle(pre).lineHeight) || 16;
     const SPACERS    = 4;
-    const sectionTop = (SPACERS + logoSection.startLine) * lineHeight;
-    const sectionH   = logoSection.lineCount * lineHeight;
 
     let scrollEl: HTMLElement;
     let viewH: number;
@@ -760,7 +663,7 @@ export default function ReleaseClient({
       maxScroll = container.scrollHeight - viewH;
     }
 
-    const target   = Math.max(0, Math.min(sectionTop - (viewH - sectionH) / 2, maxScroll));
+    const target   = computeScrollTarget(logoSection, { spacers: SPACERS, lineHeight, viewH, maxScroll });
     const hold     = Math.min(4000 + Math.max(0, logoSection.lineCount - 20) * 15, 8000);
     const scrollMs = 700;
 
