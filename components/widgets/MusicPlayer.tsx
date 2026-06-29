@@ -66,21 +66,25 @@ export default function MusicPlayer() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, cssW, cssH);
       if (!analyser) return;
-      const cols = Math.floor(cssW / 8);
-      const rows = Math.floor(cssH / 16);
       const bins = analyser.frequencyBinCount;
       const data = new Uint8Array(bins);
       analyser.getByteFrequencyData(data);
-      // Focus the lower ~60% of the spectrum where the music energy lives.
-      const step = Math.max(1, Math.floor((bins * 0.6) / cols));
+      // Classic spectrum: ~6px bars across the full width, mapped on a log
+      // frequency scale (bass spread out, treble compressed) so the bars fill
+      // the strip; smooth height (no row banding) with a gamma lift so quiet
+      // bands still register.
+      const barW = 6;
+      const nBars = Math.max(1, Math.floor(cssW / barW));
+      const minBin = 1, maxBin = Math.min(bins - 1, 220);
       ctx.fillStyle = "#ff55ff";
-      for (let i = 0; i < cols; i++) {
-        let sum = 0;
-        for (let j = 0; j < step; j++) sum += data[i * step + j] || 0;
-        const level = Math.round((sum / step / 255) * rows);
-        for (let r = 0; r < level; r++) {
-          ctx.fillRect(i * 8, cssH - (r + 1) * 16, 7, 15); // 8x16 cell, 1px gutter
-        }
+      for (let i = 0; i < nBars; i++) {
+        const lo = Math.floor(minBin * Math.pow(maxBin / minBin, i / nBars));
+        const hi = Math.max(lo + 1, Math.floor(minBin * Math.pow(maxBin / minBin, (i + 1) / nBars)));
+        let sum = 0, n = 0;
+        for (let b = lo; b < hi && b < bins; b++) { sum += data[b]; n++; }
+        const v = n ? sum / n / 255 : 0;
+        const h = Math.max(1, Math.pow(v, 0.7) * cssH);
+        ctx.fillRect(i * barW, cssH - h, barW - 1, h);
       }
     };
     draw();
