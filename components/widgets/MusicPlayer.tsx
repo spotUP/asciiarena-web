@@ -4,8 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { useMusic } from "@/components/music/MusicProvider";
 import { isUadePlayable, type ModlandFile } from "@/lib/modland";
 
+const basename = (p: string) => p.split("/").pop() || p;
+
 // Minimal Modland music player widget. Backed by the persistent MusicProvider
-// engine, so playback continues across navigation.
+// engine, so playback continues across (client-side) navigation.
 export default function MusicPlayer() {
   const { track, isPlaying, loading, error, volume, search, playFile, playRandom, toggle, stop, setVolume, getAnalyser } = useMusic();
   const [query, setQuery] = useState("");
@@ -13,7 +15,8 @@ export default function MusicPlayer() {
   const [searching, setSearching] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // FFT bars driven by the engine's AnalyserNode. Only loops while playing.
+  // FFT as chunky 8x16 blocks (matches the site's character grid). Only loops
+  // while playing.
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
@@ -24,22 +27,31 @@ export default function MusicPlayer() {
       raf = requestAnimationFrame(draw);
       const analyser = getAnalyser();
       if (!canvas || !ctx) return;
-      const w = canvas.width, h = canvas.height;
-      ctx.clearRect(0, 0, w, h);
+      const dpr = window.devicePixelRatio || 1;
+      const cssW = canvas.clientWidth, cssH = canvas.clientHeight;
+      if (cssW === 0) return;
+      if (canvas.width !== Math.round(cssW * dpr)) {
+        canvas.width = Math.round(cssW * dpr);
+        canvas.height = Math.round(cssH * dpr);
+      }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, cssW, cssH);
       if (!analyser) return;
+      const cols = Math.floor(cssW / 8);
+      const rows = Math.floor(cssH / 16);
       const bins = analyser.frequencyBinCount;
       const data = new Uint8Array(bins);
       analyser.getByteFrequencyData(data);
-      const bars = 32;
-      const step = Math.floor(bins / bars);
-      const bw = w / bars;
+      // Focus the lower ~60% of the spectrum where the music energy lives.
+      const step = Math.max(1, Math.floor((bins * 0.6) / cols));
       ctx.fillStyle = "#ff55ff";
-      for (let i = 0; i < bars; i++) {
+      for (let i = 0; i < cols; i++) {
         let sum = 0;
-        for (let j = 0; j < step; j++) sum += data[i * step + j];
-        const v = sum / step / 255;
-        const bh = Math.max(1, v * h);
-        ctx.fillRect(i * bw, h - bh, Math.max(1, bw - 1), bh);
+        for (let j = 0; j < step; j++) sum += data[i * step + j] || 0;
+        const level = Math.round((sum / step / 255) * rows);
+        for (let r = 0; r < level; r++) {
+          ctx.fillRect(i * 8, cssH - (r + 1) * 16, 7, 15); // 8x16 cell, 1px gutter
+        }
       }
     };
     draw();
@@ -62,8 +74,12 @@ export default function MusicPlayer() {
 
   const btn: React.CSSProperties = {
     background: "transparent", border: "1px solid #555", color: "#aaaaaa",
-    cursor: "pointer", fontFamily: "inherit", fontSize: "13px", padding: "2px 8px",
-    minHeight: 0, height: "auto", margin: 0,
+    cursor: "pointer", fontFamily: "inherit", fontSize: "inherit",
+    padding: "0 8px", minHeight: 0, height: "auto", margin: 0, lineHeight: "24px",
+  };
+  const field: React.CSSProperties = {
+    background: "#111", border: "1px solid #555", color: "#aaaaaa",
+    fontFamily: "inherit", fontSize: "inherit", padding: "0 6px", lineHeight: "24px",
   };
 
   return (
@@ -71,51 +87,51 @@ export default function MusicPlayer() {
       <div className="header col-lg-12 p-0">
         <h2 className="ap-1 bg-header">MUSiC PLAYER</h2>
       </div>
-      <div className="container col-12 apt-1 apb-1 m-0 p-0 bg-secondary" style={{ fontFamily: "monospace", fontSize: "13px" }}>
-        <div className="pl-lg-2 pr-lg-2" style={{ padding: "0 8px" }}>
+      <div className="container col-12 apt-1 apb-1 m-0 p-0 bg-secondary">
+        <div style={{ padding: "0 8px" }}>
           {/* Search */}
-          <div style={{ display: "flex", gap: "4px", marginBottom: "6px" }}>
+          <div style={{ display: "flex", gap: "4px", marginBottom: "8px" }}>
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") doSearch(); }}
               placeholder="search modland..."
-              style={{ flex: 1, minWidth: 0, background: "#111", border: "1px solid #555", color: "#aaaaaa", fontFamily: "inherit", fontSize: "13px", padding: "2px 6px" }}
+              style={{ ...field, flex: 1, minWidth: 0 }}
             />
             <button type="button" style={btn} onClick={doSearch}>{searching ? "..." : "Go"}</button>
           </div>
 
-          {/* Results */}
+          {/* Results — song name + extension only */}
           {results.length > 0 && (
-            <div style={{ maxHeight: "160px", overflowY: "auto", marginBottom: "6px", border: "1px solid #333" }}>
+            <div style={{ maxHeight: "176px", overflowY: "auto", marginBottom: "8px", border: "1px solid #333" }}>
               {results.map((f) => (
                 <div
                   key={f.id}
                   onClick={() => playFile(f)}
-                  title={`${f.filename} — ${f.author} [${f.format}]`}
+                  title={`${basename(f.filename)} — ${f.author} [${f.format}]`}
                   style={{
-                    padding: "1px 6px", cursor: "pointer", whiteSpace: "nowrap",
+                    padding: "0 6px", lineHeight: "16px", cursor: "pointer", whiteSpace: "nowrap",
                     overflow: "hidden", textOverflow: "ellipsis",
                     color: track?.path === f.full_path ? "#ff55ff" : "#aaaaaa",
                   }}
                 >
-                  <span style={{ color: "#555" }}>{f.format}</span>{" "}{f.filename}
+                  {basename(f.filename)}
                 </div>
               ))}
             </div>
           )}
 
-          {/* Now playing */}
-          <div className="text-truncate" style={{ marginBottom: "4px" }} title={track?.title}>
+          {/* Now playing — song name + extension only */}
+          <div className="text-truncate" style={{ marginBottom: "6px" }} title={track ? basename(track.title) : undefined}>
             {loading ? <span className="yellow">loading...</span>
-              : track ? <><span className="yellow">{track.title}</span> <span style={{ color: "#555" }}>[{track.format}]</span></>
+              : track ? <span className="yellow">{basename(track.title)}</span>
               : <span style={{ color: "#555" }}>nothing playing</span>}
           </div>
-          {error && <div style={{ color: "#ff5555", marginBottom: "4px" }}>{error}</div>}
+          {error && <div style={{ color: "#ff5555", marginBottom: "6px" }}>{error}</div>}
 
-          {/* FFT */}
-          <canvas ref={canvasRef} width={256} height={32} style={{ display: "block", width: "100%", height: "32px", marginBottom: "6px", background: "#111", imageRendering: "pixelated" }} />
+          {/* FFT block visualizer (8x16 grid) */}
+          <canvas ref={canvasRef} style={{ display: "block", width: "100%", height: "48px", marginBottom: "8px", background: "#111", imageRendering: "pixelated" }} />
 
           {/* Transport */}
           <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
