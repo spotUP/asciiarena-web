@@ -1135,7 +1135,7 @@ export default function ReleaseClient({
 
           {/* Clickable index of all entries — jump to (and render) any one.
               Magenta hover links like the sidebar widgets, 3 compact columns. */}
-          <div className="bg-secondary amb-1 ap-1" style={{ columns: "260px 3", columnGap: "16px" }}>
+          <div className="bg-secondary amb-1 ap-1" style={{ columns: "190px 4", columnGap: "16px" }}>
             {archiveFiles.map((entry, i) => (
               <button
                 key={entry}
