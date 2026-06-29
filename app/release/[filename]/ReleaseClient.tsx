@@ -251,7 +251,8 @@ function recolorMonochromeCanvas(canvas: HTMLCanvasElement, fgHex: string, bgHex
   ctx.putImageData(img, 0, 0);
 }
 
-function ArchiveEntryRenderer({ filename, entry, ansiFont, fgColor, bgColor, isAdmin, initialAdminHidden }: { filename: string; entry: string; ansiFont: string; fgColor: string; bgColor: string; isAdmin: boolean; initialAdminHidden: boolean }) {
+function ArchiveEntryRenderer({ filename, entry, entryIndex, eager, ansiFont, fgColor, bgColor, isAdmin, initialAdminHidden }: { filename: string; entry: string; entryIndex: number; eager?: boolean; ansiFont: string; fgColor: string; bgColor: string; isAdmin: boolean; initialAdminHidden: boolean }) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const hostRef = useRef<HTMLDivElement>(null);
   const animRef = useRef<AnsiLoveController | null>(null);
   const [hidden, setHidden] = useState(false);
@@ -259,6 +260,22 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont, fgColor, bgColor, isA
   const [busy, setBusy] = useState(false);
   const [isAnim, setIsAnim] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [rendered, setRendered] = useState(false);
+  // Render/fetch on demand: only when the slot is near the viewport (or eager,
+  // for the hero). Big packs (90+ entries) otherwise fetch + render everything
+  // at once. The index below scrolls a slot into view, which triggers this.
+  const [visible, setVisible] = useState(!!eager);
+
+  useEffect(() => {
+    if (visible) return;
+    const node = wrapperRef.current;
+    if (!node) return;
+    const obs = new IntersectionObserver((entries) => {
+      if (entries.some(e => e.isIntersecting)) { setVisible(true); obs.disconnect(); }
+    }, { rootMargin: "600px" });
+    obs.observe(node);
+    return () => obs.disconnect();
+  }, [visible]);
 
   const ANIM_BAUD = 28800;
   const togglePlay = () => {
@@ -292,6 +309,7 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont, fgColor, bgColor, isA
   //    flat grey-on-black, so plain text is never sent through AnsiLove.
   // The archive API already normalises 8-bit CSI (0x9B) to ESC[.
   useEffect(() => {
+    if (!visible) return;
     const el = hostRef.current;
     if (!el) return;
     let cancelled = false;
@@ -305,6 +323,7 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont, fgColor, bgColor, isA
       const bytes = new Uint8Array(buf);
       // Not renderable art (binary blob) — drop the whole entry.
       if (!isRenderableArt(bytes)) { setHidden(true); return; }
+      setRendered(true); // content is coming — release the placeholder height
       const hasEsc = bytes.includes(0x1b);
       const isCp437 = !hasEsc && looksLikeCp437Art(bytes);
 
@@ -356,11 +375,11 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont, fgColor, bgColor, isA
     }).catch(fail);
 
     return () => { cancelled = true; if (animRef.current) animRef.current.stop(); };
-  }, [filename, entry, ansiFont, fgColor, bgColor]);
+  }, [visible, filename, entry, ansiFont, fgColor, bgColor]);
 
   if (hidden) return null;
   return (
-    <div style={{ marginBottom: "16px", overflow: "visible", opacity: adminHidden ? 0.4 : 1 }}>
+    <div ref={wrapperRef} id={`archive-entry-${entryIndex}`} style={{ marginBottom: "16px", overflow: "visible", opacity: adminHidden ? 0.4 : 1, scrollMarginTop: "16px" }}>
       <div className="header bg-header col-12 ap-1" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px" }}>
         <span className="text-truncate">{entry.split("/").pop()}{adminHidden ? " (hidden)" : ""}</span>
         {isAnim && (
@@ -383,7 +402,7 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont, fgColor, bgColor, isA
           />
         )}
       </div>
-      <div ref={hostRef} style={{ backgroundColor: "#000", overflow: "visible", textAlign: "center", padding: "16px 0" }} />
+      <div ref={hostRef} style={{ backgroundColor: "#000", overflow: "visible", textAlign: "center", padding: "16px 0", minHeight: rendered ? undefined : "160px" }} />
     </div>
   );
 }
@@ -411,6 +430,7 @@ export default function ReleaseClient({
   const [downloadCount, setDownloadCount] = useState(initialDownloadCount);
   const [archiveFiles, setArchiveFiles] = useState<string[]>([]);
   const [hiddenEntries, setHiddenEntries] = useState<Set<string>>(new Set());
+  const [archiveIndexOpen, setArchiveIndexOpen] = useState(false);
   const [copyImageLabel, setCopyImageLabel] = useState("Copy as image");
   const [, startTransition] = useTransition();
 
@@ -1096,6 +1116,8 @@ export default function ReleaseClient({
         <ArchiveEntryRenderer
           filename={filename}
           entry={extractedEntry}
+          entryIndex={-1}
+          eager
           ansiFont={ANSI_FONT_MAP[font] ?? "mosoul"}
           fgColor={fgColor}
           bgColor={bgColor}
@@ -1104,17 +1126,45 @@ export default function ReleaseClient({
         />
       )}
 
-      {/* Archive viewer — renders each file in the archive using AnsiLove */}
+      {/* Archive viewer — renders each file on demand (as it scrolls into view).
+          The index jumps to any entry, which scrolls it in and renders it. */}
       {isArchive && archiveFiles.length > 0 && (
         <div>
           <div className="bg-secondary amb-1 ap-1" style={{ textAlign: "center" }}>
             <input type="button" className="btn-big" value={`Download ${filename}`} onClick={doDownload} style={{ fontSize: "16px", padding: "12px 24px" }} />
           </div>
-          {archiveFiles.map(entry => (
+
+          {/* Clickable index of all entries — jump to (and render) any one. */}
+          <div className="bg-secondary amb-1 ap-1">
+            <input
+              type="button"
+              className="btn-big"
+              value={archiveIndexOpen ? `Hide Index (${archiveFiles.length})` : `Index (${archiveFiles.length})`}
+              onClick={() => setArchiveIndexOpen(o => !o)}
+            />
+            {archiveIndexOpen && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "8px" }}>
+                {archiveFiles.map((entry, i) => (
+                  <button
+                    key={entry}
+                    className="btn-big bg-header grey-text text-truncate"
+                    style={{ maxWidth: "240px" }}
+                    title={entry}
+                    onClick={() => document.getElementById(`archive-entry-${i}`)?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                  >
+                    {hiddenEntries.has(entry) ? "[hidden] " : ""}{entry.split("/").pop()}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {archiveFiles.map((entry, i) => (
             <ArchiveEntryRenderer
               key={entry}
               filename={filename}
               entry={entry}
+              entryIndex={i}
               ansiFont={ANSI_FONT_MAP[font] ?? "mosoul"}
               fgColor={fgColor}
               bgColor={bgColor}
