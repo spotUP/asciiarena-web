@@ -430,7 +430,6 @@ export default function ReleaseClient({
   const [downloadCount, setDownloadCount] = useState(initialDownloadCount);
   const [archiveFiles, setArchiveFiles] = useState<string[]>([]);
   const [hiddenEntries, setHiddenEntries] = useState<Set<string>>(new Set());
-  const [archiveIndexOpen, setArchiveIndexOpen] = useState(false);
   const [copyImageLabel, setCopyImageLabel] = useState("Copy as image");
   const [, startTransition] = useTransition();
 
@@ -1135,35 +1134,25 @@ export default function ReleaseClient({
           </div>
 
           {/* Clickable index of all entries — jump to (and render) any one. */}
-          <div className="bg-secondary amb-1 ap-1">
-            <input
-              type="button"
-              className="btn-big"
-              value={archiveIndexOpen ? `Hide Index (${archiveFiles.length})` : `Index (${archiveFiles.length})`}
-              onClick={() => setArchiveIndexOpen(o => !o)}
-            />
-            {archiveIndexOpen && (
-              <div style={{ marginTop: "8px", columns: "260px 3", columnGap: "24px" }}>
-                {archiveFiles.map((entry, i) => (
-                  <button
-                    key={entry}
-                    title={entry}
-                    onClick={() => document.getElementById(`archive-entry-${i}`)?.scrollIntoView({ block: "start" })}
-                    style={{
-                      display: "block", width: "100%", textAlign: "left",
-                      breakInside: "avoid", background: "transparent", border: "none",
-                      cursor: "pointer", padding: "2px 4px",
-                      fontFamily: "monospace", fontSize: "13px",
-                      color: hiddenEntries.has(entry) ? "#666666" : "#aaaaaa",
-                      whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-                    }}
-                  >
-                    <span style={{ color: "#555555", marginRight: "8px" }}>{i + 1}</span>
-                    {hiddenEntries.has(entry) ? "[hidden] " : ""}{entry.split("/").pop()}
-                  </button>
-                ))}
-              </div>
-            )}
+          <div className="bg-secondary amb-1 ap-1" style={{ columns: "260px 3", columnGap: "24px" }}>
+            {archiveFiles.map((entry, i) => (
+              <button
+                key={entry}
+                title={entry}
+                onClick={() => document.getElementById(`archive-entry-${i}`)?.scrollIntoView({ block: "start" })}
+                style={{
+                  display: "block", width: "100%", textAlign: "left",
+                  breakInside: "avoid", background: "transparent", border: "none",
+                  cursor: "pointer", padding: "2px 4px",
+                  fontFamily: "monospace", fontSize: "13px",
+                  color: hiddenEntries.has(entry) ? "#666666" : "#aaaaaa",
+                  whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                }}
+              >
+                <span style={{ color: "#555555", marginRight: "8px" }}>{i + 1}</span>
+                {hiddenEntries.has(entry) ? "[hidden] " : ""}{entry.split("/").pop()}
+              </button>
+            ))}
           </div>
 
           {archiveFiles.map((entry, i) => (
