@@ -135,9 +135,36 @@ export default function MusicProvider({ children }: { children: React.ReactNode 
 
   const getAnalyser = useCallback(() => getUadePlayer().getAnalyser(), []);
 
-  // Keep the singleton's looping callback tidy on unmount (provider lives for
-  // the app lifetime, but be safe in fast-refresh / tests).
-  useEffect(() => () => { /* engine is a singleton; intentionally not torn down */ }, []);
+  // Persist what's playing so a full page reload (F5, post-deploy chunk reload,
+  // a non-Link navigation) can recover. Client-side <Link> nav keeps the engine
+  // alive and never hits this; only real document loads do. Web Audio can't be
+  // resumed without a user gesture in the new document, so we re-arm on the
+  // next interaction rather than silently autoplaying.
+  const firstRun = useRef(true);
+  useEffect(() => {
+    if (firstRun.current) { firstRun.current = false; return; }
+    try {
+      if (track && isPlaying) sessionStorage.setItem("uade.resume", JSON.stringify(track));
+      else sessionStorage.removeItem("uade.resume");
+    } catch { /* storage unavailable */ }
+  }, [track, isPlaying]);
+
+  useEffect(() => {
+    let saved: MusicTrack | null = null;
+    try {
+      const r = sessionStorage.getItem("uade.resume");
+      if (r) saved = JSON.parse(r) as MusicTrack;
+    } catch { /* */ }
+    if (!saved) return;
+    setTrack(saved); // show the last tune immediately
+    const file: ModlandFile = {
+      id: 0, format: saved.format, author: "", filename: saved.title,
+      full_path: saved.path, extension: saved.title.split(".").pop() || "",
+    };
+    const onFirst = () => { document.removeEventListener("pointerdown", onFirst); void tryLoad(file); };
+    document.addEventListener("pointerdown", onFirst, { once: true });
+    return () => document.removeEventListener("pointerdown", onFirst);
+  }, [tryLoad]);
 
   const value: MusicContextValue = {
     track, isPlaying, loading, error, volume,
