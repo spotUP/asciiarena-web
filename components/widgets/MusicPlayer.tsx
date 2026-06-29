@@ -69,12 +69,12 @@ export default function MusicPlayer() {
       const bins = analyser.frequencyBinCount;
       const data = new Uint8Array(bins);
       analyser.getByteFrequencyData(data);
-      // Classic spectrum: ~6px bars across the full width, mapped on a log
-      // frequency scale (bass spread out, treble compressed) so the bars fill
-      // the strip; smooth height (no row banding) with a gamma lift so quiet
-      // bands still register.
-      const barW = 8; // 8px grid cell (7px bar + 1px gap)
+      // Spectrum on the site's 8x16 grid: 8px-wide columns touching (no gap),
+      // height in stacked 8x16 blocks. Log frequency scale (bass spread,
+      // treble compressed) fills the width; gamma lift so quiet bands show.
+      const barW = 8;
       const nBars = Math.max(1, Math.floor(cssW / barW));
+      const rows = Math.max(1, Math.floor(cssH / 16));
       const minBin = 1, maxBin = Math.min(bins - 1, 220);
       ctx.fillStyle = "#ff55ff";
       for (let i = 0; i < nBars; i++) {
@@ -83,8 +83,8 @@ export default function MusicPlayer() {
         let sum = 0, n = 0;
         for (let b = lo; b < hi && b < bins; b++) { sum += data[b]; n++; }
         const v = n ? sum / n / 255 : 0;
-        const h = Math.max(1, Math.pow(v, 0.7) * cssH);
-        ctx.fillRect(i * barW, cssH - h, barW - 1, h);
+        const level = Math.round(Math.pow(v, 0.7) * rows);
+        for (let r = 0; r < level; r++) ctx.fillRect(i * barW, cssH - (r + 1) * 16, barW, 15);
       }
     };
     draw();
@@ -164,7 +164,7 @@ export default function MusicPlayer() {
           {error && <div style={{ color: "#ff5555", marginBottom: "6px" }}>{error}</div>}
 
           {/* FFT block visualizer (8x16 grid) */}
-          <canvas ref={canvasRef} style={{ display: "block", width: "100%", height: "48px", marginBottom: "8px", background: "#111", imageRendering: "pixelated" }} />
+          <canvas ref={canvasRef} style={{ display: "block", width: "100%", height: "80px", marginBottom: "8px", background: "#111", imageRendering: "pixelated" }} />
 
           {/* Transport */}
           <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
