@@ -45,6 +45,8 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, fg
   const modelRef = useRef<Model | null>(null);
   const focusRef = useRef<number | null>(null);
   const draggingRef = useRef(false);
+  const movedRef = useRef(false);
+  const downYRef = useRef(0);
   const drawRafRef = useRef<number | null>(null);
   const scrollRafRef = useRef<number | null>(null);
   const [thumb, setThumb] = useState<{ top: number; height: number } | null>(null);
@@ -270,15 +272,20 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, fg
 
   const onPointerDown = (e: React.PointerEvent) => {
     draggingRef.current = true;
+    movedRef.current = false;
+    downYRef.current = e.clientY;
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
     setFocusFromPointer(e.clientY);
-    scrollToPointer(e.clientY, false);
+    // Don't jump yet — a click eases on release; a drag scrubs live (below).
   };
   const onPointerMove = (e: React.PointerEvent) => {
     setFocusFromPointer(e.clientY);
-    if (draggingRef.current) scrollToPointer(e.clientY, false);
+    if (!draggingRef.current) return;
+    if (!movedRef.current && Math.abs(e.clientY - downYRef.current) > 3) movedRef.current = true;
+    if (movedRef.current) scrollToPointer(e.clientY, false); // live scrub
   };
   const endDrag = (e: React.PointerEvent) => {
+    if (draggingRef.current && !movedRef.current) scrollToPointer(e.clientY, true); // click -> eased
     draggingRef.current = false;
     (e.target as HTMLElement).releasePointerCapture?.(e.pointerId);
   };
