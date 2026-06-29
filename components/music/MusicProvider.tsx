@@ -53,53 +53,63 @@ export default function MusicProvider({ children }: { children: React.ReactNode 
 
   const search = useCallback((q: string) => searchModland({ q, limit: 40 }), []);
 
-  const playFile = useCallback(async (file: ModlandFile) => {
+  // Quiet load+play: returns success, sets track/isPlaying on success, never
+  // sets the error state itself (callers decide). Used by both playFile and the
+  // retrying playRandom.
+  const tryLoad = useCallback(async (file: ModlandFile): Promise<boolean> => {
     const seq = ++loadSeq.current;
-    setLoading(true);
-    setError(null);
     try {
       const player = getUadePlayer();
       await player.resume();
       const buffer = await downloadModlandFile(file.full_path);
-      // Two-file formats need their companion in the WASM FS before load().
       const tfmx = await downloadTFMXCompanion(file.full_path);
       if (tfmx) await player.addCompanionFile(tfmx.filename, tfmx.buffer);
       for (const c of await downloadUADECompanions(file.full_path, buffer)) {
         await player.addCompanionFile(c.filename, c.buffer);
       }
-      if (seq !== loadSeq.current) return; // superseded by a newer click
-      await player.load(buffer, file.filename);
+      if (seq !== loadSeq.current) return false; // superseded by a newer request
+      await player.load(buffer, file.filename); // throws if UADE can't play it
       player.setLooping(true);
       player.play();
-      if (seq !== loadSeq.current) return;
+      if (seq !== loadSeq.current) return false;
       setTrack({ title: file.filename, format: file.format, path: file.full_path });
       setIsPlaying(true);
-    } catch (e) {
-      if (seq === loadSeq.current) setError(e instanceof Error ? e.message : "Playback failed");
-    } finally {
-      if (seq === loadSeq.current) setLoading(false);
+      return true;
+    } catch {
+      return false;
     }
   }, []);
 
+  const playFile = useCallback(async (file: ModlandFile) => {
+    setLoading(true);
+    setError(null);
+    const ok = await tryLoad(file);
+    if (!ok) setError("Couldn't play this tune");
+    setLoading(false);
+  }, [tryLoad]);
+
   const playRandom = useCallback(async () => {
+    setLoading(true);
     setError(null);
     try {
-      // Pick a random UADE-playable format + offset for variety.
-      for (let attempt = 0; attempt < 4; attempt++) {
+      // Keep trying random UADE-playable picks until one actually plays —
+      // some Modland files are broken or need formats UADE doesn't support.
+      for (let attempt = 0; attempt < 12; attempt++) {
         const format = UADE_RANDOM_FORMATS[Math.floor(Math.random() * UADE_RANDOM_FORMATS.length)];
-        const offset = attempt === 3 ? 0 : Math.floor(Math.random() * 400);
+        const offset = Math.floor(Math.random() * 400);
         const res = await searchModland({ format, limit: 50, offset });
         const playable = res.results.filter(isUadePlayable);
-        if (playable.length) {
-          await playFile(playable[Math.floor(Math.random() * playable.length)]);
-          return;
-        }
+        if (!playable.length) continue;
+        const pick = playable[Math.floor(Math.random() * playable.length)];
+        if (await tryLoad(pick)) return;
       }
-      setError("No tunes found");
+      setError("Couldn't find a playable tune");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Search unavailable");
+    } finally {
+      setLoading(false);
     }
-  }, [playFile]);
+  }, [tryLoad]);
 
   const toggle = useCallback(() => {
     const player = getUadePlayer();

@@ -30,11 +30,17 @@ const PC_FORMATS = new Set([
 // Standalone-unplayable companion/instrument files that show up in search.
 const COMPANION_EXT = new Set(["instr", "ss", "ins", "smp", "set", "nt", "ssd", "sample"]);
 
+// Side files that are companions to a main module, not playable on their own.
+// (TFMX is the exception: "mdat.*" IS the main file, "smpl.*" is its companion.)
+const COMPANION_PREFIX = ["smpl.", "smp.", "ssd.", "ins.", "sset.", "set."];
+
 /** Whether a Modland file is something our UADE engine can actually play. */
 export function isUadePlayable(f: ModlandFile): boolean {
   if (PC_FORMATS.has(f.format.toLowerCase())) return false;
   if (COMPANION_EXT.has(f.extension.toLowerCase())) return false;
   if (/\/instruments?\//i.test(f.full_path)) return false;
+  const base = (f.filename.split("/").pop() || f.filename).toLowerCase();
+  if (COMPANION_PREFIX.some((p) => base.startsWith(p))) return false;
   return true;
 }
 
