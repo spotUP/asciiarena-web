@@ -717,14 +717,19 @@ export default function ReleaseClient({
       const minDwell = scrollMs + 1600;
       const maxDwell = scrollMs + 5000;
       const freq = new Uint8Array(analyser.frequencyBinCount);
-      let energySm = 0; // smoothed energy for a steady baseline glow
+      let baseline = 0; // slow-moving energy floor
+      let glow = 0; // smoothed glow amount above baseline
       const tick = (now: number) => {
         const dt = now - startT;
         analyser.getByteFrequencyData(freq);
         const e = lowBandEnergy(freq, 24); // low-mid loudness, 0..1
-        energySm = energySm * 0.6 + e * 0.4;
+        baseline = baseline === 0 ? e : baseline * 0.95 + e * 0.05;
+        // Glow only on energy ABOVE the baseline, so the logo rests at normal
+        // brightness and punches up on beats/transients instead of staying lit.
+        const target = Math.min(Math.max(0, e - baseline) * 5, 0.7);
+        glow = glow * 0.5 + target * 0.5;
         const el = collyRef.current as HTMLElement | null;
-        if (el) el.style.filter = `brightness(${(1 + energySm * 1.2).toFixed(2)})`;
+        if (el) el.style.filter = `brightness(${(1 + glow).toFixed(2)})`;
         const beat = detector.detect(e, now);
         if ((beat && dt >= minDwell) || dt >= maxDwell) {
           beatRafRef.current = null;
