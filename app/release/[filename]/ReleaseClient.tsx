@@ -260,7 +260,7 @@ function ArchiveEntryRenderer({ filename, entry, ansiFont, fgColor, bgColor, isA
   const [isAnim, setIsAnim] = useState(false);
   const [playing, setPlaying] = useState(false);
 
-  const ANIM_BAUD = 14400;
+  const ANIM_BAUD = 28800;
   const togglePlay = () => {
     const ctrl = animRef.current;
     if (!ctrl) return;
