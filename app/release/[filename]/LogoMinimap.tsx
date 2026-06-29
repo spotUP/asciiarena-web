@@ -4,13 +4,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { animateScroll } from "@/lib/animateScroll";
 import { type LogoIndexEntry } from "@/lib/logoSections";
 
-export const MINIMAP_WIDTH = 88; // px — keep in sync with the container's right padding
+export const MINIMAP_WIDTH = 120; // px — keep in sync with the container's right padding
 
 const LENS_A = 20; // peak extra weight at the cursor (magnification strength)
 const LENS_SIGMA = 14; // rows — how wide the lens spreads
-const BANDS = 240; // vertical slices used to render the warped source image
+const BANDS = 320; // vertical slices used to render the warped source image
 const MAX_COLS = 240;
-const MAX_SRC_H = 16000; // cap the offscreen source height (memory)
+const MAX_SRC_H = 24000; // cap the offscreen source height (memory)
+const MAX_CH = 12; // max source pixels per text row (detail vs memory)
 
 interface Props {
   containerRef: React.RefObject<HTMLDivElement | null>;
@@ -65,7 +66,7 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, fg
     if (!c || !pre) return;
     const lh = lineHeight();
     const R = Math.max(1, Math.round((c.scrollHeight || 1) / lh));
-    const ch = Math.min(8, Math.max(3, Math.floor(MAX_SRC_H / R)));
+    const ch = Math.min(MAX_CH, Math.max(3, Math.floor(MAX_SRC_H / R)));
     const fontFamily = getComputedStyle(pre).fontFamily;
     const lines = (pre.textContent || "").split("\n");
     let maxCols = 1;
@@ -280,9 +281,11 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, fg
   };
   const onPointerMove = (e: React.PointerEvent) => {
     setFocusFromPointer(e.clientY);
-    if (!draggingRef.current) return;
-    if (!movedRef.current && Math.abs(e.clientY - downYRef.current) > 3) movedRef.current = true;
-    if (movedRef.current) scrollToPointer(e.clientY, false); // live scrub
+    // Hover-to-scrub: moving over the minimap scrolls the colly live.
+    if (draggingRef.current && !movedRef.current && Math.abs(e.clientY - downYRef.current) > 3) {
+      movedRef.current = true;
+    }
+    scrollToPointer(e.clientY, false);
   };
   const endDrag = (e: React.PointerEvent) => {
     if (draggingRef.current && !movedRef.current) scrollToPointer(e.clientY, true); // click -> eased
