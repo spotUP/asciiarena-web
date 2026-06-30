@@ -2551,13 +2551,13 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Clickable entries in a colly's embedded "oN> NAME" index (see linkifyCollyIndex). */
+/* Clickable entries in a colly's embedded "oN> NAME" index (see
+   linkifyCollyIndex). Same affordance as the sidebar widget links: pointer
+   cursor, and on hover brighten + underline. */
 .colly-index-link {
   cursor: pointer;
-  text-decoration: underline;
-  text-decoration-style: dotted;
 }
 .colly-index-link:hover {
-  color: #ffffff !important;
-  background: #333333;
+  filter: brightness(170%);
+  text-decoration: underline;
 }
