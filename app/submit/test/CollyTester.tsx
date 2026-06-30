@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { FONTS } from "@/lib/ansilove";
+import { FONTS, ANSI_FONT_MAP } from "@/lib/ansilove";
 import DosSelect from "@/components/ui/DosSelect";
 import ColorSwatch from "@/components/ui/ColorSwatch";
+import AnsiLogo from "@/components/ui/AnsiLogo";
 import SoundtrackPicker from "@/components/music/SoundtrackPicker";
 
 interface LogoReport { line: number; name: string; resolved: string | null; searchable: boolean }
@@ -58,8 +59,20 @@ export default function CollyTester() {
     }
   };
 
-  const lines = useMemo(() => (report ? report.text.split("\n") : []), [report]);
+  const isCanvas = report?.type === "ANSI" || report?.type === "CP437";
+  // Mapping panel shows ESC-code-stripped lines so ANSI is readable.
+  // eslint-disable-next-line no-control-regex
+  const lines = useMemo(() => (report ? report.text.replace(/\x1b\[[0-9;?]*[ -/]*[@-~]/g, "").split("\n") : []), [report]);
   const mappedLines = useMemo(() => new Set(logoMap.map((l) => l.line)), [logoMap]);
+  // Base64 of the visible art bytes (trailer stripped) for the AnsiLove canvas.
+  const visibleB64 = useMemo(() => {
+    if (!fileBytes || !isCanvas) return null;
+    const sub = fileBytes.indexOf(0x1a);
+    const v = sub === -1 ? fileBytes : fileBytes.subarray(0, sub);
+    let s = "";
+    for (let i = 0; i < v.length; i++) s += String.fromCharCode(v[i]);
+    return btoa(s);
+  }, [fileBytes, isCanvas]);
 
   const toggleLogo = (lineNum: number) => {
     setLogoMap((prev) => prev.some((l) => l.line === lineNum)
@@ -118,8 +131,18 @@ export default function CollyTester() {
         <div className="row">
           {/* Left: live preview with clickable line numbers */}
           <div className="col-lg-7 amb-1">
-            <div className="header bg-header ap-1">PREVIEW &mdash; click a line number to mark a logo</div>
-            <div style={{ background: bg || "#111111", overflow: "auto", maxHeight: "70vh", padding: "8px 0" }}>
+            {isCanvas && visibleB64 && (
+              <>
+                <div className="header bg-header ap-1">RENDERED ({report.type})</div>
+                <div style={{ background: report.type === "CP437" ? (bg || "#000") : "#000", overflow: "auto", maxHeight: "60vh", marginBottom: "8px" }}>
+                  <AnsiLogo ansiB64={visibleB64} font={ANSI_FONT_MAP[font] ?? null} maxHeight={100000} />
+                </div>
+              </>
+            )}
+            <div className="header bg-header ap-1">
+              {isCanvas ? "MAP LOGOS" : "PREVIEW"} &mdash; click a line number to mark a logo
+            </div>
+            <div style={{ background: isCanvas ? "#111111" : (bg || "#111111"), overflow: "auto", maxHeight: "70vh", padding: "8px 0" }}>
               <pre style={{ margin: 0, fontFamily: `${font || "TopazPlus_a1200"}, monospace`, fontSize: "16px", lineHeight: "16px", color: fg || "#ff55ff", whiteSpace: "pre" }}>
                 {lines.map((ln, i) => {
                   const n = i + 1;
@@ -176,13 +199,12 @@ export default function CollyTester() {
               )}
             </div>
 
-            <div className="header bg-header ap-1">LEGEND</div>
+            <div className="header bg-header ap-1">HOW IT WORKS</div>
             <div className="bg-secondary ap-1" style={{ fontSize: "13px" }}>
-              <p className="lightgrey"><span className="cyan">Name a logo</span>: put its name on a line in the blank gap above it (e.g. <span className="white">uP rOUGH</span>), or <span className="white">NAME : author</span>.</p>
-              <p className="lightgrey"><span className="cyan">Dedications</span>: <span className="white">LOGO for SPOT</span> (or 4 / 2 / to) &mdash; the logo is indexed, SPOT is the recipient.</p>
-              <p className="lightgrey"><span className="cyan">Clickable index</span>: an <span className="white">o1&gt; NAME  o2&gt; NAME</span> table becomes jump links.</p>
-              <p className="lightgrey"><span className="cyan">Exact logos</span>: click line numbers here to map wild art precisely &mdash; or let detection handle it.</p>
-              <p className="lightgrey"><span className="cyan">Invisible tags</span>: font / colours / soundtrack / logo map ride after a Ctrl-Z (download writes them) &mdash; never shown in your art.</p>
+              <p className="lightgrey">No rules &mdash; draw your colly however you like. Two ways to get great parsing:</p>
+              <p className="lightgrey"><span className="cyan">Let us detect it</span>: we auto-find logos, <span className="white">for</span>-dedications and classic <span className="white">o1&gt;</span> indexes in common styles. Most collys just work.</p>
+              <p className="lightgrey"><span className="cyan">Or point at it</span>: click the line numbers to map each logo exactly &mdash; works for any layout, no format required.</p>
+              <p className="lightgrey"><span className="cyan">Make it yours</span>: set a font, colours and a soundtrack above. &quot;Download tagged colly&quot; saves them invisibly inside the file (after a Ctrl-Z) &mdash; never shown in your art.</p>
             </div>
           </div>
         </div>

@@ -8,7 +8,7 @@ import { parseCollyIndex } from "@/lib/collyIndex";
 import { loadEntityDicts } from "@/lib/collyLogoIndex";
 import { cleanLabel, type EntityDicts } from "@/lib/handleMatch";
 import {
-  decodeReleaseText, stripFileIdDiz, releaseTextEncoding, looksLikeCp437Art,
+  decodeReleaseText, decodeLatin1Bytes, stripFileIdDiz, releaseTextEncoding, looksLikeCp437Art, hasAnsiCodes,
 } from "@/lib/releaseText";
 
 export const dynamic = "force-dynamic";
@@ -29,8 +29,10 @@ export async function POST(request: NextRequest) {
 
   const name = file.name.toLowerCase();
   const ext = name.split(".").pop() ?? "";
-  const type = ext === "ans" ? "ANSI"
-    : ["dms", "lzh", "lha", "zip"].includes(ext) ? "ARCHIVE"
+  // Detect by CONTENT, not just extension — an ANSI colly saved as .txt still has
+  // ESC[ codes and should render as ANSI.
+  const type = ["dms", "lzh", "lha", "zip"].includes(ext) ? "ARCHIVE"
+    : ext === "ans" || hasAnsiCodes(decodeLatin1Bytes(visible)) ? "ANSI"
     : looksLikeCp437Art(visible) ? "CP437" : "ASCII";
   const encoding = releaseTextEncoding(type === "CP437" ? "CP437" : null, null);
   // Raw decoded text (not HTML-escaped) so the tester renders it 1:1 and line

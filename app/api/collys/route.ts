@@ -20,6 +20,7 @@ import { ensureArtistId, ensureCrewId } from "@/lib/ensureEntity";
 import { broadcastActivityIfAllowed } from "@/lib/activity";
 import { indexColly } from "@/lib/collyLogoIndex";
 import { parseCollyBytes } from "@/lib/collyTrailer";
+import { hasAnsiCodes, decodeLatin1Bytes } from "@/lib/releaseText";
 
 interface CollyRow {
   id: number;
@@ -204,12 +205,16 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
   await writeFile(filePath, buffer);
 
-  // Detect type
+  // Detect type by CONTENT, not just extension — an ANSI colly saved as .txt
+  // still has ESC[ codes and should be stored (and rendered) as ANSI.
   let type = "ASCII";
-  if (ext === "ans") {
-    type = "ANSI";
-  } else if (["dms", "lzh", "lha", "zip"].includes(ext)) {
+  if (["dms", "lzh", "lha", "zip"].includes(ext)) {
     type = "Archive";
+  } else if (ext === "ans") {
+    type = "ANSI";
+  } else {
+    const { visible } = parseCollyBytes(new Uint8Array(bytes));
+    if (hasAnsiCodes(decodeLatin1Bytes(visible))) type = "ANSI";
   }
 
   const file_id = filename + ".diz";

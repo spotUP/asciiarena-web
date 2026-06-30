@@ -4,7 +4,7 @@ import SiteLayout from "@/components/layout/SiteLayout";
 
 export const metadata: Metadata = {
   title: "Colly Guidelines | aSCIIaRENA",
-  description: "How to format your colly so asciiarena reads every logo, requester, index and soundtrack — while keeping full artistic freedom.",
+  description: "There are no rules — make your colly however you want. Optional ways to help asciiarena read your logos, index and add a soundtrack.",
 };
 
 function H({ children }: { children: React.ReactNode }) {
@@ -20,86 +20,72 @@ export default function GuidelinesPage() {
         </div></div>
 
         <div className="col-lg-12 apt-1" style={{ maxWidth: "920px" }}>
-          <p className="white">Style your art however you like.</p>
+          <p className="white" style={{ fontSize: "18px" }}>There are no rules. Make your colly however you want.</p>
           <p className="lightgrey">
-            None of this is required and there is no template. asciiarena already reads
-            free-form collys — these notes just help us pick out your logo names, who they
-            were for, the index, and let you set a font, colours and a soundtrack. The more
-            you follow, the more our features light up; ignore all of it and your colly still
-            works.
-          </p>
-          <p className="lightgrey">
-            Want to see exactly how we read yours? Run it through the{" "}
-            <Link href="/submit/test" className="magenta">colly tester</Link> — it shows the
-            detected logos, requesters, index, colours and soundtrack, and flags anything we
-            missed. Nothing is uploaded.{" "}
-            <a href="/example-arena-colly.txt" className="magenta" download>Download the example colly</a>{" "}
-            to poke at.
+            Draw your logos, indexes and dividers in whatever style you like — that&apos;s the
+            whole point of the scene, and a world where every colly looked the same would be a
+            boring one. None of this page is required. It just explains how asciiarena tries to
+            be helpful, and how you can make it perfect when you care to.
           </p>
 
-          <H>Naming a logo</H>
+          <H>Two ways it works</H>
           <p className="lightgrey">
-            Put the logo&apos;s name on its own line in the blank gap above the art —{" "}
-            <span className="white">uP rOUGH</span>, or <span className="white">NAME : artist</span>.
-            Leave a blank line between the caption and the art. Uncaptioned logos still render,
-            but show as &quot;Logo N&quot; and aren&apos;t searchable.
+            <span className="cyan">1. We read it for you.</span> asciiarena auto-detects logos,
+            dedications and indexes in many common scene styles, so most collys just work with
+            zero effort — upload and go.
+          </p>
+          <p className="lightgrey">
+            <span className="cyan">2. You point at it.</span> If your art is unusual, or you
+            want everything pixel-perfect, open the{" "}
+            <Link href="/submit/test" className="magenta">colly tester</Link>, drop your file,
+            and click the line of each logo. That works no matter how wild the layout is — you
+            are never forced into a format. The tester shows exactly what we detected and flags
+            anything we missed. Nothing is uploaded.
           </p>
 
-          <H>Who it was for (requesters / dedications)</H>
+          <H>What auto-detection happens to recognise</H>
           <p className="lightgrey">
-            Write <span className="white">LOGO for SPOT</span> (or <span className="white">4</span>,{" "}
-            <span className="white">2</span>, <span className="white">to</span>). The logo is
-            indexed under its own name; the name after &quot;for&quot; is recorded as the
-            recipient, not as a second logo.
+            These are <span className="white">examples</span>, not requirements — handy if you
+            want detection to do the work, ignorable if you&apos;d rather just tag in the tester:
+          </p>
+          <ul className="lightgrey">
+            <li>A logo with its name on a nearby line (a caption / signature) is detected and
+              named. No caption? It still renders — it just shows as &quot;Logo N&quot; and won&apos;t
+              be searchable unless you name it in the tester.</li>
+            <li>A name after <span className="white">for</span> / <span className="white">4</span> /{" "}
+              <span className="white">2</span> / <span className="white">to</span> (e.g.{" "}
+              <span className="white">myLogo for spot</span>) is read as the recipient, so the
+              logo isn&apos;t mistaken for two.</li>
+            <li>A numbered index in the classic <span className="white">o1&gt; NAME</span> style
+              becomes clickable jump links. Drew your contents some other way? Map those logos
+              in the tester instead — your index, your style.</li>
+          </ul>
+
+          <H>Make it yours: font, colours &amp; a soundtrack</H>
+          <p className="lightgrey">
+            Optionally give your colly a preferred font, text/background colours, and a{" "}
+            <span className="white">soundtrack</span> — any tune from Modland plays while people
+            view it. Set these in the tester or on the submit form. Your choices are the
+            colly&apos;s initial look (a viewer can still recolour it live); the soundtrack starts
+            on the viewer&apos;s first click and never interrupts music they&apos;re already playing.
           </p>
 
-          <H>A clickable index</H>
+          <H>Where the settings live (invisible, never in your art)</H>
           <p className="lightgrey">
-            If you draw a table of contents, use <span className="white">o1&gt; NAME</span> entries
-            (the &quot;o&quot; doubles as zero; two columns are fine):
+            Font / colours / soundtrack / an exact logo map can ride <span className="white">inside
+            the file, after a Ctrl-Z (EOF) byte</span> — invisible in every viewer, the same trick
+            the scene&apos;s SAUCE records use. We read a <span className="white">SAUCE</span> record
+            if your editor wrote one, or simple <span className="white">key: value</span> lines.
+            The tester&apos;s &quot;Download tagged colly&quot; writes them for you, so you never
+            touch a byte by hand. (We also still read an embedded{" "}
+            <span className="white">@BEGIN_FILE_ID.DIZ … @END_FILE_ID.DIZ</span> block.) Or skip
+            the file entirely and just set everything on the submit form — your call.
           </p>
-          <pre className="cyan ap-1" style={{ background: "#000", lineHeight: "16px" }}>{`  o1> STATiC DESC        o4> REMEDY
-  o2> ATTENTiON          o5> MYSTiC
-  o3> REViSiON           o6> TWiLiGHT`}</pre>
-          <p className="lightgrey">Those entries become links that scroll straight to each logo.</p>
-
-          <H>Wild art? Map your logos exactly</H>
-          <p className="lightgrey">
-            If your colly is too freeform for auto-detection, pin each logo to a line yourself
-            in the tester (click the line numbers) — autoplay, the index, the minimap and jumps
-            then land perfectly, no matter how chaotic the art. Everyone else can just let
-            detection do it.
-          </p>
-
-          <H>Font, colours &amp; a soundtrack</H>
-          <p className="lightgrey">
-            You can set a preferred font, text/background colours, and a{" "}
-            <span className="white">soundtrack</span> (any tune from Modland) for your colly.
-            Set them in the tester or on the submit form. Your choices are the colly&apos;s
-            initial look — a viewer can still recolour it live. The soundtrack starts on the
-            viewer&apos;s first click (and never interrupts music they already have playing).
-          </p>
-
-          <H>Invisible tags (optional, never in your art)</H>
-          <p className="lightgrey">
-            All of the above (font / colours / soundtrack / logo map) can travel inside the
-            file itself, carried <span className="white">after a Ctrl-Z (EOF)</span> byte so it
-            is invisible in every viewer — exactly how the scene&apos;s SAUCE records work. We
-            read a <span className="white">SAUCE</span> record if your tool wrote one, or simple{" "}
-            <span className="white">key: value</span> lines. The tester&apos;s &quot;Download
-            tagged colly&quot; writes them for you. We also still read an embedded{" "}
-            <span className="white">@BEGIN_FILE_ID.DIZ … @END_FILE_ID.DIZ</span> block.
-          </p>
-          <pre className="lightgrey ap-1" style={{ background: "#000", lineHeight: "16px" }}>{`(after a Ctrl-Z at the very end of the file:)
-font: A1200 Topaz+
-fg: #55ff55
-soundtrack: Protracker/4-Mat/madness.mod
-logo: 8 STATiC for NEXUS
-logo: 22 up rough`}</pre>
 
           <p className="lightgrey amt-1">
-            That&apos;s it. <Link href="/submit/test" className="magenta">Test your colly</Link>{" "}
-            or <Link href="/submit" className="magenta">submit one</Link>.
+            <a href="/example-arena-colly.txt" className="magenta" download>Download an example</a>{" "}
+            to poke at, <Link href="/submit/test" className="magenta">test your colly</Link>, or{" "}
+            <Link href="/submit" className="magenta">submit one</Link>.
           </p>
         </div>
       </div>
