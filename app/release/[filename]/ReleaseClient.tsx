@@ -656,12 +656,20 @@ export default function ReleaseClient({
     const viewH = scrollEl.clientHeight;
     const maxScroll = scrollEl.scrollHeight - viewH;
     const elTop = scrollEl.getBoundingClientRect().top;
-    const canvas = scrollEl.querySelector("canvas");
-    if (canvas && canvas.clientHeight) {
-      const total = Math.max(1, detectionText.split("\n").length);
-      const lineHeight = canvas.clientHeight / total;
-      const originTop = canvas.getBoundingClientRect().top - elTop + scrollEl.scrollTop;
-      return { scrollEl, viewH, maxScroll, lineHeight, spacers: 0, originTop };
+    // AnsiLove tiles tall art across MANY canvases (per-canvas height cap), so
+    // the row height is total-art-height / total-lines, summed over all tiles —
+    // not the first tile's height.
+    const canvases = scrollEl.querySelectorAll("canvas");
+    if (canvases.length) {
+      let artHeight = 0;
+      for (const c of canvases) artHeight += (c as HTMLCanvasElement).clientHeight;
+      if (artHeight) {
+        const total = Math.max(1, detectionText.split("\n").length);
+        const lineHeight = artHeight / total;
+        const first = canvases[0] as HTMLElement;
+        const originTop = first.getBoundingClientRect().top - elTop + scrollEl.scrollTop;
+        return { scrollEl, viewH, maxScroll, lineHeight, spacers: 0, originTop };
+      }
     }
     const pre = collyRef.current as HTMLElement | null;
     if (!pre) return null;
