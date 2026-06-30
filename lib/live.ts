@@ -48,7 +48,28 @@ export function subscriberCount(channel: string): number {
   return channels.get(channel)?.size ?? 0;
 }
 
+// Recent-event history for channels that need backfill on (re)connect. Without
+// it, an event broadcast while a feed is briefly disconnected (e.g. the SSE drops
+// during a page navigation and reconnects a moment later) is lost forever — the
+// reason a user's own colly view never appeared in the live feed. Kept tiny and
+// in-memory (single server process).
+const HISTORY_CHANNELS = new Set(["site:activity"]);
+const HISTORY_MAX = 20;
+const history = new Map<string, LiveEvent[]>();
+
+export function getHistory(channel: string): LiveEvent[] {
+  return history.get(channel) ?? [];
+}
+
 export function broadcast(channel: string, event: LiveEvent): void {
+  // Record to history BEFORE the no-subscribers early return, so events that
+  // happen during a connection gap are still delivered to the next subscriber.
+  if (HISTORY_CHANNELS.has(channel) && event.type !== "watching") {
+    const h = history.get(channel) ?? [];
+    h.push(event);
+    if (h.length > HISTORY_MAX) h.shift();
+    history.set(channel, h);
+  }
   const subs = channels.get(channel);
   if (!subs || subs.size === 0) return;
   const payload = encoder.encode(`data: ${JSON.stringify(event)}\n\n`);

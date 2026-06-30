@@ -14,7 +14,6 @@ const schema = z.object({
 
 export async function POST(request: NextRequest) {
   const session = await auth();
-  console.log(`[activitydbg] POST /api/activity pid=${process.pid} hasSession=${!!session?.user?.id} nick=${session?.user?.name ?? "(none)"}`);
   if (!session?.user?.id || !session.user.name) return apiError("Unauthorized", 401);
 
   const body = await request.json().catch(() => ({}));

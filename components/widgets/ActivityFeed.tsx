@@ -38,10 +38,16 @@ export default function ActivityFeed() {
 
   useEffect(() => {
     const es = new EventSource("/api/live?channel=site:activity");
+    // Dedupe: the server backfills recent events on (re)connect, so the same
+    // event can arrive again after an SSE reconnect.
+    const seen = new Set<string>();
     es.onmessage = (e) => {
       try {
         const event = JSON.parse(e.data) as Omit<ActivityEntry, "id">;
         if (!event.nick || !event.target) return;
+        const key = `${event.type}|${event.nick}|${event.target}|${event.timestamp}`;
+        if (seen.has(key)) return;
+        seen.add(key);
         setEntries(prev => {
           const next = [{ ...event, id: ++entryId }, ...prev];
           return next.slice(0, 15);

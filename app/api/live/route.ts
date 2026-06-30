@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { subscribe, broadcast, subscriberCount } from "@/lib/live";
+import { subscribe, broadcast, subscriberCount, getHistory } from "@/lib/live";
 import { auth } from "@/lib/auth";
 import { apiError } from "@/lib/utils";
 import { ensureCedPoller } from "@/lib/cedPoller";
@@ -24,7 +24,11 @@ export async function GET(request: NextRequest) {
     start(ctrl) {
       ctrl.enqueue(encoder.encode(": keepalive\n\n"));
       unsubscribe = subscribe(channel, ctrl);
-      if (channel === "site:activity") console.log(`[activitydbg] SSE subscribe site:activity pid=${process.pid} subs=${subscriberCount(channel)}`);
+      // Backfill recent events so a feed that connects (or reconnects after a
+      // navigation gap) immediately shows what it missed.
+      for (const ev of getHistory(channel)) {
+        ctrl.enqueue(encoder.encode(`data: ${JSON.stringify(ev)}\n\n`));
+      }
       broadcast(channel, { type: "watching", count: subscriberCount(channel) });
       pingInterval = setInterval(() => {
         try {
