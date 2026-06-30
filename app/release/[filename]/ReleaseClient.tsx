@@ -752,6 +752,8 @@ export default function ReleaseClient({
   useEffect(() => {
     if (!collyVisible || !(type === "ASCII" || type === "ANSI")) return; // text + canvas viewers
     const handler = (e: KeyboardEvent) => {
+      // Never hijack browser/OS shortcuts (Cmd+F find, Ctrl+P print, etc.).
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
       // Don't fire shortcuts when typing in form fields
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (e.target as HTMLElement)?.isContentEditable) return;

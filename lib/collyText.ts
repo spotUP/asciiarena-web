@@ -1,6 +1,6 @@
 import { readFileSync, existsSync } from "fs";
 import path from "path";
-import { encodeReleaseText, releaseTextEncoding, stripFileIdDiz } from "@/lib/releaseText";
+import { decodeReleaseText, releaseTextEncoding, stripFileIdDiz } from "@/lib/releaseText";
 import { parseCollyBytes } from "@/lib/collyTrailer";
 
 // Resolve a colly's on-disk path the same way the release page does:
@@ -31,9 +31,13 @@ export function readCollyText(filename: string, storedType?: string | null): str
     // Drop the invisible metadata trailer (after Ctrl-Z) so logo detection / the
     // search catalog never see SAUCE bytes or key:value tag lines.
     const { visible } = parseCollyBytes(readFileSync(filePath));
-    let text = encodeReleaseText(visible, encoding);
+    // Decode with the ESC byte INTACT, strip ANSI sequences in full, THEN drop
+    // control chars — doing it the other way (encodeReleaseText first) removes the
+    // ESC and leaves bare "[1m" fragments behind.
+    let text = decodeReleaseText(visible, encoding);
     text = stripFileIdDiz(text).content;
     text = stripAnsiEscapes(text);
+    text = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "");
     return text;
   } catch {
     return null;

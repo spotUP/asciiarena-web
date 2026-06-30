@@ -1,4 +1,5 @@
 import SiteLayout from "@/components/layout/SiteLayout";
+import SearchForm from "@/components/layout/SearchForm";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { searchLogos } from "@/lib/collyLogoSearch";
@@ -58,12 +59,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
   return (
     <SiteLayout title="SEARCH">
-      <form method="GET" action="/search" className="row amb-1">
-        <div className="col-12 d-flex" style={{ gap: "8px" }}>
-          <input name="q" defaultValue={query} className="form-control" placeholder="Search releases, artists, crews..." autoFocus style={{ flex: 1 }} />
-          <input type="submit" className="btn-big" value="Search" />
-        </div>
-      </form>
+      <SearchForm initial={query} />
 
       {query.length >= 2 && (
         <div className="col-12 lightgrey amb-1">

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Session } from "next-auth";
+import SearchForm from "@/components/layout/SearchForm";
 import UnreadBadge from "@/components/layout/UnreadBadge";
 import LogoutButton from "@/components/layout/LogoutButton";
 import NotificationBell from "@/components/layout/NotificationBell";
@@ -125,9 +126,7 @@ export default function Navbar({ session }: NavbarProps) {
           {/* Right-side items — menu-right gives position:absolute;right:0 from site.css */}
           <ul className="navbar-nav menu-right">
             <li className="nav-item d-none d-lg-block">
-              <form action="/search" method="GET">
-                <input name="q" className="form-control ascii" style={{ width: "80px", height: "21px", padding: "0 4px", border: "none" }} placeholder="search..." />
-              </form>
+              <SearchForm compact />
             </li>
 
             {!isLoggedIn && (
