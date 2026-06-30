@@ -2550,14 +2550,3 @@ a {
 a:hover {
   text-decoration: underline;
 }
-
-/* Clickable entries in a colly's embedded "oN> NAME" index (see
-   linkifyCollyIndex). Same affordance as the sidebar widget links: pointer
-   cursor, and on hover brighten + underline. */
-.colly-index-link {
-  cursor: pointer;
-}
-.colly-index-link:hover {
-  filter: brightness(170%);
-  text-decoration: underline;
-}
