@@ -16,6 +16,22 @@ const NOISE = new Set([
   "menu", "credits", "greetings", "greets", "info", "information", "stage",
   "name", "sof", "eof", "oof", "called", "members", "total", "loading",
   "index", "main", "intro", "outro", "news", "thanks",
+  // BBS-ad section vocabulary — these are board-screen section headers, not
+  // handles. Corpus mining (3906 collys) showed the detector was cataloguing
+  // them as "logos" en masse (CONFS x75, BULLETINS x66, DOORS x57, LOGOFF x47,
+  // CONFERENCES x41, SYSOP x23, WEEKTOP x21, GOODBYE x60, ...). Dropping them
+  // as noise removes the bulk of false catalog/search entries. Known scene
+  // GROUP names (fairlight, elite, ...) are deliberately NOT here — they resolve
+  // via the entity DB instead.
+  "conf", "confs", "conference", "conferences", "bulletin", "bulletins",
+  "message", "messages", "msg", "msgs", "door", "doors", "logon", "logoff",
+  "login", "logout", "sysop", "sysops", "cosysop", "board", "boards",
+  "weektop", "newuser", "newusers", "caller", "callers", "oneliner",
+  "oneliners", "voting", "votes", "leech", "affil", "affils", "affiliate",
+  "affiliates", "distro", "distros", "validate", "validation", "application",
+  "mailbox", "file", "files", "module", "modules", "node", "nodes", "post",
+  "posts", "goodbye", "hello", "welcome", "dedicated", "dedication",
+  "entitled", "respects", "respect", "amiga", "snes", "console",
 ]);
 
 // Entities shorter than this (after normalization) are skipped in v1 — symbol/

@@ -85,6 +85,16 @@ describe("isLikelyLogoLabel", () => {
       expect(isLikelyLogoLabel(no)).toBe(false);
     }
   });
+
+  it("drops BBS-ad section headers (not handles)", () => {
+    for (const no of [
+      "CONFS", "Bulletins", "messages", "DOORS", "logoff", "Conferences",
+      "SysOp", "WEEKTOP", "NewUsers", "Goodbye", "Welcome", "files",
+      "Modules", "amiga", "respects",
+    ]) {
+      expect(isLikelyLogoLabel(no)).toBe(false);
+    }
+  });
 });
 
 describe("resolveEntities", () => {
