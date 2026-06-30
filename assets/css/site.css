@@ -2607,12 +2607,11 @@ input::file-selector-button {
 }
 
 /* Clickable entries in a colly's embedded "oN> NAME" index (see
-   linkifyCollyIndex). Matches the sidebar widget link affordance: hover
-   brightens + underlines. (Cursor is the site-wide custom cursor.) */
+   linkifyCollyIndex). Hover brightens (no underline — keeps the art clean).
+   Cursor is the site-wide custom cursor. */
 .colly-index-link {
   cursor: pointer;
 }
 .colly-index-link:hover {
   filter: brightness(170%);
-  text-decoration: underline;
 }

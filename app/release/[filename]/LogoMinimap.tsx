@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { animateScroll } from "@/lib/animateScroll";
 import { type LogoIndexEntry } from "@/lib/logoSections";
+import { cleanLabel } from "@/lib/handleMatch";
 
 export const MINIMAP_WIDTH = 120; // px — keep in sync with the container's right padding
 
@@ -354,7 +355,7 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, fg
           }}
         >
           <span style={{ color: "#555", marginRight: "8px" }}>{hover.idx + 1}</span>
-          {entries[hover.idx].label}
+          {cleanLabel(entries[hover.idx].label)}
         </span>
       )}
     </div>
