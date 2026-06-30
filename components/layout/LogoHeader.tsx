@@ -140,7 +140,7 @@ export default function LogoHeader({ logos }: LogoHeaderProps) {
               >
                 <Link href="/" className="logo ascii">
                   {logo.kind === "ansi" ? (
-                    <AnsiLogo ansiB64={logo.ansiB64} font={logo.font} maxHeight={ANSI_LOGO_PX} />
+                    <AnsiLogo ansiB64={logo.ansiB64} font={logo.font} maxHeight={ANSI_LOGO_PX} transparentBg />
                   ) : (
                     <pre className="copper-gradient" style={{ overflow: "hidden" }}>
                       {logo.ascii}
