@@ -208,6 +208,28 @@ enum logos_kind {
   ansi
 }
 
+// One row per detected logo inside a colly, keyed by its extracted plaintext
+// label (from dividers / index sections). Stores labels only — NOT colly art.
+// Powers "search logos in collys", per-entity logo listings, and stats.
+model colly_logos {
+  id         Int     @id @default(autoincrement()) @db.UnsignedInt
+  colly_id   Int     @db.UnsignedInt
+  position   Int // 0-based index of the logo within the colly
+  start_line Int // line offset, for scroll-to/deep-link
+  label      String  @db.Char(120)
+  label_norm String  @db.Char(120)
+  artist_id  Int?    @db.UnsignedInt
+  crew_id    Int?    @db.UnsignedInt
+  user_id    Int?    @db.UnsignedInt
+
+  @@index([colly_id])
+  @@index([artist_id])
+  @@index([crew_id])
+  @@index([user_id])
+  @@index([label_norm])
+  @@fulltext([label], map: "ft_colly_logo_label")
+}
+
 model mags {
   id           Int     @id @default(autoincrement())
   name         String? @db.Char(60)

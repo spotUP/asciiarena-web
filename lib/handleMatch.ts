@@ -1,0 +1,96 @@
+// Fuzzy resolution of a logo's extracted label (e.g. "uP rOUGH",
+// "3o ! bROwAlliA 4 nUkLEUs.nFO : o3") to artist / crew / user records.
+//
+// v1 is auto-fuzzy: normalize both sides to lowercase alphanumerics, then match
+// the entity against the label's word-tokens (and short joins of consecutive
+// tokens, so multi-word names like "up rough" -> "uprough" match). A curated
+// alias/override table can layer on in v2 without changing this logic.
+
+// Label words that are structural noise, not handles.
+const NOISE = new Set([
+  "nfo", "diz", "txt", "ascii", "ansi", "presents", "present", "pres",
+  "colly", "collection", "coll", "logo", "logos", "by", "the", "and",
+  "of", "in", "for", "crew", "group", "proudly", "presentz",
+]);
+
+// Entities shorter than this (after normalization) are skipped in v1 — symbol/
+// 2-char handles (z!o, etc.) need the v2 alias table to match safely.
+const MIN_ENTITY_LEN = 3;
+
+export function normalizeHandle(s: string): string {
+  return s
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+}
+
+// Split a label into normalized alnum tokens, dropping noise words and pure
+// numbers (logo counters / years).
+export function labelTokens(label: string): string[] {
+  return label
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((t) => t.length >= 2 && !/^\d+$/.test(t) && !NOISE.has(t));
+}
+
+// Tokens plus joins of up to 3 consecutive tokens, so a multi-word entity name
+// ("up rough" -> "uprough") matches a label that spaces the words out.
+function candidateStrings(tokens: string[]): Set<string> {
+  const out = new Set<string>();
+  for (let i = 0; i < tokens.length; i++) {
+    let joined = "";
+    for (let j = i; j < i + 3 && j < tokens.length; j++) {
+      joined += tokens[j];
+      out.add(joined);
+    }
+  }
+  return out;
+}
+
+export interface EntityRef {
+  id: number;
+  norm: string; // normalizeHandle(nick|name|acronym)
+}
+
+export interface EntityDicts {
+  artists: EntityRef[];
+  crews: EntityRef[];
+  users: EntityRef[];
+}
+
+export interface ResolveResult {
+  artist_id?: number;
+  crew_id?: number;
+  user_id?: number;
+}
+
+function matchEntity(cands: Set<string>, entities: EntityRef[]): number | undefined {
+  for (const e of entities) {
+    if (e.norm.length < MIN_ENTITY_LEN) continue;
+    if (cands.has(e.norm)) return e.id; // exact (covers multi-word via joins)
+    // conservative containment only for longer names, to avoid coincidences
+    if (e.norm.length >= 5) {
+      for (const c of cands) {
+        if (c.length >= 5 && (c.includes(e.norm) || e.norm.includes(c))) return e.id;
+      }
+    }
+  }
+  return undefined;
+}
+
+export function resolveEntities(label: string, dicts: EntityDicts): ResolveResult {
+  const tokens = labelTokens(label);
+  if (!tokens.length) return {};
+  const cands = candidateStrings(tokens);
+  const result: ResolveResult = {};
+  const artist = matchEntity(cands, dicts.artists);
+  const crew = matchEntity(cands, dicts.crews);
+  const user = matchEntity(cands, dicts.users);
+  if (artist !== undefined) result.artist_id = artist;
+  if (crew !== undefined) result.crew_id = crew;
+  if (user !== undefined) result.user_id = user;
+  return result;
+}

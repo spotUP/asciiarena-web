@@ -1,0 +1,63 @@
+import { describe, it, expect } from "vitest";
+import { readFileSync } from "fs";
+import { join } from "path";
+import { buildLogoRows } from "@/lib/collyLogoRows";
+import { normalizeHandle, type EntityDicts } from "@/lib/handleMatch";
+
+const colly = (...lines: string[]) => lines.join("\n");
+
+const EMPTY_DICTS: EntityDicts = { artists: [], crews: [], users: [] };
+
+// A captioned logo: the crew name sits on a divider/caption line just above the
+// art (blank-separated), exactly how collys label logos.
+const CAPTIONED = colly(
+  "uP rOUGH",
+  "",
+  "_/\\__ ___ AAA ___ __/\\_",
+  "|  | /   \\ |  | /   \\| |",
+  "|__| \\___/ |__| \\___/|_|",
+  "|  | /   \\ |  | /   \\| |",
+  "|__| \\___/ |__| \\___/|_|",
+  "",
+);
+
+describe("buildLogoRows", () => {
+  it("extracts a captioned logo and resolves it to a crew", () => {
+    const dicts: EntityDicts = { ...EMPTY_DICTS, crews: [{ id: 20, norm: normalizeHandle("up rough") }] };
+    const rows = buildLogoRows(7, CAPTIONED, dicts);
+    expect(rows.length).toBe(1);
+    expect(rows[0].colly_id).toBe(7);
+    expect(normalizeHandle(rows[0].label)).toBe("uprough");
+    expect(rows[0].label_norm).toBe("uprough");
+    expect(rows[0].crew_id).toBe(20);
+    expect(rows[0].artist_id).toBeNull();
+    expect(rows[0].start_line).toBeGreaterThanOrEqual(0);
+  });
+
+  it("does not store uncaptioned / generic 'Logo N' rows", () => {
+    // Same art but no caption above it -> label falls back to generic -> skipped.
+    const noCaption = colly(
+      "_/\\__ ___ AAA ___ __/\\_",
+      "|  | /   \\ |  | /   \\| |",
+      "|__| \\___/ |__| \\___/|_|",
+      "|  | /   \\ |  | /   \\| |",
+      "|__| \\___/ |__| \\___/|_|",
+      "",
+    );
+    const rows = buildLogoRows(7, noCaption, EMPTY_DICTS);
+    for (const r of rows) expect(r.label).not.toMatch(/^Logo \d+$/);
+  });
+
+  it("produces consistent, non-generic rows on a real colly", () => {
+    const txt = readFileSync(join(__dirname, "fixtures", "colly-spn-russ.txt"), "latin1");
+    const rows = buildLogoRows(1, txt, EMPTY_DICTS);
+    expect(rows.length).toBeGreaterThan(0);
+    for (const r of rows) {
+      expect(r.label.length).toBeGreaterThan(0);
+      expect(r.label).not.toMatch(/^Logo \d+$/);
+      expect(r.label.length).toBeLessThanOrEqual(120);
+      expect(r.label_norm.length).toBeLessThanOrEqual(120);
+      expect(r.start_line).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
