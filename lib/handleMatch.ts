@@ -25,15 +25,28 @@ export function normalizeHandle(s: string): string {
     .replace(/[^a-z0-9]/g, "");
 }
 
-// Split a label into normalized alnum tokens, dropping noise words and pure
-// numbers (logo counters / years).
+// Split a label into normalized tokens, dropping noise words and pure numbers
+// (logo counters / years). Digits are a common connector in divider captions
+// ("spot 4 asciiarena" = "spot FOR asciiarena", "x 2 y") and get collapsed by
+// label extraction, so each alnum token is ALSO split on digit runs — yielding
+// the bare handle ("spot", "asciiarena") while still keeping the whole token
+// (so a genuinely digit-bearing handle like "g80" survives too).
 export function labelTokens(label: string): string[] {
-  return label
+  const base = label
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
     .split(/[^a-z0-9]+/)
-    .filter((t) => t.length >= 2 && !/^\d+$/.test(t) && !NOISE.has(t));
+    .filter(Boolean);
+  const out = new Set<string>();
+  const keep = (t: string) => {
+    if (t.length >= 2 && !/^\d+$/.test(t) && !NOISE.has(t)) out.add(t);
+  };
+  for (const t of base) {
+    keep(t); // whole token, e.g. "g80" or "browallia4nukleus"
+    for (const part of t.split(/[0-9]+/)) keep(part); // letter-runs: "spot", "asciiarena"
+  }
+  return [...out];
 }
 
 // Tokens plus joins of up to 3 consecutive tokens, so a multi-word entity name

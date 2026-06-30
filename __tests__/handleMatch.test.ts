@@ -30,6 +30,12 @@ describe("labelTokens", () => {
     expect(labelTokens("3o ! bROwAlliA 4 nUkLEUs.nFO : o3")).toEqual(["3o", "browallia", "nukleus", "o3"]);
     expect(labelTokens("- nukleus presents -")).toEqual(["nukleus"]);
   });
+
+  it("splits digit connectors so glued handles separate ('spot 4 asciiarena')", () => {
+    const t = labelTokens("sPOt 4 aSCiiARENa");
+    expect(t).toContain("spot");
+    expect(t).toContain("asciiarena");
+  });
 });
 
 describe("resolveEntities", () => {
@@ -45,6 +51,10 @@ describe("resolveEntities", () => {
 
   it("matches a user handle exactly", () => {
     expect(resolveEntities("spot", DICTS).user_id).toBe(30);
+  });
+
+  it("resolves a handle glued to a word by a digit connector ('sPOt4aSCiiARENa')", () => {
+    expect(resolveEntities("61 | sPOt4aSCiiARENa (dIZ) | 16", DICTS).user_id).toBe(30);
   });
 
   it("does not match 'spot' inside 'spotlight' (no over-eager containment for short handles)", () => {
