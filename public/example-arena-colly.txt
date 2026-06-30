@@ -1,0 +1,42 @@
+                          .: aSCIIaRENA eXAMPLE cOLLY :.
+
+
+        o1> STATiC            o2> UP ROUGH            o3> ROGUELANDS
+
+
+STATiC for NEXUS
+
+    _____ _____  _____ _____ _____ _____
+   |   __|_   _||  _  |_   _|_   _|     |
+   |__   | | |  |     | | |  _| |_|   --|
+   |__   | | |  |     | | |  _| |_|   --|
+   |_____| |_|  |__|__| |_|  |_____|_____|
+
+
+up rough  -spot
+
+    _   _ ____   ____  ____  _   _  ____ _   _
+   | | | |  _ \ |  _ \|  _ \| | | |/ ___| | | |
+   | | | | |_) || |_) | |_) | | | | |  _| |_| |
+   | |_| |  __/ |  _ <|  _ <| |_| | |_| |  _  |
+   |_____|_|    |_| \_\_| \_\\___/ \____|_| |_|
+
+
+ROGUELANDS for zeus
+
+    ____   ___   ____ _   _ _____ _      ___
+   |  _ \ / _ \ / ___| | | | ____| |    / _ \
+   | |_) | | | | |  _| | | |  _| | |   | | | |
+   | |_) | | | | |  _| | | |  _| | |   | | | |
+   |_| \_\\___/ \____|\___/|_____|____|\___/
+
+
+@BEGIN_FILE_ID.DIZ
+aSCIIaRENA example colly - demonstrates captioned logos,
+a clickable index, a 'for' dedication, and an invisible
+soundtrack trailer. Style yours however you like!
+@END_FILE_ID.DIZ
+font: A1200 Topaz+
+fg: #55ff55
+bg: #111111
+soundtrack: Protracker/4-Mat/madness.mod

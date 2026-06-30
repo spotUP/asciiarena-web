@@ -564,6 +564,12 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
           <div className="header col-lg-12 p-0 amb-1">
             <h2 className="ap-1 bg-header">UPLOAD COLLY</h2>
           </div>
+          <div className="bg-secondary ap-1 amb-1 lightgrey">
+            New here? <a href="/submit/test" className="magenta">Test your colly</a> to see how
+            we&apos;ll read it, or read the{" "}
+            <a href="/guidelines" className="magenta">colly guidelines</a>. Style freely &mdash;
+            it&apos;s all optional.
+          </div>
           <form onSubmit={handleCollySubmit} className="container-fluid bg-secondary apb-1 ap-1 amb-2">
             <Field label="File" required>
               <input type="file" ref={collyFileRef} required className="form-control w-100" />
