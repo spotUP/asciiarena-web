@@ -52,18 +52,12 @@ export async function indexColly(
   dicts?: EntityDicts,
 ): Promise<IndexResult> {
   const d = dicts ?? (await getDicts());
-  // Tagged collys: index from the artist's explicit logo map (exact names, even
-  // for wild art). Untagged: detect labels from the visible text as before.
-  let logoMap: { line: number; caption: string }[] | undefined;
-  try { logoMap = parseCollyBytes(new Uint8Array(readFileSync(collyFilePath(filename)))).meta.logos; } catch { /* unreadable */ }
-  let rows;
-  if (logoMap?.length) {
-    rows = buildLogoRowsFromMap(collyId, logoMap, d);
-  } else {
-    const text = readCollyText(filename, storedType);
-    rows = text == null ? [] : buildLogoRows(collyId, text, d);
-  }
-  const ops: Promise<unknown>[] = [prisma.colly_logos.deleteMany({ where: { colly_id: collyId } })];
+  // Auto-detected catalog rows (manual = 0). A colly that's been mapped in the
+  // editor has manual rows written by the upload route, which take precedence and
+  // are NOT overwritten here (this only refreshes the auto layer).
+  const text = readCollyText(filename, storedType);
+  const rows = text == null ? [] : buildLogoRows(collyId, text, d);
+  const ops: Promise<unknown>[] = [prisma.colly_logos.deleteMany({ where: { colly_id: collyId, manual: 0 } })];
   if (rows.length) ops.push(prisma.colly_logos.createMany({ data: rows }));
   await prisma.$transaction(ops as never);
   return { logos: rows.length, resolved: rows.filter((r) => r.artist_id || r.crew_id || r.user_id).length };

@@ -8,6 +8,7 @@ export interface LogoRow {
   colly_id: number;
   position: number;
   start_line: number;
+  end_line: number | null;
   label: string;
   label_norm: string;
   artist_id: number | null;
@@ -17,7 +18,7 @@ export interface LogoRow {
 
 // Build one catalog row from a single caption, or null if it's not a real logo
 // label. Shared by detection (buildLogoRows) and the explicit map (buildLogoRowsFromMap).
-function buildLogoRow(collyId: number, rawLabel: string, position: number, startLine: number, dicts: EntityDicts): LogoRow | null {
+function buildLogoRow(collyId: number, rawLabel: string, position: number, startLine: number, endLine: number | null, dicts: EntityDicts): LogoRow | null {
   const raw = (rawLabel || "").trim();
   if (!raw || /^Logo \d+$/.test(raw)) return null; // uncaptioned / generic fallback
   const label = raw.slice(0, 120);
@@ -31,6 +32,7 @@ function buildLogoRow(collyId: number, rawLabel: string, position: number, start
     colly_id: collyId,
     position,
     start_line: startLine,
+    end_line: endLine,
     label,
     // Whole-token search key for the SUBJECT only: searching "spot" matches the
     // handle "spot" but not "spotlite" (substring) nor an "up rough FOR spot"
@@ -50,7 +52,7 @@ export function buildLogoRows(collyId: number, text: string, dicts: EntityDicts)
   const index = buildLogoIndex(text, sections);
   const rows: LogoRow[] = [];
   index.forEach((entry, position) => {
-    const row = buildLogoRow(collyId, entry.label, position, entry.section.startLine, dicts);
+    const row = buildLogoRow(collyId, entry.label, position, entry.section.startLine, null, dicts);
     if (row) rows.push(row);
   });
   return rows;
@@ -67,7 +69,8 @@ export function buildLogoRowsFromMap(
   const sorted = [...logos].sort((a, b) => a.line - b.line);
   const rows: LogoRow[] = [];
   sorted.forEach((lg, position) => {
-    const row = buildLogoRow(collyId, lg.caption, position, Math.max(0, lg.line - 1), dicts);
+    const endLine = lg.end && lg.end >= lg.line ? lg.end - 1 : null;
+    const row = buildLogoRow(collyId, lg.caption, position, Math.max(0, lg.line - 1), endLine, dicts);
     if (row) rows.push(row);
   });
   return rows;

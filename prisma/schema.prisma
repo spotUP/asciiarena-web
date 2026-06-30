@@ -220,6 +220,8 @@ model colly_logos {
   colly_id   Int     @db.UnsignedInt
   position   Int // 0-based index of the logo within the colly
   start_line Int // line offset, for scroll-to/deep-link
+  end_line   Int? // 0-based end line of the logo (manual maps); null = auto-detected
+  manual     Int     @default(0) // 1 = artist-mapped in the editor (drives rendering)
   label      String  @db.Char(120)
   label_norm String  @db.Char(120)
   artist_id  Int?    @db.UnsignedInt

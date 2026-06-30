@@ -18,7 +18,8 @@ import { existsSync } from "fs";
 import { broadcast } from "@/lib/live";
 import { ensureArtistId, ensureCrewId } from "@/lib/ensureEntity";
 import { broadcastActivityIfAllowed } from "@/lib/activity";
-import { indexColly } from "@/lib/collyLogoIndex";
+import { indexColly, loadEntityDicts } from "@/lib/collyLogoIndex";
+import { buildLogoRowsFromMap } from "@/lib/collyLogoRows";
 import { parseCollyBytes } from "@/lib/collyTrailer";
 import { detectCollyType, COLLY_TYPES } from "@/lib/collyType";
 
@@ -203,28 +204,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   if (!existsSync(uploadDir)) {
     await mkdir(uploadDir, { recursive: true });
   }
-  // If the editor mapped logos, persist them as an invisible Ctrl-Z trailer so the
-  // search catalog + renderer use the exact map. Strips any prior trailer first
-  // (the editor re-sends the final map). Untouched when no logos were mapped.
-  let outBuffer = buffer;
-  const logosRaw = String(formData.get("logos") ?? "");
-  if (logosRaw) {
-    try {
-      const logos = JSON.parse(logosRaw) as { line: number; end?: number; caption: string }[];
-      if (Array.isArray(logos) && logos.length) {
-        const { visible } = parseCollyBytes(new Uint8Array(bytes));
-        const trailer = "\x1a" + logos
-          .map((l) => {
-            const start = Math.max(1, Math.floor(l.line));
-            const range = l.end && l.end > start ? `${start}-${Math.floor(l.end)}` : `${start}`;
-            return `logo: ${range} ${String(l.caption).replace(/[\r\n]+/g, " ").slice(0, 120)}`;
-          })
-          .join("\n") + "\n";
-        outBuffer = Buffer.concat([Buffer.from(visible), Buffer.from(trailer, "latin1")]);
-      }
-    } catch { /* ignore malformed logo map */ }
-  }
-  await writeFile(filePath, outBuffer);
+  // The colly file is stored as-is — the editor's logo map goes to the DB, not
+  // into the file (no in-file tags).
+  await writeFile(filePath, buffer);
+  let manualLogos: { line: number; end?: number; caption: string }[] = [];
+  try {
+    const parsed = JSON.parse(String(formData.get("logos") ?? "[]")) as { line: number; end?: number; caption: string }[];
+    if (Array.isArray(parsed)) manualLogos = parsed.filter((l) => l && typeof l.line === "number" && String(l.caption ?? "").trim());
+  } catch { /* no/!invalid map */ }
 
   // Use the submitter's explicit type when valid, else detect by CONTENT (an
   // ANSI colly saved as .txt is still recognised as ANSI).
@@ -275,9 +262,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  // Index this colly's logo labels for search (non-fatal — never block an
-  // upload on indexing, and tolerate the catalog table not existing yet).
-  try { await indexColly(collyId, filename, type); } catch { /* ignore */ }
+  // Logo catalog (non-fatal). If the editor mapped logos, store them as the
+  // manual map (drives rendering + search); otherwise auto-detect.
+  try {
+    if (manualLogos.length) {
+      const rows = buildLogoRowsFromMap(collyId, manualLogos, await loadEntityDicts());
+      await prisma.colly_logos.deleteMany({ where: { colly_id: collyId } });
+      if (rows.length) await prisma.colly_logos.createMany({ data: rows.map((r) => ({ ...r, manual: 1 })) });
+    } else {
+      await indexColly(collyId, filename, type);
+    }
+  } catch { /* ignore */ }
 
   // Update uploader stats
   await prisma.$executeRaw(

@@ -256,6 +256,19 @@ export default async function ReleasePage({ params }: PageProps) {
   const collyId = Number(colly.id);
   const collyFileUrl = `/collections/${dirname}/${filename}`;
 
+  // Artist-mapped logos (manual=1) drive rendering/autoplay/jumps; without a
+  // manual map the viewer falls back to live detection. Stored in the DB now,
+  // not in the file.
+  let dbLogoMap: { line: number; end?: number; caption: string }[] | null = null;
+  try {
+    const ml = await prisma.colly_logos.findMany({
+      where: { colly_id: collyId, manual: 1 },
+      orderBy: { position: "asc" },
+      select: { start_line: true, end_line: true, label: true },
+    });
+    if (ml.length) dbLogoMap = ml.map((r) => ({ line: r.start_line + 1, end: r.end_line != null ? r.end_line + 1 : undefined, caption: r.label }));
+  } catch { /* catalog may be unavailable */ }
+
   // Date display
   const day = colly.day && colly.day !== 0 ? colly.day : null;
   const month = colly.month && colly.month !== 0 ? MONTHS[colly.month] : null;
@@ -391,7 +404,7 @@ export default async function ReleasePage({ params }: PageProps) {
         fileContent={fileContent}
         logoText={logoText}
         soundtrack={soundtrack}
-        logoMap={collyMeta.logos ?? null}
+        logoMap={dbLogoMap}
         extractedEntry={extractedEntry}
         type={type}
         isCp437={isCp437}
