@@ -2625,3 +2625,11 @@ input::file-selector-button {
 /* Colly submit preview: hover/click the whole line to map a logo (CollyPreview). */
 .colly-line { cursor: pointer; }
 .colly-line:hover { background: rgba(255,85,255,0.28) !important; }
+
+/* Give the caret some air on the left of every text field. Inline styles on
+   specially-sized inputs (e.g. the compact nav search) still override this. */
+input[type="text"], input[type="search"], input[type="number"], input[type="email"],
+input[type="password"], input[type="url"], input[type="tel"], input:not([type]),
+textarea, .form-control {
+  padding-left: 8px;
+}
