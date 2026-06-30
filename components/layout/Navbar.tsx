@@ -92,6 +92,7 @@ export default function Navbar({ session }: NavbarProps) {
 
             <li className="nav-item"><Link prefetch={false} className="nav-link ascii apr-1" href="/artists">ARTiSTS</Link></li>
             <li className="nav-item"><Link prefetch={false} className="nav-link ascii apr-1" href="/crews">CREWS</Link></li>
+            <li className="nav-item"><Link prefetch={false} className="nav-link ascii apr-1" href="/logos">LOGOS</Link></li>
             <li className="nav-item"><Link prefetch={false} className="nav-link ascii apr-1" href="/bbs">BOARDS</Link></li>
             <li className="nav-item"><Link prefetch={false} className="nav-link ascii apr-1" href="/requests">REQUESTS</Link></li>
             <li className="nav-item"><Link prefetch={false} className="nav-link ascii apr-1" href="/polls">POLLS</Link></li>
