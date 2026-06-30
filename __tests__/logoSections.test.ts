@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "fs";
 import { join } from "path";
-import { detectLogoSections, computeScrollTarget, pingPongNext } from "@/lib/logoSections";
+import { detectLogoSections, computeScrollTarget, pingPongNext, extractDividerLabel } from "@/lib/logoSections";
 
 const colly = (...lines: string[]) => lines.join("\n");
 
@@ -211,6 +211,14 @@ describe("detectLogoSections", () => {
       expect(s.startLine).toBeGreaterThan(prevEnd); // ordered, non-overlapping
       prevEnd = s.endLine;
     }
+  });
+});
+
+describe("extractDividerLabel", () => {
+  it("joins spaced-out letters but keeps spaces between real words", () => {
+    expect(extractDividerLabel(["s u b l i m e"])).toBe("sublime");
+    expect(extractDividerLabel(["spot 4 asciiarena"])).toBe("spot 4 asciiarena");
+    expect(extractDividerLabel(["name : up rough"])).toBe("up rough");
   });
 });
 

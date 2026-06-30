@@ -238,15 +238,23 @@ export function extractDividerLabel(divLines: string[]): string {
   });
   if (!contentLines.length) return "";
 
-  // Collapse spaced-letter sequences: "s u b l i m e" -> "sublime"
+  // Collapse spaced-LETTER sequences ("s u b l i m e" -> "sublime") while
+  // KEEPING the spaces between real words ("spot 4 asciiarena" stays readable).
+  // Only consecutive single-character tokens are merged.
   const compact = (s: string) => {
-    s = s.replace(/ {2,}/g, " ");
-    let prev: string;
-    do {
-      prev = s;
-      s = s.replace(/([a-zA-Z0-9_]) ([a-zA-Z0-9_])/g, "$1$2");
-    } while (s !== prev);
-    return s.trim();
+    const parts = s.replace(/\s{2,}/g, " ").trim().split(" ").filter(Boolean);
+    const out: string[] = [];
+    let buf = "";
+    for (const p of parts) {
+      if (p.length === 1) {
+        buf += p; // accumulate a run of spaced single chars
+      } else {
+        if (buf) { out.push(buf); buf = ""; }
+        out.push(p);
+      }
+    }
+    if (buf) out.push(buf);
+    return out.join(" ").trim();
   };
   const strip = (s: string) => s.replace(/^[^a-zA-Z0-9]+/, "").replace(/[^a-zA-Z0-9]+$/, "").trim();
 
