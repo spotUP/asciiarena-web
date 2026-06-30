@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Combobox from "@/components/ui/Combobox";
 import DosSelect from "@/components/ui/DosSelect";
+import DatePicker from "@/components/ui/DatePicker";
 import AnsiEditor, { type AnsiEditorRef } from "@/components/ui/AnsiEditor/AnsiEditor";
 import { FONTS } from "@/lib/ansilove";
 
@@ -563,11 +564,16 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
               />
             </Field>
             <Field label="Released">
-              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                <input type="number" className="form-control" min={1980} max={2100} placeholder="YYYY" style={{ width: "96px" }} value={collyYear} onChange={e => setCollyYear(e.target.value)} />
-                <input type="number" className="form-control" min={1} max={12} placeholder="MM" style={{ width: "80px" }} value={collyMonth} onChange={e => setCollyMonth(e.target.value)} />
-                <input type="number" className="form-control" min={1} max={31} placeholder="DD" style={{ width: "80px" }} value={collyDay} onChange={e => setCollyDay(e.target.value)} />
-              </div>
+              <DatePicker
+                value={collyYear && collyMonth && collyDay
+                  ? `${String(collyYear).padStart(4, "0")}-${String(collyMonth).padStart(2, "0")}-${String(collyDay).padStart(2, "0")}`
+                  : ""}
+                onChange={v => {
+                  if (!v) { setCollyYear(""); setCollyMonth(""); setCollyDay(""); return; }
+                  const [y, m, d] = v.split("-");
+                  setCollyYear(String(parseInt(y))); setCollyMonth(String(parseInt(m))); setCollyDay(String(parseInt(d)));
+                }}
+              />
             </Field>
             <MultiSelect label="Artist(s)" values={collyArtists} options={artistList} placeholder="-- Unknown --" createLabel="artist" onChange={setCollyArtists} />
             <MultiSelect label="Crew(s)" values={collyCrews} options={crewList} placeholder="-- None --" createLabel="crew" onChange={setCollyCrews} />

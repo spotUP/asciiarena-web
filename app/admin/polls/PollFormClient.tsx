@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { POLL_TYPES, POLL_TYPE_LABELS, type PollType, type PollStatus, type PollShowResults, type PollResultLayout, type PollConfig, DEFAULT_APPROVAL_STANCES, DEFAULT_RATING_SCALE, DEFAULT_YESNO_LABELS } from "@/lib/polls/types";
 import { ANSI_PALETTE, ANSI_PALETTE_LABELS } from "@/lib/polls/palette";
+import { DateTimePicker } from "@/components/ui/DatePicker";
 
 interface OptionDraft { id?: number; label: string; color_idx: number }
 interface InitialPoll {
@@ -217,11 +218,11 @@ export default function PollFormClient({ initial }: { initial?: InitialPoll }) {
       <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
         <div style={{ flex: 1 }}>
           <label className={LABEL_CLASS} style={LABEL_STYLE}>Opens at (optional)</label>
-          <input type="datetime-local" className={INPUT_CLASS} value={opensAt} onChange={(e) => setOpensAt(e.target.value)} />
+          <DateTimePicker value={opensAt} onChange={setOpensAt} />
         </div>
         <div style={{ flex: 1 }}>
           <label className={LABEL_CLASS} style={LABEL_STYLE}>Closes at (optional)</label>
-          <input type="datetime-local" className={INPUT_CLASS} value={closesAt} onChange={(e) => setClosesAt(e.target.value)} />
+          <DateTimePicker value={closesAt} onChange={setClosesAt} />
         </div>
       </div>
 

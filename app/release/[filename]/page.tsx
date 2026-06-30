@@ -173,6 +173,12 @@ export default async function ReleasePage({ params }: PageProps) {
   let logoText = "";
   if (type === "ANSI" && existsSync(filePath)) {
     logoText = readCollyText(filename, type) ?? "";
+    // The ASCII branch pulls the embedded @BEGIN_FILE_ID.DIZ block; ANSI never
+    // did, so its .diz was lost. Extract it here too (decode + strip markers).
+    try {
+      const stripped = stripFileIdDiz(encodeFileText(filePath, textEncoding));
+      if (stripped.dizText) embeddedDiz = stripped.dizText;
+    } catch { /* no embedded diz */ }
   }
 
   // For archives, try to extract a renderable ASCII file so it can be

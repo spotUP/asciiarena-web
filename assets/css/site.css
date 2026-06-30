@@ -2615,3 +2615,9 @@ input::file-selector-button {
 .colly-index-link:hover {
   filter: brightness(170%);
 }
+
+/* Terminal date picker (components/ui/DatePicker.tsx) — day-cell hover. */
+.datepicker-day:hover {
+  background: #333333;
+  color: #ffffff !important;
+}

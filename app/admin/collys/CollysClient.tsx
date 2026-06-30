@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { convertPcbColors, hasPcbCodes } from "@/lib/pcbColors";
 import { convertAnsiCodes, hasAnsiCodes, escapeHtmlText } from "@/lib/releaseText";
 import Cp437DizPreview from "@/components/release/Cp437DizPreview";
+import DatePicker from "@/components/ui/DatePicker";
 
 interface Colly {
   id: number;
@@ -289,9 +290,7 @@ export default function CollysClient() {
             <div className="row amb-1 align-items-center">
               <div className="col-3 lightgrey">RELEASE DATE</div>
               <div className="col-9">
-                <input
-                  type="date"
-                  className="date-dos"
+                <DatePicker
                   value={(() => {
                     const y = edits[selected.id]?.year ?? selected.year;
                     const m = edits[selected.id]?.month ?? selected.month;
@@ -299,8 +298,7 @@ export default function CollysClient() {
                     if (!y || !m || !d) return "";
                     return `${String(y).padStart(4, "0")}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
                   })()}
-                  onChange={e => {
-                    const v = e.target.value;
+                  onChange={v => {
                     if (!v) { edit(selected.id, "year", null); edit(selected.id, "month", null); edit(selected.id, "day", null); return; }
                     const [y, m, d] = v.split("-");
                     edit(selected.id, "year", parseInt(y) || null);
