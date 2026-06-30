@@ -20,7 +20,14 @@ interface Props {
   entries: LogoIndexEntry[];
   spacers: number;
   fgColor: string;
+  /** Canvas (ANSI) collys: build the source from the rendered AnsiLove canvas
+   *  tiles instead of text glyphs. lineCount = decoded plaintext line count. */
+  canvasMode?: boolean;
+  lineCount?: number;
 }
+
+const CANVAS_SRC_H = 6000; // downscaled thumbnail height for canvas-mode source
+const CANVAS_SRC_W = 240;  // source width (the strip stretches it to its own width)
 
 interface Source {
   canvas: HTMLCanvasElement;
@@ -41,7 +48,7 @@ interface Model {
 // once to a high-resolution offscreen canvas (actual glyphs), then sampled into
 // the visible strip with smoothing — so it reads like a real zoomed document
 // rather than blocky dots. Rows near the cursor bulge larger; the ends compress.
-export default function LogoMinimap({ containerRef, preRef, entries, spacers, fgColor }: Props) {
+export default function LogoMinimap({ containerRef, preRef, entries, spacers, fgColor, canvasMode = false, lineCount = 0 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const sourceRef = useRef<Source | null>(null);
   const modelRef = useRef<Model | null>(null);
@@ -59,9 +66,43 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, fg
     return (pre && parseFloat(getComputedStyle(pre).lineHeight)) || 16;
   }, [preRef]);
 
+  // Canvas (ANSI) collys: the art is already rendered as a stack of AnsiLove
+  // canvas tiles. Downscale them into the offscreen source image (no glyphs).
+  // Row units = decoded plaintext lines, so hover→section mapping lines up.
+  const buildSourceFromCanvas = useCallback(() => {
+    const c = containerRef.current;
+    if (!c || lineCount < 1) return;
+    const tiles = [...c.querySelectorAll("canvas")] as HTMLCanvasElement[];
+    if (!tiles.length) return; // tiles not rendered yet — ResizeObserver retries
+    let artHeight = 0;
+    for (const t of tiles) artHeight += t.clientHeight;
+    if (!artHeight) return;
+    const R = Math.max(1, lineCount);
+    const lh = artHeight / R;              // live px per text line
+    const srcH = Math.max(1, Math.min(CANVAS_SRC_H, Math.round(artHeight)));
+    const ch = srcH / R;                   // source px per text line
+    const srcW = Math.max(1, Math.min(CANVAS_SRC_W, tiles[0].clientWidth || tiles[0].width || 1));
+    const off = sourceRef.current?.canvas ?? document.createElement("canvas");
+    off.width = srcW;
+    off.height = srcH;
+    const octx = off.getContext("2d");
+    if (!octx) return;
+    octx.clearRect(0, 0, srcW, srcH);
+    octx.imageSmoothingEnabled = true;
+    octx.imageSmoothingQuality = "high";
+    let artY = 0;
+    for (const t of tiles) {
+      const th = t.clientHeight;
+      octx.drawImage(t, 0, 0, t.width, t.height, 0, (artY * srcH) / artHeight, srcW, (th * srcH) / artHeight);
+      artY += th;
+    }
+    sourceRef.current = { canvas: off, srcW, ch, R, lineHeight: lh };
+  }, [containerRef, lineCount]);
+
   // Render the colly to an offscreen canvas at a real (small) font size. Costly,
   // so only rebuilt on mount / resize / font / colour change — never on hover.
   const buildSource = useCallback(() => {
+    if (canvasMode) { buildSourceFromCanvas(); return; }
     const c = containerRef.current;
     const pre = preRef.current;
     if (!c || !pre) return;
@@ -96,7 +137,7 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, fg
       if (line.trim() !== "") octx.fillText(line.length > MAX_COLS ? line.slice(0, MAX_COLS) : line, 0, r * ch);
     }
     sourceRef.current = { canvas: off, srcW, ch, R, lineHeight: lh };
-  }, [containerRef, preRef, lineHeight, spacers, fgColor]);
+  }, [canvasMode, buildSourceFromCanvas, containerRef, preRef, lineHeight, spacers, fgColor]);
 
   // Build the row->Y warp for the current focus, then sample the source image
   // into the strip band by band (smoothed).

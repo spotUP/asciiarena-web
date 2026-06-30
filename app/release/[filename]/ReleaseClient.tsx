@@ -359,6 +359,7 @@ export default function ReleaseClient({
   // Text the logo detector runs on: the HTML <pre> content for ASCII, or the
   // decoded plaintext for canvas (ANSI) collys where fileContent is empty.
   const detectionText = logoText || fileContent;
+  const lineCount = useMemo(() => detectionText.split("\n").length, [detectionText]);
   const sections  = useMemo(() => detectLogoSections(detectionText), [detectionText]);
   const logoIndex = useMemo(() => buildLogoIndex(detectionText, sections), [detectionText, sections]);
   // The index panel prefers the colly's OWN embedded index (clean author names)
@@ -1272,6 +1273,7 @@ export default function ReleaseClient({
       {/* Canvas viewer — AnsiLove renders ANSI art and PC/CP437 block art here.
           CP437 art is recoloured to the user's bg, so match the container bg. */}
       {useCanvasViewer && collyVisible && (
+        <div style={{ position: "relative" }}>
         <div
           ref={collyDivRef}
           id="colly-div"
@@ -1279,6 +1281,7 @@ export default function ReleaseClient({
             display: "flex", justifyContent: "center", alignItems: "flex-start",
             overflowY: "scroll", overflowX: "hidden", height: "100vh",
             backgroundColor: isCp437Art ? bgColor : "#000", margin: 0, padding: 0,
+            paddingRight: !isFullscreen && logoIndex.length > 1 ? `${MINIMAP_WIDTH}px` : 0,
             // Fullscreen: fixed viewport-sized stage so the groove warp/filters render.
             ...(isFullscreen ? { position: "fixed" as const, top: 0, left: 0, width: "100vw", height: "100vh", zIndex: 999998 } : {}),
           }}
@@ -1291,6 +1294,18 @@ export default function ReleaseClient({
             className={isFullscreen ? "fullscreen" : undefined}
             style={{ paddingTop: "64px" }}
           />
+        </div>
+        {!isFullscreen && logoIndex.length > 1 && (
+          <LogoMinimap
+            containerRef={collyDivRef}
+            preRef={collyRef}
+            entries={logoIndex}
+            spacers={0}
+            fgColor={fgColor}
+            canvasMode
+            lineCount={lineCount}
+          />
+        )}
         </div>
       )}
 
