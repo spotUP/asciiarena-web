@@ -1,6 +1,8 @@
+import { readFileSync } from "fs";
 import { prisma } from "@/lib/db";
-import { readCollyText } from "@/lib/collyText";
-import { buildLogoRows } from "@/lib/collyLogoRows";
+import { readCollyText, collyFilePath } from "@/lib/collyText";
+import { buildLogoRows, buildLogoRowsFromMap } from "@/lib/collyLogoRows";
+import { parseCollyBytes } from "@/lib/collyTrailer";
 import { normalizeHandle, type EntityDicts, type EntityRef } from "@/lib/handleMatch";
 
 export { buildLogoRows, type LogoRow } from "@/lib/collyLogoRows";
@@ -49,9 +51,18 @@ export async function indexColly(
   storedType?: string | null,
   dicts?: EntityDicts,
 ): Promise<IndexResult> {
-  const text = readCollyText(filename, storedType);
   const d = dicts ?? (await getDicts());
-  const rows = text == null ? [] : buildLogoRows(collyId, text, d);
+  // Tagged collys: index from the artist's explicit logo map (exact names, even
+  // for wild art). Untagged: detect labels from the visible text as before.
+  let logoMap: { line: number; caption: string }[] | undefined;
+  try { logoMap = parseCollyBytes(new Uint8Array(readFileSync(collyFilePath(filename)))).meta.logos; } catch { /* unreadable */ }
+  let rows;
+  if (logoMap?.length) {
+    rows = buildLogoRowsFromMap(collyId, logoMap, d);
+  } else {
+    const text = readCollyText(filename, storedType);
+    rows = text == null ? [] : buildLogoRows(collyId, text, d);
+  }
   const ops: Promise<unknown>[] = [prisma.colly_logos.deleteMany({ where: { colly_id: collyId } })];
   if (rows.length) ops.push(prisma.colly_logos.createMany({ data: rows }));
   await prisma.$transaction(ops as never);

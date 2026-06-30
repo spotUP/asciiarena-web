@@ -83,3 +83,21 @@ describe("buildLogoRows", () => {
     }
   });
 });
+
+import { buildLogoRowsFromMap } from "@/lib/collyLogoRows";
+import { normalizeHandle as nh } from "@/lib/handleMatch";
+
+describe("buildLogoRowsFromMap (tagged collys)", () => {
+  it("builds rows from explicit captions + resolves entities, recipient excluded", () => {
+    const dicts = { artists: [{ id: 5, norm: nh("spot") }], crews: [{ id: 9, norm: nh("up rough") }], users: [] };
+    const rows = buildLogoRowsFromMap(7, [
+      { line: 8, caption: "spot for nexus" },
+      { line: 22, caption: "up rough" },
+    ], dicts);
+    expect(rows.length).toBe(2);
+    expect(rows[0].artist_id).toBe(5);          // spot resolved
+    expect(rows[0].label_norm).not.toContain("nexus"); // recipient excluded
+    expect(rows[0].start_line).toBe(7);         // 1-based 8 -> 0-based 7
+    expect(rows[1].crew_id).toBe(9);            // up rough resolved
+  });
+});

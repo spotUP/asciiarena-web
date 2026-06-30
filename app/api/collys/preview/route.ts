@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { parseCollyBytes, sectionsFromLogoMap, type CollyMeta } from "@/lib/collyTrailer";
 import { detectLogoSections, buildLogoIndex, type LogoSection } from "@/lib/logoSections";
-import { buildLogoRows } from "@/lib/collyLogoRows";
+import { buildLogoRows, buildLogoRowsFromMap } from "@/lib/collyLogoRows";
 import { parseCollyIndex } from "@/lib/collyIndex";
 import { loadEntityDicts } from "@/lib/collyLogoIndex";
 import { cleanLabel, type EntityDicts } from "@/lib/handleMatch";
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
   const sections: LogoSection[] = tagged
     ? sectionsFromLogoMap(meta.logos!, lineCount)
     : detectLogoSections(text);
-  const rows = buildLogoRows(0, text, dicts);
+  const rows = tagged ? buildLogoRowsFromMap(0, meta.logos!, dicts) : buildLogoRows(0, text, dicts);
 
   // One report row per detected/mapped logo.
   const logos = (tagged
