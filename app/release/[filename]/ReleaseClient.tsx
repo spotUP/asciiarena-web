@@ -22,6 +22,7 @@ import {
   type LogoSection,
 } from "@/lib/logoSections";
 import LogoMinimap, { MINIMAP_WIDTH } from "./LogoMinimap";
+import { parseCollyIndex, sectionForIndexEntry } from "@/lib/collyIndex";
 import { useMusic } from "@/components/music/MusicProvider";
 import { BeatDetector, lowBandEnergy } from "@/lib/uade/beatDetector";
 
@@ -354,6 +355,17 @@ export default function ReleaseClient({
 
   const sections  = useMemo(() => detectLogoSections(fileContent), [fileContent]);
   const logoIndex = useMemo(() => buildLogoIndex(fileContent, sections), [fileContent, sections]);
+  // The index panel prefers the colly's OWN embedded index (clean author names)
+  // when one exists, falling back to the auto-detected divider labels.
+  const displayIndex = useMemo(() => {
+    const parsed = parseCollyIndex(fileContent);
+    if (parsed.length) {
+      return parsed
+        .map((e) => ({ label: e.name, section: sectionForIndexEntry(e, logoIndex, sections) }))
+        .filter((x): x is { label: string; section: LogoSection } => x.section !== null);
+    }
+    return logoIndex.map((li) => ({ label: li.label, section: li.section }));
+  }, [fileContent, logoIndex, sections]);
   const [indexOpen, setIndexOpen] = useState(false);
 
   const [commentText, setCommentText] = useState("");
@@ -1170,31 +1182,34 @@ export default function ReleaseClient({
             ...(isFullscreen ? { position: "fixed" as const, top: 0, left: 0, width: "100vw", height: "100vh", zIndex: 999998 } : {}),
           }}
         >
-          {indexOpen && logoIndex.length > 0 && (
+          {indexOpen && displayIndex.length > 0 && (
             <div style={{
               position: "sticky", top: 0, alignSelf: "flex-start",
               zIndex: 100, overflowY: "auto", maxHeight: "100vh",
               background: "rgba(17,17,17,0.93)", minWidth: "200px",
               borderRight: "1px solid #333", padding: "8px 0", flexShrink: 0,
             }}>
-              {logoIndex.map((entry, n) => (
-                <div
-                  key={n}
-                  onClick={() => { scrollToSection(entry.section); setIndexOpen(false); }}
-                  style={{
-                    padding: "4px 12px",
-                    cursor: "pointer",
-                    color: autoplay && autoplayIndex === n ? "#ff55ff" : "#aaaaaa",
-                    background: autoplay && autoplayIndex === n ? "#222" : "transparent",
-                    fontFamily: "monospace", fontSize: "13px", whiteSpace: "nowrap",
-                    overflow: "hidden", textOverflow: "ellipsis",
-                  }}
-                  title={entry.label}
-                >
-                  <span style={{ color: "#555", marginRight: "8px" }}>{n + 1}</span>
-                  {entry.label}
-                </div>
-              ))}
+              {displayIndex.map((entry, n) => {
+                const current = autoplay && sections[autoplayIndex] === entry.section;
+                return (
+                  <div
+                    key={n}
+                    onClick={() => { scrollToSection(entry.section); setIndexOpen(false); }}
+                    style={{
+                      padding: "4px 12px",
+                      cursor: "pointer",
+                      color: current ? "#ff55ff" : "#aaaaaa",
+                      background: current ? "#222" : "transparent",
+                      fontFamily: "monospace", fontSize: "13px", whiteSpace: "nowrap",
+                      overflow: "hidden", textOverflow: "ellipsis",
+                    }}
+                    title={entry.label}
+                  >
+                    <span style={{ color: "#555", marginRight: "8px" }}>{n + 1}</span>
+                    {entry.label}
+                  </div>
+                );
+              })}
             </div>
           )}
           <pre
