@@ -12,7 +12,7 @@ export interface PreviewReport {
   text: string;
   artB64: string | null;
   meta: { title?: string; author?: string; crew?: string; font?: string; fg?: string; bg?: string; soundtrack?: string; logos?: { line: number; end?: number; caption: string }[] };
-  logos: { line: number; end: number; name: string; resolved: string | null; searchable: boolean }[];
+  logos: { line: number; end: number; name: string; author: string | null; resolved: string | null; searchable: boolean }[];
   index: { num: number; name: string }[];
   warnings: string[];
 }
@@ -78,7 +78,15 @@ export default function CollyPreview({
   const [fName, setFName] = useState(""); const [fBy, setFBy] = useState(""); const [fFor, setFFor] = useState("");
 
   const close = () => { setSel(null); setEditIdx(null); };
-  const openNew = (s: number, e: number) => { setSel({ start: s, end: e }); setEditIdx(null); setFName(""); setFBy(defaultAuthor); setFFor(""); };
+  const openNew = (s: number, e: number) => {
+    setSel({ start: s, end: e }); setEditIdx(null); setFName(""); setFBy(defaultAuthor); setFFor("");
+    // Derive the author from the selection's signature/acronym (artist DB).
+    const txt = lines.slice(s - 1, e).join(" ").trim();
+    if (txt) {
+      fetch("/api/collys/resolve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: txt }) })
+        .then((r) => r.json()).then((d: { author?: string | null }) => { if (d?.author) setFBy(d.author); }).catch(() => {});
+    }
+  };
   const openEdit = (i: number) => { const en = logoMap[i]; const d = decompose(en.caption); setSel({ start: en.line, end: en.end ?? en.line }); setEditIdx(i); setFName(d.name); setFBy(d.by || defaultAuthor); setFFor(d.for); };
   const save = () => {
     if (!sel || !fName.trim()) return;
@@ -170,12 +178,17 @@ export default function CollyPreview({
       </div>
 
       <div className="col-lg-5">
-        <div className="header bg-header ap-1">WHAT WE READ</div>
+        <div className="header bg-header ap-1">Metadata</div>
         <div className="bg-secondary ap-1 amb-1">
           <div className="lightgrey">Type: <span className="white">{report.type}</span></div>
           <div className="lightgrey">{report.lineCount} lines</div>
           <div className="lightgrey">{logoMap.length} logos</div>
           {report.warnings.map((w, i) => <div key={i} className="yellow">{w}</div>)}
+          <div>&nbsp;</div>
+        </div>
+        <div className="header bg-header ap-1">Logos</div>
+        <div className="bg-secondary ap-1 amb-1">
+          <div>&nbsp;</div>
           {logoMap.map((l, i) => (
             <div key={i} className="lightgrey colly-line" onClick={() => openEdit(i)} style={{ fontSize: "13px" }}>
               <span style={{ color: l.auto ? "#55ffff" : "#ff55ff" }}>{l.auto ? "auto" : "set"}</span> {l.caption}

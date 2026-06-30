@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 import { apiError, apiOk } from "@/lib/utils";
 import { parseCollyBytes, sectionsFromLogoMap, type CollyMeta } from "@/lib/collyTrailer";
 import { detectLogoSections, buildLogoIndex, type LogoSection } from "@/lib/logoSections";
@@ -44,11 +45,17 @@ export async function POST(request: NextRequest) {
   // Raw decoded text (not HTML-escaped) so the tester renders it 1:1 and line
   // numbers line up with the logo map.
   const raw = decodeReleaseText(visible, encoding).replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-  const text = stripFileIdDiz(raw).content;
+  // Strip ANSI escape sequences so detection (and the displayed report) see the
+  // characters, not "[36m" fragments. ANSI collys were leaking codes into names.
+  // eslint-disable-next-line no-control-regex
+  const text = stripFileIdDiz(raw).content.replace(/\x1b\[[0-9;?]*[ -/]*[@-~]/g, "");
   const lineCount = text.split("\n").length;
 
   let dicts: EntityDicts = { artists: [], crews: [], users: [] };
   try { dicts = await loadEntityDicts(); } catch { /* catalog may be empty */ }
+  // artist id -> full name, so a logo signed with an acronym fills in the author.
+  const artistNick = new Map<number, string>();
+  try { (await prisma.artists.findMany({ select: { id: true, nick: true } })).forEach((a) => { if (a.nick) artistNick.set(a.id, a.nick); }); } catch { /* ignore */ }
 
   const tagged = !!(meta.logos && meta.logos.length);
   const sections: LogoSection[] = tagged
@@ -66,6 +73,8 @@ export async function POST(request: NextRequest) {
       line: lg.line,
       end: lg.end,
       name: cleanLabel(lg.label),
+      // Logo signed with an acronym -> the matched artist's full name.
+      author: row?.artist_id ? (artistNick.get(row.artist_id) ?? null) : null,
       resolved: row ? (row.artist_id ? "artist" : row.crew_id ? "crew" : row.user_id ? "member" : null) : null,
       searchable: !!row,
     };

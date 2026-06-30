@@ -130,7 +130,7 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
       if (data.meta?.logos?.length) {
         setCollyLogoMap(data.meta.logos.map((l) => ({ ...l, auto: false })));
       } else {
-        setCollyLogoMap(data.logos.map((l) => ({ line: l.line, end: l.end, caption: l.name, auto: true })));
+        setCollyLogoMap(data.logos.map((l) => ({ line: l.line, end: l.end, caption: l.author ? `${l.name} -${l.author}` : l.name, auto: true })));
       }
     } catch { setCollyReport(null); }
   };
