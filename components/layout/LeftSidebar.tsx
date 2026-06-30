@@ -16,11 +16,13 @@ import Weektop from "@/components/widgets/Weektop";
 
 export default async function LeftSidebar() {
   const session = await auth().catch(() => null);
-  const isLoggedIn = !!(session as { user?: unknown } | null)?.user;
+  const user = (session as { user?: { id?: string } } | null)?.user;
+  const isLoggedIn = !!user;
+  const currentUserId = user?.id ? parseInt(user.id, 10) : undefined;
   const hidden = await getHiddenWidgets();
   return (
     <>
-      {!hidden.has("users_online") && <UsersOnlineLive isLoggedIn={isLoggedIn} />}
+      {!hidden.has("users_online") && <UsersOnlineLive isLoggedIn={isLoggedIn} currentUserId={currentUserId} />}
       {!hidden.has("activity_feed") && <ActivityFeed />}
       {!hidden.has("ced_sessions") && <CedSessions />}
       {!hidden.has("now_playing") && <NowPlaying />}

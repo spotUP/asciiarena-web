@@ -35,7 +35,7 @@ function load(set: (d: OnlineData) => void) {
     .catch(() => {});
 }
 
-export default function UsersOnlineLive({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
+export default function UsersOnlineLive({ isLoggedIn = false, currentUserId }: { isLoggedIn?: boolean; currentUserId?: number }) {
   const [entries, setEntries] = useState<UserEntry[]>([]);
   const [anonCount, setAnonCount] = useState(0);
   const [anonFlash, setAnonFlash] = useState(false);
@@ -143,7 +143,7 @@ export default function UsersOnlineLive({ isLoggedIn = false }: { isLoggedIn?: b
                 [c]
               </span>
             )}
-            {isLoggedIn && entry.id > 0 && (
+            {isLoggedIn && entry.id > 0 && entry.id !== currentUserId && (
               <button
                 onClick={() => openChat(entry.id, entry.nick)}
                 className="lightgrey"
