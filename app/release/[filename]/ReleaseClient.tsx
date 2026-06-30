@@ -23,6 +23,7 @@ import {
 } from "@/lib/logoSections";
 import LogoMinimap, { MINIMAP_WIDTH } from "./LogoMinimap";
 import { parseCollyIndex, sectionForIndexEntry, linkifyCollyIndex } from "@/lib/collyIndex";
+import { sectionsFromLogoMap } from "@/lib/collyTrailer";
 import ColorSwatch from "@/components/ui/ColorSwatch";
 import { useMusic } from "@/components/music/MusicProvider";
 import { BeatDetector, lowBandEnergy } from "@/lib/uade/beatDetector";
@@ -54,6 +55,9 @@ interface Props {
   logoText: string;
   /** Optional Modland full_path the artist set as this colly's soundtrack. */
   soundtrack: string | null;
+  /** Explicit logo map from the colly's tags — when present it drives the logo
+   *  sections (autoplay/index/minimap/jumps) instead of island detection. */
+  logoMap: { line: number; caption: string }[] | null;
   extractedEntry: string | null;
   type: string;
   /** True when the release is PC/CP437 art — rendered via AnsiLove with an IBM
@@ -252,7 +256,7 @@ function ArchiveEntryRenderer({ filename, entry, entryIndex, eager, ansiFont, fg
 export default function ReleaseClient({
   collyId, filename, collyFileUrl, userNick, isAdmin,
   isFavourited, initBgColor, initFgColor, initFont,
-  isArchive, fileContent, logoText, soundtrack, extractedEntry, type, isCp437, collyTitle, siteUrl,
+  isArchive, fileContent, logoText, soundtrack, logoMap, extractedEntry, type, isCp437, collyTitle, siteUrl,
   initialViewCount, initialFavCount, initialDownloadCount,
 }: Props) {
   const [collyVisible, setCollyVisible] = useState(true);
@@ -334,10 +338,21 @@ export default function ReleaseClient({
   // decoded plaintext for canvas (ANSI) collys where fileContent is empty.
   const detectionText = logoText || fileContent;
   const lineCount = useMemo(() => detectionText.split("\n").length, [detectionText]);
-  const sections  = useMemo(() => detectLogoSections(detectionText), [detectionText]);
-  const logoIndex = useMemo(() => buildLogoIndex(detectionText, sections), [detectionText, sections]);
+  // Tagged collys: the artist's explicit logo map drives the sections exactly, so
+  // the art can be arbitrarily wild. Untagged collys (the majority): smart island
+  // detection, unchanged.
+  const sections = useMemo(
+    () => (logoMap && logoMap.length ? sectionsFromLogoMap(logoMap, lineCount) : detectLogoSections(detectionText)),
+    [logoMap, lineCount, detectionText],
+  );
+  const logoIndex = useMemo(
+    () => (logoMap && logoMap.length
+      ? logoMap.slice().sort((a, b) => a.line - b.line).map((m, i) => ({ section: sections[i], label: m.caption }))
+      : buildLogoIndex(detectionText, sections)),
+    [logoMap, detectionText, sections],
+  );
   // The index panel prefers the colly's OWN embedded index (clean author names)
-  // when one exists, falling back to the auto-detected divider labels.
+  // when one exists, falling back to the (map or auto-detected) divider labels.
   const displayIndex = useMemo(() => {
     const parsed = parseCollyIndex(detectionText);
     if (parsed.length) {

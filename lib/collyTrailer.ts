@@ -1,5 +1,6 @@
 import { decodeLatin1Bytes } from "./releaseText";
 import { FONTS } from "./ansilove";
+import type { LogoSection } from "./logoSections";
 
 // Invisible per-colly metadata carried AFTER the Ctrl-Z (0x1A) EOF byte — every
 // renderer stops at 0x1A, so the trailer never shows in the art. Two flavours are
@@ -17,6 +18,9 @@ export interface CollyMeta {
   bg?: string;         // "#rrggbb"
   soundtrack?: string; // Modland full_path
   width?: number;
+  // Explicit logo map: the artist (or the dry-run editor) pins each logo to a
+  // start line + caption, so rendering/jumps skip the island-detection heuristic.
+  logos?: { line: number; caption: string }[];
 }
 
 const SUB = 0x1a; // Ctrl-Z / DOS EOF
@@ -116,6 +120,11 @@ function parseKeyValue(text: string): CollyMeta {
       case "fg": case "foreground": { const c = parseColor(val); if (c) meta.fg = c; break; }
       case "bg": case "background": { const c = parseColor(val); if (c) meta.bg = c; break; }
       case "soundtrack": case "music": case "tune": meta.soundtrack = val; break;
+      case "logo": {
+        const mm = /^(\d+)\s+(.+)$/.exec(val);
+        if (mm) (meta.logos ??= []).push({ line: parseInt(mm[1], 10), caption: mm[2].trim() });
+        break;
+      }
       default: break;
     }
   }
@@ -154,7 +163,24 @@ export function parseCollyBytes(bytes: Uint8Array): { visible: Uint8Array; meta:
   }
 
   // SAUCE wins for the fields it carries; key:value fills the rest (soundtrack,
-  // fg/bg — which SAUCE has no standard slots for).
+  // fg/bg, the logo map — which SAUCE has no standard slots for).
   const meta: CollyMeta = { ...kv, ...(sauce ?? {}) };
+  if (kv.logos) meta.logos = kv.logos;
   return { visible: bytes.subarray(0, end), meta };
+}
+
+/** Build exact logo sections from an artist-provided line map (1-based lines),
+ *  so rendering/autoplay/jumps don't need the island-detection heuristic. Each
+ *  logo spans from its line to just before the next one's. */
+export function sectionsFromLogoMap(
+  logos: { line: number; caption: string }[],
+  totalLines: number,
+): LogoSection[] {
+  const sorted = [...logos].sort((a, b) => a.line - b.line);
+  return sorted.map((lg, i) => {
+    const startLine = Math.max(0, lg.line - 1); // author counts 1-based
+    const nextStart = i + 1 < sorted.length ? Math.max(0, sorted[i + 1].line - 1) : totalLines;
+    const endLine = Math.max(startLine, nextStart - 1);
+    return { startLine, endLine, lineCount: endLine - startLine + 1, inkTop: startLine, inkBottom: endLine };
+  });
 }

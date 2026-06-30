@@ -391,6 +391,7 @@ export default async function ReleasePage({ params }: PageProps) {
         fileContent={fileContent}
         logoText={logoText}
         soundtrack={soundtrack}
+        logoMap={collyMeta.logos ?? null}
         extractedEntry={extractedEntry}
         type={type}
         isCp437={isCp437}

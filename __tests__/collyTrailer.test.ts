@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseCollyBytes, resolveFont } from "@/lib/collyTrailer";
+import { parseCollyBytes, resolveFont, sectionsFromLogoMap } from "@/lib/collyTrailer";
 
 const bytes = (s: string) => new Uint8Array([...s].map((c) => c.charCodeAt(0)));
 const SUB = "\x1a";
@@ -73,6 +73,25 @@ describe("parseCollyBytes — no trailer", () => {
     const { visible, meta } = parseCollyBytes(file);
     expect(new TextDecoder().decode(visible)).toBe("just art\nno trailer\n");
     expect(meta).toEqual({});
+  });
+});
+
+describe("explicit logo map (tagged collys)", () => {
+  it("parses repeated `logo: <line> <caption>` lines into an ordered map", () => {
+    const file = bytes("wild art with chars all over\n" + SUB +
+      "logo: 8 STATiC for NEXUS\nlogo: 22 up rough\nlogo: 36 ROGUELANDS for zeus\n");
+    const { meta } = parseCollyBytes(file);
+    expect(meta.logos).toEqual([
+      { line: 8, caption: "STATiC for NEXUS" },
+      { line: 22, caption: "up rough" },
+      { line: 36, caption: "ROGUELANDS for zeus" },
+    ]);
+  });
+
+  it("builds exact sections from the map (1-based lines, span to the next logo)", () => {
+    const secs = sectionsFromLogoMap([{ line: 8, caption: "a" }, { line: 22, caption: "b" }], 40);
+    expect(secs[0]).toMatchObject({ startLine: 7, endLine: 20, inkTop: 7 });
+    expect(secs[1]).toMatchObject({ startLine: 21, endLine: 39 }); // last spans to totalLines
   });
 });
 
