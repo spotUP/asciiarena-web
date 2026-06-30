@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ANSI_FONT_MAP } from "@/lib/ansilove";
 import AnsiLogo from "@/components/ui/AnsiLogo";
 
@@ -46,32 +46,62 @@ export default function CollyPreview({
 
   const toggle = (n: number) => setLogoMap(mapped.has(n) ? logoMap.filter((l) => l.line !== n) : [...logoMap, { line: n, caption: "" }].sort((a, b) => a.line - b.line));
 
+  // For the canvas preview, measure the rendered art's row height so the clickable
+  // line-number gutter aligns to the canvas rows (one merged view).
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [rowH, setRowH] = useState(16);
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el || !isCanvas) return;
+    const measure = () => {
+      const img = el.querySelector("img");
+      const h = img?.clientHeight ?? 0;
+      if (h > 0 && lines.length) setRowH(h / lines.length);
+    };
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    measure();
+    return () => ro.disconnect();
+  }, [isCanvas, lines.length, visibleB64]);
+
+  // Clickable line-number gutter, sized to `rh` px per row.
+  const gutter = (rh: number) => lines.map((_, i) => {
+    const n = i + 1; const on = mapped.has(n);
+    return (
+      <div key={i} onClick={() => toggle(n)} title="mark/unmark a logo at this line"
+        style={{ height: `${rh}px`, lineHeight: `${rh}px`, textAlign: "right", paddingRight: "6px", cursor: "pointer", fontFamily: "monospace", fontSize: "11px", color: on ? "#ff55ff" : "#888", background: on ? "rgba(255,85,255,0.18)" : "rgba(0,0,0,0.45)", userSelect: "none" }}>{n}</div>
+    );
+  });
+
   return (
     <div className="row amt-1">
       <div className="col-lg-7 amb-1">
-        {isCanvas && visibleB64 && (
-          <>
-            <div className="header bg-header ap-1">RENDERED ({type})</div>
-            <div style={{ background: type === "CP437" ? (bg || "#000") : "#000", overflow: "auto", maxHeight: "60vh", marginBottom: "8px" }}>
-              <AnsiLogo ansiB64={visibleB64} font={ANSI_FONT_MAP[font] ?? null} maxHeight={100000} />
+        <div className="header bg-header ap-1">PREVIEW{isCanvas ? ` (${type})` : ""} &mdash; click a line number to mark a logo</div>
+        {isCanvas && visibleB64 ? (
+          <div style={{ background: type === "CP437" ? (bg || "#000") : "#000", overflow: "auto", maxHeight: "70vh" }}>
+            <div ref={stageRef} style={{ position: "relative", display: "inline-block", minWidth: "100%" }}>
+              <div style={{ paddingLeft: "40px" }}>
+                <AnsiLogo ansiB64={visibleB64} font={ANSI_FONT_MAP[font] ?? null} maxHeight={100000} />
+              </div>
+              <div style={{ position: "absolute", top: 0, left: 0, width: "40px" }}>{gutter(rowH)}</div>
             </div>
-          </>
+          </div>
+        ) : (
+          <div style={{ background: bg || "#111111", overflow: "auto", maxHeight: "70vh", padding: "8px 0" }}>
+            <pre style={{ margin: 0, fontFamily: `${font || "TopazPlus_a1200"}, monospace`, fontSize: "16px", lineHeight: "16px", color: fg || "#ff55ff", whiteSpace: "pre" }}>
+              {lines.map((ln, i) => {
+                const n = i + 1; const on = mapped.has(n);
+                return (
+                  <div key={i} style={{ display: "flex" }}>
+                    <span onClick={() => toggle(n)} title="mark/unmark a logo at this line"
+                      style={{ width: "48px", flexShrink: 0, textAlign: "right", paddingRight: "8px", cursor: "pointer", color: on ? "#ff55ff" : "#555", background: on ? "#332033" : "transparent", userSelect: "none" }}>{n}</span>
+                    <span>{ln || " "}</span>
+                  </div>
+                );
+              })}
+            </pre>
+          </div>
         )}
-        <div className="header bg-header ap-1">{isCanvas ? "MAP LOGOS" : "PREVIEW"} &mdash; click a line number to mark a logo</div>
-        <div style={{ background: isCanvas ? "#111111" : (bg || "#111111"), overflow: "auto", maxHeight: "70vh", padding: "8px 0" }}>
-          <pre style={{ margin: 0, fontFamily: `${font || "TopazPlus_a1200"}, monospace`, fontSize: "16px", lineHeight: "16px", color: fg || "#ff55ff", whiteSpace: "pre" }}>
-            {lines.map((ln, i) => {
-              const n = i + 1; const on = mapped.has(n);
-              return (
-                <div key={i} style={{ display: "flex" }}>
-                  <span onClick={() => toggle(n)} title="mark/unmark a logo at this line"
-                    style={{ width: "48px", flexShrink: 0, textAlign: "right", paddingRight: "8px", cursor: "pointer", color: on ? "#ff55ff" : "#555", background: on ? "#332033" : "transparent", userSelect: "none" }}>{n}</span>
-                  <span>{ln || " "}</span>
-                </div>
-              );
-            })}
-          </pre>
-        </div>
       </div>
 
       <div className="col-lg-5">
