@@ -202,11 +202,10 @@ export default function CollyPreview({
             </div>
           ))}
         </div>
-        <div className="header bg-header ap-1">HOW IT WORKS</div>
+        <div className="header bg-header ap-1">INSTRUCTIONS</div>
         <div className="bg-secondary ap-1" style={{ fontSize: "13px" }}>
-          <p className="lightgrey">No rules &mdash; draw your colly however you like.</p>
-          <p className="lightgrey"><span className="cyan">Auto</span>: we find logos, <span className="white">for</span>-dedications and <span className="white">o1&gt;</span> indexes by ourselves.</p>
-          <p className="lightgrey"><span className="cyan">Or drag</span> over a logo to map it exactly, then fill in name / author / who it&apos;s for.</p>
+          <p className="lightgrey">aSCIIaRENA maps logos automatically at best effort.</p>
+          <p className="lightgrey">Override it by selecting a logo and filling the form.</p>
         </div>
       </div>
     </div>
