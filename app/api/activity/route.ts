@@ -3,6 +3,7 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { broadcastActivityIfAllowed } from "@/lib/activity";
+import { broadcast } from "@/lib/live";
 
 export const dynamic = "force-dynamic";
 
@@ -14,23 +15,24 @@ const schema = z.object({
 
 export async function POST(request: NextRequest) {
   const session = await auth();
-  if (!session?.user?.id || !session.user.name) return apiError("Unauthorized", 401);
 
   const body = await request.json().catch(() => ({}));
   const parsed = schema.safeParse(body);
   if (!parsed.success) return apiError("Invalid request", 400);
 
   const { type, target, targetUrl } = parsed.data;
-  const nick = session.user.name;
-  const userId = parseInt(session.user.id);
+  const timestamp = Math.floor(Date.now() / 1000);
 
-  await broadcastActivityIfAllowed(userId, type, {
-    type,
-    nick,
-    target,
-    targetUrl,
-    timestamp: Math.floor(Date.now() / 1000),
-  });
+  if (session?.user?.id && session.user.name) {
+    // Logged in: respects the user's per-type opt-out.
+    await broadcastActivityIfAllowed(parseInt(session.user.id), type, {
+      type, nick: session.user.name, target, targetUrl, timestamp,
+    });
+  } else {
+    // Anonymous: only views, broadcast as "anon" (no prefs to consult).
+    if (type !== "view") return apiError("Unauthorized", 401);
+    broadcast("site:activity", { type: "view", nick: "anon", target, targetUrl, timestamp });
+  }
 
   return apiOk({ ok: true });
 }

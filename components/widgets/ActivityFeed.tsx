@@ -74,9 +74,13 @@ export default function ActivityFeed() {
             className="col-lg-12 p-0 pl-lg-2 pr-lg-2"
             style={{ fontSize: "0.85em", paddingBottom: "3px" }}
           >
-            <a href={`/member/${entry.nick}`} className="yellow" style={{ marginRight: "4px" }}>
-              {entry.nick}
-            </a>
+            {entry.nick === "anon" ? (
+              <span className="lightgrey" style={{ marginRight: "4px" }}>anon</span>
+            ) : (
+              <a href={`/member/${entry.nick}`} className="yellow" style={{ marginRight: "4px" }}>
+                {entry.nick}
+              </a>
+            )}
             <span className="lightgrey" style={{ marginRight: "4px" }}>
               {actionLabel(entry.type)}
             </span>

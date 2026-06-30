@@ -517,9 +517,9 @@ export default function ReleaseClient({
     return () => document.removeEventListener("mousedown", h);
   }, [fontOpen]);
 
-  // Broadcast view activity for logged-in users
+  // Broadcast view activity — for everyone; anonymous viewers show as "anon".
   useEffect(() => {
-    if (!userNick || !collyVisible) return;
+    if (!collyVisible) return;
     fetch("/api/activity", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
