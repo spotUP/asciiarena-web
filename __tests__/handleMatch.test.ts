@@ -68,6 +68,7 @@ describe("isLikelyLogoLabel", () => {
       "nOnEEDtOcRY - tHE7tHcOLLECTiONbYpasz",
       "Dennacoolygjordesenregnigsaturdaynig",
       "ViEWthiSPROdUCtiONONAMiGA",
+      "All work by TANGo except the following gifts", // credits prose
     ]) {
       expect(isLikelyLogoLabel(no)).toBe(false);
     }

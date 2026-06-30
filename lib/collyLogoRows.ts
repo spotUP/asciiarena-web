@@ -1,5 +1,5 @@
 import { detectLogoSections, buildLogoIndex } from "@/lib/logoSections";
-import { normalizeHandle, resolveEntities, isLikelyLogoLabel, type EntityDicts } from "@/lib/handleMatch";
+import { normalizeHandle, resolveEntities, isLikelyLogoLabel, subjectPart, type EntityDicts } from "@/lib/handleMatch";
 
 // Pure (no DB) so it's unit-testable. Kept separate from collyLogoIndex.ts,
 // which imports the Prisma client.
@@ -26,11 +26,11 @@ export function buildLogoRows(collyId: number, text: string, dicts: EntityDicts)
     const raw = (entry.label || "").trim();
     if (!raw || /^Logo \d+$/.test(raw)) return; // uncaptioned / generic fallback
     const label = raw.slice(0, 120);
+    // The label's SUBJECT (before any "for"/"4" recipient) must look like a real
+    // handle — even when it resolves. This drops credits/gifts tables and prose
+    // that merely mention a handle ("All work by TANGo except the following...").
+    if (!isLikelyLogoLabel(subjectPart(label))) return;
     const res = resolveEntities(label, dicts);
-    const resolved = res.artist_id || res.crew_id || res.user_id;
-    // Keep every resolved logo; for the rest, keep only plausible handle labels
-    // (drops scrolltext prose, art fragments, section words, 2-char noise).
-    if (!resolved && !isLikelyLogoLabel(label)) return;
     rows.push({
       colly_id: collyId,
       position,
