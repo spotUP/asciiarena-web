@@ -10,6 +10,7 @@ export interface PreviewReport {
   lineCount: number;
   tagged: boolean;
   text: string;
+  artB64: string | null;
   meta: { title?: string; author?: string; crew?: string; font?: string; fg?: string; bg?: string; soundtrack?: string; logos?: { line: number; end?: number; caption: string }[] };
   logos: { line: number; end: number; name: string; resolved: string | null; searchable: boolean }[];
   index: { num: number; name: string }[];
@@ -36,9 +37,8 @@ function decompose(caption: string): { name: string; by: string; for: string } {
 }
 
 export default function CollyPreview({
-  fileBytes, report, type, font, fg, bg, logoMap, setLogoMap, defaultAuthor = "",
+  report, type, font, fg, bg, logoMap, setLogoMap, defaultAuthor = "",
 }: {
-  fileBytes: Uint8Array | null;
   report: PreviewReport;
   type: string;
   font: string;
@@ -52,13 +52,12 @@ export default function CollyPreview({
   // eslint-disable-next-line no-control-regex
   const lines = useMemo(() => report.text.replace(/\x1b\[[0-9;?]*[ -/]*[@-~]/g, "").split("\n"), [report.text]);
 
-  const visibleB64 = useMemo(() => {
-    if (!fileBytes || !isCanvas) return null;
-    const sub = fileBytes.indexOf(0x1a);
-    const v = sub === -1 ? fileBytes : fileBytes.subarray(0, sub);
-    let s = ""; for (let i = 0; i < v.length; i++) s += String.fromCharCode(v[i]);
-    return btoa(s);
-  }, [fileBytes, isCanvas]);
+  // Diz-stripped art bytes from the API, so the canvas height matches the text the
+  // detector measured (otherwise the logo bands drift down past the diz).
+  const visibleB64 = isCanvas ? report.artB64 : null;
+  // Render at the art's own width so AnsiLove's default-160 wrap doesn't add rows
+  // (which would misalign the line overlay).
+  const artCols = useMemo(() => lines.reduce((m, l) => Math.max(m, l.length), 0), [lines]);
 
   // Canvas row height (measured) so the gutter + selection align to art rows.
   const stageRef = useRef<HTMLDivElement>(null);
@@ -146,7 +145,7 @@ export default function CollyPreview({
         <div style={{ position: "relative", background: isCanvas && type !== "CP437" ? "#000" : (bg || "#111111"), overflow: "auto", maxHeight: "70vh" }}>
           {isCanvas && visibleB64 ? (
             <div ref={stageRef} style={{ position: "relative", display: "inline-block", minWidth: "100%" }}>
-              <AnsiLogo ansiB64={visibleB64} font={ANSI_FONT_MAP[font] ?? null} maxHeight={100000} />
+              <AnsiLogo ansiB64={visibleB64} font={ANSI_FONT_MAP[font] ?? null} maxHeight={100000} columns={artCols || undefined} />
               <div style={{ position: "absolute", top: 0, left: 0, right: 0 }}>
                 {lines.map((_, i) => (
                   <div key={i} className="colly-line" onMouseDown={down(i + 1)} onMouseEnter={enter(i + 1)}

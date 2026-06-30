@@ -7,10 +7,23 @@ import { buildLogoRows, buildLogoRowsFromMap } from "@/lib/collyLogoRows";
 import { parseCollyIndex } from "@/lib/collyIndex";
 import { loadEntityDicts } from "@/lib/collyLogoIndex";
 import { cleanLabel, type EntityDicts } from "@/lib/handleMatch";
-import { decodeReleaseText, stripFileIdDiz, releaseTextEncoding } from "@/lib/releaseText";
+import { decodeReleaseText, decodeLatin1Bytes, stripFileIdDiz, releaseTextEncoding, BEGIN_FILE_ID_DIZ, END_FILE_ID_DIZ } from "@/lib/releaseText";
 import { detectCollyType } from "@/lib/collyType";
 
 export const dynamic = "force-dynamic";
+
+// Remove the embedded file_id.diz block at the BYTE level, so the canvas the
+// editor renders matches the diz-stripped text the detector measures (otherwise
+// the diz's extra rows make the canvas taller and the logo bands drift down).
+function stripDizBytes(bytes: Uint8Array): Uint8Array {
+  const s = decodeLatin1Bytes(bytes); // 1:1 byte<->char
+  const b = s.indexOf(BEGIN_FILE_ID_DIZ); const e = s.indexOf(END_FILE_ID_DIZ);
+  if (b === -1 || e === -1 || e <= b) return bytes;
+  let end = e + END_FILE_ID_DIZ.length;
+  if (s[end] === "\r") end++; if (s[end] === "\n") end++;
+  const out = s.slice(0, b) + s.slice(end);
+  return new Uint8Array([...out].map((c) => c.charCodeAt(0) & 0xff));
+}
 
 // Dry-run: parse an uploaded colly EXACTLY as the site would, and report what we
 // read — detected/mapped logos, index, trailer settings, and warnings — without
@@ -67,10 +80,13 @@ export async function POST(request: NextRequest) {
   if (sections.length > 1 && index.length === 0 && !tagged) warnings.push("No clickable index detected");
   if (meta.soundtrack && !/^[^/]+\/[^/]+\/.+/.test(meta.soundtrack)) warnings.push("Soundtrack path looks wrong");
 
+  // Canvas art = the diz-stripped visible bytes, so it lines up with `text`.
+  const artB64 = type === "ANSI" || type === "CP437" ? Buffer.from(stripDizBytes(visible)).toString("base64") : null;
+
   const report: {
-    type: string; encoding: string; lineCount: number; tagged: boolean; text: string;
+    type: string; encoding: string; lineCount: number; tagged: boolean; text: string; artB64: string | null;
     meta: CollyMeta; logos: typeof logos; index: typeof index; warnings: string[];
-  } = { type, encoding, lineCount, tagged, text, meta, logos, index, warnings };
+  } = { type, encoding, lineCount, tagged, text, artB64, meta, logos, index, warnings };
 
   return apiOk(report);
 }

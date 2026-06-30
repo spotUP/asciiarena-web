@@ -28,6 +28,9 @@ export interface AnsiLogoProps {
   maxHeight?: number;
   /** Knock the black background out to transparent so it blends over the page. */
   transparentBg?: boolean;
+  /** Render width in columns. Set to the art's max line width to avoid AnsiLove's
+   *  default-160 wrap (which would add rows and misalign line overlays). */
+  columns?: number;
 }
 
 // AnsiLove draws an opaque black background. Make near-black pixels transparent
@@ -43,8 +46,8 @@ function knockOutBlack(canvas: HTMLCanvasElement): void {
   ctx.putImageData(img, 0, 0);
 }
 
-export default function AnsiLogo({ ansiB64, font, maxHeight = 220, transparentBg = false }: AnsiLogoProps) {
-  const cacheKey = `${transparentBg ? "t" : "o"}:${ansiB64}`;
+export default function AnsiLogo({ ansiB64, font, maxHeight = 220, transparentBg = false, columns }: AnsiLogoProps) {
+  const cacheKey = `${transparentBg ? "t" : "o"}:${columns ?? ""}:${ansiB64}`;
   const [src, setSrc] = useState<string | null>(() => ansiCache.get(cacheKey) ?? null);
 
   useEffect(() => {
@@ -67,7 +70,7 @@ export default function AnsiLogo({ ansiB64, font, maxHeight = 220, transparentBg
               setSrc(url);
             } catch { /* tainted/oversized canvas — skip */ }
           },
-          { font: font ?? "topaz", bits: "8", icecolors: 1, filetype: "ans" },
+          { font: font ?? "topaz", bits: "8", icecolors: 1, filetype: "ans", ...(columns && columns > 0 ? { columns } : {}) },
           () => { /* render failure — leave slot empty */ },
         );
       })

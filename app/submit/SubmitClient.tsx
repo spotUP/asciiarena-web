@@ -109,13 +109,11 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
   const [collySoundtrack, setCollySoundtrack] = useState("");
   const [collyLogoMap, setCollyLogoMap] = useState<LogoEntry[]>([]);
   const [collyReport, setCollyReport] = useState<PreviewReport | null>(null);
-  const [collyBytes, setCollyBytes] = useState<Uint8Array | null>(null);
 
   // Analyze a picked colly: detect type + run the dry-run preview so the upload
   // form always shows an editable preview/report before submitting.
   const analyzeColly = async (f: File) => {
     const buf = new Uint8Array(await f.arrayBuffer());
-    setCollyBytes(buf);
     setCollyType(detectCollyType(buf, f.name));
     const fd = new FormData();
     fd.append("file", f);
@@ -302,7 +300,7 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
       setCollyName(""); setCollyYear(""); setCollyMonth(""); setCollyDay("");
       setCollyArtists([""]); setCollyCrews([""]);
       setCollyFont(""); setCollyFg(""); setCollyBg(""); setCollySoundtrack(""); setCollyType("ASCII");
-      setCollyLogoMap([]); setCollyReport(null); setCollyBytes(null);
+      setCollyLogoMap([]); setCollyReport(null);
       if (collyFileRef.current) collyFileRef.current.value = "";
     } else {
       const body = (await r.json().catch(() => ({}))) as { error?: string };
@@ -675,7 +673,6 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
             </Field>
             {collyReport && (
               <CollyPreview
-                fileBytes={collyBytes}
                 report={collyReport}
                 type={collyType}
                 font={collyFont}
