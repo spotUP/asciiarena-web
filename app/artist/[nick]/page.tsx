@@ -12,7 +12,9 @@ import { normalizeOrder } from "@/lib/sort-headers";
 import { type ReleaseSortKey } from "@/lib/release-sort";
 import ArtistReleases from "./ArtistReleases";
 import EntityLogosSection from "@/components/release/EntityLogosSection";
+import SceneLinksSection from "@/components/release/SceneLinksSection";
 import { logosForEntity } from "@/lib/collyLogoSearch";
+import { artistsWith } from "@/lib/sceneGraph";
 
 // Recognised sort keys for the "All Releases" table — shared (as clean keys)
 // with the client component and the JS comparator in lib/release-sort.
@@ -344,6 +346,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
         initialOrder={sortOrder}
       />
       <EntityLogosSection hits={await logosForEntity("artist", artist.id)} title={`Collys with a ${artist.nick} logo`} />
+      <SceneLinksSection links={await artistsWith(artist.id)} title={`${artist.nick} appears with`} color="green" />
     </SiteLayout>
   );
 }

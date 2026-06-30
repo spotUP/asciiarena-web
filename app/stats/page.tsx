@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { urlsafe, formatBytes } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { mostDrawnArtists, mostDrawnCrews } from "@/lib/collyLogoStats";
+import { topCollaborations } from "@/lib/sceneGraph";
 
 const COUNTS = [5, 10, 20, 50] as const;
 type Count = (typeof COUNTS)[number];
@@ -125,7 +126,7 @@ export default async function StatsPage({
   const { count: countParam } = await searchParams;
   const count: Count = (COUNTS.includes(Number(countParam) as Count) ? Number(countParam) : 10) as Count;
 
-  const [arena, artists, crews, collys, viewed, downloaded, uploaders, commenters, drawnArtists, drawnCrews] = await Promise.all([
+  const [arena, artists, crews, collys, viewed, downloaded, uploaders, commenters, drawnArtists, drawnCrews, collabs] = await Promise.all([
     getArenaStats(),
     getTopArtists(count),
     getTopCrews(count),
@@ -136,6 +137,7 @@ export default async function StatsPage({
     getTopCommenters(count),
     mostDrawnArtists(count),
     mostDrawnCrews(count),
+    topCollaborations(count),
   ]);
 
   return (
@@ -212,6 +214,24 @@ export default async function StatsPage({
             </Section>
           </div>
         </div>
+      )}
+
+      {collabs.length > 0 && (
+        <Section title="TOP COLLABORATIONS">
+          {collabs.map((p) => (
+            <Row
+              key={`${p.a.id}-${p.b.id}`}
+              left={
+                <span className="text-truncate">
+                  <Link className="green" href={p.a.url}>{p.a.name}</Link>
+                  <span className="lightgrey"> + </span>
+                  <Link className="green" href={p.b.url}>{p.b.name}</Link>
+                </span>
+              }
+              right={`${p.shared} collys`}
+            />
+          ))}
+        </Section>
       )}
 
       <div className="row m-0 p-0">

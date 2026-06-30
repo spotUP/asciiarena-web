@@ -7,7 +7,9 @@ import { urlsafe, decodeParam } from "@/lib/utils";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
 import WatchingPip from "@/components/widgets/WatchingPip";
 import EntityLogosSection from "@/components/release/EntityLogosSection";
+import SceneLinksSection from "@/components/release/SceneLinksSection";
 import { logosForEntity } from "@/lib/collyLogoSearch";
+import { crewsWith } from "@/lib/sceneGraph";
 
 interface PageProps {
   params: Promise<{ name: string }>;
@@ -221,6 +223,7 @@ export default async function CrewPage({ params }: PageProps) {
       )}
 
       <EntityLogosSection hits={await logosForEntity("crew", crew.id)} title={`Collys with a ${crew.name} logo`} />
+      <SceneLinksSection links={await crewsWith(crew.id)} title={`${crew.name} appears with`} color="magenta" />
     </SiteLayout>
   );
 }
