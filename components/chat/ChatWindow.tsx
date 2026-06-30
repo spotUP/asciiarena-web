@@ -43,6 +43,7 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [systemLines, setSystemLines] = useState<{ id: number; text: string }[]>([]);
   const [input, setInput] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
   const [peerDraft, setPeerDraft] = useState<{ nick: string; text: string } | null>(null);
   const [sending, setSending] = useState(false);
   const [flashing, setFlashing] = useState(false);
@@ -391,6 +392,9 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
       const data = await res.json() as { ok?: boolean; threadId?: number };
       if (data?.ok) {
         setInput("");
+        // The block caret (caret-shape: block) doesn't always snap back to the
+        // start when a controlled input is cleared — reset it explicitly.
+        requestAnimationFrame(() => { const el = inputRef.current; if (el) { el.focus(); el.setSelectionRange(0, 0); } });
         const newThreadId = data.threadId;
         if ((!tid || tid <= 0) && newThreadId) {
           setThreadId(windowKey, newThreadId);
@@ -680,6 +684,7 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
       {/* Input */}
       <div style={{ display: "flex", borderTop: "1px solid #333" }}>
         <input
+          ref={inputRef}
           type="text"
           value={input}
           onChange={e => { setInput(e.target.value); broadcastTyping(e.target.value); }}
