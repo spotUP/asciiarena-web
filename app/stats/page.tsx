@@ -3,6 +3,7 @@ import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { urlsafe, formatBytes } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
+import { mostDrawnArtists, mostDrawnCrews } from "@/lib/collyLogoStats";
 
 const COUNTS = [5, 10, 20, 50] as const;
 type Count = (typeof COUNTS)[number];
@@ -124,7 +125,7 @@ export default async function StatsPage({
   const { count: countParam } = await searchParams;
   const count: Count = (COUNTS.includes(Number(countParam) as Count) ? Number(countParam) : 10) as Count;
 
-  const [arena, artists, crews, collys, viewed, downloaded, uploaders, commenters] = await Promise.all([
+  const [arena, artists, crews, collys, viewed, downloaded, uploaders, commenters, drawnArtists, drawnCrews] = await Promise.all([
     getArenaStats(),
     getTopArtists(count),
     getTopCrews(count),
@@ -133,6 +134,8 @@ export default async function StatsPage({
     getMostDownloaded(count),
     getTopUploaders(count),
     getTopCommenters(count),
+    mostDrawnArtists(count),
+    mostDrawnCrews(count),
   ]);
 
   return (
@@ -183,6 +186,33 @@ export default async function StatsPage({
           </Section>
         </div>
       </div>
+
+      {(drawnArtists.length > 0 || drawnCrews.length > 0) && (
+        <div className="row m-0 p-0">
+          <div className="col-12 col-lg-6 pl-0 pr-lg-2">
+            <Section title={`MOST DRAWN ARTISTS`}>
+              {drawnArtists.map(row => (
+                <Row
+                  key={row.id}
+                  left={<Link className="green text-truncate" href={`/artist/${row.url}`}>{row.name}</Link>}
+                  right={`${row.logos} logos / ${row.collys} collys`}
+                />
+              ))}
+            </Section>
+          </div>
+          <div className="col-12 col-lg-6 pl-0 pr-lg-2">
+            <Section title={`MOST DRAWN CREWS`}>
+              {drawnCrews.map(row => (
+                <Row
+                  key={row.id}
+                  left={<Link className="text-truncate" href={`/crew/${urlsafe(row.name)}`}>{row.name}</Link>}
+                  right={`${row.logos} logos / ${row.collys} collys`}
+                />
+              ))}
+            </Section>
+          </div>
+        </div>
+      )}
 
       <div className="row m-0 p-0">
         <div className="col-12 col-lg-6 pl-0 pr-lg-2">
