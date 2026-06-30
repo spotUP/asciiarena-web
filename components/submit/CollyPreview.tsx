@@ -64,12 +64,17 @@ export default function CollyPreview({
     return () => ro.disconnect();
   }, [isCanvas, lines.length, visibleB64]);
 
-  // Clickable line-number gutter, sized to `rh` px per row.
+  // Full-width clickable rows over the canvas — hover/click anywhere on a line to
+  // map it. The number sits in a left cell; the rest is transparent so the art
+  // shows through.
   const gutter = (rh: number) => lines.map((_, i) => {
     const n = i + 1; const on = mapped.has(n);
     return (
-      <div key={i} onClick={() => toggle(n)} title="mark/unmark a logo at this line"
-        style={{ height: `${rh}px`, lineHeight: `${rh}px`, textAlign: "right", paddingRight: "6px", cursor: "pointer", fontFamily: "monospace", fontSize: "11px", color: on ? "#ff55ff" : "#888", background: on ? "rgba(255,85,255,0.18)" : "rgba(0,0,0,0.45)", userSelect: "none" }}>{n}</div>
+      <div key={i} className="colly-line" onClick={() => toggle(n)} title="mark/unmark a logo at this line"
+        style={{ height: `${rh}px`, display: "flex", background: on ? "rgba(255,85,255,0.18)" : undefined, userSelect: "none" }}>
+        <span style={{ width: "40px", flexShrink: 0, textAlign: "right", paddingRight: "6px", lineHeight: `${rh}px`, fontFamily: "monospace", fontSize: "11px", color: on ? "#ff55ff" : "#888", background: "rgba(0,0,0,0.45)" }}>{n}</span>
+        <span style={{ flex: 1 }} />
+      </div>
     );
   });
 
@@ -83,7 +88,7 @@ export default function CollyPreview({
               <div style={{ paddingLeft: "40px" }}>
                 <AnsiLogo ansiB64={visibleB64} font={ANSI_FONT_MAP[font] ?? null} maxHeight={100000} />
               </div>
-              <div style={{ position: "absolute", top: 0, left: 0, width: "40px" }}>{gutter(rowH)}</div>
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0 }}>{gutter(rowH)}</div>
             </div>
           </div>
         ) : (
@@ -92,9 +97,9 @@ export default function CollyPreview({
               {lines.map((ln, i) => {
                 const n = i + 1; const on = mapped.has(n);
                 return (
-                  <div key={i} style={{ display: "flex" }}>
-                    <span onClick={() => toggle(n)} title="mark/unmark a logo at this line"
-                      style={{ width: "48px", flexShrink: 0, textAlign: "right", paddingRight: "8px", cursor: "pointer", color: on ? "#ff55ff" : "#555", background: on ? "#332033" : "transparent", userSelect: "none" }}>{n}</span>
+                  <div key={i} className="colly-line" onClick={() => toggle(n)} title="mark/unmark a logo at this line"
+                    style={{ display: "flex", background: on ? "rgba(255,85,255,0.18)" : undefined }}>
+                    <span style={{ width: "48px", flexShrink: 0, textAlign: "right", paddingRight: "8px", color: on ? "#ff55ff" : "#555", userSelect: "none" }}>{n}</span>
                     <span>{ln || " "}</span>
                   </div>
                 );
