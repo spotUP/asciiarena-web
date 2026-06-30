@@ -640,18 +640,36 @@ export default function ReleaseClient({
     });
   }, [sections.length]);
 
-  const scrollToSection = useCallback((section: LogoSection) => {
+  // Scroll/centre metrics that work for BOTH the text <pre> and the AnsiLove
+  // canvas (ANSI/CP437). The canvas renders rows at a fixed height, so a logo's
+  // line number maps to an exact pixel position — detect a canvas in the
+  // container and use its per-row height; otherwise use the <pre>'s line height.
+  const getScrollMetrics = useCallback(() => {
+    const scrollEl = collyDivRef.current;
+    if (!scrollEl) return null;
+    const viewH = scrollEl.clientHeight;
+    const maxScroll = scrollEl.scrollHeight - viewH;
+    const elTop = scrollEl.getBoundingClientRect().top;
+    const canvas = scrollEl.querySelector("canvas");
+    if (canvas && canvas.clientHeight) {
+      const total = Math.max(1, fileContent.split("\n").length);
+      const lineHeight = canvas.clientHeight / total;
+      const originTop = canvas.getBoundingClientRect().top - elTop + scrollEl.scrollTop;
+      return { scrollEl, viewH, maxScroll, lineHeight, spacers: 0, originTop };
+    }
     const pre = collyRef.current as HTMLElement | null;
-    const container = collyDivRef.current;
-    if (!pre || !container) return;
+    if (!pre) return null;
     const lineHeight = parseFloat(getComputedStyle(pre).lineHeight) || 16;
-    const SPACERS    = 4;
-    const preRect = pre.getBoundingClientRect();
-    const viewH  = container.clientHeight;
-    const originTop = preRect.top - container.getBoundingClientRect().top + container.scrollTop;
-    const target = computeScrollTarget(section, { spacers: SPACERS, lineHeight, viewH, originTop, maxScroll: container.scrollHeight - viewH });
-    animateScroll(container, target, 500);
-  }, []);
+    const originTop = pre.getBoundingClientRect().top - elTop + scrollEl.scrollTop;
+    return { scrollEl, viewH, maxScroll, lineHeight, spacers: 4, originTop };
+  }, [fileContent]);
+
+  const scrollToSection = useCallback((section: LogoSection) => {
+    const m = getScrollMetrics();
+    if (!m) return;
+    const target = computeScrollTarget(section, { spacers: m.spacers, lineHeight: m.lineHeight, viewH: m.viewH, originTop: m.originTop, maxScroll: m.maxScroll });
+    animateScroll(m.scrollEl, target, 500);
+  }, [getScrollMetrics]);
 
   // Click on an embedded index entry (linkifyCollyIndex wrapped it) -> scroll to
   // that logo.
@@ -708,7 +726,7 @@ export default function ReleaseClient({
 
   // Keyboard shortcuts
   useEffect(() => {
-    if (!collyVisible || type !== "ASCII") return;
+    if (!collyVisible || !(type === "ASCII" || type === "ANSI")) return; // text + canvas viewers
     const handler = (e: KeyboardEvent) => {
       // Don't fire shortcuts when typing in form fields
       const tag = (e.target as HTMLElement)?.tagName;
@@ -739,21 +757,10 @@ export default function ReleaseClient({
     if (!sections.length) { stopAutoplay(); return; }
 
     const logoSection = sections[Math.min(autoplayIndex, sections.length - 1)];
-    const pre         = collyRef.current as HTMLElement | null;
-    if (!pre) return;
-
-    const lineHeight = parseFloat(getComputedStyle(pre).lineHeight) || 16;
-    const SPACERS    = 4;
-
-    // #colly-div is the scroller in both modes (fixed viewport stage in fullscreen).
-    const scrollEl = collyDivRef.current;
-    if (!scrollEl) return;
-    const preRect = pre.getBoundingClientRect();
-    const viewH = scrollEl.clientHeight;
-    const maxScroll = scrollEl.scrollHeight - viewH;
-    const originTop = preRect.top - scrollEl.getBoundingClientRect().top + scrollEl.scrollTop;
-
-    const target   = computeScrollTarget(logoSection, { spacers: SPACERS, lineHeight, viewH, originTop, maxScroll });
+    const m = getScrollMetrics();
+    if (!m) return;
+    const { scrollEl, viewH, maxScroll } = m;
+    const target   = computeScrollTarget(logoSection, { spacers: m.spacers, lineHeight: m.lineHeight, viewH, originTop: m.originTop, maxScroll });
     const hold     = Math.min(4000 + Math.max(0, logoSection.lineCount - 20) * 15, 8000);
     const scrollMs = 700;
 
@@ -781,7 +788,7 @@ export default function ReleaseClient({
       if (autoScrollClearRef.current) { clearTimeout(autoScrollClearRef.current); autoScrollClearRef.current = null; }
       isAutoScrolling.current = false;
     };
-  }, [autoplay, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen, musicGroove, advanceAutoplay]);
+  }, [autoplay, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen, musicGroove, advanceAutoplay, getScrollMetrics]);
 
   // Groove autoplay: centre each logo (scroll-to-logo, like normal autoplay),
   // but ride the music while it's held — the view eases in to the logo, bounces
@@ -794,18 +801,13 @@ export default function ReleaseClient({
     const pre = collyRef.current as HTMLElement | null;
     if (!analyser || !pre) return;
 
-    const lineHeight = parseFloat(getComputedStyle(pre).lineHeight) || 16;
-    const SPACERS = 4;
     // #colly-div is the scroller AND the filter stage (viewport-sized, so the
-    // warp/glow filters actually render — they're dropped on the huge <pre>).
-    const stage = collyDivRef.current;
-    if (!stage) return;
-    const scrollEl = stage;
-    const preRect = pre.getBoundingClientRect();
-    const viewH = stage.clientHeight;
-    const maxScroll = stage.scrollHeight - viewH;
-    const originTop = preRect.top - stage.getBoundingClientRect().top + stage.scrollTop;
-    const target = computeScrollTarget(sections[Math.min(autoplayIndex, sections.length - 1)], { spacers: SPACERS, lineHeight, viewH, originTop, maxScroll });
+    // warp/glow filters actually render). Metrics handle both <pre> and canvas.
+    const m = getScrollMetrics();
+    if (!m) return;
+    const { scrollEl, viewH, maxScroll } = m;
+    const stage = scrollEl;
+    const target = computeScrollTarget(sections[Math.min(autoplayIndex, sections.length - 1)], { spacers: m.spacers, lineHeight: m.lineHeight, viewH, originTop: m.originTop, maxScroll });
 
     const prevBehavior = scrollEl.style.scrollBehavior;
     scrollEl.style.scrollBehavior = "auto"; // per-frame writes must be instant
@@ -916,7 +918,7 @@ export default function ReleaseClient({
       warpDispRef.current?.setAttribute("scale", "0");
       isAutoScrolling.current = false;
     };
-  }, [autoplay, musicGroove, musicIsPlaying, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen, getMusicAnalyser, advanceAutoplay, fgColor]);
+  }, [autoplay, musicGroove, musicIsPlaying, autoplayIndex, collyVisible, sections, stopAutoplay, isFullscreen, getMusicAnalyser, advanceAutoplay, fgColor, getScrollMetrics]);
 
   // Stop autoplay if the user scrolls the colly themselves. #colly-div is the
   // scroller in both modes now.
@@ -1058,6 +1060,37 @@ export default function ReleaseClient({
   // Both ANSI and CP437 art render on the AnsiLove <canvas> path.
   const useCanvasViewer = type === "ANSI" || isCp437Art;
 
+  // Jump-to-logo index panel — shared by the text and canvas viewers.
+  const indexPanel = indexOpen && displayIndex.length > 0 ? (
+    <div style={{
+      position: "sticky", top: 0, alignSelf: "flex-start",
+      zIndex: 100, overflowY: "auto", maxHeight: "100vh",
+      background: "rgba(17,17,17,0.93)", minWidth: "200px",
+      borderRight: "1px solid #333", padding: "8px 0", flexShrink: 0,
+    }}>
+      {displayIndex.map((entry, n) => {
+        const current = autoplay && sections[autoplayIndex] === entry.section;
+        return (
+          <div
+            key={n}
+            onClick={() => { scrollToSection(entry.section); setIndexOpen(false); }}
+            style={{
+              padding: "4px 12px", cursor: "pointer",
+              color: current ? "#ff55ff" : "#aaaaaa",
+              background: current ? "#222" : "transparent",
+              fontFamily: "monospace", fontSize: "13px", whiteSpace: "nowrap",
+              overflow: "hidden", textOverflow: "ellipsis",
+            }}
+            title={entry.label}
+          >
+            <span style={{ color: "#555", marginRight: "8px" }}>{n + 1}</span>
+            {entry.label}
+          </div>
+        );
+      })}
+    </div>
+  ) : null;
+
   return (
     <>
       <div id="blacker" className={isFullscreen ? "show" : undefined} style={{ backgroundColor: bgColor }} />
@@ -1085,7 +1118,7 @@ export default function ReleaseClient({
             <input type="button" className="btn-big" value={copyImageLabel} onClick={doCopyImage} />
           )}
 
-          {hasInlineContent && type === "ASCII" && !isCp437Art && collyVisible && (
+          {hasInlineContent && (type === "ASCII" || useCanvasViewer) && collyVisible && (
             <>
               <input type="button" className="btn-big"
                 value={autoplay ? "Stop" : "Autoplay"}
@@ -1200,36 +1233,7 @@ export default function ReleaseClient({
             ...(isFullscreen ? { position: "fixed" as const, top: 0, left: 0, width: "100vw", height: "100vh", zIndex: 999998 } : {}),
           }}
         >
-          {indexOpen && displayIndex.length > 0 && (
-            <div style={{
-              position: "sticky", top: 0, alignSelf: "flex-start",
-              zIndex: 100, overflowY: "auto", maxHeight: "100vh",
-              background: "rgba(17,17,17,0.93)", minWidth: "200px",
-              borderRight: "1px solid #333", padding: "8px 0", flexShrink: 0,
-            }}>
-              {displayIndex.map((entry, n) => {
-                const current = autoplay && sections[autoplayIndex] === entry.section;
-                return (
-                  <div
-                    key={n}
-                    onClick={() => { scrollToSection(entry.section); setIndexOpen(false); }}
-                    style={{
-                      padding: "4px 12px",
-                      cursor: "pointer",
-                      color: current ? "#ff55ff" : "#aaaaaa",
-                      background: current ? "#222" : "transparent",
-                      fontFamily: "monospace", fontSize: "13px", whiteSpace: "nowrap",
-                      overflow: "hidden", textOverflow: "ellipsis",
-                    }}
-                    title={entry.label}
-                  >
-                    <span style={{ color: "#555", marginRight: "8px" }}>{n + 1}</span>
-                    {entry.label}
-                  </div>
-                );
-              })}
-            </div>
-          )}
+          {indexPanel}
           <pre
             ref={collyRef as React.RefObject<HTMLPreElement>}
             id="colly"
@@ -1257,8 +1261,15 @@ export default function ReleaseClient({
         <div
           ref={collyDivRef}
           id="colly-div"
-          style={{ display: "flex", justifyContent: "center", alignItems: "flex-start", backgroundColor: isCp437Art ? bgColor : "#000", overflowX: "hidden", margin: 0, padding: 0 }}
+          style={{
+            display: "flex", justifyContent: "center", alignItems: "flex-start",
+            overflowY: "scroll", overflowX: "hidden", height: "100vh",
+            backgroundColor: isCp437Art ? bgColor : "#000", margin: 0, padding: 0,
+            // Fullscreen: fixed viewport-sized stage so the groove warp/filters render.
+            ...(isFullscreen ? { position: "fixed" as const, top: 0, left: 0, width: "100vw", height: "100vh", zIndex: 999998 } : {}),
+          }}
         >
+          {indexPanel}
           <span id="loading" style={{ animation: "blink 2s linear infinite" }}>.LOADiNG.</span>
           <div
             ref={collyRef as React.RefObject<HTMLDivElement>}
