@@ -22,7 +22,7 @@ import {
   type LogoSection,
 } from "@/lib/logoSections";
 import LogoMinimap, { MINIMAP_WIDTH } from "./LogoMinimap";
-import { parseCollyIndex, sectionForIndexEntry } from "@/lib/collyIndex";
+import { parseCollyIndex, sectionForIndexEntry, linkifyCollyIndex } from "@/lib/collyIndex";
 import { useMusic } from "@/components/music/MusicProvider";
 import { BeatDetector, lowBandEnergy } from "@/lib/uade/beatDetector";
 
@@ -366,6 +366,12 @@ export default function ReleaseClient({
     }
     return logoIndex.map((li) => ({ label: li.label, section: li.section }));
   }, [fileContent, logoIndex, sections]);
+  // The colly HTML with its embedded "oN> NAME" index entries wrapped in
+  // clickable spans (data-logo-line) — so the index in the art is clickable.
+  const linkedContent = useMemo(
+    () => linkifyCollyIndex(fileContent, (e) => sectionForIndexEntry(e, logoIndex, sections)?.startLine ?? null),
+    [fileContent, logoIndex, sections],
+  );
   const [indexOpen, setIndexOpen] = useState(false);
 
   const [commentText, setCommentText] = useState("");
@@ -646,6 +652,18 @@ export default function ReleaseClient({
     const target = computeScrollTarget(section, { spacers: SPACERS, lineHeight, viewH, originTop, maxScroll: container.scrollHeight - viewH });
     animateScroll(container, target, 500);
   }, []);
+
+  // Click on an embedded index entry (linkifyCollyIndex wrapped it) -> scroll to
+  // that logo.
+  const onCollyClick = useCallback((e: React.MouseEvent) => {
+    const el = (e.target as HTMLElement).closest("[data-logo-line]");
+    if (!el) return;
+    const line = parseInt(el.getAttribute("data-logo-line") ?? "", 10);
+    if (Number.isNaN(line) || !sections.length) return;
+    let best = sections[0];
+    for (const s of sections) if (Math.abs(s.startLine - line) < Math.abs(best.startLine - line)) best = s;
+    scrollToSection(best);
+  }, [sections, scrollToSection]);
 
   // Deep-link: /release/<file>#logo-<startLine> scrolls to that logo on load
   // (used by colly-logo search + crew/artist/user "logos in collys" links).
@@ -1217,7 +1235,8 @@ export default function ReleaseClient({
             id="colly"
             className={isFullscreen ? "fullscreen" : undefined}
             style={{ overflow: "hidden", fontFamily: `${font}, TopazPlus_a1200, "Courier New", Consolas, monospace`, fontSize: "16px", lineHeight: "1", color: fgColor, whiteSpace: "pre", fontFeatureSettings: "normal", fontKerning: "none", textRendering: "optimizeSpeed" }}
-            dangerouslySetInnerHTML={{ __html: "<br><br><br><br>" + fileContent + "<br><br><br><br>" }}
+            onClick={onCollyClick}
+            dangerouslySetInnerHTML={{ __html: "<br><br><br><br>" + linkedContent + "<br><br><br><br>" }}
           />
         </div>
         {!isFullscreen && type === "ASCII" && (

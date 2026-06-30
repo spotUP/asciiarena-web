@@ -44,26 +44,55 @@ function lineEntries(line: string): CollyIndexEntry[] {
   return out;
 }
 
-export function parseCollyIndex(text: string): CollyIndexEntry[] {
-  const lines = decodeEntities(text).split("\n");
-  // Pick the longest CONTIGUOUS run of index lines (the real TOC block), not
-  // scattered per-logo header lines that also look like "N> NAME".
-  let best: CollyIndexEntry[] = [];
-  let cur: CollyIndexEntry[] = [];
-  const flush = () => { if (cur.length > best.length) best = cur; cur = []; };
-  for (const line of lines) {
+// The longest CONTIGUOUS run of index lines (the real TOC block) — not the
+// scattered per-logo header lines that also look like "N> NAME". Returns the
+// entries plus the set of (0-based) line indices the block occupies.
+function findIndexBlock(decodedLines: string[]): { entries: CollyIndexEntry[]; lines: Set<number> } | null {
+  let best = { entries: [] as CollyIndexEntry[], lines: new Set<number>() };
+  let cur = { entries: [] as CollyIndexEntry[], lines: new Set<number>() };
+  const flush = () => { if (cur.entries.length > best.entries.length) best = cur; cur = { entries: [], lines: new Set() }; };
+  decodedLines.forEach((line, i) => {
     const es = lineEntries(line);
-    if (es.length) cur.push(...es);
+    if (es.length) { cur.entries.push(...es); cur.lines.add(i); }
     else flush();
-  }
+  });
   flush();
-  if (best.length < 3) return [];
-  // Dedupe by number, sort, sanity-check it's a near-contiguous sequence from ~1.
+  if (best.entries.length < 3) return null;
+  const nums = best.entries.map((e) => e.num).sort((a, b) => a - b);
+  if (nums[0] > 2 || nums[nums.length - 1] > best.entries.length * 2 + 2) return null;
+  return best;
+}
+
+export function parseCollyIndex(text: string): CollyIndexEntry[] {
+  const block = findIndexBlock(decodeEntities(text).split("\n"));
+  if (!block) return [];
   const byNum = new Map<number, string>();
-  for (const e of best) if (!byNum.has(e.num)) byNum.set(e.num, e.name);
-  const out = [...byNum.entries()].map(([num, name]) => ({ num, name })).sort((a, b) => a.num - b.num);
-  if (out.length < 3 || out[0].num > 2 || out[out.length - 1].num > out.length * 2 + 2) return [];
-  return out;
+  for (const e of block.entries) if (!byNum.has(e.num)) byNum.set(e.num, e.name);
+  return [...byNum.entries()].map(([num, name]) => ({ num, name })).sort((a, b) => a.num - b.num);
+}
+
+// Wrap each index entry in the rendered (HTML) colly with a clickable span
+// carrying the target logo's start line, so the embedded "oN> NAME" table is
+// clickable in place. Returns the HTML unchanged when there's no index block.
+export function linkifyCollyIndex(html: string, targetLine: (e: CollyIndexEntry) => number | null): string {
+  const lines = html.split("\n");
+  const block = findIndexBlock(lines.map(decodeEntities));
+  if (!block) return html;
+  for (const i of block.lines) {
+    lines[i] = lines[i].replace(
+      /([oO\d]{1,3})(&gt;|[>)])([ \t]+)([^<\n]+?)(?=\s{2,}|<|$)/g,
+      (full: string, numTok: string, _gt: string, _sp: string, rawName: string) => {
+        const num = parseNum(numTok);
+        if (num == null) return full;
+        const name = rawName.replace(/\s*\|.*$/, "").replace(/[>)\].:|=_-]+$/, "").trim();
+        if (name.replace(/[^a-zA-Z0-9]/g, "").length < 2) return full;
+        const t = targetLine({ num, name });
+        if (t == null) return full;
+        return `<span class="colly-index-link" data-logo-line="${t}">${full}</span>`;
+      },
+    );
+  }
+  return lines.join("\n");
 }
 
 // Map an index entry to a detected logo section: prefer a normalized name match
