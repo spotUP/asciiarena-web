@@ -47,6 +47,13 @@ rsync_resilient -L \
   public/ \
   spot@97.75.89.139:/var/www/asciiarena.se/nextjs-current/public/
 
+# nginx serves /assets/ and /fonts/ from the project root (see the nginx conf),
+# NOT from public/, so they must be synced too — otherwise CSS/font edits never
+# go live.
+echo "Deploying assets/ + fonts/..."
+rsync_resilient assets/ spot@97.75.89.139:/var/www/asciiarena.se/nextjs-current/assets/
+rsync_resilient fonts/ spot@97.75.89.139:/var/www/asciiarena.se/nextjs-current/fonts/
+
 echo "Syncing nginx config..."
 # Guard: if nginx config on server differs from repo, update + reload.
 # This prevents the old PHP config from silently reverting (it happened).
