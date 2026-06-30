@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { normalizeHandle, labelTokens, resolveEntities, isLikelyLogoLabel, type EntityDicts } from "@/lib/handleMatch";
+import { normalizeHandle, labelTokens, resolveEntities, isLikelyLogoLabel, cleanLabel, type EntityDicts } from "@/lib/handleMatch";
 
 const DICTS: EntityDicts = {
   artists: [
@@ -35,6 +35,24 @@ describe("labelTokens", () => {
     const t = labelTokens("sPOt 4 aSCiiARENa");
     expect(t).toContain("spot");
     expect(t).toContain("asciiarena");
+  });
+});
+
+describe("cleanLabel", () => {
+  it("strips leading/trailing logo counters and separators", () => {
+    expect(cleanLabel("61 | sPOt4aSCiiARENa (dIZ) | 16")).toBe("sPOt4aSCiiARENa (dIZ)");
+    expect(cleanLabel("o5 ! bROwAlliA4nUkLEUs.nFO : o5")).toBe("bROwAlliA4nUkLEUs.nFO");
+    expect(cleanLabel("7o ! mAki4mAkIrOOtS.dIZ : o7")).toBe("mAki4mAkIrOOtS.dIZ");
+  });
+
+  it("truncates very long labels", () => {
+    const out = cleanLabel("x".repeat(80));
+    expect(out.length).toBeLessThanOrEqual(48);
+    expect(out.endsWith("…")).toBe(true);
+  });
+
+  it("leaves a clean label unchanged", () => {
+    expect(cleanLabel("up rough")).toBe("up rough");
   });
 });
 

@@ -114,6 +114,22 @@ export function isLikelyLogoLabel(label: string): boolean {
   return true;
 }
 
+// Tidy a raw divider label for display: strip leading/trailing logo counters
+// ("61 |", "| 16", "o5 !", ": 13") and surrounding separator punctuation,
+// collapse whitespace, cap length. Best-effort — internal "4"="for" glue can't
+// be un-collapsed, but it reads far better than the raw caption.
+export function cleanLabel(label: string): string {
+  let s = label
+    .replace(/^\s*[oO0-9]{1,3}\s*[-|.!:>＞<＜]+\s*/, "")
+    .replace(/\s*[-|.!:>＞<＜]+\s*[oO0-9]{1,3}\s*$/, "")
+    .replace(/^[\s|.!:>＞<＜*=_-]+/, "")
+    .replace(/[\s|.!:>＞<＜*=_-]+$/, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+  if (!s) s = label.trim();
+  return s.length > 48 ? s.slice(0, 47).trimEnd() + "…" : s;
+}
+
 export function resolveEntities(label: string, dicts: EntityDicts): ResolveResult {
   const tokens = labelTokens(label);
   if (!tokens.length) return {};

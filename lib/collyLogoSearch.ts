@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/generated/prisma/client";
-import { normalizeHandle } from "@/lib/handleMatch";
+import { normalizeHandle, cleanLabel } from "@/lib/handleMatch";
 
 export interface CollyLogoHit {
   filename: string;
@@ -18,13 +18,22 @@ interface Row {
 
 function groupByColly(rows: Row[], limit: number): CollyLogoHit[] {
   const byColly = new Map<string, CollyLogoHit>();
+  const seen = new Map<string, Set<string>>();
   for (const r of rows) {
-    const hit = byColly.get(r.filename);
-    if (hit) {
-      if (!hit.labels.includes(r.label)) hit.labels.push(r.label);
-    } else {
-      byColly.set(r.filename, { filename: r.filename, name: r.name, labels: [r.label], start_line: r.start_line });
-      if (byColly.size >= limit) break;
+    const clean = cleanLabel(r.label);
+    if (!clean) continue;
+    const key = clean.toLowerCase();
+    let hit = byColly.get(r.filename);
+    if (!hit) {
+      if (byColly.size >= limit) continue;
+      hit = { filename: r.filename, name: r.name, labels: [], start_line: r.start_line };
+      byColly.set(r.filename, hit);
+      seen.set(r.filename, new Set());
+    }
+    const s = seen.get(r.filename)!;
+    if (!s.has(key) && hit.labels.length < 4) {
+      s.add(key);
+      hit.labels.push(clean);
     }
   }
   return [...byColly.values()];

@@ -19,9 +19,13 @@ export default function EntityLogosSection({
       </div>
       <div className="container col-12 apt-1 apb-1 m-0 p-0 bg-secondary">
         {hits.map((h) => (
-          <div key={h.filename} className="col-lg-12 p-0 pl-lg-2 pr-lg-2">
-            <Link className="magenta" href={`/release/${h.filename}#logo-${h.start_line}`}>{h.name ?? h.filename}</Link>
-            <span className="lightgrey apl-1">{h.labels.slice(0, 4).join(", ")}</span>
+          <div key={h.filename} className="col-lg-12 p-0 pl-lg-2 pr-lg-2 amb-1">
+            <div>
+              <Link className="magenta" href={`/release/${h.filename}#logo-${h.start_line}`}>{h.name ?? h.filename}</Link>
+            </div>
+            {h.labels.length > 0 && (
+              <div className="lightgrey" style={{ fontSize: "0.85em" }}>{h.labels.join("  ·  ")}</div>
+            )}
           </div>
         ))}
       </div>

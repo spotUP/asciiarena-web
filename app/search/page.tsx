@@ -92,7 +92,9 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             <div key={h.filename} className="row amb-1">
               <div className="col-12">
                 <Link className="magenta" href={`/release/${h.filename}#logo-${h.start_line}`}>{h.name ?? h.filename}</Link>
-                <span className="lightgrey apl-1">{h.labels.slice(0, 4).join(", ")}</span>
+                {h.labels.length > 0 && (
+                  <div className="lightgrey" style={{ fontSize: "0.85em" }}>{h.labels.join("  ·  ")}</div>
+                )}
               </div>
             </div>
           ))}
