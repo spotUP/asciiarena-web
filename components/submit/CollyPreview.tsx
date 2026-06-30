@@ -127,7 +127,7 @@ export default function CollyPreview({
       background: "#111", border: "1px solid #ff55ff", padding: "8px", display: "grid", gap: "6px",
       fontFamily: "TopazPlus_a1200, monospace", fontSize: "13px",
     }}>
-      <div className="magenta">Logo lines {sel.start}{sel.end > sel.start ? `-${sel.end}` : ""}</div>
+      <div className="magenta">Selected logo</div>
       <input className="form-control" placeholder="logo name" autoFocus value={fName} onChange={(e) => setFName(e.target.value)} />
       <input className="form-control" placeholder="author (who drew it)" value={fBy} onChange={(e) => setFBy(e.target.value)} />
       <input className="form-control" placeholder="for (requested by)" value={fFor} onChange={(e) => setFFor(e.target.value)} />
@@ -146,35 +146,23 @@ export default function CollyPreview({
         <div style={{ position: "relative", background: isCanvas && type !== "CP437" ? "#000" : (bg || "#111111"), overflow: "auto", maxHeight: "70vh" }}>
           {isCanvas && visibleB64 ? (
             <div ref={stageRef} style={{ position: "relative", display: "inline-block", minWidth: "100%" }}>
-              <div style={{ paddingLeft: "40px" }}>
-                <AnsiLogo ansiB64={visibleB64} font={ANSI_FONT_MAP[font] ?? null} maxHeight={100000} />
-              </div>
+              <AnsiLogo ansiB64={visibleB64} font={ANSI_FONT_MAP[font] ?? null} maxHeight={100000} />
               <div style={{ position: "absolute", top: 0, left: 0, right: 0 }}>
-                {lines.map((_, i) => {
-                  const n = i + 1;
-                  return (
-                    <div key={i} className="colly-line" onMouseDown={down(n)} onMouseEnter={enter(n)}
-                      style={{ height: `${rowH}px`, display: "flex", background: rowBg(n) }}>
-                      <span style={{ width: "40px", flexShrink: 0, textAlign: "right", paddingRight: "6px", lineHeight: `${rowH}px`, fontFamily: "monospace", fontSize: "11px", color: "#888", background: "rgba(0,0,0,0.45)" }}>{n}</span>
-                      <span style={{ flex: 1 }} />
-                    </div>
-                  );
-                })}
+                {lines.map((_, i) => (
+                  <div key={i} className="colly-line" onMouseDown={down(i + 1)} onMouseEnter={enter(i + 1)}
+                    style={{ height: `${rowH}px`, background: rowBg(i + 1) }} />
+                ))}
               </div>
               {panel}
             </div>
           ) : (
             <div style={{ position: "relative" }}>
               <pre style={{ margin: 0, fontFamily: `${font || "TopazPlus_a1200"}, monospace`, fontSize: "16px", lineHeight: "16px", color: fg || "#ff55ff", whiteSpace: "pre" }}>
-                {lines.map((ln, i) => {
-                  const n = i + 1;
-                  return (
-                    <div key={i} className="colly-line" onMouseDown={down(n)} onMouseEnter={enter(n)} style={{ display: "flex", background: rowBg(n) }}>
-                      <span style={{ width: "48px", flexShrink: 0, textAlign: "right", paddingRight: "8px", color: "#555", userSelect: "none" }}>{n}</span>
-                      <span>{ln || " "}</span>
-                    </div>
-                  );
-                })}
+                {lines.map((ln, i) => (
+                  <div key={i} className="colly-line" onMouseDown={down(i + 1)} onMouseEnter={enter(i + 1)} style={{ background: rowBg(i + 1) }}>
+                    {ln || " "}
+                  </div>
+                ))}
               </pre>
               {panel}
             </div>
@@ -191,8 +179,7 @@ export default function CollyPreview({
           {report.warnings.map((w, i) => <div key={i} className="yellow">{w}</div>)}
           {logoMap.map((l, i) => (
             <div key={i} className="lightgrey colly-line" onClick={() => openEdit(i)} style={{ fontSize: "13px" }}>
-              <span style={{ color: l.auto ? "#55ffff" : "#ff55ff" }}>{l.auto ? "auto" : "set"}</span>{" "}
-              <span style={{ color: "#555" }}>L{l.line}{l.end && l.end > l.line ? `-${l.end}` : ""}</span> {l.caption}
+              <span style={{ color: l.auto ? "#55ffff" : "#ff55ff" }}>{l.auto ? "auto" : "set"}</span> {l.caption}
             </div>
           ))}
         </div>
