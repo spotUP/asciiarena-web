@@ -61,9 +61,26 @@ function shape(r: RawRow): GalleryLogo {
 // caption), in ASCII collys (the stripped content_text renders cleanly as
 // monospace), with content available to slice. `seed` makes the random pick
 // deterministic — same seed -> same selection (used for "logo of the day").
+//
+// TWO STAGES so the MEDIUMTEXT content_text is NEVER pulled into a sort: stage 1
+// randomizes only row ids (a tiny filesort), stage 2 fetches those few rows by
+// primary key. Selecting content_text into an ORDER BY RAND() over the whole
+// catalog ballooned InnoDB temp tablespaces to 13G and filled the disk.
 // Defensive: [] if the catalog/columns don't exist yet.
 async function galleryPool(n: number, seed: number): Promise<GalleryLogo[]> {
   try {
+    const idRows = await prisma.$queryRaw<{ id: number }[]>(Prisma.sql`
+      SELECT cl.id AS id
+      FROM colly_logos cl
+      JOIN collys c ON c.id = cl.colly_id
+      WHERE (cl.artist_id IS NOT NULL OR cl.crew_id IS NOT NULL)
+        AND c.content_text IS NOT NULL
+        AND (c.type IS NULL OR c.type = 'ASCII')
+      ORDER BY RAND(${seed})
+      LIMIT ${n}
+    `);
+    const ids = idRows.map((r) => r.id);
+    if (!ids.length) return [];
     const rows = await prisma.$queryRaw<RawRow[]>(Prisma.sql`
       SELECT c.filename AS filename, c.name AS name, cl.start_line AS start_line,
              cl.end_line AS end_line, cl.label AS label, c.content_text AS content_text,
@@ -72,11 +89,7 @@ async function galleryPool(n: number, seed: number): Promise<GalleryLogo[]> {
       JOIN collys c ON c.id = cl.colly_id
       LEFT JOIN artists a ON a.id = cl.artist_id
       LEFT JOIN crews w ON w.id = cl.crew_id
-      WHERE (cl.artist_id IS NOT NULL OR cl.crew_id IS NOT NULL)
-        AND c.content_text IS NOT NULL
-        AND (c.type IS NULL OR c.type = 'ASCII')
-      ORDER BY RAND(${seed})
-      LIMIT ${n}
+      WHERE cl.id IN (${Prisma.join(ids)})
     `);
     return rows.map(shape).filter((g) => g.snippet.length > 0);
   } catch {
