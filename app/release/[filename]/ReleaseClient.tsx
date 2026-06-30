@@ -66,6 +66,9 @@ interface Props {
   initFont: string;
   isArchive: boolean;
   fileContent: string;
+  /** Decoded plaintext for logo detection on canvas (ANSI) collys, where
+   *  fileContent is empty because the art renders on the AnsiLove canvas. */
+  logoText: string;
   extractedEntry: string | null;
   type: string;
   /** True when the release is PC/CP437 art — rendered via AnsiLove with an IBM
@@ -306,7 +309,7 @@ function ArchiveEntryRenderer({ filename, entry, entryIndex, eager, ansiFont, fg
 export default function ReleaseClient({
   collyId, filename, collyFileUrl, userNick, isAdmin,
   isFavourited, initBgColor, initFgColor, initFont,
-  isArchive, fileContent, extractedEntry, type, isCp437, collyTitle, siteUrl,
+  isArchive, fileContent, logoText, extractedEntry, type, isCp437, collyTitle, siteUrl,
   initialViewCount, initialFavCount, initialDownloadCount,
 }: Props) {
   const [collyVisible, setCollyVisible] = useState(true);
@@ -353,19 +356,22 @@ export default function ReleaseClient({
   // so trailing (async) programmatic scroll events aren't read as user scrolls.
   const autoScrollClearRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const sections  = useMemo(() => detectLogoSections(fileContent), [fileContent]);
-  const logoIndex = useMemo(() => buildLogoIndex(fileContent, sections), [fileContent, sections]);
+  // Text the logo detector runs on: the HTML <pre> content for ASCII, or the
+  // decoded plaintext for canvas (ANSI) collys where fileContent is empty.
+  const detectionText = logoText || fileContent;
+  const sections  = useMemo(() => detectLogoSections(detectionText), [detectionText]);
+  const logoIndex = useMemo(() => buildLogoIndex(detectionText, sections), [detectionText, sections]);
   // The index panel prefers the colly's OWN embedded index (clean author names)
   // when one exists, falling back to the auto-detected divider labels.
   const displayIndex = useMemo(() => {
-    const parsed = parseCollyIndex(fileContent);
+    const parsed = parseCollyIndex(detectionText);
     if (parsed.length) {
       return parsed
         .map((e) => ({ label: e.name, section: sectionForIndexEntry(e, logoIndex, sections) }))
         .filter((x): x is { label: string; section: LogoSection } => x.section !== null);
     }
     return logoIndex.map((li) => ({ label: li.label, section: li.section }));
-  }, [fileContent, logoIndex, sections]);
+  }, [detectionText, logoIndex, sections]);
   // The colly HTML with its embedded "oN> NAME" index entries wrapped in
   // clickable spans (data-logo-line) — so the index in the art is clickable.
   const linkedContent = useMemo(
@@ -652,7 +658,7 @@ export default function ReleaseClient({
     const elTop = scrollEl.getBoundingClientRect().top;
     const canvas = scrollEl.querySelector("canvas");
     if (canvas && canvas.clientHeight) {
-      const total = Math.max(1, fileContent.split("\n").length);
+      const total = Math.max(1, detectionText.split("\n").length);
       const lineHeight = canvas.clientHeight / total;
       const originTop = canvas.getBoundingClientRect().top - elTop + scrollEl.scrollTop;
       return { scrollEl, viewH, maxScroll, lineHeight, spacers: 0, originTop };
@@ -662,7 +668,7 @@ export default function ReleaseClient({
     const lineHeight = parseFloat(getComputedStyle(pre).lineHeight) || 16;
     const originTop = pre.getBoundingClientRect().top - elTop + scrollEl.scrollTop;
     return { scrollEl, viewH, maxScroll, lineHeight, spacers: 4, originTop };
-  }, [fileContent]);
+  }, [detectionText]);
 
   const scrollToSection = useCallback((section: LogoSection) => {
     const m = getScrollMetrics();

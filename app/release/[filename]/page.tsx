@@ -7,6 +7,7 @@ import Link from "next/link";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { encodeReleaseText, releaseTextEncoding, releaseViewerType, stripFileIdDiz, convertAnsiCodes, hasAnsiCodes, looksLikeCp437Art } from "@/lib/releaseText";
+import { readCollyText } from "@/lib/collyText";
 import { convertPcbColors, hasPcbCodes } from "@/lib/pcbColors";
 import { extractFirstRenderable } from "@/lib/archive";
 import Cp437DizPreview from "@/components/release/Cp437DizPreview";
@@ -163,6 +164,15 @@ export default async function ReleasePage({ params }: PageProps) {
       fileContent = convertPcbColors(fileContent);
       hasPcb = true;
     }
+  }
+
+  // Pure ANSI collys render on the canvas (from the file URL), so fileContent
+  // stays empty — but autoplay / jump-index / logo detection need the decoded
+  // plaintext to find logo rows. Provide it (ANSI-escapes stripped); line
+  // numbers line up with the canvas, which AnsiLove renders one row per line.
+  let logoText = "";
+  if (type === "ANSI" && existsSync(filePath)) {
+    logoText = readCollyText(filename, type) ?? "";
   }
 
   // For archives, try to extract a renderable ASCII file so it can be
@@ -353,6 +363,7 @@ export default async function ReleasePage({ params }: PageProps) {
         initFont={font}
         isArchive={isArchive}
         fileContent={fileContent}
+        logoText={logoText}
         extractedEntry={extractedEntry}
         type={type}
         isCp437={isCp437}
