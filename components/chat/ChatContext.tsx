@@ -75,6 +75,22 @@ export function ChatContextProvider({ children }: { children: ReactNode }) {
     try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(windows)); } catch { /* quota / disabled */ }
   }, [windows]);
 
+  // Multi-tab sync: when another tab changes the dock, adopt its state instead of
+  // racing/overwriting it (the `storage` event only fires in OTHER tabs). Without
+  // this, two tabs' last-write-wins clobbered each other and chat windows vanished.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== STORAGE_KEY) return;
+      try {
+        const parsed = e.newValue ? (JSON.parse(e.newValue) as ChatWindowState[]) : [];
+        if (Array.isArray(parsed)) { skipNextPersist.current = true; setWindows(parsed); }
+      } catch { /* ignore corrupt storage */ }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
   const openChat = useCallback<ChatContextValue["openChat"]>((peerId, peerNick, threadId, opts) => {
     const key = dmKey(peerId);
     const tid = threadId && threadId > 0 ? threadId : null;

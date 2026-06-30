@@ -289,32 +289,36 @@ export default function ReleaseClient({
   const autoplayDirRef = useRef(1); // +1 forward, -1 backward (ping-pong loop)
   // Groove mode: advance the slideshow on the music's beat instead of a timer.
   const [musicGroove, setMusicGroove] = useState(false);
-  const { getAnalyser: getMusicAnalyser, playRandom: playRandomMusic, playFile: playMusicFile, isPlaying: musicIsPlaying } = useMusic();
+  const { getAnalyser: getMusicAnalyser, playRandom: playRandomMusic, playFile: playMusicFile, stop: stopMusic, isPlaying: musicIsPlaying } = useMusic();
   const musicPlayingRef = useRef(false);
   useEffect(() => { musicPlayingRef.current = musicIsPlaying; }, [musicIsPlaying]);
 
-  // The artist's soundtrack: start it on the viewer's FIRST gesture (browser
-  // autoplay policy needs one), but never hijack music the viewer already has
-  // playing. One-shot — detaches after it fires.
+  // Play the colly's soundtrack (if any) unless the viewer already has a tune on.
+  // Tracked so leaving autoplay can stop the tune WE started (not the viewer's).
+  const weStartedSoundtrackRef = useRef(false);
+  const playSoundtrack = useCallback(() => {
+    if (!soundtrack || musicPlayingRef.current) return;
+    const parts = soundtrack.split("/");
+    const filename = parts[parts.length - 1] || soundtrack;
+    weStartedSoundtrackRef.current = true;
+    void playMusicFile({
+      id: 0,
+      format: parts[0] || "",
+      author: parts[1] || "",
+      filename,
+      full_path: soundtrack,
+      extension: (filename.match(/\.([^.]+)$/)?.[1] || "").toLowerCase(),
+    });
+  }, [soundtrack, playMusicFile]);
+
+  // Start the soundtrack on the viewer's FIRST gesture (browser autoplay policy
+  // needs one). One-shot — detaches after it fires.
   useEffect(() => {
     if (!soundtrack) return;
-    let done = false;
     const start = () => {
-      if (done) return;
-      done = true;
       document.removeEventListener("pointerdown", start);
       document.removeEventListener("keydown", start);
-      if (musicPlayingRef.current) return; // don't interrupt the viewer's tune
-      const parts = soundtrack.split("/");
-      const filename = parts[parts.length - 1] || soundtrack;
-      void playMusicFile({
-        id: 0,
-        format: parts[0] || "",
-        author: parts[1] || "",
-        filename,
-        full_path: soundtrack,
-        extension: (filename.match(/\.([^.]+)$/)?.[1] || "").toLowerCase(),
-      });
+      playSoundtrack();
     };
     document.addEventListener("pointerdown", start);
     document.addEventListener("keydown", start);
@@ -322,7 +326,7 @@ export default function ReleaseClient({
       document.removeEventListener("pointerdown", start);
       document.removeEventListener("keydown", start);
     };
-  }, [soundtrack, playMusicFile]);
+  }, [soundtrack, playSoundtrack]);
   const autoplayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoplayRafRef   = useRef<(() => void) | null>(null);
   const beatRafRef       = useRef<number | null>(null);
@@ -614,7 +618,9 @@ export default function ReleaseClient({
     if (beatRafRef.current != null) { cancelAnimationFrame(beatRafRef.current); beatRafRef.current = null; }
     if (autoScrollClearRef.current) { clearTimeout(autoScrollClearRef.current); autoScrollClearRef.current = null; }
     isAutoScrolling.current = false;
-  }, []);
+    // Stop the colly's soundtrack if WE started it (leave the viewer's own tune alone).
+    if (weStartedSoundtrackRef.current) { stopMusic(); weStartedSoundtrackRef.current = false; }
+  }, [stopMusic]);
 
   const startAutoplay = useCallback(() => {
     if (collyDivRef.current) collyDivRef.current.scrollTop = 0;
@@ -622,9 +628,23 @@ export default function ReleaseClient({
     setIsFullscreen(true);
     setAutoplayIndex(0);
     setAutoplay(true);
-    // Groove mode: make sure a tune is playing so beats can drive the slideshow.
-    if (musicGroove && !musicPlayingRef.current) void playRandomMusic();
-  }, [musicGroove, playRandomMusic]);
+    // Play the colly's soundtrack if it has one; otherwise, in groove mode, start
+    // a random tune so beats can drive the slideshow.
+    if (soundtrack) playSoundtrack();
+    else if (musicGroove && !musicPlayingRef.current) void playRandomMusic();
+  }, [soundtrack, playSoundtrack, musicGroove, playRandomMusic]);
+
+  // Deep-link: /release/<file>?autoplay=1 (or #autoplay) starts autoplay once the
+  // colly is on-screen and its logos are known. Fires once.
+  const autoplayLinkFired = useRef(false);
+  useEffect(() => {
+    if (autoplayLinkFired.current || !collyVisible || sections.length < 2) return;
+    const sp = new URLSearchParams(window.location.search);
+    if (sp.get("autoplay") === "1" || window.location.hash === "#autoplay") {
+      autoplayLinkFired.current = true;
+      startAutoplay();
+    }
+  }, [collyVisible, sections.length, startAutoplay]);
 
   // Advance to the next logo, ping-ponging at the ends so autoplay loops forever
   // (forward to the last logo, then backward to the first, and so on).
@@ -1154,6 +1174,12 @@ export default function ReleaseClient({
                 <a className="dropdown-item" href={`http://www.facebook.com/sharer.php?u=${encodeURIComponent(releaseUrl)}`} target="_blank" rel="noreferrer">Facebook</a>
                 <a className="dropdown-item" href={`http://reddit.com/submit?url=${encodeURIComponent(releaseUrl)}&title=Check+out+${encodeURIComponent(collyTitle)}+at+asciiarena.se`} target="_blank" rel="noreferrer">Reddit</a>
                 <a className="dropdown-item" href={`https://twitter.com/share?url=${encodeURIComponent(releaseUrl)}&text=${encodeURIComponent(`Check out ${collyTitle} at asciiarena.se`)}`} target="_blank" rel="noreferrer">Twitter</a>
+                {sections.length > 1 && (
+                  <button className="dropdown-item" style={{ background: "none", border: "none", width: "100%", textAlign: "left", cursor: "pointer" }}
+                    onClick={() => { navigator.clipboard?.writeText(`${releaseUrl}?autoplay=1`); setShareOpen(false); }}>
+                    Copy autoplay link
+                  </button>
+                )}
               </div>
             )}
           </div>

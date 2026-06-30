@@ -2,8 +2,19 @@ import Link from "next/link";
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { buildLatestReleaseRowsQuery } from "@/lib/home-latest-releases-query";
+import { readCollyText } from "@/lib/collyText";
 import { readFileSync, existsSync } from "fs";
 import path from "path";
+
+const escapeHtml = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+// Preview for a colly that has no separate .diz: a snippet of the art itself.
+function collySnippet(filename: string): string | null {
+  const art = readCollyText(filename); // decoded, diz + ANSI-escape stripped
+  if (!art) return null;
+  const lines = art.split("\n").filter((l) => l.trim()).slice(0, 16).map((l) => (l.length > 80 ? l.slice(0, 80) : l));
+  return lines.length ? escapeHtml(lines.join("\n")) : null;
+}
 
 interface ReleaseRow {
   type: string;
@@ -58,7 +69,9 @@ const getReleasesForHero = unstable_cache(
         dizPath = path.join(appsPath, `${base}.diz`);
         url = `/application/${filename}`;
       }
-      const content = readDiz(dizPath);
+      // Prefer the .diz; for collys without one (e.g. fresh uploads), fall back to
+      // a snippet of the art so they still appear in the hero.
+      const content = readDiz(dizPath) ?? (row.type === "C" ? collySnippet(filename) : null);
       if (content) releases.push({ url, content });
     }
     return releases;
