@@ -130,8 +130,19 @@ export function cleanLabel(label: string): string {
   return s.length > 48 ? s.slice(0, 47).trimEnd() + "…" : s;
 }
 
+// Scene dividers dedicate logos with "X for Y" / "X 4 Y" / "X 2 Y" — the logo
+// is X; Y is the recipient (a greeting), NOT a logo of Y. So entity resolution
+// only looks at the SUBJECT: everything before the first for/to connector.
+// ("speed for xcz" resolves speed, not xcz.)
+const CONNECTORS = new Set(["for", "to", "4", "2"]);
+export function subjectPart(label: string): string {
+  const words = label.split(/\s+/).filter(Boolean);
+  const i = words.findIndex((w) => CONNECTORS.has(normalizeHandle(w)));
+  return (i >= 0 ? words.slice(0, i) : words).join(" ");
+}
+
 export function resolveEntities(label: string, dicts: EntityDicts): ResolveResult {
-  const tokens = labelTokens(label);
+  const tokens = labelTokens(subjectPart(label));
   if (!tokens.length) return {};
   const cands = candidateStrings(tokens);
   const result: ResolveResult = {};

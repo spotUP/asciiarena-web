@@ -91,10 +91,12 @@ describe("resolveEntities", () => {
     expect(resolveEntities("uP rOUGH", DICTS).crew_id).toBe(20);
   });
 
-  it("matches both an artist and a crew in a framed name-box label", () => {
+  it("attributes the subject of a framed name-box, not the 'for' recipient", () => {
+    // "bROwAlliA 4 nUkLEUs" = browallia FOR nukleus -> browallia is the logo;
+    // nukleus is the dedication recipient and is NOT attributed.
     const r = resolveEntities("3o ! bROwAlliA 4 nUkLEUs.nFO : o3", DICTS);
     expect(r.artist_id).toBe(10); // browallia
-    expect(r.crew_id).toBe(21); // nukleus
+    expect(r.crew_id).toBeUndefined(); // nukleus = recipient after "4"
   });
 
   it("matches a user handle exactly", () => {
@@ -116,5 +118,27 @@ describe("resolveEntities", () => {
 
   it("returns nothing for a label with no real handles", () => {
     expect(resolveEntities("- presents - 2026", DICTS)).toEqual({});
+  });
+
+  it("attributes the subject, NOT the 'for X' recipient (dedication)", () => {
+    const d: EntityDicts = {
+      artists: [{ id: 40, norm: normalizeHandle("speed") }],
+      crews: [],
+      users: [{ id: 41, norm: normalizeHandle("xcz") }],
+    };
+    const r = resolveEntities("speed for xcz", d);
+    expect(r.artist_id).toBe(40); // speed = the logo
+    expect(r.user_id).toBeUndefined(); // xcz = recipient, not attributed
+  });
+
+  it("treats '4' / '2' as for/to connectors (recipient dropped)", () => {
+    const d: EntityDicts = {
+      artists: [{ id: 50, norm: normalizeHandle("spot") }],
+      crews: [{ id: 51, norm: normalizeHandle("asciiarena") }],
+      users: [],
+    };
+    const r = resolveEntities("spot 4 asciiarena", d);
+    expect(r.artist_id).toBe(50);
+    expect(r.crew_id).toBeUndefined(); // "4 asciiarena" is the dedication
   });
 });
