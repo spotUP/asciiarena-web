@@ -96,6 +96,7 @@ export default function Navbar({ session }: NavbarProps) {
             <li className="nav-item"><Link prefetch={false} className="nav-link ascii apr-1" href="/bbs">BOARDS</Link></li>
             <li className="nav-item"><Link prefetch={false} className="nav-link ascii apr-1" href="/requests">REQUESTS</Link></li>
             <li className="nav-item"><Link prefetch={false} className="nav-link ascii apr-1" href="/polls">POLLS</Link></li>
+            <li className="nav-item"><Link prefetch={false} className="nav-link ascii apr-1" href="/timeline">TiMELINE</Link></li>
             <li className="nav-item"><Link prefetch={false} className="nav-link ascii apr-1" href="/stats">STATS</Link></li>
             <li className="nav-item"><Link prefetch={false} className="nav-link ascii apr-1" href="/about">ABOUT</Link></li>
             <li className="nav-item"><a className="nav-link ascii apr-1" href="https://hippoplayer.se">WORKBENCH</a></li>
