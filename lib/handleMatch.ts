@@ -115,14 +115,13 @@ function matchEntity(cands: Set<string>, entities: EntityRef[]): number | undefi
 // prose, ASCII-art fragments, section words, or 2-char noise). Resolved labels
 // are always kept; this gates the rest so the catalog isn't drowned in junk.
 export function isLikelyLogoLabel(label: string): boolean {
-  const tokens = labelTokens(label);
-  if (tokens.length < 1 || tokens.length > 4) return false; // 0 = all noise; >4 = prose
-  const norm = normalizeHandle(label);
-  if (norm.length < 3 || norm.length > 15) return false; // too short / run-on sentence
-  const letters = (norm.match(/[a-z]/g) || []).length;
+  const tokens = labelTokens(label); // noise words already dropped
+  if (tokens.length < 1 || tokens.length > 4) return false; // 0 = all noise; >4 = credits/prose
+  if (tokens.some((t) => t.length > 15)) return false; // a run-on word (collapsed sentence)
+  const letters = (tokens.join("").match(/[a-z]/g) || []).length;
   if (letters < 3) return false; // "hs", "oO", counter strings
   const nonSpace = label.replace(/\s/g, "").length;
-  if (nonSpace === 0 || norm.length / nonSpace < 0.5) return false; // mostly symbols => art
+  if (nonSpace === 0 || normalizeHandle(label).length / nonSpace < 0.5) return false; // mostly symbols => art
   return true;
 }
 
