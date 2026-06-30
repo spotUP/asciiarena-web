@@ -86,15 +86,14 @@ export interface ResolveResult {
 }
 
 function matchEntity(cands: Set<string>, entities: EntityRef[]): number | undefined {
+  // Exact match only (a token, or a join of up to 3 consecutive tokens for
+  // multi-word names). Substring/containment matching was dropped — it
+  // over-matched short common names ("style" -> stylez/freestyle/lifestyle).
+  // Word-spacing + digit-splitting already break glued labels into real tokens,
+  // so exact matching covers the legitimate cases without the false positives.
   for (const e of entities) {
     if (e.norm.length < MIN_ENTITY_LEN) continue;
-    if (cands.has(e.norm)) return e.id; // exact (covers multi-word via joins)
-    // conservative containment only for longer names, to avoid coincidences
-    if (e.norm.length >= 5) {
-      for (const c of cands) {
-        if (c.length >= 5 && (c.includes(e.norm) || e.norm.includes(c))) return e.id;
-      }
-    }
+    if (cands.has(e.norm)) return e.id;
   }
   return undefined;
 }

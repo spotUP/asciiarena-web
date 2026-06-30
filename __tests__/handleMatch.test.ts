@@ -112,6 +112,14 @@ describe("resolveEntities", () => {
     expect(r.user_id).toBeUndefined();
   });
 
+  it("does not over-match a short name via containment (Style vs Stylez/freestyle)", () => {
+    const d: EntityDicts = { artists: [{ id: 60, norm: normalizeHandle("style") }], crews: [], users: [] };
+    expect(resolveEntities("Stylez", d).artist_id).toBeUndefined(); // not "style"
+    expect(resolveEntities("freestyle", d).artist_id).toBeUndefined();
+    expect(resolveEntities("lifestyle crew", d).artist_id).toBeUndefined();
+    expect(resolveEntities("style", d).artist_id).toBe(60); // exact still works
+  });
+
   it("skips too-short/symbol handles in v1 (z!o)", () => {
     expect(resolveEntities("z!o", DICTS).user_id).toBeUndefined();
   });
