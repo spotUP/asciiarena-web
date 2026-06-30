@@ -7,6 +7,7 @@ import DatePicker from "@/components/ui/DatePicker";
 import ColorSwatch from "@/components/ui/ColorSwatch";
 import SoundtrackPicker from "@/components/music/SoundtrackPicker";
 import { detectCollyType, COLLY_TYPES } from "@/lib/collyType";
+import CollyPreview, { type PreviewReport } from "@/components/submit/CollyPreview";
 import AnsiEditor, { type AnsiEditorRef } from "@/components/ui/AnsiEditor/AnsiEditor";
 import { FONTS } from "@/lib/ansilove";
 
@@ -106,6 +107,28 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
   const [collyFg, setCollyFg] = useState("");
   const [collyBg, setCollyBg] = useState("");
   const [collySoundtrack, setCollySoundtrack] = useState("");
+  const [collyLogoMap, setCollyLogoMap] = useState<{ line: number; caption: string }[]>([]);
+  const [collyReport, setCollyReport] = useState<PreviewReport | null>(null);
+  const [collyBytes, setCollyBytes] = useState<Uint8Array | null>(null);
+
+  // Analyze a picked colly: detect type + run the dry-run preview so the upload
+  // form always shows an editable preview/report before submitting.
+  const analyzeColly = async (f: File) => {
+    const buf = new Uint8Array(await f.arrayBuffer());
+    setCollyBytes(buf);
+    setCollyType(detectCollyType(buf, f.name));
+    const fd = new FormData();
+    fd.append("file", f);
+    try {
+      const data = (await (await fetch("/api/collys/preview", { method: "POST", body: fd })).json()) as PreviewReport;
+      setCollyReport(data);
+      if (data.meta?.font) setCollyFont(data.meta.font);
+      if (data.meta?.fg) setCollyFg(data.meta.fg);
+      if (data.meta?.bg) setCollyBg(data.meta.bg);
+      if (data.meta?.soundtrack) setCollySoundtrack(data.meta.soundtrack);
+      setCollyLogoMap(data.meta?.logos ?? []);
+    } catch { setCollyReport(null); }
+  };
 
   // Crew form
   const [crewName, setCrewName] = useState("");
@@ -255,6 +278,8 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
       if (collyBg) formData.append("render_bg", collyBg);
     }
     if (collySoundtrack) formData.append("soundtrack", collySoundtrack);
+    const mappedLogos = collyLogoMap.filter((l) => l.caption.trim());
+    if (mappedLogos.length) formData.append("logos", JSON.stringify(mappedLogos));
 
     const r = await fetch("/api/collys", { method: "POST", body: formData });
     if (r.status === 409) {
@@ -264,6 +289,7 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
       setCollyName(""); setCollyYear(""); setCollyMonth(""); setCollyDay("");
       setCollyArtists([""]); setCollyCrews([""]);
       setCollyFont(""); setCollyFg(""); setCollyBg(""); setCollySoundtrack(""); setCollyType("ASCII");
+      setCollyLogoMap([]); setCollyReport(null); setCollyBytes(null);
       if (collyFileRef.current) collyFileRef.current.value = "";
     } else {
       const body = (await r.json().catch(() => ({}))) as { error?: string };
@@ -570,18 +596,14 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
             <h2 className="ap-1 bg-header">UPLOAD COLLY</h2>
           </div>
           <div className="bg-secondary ap-1 amb-1 lightgrey">
-            New here? <a href="/submit/test" className="magenta">Test your colly</a> to see how
-            we&apos;ll read it, or read the{" "}
-            <a href="/guidelines" className="magenta">colly guidelines</a>. Style freely &mdash;
-            it&apos;s all optional.
+            Pick a file and you&apos;ll see exactly how we read it &mdash; tweak it, then submit.
+            Style freely; it&apos;s all optional. See the{" "}
+            <a href="/guidelines" className="magenta">colly guidelines</a>.
           </div>
           <form onSubmit={handleCollySubmit} className="container-fluid bg-secondary apb-1 ap-1 amb-2">
             <Field label="File" required>
               <input type="file" ref={collyFileRef} required className="form-control w-100"
-                onChange={async (e) => {
-                  const f = e.target.files?.[0];
-                  if (f) setCollyType(detectCollyType(new Uint8Array(await f.arrayBuffer()), f.name));
-                }} />
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) void analyzeColly(f); }} />
             </Field>
             <Field label="Type">
               <DosSelect padded width={160} value={collyType}
@@ -638,6 +660,18 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
             <Field label="Soundtrack">
               <SoundtrackPicker value={collySoundtrack} onChange={setCollySoundtrack} />
             </Field>
+            {collyReport && (
+              <CollyPreview
+                fileBytes={collyBytes}
+                report={collyReport}
+                type={collyType}
+                font={collyFont}
+                fg={collyFg}
+                bg={collyBg}
+                logoMap={collyLogoMap}
+                setLogoMap={setCollyLogoMap}
+              />
+            )}
             <div className="amt-1">
               <input type="submit" className="btn-big bg-green white" value="Upload Colly" />
             </div>

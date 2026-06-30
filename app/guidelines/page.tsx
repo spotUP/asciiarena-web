@@ -37,7 +37,7 @@ export default function GuidelinesPage() {
           <p className="lightgrey">
             <span className="cyan">2. You point at it.</span> If your art is unusual, or you
             want everything pixel-perfect, open the{" "}
-            <Link href="/submit/test" className="magenta">colly tester</Link>, drop your file,
+            <Link href="/submit" className="magenta">colly tester</Link>, drop your file,
             and click the line of each logo. That works no matter how wild the layout is — you
             are never forced into a format. The tester shows exactly what we detected and flags
             anything we missed. Nothing is uploaded.
@@ -76,15 +76,15 @@ export default function GuidelinesPage() {
             the file, after a Ctrl-Z (EOF) byte</span> — invisible in every viewer, the same trick
             the scene&apos;s SAUCE records use. We read a <span className="white">SAUCE</span> record
             if your editor wrote one, or simple <span className="white">key: value</span> lines.
-            The tester&apos;s &quot;Download tagged colly&quot; writes them for you, so you never
-            touch a byte by hand. (We also still read an embedded{" "}
+            The submit form writes them for you when you save, so you never touch a byte by
+            hand. (We also still read an embedded{" "}
             <span className="white">@BEGIN_FILE_ID.DIZ … @END_FILE_ID.DIZ</span> block.) Or skip
             the file entirely and just set everything on the submit form — your call.
           </p>
 
           <p className="lightgrey amt-1">
             <a href="/example-arena-colly.txt" className="magenta" download>Download an example</a>{" "}
-            to poke at, <Link href="/submit/test" className="magenta">test your colly</Link>, or{" "}
+            to poke at, <Link href="/submit" className="magenta">test your colly</Link>, or{" "}
             <Link href="/submit" className="magenta">submit one</Link>.
           </p>
         </div>

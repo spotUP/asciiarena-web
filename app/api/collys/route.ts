@@ -203,7 +203,24 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   if (!existsSync(uploadDir)) {
     await mkdir(uploadDir, { recursive: true });
   }
-  await writeFile(filePath, buffer);
+  // If the editor mapped logos, persist them as an invisible Ctrl-Z trailer so the
+  // search catalog + renderer use the exact map. Strips any prior trailer first
+  // (the editor re-sends the final map). Untouched when no logos were mapped.
+  let outBuffer = buffer;
+  const logosRaw = String(formData.get("logos") ?? "");
+  if (logosRaw) {
+    try {
+      const logos = JSON.parse(logosRaw) as { line: number; caption: string }[];
+      if (Array.isArray(logos) && logos.length) {
+        const { visible } = parseCollyBytes(new Uint8Array(bytes));
+        const trailer = "\x1a" + logos
+          .map((l) => `logo: ${Math.max(1, Math.floor(l.line))} ${String(l.caption).replace(/[\r\n]+/g, " ").slice(0, 120)}`)
+          .join("\n") + "\n";
+        outBuffer = Buffer.concat([Buffer.from(visible), Buffer.from(trailer, "latin1")]);
+      }
+    } catch { /* ignore malformed logo map */ }
+  }
+  await writeFile(filePath, outBuffer);
 
   // Use the submitter's explicit type when valid, else detect by CONTENT (an
   // ANSI colly saved as .txt is still recognised as ANSI).
