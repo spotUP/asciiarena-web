@@ -249,9 +249,11 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
     collyArtists.filter(Boolean).forEach((a) => formData.append("artistname[]", a));
     collyCrews.filter(Boolean).forEach((c) => formData.append("crewname[]", c));
     formData.append("type", collyType);
-    if (collyFont) formData.append("render_font", collyFont);
-    if (collyFg) formData.append("render_fg", collyFg);
-    if (collyBg) formData.append("render_bg", collyBg);
+    if (collyType !== "ARCHIVE" && collyFont) formData.append("render_font", collyFont);
+    if (collyType === "ASCII" || collyType === "CP437") {
+      if (collyFg) formData.append("render_fg", collyFg);
+      if (collyBg) formData.append("render_bg", collyBg);
+    }
     if (collySoundtrack) formData.append("soundtrack", collySoundtrack);
 
     const r = await fetch("/api/collys", { method: "POST", body: formData });
@@ -606,28 +608,33 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
             </Field>
             <MultiSelect label="Artist(s)" values={collyArtists} options={artistList} placeholder="-- Unknown --" createLabel="artist" onChange={setCollyArtists} />
             <MultiSelect label="Crew(s)" values={collyCrews} options={crewList} placeholder="-- None --" createLabel="crew" onChange={setCollyCrews} />
-            <Field label="Font">
-              <DosSelect
-                padded
-                width={240}
-                value={collyFont}
-                options={[{ value: "", label: "Default / viewer choice" }, ...FONTS]}
-                onChange={setCollyFont}
-              />
-            </Field>
-            <Field label="Colours">
-              <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-                <span className="lightgrey" style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                  text <ColorSwatch current={collyFg || "#ff55ff"} onChange={setCollyFg} />
-                </span>
-                <span className="lightgrey" style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                  background <ColorSwatch current={collyBg || "#111111"} onChange={setCollyBg} />
-                </span>
-                {(collyFg || collyBg) && (
-                  <input type="button" className="btn-big" value="Reset colours" onClick={() => { setCollyFg(""); setCollyBg(""); }} />
-                )}
-              </div>
-            </Field>
+            {collyType !== "ARCHIVE" && (
+              <Field label="Font">
+                <DosSelect
+                  padded
+                  width={240}
+                  value={collyFont}
+                  options={[{ value: "", label: "Default / viewer choice" }, ...FONTS]}
+                  onChange={setCollyFont}
+                />
+              </Field>
+            )}
+            {/* ANSI keeps its own colours; only ASCII / CP437 take a colour choice. */}
+            {(collyType === "ASCII" || collyType === "CP437") && (
+              <Field label="Colours">
+                <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+                  <span className="lightgrey" style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                    text <ColorSwatch current={collyFg || "#ff55ff"} onChange={setCollyFg} />
+                  </span>
+                  <span className="lightgrey" style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                    background <ColorSwatch current={collyBg || "#111111"} onChange={setCollyBg} />
+                  </span>
+                  {(collyFg || collyBg) && (
+                    <input type="button" className="btn-big" value="Reset colours" onClick={() => { setCollyFg(""); setCollyBg(""); }} />
+                  )}
+                </div>
+              </Field>
+            )}
             <Field label="Soundtrack">
               <SoundtrackPicker value={collySoundtrack} onChange={setCollySoundtrack} />
             </Field>

@@ -63,6 +63,9 @@ export default function CollyTester() {
   };
 
   const isCanvas = type === "ANSI" || type === "CP437";
+  // ANSI keeps its own colours; archives aren't text — show only what applies.
+  const showColours = type === "ASCII" || type === "CP437";
+  const showFont = type !== "ARCHIVE";
   // Mapping panel shows ESC-code-stripped lines so ANSI is readable.
   // eslint-disable-next-line no-control-regex
   const lines = useMemo(() => (report ? report.text.replace(/\x1b\[[0-9;?]*[ -/]*[@-~]/g, "").split("\n") : []), [report]);
@@ -174,12 +177,16 @@ export default function CollyTester() {
                 <span style={{ color: "#555", fontSize: "12px" }}>(auto-detected)</span></div>
               <label className="lightgrey">Title <input className="form-control" value={title} onChange={(e) => setTitle(e.target.value)} /></label>
               <label className="lightgrey">Author <input className="form-control" value={author} onChange={(e) => setAuthor(e.target.value)} /></label>
-              <div className="lightgrey" style={{ display: "flex", gap: "8px", alignItems: "center" }}>Font
-                <DosSelect padded width={200} value={font} options={[{ value: "", label: "Default / viewer" }, ...FONTS]} onChange={setFont} /></div>
-              <div className="lightgrey" style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-                <span style={{ display: "flex", gap: "8px", alignItems: "center" }}>text <ColorSwatch current={fg || "#ff55ff"} onChange={setFg} /></span>
-                <span style={{ display: "flex", gap: "8px", alignItems: "center" }}>bg <ColorSwatch current={bg || "#111111"} onChange={setBg} /></span>
-              </div>
+              {showFont && (
+                <div className="lightgrey" style={{ display: "flex", gap: "8px", alignItems: "center" }}>Font
+                  <DosSelect padded width={200} value={font} options={[{ value: "", label: "Default / viewer" }, ...FONTS]} onChange={setFont} /></div>
+              )}
+              {showColours && (
+                <div className="lightgrey" style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+                  <span style={{ display: "flex", gap: "8px", alignItems: "center" }}>text <ColorSwatch current={fg || "#ff55ff"} onChange={setFg} /></span>
+                  <span style={{ display: "flex", gap: "8px", alignItems: "center" }}>bg <ColorSwatch current={bg || "#111111"} onChange={setBg} /></span>
+                </div>
+              )}
               <div className="lightgrey">Soundtrack<div style={{ marginTop: "4px" }}><SoundtrackPicker value={soundtrack} onChange={setSoundtrack} /></div></div>
               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                 <input type="button" className="btn-big" value="Seed logo map from detected" onClick={seedFromDetected} />
