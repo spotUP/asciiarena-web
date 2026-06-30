@@ -185,16 +185,10 @@ export default function CollyPreview({
       <div className="col-lg-5">
         <div className="header bg-header ap-1">WHAT WE READ</div>
         <div className="bg-secondary ap-1 amb-1">
-          <div className="lightgrey" style={{ fontSize: "12px", marginBottom: "6px" }}>
-            What asciiarena figured out on its own &mdash; this is what we&apos;d store if you
-            upload as-is. Drag to map logos yourself and your tags take over.
-          </div>
-          <div className="lightgrey">Type: <span className="white">{report.type}</span> &middot; {report.lineCount} lines &middot; {report.tagged ? <span className="green">tag-mapped</span> : "auto-detected"}</div>
-          {report.warnings.map((w, i) => <div key={i} className="yellow" style={{ marginTop: "4px" }}>! {w}</div>)}
-          <div className="white" style={{ marginTop: "8px" }}>Logos ({logoMap.length})</div>
-          <div style={{ fontSize: "11px", marginBottom: "4px" }}>
-            <span style={{ color: "#55ffff" }}>cyan = our guess</span> &middot; <span style={{ color: "#ff55ff" }}>magenta = yours</span> &middot; click to edit
-          </div>
+          <div className="lightgrey">Type: <span className="white">{report.type}</span></div>
+          <div className="lightgrey">{report.lineCount} lines</div>
+          <div className="lightgrey">{logoMap.length} logos</div>
+          {report.warnings.map((w, i) => <div key={i} className="yellow">{w}</div>)}
           {logoMap.map((l, i) => (
             <div key={i} className="lightgrey colly-line" onClick={() => openEdit(i)} style={{ fontSize: "13px" }}>
               <span style={{ color: l.auto ? "#55ffff" : "#ff55ff" }}>{l.auto ? "auto" : "set"}</span>{" "}

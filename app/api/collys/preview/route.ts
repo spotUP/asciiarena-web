@@ -61,11 +61,11 @@ export async function POST(request: NextRequest) {
   const index = parseCollyIndex(text);
 
   const warnings: string[] = [];
-  if (!tagged && sections.length === 0) warnings.push("No logos detected. Caption each logo (a name line in the gap above it) or add a logo map.");
+  if (!tagged && sections.length === 0) warnings.push("No logos detected");
   const uncaptioned = logos.filter((l) => /^Logo \d+$/.test(l.name)).length;
-  if (uncaptioned) warnings.push(`${uncaptioned} logo(s) have no caption — they won't be searchable. Add a name line above each, or tag them.`);
-  if (sections.length > 1 && index.length === 0 && !tagged) warnings.push("No clickable index detected. An 'o1> NAME  o2> NAME' table becomes jump links.");
-  if (meta.soundtrack && !/^[^/]+\/[^/]+\/.+/.test(meta.soundtrack)) warnings.push(`Soundtrack "${meta.soundtrack}" doesn't look like a Modland path (Format/Author/File).`);
+  if (uncaptioned) warnings.push(`${uncaptioned} logo${uncaptioned === 1 ? "" : "s"} not searchable`);
+  if (sections.length > 1 && index.length === 0 && !tagged) warnings.push("No clickable index detected");
+  if (meta.soundtrack && !/^[^/]+\/[^/]+\/.+/.test(meta.soundtrack)) warnings.push("Soundtrack path looks wrong");
 
   const report: {
     type: string; encoding: string; lineCount: number; tagged: boolean; text: string;
