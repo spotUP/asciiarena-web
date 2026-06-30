@@ -59,6 +59,11 @@ export async function indexColly(
   const rows = text == null ? [] : buildLogoRows(collyId, text, d);
   const ops: Promise<unknown>[] = [prisma.colly_logos.deleteMany({ where: { colly_id: collyId, manual: 0 } })];
   if (rows.length) ops.push(prisma.colly_logos.createMany({ data: rows }));
+  // Keep the full-content search index in sync from the same decoded text, so a
+  // re-index backfills content_text for every colly in one pass.
+  if (text != null) {
+    ops.push(prisma.$executeRaw`UPDATE collys SET content_text = ${text.slice(0, 5_000_000)} WHERE id = ${collyId}`);
+  }
   await prisma.$transaction(ops as never);
   return { logos: rows.length, resolved: rows.filter((r) => r.artist_id || r.crew_id || r.user_id).length };
 }
