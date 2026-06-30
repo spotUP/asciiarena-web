@@ -114,11 +114,13 @@ model collys {
   render_fg      String?          @db.Char(15)
   render_bg      String?          @db.Char(15)
   soundtrack     String?          @db.Char(255)
+  content_text   String?          @db.MediumText // decoded plain text for full-content search
   artists_collys artists_collys[]
   collys_crews   collys_crews[]
 
   @@index([uploader_id], map: "uploader_id")
   @@fulltext([name, filename], map: "name")
+  @@fulltext([content_text], map: "content_ft")
 }
 
 model collys_crews {

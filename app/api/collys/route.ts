@@ -19,6 +19,7 @@ import { broadcast } from "@/lib/live";
 import { ensureArtistId, ensureCrewId } from "@/lib/ensureEntity";
 import { broadcastActivityIfAllowed } from "@/lib/activity";
 import { indexColly, loadEntityDicts } from "@/lib/collyLogoIndex";
+import { readCollyText } from "@/lib/collyText";
 import { buildLogoRowsFromMap } from "@/lib/collyLogoRows";
 import { parseCollyBytes } from "@/lib/collyTrailer";
 import { detectCollyType, COLLY_TYPES } from "@/lib/collyType";
@@ -242,6 +243,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   );
   const collyId = insertedRow[0]?.rowid;
   if (!collyId) return apiError("Failed to insert colly", 500);
+
+  // Full-content search index: store the decoded plain text (same path used for
+  // display/logo indexing). Non-fatal — search degrades gracefully without it.
+  try {
+    const plain = readCollyText(filename, type);
+    if (plain) {
+      await prisma.$executeRaw(
+        Prisma.sql`UPDATE collys SET content_text = ${plain.slice(0, 5_000_000)} WHERE id = ${collyId}`
+      );
+    }
+  } catch { /* ignore */ }
 
   // Insert crew relationships — ensure-or-create each named crew so the
   // submitter doesn't have to leave the form to add a missing crew.
