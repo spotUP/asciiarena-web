@@ -635,6 +635,26 @@ export default function ReleaseClient({
     animateScroll(container, target, 500);
   }, []);
 
+  // Deep-link: /release/<file>#logo-<startLine> scrolls to that logo on load
+  // (used by colly-logo search + crew/artist/user "logos in collys" links).
+  const deepLinkedRef = useRef(false);
+  useEffect(() => {
+    if (deepLinkedRef.current) return;
+    if (!collyVisible || type !== "ASCII" || !sections.length) return;
+    const m = /(?:^|#)logo-(\d+)/.exec(window.location.hash);
+    if (!m) return;
+    const line = parseInt(m[1], 10);
+    // Nearest detected section by start line (client re-detection matches the
+    // indexer, but tolerate any drift).
+    let best = sections[0];
+    for (const s of sections) {
+      if (Math.abs(s.startLine - line) < Math.abs(best.startLine - line)) best = s;
+    }
+    deepLinkedRef.current = true;
+    const t = setTimeout(() => scrollToSection(best), 250); // let the colly lay out first
+    return () => clearTimeout(t);
+  }, [collyVisible, sections, type, scrollToSection]);
+
   // Keyboard shortcuts
   useEffect(() => {
     if (!collyVisible || type !== "ASCII") return;
