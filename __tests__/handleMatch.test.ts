@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { normalizeHandle, labelTokens, resolveEntities, type EntityDicts } from "@/lib/handleMatch";
+import { normalizeHandle, labelTokens, resolveEntities, isLikelyLogoLabel, type EntityDicts } from "@/lib/handleMatch";
 
 const DICTS: EntityDicts = {
   artists: [
@@ -35,6 +35,36 @@ describe("labelTokens", () => {
     const t = labelTokens("sPOt 4 aSCiiARENa");
     expect(t).toContain("spot");
     expect(t).toContain("asciiarena");
+  });
+});
+
+describe("isLikelyLogoLabel", () => {
+  it("keeps real handle-like labels (even ones not in the DB)", () => {
+    for (const ok of ["Fairlight", "lITHIUM", "BlueZone", "DarkConflict", "up rough", "darius zendeh"]) {
+      expect(isLikelyLogoLabel(ok)).toBe(true);
+    }
+  });
+
+  it("drops scrolltext / run-on prose", () => {
+    for (const no of [
+      "nOnEEDtOcRY - tHE7tHcOLLECTiONbYpasz",
+      "Dennacoolygjordesenregnigsaturdaynig",
+      "ViEWthiSPROdUCtiONONAMiGA",
+    ]) {
+      expect(isLikelyLogoLabel(no)).toBe(false);
+    }
+  });
+
+  it("drops ascii-art fragments (mostly symbols)", () => {
+    for (const no of ["l__\\\\ '\\ '\\__/,(__/", "C.D.| ------](___", "l | \\_____| l"]) {
+      expect(isLikelyLogoLabel(no)).toBe(false);
+    }
+  });
+
+  it("drops section words and 2-char noise", () => {
+    for (const no of ["LOGO", "pRESENTS", "REQUEST", "uPLOAd", "credits", "hs", "oO", "XX"]) {
+      expect(isLikelyLogoLabel(no)).toBe(false);
+    }
   });
 });
 

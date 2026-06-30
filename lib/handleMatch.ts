@@ -11,6 +11,11 @@ const NOISE = new Set([
   "nfo", "diz", "txt", "ascii", "ansi", "presents", "present", "pres",
   "colly", "collection", "coll", "logo", "logos", "by", "the", "and",
   "of", "in", "for", "crew", "group", "proudly", "presentz",
+  // section / UI / scrolltext words that recur as captions but aren't handles
+  "request", "requests", "upload", "uploads", "download", "downloads",
+  "menu", "credits", "greetings", "greets", "info", "information", "stage",
+  "name", "sof", "eof", "oof", "called", "members", "total", "loading",
+  "index", "main", "intro", "outro", "news", "thanks",
 ]);
 
 // Entities shorter than this (after normalization) are skipped in v1 — symbol/
@@ -92,6 +97,21 @@ function matchEntity(cands: Set<string>, entities: EntityRef[]): number | undefi
     }
   }
   return undefined;
+}
+
+// Whether an UNRESOLVED label is plausibly a real logo handle (vs. scrolltext
+// prose, ASCII-art fragments, section words, or 2-char noise). Resolved labels
+// are always kept; this gates the rest so the catalog isn't drowned in junk.
+export function isLikelyLogoLabel(label: string): boolean {
+  const tokens = labelTokens(label);
+  if (tokens.length < 1 || tokens.length > 4) return false; // 0 = all noise; >4 = prose
+  const norm = normalizeHandle(label);
+  if (norm.length < 3 || norm.length > 15) return false; // too short / run-on sentence
+  const letters = (norm.match(/[a-z]/g) || []).length;
+  if (letters < 3) return false; // "hs", "oO", counter strings
+  const nonSpace = label.replace(/\s/g, "").length;
+  if (nonSpace === 0 || norm.length / nonSpace < 0.5) return false; // mostly symbols => art
+  return true;
 }
 
 export function resolveEntities(label: string, dicts: EntityDicts): ResolveResult {
