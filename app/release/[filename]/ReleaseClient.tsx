@@ -639,21 +639,42 @@ export default function ReleaseClient({
   // (used by colly-logo search + crew/artist/user "logos in collys" links).
   const deepLinkedRef = useRef(false);
   useEffect(() => {
-    if (deepLinkedRef.current) return;
-    if (!collyVisible || type !== "ASCII" || !sections.length) return;
+    if (deepLinkedRef.current || !collyVisible) return;
     const m = /(?:^|#)logo-(\d+)/.exec(window.location.hash);
     if (!m) return;
     const line = parseInt(m[1], 10);
-    // Nearest detected section by start line (client re-detection matches the
-    // indexer, but tolerate any drift).
-    let best = sections[0];
-    for (const s of sections) {
-      if (Math.abs(s.startLine - line) < Math.abs(best.startLine - line)) best = s;
-    }
-    deepLinkedRef.current = true;
-    const t = setTimeout(() => scrollToSection(best), 250); // let the colly lay out first
-    return () => clearTimeout(t);
-  }, [collyVisible, sections, type, scrollToSection]);
+    let cancelled = false;
+    let tries = 0;
+    // Poll until the colly is actually laid out and scrollable — a fixed delay
+    // was firing before layout on large/slow collys, so it scrolled to ~0.
+    const attempt = () => {
+      if (cancelled || deepLinkedRef.current) return;
+      const container = collyDivRef.current;
+      const ready = container && container.scrollHeight > container.clientHeight + 10;
+      if (ready) {
+        deepLinkedRef.current = true;
+        const pre = collyRef.current as HTMLElement | null;
+        if (pre && sections.length) {
+          // Precise (text colly): scroll to the nearest detected section.
+          let best = sections[0];
+          for (const s of sections) {
+            if (Math.abs(s.startLine - line) < Math.abs(best.startLine - line)) best = s;
+          }
+          scrollToSection(best);
+        } else {
+          // Canvas colly (ANSI/CP437): no text <pre> to measure, so scroll
+          // proportionally by line position.
+          const totalLines = Math.max(1, fileContent.split("\n").length);
+          const max = container.scrollHeight - container.clientHeight;
+          animateScroll(container, Math.max(0, Math.min((line / totalLines) * max, max)), 500);
+        }
+        return;
+      }
+      if (tries++ < 50) setTimeout(attempt, 100); // up to ~5s
+    };
+    attempt();
+    return () => { cancelled = true; };
+  }, [collyVisible, sections, scrollToSection, fileContent]);
 
   // Keyboard shortcuts
   useEffect(() => {
