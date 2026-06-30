@@ -129,8 +129,19 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
       // artist replaces each one).
       if (data.meta?.logos?.length) {
         setCollyLogoMap(data.meta.logos.map((l) => ({ ...l, auto: false })));
+      } else if (data.type === "ANSI" || data.type === "CP437") {
+        // ANSI's rendered rows don't reliably match text lines (cursor codes /
+        // SAUCE width), so auto-bands mislead — start empty, map by dragging.
+        setCollyLogoMap([]);
       } else {
-        setCollyLogoMap(data.logos.map((l) => ({ line: l.line, end: l.end, caption: l.author ? `${l.name} -${l.author}` : l.name, auto: true })));
+        // Seed regions. Only carry a name when one was actually found (resolved /
+        // searchable) — most logos are unsigned, so don't fill junk from the art;
+        // leave those as empty regions for the artist to name.
+        setCollyLogoMap(data.logos.map((l) => ({
+          line: l.line, end: l.end,
+          caption: l.searchable ? (l.author ? `${l.name} -${l.author}` : l.name) : "",
+          auto: true,
+        })));
       }
     } catch { setCollyReport(null); }
   };
