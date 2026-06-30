@@ -117,7 +117,20 @@ describe("resolveEntities", () => {
     expect(resolveEntities("Stylez", d).artist_id).toBeUndefined(); // not "style"
     expect(resolveEntities("freestyle", d).artist_id).toBeUndefined();
     expect(resolveEntities("lifestyle crew", d).artist_id).toBeUndefined();
-    expect(resolveEntities("style", d).artist_id).toBe(60); // exact still works
+    expect(resolveEntities("style", d).artist_id).toBeUndefined(); // 'style' is a stoplisted common word
+  });
+
+  it("blocks ambiguous common-word entity names but keeps multi-word groups", () => {
+    const d: EntityDicts = {
+      artists: [],
+      crews: [
+        { id: 70, norm: normalizeHandle("design") },        // bare word -> blocked
+        { id: 71, norm: normalizeHandle("epsilon design") }, // distinct -> allowed
+      ],
+      users: [],
+    };
+    expect(resolveEntities("cool design pack", d).crew_id).toBeUndefined();
+    expect(resolveEntities("epsilon design", d).crew_id).toBe(71);
   });
 
   it("skips too-short/symbol handles in v1 (z!o)", () => {

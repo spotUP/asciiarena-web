@@ -22,6 +22,18 @@ const NOISE = new Set([
 // 2-char handles (z!o, etc.) need the v2 alias table to match safely.
 const MIN_ENTITY_LEN = 3;
 
+// Entity names that are also everyday descriptor words — they appear as plain
+// words in tons of captions ("old style", "an art pack", "ascii art"), so
+// auto-resolving them attributes hundreds of false logos. Blocked from
+// auto-matching; a multi-word group that merely CONTAINS one of these still
+// matches via its full name ("Epsilon Design" -> "epsilondesign", not "design").
+// Extend as more ambiguous names surface; curate exceptions via the v2 aliases.
+const ENTITY_STOPLIST = new Set([
+  "style", "art", "design", "studio", "graphics", "production", "productions",
+  "scene", "world", "zone", "online", "request", "music", "sound", "image",
+  "images", "vision", "media",
+]);
+
 export function normalizeHandle(s: string): string {
   return s
     .normalize("NFD")
@@ -93,6 +105,7 @@ function matchEntity(cands: Set<string>, entities: EntityRef[]): number | undefi
   // so exact matching covers the legitimate cases without the false positives.
   for (const e of entities) {
     if (e.norm.length < MIN_ENTITY_LEN) continue;
+    if (ENTITY_STOPLIST.has(e.norm)) continue; // ambiguous common word
     if (cands.has(e.norm)) return e.id;
   }
   return undefined;
