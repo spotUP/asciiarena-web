@@ -7,6 +7,12 @@ import { convertPcbColors, hasPcbCodes } from "@/lib/pcbColors";
 import { convertAnsiCodes, hasAnsiCodes, escapeHtmlText } from "@/lib/releaseText";
 import Cp437DizPreview from "@/components/release/Cp437DizPreview";
 import DatePicker from "@/components/ui/DatePicker";
+import DosSelect from "@/components/ui/DosSelect";
+import ColorSwatch from "@/components/ui/ColorSwatch";
+import SoundtrackPicker from "@/components/music/SoundtrackPicker";
+import CollyPreview, { type PreviewReport, type LogoEntry } from "@/components/submit/CollyPreview";
+import { FONTS } from "@/lib/ansilove";
+import { COLLY_TYPES } from "@/lib/collyType";
 
 interface Colly {
   id: number;
@@ -21,6 +27,10 @@ interface Colly {
   crews: string | null;
   broken?: number;
   broken_comment?: string | null;
+  render_font?: string | null;
+  render_fg?: string | null;
+  render_bg?: string | null;
+  soundtrack?: string | null;
 }
 
 function splitNames(value: string | null | undefined): string[] {
@@ -106,6 +116,11 @@ export default function CollysClient() {
   const [dizCp437, setDizCp437] = useState(false);
   const [dizB64, setDizB64] = useState<string | null>(null);
   const [showDizPreview, setShowDizPreview] = useState(false);
+  // Logo-map editor: the preview report (art + detection) and the editable map,
+  // both keyed to the selected colly. Loaded lazily when the editor is opened.
+  const [report, setReport] = useState<PreviewReport | null>(null);
+  const [logoMap, setLogoMap] = useState<LogoEntry[]>([]);
+  const [showMapEditor, setShowMapEditor] = useState(false);
 
   const dizPreviewHtml = useMemo(() => {
     if (!dizContent) return { html: "", hasPcb: false, hasAnsi: false };
@@ -169,6 +184,15 @@ export default function CollysClient() {
           broken_comment: e.broken_comment ?? colly.broken_comment,
           artistNames: splitNames((e.artists ?? colly.artists) as string | null),
           crewNames: splitNames((e.crews ?? colly.crews) as string | null),
+          render_font: (e.render_font ?? colly.render_font) || "",
+          render_fg: (e.render_fg ?? colly.render_fg) || "",
+          render_bg: (e.render_bg ?? colly.render_bg) || "",
+          soundtrack: (e.soundtrack ?? colly.soundtrack) || "",
+          // Only send the map when the editor was actually opened/loaded —
+          // otherwise leave the colly's existing catalog rows untouched.
+          ...(showMapEditor && report
+            ? { logos: logoMap.map(l => ({ line: l.line, end: l.end, caption: l.caption })) }
+            : {}),
         }),
       });
     } catch {
@@ -193,6 +217,10 @@ export default function CollysClient() {
       broken_comment: e.broken_comment ?? colly.broken_comment,
       artists: (e.artists ?? colly.artists) as string | null,
       crews: (e.crews ?? colly.crews) as string | null,
+      render_font: (e.render_font ?? colly.render_font) || null,
+      render_fg: (e.render_fg ?? colly.render_fg) || null,
+      render_bg: (e.render_bg ?? colly.render_bg) || null,
+      soundtrack: (e.soundtrack ?? colly.soundtrack) || null,
     } : row));
   };
 
@@ -217,6 +245,26 @@ export default function CollysClient() {
       .then(d => { setDizContent(d.content ?? ""); setDizCp437(!!d.cp437); setDizB64(d.b64 ?? null); })
       .catch(() => { setDizContent(""); setDizCp437(false); setDizB64(null); });
   }, [selected]);
+
+  // Reset the logo-map editor whenever the selected colly changes.
+  useEffect(() => { setShowMapEditor(false); setReport(null); setLogoMap([]); }, [selectedId]);
+
+  // Lazily load the preview report + the colly's saved manual map when the
+  // admin opens the visual editor (parity with the submit-time editor).
+  useEffect(() => {
+    if (!showMapEditor || !selected || report) return;
+    const fn = selected.filename;
+    const id = selected.id;
+    Promise.all([
+      fetch(`/api/collys/preview?filename=${encodeURIComponent(fn)}`).then(r => r.json()),
+      fetch(`/api/admin/collys?logos=${id}`).then(r => r.json()),
+    ])
+      .then(([rep, map]: [PreviewReport, { line: number; end?: number; caption: string }[]]) => {
+        setReport(rep);
+        setLogoMap((Array.isArray(map) ? map : []).map(m => ({ ...m, auto: false })));
+      })
+      .catch(() => { setReport(null); setLogoMap([]); flash("Could not load logo editor", false); });
+  }, [showMapEditor, selected, report]);
 
   return (
     <>
@@ -444,6 +492,76 @@ export default function CollysClient() {
                 />
               </div>
             </div>
+            {(() => {
+              const curType = edits[selected.id]?.type ?? selected.type ?? "";
+              const font = (edits[selected.id]?.render_font ?? selected.render_font ?? "") as string;
+              const fg = (edits[selected.id]?.render_fg ?? selected.render_fg ?? "") as string;
+              const bg = (edits[selected.id]?.render_bg ?? selected.render_bg ?? "") as string;
+              const soundtrack = (edits[selected.id]?.soundtrack ?? selected.soundtrack ?? "") as string;
+              const author = splitNames((edits[selected.id]?.artists ?? selected.artists) as string | null)[0] ?? "";
+              return (
+                <>
+                  {curType !== "ARCHIVE" && (
+                    <div className="row amb-1 align-items-center">
+                      <div className="col-3 lightgrey">FONT</div>
+                      <div className="col-9">
+                        <DosSelect width={240} value={font}
+                          options={[{ value: "", label: "Default / viewer choice" }, ...FONTS]}
+                          onChange={v => edit(selected.id, "render_font", v)} />
+                      </div>
+                    </div>
+                  )}
+                  {(curType === "ASCII" || curType === "CP437") && (
+                    <div className="row amb-1 align-items-center">
+                      <div className="col-3 lightgrey">COLOURS</div>
+                      <div className="col-9" style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+                        <span className="lightgrey" style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                          text <ColorSwatch current={fg || "#ff55ff"} onChange={v => edit(selected.id, "render_fg", v)} />
+                        </span>
+                        <span className="lightgrey" style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                          background <ColorSwatch current={bg || "#111111"} onChange={v => edit(selected.id, "render_bg", v)} />
+                        </span>
+                        {(fg || bg) && (
+                          <input type="button" className="btn-big" value="Reset colours"
+                            onClick={() => { edit(selected.id, "render_fg", ""); edit(selected.id, "render_bg", ""); }} />
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  <div className="row amb-1 align-items-center">
+                    <div className="col-3 lightgrey">SOUNDTRACK</div>
+                    <div className="col-9">
+                      <SoundtrackPicker value={soundtrack} onChange={v => edit(selected.id, "soundtrack", v)} />
+                    </div>
+                  </div>
+                  <div className="row amb-1">
+                    <div className="col-3 lightgrey">LOGOS</div>
+                    <div className="col-9">
+                      <input type="button" className="btn-big" value={showMapEditor ? "Hide logo editor" : "Edit logos"}
+                        onClick={() => setShowMapEditor(p => !p)} />
+                      {showMapEditor && (
+                        report ? (
+                          <div className="amt-1">
+                            <CollyPreview
+                              report={report}
+                              type={curType}
+                              font={font}
+                              fg={fg}
+                              bg={bg}
+                              logoMap={logoMap}
+                              setLogoMap={setLogoMap}
+                              defaultAuthor={author}
+                            />
+                          </div>
+                        ) : (
+                          <div className="lightgrey amt-1">Loading logo editor…</div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                </>
+              );
+            })()}
             <div className="row amb-1">
               <div className="col-3" />
               <div className="col-9" style={{ display: "flex", gap: "8px" }}>

@@ -10,6 +10,8 @@ import { loadEntityDicts } from "@/lib/collyLogoIndex";
 import { cleanLabel, type EntityDicts } from "@/lib/handleMatch";
 import { decodeReleaseText, decodeLatin1Bytes, stripFileIdDiz, releaseTextEncoding, BEGIN_FILE_ID_DIZ, END_FILE_ID_DIZ } from "@/lib/releaseText";
 import { detectCollyType } from "@/lib/collyType";
+import { collyFilePath } from "@/lib/collyText";
+import { readFile } from "fs/promises";
 
 export const dynamic = "force-dynamic";
 
@@ -29,18 +31,10 @@ function stripDizBytes(bytes: Uint8Array): Uint8Array {
 // Dry-run: parse an uploaded colly EXACTLY as the site would, and report what we
 // read — detected/mapped logos, index, trailer settings, and warnings — without
 // storing anything. Powers the interactive tester so artists tune before publishing.
-export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) return apiError("Unauthorized", 401);
-
-  const form = await request.formData().catch(() => null);
-  const file = form?.get("file");
-  if (!(file instanceof File)) return apiError("No file", 400);
-
-  const bytes = new Uint8Array(await file.arrayBuffer());
+async function buildReport(bytes: Uint8Array, filename: string) {
   const { visible, meta } = parseCollyBytes(bytes);
 
-  const type = detectCollyType(bytes, file.name);
+  const type = detectCollyType(bytes, filename);
   const encoding = releaseTextEncoding(type === "CP437" ? "CP437" : null, null);
   // Raw decoded text (not HTML-escaped) so the tester renders it 1:1 and line
   // numbers line up with the logo map.
@@ -97,5 +91,33 @@ export async function POST(request: NextRequest) {
     meta: CollyMeta; logos: typeof logos; index: typeof index; warnings: string[];
   } = { type, encoding, lineCount, tagged, text, artB64, meta, logos, index, warnings };
 
-  return apiOk(report);
+  return report;
+}
+
+// Dry-run an UPLOADED file (submit flow): parse exactly as the site would and
+// report what we read, without storing anything.
+export async function POST(request: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) return apiError("Unauthorized", 401);
+
+  const form = await request.formData().catch(() => null);
+  const file = form?.get("file");
+  if (!(file instanceof File)) return apiError("No file", 400);
+
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  return apiOk(await buildReport(bytes, file.name));
+}
+
+// Same report for an EXISTING colly on disk (admin colly editor re-mapping).
+export async function GET(request: NextRequest) {
+  const session = await auth();
+  if ((session?.user as { rank?: string } | undefined)?.rank !== "Admin") return apiError("Forbidden", 403);
+
+  const filename = request.nextUrl.searchParams.get("filename")?.trim();
+  if (!filename) return apiError("No filename", 400);
+  const path = collyFilePath(filename);
+  if (!path) return apiError("Not found", 404);
+  let bytes: Uint8Array;
+  try { bytes = new Uint8Array(await readFile(path)); } catch { return apiError("Not found", 404); }
+  return apiOk(await buildReport(bytes, filename));
 }
