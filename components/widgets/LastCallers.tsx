@@ -8,15 +8,16 @@ export type LastCallersProps = {
   limit?: number;
 };
 
-// Not cached: it must reflect a fresh login immediately (a 71s cache made it
-// look stale right after logging in). It's a single indexed ORDER BY ... LIMIT 5
-// query, so running it per render is cheap — unlike the heavier widgets whose
-// caches exist to avoid a synchronized revalidation stampede.
+// Recently-ACTIVE users (users.lastactive, stamped by the heartbeat ping), not
+// just fresh logins — a user on a persistent session who's browsing/chatting
+// should appear too. One row per user (no login dupes). Not cached: cheap indexed
+// ORDER BY ... LIMIT, and it must feel live.
 async function getLastCallers(limit: number) {
-  return prisma.lastusers.findMany({
-    orderBy: { timestamp: "desc" },
+  return prisma.users.findMany({
+    where: { lastactive: { gt: 0 } },
+    orderBy: { lastactive: "desc" },
     take: limit,
-    select: { id: true, user_id: true, nick: true, timestamp: true },
+    select: { id: true, nick: true, lastactive: true },
   });
 }
 
@@ -40,11 +41,11 @@ export default async function LastCallers({ limit = 5 }: LastCallersProps) {
                 <Link
                   prefetch={false}
                   className="yellow text-truncate"
-                  href={`/member/${urlsafe(row.nick)}`}
+                  href={`/member/${urlsafe(row.nick ?? "")}`}
                 >
                   {row.nick}
                 </Link>
-                <RelativeTime unix={row.timestamp} className="text-truncate" />
+                <RelativeTime unix={row.lastactive ?? 0} className="text-truncate" />
               </div>
             ))}
             </PrintLines>

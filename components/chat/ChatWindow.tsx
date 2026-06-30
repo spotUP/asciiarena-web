@@ -392,9 +392,16 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
       const data = await res.json() as { ok?: boolean; threadId?: number };
       if (data?.ok) {
         setInput("");
-        // The block caret (caret-shape: block) doesn't always snap back to the
-        // start when a controlled input is cleared — reset it explicitly.
-        requestAnimationFrame(() => { const el = inputRef.current; if (el) { el.focus(); el.setSelectionRange(0, 0); } });
+        // The block caret (caret-shape: block) doesn't repaint to the start when a
+        // controlled input is cleared — a blur+focus cycle forces it to recompute
+        // from selectionStart (0). Run after the empty value has committed.
+        requestAnimationFrame(() => {
+          const el = inputRef.current;
+          if (!el) return;
+          el.blur();
+          el.focus();
+          el.setSelectionRange(0, 0);
+        });
         const newThreadId = data.threadId;
         if ((!tid || tid <= 0) && newThreadId) {
           setThreadId(windowKey, newThreadId);
