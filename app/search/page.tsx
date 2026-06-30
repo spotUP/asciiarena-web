@@ -1,12 +1,13 @@
 import SiteLayout from "@/components/layout/SiteLayout";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
+import { searchLogos } from "@/lib/collyLogoSearch";
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const { q = "" } = await searchParams;
   const query = q.trim();
 
-  const [collys, collysByArtist, artists, crews, members] = query.length >= 2 ? await Promise.all([
+  const [collys, collysByArtist, artists, crews, members, logoHits] = query.length >= 2 ? await Promise.all([
     // Collys by name/filename
     prisma.collys.findMany({
       where: { OR: [{ name: { contains: query } }, { filename: { contains: query } }] },
@@ -42,7 +43,9 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       take: 10,
       orderBy: { nick: "asc" },
     }),
-  ]) : [[], [], [], [], []];
+    // Logos inside collys whose label matches the query
+    searchLogos(query),
+  ]) : [[], [], [], [], [], []];
 
   // Merge colly results, deduplicate by filename
   const collyFilenames = new Set(collys.map(c => c.filename));
@@ -51,7 +54,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     .filter(c => c && !collyFilenames.has(c.filename)) as { filename: string; name: string | null }[];
   const allCollys = [...collys, ...extraCollys].slice(0, 30);
 
-  const total = allCollys.length + artists.length + crews.length + members.length;
+  const total = allCollys.length + artists.length + crews.length + members.length + logoHits.length;
 
   return (
     <SiteLayout title="SEARCH">
@@ -76,6 +79,20 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
               <div className="col-12">
                 <Link className="magenta" href={`/release/${c.filename}`}>{c.name ?? c.filename}</Link>
                 <span className="lightgrey apl-1">{c.filename}</span>
+              </div>
+            </div>
+          ))}
+        </>
+      )}
+
+      {logoHits.length > 0 && (
+        <>
+          <h2 className="bg-header ap-1 amb-1 apt-1">Logos in collys</h2>
+          {logoHits.map(h => (
+            <div key={h.filename} className="row amb-1">
+              <div className="col-12">
+                <Link className="magenta" href={`/release/${h.filename}`}>{h.name ?? h.filename}</Link>
+                <span className="lightgrey apl-1">{h.labels.slice(0, 4).join(", ")}</span>
               </div>
             </div>
           ))}

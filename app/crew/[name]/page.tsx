@@ -6,6 +6,8 @@ import { prisma } from "@/lib/db";
 import { urlsafe, decodeParam } from "@/lib/utils";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
 import WatchingPip from "@/components/widgets/WatchingPip";
+import EntityLogosSection from "@/components/release/EntityLogosSection";
+import { logosForEntity } from "@/lib/collyLogoSearch";
 
 interface PageProps {
   params: Promise<{ name: string }>;
@@ -217,6 +219,8 @@ export default async function CrewPage({ params }: PageProps) {
       ) : (
         <div className="col-lg-12 pl-0 lightgrey">No releases found.</div>
       )}
+
+      <EntityLogosSection hits={await logosForEntity("crew", crew.id)} title={`Collys with a ${crew.name} logo`} />
     </SiteLayout>
   );
 }

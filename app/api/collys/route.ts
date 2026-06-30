@@ -18,6 +18,7 @@ import { existsSync } from "fs";
 import { broadcast } from "@/lib/live";
 import { ensureArtistId, ensureCrewId } from "@/lib/ensureEntity";
 import { broadcastActivityIfAllowed } from "@/lib/activity";
+import { indexColly } from "@/lib/collyLogoIndex";
 
 interface CollyRow {
   id: number;
@@ -242,6 +243,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       Prisma.sql`INSERT IGNORE INTO artists_collys (colly_id, artist_id) VALUES (${collyId}, ${artistId})`
     );
   }
+
+  // Index this colly's logo labels for search (non-fatal — never block an
+  // upload on indexing, and tolerate the catalog table not existing yet).
+  try { await indexColly(collyId, filename, type); } catch { /* ignore */ }
 
   // Update uploader stats
   await prisma.$executeRaw(

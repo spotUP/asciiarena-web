@@ -5,6 +5,8 @@ import UnfaveButton from "./UnfaveButton";
 import ChatButton from "./ChatButton";
 import OnlineDot from "@/components/ui/OnlineDot";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
+import EntityLogosSection from "@/components/release/EntityLogosSection";
+import { logosForEntity } from "@/lib/collyLogoSearch";
 import { prisma } from "@/lib/db";
 import { getSession as auth } from "@/lib/session";
 import { decodeParam } from "@/lib/utils";
@@ -359,6 +361,7 @@ export default async function MemberPage({
         )}
       </div>
 
+      <EntityLogosSection hits={await logosForEntity("user", member.id)} title={`Collys with a ${member.nick} logo`} />
     </SiteLayout>
   );
 }
