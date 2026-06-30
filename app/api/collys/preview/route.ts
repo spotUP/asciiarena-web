@@ -43,14 +43,15 @@ export async function POST(request: NextRequest) {
     : detectLogoSections(text);
   const rows = tagged ? buildLogoRowsFromMap(0, meta.logos!, dicts) : buildLogoRows(0, text, dicts);
 
-  // One report row per detected/mapped logo.
+  // One report row per detected/mapped logo, with its line range (for bands).
   const logos = (tagged
-    ? meta.logos!.slice().sort((a, b) => a.line - b.line).map((m) => ({ line: m.line, label: m.caption }))
-    : buildLogoIndex(text, sections).map((e) => ({ line: e.section.startLine + 1, label: e.label }))
+    ? meta.logos!.slice().sort((a, b) => a.line - b.line).map((m, i, arr) => ({ line: m.line, end: m.end ?? (arr[i + 1] ? arr[i + 1].line - 1 : lineCount), label: m.caption }))
+    : buildLogoIndex(text, sections).map((e) => ({ line: e.section.startLine + 1, end: e.section.endLine + 1, label: e.label }))
   ).map((lg) => {
     const row = rows.find((r) => cleanLabel(r.label).toLowerCase() === cleanLabel(lg.label).toLowerCase());
     return {
       line: lg.line,
+      end: lg.end,
       name: cleanLabel(lg.label),
       resolved: row ? (row.artist_id ? "artist" : row.crew_id ? "crew" : row.user_id ? "member" : null) : null,
       searchable: !!row,

@@ -11,12 +11,14 @@ export interface PreviewReport {
   tagged: boolean;
   text: string;
   meta: { title?: string; author?: string; crew?: string; font?: string; fg?: string; bg?: string; soundtrack?: string; logos?: { line: number; end?: number; caption: string }[] };
-  logos: { line: number; name: string; resolved: string | null; searchable: boolean }[];
+  logos: { line: number; end: number; name: string; resolved: string | null; searchable: boolean }[];
   index: { num: number; name: string }[];
   warnings: string[];
 }
 
-export type LogoEntry = { line: number; end?: number; caption: string };
+// `auto` = a kept asciiarena suggestion (shown in a different colour); cleared
+// once the artist edits/replaces it.
+export type LogoEntry = { line: number; end?: number; caption: string; auto?: boolean };
 
 // caption <-> {name, by, for}: "NAME -AUTHOR for REQUESTER" (reuses the existing
 // caption grammar: subject before "for", author as a trailing -signature).
@@ -81,8 +83,15 @@ export default function CollyPreview({
   const openEdit = (i: number) => { const en = logoMap[i]; const d = decompose(en.caption); setSel({ start: en.line, end: en.end ?? en.line }); setEditIdx(i); setFName(d.name); setFBy(d.by || defaultAuthor); setFFor(d.for); };
   const save = () => {
     if (!sel || !fName.trim()) return;
-    const entry: LogoEntry = { line: sel.start, end: sel.end > sel.start ? sel.end : undefined, caption: compose(fName, fBy, fFor) };
-    const next = editIdx != null ? logoMap.map((x, i) => (i === editIdx ? entry : x)) : [...logoMap, entry];
+    const entry: LogoEntry = { line: sel.start, end: sel.end > sel.start ? sel.end : undefined, caption: compose(fName, fBy, fFor), auto: false };
+    let next: LogoEntry[];
+    if (editIdx != null) {
+      next = logoMap.map((x, i) => (i === editIdx ? entry : x));
+    } else {
+      // New mapping replaces ONLY the entries it overlaps; the rest (other auto
+      // suggestions + manual logos) stay put.
+      next = [...logoMap.filter((en) => !(sel.start <= (en.end ?? en.line) && sel.end >= en.line)), entry];
+    }
     setLogoMap(next.sort((a, b) => a.line - b.line));
     close();
   };
@@ -103,9 +112,10 @@ export default function CollyPreview({
   }, [drag, logoMap, defaultAuthor]);
 
   const rowBg = (n: number): string | undefined => {
-    if (drag && n >= Math.min(drag.a, drag.b) && n <= Math.max(drag.a, drag.b)) return "rgba(255,85,255,0.35)";
-    if (sel && n >= sel.start && n <= sel.end) return "rgba(255,85,255,0.35)";
-    if (logoMap.some((en) => n >= en.line && n <= (en.end ?? en.line))) return "rgba(255,85,255,0.15)";
+    if (drag && n >= Math.min(drag.a, drag.b) && n <= Math.max(drag.a, drag.b)) return "rgba(255,85,255,0.45)";
+    if (sel && n >= sel.start && n <= sel.end) return "rgba(255,85,255,0.45)";
+    const en = logoMap.find((e) => n >= e.line && n <= (e.end ?? e.line));
+    if (en) return en.auto ? "rgba(85,255,255,0.20)" : "rgba(255,85,255,0.20)"; // auto = cyan, manual = magenta
     return undefined;
   };
   const down = (n: number) => (e: React.MouseEvent) => { e.preventDefault(); setDrag({ a: n, b: n }); };
@@ -181,22 +191,16 @@ export default function CollyPreview({
           </div>
           <div className="lightgrey">Type: <span className="white">{report.type}</span> &middot; {report.lineCount} lines &middot; {report.tagged ? <span className="green">tag-mapped</span> : "auto-detected"}</div>
           {report.warnings.map((w, i) => <div key={i} className="yellow" style={{ marginTop: "4px" }}>! {w}</div>)}
-          <div className="white" style={{ marginTop: "8px" }}>Mapped logos ({logoMap.length})</div>
+          <div className="white" style={{ marginTop: "8px" }}>Logos ({logoMap.length})</div>
+          <div style={{ fontSize: "11px", marginBottom: "4px" }}>
+            <span style={{ color: "#55ffff" }}>cyan = our guess</span> &middot; <span style={{ color: "#ff55ff" }}>magenta = yours</span> &middot; click to edit
+          </div>
           {logoMap.map((l, i) => (
             <div key={i} className="lightgrey colly-line" onClick={() => openEdit(i)} style={{ fontSize: "13px" }}>
+              <span style={{ color: l.auto ? "#55ffff" : "#ff55ff" }}>{l.auto ? "auto" : "set"}</span>{" "}
               <span style={{ color: "#555" }}>L{l.line}{l.end && l.end > l.line ? `-${l.end}` : ""}</span> {l.caption}
             </div>
           ))}
-          {logoMap.length === 0 && (
-            <><div className="white" style={{ marginTop: "8px" }}>Auto-detected ({report.logos.length})</div>
-              {report.logos.map((l, i) => (
-                <div key={i} className="lightgrey" style={{ fontSize: "13px" }}>
-                  <span style={{ color: "#555" }}>L{l.line}</span> {l.name}
-                  {l.resolved && <span className="green"> [{l.resolved}]</span>}
-                  {!l.searchable && <span className="yellow"> (not searchable)</span>}
-                </div>
-              ))}</>
-          )}
         </div>
         <div className="header bg-header ap-1">HOW IT WORKS</div>
         <div className="bg-secondary ap-1" style={{ fontSize: "13px" }}>

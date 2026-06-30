@@ -126,7 +126,14 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
       if (data.meta?.fg) setCollyFg(data.meta.fg);
       if (data.meta?.bg) setCollyBg(data.meta.bg);
       if (data.meta?.soundtrack) setCollySoundtrack(data.meta.soundtrack);
-      setCollyLogoMap(data.meta?.logos ?? []);
+      // Seed the editable map: the file's own tags if present (treated as "set"),
+      // else asciiarena's auto-detected logos as suggestions (cyan, kept until the
+      // artist replaces each one).
+      if (data.meta?.logos?.length) {
+        setCollyLogoMap(data.meta.logos.map((l) => ({ ...l, auto: false })));
+      } else {
+        setCollyLogoMap(data.logos.map((l) => ({ line: l.line, end: l.end, caption: l.name, auto: true })));
+      }
     } catch { setCollyReport(null); }
   };
 
@@ -278,8 +285,14 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
       if (collyBg) formData.append("render_bg", collyBg);
     }
     if (collySoundtrack) formData.append("soundtrack", collySoundtrack);
-    const mappedLogos = collyLogoMap.filter((l) => l.caption.trim());
-    if (mappedLogos.length) formData.append("logos", JSON.stringify(mappedLogos));
+    // Only freeze the logo map into the file when the artist actually edited one
+    // (else leave it to live auto-detection at render). When they did, write the
+    // whole reviewed set — kept suggestions + their edits.
+    const touched = collyLogoMap.some((l) => l.auto === false);
+    if (touched) {
+      const mappedLogos = collyLogoMap.filter((l) => l.caption.trim());
+      if (mappedLogos.length) formData.append("logos", JSON.stringify(mappedLogos));
+    }
 
     const r = await fetch("/api/collys", { method: "POST", body: formData });
     if (r.status === 409) {
