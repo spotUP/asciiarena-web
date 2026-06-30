@@ -153,6 +153,17 @@ describe("resolveEntities", () => {
     expect(r.user_id).toBeUndefined(); // xcz = recipient, not attributed
   });
 
+  it("handles a glued digit connector ('asciiarena 4spot' -> asciiarena)", () => {
+    const d: EntityDicts = {
+      artists: [],
+      crews: [{ id: 80, norm: normalizeHandle("asciiarena") }],
+      users: [{ id: 81, norm: normalizeHandle("spot") }],
+    };
+    const r = resolveEntities("e] .| asciiarena 4spot", d);
+    expect(r.crew_id).toBe(80); // asciiarena = the logo
+    expect(r.user_id).toBeUndefined(); // spot = recipient
+  });
+
   it("treats '4' / '2' as for/to connectors (recipient dropped)", () => {
     const d: EntityDicts = {
       artists: [{ id: 50, norm: normalizeHandle("spot") }],

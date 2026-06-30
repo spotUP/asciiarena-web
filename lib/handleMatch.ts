@@ -148,8 +148,17 @@ export function cleanLabel(label: string): string {
 const CONNECTORS = new Set(["for", "to", "4", "2"]);
 export function subjectPart(label: string): string {
   const words = label.split(/\s+/).filter(Boolean);
-  const i = words.findIndex((w) => CONNECTORS.has(normalizeHandle(w)));
-  return (i >= 0 ? words.slice(0, i) : words).join(" ");
+  for (let i = 0; i < words.length; i++) {
+    const n = normalizeHandle(words[i]);
+    if (CONNECTORS.has(n)) return words.slice(0, i).join(" "); // standalone "for"/"4"
+    // Glued connector: "4spot" / "2spot" (a 4/2 stuck to the recipient). Only
+    // when there's already a subject and the tail looks like a handle.
+    const g = /^([42])([a-z].*)$/.exec(n);
+    if (i > 0 && g && (g[2].match(/[a-z]/g) || []).length >= 3) {
+      return words.slice(0, i).join(" ");
+    }
+  }
+  return words.join(" ");
 }
 
 export function resolveEntities(label: string, dicts: EntityDicts): ResolveResult {
