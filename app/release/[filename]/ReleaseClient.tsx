@@ -23,27 +23,10 @@ import {
 } from "@/lib/logoSections";
 import LogoMinimap, { MINIMAP_WIDTH } from "./LogoMinimap";
 import { parseCollyIndex, sectionForIndexEntry, linkifyCollyIndex } from "@/lib/collyIndex";
+import ColorSwatch from "@/components/ui/ColorSwatch";
 import { useMusic } from "@/components/music/MusicProvider";
 import { BeatDetector, lowBandEnergy } from "@/lib/uade/beatDetector";
 
-const COLOR_OPTIONS = [
-  { value: "#555555", label: "Bright Black" },
-  { value: "#5555ff", label: "Bright Blue" },
-  { value: "#ff55ff", label: "Bright Magenta" },
-  { value: "#ff5555", label: "Bright Red" },
-  { value: "#ffff55", label: "Bright Yellow" },
-  { value: "#55ff55", label: "Bright Green" },
-  { value: "#55FFFF", label: "Bright Cyan" },
-  { value: "#ffffff", label: "White" },
-  { value: "#000000", label: "Black" },
-  { value: "#0000aa", label: "Blue" },
-  { value: "#aa00aa", label: "Magenta" },
-  { value: "#aa0000", label: "Red" },
-  { value: "#aa5500", label: "Yellow" },
-  { value: "#00aa00", label: "Green" },
-  { value: "#00aaaa", label: "Cyan" },
-  { value: "#aaaaaa", label: "Grey" },
-];
 
 
 interface Comment {
@@ -69,6 +52,8 @@ interface Props {
   /** Decoded plaintext for logo detection on canvas (ANSI) collys, where
    *  fileContent is empty because the art renders on the AnsiLove canvas. */
   logoText: string;
+  /** Optional Modland full_path the artist set as this colly's soundtrack. */
+  soundtrack: string | null;
   extractedEntry: string | null;
   type: string;
   /** True when the release is PC/CP437 art — rendered via AnsiLove with an IBM
@@ -82,48 +67,6 @@ interface Props {
 }
 
 type Section = null | "add-comment" | "edit-comment" | "broken";
-
-function ColorSwatch({ current, onChange }: { current: string; onChange: (v: string) => void }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
-
-  return (
-    <div ref={ref} style={{ position: "relative" }}>
-      <button
-        onClick={() => setOpen(o => !o)}
-        style={{ width: "8px", height: "16px", background: current, border: "none", padding: 0, cursor: "pointer", display: "block" }}
-      />
-      {open && (
-        <div style={{
-          position: "absolute", top: "100%", left: 0, zIndex: 100,
-          background: "#222", border: "1px solid #555", padding: "4px",
-          display: "grid", gridTemplateColumns: "repeat(8, 20px)", gap: "2px",
-        }}>
-          {COLOR_OPTIONS.map(c => (
-            <button
-              key={c.value}
-              title={c.label}
-              style={{
-                width: "20px", height: "20px", background: c.value, cursor: "pointer",
-                border: current === c.value ? "2px solid white" : "1px solid #555", padding: 0,
-              }}
-              onClick={() => { onChange(c.value); setOpen(false); }}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 function hexToRgb(hex: string): [number, number, number] {
   const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
@@ -309,7 +252,7 @@ function ArchiveEntryRenderer({ filename, entry, entryIndex, eager, ansiFont, fg
 export default function ReleaseClient({
   collyId, filename, collyFileUrl, userNick, isAdmin,
   isFavourited, initBgColor, initFgColor, initFont,
-  isArchive, fileContent, logoText, extractedEntry, type, isCp437, collyTitle, siteUrl,
+  isArchive, fileContent, logoText, soundtrack, extractedEntry, type, isCp437, collyTitle, siteUrl,
   initialViewCount, initialFavCount, initialDownloadCount,
 }: Props) {
   const [collyVisible, setCollyVisible] = useState(true);
@@ -342,9 +285,40 @@ export default function ReleaseClient({
   const autoplayDirRef = useRef(1); // +1 forward, -1 backward (ping-pong loop)
   // Groove mode: advance the slideshow on the music's beat instead of a timer.
   const [musicGroove, setMusicGroove] = useState(false);
-  const { getAnalyser: getMusicAnalyser, playRandom: playRandomMusic, isPlaying: musicIsPlaying } = useMusic();
+  const { getAnalyser: getMusicAnalyser, playRandom: playRandomMusic, playFile: playMusicFile, isPlaying: musicIsPlaying } = useMusic();
   const musicPlayingRef = useRef(false);
   useEffect(() => { musicPlayingRef.current = musicIsPlaying; }, [musicIsPlaying]);
+
+  // The artist's soundtrack: start it on the viewer's FIRST gesture (browser
+  // autoplay policy needs one), but never hijack music the viewer already has
+  // playing. One-shot — detaches after it fires.
+  useEffect(() => {
+    if (!soundtrack) return;
+    let done = false;
+    const start = () => {
+      if (done) return;
+      done = true;
+      document.removeEventListener("pointerdown", start);
+      document.removeEventListener("keydown", start);
+      if (musicPlayingRef.current) return; // don't interrupt the viewer's tune
+      const parts = soundtrack.split("/");
+      const filename = parts[parts.length - 1] || soundtrack;
+      void playMusicFile({
+        id: 0,
+        format: parts[0] || "",
+        author: parts[1] || "",
+        filename,
+        full_path: soundtrack,
+        extension: (filename.match(/\.([^.]+)$/)?.[1] || "").toLowerCase(),
+      });
+    };
+    document.addEventListener("pointerdown", start);
+    document.addEventListener("keydown", start);
+    return () => {
+      document.removeEventListener("pointerdown", start);
+      document.removeEventListener("keydown", start);
+    };
+  }, [soundtrack, playMusicFile]);
   const autoplayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoplayRafRef   = useRef<(() => void) | null>(null);
   const beatRafRef       = useRef<number | null>(null);

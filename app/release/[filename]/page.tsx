@@ -238,12 +238,16 @@ export default async function ReleasePage({ params }: PageProps) {
     if (userPrefs.def_fg_col && userPrefs.def_fg_col.length > 1) fgcolor = userPrefs.def_fg_col;
     if (userPrefs.def_bg_col && userPrefs.def_bg_col.length > 1) bgcolor = userPrefs.def_bg_col;
   }
-  // The colly's own settings (the invisible trailer; Phase 2 adds DB columns that
-  // layer on top) are the artist's intended look — they win over the viewer's
+  // The colly's own settings — the submit-form DB columns, else the invisible
+  // trailer — are the artist's intended look, so they win over the viewer's
   // global pref for the INITIAL render. The viewer's live picker still overrides.
-  if (collyMeta.font) font = collyMeta.font;
-  if (collyMeta.fg) fgcolor = collyMeta.fg;
-  if (collyMeta.bg) bgcolor = collyMeta.bg;
+  const collyFont = colly.render_font || collyMeta.font;
+  const collyFg = colly.render_fg || collyMeta.fg;
+  const collyBg = colly.render_bg || collyMeta.bg;
+  if (collyFont) font = collyFont;
+  if (collyFg) fgcolor = collyFg;
+  if (collyBg) bgcolor = collyBg;
+  const soundtrack = colly.soundtrack || collyMeta.soundtrack || null;
   // PCB-coloured collys use exact background colours per span; the
   // wrapper <pre> must be black so the gaps look correct.
   if (hasPcb) bgcolor = "#000000";
@@ -386,6 +390,7 @@ export default async function ReleasePage({ params }: PageProps) {
         isArchive={isArchive}
         fileContent={fileContent}
         logoText={logoText}
+        soundtrack={soundtrack}
         extractedEntry={extractedEntry}
         type={type}
         isCp437={isCp437}

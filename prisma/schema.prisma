@@ -110,6 +110,10 @@ model collys {
   day            Int?
   broken         Int?
   broken_comment String?          @db.MediumText
+  render_font    String?          @db.Char(32)
+  render_fg      String?          @db.Char(15)
+  render_bg      String?          @db.Char(15)
+  soundtrack     String?          @db.Char(255)
   artists_collys artists_collys[]
   collys_crews   collys_crews[]
 

@@ -19,6 +19,7 @@ import { broadcast } from "@/lib/live";
 import { ensureArtistId, ensureCrewId } from "@/lib/ensureEntity";
 import { broadcastActivityIfAllowed } from "@/lib/activity";
 import { indexColly } from "@/lib/collyLogoIndex";
+import { parseCollyBytes } from "@/lib/collyTrailer";
 
 interface CollyRow {
   id: number;
@@ -213,10 +214,18 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const file_id = filename + ".diz";
 
+  // Per-colly render settings: the submit form wins, else seed from the file's
+  // invisible trailer (SAUCE / key:value) so trailer-carrying files self-fill.
+  const { meta: trailerMeta } = parseCollyBytes(new Uint8Array(bytes));
+  const render_font = (String(formData.get("render_font") ?? "").trim() || trailerMeta.font) || null;
+  const render_fg = (String(formData.get("render_fg") ?? "").trim() || trailerMeta.fg) || null;
+  const render_bg = (String(formData.get("render_bg") ?? "").trim() || trailerMeta.bg) || null;
+  const soundtrack = (String(formData.get("soundtrack") ?? "").trim() || trailerMeta.soundtrack) || null;
+
   // Insert colly
   await prisma.$executeRaw(
-    Prisma.sql`INSERT INTO collys (name, filename, type, year, month, day, file_id, filesize, uploader, uploader_id, timestamp, view_counter, downloads, broken)
-      VALUES (${name}, ${filename}, ${type}, ${year}, ${month}, ${day}, ${file_id}, ${filesize}, ${uploaderNick}, ${uploaderId}, UNIX_TIMESTAMP(), 0, 0, 0)`
+    Prisma.sql`INSERT INTO collys (name, filename, type, year, month, day, file_id, filesize, uploader, uploader_id, timestamp, view_counter, downloads, broken, render_font, render_fg, render_bg, soundtrack)
+      VALUES (${name}, ${filename}, ${type}, ${year}, ${month}, ${day}, ${file_id}, ${filesize}, ${uploaderNick}, ${uploaderId}, UNIX_TIMESTAMP(), 0, 0, 0, ${render_font}, ${render_fg}, ${render_bg}, ${soundtrack})`
   );
 
   const insertedRow = await prisma.$queryRaw<[{ rowid: number }]>(

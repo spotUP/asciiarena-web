@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Combobox from "@/components/ui/Combobox";
 import DosSelect from "@/components/ui/DosSelect";
 import DatePicker from "@/components/ui/DatePicker";
+import ColorSwatch from "@/components/ui/ColorSwatch";
+import SoundtrackPicker from "@/components/music/SoundtrackPicker";
 import AnsiEditor, { type AnsiEditorRef } from "@/components/ui/AnsiEditor/AnsiEditor";
 import { FONTS } from "@/lib/ansilove";
 
@@ -97,6 +99,11 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
   const [collyDay, setCollyDay] = useState("");
   const [collyArtists, setCollyArtists] = useState<string[]>([""]);
   const [collyCrews, setCollyCrews] = useState<string[]>([""]);
+  // Optional per-colly render settings (also settable via the file's invisible trailer).
+  const [collyFont, setCollyFont] = useState("");
+  const [collyFg, setCollyFg] = useState("");
+  const [collyBg, setCollyBg] = useState("");
+  const [collySoundtrack, setCollySoundtrack] = useState("");
 
   // Crew form
   const [crewName, setCrewName] = useState("");
@@ -239,6 +246,10 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
     formData.append("day", collyDay);
     collyArtists.filter(Boolean).forEach((a) => formData.append("artistname[]", a));
     collyCrews.filter(Boolean).forEach((c) => formData.append("crewname[]", c));
+    if (collyFont) formData.append("render_font", collyFont);
+    if (collyFg) formData.append("render_fg", collyFg);
+    if (collyBg) formData.append("render_bg", collyBg);
+    if (collySoundtrack) formData.append("soundtrack", collySoundtrack);
 
     const r = await fetch("/api/collys", { method: "POST", body: formData });
     if (r.status === 409) {
@@ -247,6 +258,7 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
       setStatus({ msg: "Colly uploaded successfully!", ok: true });
       setCollyName(""); setCollyYear(""); setCollyMonth(""); setCollyDay("");
       setCollyArtists([""]); setCollyCrews([""]);
+      setCollyFont(""); setCollyFg(""); setCollyBg(""); setCollySoundtrack("");
       if (collyFileRef.current) collyFileRef.current.value = "";
     } else {
       const body = (await r.json().catch(() => ({}))) as { error?: string };
@@ -577,6 +589,31 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
             </Field>
             <MultiSelect label="Artist(s)" values={collyArtists} options={artistList} placeholder="-- Unknown --" createLabel="artist" onChange={setCollyArtists} />
             <MultiSelect label="Crew(s)" values={collyCrews} options={crewList} placeholder="-- None --" createLabel="crew" onChange={setCollyCrews} />
+            <Field label="Font">
+              <DosSelect
+                padded
+                width={240}
+                value={collyFont}
+                options={[{ value: "", label: "Default / viewer choice" }, ...FONTS]}
+                onChange={setCollyFont}
+              />
+            </Field>
+            <Field label="Colours">
+              <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+                <span className="lightgrey" style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                  text <ColorSwatch current={collyFg || "#ff55ff"} onChange={setCollyFg} />
+                </span>
+                <span className="lightgrey" style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                  background <ColorSwatch current={collyBg || "#111111"} onChange={setCollyBg} />
+                </span>
+                {(collyFg || collyBg) && (
+                  <input type="button" className="btn-big" value="Reset colours" onClick={() => { setCollyFg(""); setCollyBg(""); }} />
+                )}
+              </div>
+            </Field>
+            <Field label="Soundtrack">
+              <SoundtrackPicker value={collySoundtrack} onChange={setCollySoundtrack} />
+            </Field>
             <div className="amt-1">
               <input type="submit" className="btn-big bg-green white" value="Upload Colly" />
             </div>
