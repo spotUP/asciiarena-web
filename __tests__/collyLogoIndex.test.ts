@@ -34,6 +34,25 @@ describe("buildLogoRows", () => {
     expect(rows[0].start_line).toBeGreaterThanOrEqual(0);
   });
 
+  it("indexes a 'X for Y' logo under X only — search key excludes the recipient", () => {
+    const forCaption = colly(
+      "up rough for spot",
+      "",
+      "_/\\__ ___ AAA ___ __/\\_",
+      "|  | /   \\ |  | /   \\| |",
+      "|__| \\___/ |__| \\___/|_|",
+      "|  | /   \\ |  | /   \\| |",
+      "|__| \\___/ |__| \\___/|_|",
+      "",
+    );
+    const dicts: EntityDicts = { ...EMPTY_DICTS, crews: [{ id: 20, norm: normalizeHandle("up rough") }] };
+    const rows = buildLogoRows(7, forCaption, dicts);
+    expect(rows.length).toBe(1);
+    expect(rows[0].crew_id).toBe(20); // up rough = the logo
+    expect(rows[0].label_norm).toBe("uprough"); // recipient "spot" excluded from search key
+    expect(rows[0].label_norm).not.toContain("spot");
+  });
+
   it("does not store uncaptioned / generic 'Logo N' rows", () => {
     // Same art but no caption above it -> label falls back to generic -> skipped.
     const noCaption = colly(

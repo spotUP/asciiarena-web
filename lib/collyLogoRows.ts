@@ -26,17 +26,20 @@ export function buildLogoRows(collyId: number, text: string, dicts: EntityDicts)
     const raw = (entry.label || "").trim();
     if (!raw || /^Logo \d+$/.test(raw)) return; // uncaptioned / generic fallback
     const label = raw.slice(0, 120);
+    const subject = subjectPart(label);
     // The label's SUBJECT (before any "for"/"4" recipient) must look like a real
     // handle — even when it resolves. This drops credits/gifts tables and prose
     // that merely mention a handle ("All work by TANGo except the following...").
-    if (!isLikelyLogoLabel(subjectPart(label))) return;
+    if (!isLikelyLogoLabel(subject)) return;
     const res = resolveEntities(label, dicts);
     rows.push({
       colly_id: collyId,
       position,
       start_line: entry.section.startLine,
       label,
-      label_norm: normalizeHandle(label).slice(0, 120),
+      // Search key is the SUBJECT only, so searching "spot" doesn't match an
+      // "up rough FOR spot" logo (it's an up rough logo, dedicated to spot).
+      label_norm: normalizeHandle(subject).slice(0, 120),
       artist_id: res.artist_id ?? null,
       crew_id: res.crew_id ?? null,
       user_id: res.user_id ?? null,
