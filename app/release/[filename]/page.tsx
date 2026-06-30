@@ -8,6 +8,7 @@ import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { encodeReleaseText, releaseTextEncoding, releaseViewerType, stripFileIdDiz, convertAnsiCodes, hasAnsiCodes, looksLikeCp437Art } from "@/lib/releaseText";
 import { readCollyText } from "@/lib/collyText";
+import { parseCollyBytes, type CollyMeta } from "@/lib/collyTrailer";
 import { convertPcbColors, hasPcbCodes } from "@/lib/pcbColors";
 import { extractFirstRenderable } from "@/lib/archive";
 import Cp437DizPreview from "@/components/release/Cp437DizPreview";
@@ -146,8 +147,14 @@ export default async function ReleasePage({ params }: PageProps) {
   let fileContent = "";
   let embeddedDiz: string | null = null;
   let hasPcb = false;
+  // Invisible per-colly metadata after the Ctrl-Z EOF (SAUCE / key:value).
+  let collyMeta: CollyMeta = {};
   if (type === "ASCII" && existsSync(filePath)) {
-    try { fileContent = encodeFileText(filePath, textEncoding); } catch { fileContent = ""; }
+    try {
+      const { visible, meta } = parseCollyBytes(readFileSync(filePath));
+      collyMeta = meta;
+      fileContent = encodeReleaseText(visible, textEncoding);
+    } catch { fileContent = ""; }
     if (fileContent) {
       // Strip @BEGIN_FILE_ID.DIZ ... @END_FILE_ID.DIZ block (PHP cmds.php behaviour)
       const stripped = stripFileIdDiz(fileContent);
@@ -174,9 +181,12 @@ export default async function ReleasePage({ params }: PageProps) {
   if (type === "ANSI" && existsSync(filePath)) {
     logoText = readCollyText(filename, type) ?? "";
     // The ASCII branch pulls the embedded @BEGIN_FILE_ID.DIZ block; ANSI never
-    // did, so its .diz was lost. Extract it here too (decode + strip markers).
+    // did, so its .diz was lost. Extract it here too (decode + strip markers),
+    // and capture the invisible trailer metadata.
     try {
-      const stripped = stripFileIdDiz(encodeFileText(filePath, textEncoding));
+      const { visible, meta } = parseCollyBytes(readFileSync(filePath));
+      collyMeta = meta;
+      const stripped = stripFileIdDiz(encodeReleaseText(visible, textEncoding));
       if (stripped.dizText) embeddedDiz = stripped.dizText;
     } catch { /* no embedded diz */ }
   }
@@ -228,6 +238,12 @@ export default async function ReleasePage({ params }: PageProps) {
     if (userPrefs.def_fg_col && userPrefs.def_fg_col.length > 1) fgcolor = userPrefs.def_fg_col;
     if (userPrefs.def_bg_col && userPrefs.def_bg_col.length > 1) bgcolor = userPrefs.def_bg_col;
   }
+  // The colly's own settings (the invisible trailer; Phase 2 adds DB columns that
+  // layer on top) are the artist's intended look — they win over the viewer's
+  // global pref for the INITIAL render. The viewer's live picker still overrides.
+  if (collyMeta.font) font = collyMeta.font;
+  if (collyMeta.fg) fgcolor = collyMeta.fg;
+  if (collyMeta.bg) bgcolor = collyMeta.bg;
   // PCB-coloured collys use exact background colours per span; the
   // wrapper <pre> must be black so the gaps look correct.
   if (hasPcb) bgcolor = "#000000";

@@ -1,6 +1,7 @@
 import { readFileSync, existsSync } from "fs";
 import path from "path";
 import { encodeReleaseText, releaseTextEncoding, stripFileIdDiz } from "@/lib/releaseText";
+import { parseCollyBytes } from "@/lib/collyTrailer";
 
 // Resolve a colly's on-disk path the same way the release page does:
 // <COLLECTIONS_PATH>/<filename-without-ext>/<filename>.
@@ -27,7 +28,10 @@ export function readCollyText(filename: string, storedType?: string | null): str
   if (!existsSync(filePath)) return null;
   try {
     const encoding = releaseTextEncoding((storedType ?? "ASCII").toUpperCase(), null);
-    let text = encodeReleaseText(readFileSync(filePath), encoding);
+    // Drop the invisible metadata trailer (after Ctrl-Z) so logo detection / the
+    // search catalog never see SAUCE bytes or key:value tag lines.
+    const { visible } = parseCollyBytes(readFileSync(filePath));
+    let text = encodeReleaseText(visible, encoding);
     text = stripFileIdDiz(text).content;
     text = stripAnsiEscapes(text);
     return text;
