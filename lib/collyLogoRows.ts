@@ -1,5 +1,5 @@
 import { detectLogoSections, buildLogoIndex } from "@/lib/logoSections";
-import { normalizeHandle, resolveEntities, isLikelyLogoLabel, subjectPart, type EntityDicts } from "@/lib/handleMatch";
+import { resolveEntities, isLikelyLogoLabel, subjectPart, searchKey, type EntityDicts } from "@/lib/handleMatch";
 
 // Pure (no DB) so it's unit-testable. Kept separate from collyLogoIndex.ts,
 // which imports the Prisma client.
@@ -37,9 +37,10 @@ export function buildLogoRows(collyId: number, text: string, dicts: EntityDicts)
       position,
       start_line: entry.section.startLine,
       label,
-      // Search key is the SUBJECT only, so searching "spot" doesn't match an
-      // "up rough FOR spot" logo (it's an up rough logo, dedicated to spot).
-      label_norm: normalizeHandle(subject).slice(0, 120),
+      // Whole-token search key for the SUBJECT only: searching "spot" matches
+      // the handle "spot" but not "spotlite" (substring) nor an "up rough FOR
+      // spot" recipient.
+      label_norm: searchKey(subject).slice(0, 120),
       artist_id: res.artist_id ?? null,
       crew_id: res.crew_id ?? null,
       user_id: res.user_id ?? null,

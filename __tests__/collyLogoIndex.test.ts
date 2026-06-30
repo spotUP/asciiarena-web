@@ -28,7 +28,7 @@ describe("buildLogoRows", () => {
     expect(rows.length).toBe(1);
     expect(rows[0].colly_id).toBe(7);
     expect(normalizeHandle(rows[0].label)).toBe("uprough");
-    expect(rows[0].label_norm).toBe("uprough");
+    expect(rows[0].label_norm.split(" ")).toContain("uprough");
     expect(rows[0].crew_id).toBe(20);
     expect(rows[0].artist_id).toBeNull();
     expect(rows[0].start_line).toBeGreaterThanOrEqual(0);
@@ -49,7 +49,7 @@ describe("buildLogoRows", () => {
     const rows = buildLogoRows(7, forCaption, dicts);
     expect(rows.length).toBe(1);
     expect(rows[0].crew_id).toBe(20); // up rough = the logo
-    expect(rows[0].label_norm).toBe("uprough"); // recipient "spot" excluded from search key
+    expect(rows[0].label_norm.split(" ")).toContain("uprough"); // recipient "spot" excluded from search key
     expect(rows[0].label_norm).not.toContain("spot");
   });
 

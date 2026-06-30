@@ -80,6 +80,14 @@ function candidateStrings(tokens: string[]): Set<string> {
   return out;
 }
 
+// Space-separated whole-token search key for a label's subject: the candidate
+// strings (tokens + multi-word joins). Stored as label_norm and matched with
+// delimiters ('% spot %') so a query matches a whole handle, never a substring
+// ("spot" must not match "spotlite" / "sayspotion").
+export function searchKey(text: string): string {
+  return [...candidateStrings(labelTokens(text))].join(" ");
+}
+
 export interface EntityRef {
   id: number;
   norm: string; // normalizeHandle(nick|name|acronym)

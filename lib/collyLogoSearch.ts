@@ -71,11 +71,13 @@ export async function searchLogos(q: string, limit = 60): Promise<CollyLogoHit[]
   const norm = normalizeHandle(q);
   if (norm.length < 2) return [];
   try {
+    // Whole-token match: label_norm is space-separated candidate tokens, so the
+    // delimited LIKE matches the handle "spot" but never "spotlite"/"sayspotion".
     const rows = await prisma.$queryRaw<Row[]>(Prisma.sql`
       SELECT c.filename AS filename, c.name AS name, cl.label AS label, cl.start_line AS start_line
       FROM colly_logos cl
       JOIN collys c ON c.id = cl.colly_id
-      WHERE cl.label_norm LIKE ${`%${norm}%`}
+      WHERE CONCAT(' ', cl.label_norm, ' ') LIKE ${`% ${norm} %`}
       ORDER BY c.view_counter DESC, cl.start_line ASC
       LIMIT ${limit * 4}
     `);
