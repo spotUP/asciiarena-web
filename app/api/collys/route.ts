@@ -20,7 +20,7 @@ import { ensureArtistId, ensureCrewId } from "@/lib/ensureEntity";
 import { broadcastActivityIfAllowed } from "@/lib/activity";
 import { indexColly } from "@/lib/collyLogoIndex";
 import { parseCollyBytes } from "@/lib/collyTrailer";
-import { hasAnsiCodes, decodeLatin1Bytes } from "@/lib/releaseText";
+import { detectCollyType, COLLY_TYPES } from "@/lib/collyType";
 
 interface CollyRow {
   id: number;
@@ -205,17 +205,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
   await writeFile(filePath, buffer);
 
-  // Detect type by CONTENT, not just extension — an ANSI colly saved as .txt
-  // still has ESC[ codes and should be stored (and rendered) as ANSI.
-  let type = "ASCII";
-  if (["dms", "lzh", "lha", "zip"].includes(ext)) {
-    type = "Archive";
-  } else if (ext === "ans") {
-    type = "ANSI";
-  } else {
-    const { visible } = parseCollyBytes(new Uint8Array(bytes));
-    if (hasAnsiCodes(decodeLatin1Bytes(visible))) type = "ANSI";
-  }
+  // Use the submitter's explicit type when valid, else detect by CONTENT (an
+  // ANSI colly saved as .txt is still recognised as ANSI).
+  const formType = String(formData.get("type") ?? "").trim().toUpperCase();
+  let type = (COLLY_TYPES as string[]).includes(formType)
+    ? formType
+    : detectCollyType(new Uint8Array(bytes), filename);
+  if (type === "ARCHIVE") type = "Archive"; // match the stored convention
 
   const file_id = filename + ".diz";
 

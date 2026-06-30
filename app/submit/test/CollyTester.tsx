@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { FONTS, ANSI_FONT_MAP } from "@/lib/ansilove";
+import { COLLY_TYPES } from "@/lib/collyType";
 import DosSelect from "@/components/ui/DosSelect";
 import ColorSwatch from "@/components/ui/ColorSwatch";
 import AnsiLogo from "@/components/ui/AnsiLogo";
@@ -32,6 +33,7 @@ export default function CollyTester() {
   const [soundtrack, setSoundtrack] = useState("");
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
+  const [type, setType] = useState("ASCII"); // detected, overridable
   const [logoMap, setLogoMap] = useState<{ line: number; caption: string }[]>([]);
 
   const analyze = async (file: File) => {
@@ -45,6 +47,7 @@ export default function CollyTester() {
       const r = await fetch("/api/collys/preview", { method: "POST", body: fd });
       const data = (await r.json()) as Report;
       setReport(data);
+      setType(data.type);
       setFont(data.meta.font ?? "");
       setFg(data.meta.fg ?? "");
       setBg(data.meta.bg ?? "");
@@ -59,7 +62,7 @@ export default function CollyTester() {
     }
   };
 
-  const isCanvas = report?.type === "ANSI" || report?.type === "CP437";
+  const isCanvas = type === "ANSI" || type === "CP437";
   // Mapping panel shows ESC-code-stripped lines so ANSI is readable.
   // eslint-disable-next-line no-control-regex
   const lines = useMemo(() => (report ? report.text.replace(/\x1b\[[0-9;?]*[ -/]*[@-~]/g, "").split("\n") : []), [report]);
@@ -133,8 +136,8 @@ export default function CollyTester() {
           <div className="col-lg-7 amb-1">
             {isCanvas && visibleB64 && (
               <>
-                <div className="header bg-header ap-1">RENDERED ({report.type})</div>
-                <div style={{ background: report.type === "CP437" ? (bg || "#000") : "#000", overflow: "auto", maxHeight: "60vh", marginBottom: "8px" }}>
+                <div className="header bg-header ap-1">RENDERED ({type})</div>
+                <div style={{ background: type === "CP437" ? (bg || "#000") : "#000", overflow: "auto", maxHeight: "60vh", marginBottom: "8px" }}>
                   <AnsiLogo ansiB64={visibleB64} font={ANSI_FONT_MAP[font] ?? null} maxHeight={100000} />
                 </div>
               </>
@@ -166,6 +169,9 @@ export default function CollyTester() {
           <div className="col-lg-5">
             <div className="header bg-header ap-1">SETTINGS</div>
             <div className="bg-secondary ap-1 amb-1" style={{ display: "grid", gap: "8px" }}>
+              <div className="lightgrey" style={{ display: "flex", gap: "8px", alignItems: "center" }}>Type
+                <DosSelect padded width={140} value={type} options={COLLY_TYPES.map((t) => ({ value: t, label: t }))} onChange={setType} />
+                <span style={{ color: "#555", fontSize: "12px" }}>(auto-detected)</span></div>
               <label className="lightgrey">Title <input className="form-control" value={title} onChange={(e) => setTitle(e.target.value)} /></label>
               <label className="lightgrey">Author <input className="form-control" value={author} onChange={(e) => setAuthor(e.target.value)} /></label>
               <div className="lightgrey" style={{ display: "flex", gap: "8px", alignItems: "center" }}>Font

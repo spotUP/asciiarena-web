@@ -7,9 +7,8 @@ import { buildLogoRows, buildLogoRowsFromMap } from "@/lib/collyLogoRows";
 import { parseCollyIndex } from "@/lib/collyIndex";
 import { loadEntityDicts } from "@/lib/collyLogoIndex";
 import { cleanLabel, type EntityDicts } from "@/lib/handleMatch";
-import {
-  decodeReleaseText, decodeLatin1Bytes, stripFileIdDiz, releaseTextEncoding, looksLikeCp437Art, hasAnsiCodes,
-} from "@/lib/releaseText";
+import { decodeReleaseText, stripFileIdDiz, releaseTextEncoding } from "@/lib/releaseText";
+import { detectCollyType } from "@/lib/collyType";
 
 export const dynamic = "force-dynamic";
 
@@ -27,13 +26,7 @@ export async function POST(request: NextRequest) {
   const bytes = new Uint8Array(await file.arrayBuffer());
   const { visible, meta } = parseCollyBytes(bytes);
 
-  const name = file.name.toLowerCase();
-  const ext = name.split(".").pop() ?? "";
-  // Detect by CONTENT, not just extension — an ANSI colly saved as .txt still has
-  // ESC[ codes and should render as ANSI.
-  const type = ["dms", "lzh", "lha", "zip"].includes(ext) ? "ARCHIVE"
-    : ext === "ans" || hasAnsiCodes(decodeLatin1Bytes(visible)) ? "ANSI"
-    : looksLikeCp437Art(visible) ? "CP437" : "ASCII";
+  const type = detectCollyType(bytes, file.name);
   const encoding = releaseTextEncoding(type === "CP437" ? "CP437" : null, null);
   // Raw decoded text (not HTML-escaped) so the tester renders it 1:1 and line
   // numbers line up with the logo map.

@@ -6,6 +6,7 @@ import DosSelect from "@/components/ui/DosSelect";
 import DatePicker from "@/components/ui/DatePicker";
 import ColorSwatch from "@/components/ui/ColorSwatch";
 import SoundtrackPicker from "@/components/music/SoundtrackPicker";
+import { detectCollyType, COLLY_TYPES } from "@/lib/collyType";
 import AnsiEditor, { type AnsiEditorRef } from "@/components/ui/AnsiEditor/AnsiEditor";
 import { FONTS } from "@/lib/ansilove";
 
@@ -99,6 +100,7 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
   const [collyDay, setCollyDay] = useState("");
   const [collyArtists, setCollyArtists] = useState<string[]>([""]);
   const [collyCrews, setCollyCrews] = useState<string[]>([""]);
+  const [collyType, setCollyType] = useState("ASCII");
   // Optional per-colly render settings (also settable via the file's invisible trailer).
   const [collyFont, setCollyFont] = useState("");
   const [collyFg, setCollyFg] = useState("");
@@ -246,6 +248,7 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
     formData.append("day", collyDay);
     collyArtists.filter(Boolean).forEach((a) => formData.append("artistname[]", a));
     collyCrews.filter(Boolean).forEach((c) => formData.append("crewname[]", c));
+    formData.append("type", collyType);
     if (collyFont) formData.append("render_font", collyFont);
     if (collyFg) formData.append("render_fg", collyFg);
     if (collyBg) formData.append("render_bg", collyBg);
@@ -258,7 +261,7 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
       setStatus({ msg: "Colly uploaded successfully!", ok: true });
       setCollyName(""); setCollyYear(""); setCollyMonth(""); setCollyDay("");
       setCollyArtists([""]); setCollyCrews([""]);
-      setCollyFont(""); setCollyFg(""); setCollyBg(""); setCollySoundtrack("");
+      setCollyFont(""); setCollyFg(""); setCollyBg(""); setCollySoundtrack(""); setCollyType("ASCII");
       if (collyFileRef.current) collyFileRef.current.value = "";
     } else {
       const body = (await r.json().catch(() => ({}))) as { error?: string };
@@ -572,7 +575,15 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
           </div>
           <form onSubmit={handleCollySubmit} className="container-fluid bg-secondary apb-1 ap-1 amb-2">
             <Field label="File" required>
-              <input type="file" ref={collyFileRef} required className="form-control w-100" />
+              <input type="file" ref={collyFileRef} required className="form-control w-100"
+                onChange={async (e) => {
+                  const f = e.target.files?.[0];
+                  if (f) setCollyType(detectCollyType(new Uint8Array(await f.arrayBuffer()), f.name));
+                }} />
+            </Field>
+            <Field label="Type">
+              <DosSelect padded width={160} value={collyType}
+                options={COLLY_TYPES.map((t) => ({ value: t, label: t }))} onChange={setCollyType} />
             </Field>
             <Field label="Name">
               <input
