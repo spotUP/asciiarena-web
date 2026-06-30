@@ -7,7 +7,7 @@ import DatePicker from "@/components/ui/DatePicker";
 import ColorSwatch from "@/components/ui/ColorSwatch";
 import SoundtrackPicker from "@/components/music/SoundtrackPicker";
 import { detectCollyType, COLLY_TYPES } from "@/lib/collyType";
-import CollyPreview, { type PreviewReport } from "@/components/submit/CollyPreview";
+import CollyPreview, { type PreviewReport, type LogoEntry } from "@/components/submit/CollyPreview";
 import AnsiEditor, { type AnsiEditorRef } from "@/components/ui/AnsiEditor/AnsiEditor";
 import { FONTS } from "@/lib/ansilove";
 
@@ -107,7 +107,7 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
   const [collyFg, setCollyFg] = useState("");
   const [collyBg, setCollyBg] = useState("");
   const [collySoundtrack, setCollySoundtrack] = useState("");
-  const [collyLogoMap, setCollyLogoMap] = useState<{ line: number; caption: string }[]>([]);
+  const [collyLogoMap, setCollyLogoMap] = useState<LogoEntry[]>([]);
   const [collyReport, setCollyReport] = useState<PreviewReport | null>(null);
   const [collyBytes, setCollyBytes] = useState<Uint8Array | null>(null);
 
@@ -670,6 +670,7 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
                 bg={collyBg}
                 logoMap={collyLogoMap}
                 setLogoMap={setCollyLogoMap}
+                defaultAuthor={collyArtists.filter(Boolean)[0] ?? ""}
               />
             )}
             <div className="amt-1">

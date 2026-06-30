@@ -19,8 +19,9 @@ export interface CollyMeta {
   soundtrack?: string; // Modland full_path
   width?: number;
   // Explicit logo map: the artist (or the dry-run editor) pins each logo to a
-  // start line + caption, so rendering/jumps skip the island-detection heuristic.
-  logos?: { line: number; caption: string }[];
+  // start line (+ optional end line for the logo's extent) + caption, so
+  // rendering/jumps skip the island-detection heuristic.
+  logos?: { line: number; end?: number; caption: string }[];
 }
 
 const SUB = 0x1a; // Ctrl-Z / DOS EOF
@@ -121,8 +122,8 @@ function parseKeyValue(text: string): CollyMeta {
       case "bg": case "background": { const c = parseColor(val); if (c) meta.bg = c; break; }
       case "soundtrack": case "music": case "tune": meta.soundtrack = val; break;
       case "logo": {
-        const mm = /^(\d+)\s+(.+)$/.exec(val);
-        if (mm) (meta.logos ??= []).push({ line: parseInt(mm[1], 10), caption: mm[2].trim() });
+        const mm = /^(\d+)(?:-(\d+))?\s+(.+)$/.exec(val);
+        if (mm) (meta.logos ??= []).push({ line: parseInt(mm[1], 10), end: mm[2] ? parseInt(mm[2], 10) : undefined, caption: mm[3].trim() });
         break;
       }
       default: break;
@@ -173,14 +174,15 @@ export function parseCollyBytes(bytes: Uint8Array): { visible: Uint8Array; meta:
  *  so rendering/autoplay/jumps don't need the island-detection heuristic. Each
  *  logo spans from its line to just before the next one's. */
 export function sectionsFromLogoMap(
-  logos: { line: number; caption: string }[],
+  logos: { line: number; end?: number; caption: string }[],
   totalLines: number,
 ): LogoSection[] {
   const sorted = [...logos].sort((a, b) => a.line - b.line);
   return sorted.map((lg, i) => {
     const startLine = Math.max(0, lg.line - 1); // author counts 1-based
     const nextStart = i + 1 < sorted.length ? Math.max(0, sorted[i + 1].line - 1) : totalLines;
-    const endLine = Math.max(startLine, nextStart - 1);
+    // Use the explicit end (the dragged extent) when given, else span to the next.
+    const endLine = lg.end && lg.end >= lg.line ? Math.max(startLine, lg.end - 1) : Math.max(startLine, nextStart - 1);
     return { startLine, endLine, lineCount: endLine - startLine + 1, inkTop: startLine, inkBottom: endLine };
   });
 }

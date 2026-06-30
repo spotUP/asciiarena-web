@@ -61,7 +61,7 @@ export function buildLogoRows(collyId: number, text: string, dicts: EntityDicts)
 // detection. Lines are 1-based as authored; stored start_line is 0-based.
 export function buildLogoRowsFromMap(
   collyId: number,
-  logos: { line: number; caption: string }[],
+  logos: { line: number; end?: number; caption: string }[],
   dicts: EntityDicts,
 ): LogoRow[] {
   const sorted = [...logos].sort((a, b) => a.line - b.line);

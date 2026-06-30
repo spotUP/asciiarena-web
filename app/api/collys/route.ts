@@ -210,11 +210,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const logosRaw = String(formData.get("logos") ?? "");
   if (logosRaw) {
     try {
-      const logos = JSON.parse(logosRaw) as { line: number; caption: string }[];
+      const logos = JSON.parse(logosRaw) as { line: number; end?: number; caption: string }[];
       if (Array.isArray(logos) && logos.length) {
         const { visible } = parseCollyBytes(new Uint8Array(bytes));
         const trailer = "\x1a" + logos
-          .map((l) => `logo: ${Math.max(1, Math.floor(l.line))} ${String(l.caption).replace(/[\r\n]+/g, " ").slice(0, 120)}`)
+          .map((l) => {
+            const start = Math.max(1, Math.floor(l.line));
+            const range = l.end && l.end > start ? `${start}-${Math.floor(l.end)}` : `${start}`;
+            return `logo: ${range} ${String(l.caption).replace(/[\r\n]+/g, " ").slice(0, 120)}`;
+          })
           .join("\n") + "\n";
         outBuffer = Buffer.concat([Buffer.from(visible), Buffer.from(trailer, "latin1")]);
       }

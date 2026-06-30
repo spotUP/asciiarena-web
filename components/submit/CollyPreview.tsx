@@ -10,17 +10,31 @@ export interface PreviewReport {
   lineCount: number;
   tagged: boolean;
   text: string;
-  meta: { title?: string; author?: string; crew?: string; font?: string; fg?: string; bg?: string; soundtrack?: string; logos?: { line: number; caption: string }[] };
+  meta: { title?: string; author?: string; crew?: string; font?: string; fg?: string; bg?: string; soundtrack?: string; logos?: { line: number; end?: number; caption: string }[] };
   logos: { line: number; name: string; resolved: string | null; searchable: boolean }[];
   index: { num: number; name: string }[];
   warnings: string[];
 }
 
-// The editable live preview shared by the submit flow: rendered art (canvas for
-// ANSI/CP437, <pre> for ASCII), a clickable line gutter to map logos, the parse
-// report + warnings, and a legend. Controlled by the parent.
+export type LogoEntry = { line: number; end?: number; caption: string };
+
+// caption <-> {name, by, for}: "NAME -AUTHOR for REQUESTER" (reuses the existing
+// caption grammar: subject before "for", author as a trailing -signature).
+function compose(name: string, by: string, forr: string): string {
+  let c = name.trim();
+  if (by.trim()) c += ` -${by.trim()}`;
+  if (forr.trim()) c += ` for ${forr.trim()}`;
+  return c;
+}
+function decompose(caption: string): { name: string; by: string; for: string } {
+  const f = caption.split(/ for /i);
+  const forr = f.length > 1 ? f.slice(1).join(" for ").trim() : "";
+  const b = f[0].split(/ -/);
+  return { name: b[0].trim(), by: b.length > 1 ? b.slice(1).join(" -").trim() : "", for: forr };
+}
+
 export default function CollyPreview({
-  fileBytes, report, type, font, fg, bg, logoMap, setLogoMap,
+  fileBytes, report, type, font, fg, bg, logoMap, setLogoMap, defaultAuthor = "",
 }: {
   fileBytes: Uint8Array | null;
   report: PreviewReport;
@@ -28,13 +42,13 @@ export default function CollyPreview({
   font: string;
   fg: string;
   bg: string;
-  logoMap: { line: number; caption: string }[];
-  setLogoMap: (m: { line: number; caption: string }[]) => void;
+  logoMap: LogoEntry[];
+  setLogoMap: (m: LogoEntry[]) => void;
+  defaultAuthor?: string;
 }) {
   const isCanvas = type === "ANSI" || type === "CP437";
   // eslint-disable-next-line no-control-regex
   const lines = useMemo(() => report.text.replace(/\x1b\[[0-9;?]*[ -/]*[@-~]/g, "").split("\n"), [report.text]);
-  const mapped = useMemo(() => new Set(logoMap.map((l) => l.line)), [logoMap]);
 
   const visibleB64 = useMemo(() => {
     if (!fileBytes || !isCanvas) return null;
@@ -44,69 +58,118 @@ export default function CollyPreview({
     return btoa(s);
   }, [fileBytes, isCanvas]);
 
-  const toggle = (n: number) => setLogoMap(mapped.has(n) ? logoMap.filter((l) => l.line !== n) : [...logoMap, { line: n, caption: "" }].sort((a, b) => a.line - b.line));
-
-  // For the canvas preview, measure the rendered art's row height so the clickable
-  // line-number gutter aligns to the canvas rows (one merged view).
+  // Canvas row height (measured) so the gutter + selection align to art rows.
   const stageRef = useRef<HTMLDivElement>(null);
-  const [rowH, setRowH] = useState(16);
+  const [canvasRowH, setCanvasRowH] = useState(16);
   useEffect(() => {
     const el = stageRef.current;
     if (!el || !isCanvas) return;
-    const measure = () => {
-      const img = el.querySelector("img");
-      const h = img?.clientHeight ?? 0;
-      if (h > 0 && lines.length) setRowH(h / lines.length);
-    };
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    measure();
+    const measure = () => { const img = el.querySelector("img"); const h = img?.clientHeight ?? 0; if (h > 0 && lines.length) setCanvasRowH(h / lines.length); };
+    const ro = new ResizeObserver(measure); ro.observe(el); measure();
     return () => ro.disconnect();
   }, [isCanvas, lines.length, visibleB64]);
+  const rowH = isCanvas ? canvasRowH : 16;
 
-  // Full-width clickable rows over the canvas — hover/click anywhere on a line to
-  // map it. The number sits in a left cell; the rest is transparent so the art
-  // shows through.
-  const gutter = (rh: number) => lines.map((_, i) => {
-    const n = i + 1; const on = mapped.has(n);
-    return (
-      <div key={i} className="colly-line" onClick={() => toggle(n)} title="mark/unmark a logo at this line"
-        style={{ height: `${rh}px`, display: "flex", background: on ? "rgba(255,85,255,0.18)" : undefined, userSelect: "none" }}>
-        <span style={{ width: "40px", flexShrink: 0, textAlign: "right", paddingRight: "6px", lineHeight: `${rh}px`, fontFamily: "monospace", fontSize: "11px", color: on ? "#ff55ff" : "#888", background: "rgba(0,0,0,0.45)" }}>{n}</span>
-        <span style={{ flex: 1 }} />
+  // Drag-select + edit state.
+  const [drag, setDrag] = useState<{ a: number; b: number } | null>(null);
+  const [sel, setSel] = useState<{ start: number; end: number } | null>(null);
+  const [editIdx, setEditIdx] = useState<number | null>(null);
+  const [fName, setFName] = useState(""); const [fBy, setFBy] = useState(""); const [fFor, setFFor] = useState("");
+
+  const close = () => { setSel(null); setEditIdx(null); };
+  const openNew = (s: number, e: number) => { setSel({ start: s, end: e }); setEditIdx(null); setFName(""); setFBy(defaultAuthor); setFFor(""); };
+  const openEdit = (i: number) => { const en = logoMap[i]; const d = decompose(en.caption); setSel({ start: en.line, end: en.end ?? en.line }); setEditIdx(i); setFName(d.name); setFBy(d.by || defaultAuthor); setFFor(d.for); };
+  const save = () => {
+    if (!sel || !fName.trim()) return;
+    const entry: LogoEntry = { line: sel.start, end: sel.end > sel.start ? sel.end : undefined, caption: compose(fName, fBy, fFor) };
+    const next = editIdx != null ? logoMap.map((x, i) => (i === editIdx ? entry : x)) : [...logoMap, entry];
+    setLogoMap(next.sort((a, b) => a.line - b.line));
+    close();
+  };
+  const del = () => { if (editIdx != null) setLogoMap(logoMap.filter((_, i) => i !== editIdx)); close(); };
+
+  // Finalize a drag on mouse-up anywhere.
+  useEffect(() => {
+    if (!drag) return;
+    const onUp = () => {
+      const s = Math.min(drag.a, drag.b), e = Math.max(drag.a, drag.b);
+      if (s === e) { const i = logoMap.findIndex((en) => s >= en.line && s <= (en.end ?? en.line)); if (i >= 0) openEdit(i); else openNew(s, e); }
+      else openNew(s, e);
+      setDrag(null);
+    };
+    window.addEventListener("mouseup", onUp);
+    return () => window.removeEventListener("mouseup", onUp);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [drag, logoMap, defaultAuthor]);
+
+  const rowBg = (n: number): string | undefined => {
+    if (drag && n >= Math.min(drag.a, drag.b) && n <= Math.max(drag.a, drag.b)) return "rgba(255,85,255,0.35)";
+    if (sel && n >= sel.start && n <= sel.end) return "rgba(255,85,255,0.35)";
+    if (logoMap.some((en) => n >= en.line && n <= (en.end ?? en.line))) return "rgba(255,85,255,0.15)";
+    return undefined;
+  };
+  const down = (n: number) => (e: React.MouseEvent) => { e.preventDefault(); setDrag({ a: n, b: n }); };
+  const enter = (n: number) => () => setDrag((d) => (d ? { a: d.a, b: n } : null));
+
+  const panel = sel && (
+    <div style={{
+      position: "absolute", top: `${(sel.start - 1) * rowH}px`, right: "8px", zIndex: 20, width: "240px",
+      background: "#111", border: "1px solid #ff55ff", padding: "8px", display: "grid", gap: "6px",
+      fontFamily: "TopazPlus_a1200, monospace", fontSize: "13px",
+    }}>
+      <div className="magenta">Logo lines {sel.start}{sel.end > sel.start ? `-${sel.end}` : ""}</div>
+      <input className="form-control" placeholder="logo name" autoFocus value={fName} onChange={(e) => setFName(e.target.value)} />
+      <input className="form-control" placeholder="author (who drew it)" value={fBy} onChange={(e) => setFBy(e.target.value)} />
+      <input className="form-control" placeholder="for (requested by)" value={fFor} onChange={(e) => setFFor(e.target.value)} />
+      <div style={{ display: "flex", gap: "6px" }}>
+        <input type="button" className="btn-big bg-green white" value="Save" onClick={save} />
+        <input type="button" className="btn-big" value="Cancel" onClick={close} />
+        {editIdx != null && <input type="button" className="btn-big" value="Delete" onClick={del} />}
       </div>
-    );
-  });
+    </div>
+  );
 
   return (
     <div className="row amt-1">
       <div className="col-lg-7 amb-1">
-        <div className="header bg-header ap-1">PREVIEW{isCanvas ? ` (${type})` : ""} &mdash; click a line number to mark a logo</div>
-        {isCanvas && visibleB64 ? (
-          <div style={{ background: type === "CP437" ? (bg || "#000") : "#000", overflow: "auto", maxHeight: "70vh" }}>
+        <div className="header bg-header ap-1">PREVIEW{isCanvas ? ` (${type})` : ""} &mdash; drag over a logo to map it</div>
+        <div style={{ position: "relative", background: isCanvas && type !== "CP437" ? "#000" : (bg || "#111111"), overflow: "auto", maxHeight: "70vh" }}>
+          {isCanvas && visibleB64 ? (
             <div ref={stageRef} style={{ position: "relative", display: "inline-block", minWidth: "100%" }}>
               <div style={{ paddingLeft: "40px" }}>
                 <AnsiLogo ansiB64={visibleB64} font={ANSI_FONT_MAP[font] ?? null} maxHeight={100000} />
               </div>
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0 }}>{gutter(rowH)}</div>
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0 }}>
+                {lines.map((_, i) => {
+                  const n = i + 1;
+                  return (
+                    <div key={i} className="colly-line" onMouseDown={down(n)} onMouseEnter={enter(n)}
+                      style={{ height: `${rowH}px`, display: "flex", background: rowBg(n) }}>
+                      <span style={{ width: "40px", flexShrink: 0, textAlign: "right", paddingRight: "6px", lineHeight: `${rowH}px`, fontFamily: "monospace", fontSize: "11px", color: "#888", background: "rgba(0,0,0,0.45)" }}>{n}</span>
+                      <span style={{ flex: 1 }} />
+                    </div>
+                  );
+                })}
+              </div>
+              {panel}
             </div>
-          </div>
-        ) : (
-          <div style={{ background: bg || "#111111", overflow: "auto", maxHeight: "70vh", padding: "8px 0" }}>
-            <pre style={{ margin: 0, fontFamily: `${font || "TopazPlus_a1200"}, monospace`, fontSize: "16px", lineHeight: "16px", color: fg || "#ff55ff", whiteSpace: "pre" }}>
-              {lines.map((ln, i) => {
-                const n = i + 1; const on = mapped.has(n);
-                return (
-                  <div key={i} className="colly-line" onClick={() => toggle(n)} title="mark/unmark a logo at this line"
-                    style={{ display: "flex", background: on ? "rgba(255,85,255,0.18)" : undefined }}>
-                    <span style={{ width: "48px", flexShrink: 0, textAlign: "right", paddingRight: "8px", color: on ? "#ff55ff" : "#555", userSelect: "none" }}>{n}</span>
-                    <span>{ln || " "}</span>
-                  </div>
-                );
-              })}
-            </pre>
-          </div>
-        )}
+          ) : (
+            <div style={{ position: "relative" }}>
+              <pre style={{ margin: 0, fontFamily: `${font || "TopazPlus_a1200"}, monospace`, fontSize: "16px", lineHeight: "16px", color: fg || "#ff55ff", whiteSpace: "pre" }}>
+                {lines.map((ln, i) => {
+                  const n = i + 1;
+                  return (
+                    <div key={i} className="colly-line" onMouseDown={down(n)} onMouseEnter={enter(n)} style={{ display: "flex", background: rowBg(n) }}>
+                      <span style={{ width: "48px", flexShrink: 0, textAlign: "right", paddingRight: "8px", color: "#555", userSelect: "none" }}>{n}</span>
+                      <span>{ln || " "}</span>
+                    </div>
+                  );
+                })}
+              </pre>
+              {panel}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="col-lg-5">
@@ -114,25 +177,28 @@ export default function CollyPreview({
         <div className="bg-secondary ap-1 amb-1">
           <div className="lightgrey">Type: <span className="white">{report.type}</span> &middot; {report.lineCount} lines &middot; {report.tagged ? <span className="green">tag-mapped</span> : "auto-detected"}</div>
           {report.warnings.map((w, i) => <div key={i} className="yellow" style={{ marginTop: "4px" }}>! {w}</div>)}
-          <div className="white" style={{ marginTop: "8px" }}>Logos ({report.logos.length})</div>
-          {report.logos.map((l, i) => (
-            <div key={i} className="lightgrey" style={{ fontSize: "13px" }}>
-              <span style={{ color: "#555" }}>L{l.line}</span> {l.name}
-              {l.resolved && <span className="green"> [{l.resolved}]</span>}
-              {!l.searchable && <span className="yellow"> (not searchable)</span>}
+          <div className="white" style={{ marginTop: "8px" }}>Mapped logos ({logoMap.length})</div>
+          {logoMap.map((l, i) => (
+            <div key={i} className="lightgrey colly-line" onClick={() => openEdit(i)} style={{ fontSize: "13px" }}>
+              <span style={{ color: "#555" }}>L{l.line}{l.end && l.end > l.line ? `-${l.end}` : ""}</span> {l.caption}
             </div>
           ))}
-          {report.index.length > 0 && (
-            <><div className="white" style={{ marginTop: "8px" }}>Clickable index</div>
-              <div className="lightgrey" style={{ fontSize: "13px" }}>{report.index.map((e) => `${e.num}. ${e.name}`).join("  ")}</div></>
+          {logoMap.length === 0 && (
+            <><div className="white" style={{ marginTop: "8px" }}>Auto-detected ({report.logos.length})</div>
+              {report.logos.map((l, i) => (
+                <div key={i} className="lightgrey" style={{ fontSize: "13px" }}>
+                  <span style={{ color: "#555" }}>L{l.line}</span> {l.name}
+                  {l.resolved && <span className="green"> [{l.resolved}]</span>}
+                  {!l.searchable && <span className="yellow"> (not searchable)</span>}
+                </div>
+              ))}</>
           )}
         </div>
         <div className="header bg-header ap-1">HOW IT WORKS</div>
         <div className="bg-secondary ap-1" style={{ fontSize: "13px" }}>
           <p className="lightgrey">No rules &mdash; draw your colly however you like.</p>
-          <p className="lightgrey"><span className="cyan">Let us detect it</span>: we auto-find logos, <span className="white">for</span>-dedications and <span className="white">o1&gt;</span> indexes.</p>
-          <p className="lightgrey"><span className="cyan">Or point at it</span>: click line numbers to map each logo exactly.</p>
-          <p className="lightgrey"><span className="cyan">Make it yours</span>: font / colours / soundtrack above &mdash; saved invisibly with the colly.</p>
+          <p className="lightgrey"><span className="cyan">Auto</span>: we find logos, <span className="white">for</span>-dedications and <span className="white">o1&gt;</span> indexes by ourselves.</p>
+          <p className="lightgrey"><span className="cyan">Or drag</span> over a logo to map it exactly, then fill in name / author / who it&apos;s for.</p>
         </div>
       </div>
     </div>
