@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, useEffect, useMemo } from "react";
+import { useCallback, useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { convertPcbColors, hasPcbCodes } from "@/lib/pcbColors";
@@ -120,6 +120,14 @@ export default function CollysClient() {
   // both keyed to the selected colly. Loaded lazily when the editor is opened.
   const [report, setReport] = useState<PreviewReport | null>(null);
   const [logoMap, setLogoMap] = useState<LogoEntry[]>([]);
+  // True once the admin actually edits the logo map (vs. it just being seeded
+  // from a rescan). Only a dirty map is persisted on save, so opening a colly
+  // and saving metadata never freezes auto-detection into hand-picked rows.
+  const logosDirty = useRef(false);
+  const editLogoMap = useCallback((v: React.SetStateAction<LogoEntry[]>) => {
+    logosDirty.current = true;
+    setLogoMap(v);
+  }, []);
   const [showMapEditor, setShowMapEditor] = useState(false);
 
   const dizPreviewHtml = useMemo(() => {
@@ -190,7 +198,9 @@ export default function CollysClient() {
           soundtrack: (e.soundtrack ?? colly.soundtrack) || "",
           // Only send the map when the editor was actually opened/loaded —
           // otherwise leave the colly's existing catalog rows untouched.
-          ...(showMapEditor && report
+          // Only persist the map when the admin actually edited logos, so a
+          // metadata-only save leaves the auto-detected catalog untouched.
+          ...(logosDirty.current
             ? { logos: logoMap.map(l => ({ line: l.line, end: l.end, caption: l.caption })) }
             : {}),
         }),
@@ -248,7 +258,7 @@ export default function CollysClient() {
 
   // Auto-open the logo editor for the newly-selected colly (parity with the
   // submit page, where the preview shows automatically). Still collapsible.
-  useEffect(() => { setShowMapEditor(true); setReport(null); setLogoMap([]); }, [selectedId]);
+  useEffect(() => { setShowMapEditor(true); setReport(null); setLogoMap([]); logosDirty.current = false; }, [selectedId]);
 
   // Lazily load the preview report + the colly's saved manual map when the
   // admin opens the visual editor (parity with the submit-time editor).
@@ -262,7 +272,24 @@ export default function CollysClient() {
     ])
       .then(([rep, map]: [PreviewReport, { line: number; end?: number; caption: string }[]]) => {
         setReport(rep);
-        setLogoMap((Array.isArray(map) ? map : []).map(m => ({ ...m, auto: false })));
+        // Hand-picked (saved manual) logos — kept verbatim, never overwritten.
+        const manual: LogoEntry[] = (Array.isArray(map) ? map : []).map(m => ({ line: m.line, end: m.end, caption: m.caption, auto: false }));
+        // Rescan: seed auto-detected regions too, but only where they don't
+        // overlap a hand-picked entry (ANSI/CP437 rows can't map to text lines,
+        // so no auto-bands there — matches the submit flow).
+        const isCanvas = rep.type === "ANSI" || rep.type === "CP437";
+        const overlapsManual = (a: { line: number; end?: number }) =>
+          manual.some(m => a.line <= (m.end ?? m.line) && (a.end ?? a.line) >= m.line);
+        const auto: LogoEntry[] = isCanvas ? [] : (rep.logos ?? [])
+          .map(l => ({
+            line: l.line,
+            end: l.end,
+            caption: l.searchable ? (l.author ? `${l.name} -${l.author}` : l.name) : "",
+            auto: true,
+          }))
+          .filter(a => !overlapsManual(a));
+        setLogoMap([...manual, ...auto].sort((x, y) => x.line - y.line));
+        logosDirty.current = false; // seeding is not an edit
       })
       .catch(() => { setReport(null); setLogoMap([]); flash("Could not load logo editor", false); });
   }, [showMapEditor, selected, report]);
@@ -550,7 +577,7 @@ export default function CollysClient() {
                               fg={fg}
                               bg={bg}
                               logoMap={logoMap}
-                              setLogoMap={setLogoMap}
+                              setLogoMap={editLogoMap}
                               defaultAuthor={author}
                             />
                           </div>
