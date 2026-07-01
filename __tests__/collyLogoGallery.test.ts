@@ -34,8 +34,8 @@ describe("sliceSnippet", () => {
     expect(sliceSnippet("a\n\n\n\nb", 1, 3)).toEqual([]);
   });
 
-  it("caps overly long lines", () => {
+  it("keeps wide lines intact (gallery scales to fit, never truncates)", () => {
     const long = "x".repeat(200);
-    expect(sliceSnippet(long, 0, 0)[0].length).toBe(80);
+    expect(sliceSnippet(long, 0, 0)[0].length).toBe(200);
   });
 });

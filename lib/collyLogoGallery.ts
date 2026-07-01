@@ -27,15 +27,15 @@ interface RawRow {
 // How many lines to show when a logo has no explicit end (detected rows store
 // null end_line) — a fixed preview window from the start line.
 const PREVIEW_WINDOW = 11;
-const MAX_SNIPPET_LINES = 24;
-const MAX_LINE_LEN = 80;
+const MAX_SNIPPET_LINES = 32;
 
+// Lines are NOT truncated in width — the gallery scales each logo to fit its
+// card (container-query units), so wide art must stay intact. Only the line
+// COUNT is capped (tall logos scroll within the card).
 export function sliceSnippet(content: string, start0: number, end0: number | null): string[] {
   const lines = content.split(/\r?\n/);
   const end = (end0 != null && end0 >= start0 ? end0 : start0 + PREVIEW_WINDOW);
-  const out = lines
-    .slice(start0, Math.min(end + 1, start0 + MAX_SNIPPET_LINES))
-    .map((l) => (l.length > MAX_LINE_LEN ? l.slice(0, MAX_LINE_LEN) : l));
+  const out = lines.slice(start0, Math.min(end + 1, start0 + MAX_SNIPPET_LINES));
   // Trim leading/trailing blank lines so the snippet sits tight.
   while (out.length && !out[0].trim()) out.shift();
   while (out.length && !out[out.length - 1].trim()) out.pop();
