@@ -953,7 +953,7 @@ a.yellow
 select.form-control {
   background: #bbb;
   border: 0;
-  padding: 0px !important;
+  padding: 0 0 0 8px !important;
   margin-left: 0px !important;
   margin-right: 8px !important;
   box-shadow: none;
@@ -1240,19 +1240,19 @@ textarea.fig-txt{
 }
 
 input.form-control {
-  padding: 0px;
+  padding: 0 0 0 8px;
   background: #2a2a2a !important;
   color: #eeee44 !important;
 }
 
 input.form-control:active {
-  padding: 0px;
+  padding: 0 0 0 8px;
   background: #2a2a2a !important;
   color: #eeee44 !important;
 }
 
 input.form-control:focus {
-  padding: 0px;
+  padding: 0 0 0 8px;
   background: #2a2a2a !important;
   color: #eeee44 !important;
 }
