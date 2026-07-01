@@ -176,8 +176,14 @@ export function encodeReleaseText(bytes: Uint8Array, encoding: ReleaseTextEncodi
   const raw = decodeReleaseText(bytes, encoding)
     .replace(/\r\n/g, "\n")
     .replace(/\r/g, "\n")
-    // Strip control characters (except \t \n) that can confuse
+    // Strip WHOLE ANSI CSI sequences (ESC[...X) first. Otherwise the next step
+    // removes the lone ESC byte as a control char but leaves the "[37m" body
+    // visible as literal text in ASCII collys that carry a few stray colour codes.
+    // eslint-disable-next-line no-control-regex
+    .replace(/\x1b\[[0-9;?]*[ -/]*[@-~]/g, "")
+    // Strip remaining control characters (except \t \n) that can confuse
     // HTML parsers or cause unexpected vertical spacing in <pre>.
+    // eslint-disable-next-line no-control-regex
     .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "");
   return escapeHtmlText(raw);
 }

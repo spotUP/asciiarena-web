@@ -52,6 +52,12 @@ describe("release text decoding", () => {
       .toBe("&lt;&amp;&gt;");
   });
 
+  it("strips whole ANSI colour codes, not just the ESC byte (no '[37m' litter)", () => {
+    // ESC[37m HI ESC[0m  — an ASCII colly with a couple stray SGR codes
+    const bytes = new Uint8Array([0x1b, 0x5b, 0x33, 0x37, 0x6d, 0x48, 0x49, 0x1b, 0x5b, 0x30, 0x6d]);
+    expect(encodeReleaseText(bytes, "cp437")).toBe("HI");
+  });
+
   it("uses CP437 for PC charset broken collys without changing other ASCII collys", () => {
     expect(releaseTextEncoding("ASCII", "pc charset")).toBe("cp437");
     expect(releaseTextEncoding("ASCII", null)).toBe("auto");
