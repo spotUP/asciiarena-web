@@ -417,7 +417,7 @@ button.dropdown-item {
 /* Form controls: dark blue terminal look */
 .form-control, .form-select {
   height: 16px !important;
-  padding: 0 !important;
+  padding: 0 0 0 8px !important;
   font-size: 16px !important;
   line-height: 16px !important;
   color: #fff !important;
