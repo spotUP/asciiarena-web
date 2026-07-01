@@ -325,20 +325,20 @@ export default function CollysClient() {
 
           <div className="container-fluid bg-secondary apb-1 ap-1 amb-2">
             <div className="row amb-1">
-              <div className="col-3 lightgrey">FILENAME</div>
-              <div className="col-9">
+              <div className="col-12 lightgrey amb-1">FILENAME</div>
+              <div className="col-12">
                 <input type="text" className="form-control w-100" value={edits[selected.id]?.filename ?? selected.filename} onChange={e => edit(selected.id, "filename", e.target.value)} />
               </div>
             </div>
             <div className="row amb-1 align-items-center">
-              <div className="col-3 lightgrey">NAME</div>
-              <div className="col-9">
+              <div className="col-12 lightgrey amb-1">NAME</div>
+              <div className="col-12">
                 <input type="text" className="form-control w-100" value={edits[selected.id]?.name ?? selected.name ?? ""} onChange={e => edit(selected.id, "name", e.target.value)} />
               </div>
             </div>
             <div className="row amb-1 align-items-center">
-              <div className="col-3 lightgrey">RELEASE DATE</div>
-              <div className="col-9">
+              <div className="col-12 lightgrey amb-1">RELEASE DATE</div>
+              <div className="col-12">
                 <DatePicker
                   value={(() => {
                     const y = edits[selected.id]?.year ?? selected.year;
@@ -358,8 +358,8 @@ export default function CollysClient() {
               </div>
             </div>
             <div className="row amb-1 align-items-center">
-              <div className="col-3 lightgrey">TYPE</div>
-              <div className="col-9">
+              <div className="col-12 lightgrey amb-1">TYPE</div>
+              <div className="col-12">
                 <select className="form-select w-100" value={edits[selected.id]?.type ?? selected.type ?? ""} onChange={e => edit(selected.id, "type", e.target.value)}>
                   <option value="ASCII">ASCII</option>
                   <option value="ANSI">ANSI</option>
@@ -371,13 +371,13 @@ export default function CollysClient() {
               </div>
             </div>
             <div className="row amb-1 align-items-center">
-              <div className="col-3 lightgrey">FILE ID</div>
-              <div className="col-9">
+              <div className="col-12 lightgrey amb-1">FILE ID</div>
+              <div className="col-12">
                 <input type="text" className="form-control w-100" value={edits[selected.id]?.file_id ?? selected.file_id ?? ""} onChange={e => edit(selected.id, "file_id", e.target.value)} />
               </div>
             </div>
             <div className="row amb-1">
-              <div className="col-3 lightgrey">
+              <div className="col-12 lightgrey amb-1">
                 FILE_ID.DIZ
                 {(dizPreviewHtml.hasPcb || dizPreviewHtml.hasAnsi) && (
                   <div style={{ marginTop: "4px" }}>
@@ -386,7 +386,7 @@ export default function CollysClient() {
                   </div>
                 )}
               </div>
-              <div className="col-9">
+              <div className="col-12">
                 <textarea
                   className="form-control"
                   rows={15}
@@ -445,8 +445,8 @@ export default function CollysClient() {
               </div>
             </div>
             <div className="row amb-1 align-items-center">
-              <div className="col-3 lightgrey">BROKEN</div>
-              <div className="col-9">
+              <div className="col-12 lightgrey amb-1">BROKEN</div>
+              <div className="col-12">
                 <select className="form-select w-100" value={edits[selected.id]?.broken ?? selected.broken ?? 0} onChange={e => edit(selected.id, "broken", parseInt(e.target.value))}>
                   <option value={0}>No</option>
                   <option value={1}>Yes</option>
@@ -454,14 +454,14 @@ export default function CollysClient() {
               </div>
             </div>
             <div className="row amb-1 align-items-center">
-              <div className="col-3 lightgrey">BROKEN NOTE</div>
-              <div className="col-9">
+              <div className="col-12 lightgrey amb-1">BROKEN NOTE</div>
+              <div className="col-12">
                 <input type="text" className="form-control w-100" value={edits[selected.id]?.broken_comment ?? selected.broken_comment ?? ""} onChange={e => edit(selected.id, "broken_comment", e.target.value)} />
               </div>
             </div>
             <div className="row amb-1 align-items-center">
-              <div className="col-3 lightgrey">ARTISTS</div>
-              <div className="col-9">
+              <div className="col-12 lightgrey amb-1">ARTISTS</div>
+              <div className="col-12">
                 <NamePicker
                   label="artist"
                   names={splitNames((edits[selected.id]?.artists ?? selected.artists) as string | null)}
@@ -477,8 +477,8 @@ export default function CollysClient() {
               </div>
             </div>
             <div className="row amb-1 align-items-center">
-              <div className="col-3 lightgrey">CREWS</div>
-              <div className="col-9">
+              <div className="col-12 lightgrey amb-1">CREWS</div>
+              <div className="col-12">
                 <NamePicker
                   label="crew"
                   names={splitNames((edits[selected.id]?.crews ?? selected.crews) as string | null)}
@@ -504,8 +504,8 @@ export default function CollysClient() {
                 <>
                   {curType !== "ARCHIVE" && (
                     <div className="row amb-1 align-items-center">
-                      <div className="col-3 lightgrey">FONT</div>
-                      <div className="col-9">
+                      <div className="col-12 lightgrey amb-1">FONT</div>
+                      <div className="col-12">
                         <DosSelect width={240} value={font}
                           options={[{ value: "", label: "Default / viewer choice" }, ...FONTS]}
                           onChange={v => edit(selected.id, "render_font", v)} />
@@ -514,8 +514,8 @@ export default function CollysClient() {
                   )}
                   {(curType === "ASCII" || curType === "CP437") && (
                     <div className="row amb-1 align-items-center">
-                      <div className="col-3 lightgrey">COLOURS</div>
-                      <div className="col-9" style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+                      <div className="col-12 lightgrey amb-1">COLOURS</div>
+                      <div className="col-12" style={{ display: "flex", gap: "16px", alignItems: "center" }}>
                         <span className="lightgrey" style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                           text <ColorSwatch current={fg || "#ff55ff"} onChange={v => edit(selected.id, "render_fg", v)} />
                         </span>
@@ -530,14 +530,14 @@ export default function CollysClient() {
                     </div>
                   )}
                   <div className="row amb-1 align-items-center">
-                    <div className="col-3 lightgrey">SOUNDTRACK</div>
-                    <div className="col-9">
+                    <div className="col-12 lightgrey amb-1">SOUNDTRACK</div>
+                    <div className="col-12">
                       <SoundtrackPicker value={soundtrack} onChange={v => edit(selected.id, "soundtrack", v)} />
                     </div>
                   </div>
                   <div className="row amb-1">
-                    <div className="col-3 lightgrey">LOGOS</div>
-                    <div className="col-9">
+                    <div className="col-12 lightgrey amb-1">LOGOS</div>
+                    <div className="col-12">
                       <input type="button" className="btn-big" value={showMapEditor ? "Hide logo editor" : "Edit logos"}
                         onClick={() => setShowMapEditor(p => !p)} />
                       {showMapEditor && (
@@ -564,8 +564,7 @@ export default function CollysClient() {
               );
             })()}
             <div className="row amb-1">
-              <div className="col-3" />
-              <div className="col-9" style={{ display: "flex", gap: "8px" }}>
+              <div className="col-12" style={{ display: "flex", gap: "8px" }}>
                 <input type="button" className="btn-big" value="Save" onClick={() => save(selected)} />
                 <input type="button" className="btn-big" value="Delete" style={{ color: "#ff5555" }} onClick={() => del(selected.id)} />
               </div>
