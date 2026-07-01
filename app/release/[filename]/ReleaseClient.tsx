@@ -740,6 +740,11 @@ export default function ReleaseClient({
           const max = container.scrollHeight - container.clientHeight;
           animateScroll(container, Math.max(0, Math.min((line / totalLines) * max, max)), 500);
         }
+        // Flash the viewport after arriving so the jump is unmistakable — big
+        // collys scroll far and the movement can otherwise be easy to miss.
+        container.style.transition = "box-shadow 200ms ease";
+        container.style.boxShadow = "inset 0 0 0 3px #ff55ff";
+        setTimeout(() => { if (container) container.style.boxShadow = ""; }, 1400);
         return;
       }
       if (tries++ < 50) setTimeout(attempt, 100); // up to ~5s

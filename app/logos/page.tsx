@@ -17,11 +17,15 @@ function daySeed(): number {
 function Snippet({ logo, height }: { logo: GalleryLogo; height: number }) {
   const cols = logo.snippet.reduce((m, l) => Math.max(m, l.length), 1);
   const fs = `min(16px, calc(200cqw / ${cols}))`;
+  // Flex centres the art both axes; "safe" falls back to start-alignment when the
+  // art is bigger than the card so the top/left is never clipped (it scrolls).
   const artStyle: React.CSSProperties = {
     containerType: "inline-size",
     height,
-    overflowY: "auto",
-    overflowX: "hidden",
+    display: "flex",
+    alignItems: "safe center",
+    justifyContent: "safe center",
+    overflow: "auto",
     background: "#0a0a0a",
   };
   return (
@@ -29,8 +33,7 @@ function Snippet({ logo, height }: { logo: GalleryLogo; height: number }) {
       <div style={artStyle}>
         <pre
           style={{
-            width: "fit-content",
-            margin: "0 auto",
+            margin: 0,
             fontFamily: "TopazPlus_a1200, monospace",
             fontSize: fs,
             lineHeight: fs,
