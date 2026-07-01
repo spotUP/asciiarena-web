@@ -231,31 +231,38 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
             showError("error: " + (err && err.message ? err.message : String(err)));
           }
         }
-        document.getElementById("login-submit-btn")?.addEventListener("click", loginUser);
-        document.getElementById("login-form")?.addEventListener("submit", function(e) { e.preventDefault(); loginUser(); });
-        // Enter doesn't trigger implicit form submission here because the
-        // form has two text inputs and no submit-type button (the LOG iN
-        // button is type="button" so we can intercept the click and POST
-        // via fetch instead of letting NextAuth redirect us off-host).
-        // Keyboard flow: Enter in the nick field advances to the password
-        // field (Tab does this natively); Enter in the password field logs in.
-        document.getElementById("login-nick")?.addEventListener("keydown", function(e) {
-          // Enter OR Tab advances to the password field (Shift+Tab still goes
-          // back natively). Handling Tab explicitly because the modal's focus
-          // management otherwise swallowed it.
-          if (e.key === "Enter" || (e.key === "Tab" && !e.shiftKey)) {
+        // Delegate on document (which persists across client-side navigation) so
+        // login works on EVERY page. This inline script runs once (Next dedupes
+        // by id), but SiteLayout's modal DOM is recreated per route — directly
+        // binding to #login-submit-btn only worked on the first page loaded.
+        document.addEventListener("click", function(e) {
+          var t = e.target;
+          if (t && t.closest && t.closest("#login-submit-btn")) loginUser();
+        });
+        document.addEventListener("submit", function(e) {
+          if (e.target && e.target.id === "login-form") { e.preventDefault(); loginUser(); }
+        });
+        // Keyboard flow: Enter/Tab in the nick field advances to the password
+        // field (the LOG iN button is type="button", so no implicit submit);
+        // Enter in the password field logs in.
+        document.addEventListener("keydown", function(e) {
+          var t = e.target;
+          if (!t || !t.id) return;
+          if (t.id === "login-nick" && (e.key === "Enter" || (e.key === "Tab" && !e.shiftKey))) {
             e.preventDefault();
             document.getElementById("login-password")?.focus();
+          } else if (t.id === "login-password" && e.key === "Enter") {
+            e.preventDefault();
+            loginUser();
           }
         });
-        document.getElementById("login-password")?.addEventListener("keydown", function(e) {
-          if (e.key === "Enter") { e.preventDefault(); loginUser(); }
-        });
-        // Focus + select the nick field whenever the modal opens so you can
-        // type your handle immediately.
-        document.getElementById("login")?.addEventListener("shown.bs.modal", function() {
-          var nickEl = document.getElementById("login-nick");
-          if (nickEl) { nickEl.focus(); nickEl.select(); }
+        // Focus + select the nick field whenever the modal opens. Bootstrap's
+        // shown.bs.modal bubbles, so delegate it too (survives navigation).
+        document.addEventListener("shown.bs.modal", function(e) {
+          if (e.target && e.target.id === "login") {
+            var nickEl = document.getElementById("login-nick");
+            if (nickEl) { nickEl.focus(); nickEl.select(); }
+          }
         });
       `}</Script>
     </>

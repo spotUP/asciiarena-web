@@ -246,8 +246,9 @@ export default function CollysClient() {
       .catch(() => { setDizContent(""); setDizCp437(false); setDizB64(null); });
   }, [selected]);
 
-  // Reset the logo-map editor whenever the selected colly changes.
-  useEffect(() => { setShowMapEditor(false); setReport(null); setLogoMap([]); }, [selectedId]);
+  // Auto-open the logo editor for the newly-selected colly (parity with the
+  // submit page, where the preview shows automatically). Still collapsible.
+  useEffect(() => { setShowMapEditor(true); setReport(null); setLogoMap([]); }, [selectedId]);
 
   // Lazily load the preview report + the colly's saved manual map when the
   // admin opens the visual editor (parity with the submit-time editor).
