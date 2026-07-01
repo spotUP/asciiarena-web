@@ -692,6 +692,7 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
                 logoMap={collyLogoMap}
                 setLogoMap={setCollyLogoMap}
                 defaultAuthor={collyArtists.filter(Boolean)[0] ?? ""}
+                artistOptions={artistList}
               />
             )}
             <div className="amt-1">

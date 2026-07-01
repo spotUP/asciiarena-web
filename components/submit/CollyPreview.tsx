@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ANSI_FONT_MAP } from "@/lib/ansilove";
 import AnsiLogo from "@/components/ui/AnsiLogo";
+import Combobox from "@/components/ui/Combobox";
 
 export interface PreviewReport {
   type: string;
@@ -37,7 +38,7 @@ function decompose(caption: string): { name: string; by: string; for: string } {
 }
 
 export default function CollyPreview({
-  report, type, font, fg, bg, logoMap, setLogoMap, defaultAuthor = "",
+  report, type, font, fg, bg, logoMap, setLogoMap, defaultAuthor = "", artistOptions = [],
 }: {
   report: PreviewReport;
   type: string;
@@ -47,7 +48,9 @@ export default function CollyPreview({
   logoMap: LogoEntry[];
   setLogoMap: (m: LogoEntry[]) => void;
   defaultAuthor?: string;
+  artistOptions?: string[];
 }) {
+  const artistOpts = useMemo(() => artistOptions.map((a) => ({ value: a, label: a })), [artistOptions]);
   const isCanvas = type === "ANSI" || type === "CP437";
   // eslint-disable-next-line no-control-regex
   const lines = useMemo(() => report.text.replace(/\x1b\[[0-9;?]*[ -/]*[@-~]/g, "").split("\n"), [report.text]);
@@ -120,7 +123,6 @@ export default function CollyPreview({
 
   const rowBg = (n: number): string | undefined => {
     if (drag && n >= Math.min(drag.a, drag.b) && n <= Math.max(drag.a, drag.b)) return "rgba(255,85,255,0.45)";
-    if (sel && n >= sel.start && n <= sel.end) return "rgba(255,85,255,0.45)";
     const en = logoMap.find((e) => n >= e.line && n <= (e.end ?? e.line));
     if (en) return en.auto ? "rgba(85,255,255,0.20)" : "rgba(255,85,255,0.20)"; // auto = cyan, manual = magenta
     return undefined;
@@ -131,13 +133,13 @@ export default function CollyPreview({
   const panel = sel && (
     <div style={{
       position: "absolute", top: `${(sel.start - 1) * rowH}px`, right: "8px", zIndex: 20, width: "240px",
-      background: "#111", border: "1px solid #ff55ff", padding: "8px", display: "grid", gap: "6px",
+      background: "#212121", border: "1px solid #444", padding: "8px", display: "grid", gap: "6px",
       fontFamily: "TopazPlus_a1200, monospace", fontSize: "13px",
     }}>
       <div className="magenta">Selected logo</div>
-      <input className="form-control" placeholder="logo name" autoFocus value={fName} onChange={(e) => setFName(e.target.value)} />
-      <input className="form-control" placeholder="author (who drew it)" value={fBy} onChange={(e) => setFBy(e.target.value)} />
-      <input className="form-control" placeholder="for (requested by)" value={fFor} onChange={(e) => setFFor(e.target.value)} />
+      <input className="form-control" style={{ boxSizing: "border-box", width: "100%" }} placeholder="logo name" autoFocus value={fName} onChange={(e) => setFName(e.target.value)} />
+      <Combobox value={fBy} options={artistOpts} onChange={setFBy} width={224} placeholder="author (who drew it)" createLabel="artist" />
+      <input className="form-control" style={{ boxSizing: "border-box", width: "100%" }} placeholder="for (requested by)" value={fFor} onChange={(e) => setFFor(e.target.value)} />
       <div style={{ display: "flex", gap: "6px" }}>
         <input type="button" className="btn-big bg-green white" value="Save" onClick={save} />
         <input type="button" className="btn-big" value="Cancel" onClick={close} />

@@ -129,6 +129,13 @@ export default function CollysClient() {
     setLogoMap(v);
   }, []);
   const [showMapEditor, setShowMapEditor] = useState(false);
+  // All artist names, for the logo editor's filterable author picker.
+  const [artistNames, setArtistNames] = useState<string[]>([]);
+  useEffect(() => {
+    fetch("/api/admin/artists?q=*").then(r => r.json())
+      .then((os: NameOption[]) => setArtistNames(os.map(o => o.nick ?? o.name ?? "").filter(Boolean)))
+      .catch(() => setArtistNames([]));
+  }, []);
 
   const dizPreviewHtml = useMemo(() => {
     if (!dizContent) return { html: "", hasPcb: false, hasAnsi: false };
@@ -579,6 +586,7 @@ export default function CollysClient() {
                               logoMap={logoMap}
                               setLogoMap={editLogoMap}
                               defaultAuthor={author}
+                              artistOptions={artistNames}
                             />
                           </div>
                         ) : (

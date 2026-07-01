@@ -11,6 +11,24 @@
 | `npx tsc --noEmit` | Type check |
 | `./deploy.sh` | Deploy to 97.75.89.139 |
 
+### Dev server is user-owned
+
+The `npm run dev` server is owned by the human, running in their own terminal
+tab. **Agents must NOT start, kill, or restart it.** A server an agent spawns is
+tied to the agent's process group and gets reaped when the tool call / session
+ends -- it dies silently, and the human keeps reloading against a corpse (stale
+build). Worse, `kill`-ing the human's server destroys the one live instance.
+
+Rules for agents:
+- Never run `kill`, restart, or launch `npm run dev`. Assume one is already
+  running on port 3000.
+- After editing `.tsx`/`.css`, turbopack HMR in the human's server picks it up
+  automatically -- no restart needed. First load of a just-edited route may lag
+  one beat while turbopack recompiles on-demand; that is normal, not stale.
+- If a change genuinely seems not to apply, first check whether the human's
+  server is up (`lsof -i :3000`) and ask them to restart it -- do not restart it
+  yourself.
+
 ## ASCII-only UI
 
 **No Unicode characters anywhere in UI text, button labels, placeholders, headings, or alerts.**
