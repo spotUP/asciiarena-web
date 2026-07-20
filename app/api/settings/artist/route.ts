@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
+import { canClaimHandle } from "@/lib/accountRules";
 
 const postSchema = z.object({
   nick: z.string().min(1).max(100),
@@ -46,6 +47,11 @@ export async function POST(request: NextRequest) {
   if (!parsed.success) return apiError("Invalid request: " + parsed.error.issues[0]?.message, 400);
   const nick = parsed.data.nick.trim();
   if (!nick) return apiError("nick is required", 400);
+
+  // Ownership check: you may only claim a handle that IS your site nick.
+  if (!canClaimHandle(session.user.name, nick)) {
+    return apiError("You can only claim an artist handle that matches your nick.", 403);
+  }
 
   const rows = await prisma.$queryRaw<ArtistRow[]>`
     SELECT id, nick, artisturl, user_id FROM artists WHERE nick = ${nick} LIMIT 1

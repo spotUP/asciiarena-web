@@ -164,7 +164,6 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
 
   const [linkedArtists, setLinkedArtists] = useState<ArtistHandle[]>([]);
   const [suggestedArtists, setSuggestedArtists] = useState<ArtistHandle[]>([]);
-  const [claimNick, setClaimNick] = useState("");
   const [artistMsg, setArtistMsg] = useState<{ text: string; success: boolean } | null>(null);
 
   const loadArtists = useCallback(async () => {
@@ -200,7 +199,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
       body: JSON.stringify({ nick }),
     });
     const d = await r.json() as { error?: string };
-    if (r.ok) { showArtistMsg(`Claimed '${nick}'!`, true); setClaimNick(""); loadArtists(); }
+    if (r.ok) { showArtistMsg(`Claimed '${nick}'!`, true); loadArtists(); }
     else showArtistMsg(d.error ?? "Failed to claim.", false);
   }
 
@@ -572,22 +571,14 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
         </>
       )}
 
-      <div className="row apt-1"><div className="col-12">Claim by artist nick:</div></div>
-      <div className="row apt-1">
-        <div className="col-xs-12 col-md-8 apb-1">
-          <input
-            type="text" className="form-control w-100" placeholder="Enter artist nick..."
-            value={claimNick} onChange={e => setClaimNick(e.target.value)}
-            onKeyDown={e => { if (e.key === "Enter" && claimNick.trim()) claimArtist(claimNick.trim()); }}
-          />
+      {suggestedArtists.length === 0 && linkedArtists.length === 0 && (
+        <div className="row apt-1">
+          <div className="col-12 lightgrey">
+            No artist handle matches your nick yet. Handles are linked
+            automatically when a scene artist name equals your site nick.
+          </div>
         </div>
-        <div className="col-xs-12 col-md-4 apb-1">
-          <input
-            type="button" className="btn-big" value="Claim"
-            onClick={() => { if (claimNick.trim()) claimArtist(claimNick.trim()); }}
-          />
-        </div>
-      </div>
+      )}
     </div>
   );
 

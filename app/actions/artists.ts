@@ -5,11 +5,18 @@ import { Prisma } from "@/lib/generated/prisma/client";
 import { getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 import { broadcastActivityIfAllowed } from "@/lib/activity";
+import { canClaimHandle } from "@/lib/accountRules";
 
 export async function claimArtist(nick: string): Promise<{ success: boolean; error?: string }> {
   const session = await getSession();
   if (!session?.user?.id) return { success: false, error: "Not logged in" };
   const userId = Number(session.user.id);
+
+  // Ownership check: you may only claim a handle that IS your site nick.
+  // Without this, any user could grab any unclaimed artist (see "Goto80" bug).
+  if (!canClaimHandle(session.user.name, nick)) {
+    return { success: false, error: "You can only claim an artist handle that matches your nick." };
+  }
 
   const artist = await prisma.artists.findFirst({ where: { nick }, select: { id: true, user_id: true } });
   if (!artist) return { success: false, error: `Artist '${nick}' not found` };
