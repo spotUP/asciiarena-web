@@ -205,7 +205,7 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
             const sessionRes = await fetch("/api/auth/session", { credentials: "include" });
             const session = sessionRes.ok ? await sessionRes.json().catch(function() { return null; }) : null;
             if (!session || !session.user) {
-              showError("authentication failed");
+              showError("Login failed. Check your handle and password. If you just registered, click the activation link in your welcome email first.");
             } else {
               const loginEl = document.getElementById("login");
               if (loginEl) {

@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
+import { isRankLoginBlocked } from "@/lib/accountRules";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
@@ -37,6 +38,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const valid = await bcrypt.compare(credentials.password as string, user.pwhash);
         if (!valid) return null;
+
+        // Gate: an unactivated ("Inactive") account may not log in until it
+        // confirms its email via the activation link. Returning null here
+        // surfaces as a normal auth failure; the login modal tells the user to
+        // check their mail for the activation link.
+        if (isRankLoginBlocked(user.rank)) return null;
 
         return {
           id: String(user.id),

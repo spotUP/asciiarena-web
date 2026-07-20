@@ -1,19 +1,12 @@
 import { NextRequest } from "next/server";
-import crypto from "crypto";
 import nodemailer from "nodemailer";
 import { prisma } from "@/lib/db";
 import { apiError, apiOk } from "@/lib/utils";
 import { checkRateLimit } from "@/lib/rateLimit";
 import { hashResetToken } from "@/lib/resetToken";
+import { buildHmacToken } from "@/lib/hmacToken";
 
-function buildToken(userId: number, email: string): string {
-  const expiry = Date.now() + 4 * 60 * 60 * 1000;
-  const payload = `${userId}|${email}|${expiry}`;
-  const secret = process.env.NEXTAUTH_SECRET ?? "";
-  const hmac = crypto.createHmac("sha256", secret).update(payload).digest("hex");
-  const raw = `${payload}|${hmac}`;
-  return Buffer.from(raw).toString("base64url");
-}
+const RESET_TTL_MS = 4 * 60 * 60 * 1000; // 4h
 
 export async function POST(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
@@ -32,7 +25,7 @@ export async function POST(request: NextRequest) {
   // Always return success — never reveal whether the address exists
   if (!user) return apiOk({ status: true });
 
-  const token = buildToken(user.id, email);
+  const token = buildHmacToken(user.id, email, RESET_TTL_MS);
   // Store a hash of the token so we can invalidate it after use
   const tokenHash = hashResetToken(token);
   await prisma.users.update({ where: { id: user.id }, data: { temp_pw_hash: tokenHash } });

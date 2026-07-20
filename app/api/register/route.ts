@@ -7,14 +7,18 @@ import bcrypt from "bcryptjs";
 import { ACTIVITY_TYPES, type ActivityType } from "@/lib/activity-types";
 import { broadcast } from "@/lib/live";
 import { revalidateTag } from "next/cache";
+import { buildHmacToken } from "@/lib/hmacToken";
 
-async function sendWelcomeMail(nick: string, mail: string) {
+// Activation links stay valid for 7 days so a user has a comfortable window to
+// click through from their welcome email.
+const ACTIVATION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+async function sendWelcomeMail(nick: string, mail: string, activationLink: string) {
   const mailHost = process.env.MAILHOST;
   const mailPort = parseInt(process.env.MAILPORT ?? "465", 10);
   const mailUser = process.env.MAILUSER;
   const mailPass = process.env.MAILPASS;
   const mailRoot = process.env.MAILROOT ?? mailUser;
-  const siteRoot = process.env.NEXTAUTH_URL ?? "https://asciiarena.se";
 
   if (!mailHost || !mailUser || !mailPass) return;
 
@@ -28,14 +32,16 @@ async function sendWelcomeMail(nick: string, mail: string) {
   await transporter.sendMail({
     from: `"ASCII Arena" <${mailRoot}>`,
     to: mail,
-    subject: "Welcome to ASCII Arena",
+    subject: "Welcome to ASCII Arena - activate your account",
     text: [
       `Hello ${nick},`,
       "",
-      "Your ASCII Arena account has been created and is pending activation.",
-      "An admin will review your account shortly.",
+      "Your ASCII Arena account has been created. Click the link below to",
+      "activate it and log in (valid for 7 days):",
       "",
-      `In the meantime, visit us at: ${siteRoot}`,
+      activationLink,
+      "",
+      "If you did not create this account, ignore this message.",
       "",
       "- the aSCIIaRENA team",
     ].join("\n"),
@@ -47,7 +53,7 @@ async function sendWelcomeMail(nick: string, mail: string) {
       from: `"ASCII Arena" <${mailRoot}>`,
       to: mailRoot,
       subject: `New registration: ${nick}`,
-      text: `New user registered: ${nick} (${mail})\n\nActivate at: ${siteRoot}/admin#edituser`,
+      text: `New user registered: ${nick} (${mail}). Activation link emailed to the user.`,
     });
   }
 }
@@ -134,14 +140,23 @@ export async function POST(request: NextRequest) {
 
   await prisma.$executeRaw`
     INSERT INTO users
-      (nick, crew, pwhash, lastactive, current, mail, uploaded, \`rank\`, upload_signature, list_view_mode, display_mail, nickurl, activity_hidden_types)
+      (nick, crew, pwhash, lastactive, joined, current, mail, uploaded, \`rank\`, upload_signature, list_view_mode, display_mail, nickurl, activity_hidden_types)
     VALUES
-      (${nick}, 'Independent', ${pwhash}, UNIX_TIMESTAMP(), '', ${mail}, 0, 'Inactive',
+      (${nick}, 'Independent', ${pwhash}, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), '', ${mail}, 0, 'Inactive',
        '- -- - aSCIIaRENa - ---- - aSCIIaRENa - -- -', 'standard', '0', ${nickurl}, ${activityHiddenTypes})
   `;
 
+  // Look up the id we just inserted so we can mint the activation token.
+  const created = await prisma.$queryRaw<{ id: number }[]>`
+    SELECT id FROM users WHERE nickurl = ${nickurl} LIMIT 1
+  `;
+  const siteRoot = process.env.NEXTAUTH_URL ?? "https://asciiarena.se";
+  const activationLink = created[0]
+    ? `${siteRoot}/api/activate?token=${buildHmacToken(created[0].id, mail, ACTIVATION_TTL_MS)}`
+    : siteRoot;
+
   // Fire-and-forget — don't fail registration if mail is misconfigured
-  sendWelcomeMail(nick, mail).catch(() => {});
+  sendWelcomeMail(nick, mail, activationLink).catch(() => {});
 
   broadcast("site:users", { type: "joined", nick });
   revalidateTag("site:stats", "default");
