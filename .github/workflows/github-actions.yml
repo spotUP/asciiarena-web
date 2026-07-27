@@ -81,6 +81,18 @@ jobs:
             -e "ssh -i /tmp/deploy_key -o StrictHostKeyChecking=no" \
             public/ "$SERVER:$DEST/public/"
 
+          # Sync assets/ and fonts/. nginx serves /assets/ and /fonts/ straight
+          # from the project root (see deploy/asciiarena.se-nginx.conf), NOT
+          # from public/, so without this a CSS or font change never reaches
+          # production on a push -- it only went live when someone happened to
+          # run deploy.sh by hand. No --delete, matching deploy.sh.
+          rsync -az \
+            -e "ssh -i /tmp/deploy_key -o StrictHostKeyChecking=no" \
+            assets/ "$SERVER:$DEST/assets/"
+          rsync -az \
+            -e "ssh -i /tmp/deploy_key -o StrictHostKeyChecking=no" \
+            fonts/ "$SERVER:$DEST/fonts/"
+
           # Sync the nginx config (kept in the repo for version control)
           scp -i /tmp/deploy_key -o StrictHostKeyChecking=no \
             deploy/asciiarena.se-nginx.conf \

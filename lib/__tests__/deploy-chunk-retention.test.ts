@@ -46,6 +46,15 @@ describe("CI deploy client-chunk retention", () => {
     expect(ciRsyncFor("$SERVER:$DEST/")).toMatch(/--exclude=(['"]?)\/\.next\/static\1/);
   });
 
+  it("deploys the CSS and fonts nginx serves from the project root", () => {
+    // nginx serves /assets/ and /fonts/ from the project root, not from
+    // public/ (deploy/asciiarena.se-nginx.conf). CI synced only public/, so a
+    // CSS change reached production ONLY when someone ran deploy.sh by hand --
+    // a pushed stylesheet fix silently did nothing.
+    expect(ci).toMatch(/assets\/ "\$SERVER:\$DEST\/assets\/"/);
+    expect(ci).toMatch(/fonts\/ "\$SERVER:\$DEST\/fonts\/"/);
+  });
+
   it("prunes retained chunks so they cannot accumulate forever", () => {
     const prune = /find \S*\.next\/static -type f -mtime \+(\d+) -delete/.exec(ci);
     expect(prune).not.toBeNull();
