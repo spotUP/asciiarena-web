@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { logoMapSchema } from "@/lib/logoMapPayload";
 
 // PATCH contract for the admin colly editor.
 //
@@ -32,11 +33,9 @@ export const collyPatchSchema = z.object({
   soundtrack: z.string().max(255).nullable().optional(),
   // Logo map (visual editor). When present, replaces the colly's catalog rows
   // with this manual map (drives rendering + search), like a mapped upload.
-  logos: z.array(z.object({
-    line: z.number().int().positive(),
-    end: z.number().int().positive().optional(),
-    caption: z.string().max(200),
-  })).optional(),
+  // Same shape the public tagging route accepts — one schema, so the two
+  // write paths cannot drift apart.
+  logos: logoMapSchema.optional(),
 });
 
 export type CollyPatch = z.infer<typeof collyPatchSchema>;
