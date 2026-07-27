@@ -5,10 +5,22 @@ import { parseCollyBytes } from "@/lib/collyTrailer";
 
 // Resolve a colly's on-disk path the same way the release page does:
 // <COLLECTIONS_PATH>/<filename-without-ext>/<filename>.
-export function collyFilePath(filename: string): string {
-  const collectionsPath = process.env.COLLECTIONS_PATH ?? path.join(process.cwd(), "collections");
+// Returns null if the resolved path escapes the collections directory.
+export function collyFilePath(filename: string): string | null {
+  // Reject filenames containing null bytes or absolute paths.
+  if (filename.includes("\x00") || path.isAbsolute(filename)) return null;
+
+  const collectionsPath = path.resolve(process.env.COLLECTIONS_PATH ?? path.join(process.cwd(), "collections"));
   const dirname = filename.replace(/\.[^.]+$/, "");
-  return path.join(collectionsPath, dirname, filename);
+  const candidate = path.resolve(path.join(collectionsPath, dirname, filename));
+
+  // Verify the resolved path is inside the collections directory.
+  // Use path.relative to check if the path escapes: if it starts with "..",
+  // it is outside the root.
+  const relative = path.relative(collectionsPath, candidate);
+  if (relative.startsWith("..")) return null;
+
+  return candidate;
 }
 
 // Strip CSI escape sequences (ANSI colour codes) so logo-section detection sees
@@ -25,7 +37,7 @@ function stripAnsiEscapes(s: string): string {
 // null if the file is missing or unreadable. Reads only; nothing is persisted.
 export function readCollyText(filename: string, storedType?: string | null): string | null {
   const filePath = collyFilePath(filename);
-  if (!existsSync(filePath)) return null;
+  if (!filePath || !existsSync(filePath)) return null;
   try {
     const encoding = releaseTextEncoding((storedType ?? "ASCII").toUpperCase(), null);
     // Drop the invisible metadata trailer (after Ctrl-Z) so logo detection / the

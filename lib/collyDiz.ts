@@ -18,6 +18,7 @@ const clean = (s: string) => escapeHtmlText(stripAnsi(nl(s)));
 export function readCollyDiz(filename: string, storedType?: string | null): string | null {
   const enc = releaseTextEncoding((storedType ?? "ASCII").toUpperCase(), null);
   const collyPath = collyFilePath(filename);
+  if (!collyPath) return null;
   const dizPath = `${collyPath}.diz`;
 
   // 1. separate .diz file
