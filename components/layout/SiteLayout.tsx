@@ -102,7 +102,7 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
       )}
 
       <div className="container-fluid mobile-bg">
-        <div className="row" style={{ paddingTop: "58px", paddingBottom: "16px" }}>
+        <div className="row logo-header-row" style={{ paddingTop: "58px", paddingBottom: "16px" }}>
           <div className="col-12 d-flex align-items-center justify-content-center m-0 p-0">
             <LogoHeader logos={logos} />
           </div>

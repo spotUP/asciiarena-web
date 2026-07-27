@@ -2603,7 +2603,20 @@ input::file-selector-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #000000;
+}
+
+/* The black behind the logos has to be painted by the full-width ROW, not by
+   the frame. The frame is a flex item inside a centring flex row, so it
+   shrink-wraps to whatever logo is showing (and re-wraps as they rotate) —
+   painting it black left the logos' own black background sitting in a grey
+   #111111 surround, with the seam moving on every rotation. The row also
+   covers its own 58px/16px padding, so there is no grey above or below either.
+   lg-only because LogoHeader is d-none below lg; without the guard small
+   screens get an empty black strip where no logo renders. */
+@media (min-width: 992px) {
+  .logo-header-row {
+    background-color: #000000;
+  }
 }
 
 /* Clickable entries in a colly's embedded "oN> NAME" index (see
