@@ -109,10 +109,28 @@ export async function postComment(
   const parsedRating = rating ? parseInt(rating, 10) : null;
   const ratingNum = parsedRating != null && Number.isFinite(parsedRating) ? parsedRating : null;
   const colly = await prisma.collys.findUnique({ where: { id: collyId }, select: { filename: true, uploader_id: true } });
-  await prisma.$executeRaw`
+  // One live rating per user per colly. The release page averages every
+  // `comments` row with rating > 0, so leaving an earlier rating in place lets
+  // a second comment count twice — both in the average and in the vote count.
+  // Clearing the old rating (rather than blocking the comment) matches the
+  // legacy behaviour: you may comment as often as you like, and your newest
+  // rating is the one that counts. Both writes go in one transaction so a
+  // failure can never drop the old vote without recording the new one.
+  const insertComment = prisma.$executeRaw`
     INSERT INTO comments (colly_id, user_id, comment, rating, timestamp, filename, nick)
     VALUES (${collyId}, ${userId}, ${comment}, ${ratingNum}, ${Math.floor(Date.now() / 1000)}, ${colly?.filename ?? null}, ${nick})
   `;
+  if (ratingNum !== null) {
+    await prisma.$transaction([
+      prisma.$executeRaw`
+        UPDATE comments SET rating = NULL
+        WHERE colly_id = ${collyId} AND user_id = ${userId} AND rating IS NOT NULL
+      `,
+      insertComment,
+    ]);
+  } else {
+    await insertComment;
+  }
   if (colly?.filename) revalidatePath('/release/' + colly.filename);
   broadcast(`comments:${collyId}`, { type: "posted", nick });
   broadcast("site:comments", { type: "posted" });
