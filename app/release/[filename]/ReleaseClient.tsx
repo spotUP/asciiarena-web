@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, useTransition, useMemo } from "react";
+import dynamic from "next/dynamic";
 import {
   trackView, trackDownload,
   addFavourite, removeFavourite,
@@ -28,6 +29,10 @@ import { sectionsFromLogoMap } from "@/lib/collyTrailer";
 import ColorSwatch from "@/components/ui/ColorSwatch";
 import { useMusic } from "@/components/music/MusicProvider";
 import { BeatDetector, lowBandEnergy } from "@/lib/uade/beatDetector";
+
+// Loaded on first entry into tag mode only — readers who never tag do not
+// download the editor.
+const LogoTagPanel = dynamic(() => import("@/components/release/LogoTagPanel"), { ssr: false });
 
 
 
@@ -261,6 +266,8 @@ export default function ReleaseClient({
   initialViewCount, initialFavCount, initialDownloadCount,
 }: Props) {
   const [collyVisible, setCollyVisible] = useState(true);
+  // Tagging replaces the viewer in place rather than rendering the art twice.
+  const [tagging, setTagging] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const viewportWideEnough = useViewportAllowsMinimap();
   const { enabled: minimapEnabled, toggle: toggleMinimap } = useMinimapPreference();
@@ -286,6 +293,9 @@ export default function ReleaseClient({
   // - it's not an archive, or
   // - it IS an archive but we extracted renderable content from it
   const hasInlineContent = !isArchive || !!fileContent;
+
+  // One flag for both viewer branches: the plain-text one and the canvas one.
+  const viewerVisible = collyVisible && !tagging;
 
   const [autoplay, setAutoplay] = useState(false);
   const [autoplayIndex, setAutoplayIndex] = useState(0);
@@ -1004,7 +1014,7 @@ export default function ReleaseClient({
   const showMinimap = shouldShowMinimap({
     viewportAllows: viewportWideEnough,
     userEnabled: minimapEnabled,
-    entryCount: logoIndex.length,
+    entryCount: tagging ? 0 : logoIndex.length,
     isFullscreen,
   });
 
@@ -1151,19 +1161,26 @@ export default function ReleaseClient({
           {hasInlineContent && (
             <input type="button" className="btn-big" value={collyVisible ? "Hide Colly" : "View Colly"} onClick={toggleColly} />
           )}
-          {hasInlineContent && collyVisible && (
+          {hasInlineContent && viewerVisible && (
             <input type="button" className="btn-big" id="fsbutton" value={isFullscreen ? "Exit Fullscreen" : "Fullscreen"} onClick={toggleFullscreen} />
           )}
-          {hasInlineContent && collyVisible && (
+          {hasInlineContent && viewerVisible && (
             <input type="button" className="btn-big" value={fitted ? "Reset size" : "Fit to screen"} onClick={fitColly} />
           )}
           <input type="button" className="btn-big" value="Download" onClick={doDownload} />
+
+          {hasInlineContent && userNick && (
+            <input type="button" className="btn-big"
+              value={tagging ? "Stop Tagging" : "Tag Logos"}
+              title="Map the logos in this colly so they show up in search"
+              onClick={() => setTagging(t => !t)} />
+          )}
 
           {type === "ASCII" && collyVisible && (
             <input type="button" className="btn-big" value={copyImageLabel} onClick={doCopyImage} />
           )}
 
-          {hasInlineContent && (type === "ASCII" || useCanvasViewer) && collyVisible && (
+          {hasInlineContent && (type === "ASCII" || useCanvasViewer) && viewerVisible && (
             <>
               <input type="button" className="btn-big"
                 value={autoplay ? "Stop" : "Autoplay"}
@@ -1277,7 +1294,19 @@ export default function ReleaseClient({
           <feDisplacementMap ref={warpDispRef} in="SourceGraphic" in2="n" scale={0} xChannelSelector="R" yChannelSelector="G" />
         </filter>
       </svg>
-      {!useCanvasViewer && (type === "ASCII" || !!fileContent) && collyVisible && (
+      {tagging && (
+        <LogoTagPanel
+          collyId={collyId}
+          filename={filename}
+          type={type}
+          font={font}
+          fg={fgColor}
+          bg={bgColor}
+          isAdmin={isAdmin}
+          onDone={() => setTagging(false)}
+        />
+      )}
+      {!useCanvasViewer && (type === "ASCII" || !!fileContent) && viewerVisible && (
         <div style={{ position: "relative" }}>
         <div
           ref={collyDivRef}
@@ -1317,7 +1346,7 @@ export default function ReleaseClient({
 
       {/* Canvas viewer — AnsiLove renders ANSI art and PC/CP437 block art here.
           CP437 art is recoloured to the user's bg, so match the container bg. */}
-      {useCanvasViewer && collyVisible && (
+      {useCanvasViewer && viewerVisible && (
         <div style={{ position: "relative" }}>
         <div
           ref={collyDivRef}
