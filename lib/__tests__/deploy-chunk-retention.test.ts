@@ -64,6 +64,10 @@ describe("deploy client-chunk retention", () => {
     expect(deploy).toMatch(remoteSort);
     // Neither side may sort without pinning the collation.
     expect(deploy).not.toMatch(/find \. -type f \| sort/);
+    // And `comm` itself compares using the locale on BSD, so pinning only the
+    // sorts still reports present files as missing. This aborted a good deploy
+    // even after the sorts were fixed.
+    expect(deploy).toMatch(/LC_ALL=C comm -23/);
   });
 
   it("aborts before restarting rather than serving a build with missing assets", () => {

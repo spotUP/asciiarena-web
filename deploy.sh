@@ -75,9 +75,12 @@ echo "Verifying client assets..."
 # this it reports chunks as missing that are sitting right there — and Turbopack
 # names chunks with exactly the punctuation the two disagree about (~ _ - .).
 verify_static() {
+  # LC_ALL=C applies to `comm` as well, not just the two sorts. BSD comm
+  # compares using the current locale, so pinning only the sorts still let it
+  # report present files as missing -- which aborted a good deploy.
   ( cd .next/static && find . -type f | LC_ALL=C sort ) > /tmp/aa-static-local.txt
   ssh spot@97.75.89.139 'cd /var/www/asciiarena.se/nextjs-current/.next/static && find . -type f | LC_ALL=C sort' > /tmp/aa-static-remote.txt
-  comm -23 /tmp/aa-static-local.txt /tmp/aa-static-remote.txt | wc -l | tr -d ' '
+  LC_ALL=C comm -23 /tmp/aa-static-local.txt /tmp/aa-static-remote.txt | wc -l | tr -d ' '
 }
 MISSING=$(verify_static)
 if [ "$MISSING" != "0" ]; then
