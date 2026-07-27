@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { countrySlug } from "@/lib/countrySlug";
 import { urlsafe } from "@/lib/utils";
 import SortHeader from "@/components/ui/SortHeader";
 import NewItemsPill from "@/components/ui/NewItemsPill";
@@ -149,7 +150,11 @@ export default function ArtistsClient({ initialSort, initialOrder }: ArtistsClie
                 ))}
               </div>
               <div className="col-2 lightgrey">{artist.rating != null ? artist.rating.toFixed(1) : "-"}</div>
-              <div className="col-2 lightgrey">{artist.country || "-"}</div>
+              <div className="col-2 lightgrey">
+                {artist.country
+                  ? <Link href={`/country/${countrySlug(artist.country)}`} className="lightgrey">{artist.country}</Link>
+                  : "-"}
+              </div>
             </div>
           ))}
         {loadingMore && <div className="row apt-1"><div className="col lightgrey">Loading...</div></div>}

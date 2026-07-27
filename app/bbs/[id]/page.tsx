@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { countrySlug } from "@/lib/countrySlug";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
@@ -71,7 +73,7 @@ export default async function BbsPage({ params }: PageProps) {
       {bbs.country && (
         <div className="col-lg-12 pl-0">
           <span className="lightgrey">Country: </span>
-          {bbs.country}
+          <Link href={`/country/${countrySlug(bbs.country)}`}>{bbs.country}</Link>
         </div>
       )}
       {bbs.software && (

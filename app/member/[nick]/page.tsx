@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { countrySlug } from "@/lib/countrySlug";
 import type { Metadata } from "next";
 import SiteLayout from "@/components/layout/SiteLayout";
 import UnfaveButton from "./UnfaveButton";
@@ -192,7 +193,7 @@ export default async function MemberPage({
             {member.country && (
               <div className="col-sm-8">
                 <span className="white">Country: </span>
-                <span className="yellow">{member.country}</span>
+                <Link className="yellow" href={`/country/${countrySlug(member.country)}`}>{member.country}</Link>
               </div>
             )}
           </div>

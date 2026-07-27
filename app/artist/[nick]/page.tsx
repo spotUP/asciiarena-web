@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { countrySlug } from "@/lib/countrySlug";
 import { readFileSync, existsSync } from "fs";
 import path from "path";
 import SiteLayout from "@/components/layout/SiteLayout";
@@ -222,7 +223,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
       {artist.country && (
         <div className="col-lg-12 pl-0">
           <span className="lightgrey">Country: </span>
-          {artist.country}
+          <Link href={`/country/${countrySlug(artist.country)}`}>{artist.country}</Link>
         </div>
       )}
       <div className="col-lg-12 pl-0">
