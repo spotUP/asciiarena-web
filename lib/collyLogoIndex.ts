@@ -43,13 +43,44 @@ export interface IndexResult {
 }
 
 // (Re)index one colly: read its file, extract+resolve logo labels, replace its
-// catalog rows atomically. Idempotent. Reads the file but persists only labels.
+// catalog rows atomically, and refresh the full-content search column.
+// Idempotent. Reads the file but persists only labels + plaintext.
 // Pass `dicts` during bulk backfill to avoid reloading them per colly.
 export async function indexColly(
   collyId: number,
   filename: string,
   storedType?: string | null,
   dicts?: EntityDicts,
+): Promise<IndexResult> {
+  return rebuildDetectedLayers(collyId, filename, storedType, dicts, true);
+}
+
+/**
+ * Restore ONLY the auto-detected (manual = 0) catalog layer, leaving
+ * `collys.content_text` untouched.
+ *
+ * Same detection as `indexColly` -- the difference is the content column. That
+ * column holds up to 5 MB of plaintext, and rewriting it is by far the largest
+ * write either path makes (row, binlog, replication). The public save route
+ * calls this whenever a save leaves no catalog rows, so it must write only what
+ * the rebuild actually needs: the logo rows. `content_text` cannot have gone
+ * stale, because a colly's file never changes after upload.
+ */
+export async function rebuildAutoLogoLayer(
+  collyId: number,
+  filename: string,
+  storedType?: string | null,
+  dicts?: EntityDicts,
+): Promise<IndexResult> {
+  return rebuildDetectedLayers(collyId, filename, storedType, dicts, false);
+}
+
+async function rebuildDetectedLayers(
+  collyId: number,
+  filename: string,
+  storedType: string | null | undefined,
+  dicts: EntityDicts | undefined,
+  syncContentText: boolean,
 ): Promise<IndexResult> {
   const d = dicts ?? (await getDicts());
   // Auto-detected catalog rows (manual = 0). A colly that's been mapped in the
@@ -61,7 +92,7 @@ export async function indexColly(
   if (rows.length) ops.push(prisma.colly_logos.createMany({ data: rows }));
   // Keep the full-content search index in sync from the same decoded text, so a
   // re-index backfills content_text for every colly in one pass.
-  if (text != null) {
+  if (syncContentText && text != null) {
     ops.push(prisma.$executeRaw`UPDATE collys SET content_text = ${text.slice(0, 5_000_000)} WHERE id = ${collyId}`);
   }
   await prisma.$transaction(ops as never);

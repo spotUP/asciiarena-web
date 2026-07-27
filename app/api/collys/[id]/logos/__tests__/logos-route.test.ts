@@ -9,6 +9,7 @@ interface RawCall { sql: string; values: unknown[] }
 
 const rawCalls: RawCall[] = [];
 const txCalls: unknown[][] = [];
+const autoLayerCalls: unknown[][] = [];
 const indexCollyCalls: unknown[][] = [];
 let sessionRank: string | null = "Member";
 let sessionId: string | null = "42";
@@ -24,8 +25,10 @@ let editRows: { id: number; colly_id: number; user_id: number; timestamp: number
   { id: 9, colly_id: 4122, user_id: 42, timestamp: 1753600000, logo_count: 7, map: '[{"line":12,"caption":"dipswitch"}]' },
 ];
 let manualLogoRows: { start_line: number; end_line: number | null; label: string }[] = [];
-// The requesting user's most recent save on this colly, for the rate limit.
+// The requesting user's most recent save on this colly, for the per-colly gap.
 let lastOwnEdit: { timestamp: number } | null = null;
+// That user's recent saves across ALL collys, for the global per-user quota.
+let recentOwnEdits: { timestamp: number }[] = [];
 // The row a revert resolves `editId` to.
 let revertEditRow: { id: number; colly_id: number; user_id: number; timestamp: number; logo_count: number; map: string } | null = {
   id: 9, colly_id: 4122, user_id: 42, timestamp: 1753600000, logo_count: 1,
@@ -51,7 +54,10 @@ const prismaFake = {
     count: () => Promise.resolve(editRows.length),
     findFirst: () => Promise.resolve(lastOwnEdit),
     findUnique: () => Promise.resolve(revertEditRow),
-    findMany: () => Promise.resolve(editRows),
+    // Two callers: the quota check asks for one USER's recent saves across every
+    // colly; GET asks for one COLLY's history.
+    findMany: (args?: { where?: { user_id?: number } }) =>
+      Promise.resolve(args?.where?.user_id !== undefined ? recentOwnEdits : editRows),
   },
   users: {
     findMany: () => Promise.resolve([{ id: 42, nick: "dipswitch" }]),
@@ -66,6 +72,7 @@ vi.mock("next/cache", () => ({ revalidatePath: () => {}, revalidateTag: () => {}
 vi.mock("@/lib/live", () => ({ broadcast: () => {} }));
 vi.mock("@/lib/collyLogoIndex", () => ({
   loadEntityDicts: () => Promise.resolve({ artists: [], crews: [], users: [] }),
+  rebuildAutoLogoLayer: (...args: unknown[]) => { autoLayerCalls.push(args); return Promise.resolve({ logos: 3, resolved: 1 }); },
   indexColly: (...args: unknown[]) => { indexCollyCalls.push(args); return Promise.resolve({ logos: 3, resolved: 1 }); },
 }));
 
@@ -83,6 +90,7 @@ const req = (body: unknown) => new Request("http://localhost/api/collys/4122/log
 const resetFixtures = () => {
   rawCalls.length = 0;
   txCalls.length = 0;
+  autoLayerCalls.length = 0;
   indexCollyCalls.length = 0;
   sessionRank = "Member";
   sessionId = "42";
@@ -92,6 +100,7 @@ const resetFixtures = () => {
   ];
   manualLogoRows = [];
   lastOwnEdit = null;
+  recentOwnEdits = [];
   revertEditRow = {
     id: 9, colly_id: 4122, user_id: 42, timestamp: 1753600000, logo_count: 1,
     map: '[{"line":12,"caption":"dipswitch"}]',
@@ -215,13 +224,47 @@ describe("POST /api/collys/[id]/logos -- empty save restores auto-detection", ()
   it("rebuilds the auto-detected layer when the map is saved empty", async () => {
     const res = await POST(req({ logos: [] }), { params });
     expect(res.status).toBe(200);
-    expect(indexCollyCalls).toHaveLength(1);
-    expect(indexCollyCalls[0].slice(0, 3)).toEqual([4122, "wpx-boys.txt", "ASCII"]);
+    expect(autoLayerCalls).toHaveLength(1);
+    expect(autoLayerCalls[0].slice(0, 3)).toEqual([4122, "wpx-boys.txt", "ASCII"]);
+  });
+
+  // A map whose entries all index to nothing is as empty as `logos: []` from
+  // the catalog's point of view: the delete runs, no rows replace them, and the
+  // colly vanishes from logo search. The panel seeds unsearchable auto-detected
+  // bands with a blank caption, so a member who saves without captioning them
+  // sends exactly this. Triggering the rebuild on `!logos.length` missed it.
+  it("rebuilds the auto layer when every caption is blank, so the colly stays searchable", async () => {
+    const res = await POST(req({
+      logos: [{ line: 4, end: 12, caption: "" }, { line: 20, end: 28, caption: "  " }],
+    }), { params });
+    expect(res.status).toBe(200);
+    const ops = txCalls[0] as { op: string }[];
+    // The catalog delete ran and nothing was created -- so the rebuild must.
+    expect(ops.map((o) => o.op)).toEqual(["createEdit", "deleteMany"]);
+    expect(autoLayerCalls).toHaveLength(1);
+  });
+
+  it("rebuilds the auto layer when a caption is real prose rather than a handle", async () => {
+    // `isLikelyLogoLabel` drops this, so it produces no catalog row either.
+    const res = await POST(req({
+      logos: [{ line: 4, caption: "All work by TANGo except the following ones" }],
+    }), { params });
+    expect(res.status).toBe(200);
+    expect(autoLayerCalls).toHaveLength(1);
   });
 
   it("leaves the auto layer alone when the member saved actual entries", async () => {
     await POST(req({ logos: [{ line: 12, caption: "dipswitch" }] }), { params });
+    expect(autoLayerCalls).toHaveLength(0);
+  });
+
+  // The rebuild also rewrote `collys.content_text` -- up to 5 MB, on an open
+  // endpoint, for a column that cannot have changed (a colly's file is fixed
+  // after upload). Only the logo layer may be rebuilt here.
+  it("does not rewrite the colly's content_text on the public save path", async () => {
+    await POST(req({ logos: [] }), { params });
     expect(indexCollyCalls).toHaveLength(0);
+    expect(rawCalls.some((c) => /content_text/i.test(c.sql))).toBe(false);
   });
 });
 
@@ -242,6 +285,29 @@ describe("POST /api/collys/[id]/logos -- rate limit", () => {
 
   it("allows the save once the window has elapsed", async () => {
     lastOwnEdit = { timestamp: Math.floor(Date.now() / 1000) - 30 };
+    const res = await POST(req({ logos: [{ line: 1, caption: "x" }] }), { params });
+    expect(res.status).toBe(200);
+    expect(txCalls).toHaveLength(1);
+  });
+
+  // The per-colly gap never fires for a script that walks a list of colly ids:
+  // one big snapshot per colly, on a loop, each on a colly it has not touched
+  // before. A cap that spans every colly is what bounds that.
+  it("refuses a user who has hammered many DIFFERENT collys inside the window", async () => {
+    const now = Math.floor(Date.now() / 1000);
+    // Twenty saves in the last five minutes, none of them on this colly.
+    recentOwnEdits = Array.from({ length: 20 }, (_, i) => ({ timestamp: now - 200 + i }));
+    lastOwnEdit = null;
+    const res = await POST(req({ logos: [{ line: 1, caption: "x" }] }), { params });
+    expect(res.status).toBe(429);
+    expect(txCalls).toHaveLength(0);
+    const body = await res.json();
+    expect(body.error).toMatch(/minute/i);
+  });
+
+  it("allows a user who is under the cap across all collys", async () => {
+    const now = Math.floor(Date.now() / 1000);
+    recentOwnEdits = Array.from({ length: 19 }, (_, i) => ({ timestamp: now - 200 + i }));
     const res = await POST(req({ logos: [{ line: 1, caption: "x" }] }), { params });
     expect(res.status).toBe(200);
     expect(txCalls).toHaveLength(1);
@@ -342,6 +408,17 @@ describe("POST /api/collys/[id]/logos/revert", () => {
     const res = await REVERT(revertReq(), { params });
     expect(res.status).toBe(422);
     expect(txCalls).toHaveLength(0);
+  });
+
+  // Reverting is a moderation action on someone else's mess, so the throttles
+  // that bound member write volume must not stand in an admin's way.
+  it("is not subject to either save throttle", async () => {
+    const now = Math.floor(Date.now() / 1000);
+    lastOwnEdit = { timestamp: now };
+    recentOwnEdits = Array.from({ length: 40 }, (_, i) => ({ timestamp: now - 100 + i }));
+    const res = await REVERT(revertReq(), { params });
+    expect(res.status).toBe(200);
+    expect(txCalls).toHaveLength(1);
   });
 
   it("still restores a snapshot that was genuinely empty", async () => {

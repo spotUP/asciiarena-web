@@ -3,7 +3,7 @@ import { Prisma } from "@/lib/generated/prisma/client";
 import { type LogoMapEntry } from "@/lib/logoMapPayload";
 import { serializeLogoMap, logoCountOf } from "@/lib/collyLogoSnapshot";
 import { buildLogoRowsFromMap } from "@/lib/collyLogoRows";
-import { loadEntityDicts, indexColly } from "@/lib/collyLogoIndex";
+import { loadEntityDicts, rebuildAutoLogoLayer } from "@/lib/collyLogoIndex";
 import { readManualLogoMap } from "@/lib/collyLogoManualMap";
 
 /**
@@ -67,11 +67,18 @@ export async function writeLogoEdit(
   }
   await prisma.$transaction(ops);
 
-  // An empty map means "clear the map and return this colly to automatic
-  // detection". The delete above took the auto-detected layer with it, so put
-  // it back -- otherwise the colly drops out of logo search entirely until an
-  // admin reruns the reindex tool. Same machinery as an untagged upload.
-  if (!logos.length) await restoreAutoDetectedLayer(collyId);
+  // The delete above took the auto-detected layer with it, so a save that
+  // leaves NO catalog rows drops the colly out of logo search entirely until an
+  // admin reruns the reindex tool. Put the auto layer back -- same machinery as
+  // an untagged upload.
+  //
+  // The trigger is the absence of resulting ROWS, not of map entries: a map is
+  // free of catalog rows whenever every caption is blank or fails
+  // `isLikelyLogoLabel`, which `buildLogoRowsFromMap` drops. The tagging panel
+  // seeds unsearchable auto-detected bands with an empty caption, so a member
+  // who saves without captioning them sends a non-empty map that indexes to
+  // nothing -- exactly the case an `!logos.length` trigger would miss.
+  if (!rows.length) await restoreAutoDetectedLayer(collyId);
 
   return { logoCount: logoCountOf(logos), rowCount: rows.length };
 }
@@ -93,8 +100,12 @@ async function baselineMapToPreserve(collyId: number): Promise<LogoMapEntry[]> {
 
 /**
  * Rebuild the auto-detected (manual = 0) catalog layer for a colly whose map
- * was just cleared. Non-fatal: the snapshot is already committed, and a colly
+ * indexed to nothing. Non-fatal: the snapshot is already committed, and a colly
  * whose file cannot be read must not turn a successful save into a 500.
+ *
+ * Deliberately NOT `indexColly`: that also rewrites `collys.content_text` (up
+ * to 5 MB) which cannot have changed, and this runs on the open public save
+ * endpoint whose write volume is the thing the rate limit exists to bound.
  */
 async function restoreAutoDetectedLayer(collyId: number): Promise<void> {
   try {
@@ -103,7 +114,7 @@ async function restoreAutoDetectedLayer(collyId: number): Promise<void> {
       select: { filename: true, type: true },
     });
     if (!colly?.filename) return;
-    await indexColly(collyId, colly.filename, colly.type);
+    await rebuildAutoLogoLayer(collyId, colly.filename, colly.type);
   } catch {
     /* search index only -- the history snapshot is what must not be lost */
   }
