@@ -6,6 +6,7 @@ import { getSession as auth } from "@/lib/session";
 import Navbar from "./Navbar";
 import LogoHeader from "./LogoHeader";
 import PageHeader from "./PageHeader";
+import AnnouncementBar from "@/components/news/AnnouncementBar";
 import LeftSidebar from "./LeftSidebar";
 import RightSidebar from "./RightSidebar";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
@@ -109,6 +110,10 @@ export default async function SiteLayout({ title, children }: SiteLayoutProps) {
         </div>
 
         {title && <PageHeader title={title} />}
+
+        {/* Site news, directly under the header. Renders nothing at all when
+            there is no unread announcement, so it never reserves space. */}
+        <AnnouncementBar />
 
         <div className="row m-0 p-0 amb-1">
           <div className="col-lg-12">

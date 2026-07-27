@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { getSession as auth } from "@/lib/session";
 import { getHiddenWidgets } from "@/lib/widgets";
+import LatestNews from "@/components/widgets/LatestNews";
 import UsersOnlineLive from "@/components/widgets/UsersOnlineLive";
 import CedSessions from "@/components/widgets/CedSessions";
 import NowPlaying from "@/components/widgets/NowPlaying";
@@ -21,6 +22,7 @@ export default async function LeftSidebar() {
   const hidden = await getHiddenWidgets();
   return (
     <>
+      {!hidden.has("latest_news") && <Suspense fallback={null}><LatestNews limit={5} /></Suspense>}
       {!hidden.has("users_online") && <UsersOnlineLive isLoggedIn={isLoggedIn} currentUserId={currentUserId} />}
       {!hidden.has("ced_sessions") && <CedSessions />}
       {!hidden.has("now_playing") && <NowPlaying />}

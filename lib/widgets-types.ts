@@ -10,6 +10,7 @@
 
 export const WIDGET_KEYS = [
   // Home main content
+  "activity_feed",
   "poll_hero",
   "latest_releases",
   "random_releases",
@@ -18,8 +19,8 @@ export const WIDGET_KEYS = [
   "wall",
   "global_wall",
   // Left sidebar
+  "latest_news",
   "users_online",
-  "activity_feed",
   "ced_sessions",
   "now_playing",
   "music_player",
@@ -56,6 +57,7 @@ export const WIDGET_LABELS: Record<WidgetKey, string> = {
   global_wall: "Global BBS Wall",
   users_online: "Users Online",
   activity_feed: "Live Feed",
+  latest_news: "Site News",
   ced_sessions: "Editing in CED",
   now_playing: "Playing in HippoPlayer",
   music_player: "Modland Music Player",
@@ -81,12 +83,12 @@ export const WIDGET_LABELS: Record<WidgetKey, string> = {
 export const WIDGET_GROUPS: { label: string; keys: WidgetKey[] }[] = [
   {
     label: "Home main column",
-    keys: ["poll_hero", "latest_releases", "random_releases", "latest_comments", "recently_viewed", "wall", "global_wall"],
+    keys: ["activity_feed", "poll_hero", "latest_releases", "random_releases", "latest_comments", "recently_viewed", "wall", "global_wall"],
   },
   {
     label: "Left sidebar",
     keys: [
-      "users_online", "activity_feed", "ced_sessions", "now_playing", "music_player", "last_callers",
+      "latest_news", "users_online", "ced_sessions", "now_playing", "music_player", "last_callers",
       "poll_latest_closed",
       "latest_collys_released", "latest_collys_added", "latest_mags",
       "latest_apps", "new_users", "weektop",
