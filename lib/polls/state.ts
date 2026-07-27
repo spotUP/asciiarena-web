@@ -42,6 +42,23 @@ export function isPollLive(poll: PollTiming, now: number): boolean {
   return effectivePollStatus(poll, now) === "open";
 }
 
+/**
+ * Whether to offer the "hide this from my home page" control.
+ *
+ * Only after voting, and only on the hero: dismissing a poll you never
+ * answered would quietly cost the site a response, and the control makes no
+ * sense on /polls or the sidebar, where hiding does not apply. Anonymous
+ * viewers cannot vote, so they never see it either.
+ */
+export function canHidePoll(input: {
+  variant: string;
+  hasVoted: boolean;
+  isLoggedIn: boolean;
+  status: PollStatus;
+}): boolean {
+  return input.variant === "hero" && input.hasVoted && input.isLoggedIn && input.status === "open";
+}
+
 // Prisma `where` fragment matching only polls that are live right now. Used by
 // the public list and the featured-poll lookup so out-of-window polls drop out
 // in SQL rather than being filtered after the fact.

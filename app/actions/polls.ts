@@ -121,6 +121,31 @@ export async function castVoteAction(pollId: number, payload: VotePayload): Prom
   return { ok: true };
 }
 
+// Dismiss a poll from this user's home page hero. Only meaningful once they
+// have voted — the UI hides the control until then, and this checks it again,
+// because a client-side-only rule is not a rule.
+export async function hidePollAction(pollId: number): Promise<ActionResult> {
+  const session = await getSession();
+  if (!session?.user?.id) return { ok: false, error: "Not logged in" };
+  const userId = Number(session.user.id);
+
+  const voted = await prisma.poll_votes.findFirst({
+    where: { poll_id: pollId, user_id: userId },
+    select: { id: true },
+  });
+  if (!voted) return { ok: false, error: "Vote before hiding this poll" };
+
+  // INSERT IGNORE on the (poll_id, user_id) unique key: hiding twice (two tabs,
+  // a double click) is normal, not an error.
+  await prisma.$executeRaw`
+    INSERT IGNORE INTO poll_hidden (poll_id, user_id, hidden_at)
+    VALUES (${pollId}, ${userId}, UNIX_TIMESTAMP())
+  `;
+
+  revalidatePath("/");
+  return { ok: true };
+}
+
 export async function retractVoteAction(pollId: number): Promise<ActionResult> {
   const session = await getSession();
   if (!session?.user?.id) return { ok: false, error: "Not logged in" };

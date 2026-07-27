@@ -65,8 +65,22 @@ export async function loadPollById(id: number, userId: number | null): Promise<L
 }
 
 export async function loadFeaturedPoll(userId: number | null): Promise<LoadedPoll | null> {
+  // Polls this user has answered and then dismissed. Excluded in the query
+  // rather than after it, so a dismissed poll does not suppress the hero
+  // entirely when another featured poll is available.
+  const hidden = userId
+    ? await prisma.$queryRaw<Array<{ poll_id: number }>>`
+        SELECT poll_id FROM poll_hidden WHERE user_id = ${userId}
+      `
+    : [];
+  const hiddenIds = hidden.map(h => Number(h.poll_id));
+
   const row = await prisma.polls.findFirst({
-    where: { featured: true, ...livePollWhere(nowSec()) },
+    where: {
+      featured: true,
+      ...livePollWhere(nowSec()),
+      ...(hiddenIds.length > 0 ? { id: { notIn: hiddenIds } } : {}),
+    },
     orderBy: { updated_at: "desc" },
     include: { options: { orderBy: { sort_order: "asc" } } },
   });

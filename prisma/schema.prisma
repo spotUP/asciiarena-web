@@ -537,6 +537,18 @@ model poll_options {
   @@index([poll_id], map: "ix_poll")
 }
 
+// "I have answered this one, stop showing it to me on the home page." Per
+// user and per poll; the poll stays listed on /polls and reachable by link.
+model poll_hidden {
+  id        Int @id @default(autoincrement()) @db.UnsignedInt
+  poll_id   Int @db.UnsignedInt
+  user_id   Int @db.UnsignedInt
+  hidden_at Int
+
+  @@unique([poll_id, user_id], map: "uq_poll_user")
+  @@index([user_id], map: "ix_user")
+}
+
 model poll_votes {
   id          Int          @id @default(autoincrement()) @db.UnsignedInt
   poll_id     Int          @db.UnsignedInt

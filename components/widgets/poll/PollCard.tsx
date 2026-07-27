@@ -3,6 +3,8 @@ import LiveRefresh from "@/components/widgets/LiveRefresh";
 import PollResults from "./PollResults";
 import PollVoteOrResults from "./PollVoteOrResults";
 import PollCountdown from "./PollCountdown";
+import HidePollButton from "./HidePollButton";
+import { canHidePoll } from "@/lib/polls/state";
 import type { PollView, PollResults as ResultsT } from "@/lib/polls/types";
 import { resolveConfig, POLL_TYPE_LABELS } from "@/lib/polls/types";
 
@@ -84,15 +86,27 @@ export default function PollCard({ poll, myVotes, results, canSeeResults, isLogg
           )
         ) : poll.effective_status === "open" ? (
           /* Live poll on hero / page: form swaps to results after vote. */
-          <PollVoteOrResults
-            poll={poll}
-            myVotes={myVotes}
-            results={results}
-            canSeeResults={canSeeResults}
-            isLoggedIn={isLoggedIn}
-            layout={layout}
-            widthCells={widthCells}
-          />
+          <>
+            <PollVoteOrResults
+              poll={poll}
+              myVotes={myVotes}
+              results={results}
+              canSeeResults={canSeeResults}
+              isLoggedIn={isLoggedIn}
+              layout={layout}
+              widthCells={widthCells}
+            />
+            {canHidePoll({
+              variant,
+              hasVoted: myVotes.length > 0,
+              isLoggedIn,
+              status: poll.effective_status,
+            }) && (
+              <div style={{ marginTop: "8px" }}>
+                <HidePollButton pollId={poll.id} />
+              </div>
+            )}
+          </>
         ) : poll.effective_status === "draft" ? (
           /* Scheduled but not started: nothing to vote on, nothing to show. */
           <div className="lightgrey" style={{ fontFamily: "TopazPlus_a1200, monospace" }}>

@@ -5,6 +5,7 @@ import {
   isPollLive,
   effectivePollStatus,
   livePollWhere,
+  canHidePoll,
 } from "@/lib/polls/state";
 
 const NOW = 1_700_000_000;
@@ -105,5 +106,33 @@ describe("livePollWhere", () => {
         { OR: [{ closes_at: null }, { closes_at: { gt: NOW } }] },
       ],
     });
+  });
+});
+
+describe("canHidePoll — the dismiss control on the home page hero", () => {
+  const base = { variant: "hero", hasVoted: true, isLoggedIn: true, status: "open" as const };
+
+  it("is offered to a logged-in voter on the hero", () => {
+    expect(canHidePoll(base)).toBe(true);
+  });
+
+  it("is withheld until the user has actually voted", () => {
+    // Hiding a poll you never answered would quietly cost a response.
+    expect(canHidePoll({ ...base, hasVoted: false })).toBe(false);
+  });
+
+  it("is not offered anonymously", () => {
+    expect(canHidePoll({ ...base, isLoggedIn: false })).toBe(false);
+  });
+
+  it("only applies to the hero, not the list, page or sidebar", () => {
+    for (const variant of ["list", "page", "sidebar"]) {
+      expect(canHidePoll({ ...base, variant })).toBe(false);
+    }
+  });
+
+  it("is pointless once the poll is over", () => {
+    expect(canHidePoll({ ...base, status: "closed" })).toBe(false);
+    expect(canHidePoll({ ...base, status: "draft" })).toBe(false);
   });
 });
