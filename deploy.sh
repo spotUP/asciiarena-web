@@ -60,6 +60,36 @@ rsync_resilient \
   .next/static/ \
   spot@97.75.89.139:/var/www/asciiarena.se/nextjs-current/.next/static/
 
+# Verify every client asset actually landed, and re-sync once if not.
+#
+# A deploy was observed reporting success while six of the current build's
+# chunks never reached the server; re-running the identical rsync transferred
+# them. A chunk that is missing rather than stale is the same user-visible
+# failure ("Failed to load chunk"), and it is invisible until someone clicks
+# the thing that lazy-loads it. Trusting a single rsync is not good enough for
+# files the browser hard-depends on, so the deploy now checks its own work.
+echo "Verifying client assets..."
+verify_static() {
+  local missing
+  missing=$( (cd .next/static && find . -type f | sort) > /tmp/aa-static-local.txt
+    ssh spot@97.75.89.139 'cd /var/www/asciiarena.se/nextjs-current/.next/static && find . -type f | sort' > /tmp/aa-static-remote.txt
+    comm -23 /tmp/aa-static-local.txt /tmp/aa-static-remote.txt | wc -l | tr -d ' ' )
+  echo "$missing"
+}
+MISSING=$(verify_static)
+if [ "$MISSING" != "0" ]; then
+  echo "  $MISSING client asset(s) missing on the server — re-syncing..."
+  rsync_resilient .next/static/ spot@97.75.89.139:/var/www/asciiarena.se/nextjs-current/.next/static/
+  MISSING=$(verify_static)
+  if [ "$MISSING" != "0" ]; then
+    echo "  [ERROR] $MISSING client asset(s) STILL missing after re-sync. Aborting before restart —"
+    echo "          serving this build would give visitors 'Failed to load chunk' errors."
+    comm -23 /tmp/aa-static-local.txt /tmp/aa-static-remote.txt | head -10
+    exit 1
+  fi
+fi
+echo "  all client assets present."
+
 # Prune chunks no build has produced in the last 14 days. Safe because deploy.sh
 # always builds from a clean .next, so every file in the CURRENT build gets a
 # fresh mtime that rsync -a carries to the server — an old mtime therefore means

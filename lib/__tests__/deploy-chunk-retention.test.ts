@@ -42,6 +42,23 @@ describe("deploy client-chunk retention", () => {
     expect(serverSync).toMatch(/--exclude=(['"]?)static\1/);
   });
 
+  it("verifies every client asset landed instead of trusting one rsync", () => {
+    // A deploy was seen reporting success while six of the build's chunks
+    // never reached the server. Missing is the same user-visible failure as
+    // stale, and it stays invisible until someone clicks the thing that
+    // lazy-loads it.
+    expect(deploy).toMatch(/verify_static/);
+    expect(deploy).toMatch(/comm -23 .*aa-static-local.*aa-static-remote/);
+  });
+
+  it("aborts before restarting rather than serving a build with missing assets", () => {
+    const abort = deploy.slice(deploy.indexOf("STILL missing"));
+    expect(abort).toMatch(/exit 1/);
+    // The guard has to come before the service restart, or the broken build is
+    // already live by the time it fires.
+    expect(deploy.indexOf("STILL missing")).toBeLessThan(deploy.indexOf("Restarting service"));
+  });
+
   it("prunes retained chunks on a window long enough to outlive a browsing session", () => {
     // Retention without pruning fills a disk that is already at 90 percent.
     const prune = /find\s+\S*\.next\/static\s+-type f\s+-mtime \+(\d+)\s+-delete/.exec(deploy);
