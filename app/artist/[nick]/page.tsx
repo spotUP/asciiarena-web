@@ -9,6 +9,7 @@ import { getSession as auth } from "@/lib/session";
 import { urlsafe, decodeParam, formatBytes } from "@/lib/utils";
 import { encodeReleaseText } from "@/lib/releaseText";
 import { normalizeOrder } from "@/lib/sort-headers";
+import { activeStatusLabel } from "@/lib/activeStatus";
 import { type ReleaseSortKey } from "@/lib/release-sort";
 import ArtistReleases from "./ArtistReleases";
 import EntityLogosSection from "@/components/release/EntityLogosSection";
@@ -226,7 +227,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
       )}
       <div className="col-lg-12 pl-0">
         <span className="lightgrey">Status: </span>
-        {artist.active ?? "-"}
+        {activeStatusLabel(artist.active)}
       </div>
       {artist.users && (
         <div className="col-lg-12 pl-0">

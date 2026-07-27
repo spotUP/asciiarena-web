@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-
-const ACTIVE_OPTIONS = ["Yes", "No", "ex-member"];
+import { ACTIVE_STATUSES, normalizeActiveStatus } from "@/lib/activeStatus";
 
 interface Crew {
   id: number;
@@ -34,31 +33,66 @@ export default function CrewsClient() {
     setTimeout(() => setMsg(null), 3000);
   };
 
-  const search = async () => {
-    if (!query.trim()) return;
-    const rows = await fetch(`/api/admin/crews?q=${encodeURIComponent(query)}`)
+  const searchFor = useCallback(async (term: string) => {
+    if (!term.trim()) return;
+    const rows = await fetch(`/api/admin/crews?q=${encodeURIComponent(term)}`)
       .then(r => r.json())
       .catch(() => []);
     setResults(rows);
     setEdits({});
-  };
+  }, []);
+
+  const search = () => searchFor(query);
+
+  // "Edit Crew Profile" on /crew/[name] deep-links here with ?q=<crew name>.
+  useEffect(() => {
+    const initialQuery = new URLSearchParams(window.location.search).get("q") ?? "";
+    if (!initialQuery.trim()) return;
+    setQuery(initialQuery);
+    void searchFor(initialQuery);
+  }, [searchFor]);
 
   const edit = (id: number, field: string, value: string) =>
     setEdits(prev => ({ ...prev, [id]: { ...prev[id], [field]: value } }));
 
   const save = async (c: Crew) => {
     const e = edits[c.id] ?? {};
-    await fetch("/api/admin/crews", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: c.id,
-        name: e.name ?? c.name,
-        acronym: e.acronym ?? c.acronym ?? "",
-        active: e.active ?? c.active ?? "",
-        www: e.www ?? c.www ?? "",
-      }),
-    });
+    const name = (e.name ?? c.name).trim();
+    if (!name) { flash("Name cannot be empty", false); return; }
+    let res: Response;
+    try {
+      res = await fetch("/api/admin/crews", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: c.id,
+          name,
+          acronym: e.acronym ?? c.acronym ?? "",
+          active: e.active ?? c.active ?? "",
+          www: e.www ?? c.www ?? "",
+        }),
+      });
+    } catch {
+      flash("Save failed — network error", false);
+      return;
+    }
+    if (!res.ok) {
+      // Never swallow the failure: a Save button that flashes "Saved!" on a
+      // 400 is indistinguishable from one that does nothing.
+      const detail = await res.json().catch(() => null);
+      flash(detail?.error ?? `Save failed (${res.status})`, false);
+      return;
+    }
+    const saved = await res.json().catch(() => null);
+    setResults(prev => prev.map(row => row.id === c.id ? {
+      ...row,
+      name: saved?.name ?? name,
+      crewurl: saved?.crewurl ?? row.crewurl,
+      acronym: e.acronym ?? row.acronym,
+      active: e.active ?? row.active,
+      www: e.www ?? row.www,
+    } : row));
+    setEdits(prev => ({ ...prev, [c.id]: {} }));
     flash("Saved!", true);
   };
 
@@ -117,9 +151,12 @@ export default function CrewsClient() {
                     <input type="text" className="form-control w-100" value={e.acronym ?? c.acronym ?? ""} onChange={ev => edit(c.id, "acronym", ev.target.value)} />
                   </div>
                   <div className="col-2">
-                    <select className="form-select w-100" value={e.active ?? c.active ?? ""} onChange={ev => edit(c.id, "active", ev.target.value)}>
+                    {/* Legacy rows hold "yes"/"Yes"/"Active" — normalize so the
+                        stored value actually matches an option, and so saving
+                        migrates the row to the canonical vocabulary. */}
+                    <select className="form-select w-100" value={normalizeActiveStatus(e.active ?? c.active) ?? ""} onChange={ev => edit(c.id, "active", ev.target.value)}>
                       <option value="">-</option>
-                      {ACTIVE_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                      {ACTIVE_STATUSES.map(o => <option key={o} value={o}>{o}</option>)}
                     </select>
                   </div>
                   <div className="col-2">

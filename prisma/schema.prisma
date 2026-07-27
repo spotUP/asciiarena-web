@@ -37,7 +37,8 @@ model artists {
   id             Int              @id @default(autoincrement()) @db.UnsignedInt
   nick           String           @unique(map: "nick") @default("") @db.Char(60)
   www            String?          @db.Char(60)
-  active         String?          @db.Char(8)
+  // VarChar(16), not Char(8): "Ex-member" does not fit in 8 characters.
+  active         String?          @db.VarChar(16)
   country        String?          @db.Char(60)
   rating         Float?           @db.Float
   acronym        String?          @db.Char(16)
@@ -158,7 +159,7 @@ model crews {
   name         String         @unique(map: "name") @db.Char(60)
   www          String?        @db.Char(60)
   contact      String?        @db.Char(60)
-  active       String         @default("No") @db.Char(8)
+  active       String         @default("Inactive") @db.VarChar(16)
   rating       Float?         @db.Float
   acronym      String?        @db.Char(12)
   crewurl      String         @db.Text
