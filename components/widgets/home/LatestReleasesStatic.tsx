@@ -2,7 +2,6 @@ import Link from "next/link";
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { buildLatestReleaseRowsQuery } from "@/lib/home-latest-releases-query";
-import { pickRandomSubset, HERO_POOL_FACTOR } from "@/lib/home-hero-pick";
 import { readCollyDiz } from "@/lib/collyDiz";
 import { readFileSync, existsSync } from "fs";
 import path from "path";
@@ -28,58 +27,61 @@ function readDiz(filePath: string): string | null {
   }
 }
 
-// Cache both the DB query AND the .diz file reads together for 60s. The
-// random variant used ORDER BY RAND() (O(n) on the collys table) and the
-// non-random variant still ran 20 fs.existsSync+readFileSync calls per
-// render. With cache, every visitor inside the 60s window gets the
-// pre-rendered hero in <1ms instead of paying the full I/O tax.
-//
-// `poolSize` is how many candidates to build, NOT how many to show. The
-// random hero asks for a pool and draws from it per request — caching the
-// draw itself is what made RANDOM RELEASES show the same two collys to
-// everyone until the entry expired.
-const getReleasesForHero = unstable_cache(
-  async (random: boolean, poolSize: number, collectionsPath: string, magsPath: string, appsPath: string) => {
-    let rows: ReleaseRow[] = [];
-    try {
-      rows = await prisma.$queryRaw<ReleaseRow[]>(buildLatestReleaseRowsQuery(random));
-    } catch {
-      return [];
-    }
+// Builds the hero: one sample of releases (random, or newest-first), resolved
+// to renderable .diz content. Stops as soon as `count` entries have content,
+// so a run of releases without a .diz costs a few extra reads, not 20.
+async function buildHero(random: boolean, count: number, collectionsPath: string, magsPath: string, appsPath: string) {
+  let rows: ReleaseRow[] = [];
+  try {
+    rows = await prisma.$queryRaw<ReleaseRow[]>(buildLatestReleaseRowsQuery(random));
+  } catch {
+    return [];
+  }
 
-    const releases: { url: string; content: string }[] = [];
-    for (const row of rows) {
-      if (releases.length >= poolSize) break;
-      const filename = String(row.filename);
-      const dirname = filename.replace(/\.[^.]+$/, "");
-      let dizPath = "";
-      let url = "";
-      if (row.type === "C") {
-        dizPath = path.join(collectionsPath, dirname, `${filename}.diz`);
-        url = `/release/${filename}`;
-      } else if (row.type === "M") {
-        dizPath = path.join(magsPath, dirname, `${filename}.diz`);
-        url = `/magazine/${filename}`;
-      } else if (row.type === "A") {
-        const base = filename.replace(/\.[^.]+$/, "");
-        dizPath = path.join(appsPath, `${base}.diz`);
-        url = `/application/${filename}`;
-      }
-      // Collys: separate .diz -> embedded diz -> art snippet (ANSI stripped), so
-      // fresh uploads without a .diz still appear. Mags/apps: their own .diz.
-      const content = row.type === "C" ? readCollyDiz(filename) : readDiz(dizPath);
-      if (content) releases.push({ url, content });
+  const releases: { url: string; content: string }[] = [];
+  for (const row of rows) {
+    if (releases.length >= count) break;
+    const filename = String(row.filename);
+    const dirname = filename.replace(/\.[^.]+$/, "");
+    let dizPath = "";
+    let url = "";
+    if (row.type === "C") {
+      dizPath = path.join(collectionsPath, dirname, `${filename}.diz`);
+      url = `/release/${filename}`;
+    } else if (row.type === "M") {
+      dizPath = path.join(magsPath, dirname, `${filename}.diz`);
+      url = `/magazine/${filename}`;
+    } else if (row.type === "A") {
+      const base = filename.replace(/\.[^.]+$/, "");
+      dizPath = path.join(appsPath, `${base}.diz`);
+      url = `/application/${filename}`;
     }
-    return releases;
-  },
+    // Collys: separate .diz -> embedded diz -> art snippet (ANSI stripped), so
+    // fresh uploads without a .diz still appear. Mags/apps: their own .diz.
+    const content = row.type === "C" ? readCollyDiz(filename) : readDiz(dizPath);
+    if (content) releases.push({ url, content });
+  }
+  return releases;
+}
+
+// LATEST is deterministic, so caching costs nothing in freshness: every visitor
+// inside the window gets the pre-rendered hero instead of paying for the DB
+// query plus the .diz reads. 240s is fine — the LATEST ADDED COLLYS sidebar
+// covers genuinely new releases.
+const getLatestReleasesForHero = unstable_cache(
+  async (count: number, collectionsPath: string, magsPath: string, appsPath: string) =>
+    buildHero(false, count, collectionsPath, magsPath, appsPath),
   ["latest-releases-hero"],
-  // 240s, not 60s: this is the heaviest homepage widget (DB query + up to 20
-  // .diz filesystem reads), and it backs BOTH the LATEST and RANDOM hero
-  // columns. Revalidating it 4x less often is the single biggest cut to the
-  // intermittent homepage render spike; the hero is decorative so 4-minute
-  // freshness is fine (the LATEST ADDED COLLYS sidebar covers new releases).
   { revalidate: 240 },
 );
+
+// RANDOM is deliberately NOT cached, at any layer. Caching the query caches the
+// pick, and a cached pick is not random — that is what made this widget show
+// the same two collys on every refresh. Caching a wider pool and drawing from
+// it per request has the same flaw, just with a longer repeat cycle. ORDER BY
+// RAND() over ~4k rows projecting four small columns costs about a
+// millisecond, and only the collys actually shown are read off disk.
+// Do not wrap this in unstable_cache.
 
 export default async function LatestReleasesStatic({ columns = 2, random = false, header = "LATEST RELEASES" }: {
   columns?: number;
@@ -89,12 +91,9 @@ export default async function LatestReleasesStatic({ columns = 2, random = false
   const collectionsPath = process.env.COLLECTIONS_PATH ?? path.join(process.cwd(), "collections");
   const magsPath = process.env.MAGS_PATH ?? path.join(process.cwd(), "mags");
   const appsPath = process.env.APPS_PATH ?? path.join(process.cwd(), "apps");
-  // LATEST needs exactly the columns it shows (they are ordered). RANDOM caches
-  // a wider pool and draws from it on every render, so the hero changes on
-  // refresh instead of freezing for the whole cache window.
-  const poolSize = random ? columns * HERO_POOL_FACTOR : columns;
-  const pool = await getReleasesForHero(random, poolSize, collectionsPath, magsPath, appsPath);
-  const releases = random ? pickRandomSubset(pool, columns) : pool.slice(0, columns);
+  const releases = random
+    ? await buildHero(true, columns, collectionsPath, magsPath, appsPath)
+    : await getLatestReleasesForHero(columns, collectionsPath, magsPath, appsPath);
 
   const colSize = Math.round(12 / columns);
 
