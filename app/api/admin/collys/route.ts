@@ -8,34 +8,7 @@ import { apiError, apiOk } from "@/lib/utils";
 import { broadcast } from "@/lib/live";
 import { buildLogoRowsFromMap } from "@/lib/collyLogoRows";
 import { loadEntityDicts } from "@/lib/collyLogoIndex";
-
-const patchSchema = z.object({
-  id: z.number().int().positive(),
-  filename: z.string().max(60).optional(),
-  name: z.string().max(500).optional(),
-  year: z.number().int().nullable().optional(),
-  month: z.number().int().nullable().optional(),
-  day: z.number().int().nullable().optional(),
-  type: z.string().max(50).optional(),
-  file_id: z.string().max(60).nullable().optional(),
-  artistNames: z.array(z.string().trim().min(1).max(100)).optional(),
-  crewNames: z.array(z.string().trim().min(1).max(200)).optional(),
-  broken: z.number().int().optional(),
-  broken_comment: z.string().max(1000).nullable().optional(),
-  // Render settings (parity with the submit form). Always sent by the admin UI;
-  // empty -> null clears the per-colly override (falls back to viewer/default).
-  render_font: z.string().max(32).nullable().optional(),
-  render_fg: z.string().max(15).nullable().optional(),
-  render_bg: z.string().max(15).nullable().optional(),
-  soundtrack: z.string().max(255).nullable().optional(),
-  // Logo map (visual editor). When present, replaces the colly's catalog rows
-  // with this manual map (drives rendering + search), like a mapped upload.
-  logos: z.array(z.object({
-    line: z.number().int().positive(),
-    end: z.number().int().positive().optional(),
-    caption: z.string().max(200),
-  })).optional(),
-});
+import { collyPatchSchema } from "@/lib/adminCollyPatch";
 
 const deleteSchema = z.object({
   id: z.number().int().positive(),
@@ -128,7 +101,7 @@ export async function PATCH(request: NextRequest) {
   if ((session?.user as { rank?: string } | undefined)?.rank !== "Admin") return apiError("Forbidden", 403);
 
   const rawPatchBody = await request.json().catch(() => ({}));
-  const patchParsed = patchSchema.safeParse(rawPatchBody);
+  const patchParsed = collyPatchSchema.safeParse(rawPatchBody);
   if (!patchParsed.success) return apiError("Invalid request: " + patchParsed.error.issues[0]?.message, 400);
   const { id, filename, name, year, month, day, type, file_id, artistNames, crewNames, broken, broken_comment, render_font, render_fg, render_bg, soundtrack, logos } = patchParsed.data;
 

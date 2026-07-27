@@ -25,7 +25,10 @@ interface Colly {
   file_id: string | null;
   artists: string | null;
   crews: string | null;
-  broken?: number;
+  // Nullable in the DB (and in the API's GET rows) — the editor echoes these
+  // back verbatim on save, so the types have to admit null or the PATCH
+  // contract and the client drift apart again.
+  broken?: number | null;
   broken_comment?: string | null;
   render_font?: string | null;
   render_fg?: string | null;
