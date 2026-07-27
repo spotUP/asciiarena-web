@@ -38,6 +38,7 @@ export const WIDGET_KEYS = [
   "top_crews",
   "top_uploaders",
   "top_commenters",
+  "top_taggers",
   "arena_stats",
   "bbs_weektop",
 ] as const;
@@ -71,6 +72,7 @@ export const WIDGET_LABELS: Record<WidgetKey, string> = {
   top_crews: "Top 5 Crews",
   top_uploaders: "Top Uploaders",
   top_commenters: "Top Commenters",
+  top_taggers: "Top Taggers",
   arena_stats: "aSCIIaRENA Stats",
   bbs_weektop: "Weektop — BBS:es",
 };
@@ -94,7 +96,7 @@ export const WIDGET_GROUPS: { label: string; keys: WidgetKey[] }[] = [
     label: "Right sidebar",
     keys: [
       "top_collys", "most_viewed_collys", "top_artists", "top_crews",
-      "top_uploaders", "top_commenters", "arena_stats", "bbs_weektop",
+      "top_uploaders", "top_commenters", "top_taggers", "arena_stats", "bbs_weektop",
     ],
   },
 ];

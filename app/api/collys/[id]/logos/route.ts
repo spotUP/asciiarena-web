@@ -2,7 +2,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { broadcast } from "@/lib/live";
 import { logoMapSchema, type LogoMapEntry } from "@/lib/logoMapPayload";
 import { writeLogoEdit } from "@/lib/collyLogoWrite";
@@ -76,6 +76,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
   if (colly.filename) revalidatePath("/release/" + colly.filename);
   broadcast(`release:${collyId}:logos`, { type: "tagged", nick: session.user.name ?? "" });
+  // Site-wide signal for the TOP TAGGERS sidebar widget. Its own query is
+  // cached for 10 minutes, so bust the tag too or the LiveRefresh would
+  // re-fetch and get the same stale numbers back.
+  broadcast("site:logos", { type: "tagged", nick: session.user.name ?? "" });
+  revalidateTag("site:top-taggers", "default");
 
   return apiOk({ status: true, ...result });
 }
