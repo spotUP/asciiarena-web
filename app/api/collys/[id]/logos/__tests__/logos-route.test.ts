@@ -28,6 +28,10 @@ const prismaFake = {
   },
   colly_logo_edits: {
     create: (args: unknown) => ({ op: "createEdit", args }),
+    findUnique: () => Promise.resolve({
+      id: 9, colly_id: 4122, user_id: 42, timestamp: 1753600000, logo_count: 1,
+      map: '[{"line":12,"caption":"dipswitch"}]',
+    }),
     findMany: () => Promise.resolve([
       { id: 9, colly_id: 4122, user_id: 42, timestamp: 1753600000, logo_count: 7 },
     ]),
@@ -111,5 +115,37 @@ describe("GET /api/collys/[id]/logos", () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body[0]).toMatchObject({ id: 9, logoCount: 7 });
+  });
+});
+
+const { POST: REVERT } = await import("../revert/route");
+
+describe("POST /api/collys/[id]/logos/revert", () => {
+  beforeEach(() => {
+    txCalls.length = 0;
+    sessionRank = "Admin";
+    sessionId = "1";
+  });
+
+  const revertReq = () => new Request("http://localhost/api/collys/4122/logos/revert", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ editId: 9 }),
+  });
+
+  it("refuses a non-admin", async () => {
+    sessionRank = "Member";
+    const res = await REVERT(revertReq(), { params });
+    expect(res.status).toBe(403);
+    expect(txCalls).toHaveLength(0);
+  });
+
+  it("replays the old map as a NEW edit rather than deleting history", async () => {
+    const res = await REVERT(revertReq(), { params });
+    expect(res.status).toBe(200);
+    const ops = txCalls[0] as { op: string }[];
+    // A new snapshot is appended; nothing in the history is removed.
+    expect(ops[0].op).toBe("createEdit");
+    expect(ops.some((o) => o.op === "createMany")).toBe(true);
   });
 });
