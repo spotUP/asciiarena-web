@@ -7,6 +7,7 @@ import GlobalWall from "@/components/widgets/home/GlobalWall";
 import RecentlyViewed from "@/components/widgets/RecentlyViewed";
 import PollHero from "@/components/widgets/PollHero";
 import ActivityFeed from "@/components/widgets/ActivityFeed";
+import Hideable from "@/components/widgets/Hideable";
 import { getSession as auth } from "@/lib/session";
 import { getHiddenWidgets } from "@/lib/widgets";
 
@@ -26,14 +27,14 @@ export default async function HomePage() {
       {/* Top of the middle column: ambient "who is doing what" that used to
           arrive as bell notifications. Live over SSE, and the /api/live route
           backfills recent events on connect so it is never an empty box. */}
-      {!hidden.has("activity_feed")    && <ActivityFeed />}
-      {!hidden.has("poll_hero")        && <Suspense fallback={null}><PollHero /></Suspense>}
-      {!hidden.has("latest_releases")  && <Suspense fallback={null}><LatestReleases columns={2} header="LATEST RELEASES" /></Suspense>}
-      {!hidden.has("random_releases")  && <Suspense fallback={null}><LatestReleases columns={2} random header="RANDOM RELEASES" /></Suspense>}
-      {!hidden.has("latest_comments")  && <Suspense fallback={null}><LatestComments /></Suspense>}
-      {!hidden.has("recently_viewed")  && <Suspense fallback={null}><RecentlyViewed /></Suspense>}
-      {!hidden.has("wall")             && <Suspense fallback={null}><SiteWall isLoggedIn={isLoggedIn} /></Suspense>}
-      {!hidden.has("global_wall")      && <Suspense fallback={null}><GlobalWall isLoggedIn={isLoggedIn} /></Suspense>}
+      {!hidden.has("activity_feed")    && <Hideable widgetKey="activity_feed" canHide={isLoggedIn}><ActivityFeed /></Hideable>}
+      {!hidden.has("poll_hero")        && <Hideable widgetKey="poll_hero" canHide={isLoggedIn}><Suspense fallback={null}><PollHero /></Suspense></Hideable>}
+      {!hidden.has("latest_releases")  && <Hideable widgetKey="latest_releases" canHide={isLoggedIn}><Suspense fallback={null}><LatestReleases columns={2} header="LATEST RELEASES" /></Suspense></Hideable>}
+      {!hidden.has("random_releases")  && <Hideable widgetKey="random_releases" canHide={isLoggedIn}><Suspense fallback={null}><LatestReleases columns={2} random header="RANDOM RELEASES" /></Suspense></Hideable>}
+      {!hidden.has("latest_comments")  && <Hideable widgetKey="latest_comments" canHide={isLoggedIn}><Suspense fallback={null}><LatestComments /></Suspense></Hideable>}
+      {!hidden.has("recently_viewed")  && <Hideable widgetKey="recently_viewed" canHide={isLoggedIn}><Suspense fallback={null}><RecentlyViewed /></Suspense></Hideable>}
+      {!hidden.has("wall")             && <Hideable widgetKey="wall" canHide={isLoggedIn}><Suspense fallback={null}><SiteWall isLoggedIn={isLoggedIn} /></Suspense></Hideable>}
+      {!hidden.has("global_wall")      && <Hideable widgetKey="global_wall" canHide={isLoggedIn}><Suspense fallback={null}><GlobalWall isLoggedIn={isLoggedIn} /></Suspense></Hideable>}
     </SiteLayout>
   );
 }

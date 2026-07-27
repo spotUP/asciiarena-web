@@ -2596,6 +2596,40 @@ input::file-selector-button {
   .skeleton-bar { animation: none; }
 }
 
+/* Per-widget [X] (components/widgets/Hideable.tsx).
+   The button sits over the widget's own header strip, which is always the
+   first thing a widget renders. */
+.widget-frame {
+  position: relative;
+}
+.widget-hide-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 5;
+  height: 16px;
+  line-height: 16px;
+  padding: 0 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 16px;
+  /* Hidden by default and revealed only by the :has() rule below, so a widget
+     that renders nothing at all never leaves a stray [X] floating in the gap
+     where it would have been. */
+  display: none;
+}
+.widget-hide-btn:hover {
+  color: #ff55ff;
+}
+/* "This frame contains something other than the button itself." A widget that
+   returned null leaves the button as the only element child, so the selector
+   does not match and the button stays hidden. */
+.widget-frame:has(> *:not(.widget-hide-btn)) .widget-hide-btn {
+  display: block;
+}
+
 /* Rotating logo header: a static-height box (sized server-side to the
    tallest logo) with every logo vertically + horizontally centred, so the
    header never changes height on first paint or as logos rotate. */
