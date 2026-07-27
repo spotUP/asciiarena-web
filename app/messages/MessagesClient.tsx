@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useChatContext, threadKey } from "@/components/chat/ChatContext";
 import ChatWindow from "@/components/chat/ChatWindow";
 import UserPicker, { type PickableUser } from "@/components/chat/UserPicker";
@@ -37,6 +37,8 @@ const VIEWS: Array<{ key: View; label: string }> = [
 
 const SEARCH_DEBOUNCE_MS = 250;
 
+const rowDomId = (thread: number) => `conversation-${thread}`;
+
 interface Props {
   userId: string;
   userNick: string;
@@ -58,6 +60,23 @@ export default function MessagesClient({ userId, userNick, initialReceiverId, in
   const [composing, setComposing] = useState(!!initialReceiverId);
   const [status, setStatus] = useState("");
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Scroll anchoring for the expanded row across list refreshes.
+  const expandedRef = useRef<number | null>(expanded);
+  const pendingAnchor = useRef<{ thread: number; top: number } | null>(null);
+  useEffect(() => { expandedRef.current = expanded; }, [expanded]);
+
+  // Restore the anchored row to the same viewport position after the list
+  // re-renders. useLayoutEffect so the correction lands before paint and the
+  // user never sees the intermediate position.
+  useLayoutEffect(() => {
+    const anchor = pendingAnchor.current;
+    if (!anchor) return;
+    pendingAnchor.current = null;
+    const el = document.getElementById(rowDomId(anchor.thread));
+    if (!el) return;
+    const delta = el.getBoundingClientRect().top - anchor.top;
+    if (delta !== 0) window.scrollBy(0, delta);
+  }, [rows]);
 
   useEffect(() => {
     if (searchTimer.current) clearTimeout(searchTimer.current);
@@ -66,6 +85,15 @@ export default function MessagesClient({ userId, userNick, initialReceiverId, in
   }, [query]);
 
   const load = useCallback(async () => {
+    // Anchor the expanded conversation before the list changes under it. The
+    // list is ordered by last activity, so reading or sending moves a thread
+    // to the top — without this the chat you are reading slides around the
+    // page every time anything happens.
+    const anchorEl = expandedRef.current != null
+      ? document.getElementById(rowDomId(expandedRef.current))
+      : null;
+    pendingAnchor.current = anchorEl ? { thread: expandedRef.current!, top: anchorEl.getBoundingClientRect().top } : null;
+
     setLoading(true);
     try {
       const params = new URLSearchParams({ page: "1", pagesize: "50" });
@@ -220,7 +248,11 @@ export default function MessagesClient({ userId, userNick, initialReceiverId, in
             </div>
           </div>
 
-          {loading && (
+          {/* Only on the very first load. Rendering this above the list on
+              every background refresh (which fires on each SSE event, and on
+              every read cursor update) pushed the whole list down a row and
+              back — the layout "jumping" while reading a conversation. */}
+          {loading && rows.length === 0 && (
             <div className="row bg-secondary apt-1 apb-1 apl-1">
               <div className="col-12 lightgrey">Loading...</div>
             </div>
@@ -251,6 +283,7 @@ export default function MessagesClient({ userId, userNick, initialReceiverId, in
             return (
               <div
                 key={row.thread}
+                id={rowDomId(row.thread)}
                 className="bg-secondary apl-1 apr-1 apt-1 apb-1"
                 style={{
                   borderBottom: "1px solid #333",
