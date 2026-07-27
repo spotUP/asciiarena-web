@@ -4,6 +4,8 @@ import Link from "next/link";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { urlsafe, decodeParam } from "@/lib/utils";
+import { activeStatusLabel } from "@/lib/activeStatus";
+import { getSession as auth } from "@/lib/session";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
 import WatchingPip from "@/components/widgets/WatchingPip";
 import EntityLogosSection from "@/components/release/EntityLogosSection";
@@ -63,6 +65,9 @@ export default async function CrewPage({ params }: PageProps) {
     where: { crewurl },
   });
   if (!crew) notFound();
+
+  const session = await auth();
+  const isAdmin = session?.user?.rank === "Admin";
 
   const [members, crewCollys, releaseRows, boards] = await Promise.all([
     prisma.$queryRaw<MemberRow[]>`
@@ -149,8 +154,15 @@ export default async function CrewPage({ params }: PageProps) {
       )}
       <div className="col-lg-12 pl-0">
         <span className="lightgrey">Status: </span>
-        {crew.active}
+        {activeStatusLabel(crew.active)}
       </div>
+      {isAdmin && (
+        <div className="col-lg-12 pl-0 apt-1 apb-1">
+          <Link className="btn-big" href={`/admin/crews?q=${encodeURIComponent(crew.name)}`}>
+            Edit Crew Profile
+          </Link>
+        </div>
+      )}
       <div className="col-lg-12 pl-0">
         <span className="lightgrey">Rating: </span>
         {ratingDisplay}
