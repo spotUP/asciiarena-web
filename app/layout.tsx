@@ -3,6 +3,7 @@ import ChatProvider from "@/components/chat/ChatProvider";
 import { ChatContextProvider } from "@/components/chat/ChatContext";
 import MusicProvider from "@/components/music/MusicProvider";
 import CaretOverlay from "@/components/ui/CaretOverlay";
+import ChunkReloadGuard from "@/components/ui/ChunkReloadGuard";
 import { ToastProvider } from "@/components/ui/ToastProvider";
 import "@/app/globals.css";
 
@@ -61,6 +62,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         ` }} />
       </head>
       <body suppressHydrationWarning>
+        {/* Outermost: a tab whose chunks were pruned must recover even if a
+            provider below is the thing that failed to load. */}
+        <ChunkReloadGuard />
         <ToastProvider>
           <MusicProvider>
             <ChatContextProvider>

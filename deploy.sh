@@ -37,10 +37,39 @@ rsync_resilient --include='*.php' --include='.htaccess' --exclude='*' \
   . \
   spot@97.75.89.139:/var/www/asciiarena.se/nextjs-old/
 
-echo "Deploying .next/..."
-rsync_resilient --delete --exclude='cache' \
+# The server half of the build (server chunks, manifests, BUILD_ID) must match
+# the running process exactly, so it syncs with --delete. `static` is EXCLUDED
+# here and synced separately below; rsync does not delete excluded paths, so
+# the previous build's client chunks survive this step.
+echo "Deploying .next/ (server side)..."
+rsync_resilient --delete --exclude='cache' --exclude='static' \
   .next/ \
   spot@97.75.89.139:/var/www/asciiarena.se/nextjs-current/.next/
+
+# Client chunks are ADDITIVE — never --delete here.
+#
+# Every build mints new content-hashed chunk filenames. A browser that loaded a
+# page before the deploy still holds the OLD names, and code-split chunks
+# (next/dynamic, route segments) are fetched lazily — often minutes after the
+# page loaded, when the user finally clicks something. Deleting the previous
+# build's chunks is what produced "Failed to load chunk ... from module" on
+# every single deploy. Keeping both builds' chunks costs about 2 MB per deploy
+# and makes an open tab survive a deploy instead of breaking.
+echo "Deploying .next/static/ (client chunks, additive)..."
+rsync_resilient \
+  .next/static/ \
+  spot@97.75.89.139:/var/www/asciiarena.se/nextjs-current/.next/static/
+
+# Prune chunks no build has produced in the last 14 days. Safe because deploy.sh
+# always builds from a clean .next, so every file in the CURRENT build gets a
+# fresh mtime that rsync -a carries to the server — an old mtime therefore means
+# "no recent build referenced this", not "unchanged since an old build".
+echo "Pruning client chunks older than 14 days..."
+ssh spot@97.75.89.139 "
+  find /var/www/asciiarena.se/nextjs-current/.next/static -type f -mtime +14 -delete 2>/dev/null
+  find /var/www/asciiarena.se/nextjs-current/.next/static -type d -empty -delete 2>/dev/null
+  echo \"  static now \$(du -sh /var/www/asciiarena.se/nextjs-current/.next/static | cut -f1)\"
+"
 
 echo "Deploying public/..."
 rsync_resilient -L \
