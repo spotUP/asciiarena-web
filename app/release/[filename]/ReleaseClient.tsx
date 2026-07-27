@@ -46,6 +46,8 @@ interface Comment {
 
 interface Props {
   collyId: number;
+  /** The colly's own artist, pre-filled as the author when tagging a new logo. */
+  collyAuthor: string;
   filename: string;
   collyFileUrl: string;
   userNick: string | null;
@@ -260,7 +262,7 @@ function ArchiveEntryRenderer({ filename, entry, entryIndex, eager, ansiFont, fg
 }
 
 export default function ReleaseClient({
-  collyId, filename, collyFileUrl, userNick, isAdmin,
+  collyId, collyAuthor, filename, collyFileUrl, userNick, isAdmin,
   isFavourited, initBgColor, initFgColor, initFont,
   isArchive, fileContent, logoText, soundtrack, logoMap, extractedEntry, type, isCp437, collyTitle, siteUrl,
   initialViewCount, initialFavCount, initialDownloadCount,
@@ -1303,6 +1305,7 @@ export default function ReleaseClient({
           fg={fgColor}
           bg={bgColor}
           isAdmin={isAdmin}
+          defaultAuthor={collyAuthor}
           onDone={() => setTagging(false)}
         />
       )}

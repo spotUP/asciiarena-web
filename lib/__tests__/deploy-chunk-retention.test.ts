@@ -57,8 +57,9 @@ describe("deploy client-chunk retention", () => {
     // collation, so mismatched sorts report present files as missing — and
     // Turbopack names chunks with exactly the punctuation they disagree on.
     // This aborted two good deploys before it was understood.
-    const localSort = /find \. -type f \| LC_ALL=C sort.*aa-static-local/s;
-    const remoteSort = /find \. -type f \| LC_ALL=C sort.*aa-static-remote/s;
+    // No dotAll flag: this repo targets ES2017, which rejects it.
+    const localSort = /find \. -type f \| LC_ALL=C sort[\s\S]*aa-static-local/;
+    const remoteSort = /find \. -type f \| LC_ALL=C sort[\s\S]*aa-static-remote/;
     expect(deploy).toMatch(localSort);
     expect(deploy).toMatch(remoteSort);
     // Neither side may sort without pinning the collation.

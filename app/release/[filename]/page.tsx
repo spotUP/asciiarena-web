@@ -392,6 +392,10 @@ export default async function ReleasePage({ params }: PageProps) {
       <Suspense>
       <ReleaseClient
         collyId={collyId}
+        // The colly's own artist, pre-filled as the author when a tagger marks
+        // a new logo -- the same default the admin logo editor uses, since most
+        // logos in a colly are by the person who made it.
+        collyAuthor={artists[0]?.nick ?? ""}
         filename={filename}
         collyFileUrl={collyFileUrl}
         userNick={userNick}

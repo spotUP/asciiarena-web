@@ -12,6 +12,8 @@ export interface LogoTagPanelProps {
   fg: string;
   bg: string;
   isAdmin: boolean;
+  /** The colly's own artist, pre-filled as the author for a newly marked logo. */
+  defaultAuthor?: string;
   onDone: () => void;
 }
 
@@ -37,8 +39,12 @@ function ago(unix: number): string {
   return `${Math.floor(secs / 86400)}d ago`;
 }
 
-export default function LogoTagPanel({ collyId, filename, type, font, fg, bg, isAdmin, onDone }: LogoTagPanelProps) {
+export default function LogoTagPanel({ collyId, filename, type, font, fg, bg, isAdmin, defaultAuthor = "", onDone }: LogoTagPanelProps) {
   const [report, setReport] = useState<PreviewReport | null>(null);
+  // Artist handles for the caption editor's author picker. Without them the
+  // picker matches nothing and can only offer "create a new artist", which is
+  // how a tagger ends up duplicating an artist already in the catalog.
+  const [artistNames, setArtistNames] = useState<string[]>([]);
   const [logoMap, setLogoMap] = useState<LogoEntry[]>([]);
   // True once the reader actually changes the map, as opposed to it merely
   // being seeded (saved entries plus auto-detected bands). Only a dirty map is
@@ -77,6 +83,18 @@ export default function LogoTagPanel({ collyId, filename, type, font, fg, bg, is
       })
       .catch(() => { if (historySeq.current === seq) setHistory([]); });
   }, [collyId]);
+
+  // Author suggestions for the caption editor. Deliberately NOT part of the
+  // fail-closed gate below: losing the suggestions degrades the editor, but it
+  // cannot destroy anyone's map, so it must not block tagging.
+  useEffect(() => {
+    let live = true;
+    fetch("/api/artists/names")
+      .then(r => r.ok ? (r.json() as Promise<string[]>) : Promise.reject(new Error(String(r.status))))
+      .then(names => { if (live && Array.isArray(names)) setArtistNames(names); })
+      .catch(() => { /* picker falls back to create-only */ });
+    return () => { live = false; };
+  }, []);
 
   // Seed the editor from the colly's CURRENT database map -- the newest
   // `colly_logo_edits` snapshot is the source of truth for a tagged colly;
@@ -212,6 +230,8 @@ export default function LogoTagPanel({ collyId, filename, type, font, fg, bg, is
       </div>
 
       <CollyPreview
+        artistOptions={artistNames}
+        defaultAuthor={defaultAuthor}
         report={report}
         type={type}
         font={font}
