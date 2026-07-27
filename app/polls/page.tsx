@@ -3,12 +3,13 @@ import { prisma } from "@/lib/db";
 import SiteLayout from "@/components/layout/SiteLayout";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
 import { POLL_TYPE_LABELS } from "@/lib/polls/types";
+import { livePollWhere, nowSec } from "@/lib/polls/state";
 
 export const dynamic = "force-dynamic";
 
 export default async function PollsListPage() {
   const polls = await prisma.polls.findMany({
-    where: { status: "open" },
+    where: livePollWhere(nowSec()),
     orderBy: [{ featured: "desc" }, { updated_at: "desc" }],
     include: { _count: { select: { votes: true, options: true } } },
   });

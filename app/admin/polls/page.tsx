@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { POLL_TYPE_LABELS } from "@/lib/polls/types";
+import { isPollExpired, isPollPending, nowSec } from "@/lib/polls/state";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,7 @@ function fmtTs(ts: number | null): string {
 }
 
 export default async function AdminPollsList() {
+  const now = nowSec();
   const polls = await prisma.polls.findMany({
     orderBy: [{ featured: "desc" }, { updated_at: "desc" }],
     include: { _count: { select: { votes: true, options: true } } },
@@ -38,6 +40,11 @@ export default async function AdminPollsList() {
               minWidth: "64px",
               color: p.status === "open" ? "#B6D1AA" : p.status === "closed" ? "#5e5d5e" : "#F4D799",
             }}>[{p.status}]</span>
+            {/* The row says "open" but the clock disagrees — show what visitors
+                actually see, since the status column is never rewritten. */}
+            <span style={{ minWidth: "112px", color: "#5e5d5e" }}>
+              {isPollExpired(p, now) ? "-> ended" : isPollPending(p, now) ? "-> scheduled" : ""}
+            </span>
             <Link className="magenta" href={`/admin/polls/${p.id}`} style={{ minWidth: "320px", fontFamily: "TopazPlus_a1200, monospace" }}>
               {p.title}
             </Link>

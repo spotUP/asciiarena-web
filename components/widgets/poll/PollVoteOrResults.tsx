@@ -67,7 +67,7 @@ export default function PollVoteOrResults({
           {poll.show_results === "after_close" ? "* Results will appear when the poll closes." : "* Your vote was recorded."}
         </div>
       )}
-      {poll.status === "open" && isLoggedIn && (
+      {poll.effective_status === "open" && isLoggedIn && (
         <div style={{ marginTop: "4px", fontFamily: "TopazPlus_a1200, monospace", fontSize: "16px", lineHeight: "16px" }}>
           <button
             type="button"

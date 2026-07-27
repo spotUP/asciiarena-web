@@ -6,6 +6,7 @@ import "server-only";
 import { prisma } from "@/lib/db";
 import type { PollView, PollResults as Results, PollConfig } from "./types";
 import { aggregate } from "./aggregate";
+import { effectivePollStatus, livePollWhere, nowSec } from "./state";
 
 interface LoadedPoll {
   poll: PollView;
@@ -24,6 +25,7 @@ function toView(row: NonNullable<Awaited<ReturnType<typeof prisma.polls.findUniq
     body: row.body,
     type: row.type,
     status: row.status,
+    effective_status: effectivePollStatus(row, nowSec()),
     featured: row.featured,
     created_by_id: row.created_by_id,
     opens_at: row.opens_at,
@@ -64,7 +66,7 @@ export async function loadPollById(id: number, userId: number | null): Promise<L
 
 export async function loadFeaturedPoll(userId: number | null): Promise<LoadedPoll | null> {
   const row = await prisma.polls.findFirst({
-    where: { featured: true, status: "open" },
+    where: { featured: true, ...livePollWhere(nowSec()) },
     orderBy: { updated_at: "desc" },
     include: { options: { orderBy: { sort_order: "asc" } } },
   });
@@ -108,6 +110,6 @@ async function loadFromRow(
   const canSeeResults =
     poll.show_results === "always" ||
     (poll.show_results === "after_vote" && hasVoted) ||
-    (poll.show_results === "after_close" && poll.status === "closed");
+    (poll.show_results === "after_close" && poll.effective_status === "closed");
   return { poll, myVotes, results, canSeeResults };
 }

@@ -33,7 +33,7 @@ export default function PollCard({ poll, myVotes, results, canSeeResults, isLogg
 
   return (
     <div className="container-fluid m-0 p-0 amb-1 poll-card">
-      {poll.status === "open" && <LiveRefresh channel={`poll:${poll.id}`} />}
+      {poll.effective_status === "open" && <LiveRefresh channel={`poll:${poll.id}`} />}
 
       <div className="header bg-header col-12 ap-1 text-truncate">
         <span className={titleAccent} style={{ marginRight: "16px" }}>
@@ -45,11 +45,14 @@ export default function PollCard({ poll, myVotes, results, canSeeResults, isLogg
             [{POLL_TYPE_LABELS[poll.type].toLowerCase()}]
           </span>
         )}
-        {poll.status === "open" && poll.closes_at && variant !== "sidebar" && (
+        {poll.effective_status === "open" && poll.closes_at && variant !== "sidebar" && (
           <PollCountdown closesAt={poll.closes_at} />
         )}
-        {poll.status === "closed" && (
+        {poll.effective_status === "closed" && (
           <span className="lightred" style={{ marginLeft: "16px" }}>[closed]</span>
+        )}
+        {poll.effective_status === "draft" && (
+          <span className="yellow" style={{ marginLeft: "16px" }}>[not open yet]</span>
         )}
       </div>
 
@@ -79,7 +82,7 @@ export default function PollCard({ poll, myVotes, results, canSeeResults, isLogg
               approvalStances={poll.type === "approval" ? cfg.approval_stances : undefined}
             />
           )
-        ) : poll.status === "open" ? (
+        ) : poll.effective_status === "open" ? (
           /* Live poll on hero / page: form swaps to results after vote. */
           <PollVoteOrResults
             poll={poll}
@@ -90,6 +93,11 @@ export default function PollCard({ poll, myVotes, results, canSeeResults, isLogg
             layout={layout}
             widthCells={widthCells}
           />
+        ) : poll.effective_status === "draft" ? (
+          /* Scheduled but not started: nothing to vote on, nothing to show. */
+          <div className="lightgrey" style={{ fontFamily: "TopazPlus_a1200, monospace" }}>
+            * Voting has not opened yet.
+          </div>
         ) : (
           /* Closed poll: results only. */
           canSeeResults ? (

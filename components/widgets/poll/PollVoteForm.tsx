@@ -25,7 +25,12 @@ export default function PollVoteForm({ poll, myVotes, isLoggedIn }: FormProps) {
       <span className="yellow">[!]</span> Log in to vote in this poll.
     </div>;
   }
-  if (poll.status !== "open") {
+  if (poll.effective_status === "draft") {
+    return <div className="lightgrey" style={{ padding: "0", fontFamily: "TopazPlus_a1200, monospace" }}>
+      <span className="yellow">[!]</span> Voting has not opened yet.
+    </div>;
+  }
+  if (poll.effective_status !== "open") {
     return <div className="lightgrey" style={{ padding: "0", fontFamily: "TopazPlus_a1200, monospace" }}>
       <span className="lightred">[X]</span> Voting is closed.
     </div>;

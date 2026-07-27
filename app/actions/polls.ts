@@ -7,13 +7,12 @@ import { broadcastActivityIfAllowed } from "@/lib/activity";
 import { revalidatePath } from "next/cache";
 import type { VotePayload, PollOptionView } from "@/lib/polls/types";
 import { validateVote, isSingleVoteType } from "@/lib/polls/cast";
+import { isPollLive, nowSec } from "@/lib/polls/state";
 
 interface ActionResult {
   ok: boolean;
   error?: string;
 }
-
-const nowSec = () => Math.floor(Date.now() / 1000);
 
 export async function castVoteAction(pollId: number, payload: VotePayload): Promise<ActionResult> {
   const session = await getSession();
@@ -25,7 +24,9 @@ export async function castVoteAction(pollId: number, payload: VotePayload): Prom
     include: { options: { orderBy: { sort_order: "asc" } } },
   });
   if (!poll) return { ok: false, error: "Poll not found" };
-  if (poll.status !== "open") return { ok: false, error: "Voting is closed" };
+  // Not just `status` — a poll past its closes_at is over even though nothing
+  // has rewritten the row.
+  if (!isPollLive(poll, nowSec())) return { ok: false, error: "Voting is closed" };
 
   // For text_suggest with new_label: create the option first so the validation
   // step can include it. Bounded length, trim, deduplicate against existing.
@@ -125,9 +126,9 @@ export async function retractVoteAction(pollId: number): Promise<ActionResult> {
   if (!session?.user?.id) return { ok: false, error: "Not logged in" };
   const userId = Number(session.user.id);
 
-  const poll = await prisma.polls.findUnique({ where: { id: pollId }, select: { id: true, slug: true, status: true } });
+  const poll = await prisma.polls.findUnique({ where: { id: pollId }, select: { id: true, slug: true, status: true, opens_at: true, closes_at: true } });
   if (!poll) return { ok: false, error: "Poll not found" };
-  if (poll.status !== "open") return { ok: false, error: "Voting is closed" };
+  if (!isPollLive(poll, nowSec())) return { ok: false, error: "Voting is closed" };
 
   await prisma.poll_votes.deleteMany({ where: { poll_id: poll.id, user_id: userId } });
   broadcast(`poll:${poll.id}`, { type: "voted", nick: session.user.name ?? "" });

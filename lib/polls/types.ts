@@ -52,6 +52,10 @@ export interface PollView {
   body: string;
   type: PollType;
   status: PollStatus;
+  // The status the UI must act on: `status`, except that an open poll past its
+  // closes_at reads as "closed". Computed once server-side by lib/polls/state.
+  // UI should read this, never `status`.
+  effective_status: PollStatus;
   featured: boolean;
   created_by_id: number;
   opens_at: number | null;
