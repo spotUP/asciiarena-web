@@ -12,6 +12,37 @@ import path from "path";
 // interaction silently never happens.
 
 const deploy = readFileSync(path.join(process.cwd(), "deploy.sh"), "utf8");
+// GitHub Actions deploys on every push and is what actually reaches production.
+// deploy.sh is the manual path. Both must retain chunks, or fixing one leaves
+// the real deploys broken -- which is exactly what happened: deploy.sh was
+// fixed first while CI kept deleting the previous build's chunks.
+const ci = readFileSync(path.join(process.cwd(), ".github/workflows/github-actions.yml"), "utf8");
+
+describe("CI deploy client-chunk retention", () => {
+  /** The rsync invocation in the workflow whose destination contains `dest`. */
+  function ciRsyncFor(dest: string): string {
+    const lines = ci.split("\n");
+    const hit = lines.findIndex(l => l.includes(dest) && !l.trim().startsWith("#"));
+    if (hit === -1) throw new Error(`no CI rsync line for ${dest}`);
+    let start = hit;
+    while (start > 0 && lines[start - 1].trimEnd().endsWith("\\")) start--;
+    return lines.slice(start, hit + 1).join(" ");
+  }
+
+  it("never deletes the previous build's client chunks", () => {
+    expect(ciRsyncFor("$DEST/.next/static/")).not.toMatch(/--delete/);
+  });
+
+  it("still deletes stale standalone output, which must match the running server", () => {
+    expect(ciRsyncFor("$SERVER:$DEST/")).toMatch(/--delete/);
+  });
+
+  it("prunes retained chunks so they cannot accumulate forever", () => {
+    const prune = /find \S*\.next\/static -type f -mtime \+(\d+) -delete/.exec(ci);
+    expect(prune).not.toBeNull();
+    expect(Number(prune![1])).toBeGreaterThanOrEqual(7);
+  });
+});
 
 /** The rsync invocation whose destination path contains `dest`. */
 function rsyncFor(dest: string): string {

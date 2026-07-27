@@ -46,10 +46,26 @@ jobs:
             -e "ssh -i /tmp/deploy_key -o StrictHostKeyChecking=no" \
             .next/standalone/ "$SERVER:$DEST/"
 
-          # Sync .next/static/ (JS chunks, CSS) — NOT included in standalone output
-          rsync -az --delete \
+          # Sync .next/static/ (JS chunks, CSS) — NOT included in standalone output.
+          #
+          # ADDITIVE — never --delete here. Every build mints new
+          # content-hashed chunk filenames. A browser that loaded a page before
+          # the deploy still holds the OLD names, and code-split chunks
+          # (next/dynamic, route segments) are fetched lazily, often minutes
+          # later when the user finally clicks something. Deleting the previous
+          # build's chunks is what produced "Failed to load chunk ... from
+          # module" on every single deploy. Keeping both builds costs ~2 MB per
+          # deploy and lets an open tab survive one.
+          rsync -az \
             -e "ssh -i /tmp/deploy_key -o StrictHostKeyChecking=no" \
             .next/static/ "$SERVER:$DEST/.next/static/"
+
+          # Prune chunks no build has produced in 14 days. Safe because CI
+          # always builds from a clean checkout, so every file in the current
+          # build carries a fresh mtime that rsync -a copies across; an old
+          # mtime therefore means "no recent build referenced this".
+          $SSH "$SERVER" "find $DEST/.next/static -type f -mtime +14 -delete 2>/dev/null; \
+            find $DEST/.next/static -type d -empty -delete 2>/dev/null; true"
 
           # Sync public/ (static assets served by Next.js and nginx)
           rsync -az --delete \
