@@ -17,19 +17,26 @@ const TABS = [
   { href: "/admin/requests", label: "REQUESTS" },
 ];
 
+// Exported so the layout invariant can be asserted in a test: the tab strip
+// wraps, so it must never be height-constrained.
+export const NAV_CONTAINER_STYLE: React.CSSProperties = {
+  display: "flex",
+  flexWrap: "wrap",
+  background: "#000000",
+  // minHeight, NOT height: on a narrow window the tabs wrap to a second row.
+  // A fixed 16px box left that row overflowing outside the element, where the
+  // content below covered it and swallowed the clicks (the "ARTiSTS tab is
+  // not clickable" report). The box now grows in whole 16px rows, so every tab
+  // stays hittable at any width.
+  minHeight: "16px",
+  lineHeight: "16px",
+  marginBottom: "16px",
+};
+
 export default function AdminNav() {
   const pathname = usePathname();
   return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        background: "#000000",
-        height: "16px",
-        lineHeight: "16px",
-        marginBottom: "16px",
-      }}
-    >
+    <div style={NAV_CONTAINER_STYLE}>
       {TABS.map(t => {
         const isActive = t.href === "/admin" ? pathname === "/admin" : pathname.startsWith(t.href);
         return (
