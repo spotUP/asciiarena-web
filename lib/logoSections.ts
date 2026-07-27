@@ -231,6 +231,42 @@ export function detectLogoSections(html: string): LogoSection[] {
 
 // Frame lines use <=2 distinct non-space chars (e.g. "mmMMMMMMMmm" = {m,M}).
 // Content lines have >=3 distinct non-space chars.
+/**
+ * First and last ART row inside `startLine..endLine`, by the same rule
+ * detection uses: a row counts when it has ink AND spans a real fraction of
+ * the widest row in the range. That drops the blank padding and the narrow
+ * caption/signature tails, so centring tracks the art band rather than the
+ * selection someone happened to drag.
+ *
+ * Falls back to the whole range when no row qualifies. Exported so the mapped
+ * path and the detected path cannot drift apart on what "centred" means.
+ */
+export function inkBoundsIn(html: string, startLine: number, endLine: number): { inkTop: number; inkBottom: number } {
+  // Same decode + split as detectLogoSections, done here rather than by the
+  // caller so the two paths cannot disagree about what a line is.
+  const lines = decodeEntities(html).split("\n");
+  const from = Math.max(0, startLine);
+  const to = Math.min(lines.length - 1, endLine);
+  if (to < from) return { inkTop: startLine, inkBottom: endLine };
+
+  const metas: LineMeta[] = [];
+  for (let r = from; r <= to; r++) metas.push(lineMeta(lines[r] ?? ""));
+  const maxWidth = metas.reduce((w, m) => Math.max(w, m.width), 0);
+  const artWidth = 0.35 * maxWidth;
+
+  let inkTop = -1;
+  let inkBottom = -1;
+  for (let r = 0; r < metas.length; r++) {
+    const m = metas[r];
+    if (m.ink > 0 && m.width >= artWidth) {
+      if (inkTop === -1) inkTop = from + r;
+      inkBottom = from + r;
+    }
+  }
+  if (inkTop === -1) return { inkTop: startLine, inkBottom: endLine };
+  return { inkTop, inkBottom };
+}
+
 export function extractDividerLabel(divLines: string[]): string {
   const contentLines = divLines.filter((l) => {
     const nonSpace = l.replace(/\s/g, "");

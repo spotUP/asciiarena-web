@@ -1,6 +1,6 @@
 import { decodeLatin1Bytes } from "./releaseText";
 import { FONTS } from "./ansilove";
-import type { LogoSection } from "./logoSections";
+import { inkBoundsIn, type LogoSection } from "./logoSections";
 
 // Invisible per-colly metadata carried AFTER the Ctrl-Z (0x1A) EOF byte — every
 // renderer stops at 0x1A, so the trailer never shows in the art. Two flavours are
@@ -173,9 +173,18 @@ export function parseCollyBytes(bytes: Uint8Array): { visible: Uint8Array; meta:
 /** Build exact logo sections from an artist-provided line map (1-based lines),
  *  so rendering/autoplay/jumps don't need the island-detection heuristic. Each
  *  logo spans from its line to just before the next one's. */
+/**
+ * `text` is optional only for callers that genuinely have no text (canvas art
+ * measured elsewhere). Pass it whenever you have it: without it the ink box
+ * falls back to the mapped range, and autoplay centres the RANGE rather than
+ * the art. A tagger who drags a little padding above or below a logo -- or who
+ * marks a start with no explicit end, so the range runs to the next logo --
+ * then sees the logo sitting off-centre.
+ */
 export function sectionsFromLogoMap(
   logos: { line: number; end?: number; caption: string }[],
   totalLines: number,
+  text?: string,
 ): LogoSection[] {
   const sorted = [...logos].sort((a, b) => a.line - b.line);
   return sorted.map((lg, i) => {
@@ -183,6 +192,9 @@ export function sectionsFromLogoMap(
     const nextStart = i + 1 < sorted.length ? Math.max(0, sorted[i + 1].line - 1) : totalLines;
     // Use the explicit end (the dragged extent) when given, else span to the next.
     const endLine = lg.end && lg.end >= lg.line ? Math.max(startLine, lg.end - 1) : Math.max(startLine, nextStart - 1);
-    return { startLine, endLine, lineCount: endLine - startLine + 1, inkTop: startLine, inkBottom: endLine };
+    const ink = text
+      ? inkBoundsIn(text, startLine, endLine)
+      : { inkTop: startLine, inkBottom: endLine };
+    return { startLine, endLine, lineCount: endLine - startLine + 1, ...ink };
   });
 }

@@ -353,7 +353,7 @@ export default function ReleaseClient({
   // the art can be arbitrarily wild. Untagged collys (the majority): smart island
   // detection, unchanged.
   const sections = useMemo(
-    () => (logoMap && logoMap.length ? sectionsFromLogoMap(logoMap, lineCount) : detectLogoSections(detectionText)),
+    () => (logoMap && logoMap.length ? sectionsFromLogoMap(logoMap, lineCount, detectionText) : detectLogoSections(detectionText)),
     [logoMap, lineCount, detectionText],
   );
   const logoIndex = useMemo(

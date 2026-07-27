@@ -53,7 +53,7 @@ async function buildReport(bytes: Uint8Array, filename: string) {
 
   const tagged = !!(meta.logos && meta.logos.length);
   const sections: LogoSection[] = tagged
-    ? sectionsFromLogoMap(meta.logos!, lineCount)
+    ? sectionsFromLogoMap(meta.logos!, lineCount, text)
     : detectLogoSections(text);
   const rows = tagged ? buildLogoRowsFromMap(0, meta.logos!, dicts) : buildLogoRows(0, text, dicts);
 
