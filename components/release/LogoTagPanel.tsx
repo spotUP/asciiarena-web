@@ -35,7 +35,13 @@ export default function LogoTagPanel({ collyId, filename, type, font, fg, bg, is
   const [history, setHistory] = useState<EditRow[]>([]);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
   const [saving, setSaving] = useState(false);
-  const [failed, setFailed] = useState(false);
+  // Which fetch failed, so the error state can tell the truth: a failed
+  // preview load just can't show anything, but a failed logos load means
+  // the colly's existing tags are unknown -- saving now would overwrite
+  // them, so this must fail closed rather than fall back to the file
+  // trailer (see the seeding effect's comment).
+  const [failed, setFailed] = useState<"preview" | "logos" | null>(null);
+  const [retryTick, setRetryTick] = useState(0);
 
   // Monotonic sequence guard: whichever loadHistory() call was issued LAST
   // wins, no matter which order the responses come back in. Without this a
@@ -62,35 +68,46 @@ export default function LogoTagPanel({ collyId, filename, type, font, fg, bg, is
   // seeded from the wrong source. Auto-detected regions fill in only where
   // they do not overlap a seeded entry (canvas collys have no text lines to
   // detect against).
+  //
+  // If the logos fetch fails, we do NOT fall back to treating it as
+  // `current: null` (which would mean "nobody has tagged this yet" and
+  // seed from the file trailer) -- that would silently reopen the exact
+  // data-loss bug this component exists to prevent, just gated behind a
+  // network error instead of "always". We fail closed: no editor, an
+  // explicit message, and a Retry button. Deliberate; do not "fix" this by
+  // defaulting to the trailer on fetch failure.
   useEffect(() => {
     let live = true;
-    Promise.all([
-      fetch(`/api/collys/preview?filename=${encodeURIComponent(filename)}`)
-        .then(r => r.ok ? (r.json() as Promise<PreviewReport>) : Promise.reject(new Error(String(r.status)))),
-      fetch(`/api/collys/${collyId}/logos`)
-        .then(r => r.ok ? (r.json() as Promise<LogosGetBody>) : Promise.reject(new Error(String(r.status)))),
-    ])
-      .then(([rep, logosBody]) => {
-        if (!live) return;
-        setReport(rep);
-        setHistory(Array.isArray(logosBody.history) ? logosBody.history : []);
-        const saved: LogoEntry[] = (logosBody.current ?? rep.meta.logos ?? []).map(m => ({ line: m.line, end: m.end, caption: m.caption, auto: false }));
-        const isCanvas = rep.type === "ANSI" || rep.type === "CP437";
-        const overlapsSaved = (a: { line: number; end?: number }) =>
-          saved.some(m => a.line <= (m.end ?? m.line) && (a.end ?? a.line) >= m.line);
-        const auto: LogoEntry[] = isCanvas ? [] : (rep.logos ?? [])
-          .map(l => ({
-            line: l.line,
-            end: l.end,
-            caption: l.searchable ? (l.author ? `${l.name} -${l.author}` : l.name) : "",
-            auto: true,
-          }))
-          .filter(a => !overlapsSaved(a));
-        setLogoMap([...saved, ...auto].sort((x, y) => x.line - y.line));
-      })
-      .catch(() => { if (live) setFailed(true); });
+    setFailed(null);
+    const previewFetch = fetch(`/api/collys/preview?filename=${encodeURIComponent(filename)}`)
+      .then(r => r.ok ? (r.json() as Promise<PreviewReport>) : Promise.reject(new Error(String(r.status))));
+    const logosFetch = fetch(`/api/collys/${collyId}/logos`)
+      .then(r => r.ok ? (r.json() as Promise<LogosGetBody>) : Promise.reject(new Error(String(r.status))));
+
+    Promise.allSettled([previewFetch, logosFetch]).then(([repResult, logosResult]) => {
+      if (!live) return;
+      if (repResult.status === "rejected") { setFailed("preview"); return; }
+      if (logosResult.status === "rejected") { setFailed("logos"); return; }
+      const rep = repResult.value;
+      const logosBody = logosResult.value;
+      setReport(rep);
+      setHistory(Array.isArray(logosBody.history) ? logosBody.history : []);
+      const saved: LogoEntry[] = (logosBody.current ?? rep.meta.logos ?? []).map(m => ({ line: m.line, end: m.end, caption: m.caption, auto: false }));
+      const isCanvas = rep.type === "ANSI" || rep.type === "CP437";
+      const overlapsSaved = (a: { line: number; end?: number }) =>
+        saved.some(m => a.line <= (m.end ?? m.line) && (a.end ?? a.line) >= m.line);
+      const auto: LogoEntry[] = isCanvas ? [] : (rep.logos ?? [])
+        .map(l => ({
+          line: l.line,
+          end: l.end,
+          caption: l.searchable ? (l.author ? `${l.name} -${l.author}` : l.name) : "",
+          auto: true,
+        }))
+        .filter(a => !overlapsSaved(a));
+      setLogoMap([...saved, ...auto].sort((x, y) => x.line - y.line));
+    });
     return () => { live = false; };
-  }, [filename, collyId]);
+  }, [filename, collyId, retryTick]);
 
   const save = async () => {
     setSaving(true);
@@ -137,10 +154,16 @@ export default function LogoTagPanel({ collyId, filename, type, font, fg, bg, is
   };
 
   if (failed) {
+    const message = failed === "logos"
+      ? "This colly's existing tags could not be loaded. Saving now could overwrite them, so saving is disabled until the load succeeds."
+      : "Could not load the logo editor.";
     return (
       <div className="bg-secondary ap-1 amb-1">
-        <div className="red amb-1">Could not load the logo editor.</div>
-        <input type="button" className="btn-big" value="Done" onClick={onDone} />
+        <div className="red amb-1">{message}</div>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <input type="button" className="btn-big" value="Retry" onClick={() => setRetryTick(t => t + 1)} />
+          <input type="button" className="btn-big" value="Done" onClick={onDone} />
+        </div>
       </div>
     );
   }
