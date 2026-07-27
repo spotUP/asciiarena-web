@@ -6,8 +6,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { broadcast } from "@/lib/live";
-import { buildLogoRowsFromMap } from "@/lib/collyLogoRows";
-import { loadEntityDicts } from "@/lib/collyLogoIndex";
+import { writeLogoEdit } from "@/lib/collyLogoWrite";
 import { collyPatchSchema } from "@/lib/adminCollyPatch";
 
 const deleteSchema = z.object({
@@ -105,6 +104,12 @@ export async function PATCH(request: NextRequest) {
   if (!patchParsed.success) return apiError("Invalid request: " + patchParsed.error.issues[0]?.message, 400);
   const { id, filename, name, year, month, day, type, file_id, artistNames, crewNames, broken, broken_comment, render_font, render_fg, render_bg, soundtrack, logos } = patchParsed.data;
 
+  // A logo edit is attributed to whoever made it, admin included, so the id has
+  // to be known before anything is written -- checked here rather than mid-PATCH
+  // so a session without one cannot leave the colly half-updated.
+  const adminUserId = Number((session?.user as { id?: string } | undefined)?.id);
+  if (logos && (!Number.isFinite(adminUserId) || adminUserId <= 0)) return apiError("Unauthorized", 401);
+
   await prisma.$executeRaw`
     UPDATE collys SET
       filename = COALESCE(${filename ?? null}, filename),
@@ -128,13 +133,17 @@ export async function PATCH(request: NextRequest) {
   if (render_bg !== undefined) await prisma.$executeRaw`UPDATE collys SET render_bg = ${render_bg || null} WHERE id = ${id}`;
   if (soundtrack !== undefined) await prisma.$executeRaw`UPDATE collys SET soundtrack = ${soundtrack || null} WHERE id = ${id}`;
 
-  // Logo map: replace the colly's catalog rows with the edited manual map,
-  // exactly like a mapped upload (manual rows drive rendering + search).
-  if (logos) {
-    const rows = buildLogoRowsFromMap(id, logos, await loadEntityDicts());
-    await prisma.colly_logos.deleteMany({ where: { colly_id: id } });
-    if (rows.length) await prisma.colly_logos.createMany({ data: rows.map((r) => ({ ...r, manual: 1 })) });
-  }
+  // Logo map: the same write the public tagging route makes, so an admin's
+  // re-curation is snapshotted like anyone else's edit and attributed to them.
+  //
+  // Writing `colly_logos` directly here instead would leave the catalog ahead
+  // of the newest snapshot: the tagging panel seeds from that snapshot, so the
+  // next member save would silently overwrite the admin's map with a stale one
+  // and preserve nothing. (The baseline snapshot cannot catch it -- a colly
+  // that already has snapshots never takes another baseline.) The public
+  // endpoint's rate limit lives in that route, not in `writeLogoEdit`, so an
+  // admin edit is not throttled.
+  if (logos) await writeLogoEdit(id, adminUserId, logos);
 
   if (artistNames) {
     await prisma.$executeRaw`DELETE FROM artists_collys WHERE colly_id = ${id}`;

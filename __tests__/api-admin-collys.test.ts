@@ -4,19 +4,25 @@ vi.mock("@/lib/db", () => ({
   prisma: {
     $executeRaw: vi.fn(),
     $queryRaw: vi.fn(),
+    $transaction: vi.fn().mockResolvedValue([]),
     artists: { findMany: vi.fn().mockResolvedValue([]) },
     crews: { findMany: vi.fn().mockResolvedValue([]) },
     users: { findMany: vi.fn().mockResolvedValue([]) },
+    collys: { findUnique: vi.fn().mockResolvedValue({ filename: "chr-checkmate.ans", type: "ANSI" }) },
     colly_logos: {
       findMany: vi.fn().mockResolvedValue([]),
-      deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
-      createMany: vi.fn().mockResolvedValue({ count: 0 }),
+      deleteMany: vi.fn((args: unknown) => ({ op: "deleteMany", args })),
+      createMany: vi.fn((args: unknown) => ({ op: "createMany", args })),
+    },
+    colly_logo_edits: {
+      create: vi.fn((args: unknown) => ({ op: "createEdit", args })),
+      count: vi.fn().mockResolvedValue(1),
     },
   },
 }));
 
 vi.mock("@/lib/auth", () => ({
-  auth: vi.fn().mockResolvedValue({ user: { rank: "Admin" } }),
+  auth: vi.fn().mockResolvedValue({ user: { id: "7", rank: "Admin" } }),
 }));
 
 vi.mock("@/lib/live", () => ({
@@ -25,6 +31,13 @@ vi.mock("@/lib/live", () => ({
 
 import { GET, PATCH } from "@/app/api/admin/collys/route";
 import { prisma } from "@/lib/db";
+
+type EditArgs = { data: { colly_id: number; user_id: number; map: string; logo_count: number } };
+
+const patchLogos = () => new Request("http://localhost/api/admin/collys", {
+  method: "PATCH",
+  body: JSON.stringify({ id: 123, logos: [{ line: 5, end: 12, caption: "spot" }] }),
+});
 
 function rawQueryText(): string {
   const firstCall = vi.mocked(prisma.$queryRaw).mock.calls[0];
@@ -118,13 +131,46 @@ describe("PATCH /api/admin/collys", () => {
   });
 
   it("rebuilds the logo catalog when a map is provided", async () => {
-    const req = new Request("http://localhost/api/admin/collys", {
-      method: "PATCH",
-      body: JSON.stringify({ id: 123, logos: [{ line: 5, end: 12, caption: "spot" }] }),
-    });
-    await PATCH(req as never);
+    await PATCH(patchLogos() as never);
     expect(prisma.colly_logos.deleteMany).toHaveBeenCalledWith({ where: { colly_id: 123 } });
     expect(prisma.colly_logos.createMany).toHaveBeenCalled();
+  });
+
+  // The admin editor used to write `colly_logos` straight, with no snapshot.
+  // Once ANY member has tagged a colly it already has snapshots, so the
+  // baseline-once rule never fires for it again -- leaving the catalog ahead of
+  // the newest snapshot. The tagging panel seeds from that snapshot, so the
+  // next member save overwrote the admin's curation with a stale map and
+  // preserved nothing: the same data-loss door the baseline snapshot closed,
+  // reached from the admin side.
+  it("snapshots the admin's logo map instead of writing the catalog behind history's back", async () => {
+    await PATCH(patchLogos() as never);
+    expect(prisma.colly_logo_edits.create).toHaveBeenCalledTimes(1);
+    const snapshot = vi.mocked(prisma.colly_logo_edits.create).mock.calls[0][0] as EditArgs;
+    expect(JSON.parse(snapshot.data.map)).toEqual([{ line: 5, end: 12, caption: "spot" }]);
+    expect(snapshot.data.logo_count).toBe(1);
+  });
+
+  it("attributes the snapshot to the admin who made the edit", async () => {
+    await PATCH(patchLogos() as never);
+    const snapshot = vi.mocked(prisma.colly_logo_edits.create).mock.calls[0][0] as EditArgs;
+    expect(snapshot.data.colly_id).toBe(123);
+    expect(snapshot.data.user_id).toBe(7);
+  });
+
+  it("writes the snapshot and the catalog rebuild in one transaction", async () => {
+    await PATCH(patchLogos() as never);
+    const ops = vi.mocked(prisma.$transaction).mock.calls[0][0] as unknown as { op: string }[];
+    expect(ops.map((o) => o.op)).toEqual(["createEdit", "deleteMany", "createMany"]);
+  });
+
+  it("takes no snapshot for a PATCH that carries no logo map", async () => {
+    const req = new Request("http://localhost/api/admin/collys", {
+      method: "PATCH",
+      body: JSON.stringify({ id: 123, name: "Checkmate" }),
+    });
+    await PATCH(req as never);
+    expect(prisma.colly_logo_edits.create).not.toHaveBeenCalled();
   });
 
   it("returns the saved manual map for the visual editor (?logos=id)", async () => {
