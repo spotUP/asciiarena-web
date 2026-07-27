@@ -42,6 +42,14 @@ next-env.d.ts
 
 /lib/generated/prisma
 
+# agent + browser tooling scratch (screenshots, console logs, tool memories)
+.playwright-mcp/
+test-results/
+playwright-report/
+.serena/
+audit-*.png
+*.bak
+
 # PHP legacy (root-level, being replaced)
 collections/
 collys_bad_filenames/
