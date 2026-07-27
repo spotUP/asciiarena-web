@@ -10,11 +10,30 @@ import { addParticipant, getLeftThreads } from "@/lib/chatThreadDb";
 import { createNotification } from "@/lib/notifications";
 import { normalizeMessageText } from "@/lib/normalizeText";
 
+// `receiver` (single) is the original contract; `receivers` (many) starts a
+// group thread from the composer. Exactly one of them must be present.
 const postSchema = z.object({
   subject: z.string().min(1).max(500).transform(normalizeMessageText),
   msgtext: z.string().min(1).max(10000).transform(normalizeMessageText),
-  receiver: z.number().int().positive(),
+  receiver: z.number().int().positive().optional(),
+  receivers: z.array(z.number().int().positive()).min(1).max(20).optional(),
+}).refine(v => v.receiver != null || (v.receivers?.length ?? 0) > 0, {
+  message: "receiver or receivers required",
 });
+
+// Participants arrive as "id:nick" joined by 0x1f — one GROUP_CONCAT rather
+// than two that could disagree about ordering. A nick cannot contain 0x1f, and
+// splitting the id off at the FIRST colon keeps nicks containing ":" intact.
+function parseParticipants(concat: string | null): Array<{ id: number; nick: string }> {
+  if (!concat) return [];
+  return concat.split(String.fromCharCode(0x1f)).flatMap(entry => {
+    const at = entry.indexOf(":");
+    if (at < 0) return [];
+    const id = Number(entry.slice(0, at));
+    const nick = entry.slice(at + 1);
+    return Number.isFinite(id) && nick ? [{ id, nick }] : [];
+  });
+}
 
 export async function GET(request: NextRequest) {
   const session = await auth();
@@ -33,7 +52,7 @@ export async function GET(request: NextRequest) {
     const left = await getLeftThreads(me);
     return apiOk(left.map(r => {
       const subject = r.firstSubject === "Chat" ? null : r.firstSubject;
-      const nicks = r.otherNicks ? r.otherNicks.split(String.fromCharCode(0x1f)) : [];
+      const participants = parseParticipants(r.otherNicks);
       return {
         total_count: left.length,
         thread: r.thread,
@@ -41,10 +60,15 @@ export async function GET(request: NextRequest) {
         from_id: null,
         lastFromMe: false,
         preview: null,
+        lastSenderNick: null,
         timestamp: r.lastTimestamp,
-        title: resolveDisplayTitle(r.overrideTitle, subject, nicks),
+        title: resolveDisplayTitle(r.overrideTitle, subject, participants.map(p => p.nick)),
+        overrideTitle: r.overrideTitle,
+        subject,
+        participants,
         unread: 0,
         left: true,
+        archived: false,
       };
     }));
   }
@@ -53,24 +77,52 @@ export async function GET(request: NextRequest) {
   // cursor-based unread count, and the raw inputs for title resolution. The
   // GROUP_CONCAT SEPARATOR is 0x1f (unit separator) so commas in a nick don't
   // break the split on the JS side.
+  // Archived threads are hidden from the default list until a message newer
+  // than archived_at arrives — the SQL mirror of isArchived() in
+  // lib/chatThread.ts. `?archived=1` shows exactly the complement.
+  const wantArchived = searchParams.get("archived") === "1";
+  const archivedCond = wantArchived
+    ? Prisma.sql`(cp.archived_at IS NOT NULL AND lm.timestamp <= cp.archived_at)`
+    : Prisma.sql`(cp.archived_at IS NULL OR lm.timestamp > cp.archived_at)`;
+
+  // Free-text filter over the thread subject and the other participants' nicks.
+  const q = (searchParams.get("q") ?? "").trim();
+  const search = q
+    ? Prisma.sql`AND (
+        EXISTS (SELECT 1 FROM messages sm WHERE sm.thread = cp.thread_id AND sm.subject LIKE ${"%" + q + "%"})
+        OR EXISTS (SELECT 1 FROM chat_participants sp JOIN users su ON su.id = sp.user_id
+                   WHERE sp.thread_id = cp.thread_id AND sp.user_id <> ${me} AND su.nick LIKE ${"%" + q + "%"})
+      )`
+    : Prisma.empty;
+
+  // Defined once and used both in the select list and (optionally) the filter,
+  // so the count shown and the count filtered on cannot disagree. It goes in
+  // WHERE rather than HAVING because this query has no GROUP BY and does use a
+  // window function, where HAVING's behaviour is not something to rely on.
+  const unreadExpr = Prisma.sql`(SELECT COUNT(*) FROM messages um
+     WHERE um.thread = cp.thread_id AND um.timestamp >= cp.joined_at
+       AND um.timestamp > cp.last_read_at AND (um.from_id IS NULL OR um.from_id <> ${me}))`;
+  const unreadOnly = searchParams.get("unread") === "1"
+    ? Prisma.sql`AND ${unreadExpr} > 0`
+    : Prisma.empty;
+
   const rows = await prisma.$queryRaw<Array<{
     thread: number; id: number; from_id: number | null; postername: string | null;
     message: string | null; timestamp: number | null; total_count: bigint | number;
     override_title: string | null; first_subject: string | null;
-    other_nicks: string | null; unread: bigint | number;
+    other_nicks: string | null; unread: bigint | number; archived_at: number | null;
   }>>`
     SELECT
       cp.thread_id AS thread,
       lm.id, lm.from_id, lm.postername, lm.message, lm.timestamp,
       COUNT(*) OVER() AS total_count,
       cp.title AS override_title,
+      cp.archived_at,
       (SELECT fm.subject FROM messages fm WHERE fm.thread = cp.thread_id ORDER BY fm.id ASC LIMIT 1) AS first_subject,
-      (SELECT GROUP_CONCAT(u.nick ORDER BY pp.joined_at SEPARATOR 0x1f)
+      (SELECT GROUP_CONCAT(CONCAT(u.id, ':', u.nick) ORDER BY pp.joined_at SEPARATOR 0x1f)
          FROM chat_participants pp JOIN users u ON u.id = pp.user_id
          WHERE pp.thread_id = cp.thread_id AND pp.left_at IS NULL AND pp.user_id <> ${me}) AS other_nicks,
-      (SELECT COUNT(*) FROM messages um
-         WHERE um.thread = cp.thread_id AND um.timestamp >= cp.joined_at
-           AND um.timestamp > cp.last_read_at AND (um.from_id IS NULL OR um.from_id <> ${me})) AS unread
+      ${unreadExpr} AS unread
     FROM chat_participants cp
     JOIN messages lm ON lm.id = (
       SELECT m2.id FROM messages m2
@@ -78,13 +130,16 @@ export async function GET(request: NextRequest) {
       ORDER BY m2.id DESC LIMIT 1
     )
     WHERE cp.user_id = ${me} AND cp.left_at IS NULL
+      AND ${archivedCond}
+      ${search}
+      ${unreadOnly}
     ORDER BY lm.timestamp DESC
     LIMIT ${Prisma.raw(String(pagesize))} OFFSET ${Prisma.raw(String(offset))}
   `;
 
   const result = rows.map(r => {
     const subject = r.first_subject === "Chat" ? null : r.first_subject;
-    const nicks = r.other_nicks ? r.other_nicks.split(String.fromCharCode(0x1f)) : [];
+    const participants = parseParticipants(r.other_nicks);
     return {
       total_count: Number(r.total_count),
       thread: r.thread,
@@ -92,10 +147,18 @@ export async function GET(request: NextRequest) {
       from_id: r.from_id,
       lastFromMe: r.from_id === me,
       preview: r.message,
+      lastSenderNick: r.postername,
       timestamp: r.timestamp,
-      title: resolveDisplayTitle(r.override_title, subject, nicks),
+      // Kept for the chat dock / ChatWindow, which still take one string.
+      title: resolveDisplayTitle(r.override_title, subject, participants.map(p => p.nick)),
+      // The parts the inbox list needs; a single pre-formatted title cannot
+      // express "subject AND who is in the thread".
+      overrideTitle: r.override_title,
+      subject,
+      participants,
       unread: Number(r.unread),
       left: false,
+      archived: r.archived_at != null,
     };
   });
 
@@ -109,9 +172,18 @@ export async function POST(request: NextRequest) {
   const rawBody = await request.json().catch(() => ({}));
   const parsed = postSchema.safeParse(rawBody);
   if (!parsed.success) return apiError("Invalid request: " + parsed.error.issues[0]?.message, 400);
-  const { subject, msgtext, receiver } = parsed.data;
+  const { subject, msgtext } = parsed.data;
 
   const fromId = parseInt(session.user.id);
+  // One thread, N recipients. Deduped and with the sender removed, so picking
+  // yourself (or the same nick twice) cannot create a bogus participant row.
+  const recipients = Array.from(new Set(
+    (parsed.data.receivers ?? [parsed.data.receiver!]).filter(id => id !== fromId),
+  ));
+  if (recipients.length === 0) return apiError("Pick at least one other recipient", 400);
+  // messages.to_id is a single column: the row is addressed to the first
+  // recipient, and chat_participants is what actually defines membership.
+  const receiver = recipients[0];
 
   const threadId = await prisma.$transaction(async (tx) => {
     await tx.$executeRaw`
@@ -132,11 +204,13 @@ export async function POST(request: NextRequest) {
 
   if (threadId) {
     await addParticipant(threadId, fromId);
-    await addParticipant(threadId, receiver);
+    for (const id of recipients) await addParticipant(threadId, id);
   }
 
-  broadcast(`user:${receiver}:messages`, { type: "message", fromId, fromNick, threadId });
-  await createNotification(receiver, "notif-message", { actorNick: fromNick, targetUrl: `/messages?thread=${threadId}` });
+  for (const id of recipients) {
+    broadcast(`user:${id}:messages`, { type: "message", fromId, fromNick, threadId });
+    await createNotification(id, "notif-message", { actorNick: fromNick, targetUrl: `/messages?thread=${threadId}` });
+  }
 
   return apiOk({ status: true, threadId });
 }

@@ -84,7 +84,7 @@ function PopoutInner({ peerId, peerNick, userId, userNick }: Props) {
       minimized={false}
       userId={userId}
       userNick={userNick}
-      popout
+      variant="popout"
     />
   );
 }

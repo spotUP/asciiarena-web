@@ -22,9 +22,10 @@ export async function getActiveParticipants(threadId: number): Promise<ActivePar
 // The caller's membership row (active or not), or null.
 export async function getMember(threadId: number, userId: number): Promise<Member | null> {
   const rows = await prisma.$queryRaw<Array<{
-    user_id: number; joined_at: number; left_at: number | null; last_read_at: number; title: string | null;
+    user_id: number; joined_at: number; left_at: number | null; last_read_at: number;
+    title: string | null; archived_at: number | null;
   }>>`
-    SELECT user_id, joined_at, left_at, last_read_at, title
+    SELECT user_id, joined_at, left_at, last_read_at, title, archived_at
     FROM chat_participants WHERE thread_id = ${threadId} AND user_id = ${userId} LIMIT 1
   `;
   const r = rows[0];
@@ -35,6 +36,7 @@ export async function getMember(threadId: number, userId: number): Promise<Membe
     leftAt: r.left_at == null ? null : Number(r.left_at),
     lastReadAt: Number(r.last_read_at),
     title: r.title,
+    archivedAt: r.archived_at == null ? null : Number(r.archived_at),
   };
 }
 
@@ -94,7 +96,7 @@ export async function getLeftThreads(userId: number): Promise<LeftThreadRow[]> {
          ORDER BY lm.id DESC LIMIT 1) AS last_timestamp,
       cp.title AS override_title,
       (SELECT fm.subject FROM messages fm WHERE fm.thread = cp.thread_id ORDER BY fm.id ASC LIMIT 1) AS first_subject,
-      (SELECT GROUP_CONCAT(u.nick ORDER BY pp.joined_at SEPARATOR 0x1f)
+      (SELECT GROUP_CONCAT(CONCAT(u.id, ':', u.nick) ORDER BY pp.joined_at SEPARATOR 0x1f)
          FROM chat_participants pp JOIN users u ON u.id = pp.user_id
          WHERE pp.thread_id = cp.thread_id AND pp.user_id <> ${userId}) AS other_nicks
     FROM chat_participants cp
@@ -114,6 +116,24 @@ export async function leaveThread(threadId: number, userId: number): Promise<voi
   await prisma.$executeRaw`
     UPDATE chat_participants SET left_at = UNIX_TIMESTAMP()
     WHERE thread_id = ${threadId} AND user_id = ${userId} AND left_at IS NULL
+  `;
+}
+
+// Archive / unarchive for one member. Archiving stamps "now"; the thread stays
+// hidden from the default inbox only until a message newer than that arrives
+// (see isArchived in lib/chatThread.ts), so this is reversible and self-healing
+// — unlike leaveThread, which removes the user from the conversation.
+export async function setThreadArchived(threadId: number, userId: number, archived: boolean): Promise<void> {
+  if (archived) {
+    await prisma.$executeRaw`
+      UPDATE chat_participants SET archived_at = UNIX_TIMESTAMP()
+      WHERE thread_id = ${threadId} AND user_id = ${userId}
+    `;
+    return;
+  }
+  await prisma.$executeRaw`
+    UPDATE chat_participants SET archived_at = NULL
+    WHERE thread_id = ${threadId} AND user_id = ${userId}
   `;
 }
 

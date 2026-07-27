@@ -5,6 +5,7 @@ import { useChatContext } from "./ChatContext";
 import { playChatAlert, unlockChatAudio } from "@/lib/chatSound";
 import { resolveDisplayTitle } from "@/lib/chatThread";
 import { announcePopoutOpen } from "./popoutRegistry";
+import UserPicker from "./UserPicker";
 
 interface ChatMessage {
   id: number;
@@ -25,12 +26,24 @@ interface Props {
   minimized: boolean;
   userId: string;
   userNick: string;
-  // When true: rendering as a standalone popped-out window. Hides minimize and
-  // popout buttons, fills the viewport instead of a fixed 240×~300 dock window,
-  // and the close button closes the OS window via window.close() rather than
-  // mutating the parent's ChatContext.
-  popout?: boolean;
+  /**
+   * Where this window is rendered. One prop rather than a set of booleans, so
+   * two modes cannot be requested at once.
+   *
+   * - "dock"   the draggable window in the site-wide chat dock (default).
+   * - "popout" a standalone OS window: fills the viewport, no minimize/popout
+   *            chrome, and the close button calls window.close().
+   * - "inline" embedded in a page (the /messages accordion): fills its
+   *            container's width, no dock chrome, and close calls onClose.
+   */
+  variant?: "dock" | "popout" | "inline";
+  /** Inline only: collapse the embedding container. */
+  onClose?: () => void;
 }
+
+// Inline chats sit inside a page's own layout, so the message area gets a fixed
+// grid-aligned height rather than the dock's resizable one.
+const INLINE_MSG_HEIGHT_PX = 320;
 
 function formatTime(ts: number | null): string {
   if (!ts) return "";
@@ -38,7 +51,10 @@ function formatTime(ts: number | null): string {
   return d.getHours().toString().padStart(2, "0") + ":" + d.getMinutes().toString().padStart(2, "0");
 }
 
-export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title, participants, minimized, userId, userNick, popout = false }: Props) {
+export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title, participants, minimized, userId, userNick, variant = "dock", onClose }: Props) {
+  const isDock = variant === "dock";
+  const popout = variant === "popout";
+  const isInline = variant === "inline";
   const { closeChat, minimizeChat, setThreadId, markRead, incrementUnread, setParticipants } = useChatContext();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [systemLines, setSystemLines] = useState<{ id: number; text: string }[]>([]);
@@ -48,8 +64,6 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
   const [sending, setSending] = useState(false);
   const [flashing, setFlashing] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
-  const [addSearch, setAddSearch] = useState("");
-  const [addSuggestions, setAddSuggestions] = useState<Array<{ id: number; nick: string }>>([]);
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleDraft, setTitleDraft] = useState("");
   const [size, setSize] = useState<{ width: number; msgHeight: number }>({ width: 480, msgHeight: 220 });
@@ -59,7 +73,6 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
   const scrollRef = useRef<HTMLDivElement>(null);
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const typingDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const addDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const esMessagesRef = useRef<EventSource | null>(null);
   const esTypingRef = useRef<EventSource | null>(null);
   const threadIdRef = useRef<number | null>(threadId);
@@ -78,7 +91,7 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
 
   // Load persisted size from localStorage on mount (docked only, SSR-safe)
   useEffect(() => {
-    if (typeof window === "undefined" || popout) return;
+    if (typeof window === "undefined" || !isDock) return;
     try {
       const saved = window.localStorage.getItem("asciiarena:chat:size");
       if (saved) {
@@ -86,7 +99,7 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
         if (typeof s.width === "number" && typeof s.msgHeight === "number") setSize({ width: s.width, msgHeight: s.msgHeight });
       }
     } catch { /* ignore */ }
-  }, [popout]);
+  }, [isDock]);
 
   // Fetch the resolved (per-user) title whenever the thread changes
   useEffect(() => {
@@ -241,7 +254,6 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
       if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
       if (typingDebounceRef.current) clearTimeout(typingDebounceRef.current);
       if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
-      if (addDebounceRef.current) clearTimeout(addDebounceRef.current);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -317,19 +329,6 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
     }, 50);
   };
 
-  const fetchAddSuggestions = (q: string) => {
-    if (addDebounceRef.current) clearTimeout(addDebounceRef.current);
-    if (q.length < 1) { setAddSuggestions([]); return; }
-    addDebounceRef.current = setTimeout(() => {
-      fetch(`/api/chat/users?q=${encodeURIComponent(q)}`)
-        .then(r => r.json())
-        .then((data: unknown) => {
-          if (Array.isArray(data)) setAddSuggestions(data as Array<{ id: number; nick: string }>);
-        })
-        .catch(() => {});
-    }, 150);
-  };
-
   const selectAddMember = (s: { id: number; nick: string }) => {
     const tid = threadIdRef.current;
     if (!tid) return;
@@ -354,11 +353,8 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
           });
       })
       .catch(() => {})
-      .finally(() => {
-        setAddOpen(false);
-        setAddSearch("");
-        setAddSuggestions([]);
-      });
+      // UserPicker clears its own search state after a pick.
+      .finally(() => setAddOpen(false));
   };
 
   const sendMessage = async () => {
@@ -465,6 +461,17 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
       fontFamily: "TopazPlus_a1200, monospace",
       fontSize: "13px",
       lineHeight: "16px",
+    } : isInline ? {
+      // Inline: fill the row it is expanded under
+      position: "relative",
+      width: "100%",
+      display: "flex",
+      flexDirection: "column",
+      border: "1px solid #444",
+      backgroundColor: "#111",
+      fontFamily: "TopazPlus_a1200, monospace",
+      fontSize: "13px",
+      lineHeight: "16px",
     } : {
       // Inline dock
       position: "relative",
@@ -477,7 +484,7 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
       fontSize: "13px",
       lineHeight: "16px",
     }}>
-      {!popout && (
+      {isDock && (
         <div
           onPointerDown={onResizePointerDown}
           onPointerMove={onResizePointerMove}
@@ -498,9 +505,9 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        cursor: popout ? "default" : "pointer",
+        cursor: isDock ? "pointer" : "default",
         userSelect: "none",
-      }} onClick={popout ? undefined : () => minimizeChat(windowKey, true)}>
+      }} onClick={isDock ? () => minimizeChat(windowKey, true) : undefined}>
         <span style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
           {editingTitle && !popout ? (
             <input
@@ -547,7 +554,7 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
           ) : null}
           {threadId ? (
             <button
-              onClick={(e) => { e.stopPropagation(); setAddOpen(o => !o); setAddSearch(""); setAddSuggestions([]); }}
+              onClick={(e) => { e.stopPropagation(); setAddOpen(o => !o); }}
               title="Add member to this chat"
               style={{ background: "none", border: "none", color: "#aaa", cursor: "pointer", padding: "0 2px", fontFamily: "inherit" }}>
               +
@@ -563,42 +570,14 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
               }}
               onMouseDown={e => e.stopPropagation()}
             >
-              <input
-                type="text"
-                value={addSearch}
-                onChange={e => { setAddSearch(e.target.value); fetchAddSuggestions(e.target.value); }}
-                onKeyDown={e => {
-                  e.stopPropagation();
-                  if (e.key === "Escape") { setAddOpen(false); setAddSearch(""); setAddSuggestions([]); }
-                }}
-                placeholder="nick..."
+              <UserPicker
                 autoFocus
-                style={{
-                  background: "#111", border: "1px solid #444", color: "#aaaaaa",
-                  fontFamily: "TopazPlus_a1200, monospace", fontSize: "16px", lineHeight: "16px",
-                  padding: "0 8px",
-                }}
+                excludeIds={participants.map(p => p.id)}
+                onPick={selectAddMember}
               />
-              {addSuggestions.length > 0 && (
-                <div style={{ display: "flex", flexDirection: "column", gap: "1px", marginTop: "2px" }}>
-                  {addSuggestions.map(s => (
-                    <button
-                      key={s.id}
-                      onMouseDown={e => { e.preventDefault(); selectAddMember(s); }}
-                      style={{
-                        background: "#1a1a1a", border: "1px solid #333", color: "#ffff55",
-                        cursor: "pointer", fontFamily: "TopazPlus_a1200, monospace", fontSize: "13px",
-                        padding: "2px 4px", textAlign: "left",
-                      }}
-                    >
-                      {s.nick}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
           )}
-          {!popout && !isGroup && (
+          {isDock && !isGroup && (
             <button onClick={(e) => { e.stopPropagation(); openPopout(); }}
               title="Pop out to a separate window"
               style={{ background: "none", border: "none", color: "#aaa", cursor: "pointer", padding: "0 2px", fontFamily: "inherit" }}>
@@ -606,7 +585,7 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
               ^
             </button>
           )}
-          {!popout && (
+          {isDock && (
             <button onClick={(e) => { e.stopPropagation(); minimizeChat(windowKey, true); }}
               title="Minimise"
               style={{ background: "none", border: "none", color: "#aaa", cursor: "pointer", padding: "0 2px", fontFamily: "inherit" }}>
@@ -616,9 +595,10 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
           <button onClick={(e) => {
             e.stopPropagation();
             if (popout) window.close();
+            else if (isInline) onClose?.();
             else closeChat(windowKey);
           }}
-            title={popout ? "Close window" : "Close"}
+            title={popout ? "Close window" : isInline ? "Collapse" : "Close"}
             style={{ background: "none", border: "none", color: "#aaa", cursor: "pointer", padding: "0 2px", fontFamily: "inherit" }}>
             X
           </button>
@@ -627,7 +607,9 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
 
       {/* Messages */}
       <div ref={scrollRef} style={{
-        ...(popout ? { flex: 1, minHeight: 0 } : { height: `${size.msgHeight}px` }),
+        ...(popout ? { flex: 1, minHeight: 0 }
+          : isInline ? { height: `${INLINE_MSG_HEIGHT_PX}px` }
+          : { height: `${size.msgHeight}px` }),
         overflowY: "auto",
         overflowX: "hidden",
         backgroundColor: "#212121",

@@ -8,6 +8,7 @@ export interface Member {
   leftAt: number | null;   // null = still a member
   lastReadAt: number;      // epoch seconds
   title: string | null;    // per-user thread name override
+  archivedAt?: number | null; // epoch seconds; null/undefined = not archived
 }
 
 export interface ThreadMessage {
@@ -58,6 +59,24 @@ export function resolveDisplayTitle(
 // the list filter and the rejoin guard agree on what "left" means.
 export function isLeftMember(member: Pick<Member, "leftAt">): boolean {
   return member.leftAt != null;
+}
+
+// A thread is hidden from the default inbox iff the member archived it AND
+// nothing has been said since. Archiving is deliberately NOT sticky: it means
+// "hide this until something happens", which is what makes it a safe,
+// reversible alternative to leaving. A thread with no messages at all stays
+// archived.
+//
+// One predicate for the SQL filter and the client-side list, so the two cannot
+// disagree about which threads the user should be seeing.
+export function isArchived(
+  member: Pick<Member, "archivedAt">,
+  lastMessageTs: number | null,
+): boolean {
+  const archivedAt = member.archivedAt;
+  if (archivedAt == null) return false;
+  if (lastMessageTs == null) return true;
+  return lastMessageTs <= archivedAt;
 }
 
 // Rejoin is a pure state transition on the participant row: clear left_at while

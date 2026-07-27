@@ -307,6 +307,10 @@ model chat_participants {
   left_at      Int?
   last_read_at Int     @default(0)
   title        String? @db.VarChar(128)
+  // When this member archived the thread. A timestamp rather than a flag so an
+  // archived thread resurfaces on its own once a newer message arrives — see
+  // isArchived() in lib/chatThread.ts. NULL = not archived.
+  archived_at  Int?
 
   @@unique([thread_id, user_id], map: "uq_thread_user")
   @@index([thread_id], map: "idx_thread")
