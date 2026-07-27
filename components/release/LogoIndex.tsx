@@ -60,14 +60,16 @@ export default function LogoIndex({ entries, onJump, currentSection }: LogoIndex
                 display: "flex",
                 gap: "8px",
                 alignItems: "baseline",
-                background: current ? "#222" : "transparent",
                 border: "none",
                 padding: "0 8px",
                 height: "16px",
                 lineHeight: "16px",
                 fontFamily: "inherit",
                 fontSize: "16px",
-                color: current ? "#ff55ff" : "#aaaaaa",
+                // Colour ONLY for the autoplay-current entry. The resting
+                // colours live in .logo-index-entry, because an inline colour
+                // outranks the :hover rule and would suppress it.
+                ...(current ? { background: "#222222", color: "#ff55ff" } : {}),
                 cursor: "pointer",
                 textAlign: "left",
                 overflow: "hidden",

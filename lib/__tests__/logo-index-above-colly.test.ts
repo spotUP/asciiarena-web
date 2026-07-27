@@ -70,6 +70,16 @@ describe("logo index component", () => {
     expect(css).toMatch(/\.logo-index-entry:hover \{/);
   });
 
+  it("does not set a resting colour inline, which would outrank the hover", () => {
+    // An inline `color` beats any class rule, so setting the resting colour
+    // inline silently kills :hover -- which is exactly what shipped first.
+    // The resting colours belong in .logo-index-entry.
+    expect(component).not.toMatch(/color: current \? "#ff55ff" : "#aaaaaa"/);
+    expect(component).toMatch(/\.\.\.\(current \? \{ background: "#222222", color: "#ff55ff" \} : \{\}\)/);
+    const css = read("assets/css/site.css");
+    expect(css).toMatch(/\.logo-index-entry \{[^}]*color: #aaaaaa/);
+  });
+
   it("renders nothing when there is nothing to index", () => {
     expect(component).toMatch(/if \(!entries\.length\) return null;/);
   });

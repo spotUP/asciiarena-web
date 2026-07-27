@@ -2623,10 +2623,17 @@ input::file-selector-button {
 }
 
 /* Clickable logo index above a hand-tagged colly (components/release/LogoIndex).
-   Entries are <button>s, so the hover cannot live in an inline style. Matches
-   the day-cell treatment above, which is this site's pattern for an
-   interactive row that is not a link. The number stays dim on hover so the
-   name is what lights up. */
+   Entries are <button>s, so the hover cannot live in an inline style — and the
+   BASE colours have to live here too. An inline `color` beats a class rule no
+   matter what the class says, so setting the resting colour inline silently
+   killed this hover. (.datepicker-day above only works because it uses
+   !important.) The number keeps its own dim colour so the name is what
+   lights up. */
+.logo-index-entry {
+  background: transparent;
+  color: #aaaaaa;
+}
+
 .logo-index-entry:hover {
   background: #333333;
   color: #ffffff;
