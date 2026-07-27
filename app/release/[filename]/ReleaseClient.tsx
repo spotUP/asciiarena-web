@@ -22,6 +22,7 @@ import {
   type LogoSection,
 } from "@/lib/logoSections";
 import LogoMinimap, { MINIMAP_WIDTH } from "./LogoMinimap";
+import { shouldShowMinimap, useMinimapPreference, useViewportAllowsMinimap } from "@/lib/minimapVisibility";
 import { parseCollyIndex, sectionForIndexEntry, linkifyCollyIndex } from "@/lib/collyIndex";
 import { sectionsFromLogoMap } from "@/lib/collyTrailer";
 import ColorSwatch from "@/components/ui/ColorSwatch";
@@ -261,6 +262,8 @@ export default function ReleaseClient({
 }: Props) {
   const [collyVisible, setCollyVisible] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const viewportWideEnough = useViewportAllowsMinimap();
+  const { enabled: minimapEnabled, toggle: toggleMinimap } = useMinimapPreference();
   const [bgColor, setBgColor] = useState(initBgColor);
   const [fgColor, setFgColor] = useState(initFgColor);
   const [font, setFont] = useState(initFont);
@@ -994,6 +997,17 @@ export default function ReleaseClient({
 
   const toggleFullscreen = () => setIsFullscreen(f => !f);
 
+  // Minimap: off on narrow viewports (it does not work on mobile and its
+  // 120px strip costs a third of the art on a small screen), otherwise the
+  // reader's own stored choice. One flag drives both the strip and the
+  // container padding that reserves room for it.
+  const showMinimap = shouldShowMinimap({
+    viewportAllows: viewportWideEnough,
+    userEnabled: minimapEnabled,
+    entryCount: logoIndex.length,
+    isFullscreen,
+  });
+
   const doDownload = () => {
     startTransition(() => { trackDownload(collyId); });
     const link = document.createElement("a");
@@ -1167,6 +1181,15 @@ export default function ReleaseClient({
                   value={indexOpen ? "Close Index" : "Index"}
                   onClick={() => setIndexOpen(o => !o)} />
               )}
+              {/* Offered only where the minimap could actually appear — on a
+                  narrow screen it is off regardless, so a toggle would lie. */}
+              {viewportWideEnough && logoIndex.length > 1 && (
+                <input type="button" className="btn-big"
+                  value={minimapEnabled ? "Minimap: ON" : "Minimap: OFF"}
+                  title="Show the logo minimap beside the colly (it costs 120px of width)"
+                  style={minimapEnabled ? undefined : { color: "#777777" }}
+                  onClick={toggleMinimap} />
+              )}
             </>
           )}
 
@@ -1263,7 +1286,7 @@ export default function ReleaseClient({
             display: "flex", justifyContent: "center", alignItems: "flex-start",
             overflowY: "scroll", overflowX: "hidden", height: "100vh",
             backgroundColor: bgColor, margin: 0, padding: 0,
-            paddingRight: !isFullscreen && type === "ASCII" && logoIndex.length > 1 ? `${MINIMAP_WIDTH}px` : 0,
+            paddingRight: showMinimap ? `${MINIMAP_WIDTH}px` : 0,
             // Fullscreen: become the fixed, viewport-sized stage so CSS/SVG
             // filters (the groove warp/glow) render — they're dropped on the
             // full-height <pre>.
@@ -1280,7 +1303,7 @@ export default function ReleaseClient({
             dangerouslySetInnerHTML={{ __html: "<br><br><br><br>" + linkedContent + "<br><br><br><br>" }}
           />
         </div>
-        {!isFullscreen && type === "ASCII" && (
+        {showMinimap && (
           <LogoMinimap
             containerRef={collyDivRef}
             preRef={collyRef}
@@ -1303,7 +1326,7 @@ export default function ReleaseClient({
             display: "flex", justifyContent: "center", alignItems: "flex-start",
             overflowY: "scroll", overflowX: "hidden", height: "100vh",
             backgroundColor: isCp437Art ? bgColor : "#000", margin: 0, padding: 0,
-            paddingRight: !isFullscreen && logoIndex.length > 1 ? `${MINIMAP_WIDTH}px` : 0,
+            paddingRight: showMinimap ? `${MINIMAP_WIDTH}px` : 0,
             // Fullscreen: fixed viewport-sized stage so the groove warp/filters render.
             ...(isFullscreen ? { position: "fixed" as const, top: 0, left: 0, width: "100vw", height: "100vh", zIndex: 999998 } : {}),
           }}
@@ -1317,7 +1340,7 @@ export default function ReleaseClient({
             style={{ paddingTop: "64px" }}
           />
         </div>
-        {!isFullscreen && logoIndex.length > 1 && (
+        {showMinimap && (
           <LogoMinimap
             containerRef={collyDivRef}
             preRef={collyRef}
