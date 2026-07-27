@@ -6,7 +6,24 @@
 -- thread resurfaces by itself as soon as a message newer than archived_at
 -- arrives (the rule lives in isArchived(), lib/chatThread.ts).
 --
--- Idempotent: safe to run more than once.
+-- Idempotent, and deliberately NOT written as "ADD COLUMN IF NOT EXISTS":
+-- that syntax is MariaDB-only, and this database is MySQL 8, where it is a
+-- syntax error. The information_schema guard below works on both.
 
-ALTER TABLE chat_participants
-  ADD COLUMN IF NOT EXISTS archived_at INT NULL AFTER title;
+SET @col_exists := (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'chat_participants'
+    AND COLUMN_NAME = 'archived_at'
+);
+
+SET @ddl := IF(@col_exists = 0,
+  'ALTER TABLE chat_participants ADD COLUMN archived_at INT NULL AFTER title',
+  'DO 0'
+);
+
+PREPARE stmt FROM @ddl;
+
+EXECUTE stmt;
+
+DEALLOCATE PREPARE stmt;

@@ -1,7 +1,11 @@
 // One-shot: apply database/2026-07-28_chat_participants_archived.sql.
-// Idempotent (ADD COLUMN IF NOT EXISTS). Run once locally and once on the
-// server:
+// Idempotent (the SQL guards on information_schema — the database is MySQL 8,
+// where MariaDB's ADD COLUMN IF NOT EXISTS is a syntax error). Run once
+// locally and once on the server:
 //   node scripts/apply-chat-archive-migration.mjs
+//
+// Already applied to production on 2026-07-28 via the mysql CLI, because the
+// deployed standalone bundle carries no database driver.
 //
 // Talks to MariaDB directly rather than through the generated Prisma client:
 // Prisma 7 emits TypeScript into lib/generated/prisma, so a plain .mjs cannot
