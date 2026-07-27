@@ -29,6 +29,7 @@ Spec: `docs/superpowers/specs/2026-07-27-public-logo-tagging-design.md`
 - `lib/logoMapPayload.ts` — the logo-map array schema, shared by the admin PATCH and the new public route so they cannot drift.
 - `lib/collyLogoSnapshot.ts` — pure serialize/parse for the snapshot `map` column plus `logoCountOf`.
 - `prisma/colly_logo_edits_migration.sql` — the new table, run on the host.
+- `lib/collyLogoWrite.ts` — `writeLogoEdit`: the atomic snapshot-plus-catalog-rebuild, shared by the save and revert routes.
 - `app/api/collys/[id]/logos/route.ts` — public POST (save) and GET (history).
 - `app/api/collys/[id]/logos/revert/route.ts` — admin POST (replay an edit).
 - `components/release/LogoTagPanel.tsx` — the tagging mode: report fetch, map state, save, history.
@@ -347,11 +348,15 @@ git commit -m "feat: add colly logo edit snapshots"
 ### Task 3: Public save and history endpoint
 
 **Files:**
-- Create: `app/api/collys/[id]/logos/route.ts`, `app/api/collys/[id]/logos/__tests__/logos-route.test.ts`
+- Create: `lib/collyLogoWrite.ts`, `app/api/collys/[id]/logos/route.ts`, `app/api/collys/[id]/logos/__tests__/logos-route.test.ts`
 
 **Interfaces:**
 - Consumes: `logoMapSchema` (Task 1); `serializeLogoMap`, `logoCountOf` (Task 2); existing `buildLogoRowsFromMap` from `@/lib/collyLogoRows` and `loadEntityDicts` from `@/lib/collyLogoIndex`.
-- Produces: `POST /api/collys/[id]/logos` returning `{ status: true, logoCount: number, rowCount: number }`, and `GET` returning `{ id, nick, timestamp, logoCount }[]`. Task 4 reuses the exported `writeLogoEdit` helper.
+- Produces: `writeLogoEdit(collyId: number, userId: number, logos: LogoMapEntry[]): Promise<{ logoCount: number; rowCount: number }>` in `lib/collyLogoWrite.ts` — Task 4 imports it from there. Plus `POST /api/collys/[id]/logos` returning `{ status: true, logoCount, rowCount }` and `GET` returning `{ id, nick, timestamp, logoCount }[]`.
+
+**Why the helper lives in `lib/`, not the route file:** no `route.ts` in this
+codebase exports a non-handler, and Next.js validates App Router route module
+exports. Shared server logic belongs in `lib/`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -479,30 +484,29 @@ Expected: FAIL — cannot resolve `../route`
 - [ ] **Step 3: Write the implementation**
 
 ```ts
-// app/api/collys/[id]/logos/route.ts
-import { z } from "zod";
+// lib/collyLogoWrite.ts
 import { prisma } from "@/lib/db";
-import { auth } from "@/lib/auth";
-import { apiError, apiOk } from "@/lib/utils";
-import { revalidatePath } from "next/cache";
-import { broadcast } from "@/lib/live";
-import { logoMapSchema, type LogoMapEntry } from "@/lib/logoMapPayload";
+import { Prisma } from "@/lib/generated/prisma/client";
+import { type LogoMapEntry } from "@/lib/logoMapPayload";
 import { serializeLogoMap, logoCountOf } from "@/lib/collyLogoSnapshot";
 import { buildLogoRowsFromMap } from "@/lib/collyLogoRows";
 import { loadEntityDicts } from "@/lib/collyLogoIndex";
-
-const postSchema = z.object({ logos: logoMapSchema });
 
 /**
  * Append a snapshot and rebuild the colly's catalog rows from it, atomically.
  * A snapshot without its rebuild (or the reverse) would leave search
  * disagreeing with the recorded history, so both go in one transaction.
  *
- * Shared with the admin revert route, which replays an old map through here.
+ * Shared by the public save route and the admin revert route, which replays an
+ * old map through here.
  */
-export async function writeLogoEdit(collyId: number, userId: number, logos: LogoMapEntry[]) {
+export async function writeLogoEdit(
+  collyId: number,
+  userId: number,
+  logos: LogoMapEntry[],
+): Promise<{ logoCount: number; rowCount: number }> {
   const rows = buildLogoRowsFromMap(collyId, logos, await loadEntityDicts());
-  const ops: unknown[] = [
+  const ops: Prisma.PrismaPromise<unknown>[] = [
     prisma.colly_logo_edits.create({
       data: {
         colly_id: collyId,
@@ -518,10 +522,23 @@ export async function writeLogoEdit(collyId: number, userId: number, logos: Logo
   if (rows.length) {
     ops.push(prisma.colly_logos.createMany({ data: rows.map((r) => ({ ...r, manual: 1 })) }));
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await prisma.$transaction(ops as any);
+  await prisma.$transaction(ops);
   return { logoCount: logoCountOf(logos), rowCount: rows.length };
 }
+```
+
+```ts
+// app/api/collys/[id]/logos/route.ts
+import { z } from "zod";
+import { prisma } from "@/lib/db";
+import { auth } from "@/lib/auth";
+import { apiError, apiOk } from "@/lib/utils";
+import { revalidatePath } from "next/cache";
+import { broadcast } from "@/lib/live";
+import { logoMapSchema } from "@/lib/logoMapPayload";
+import { writeLogoEdit } from "@/lib/collyLogoWrite";
+
+const postSchema = z.object({ logos: logoMapSchema });
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
@@ -588,7 +605,7 @@ Expected: no errors
 - [ ] **Step 6: Commit**
 
 ```bash
-git add "app/api/collys/[id]/logos/route.ts" "app/api/collys/[id]/logos/__tests__/logos-route.test.ts"
+git add lib/collyLogoWrite.ts "app/api/collys/[id]/logos/route.ts" "app/api/collys/[id]/logos/__tests__/logos-route.test.ts"
 git commit -m "feat: public endpoint for saving a colly logo map"
 ```
 
@@ -672,7 +689,7 @@ import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 import { parseLogoMap } from "@/lib/collyLogoSnapshot";
-import { writeLogoEdit } from "../route";
+import { writeLogoEdit } from "@/lib/collyLogoWrite";
 
 const postSchema = z.object({ editId: z.number().int().positive() });
 
