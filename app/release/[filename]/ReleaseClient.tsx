@@ -1131,10 +1131,12 @@ export default function ReleaseClient({
             key={n}
             onClick={() => { scrollToSection(entry.section); setIndexOpen(false); }}
             style={{
-              padding: "4px 12px", cursor: "pointer",
+              // Site font on the 8x16 cell grid. Was monospace/13px with 4px
+              // padding, so it rendered in the browser's default mono face.
+              padding: "0 8px", cursor: "pointer",
               color: current ? "#ff55ff" : "#aaaaaa",
               background: current ? "#222" : "transparent",
-              fontFamily: "monospace", fontSize: "13px", whiteSpace: "nowrap",
+              fontFamily: "inherit", fontSize: "16px", lineHeight: "16px", whiteSpace: "nowrap",
               overflow: "hidden", textOverflow: "ellipsis",
             }}
             title={entry.label}
