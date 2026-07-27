@@ -25,7 +25,18 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const edit = await prisma.colly_logo_edits.findUnique({ where: { id: parsed.data.editId } });
   if (!edit || edit.colly_id !== collyId) return apiError("Not found", 404);
 
-  const result = await writeLogoEdit(collyId, Number(session!.user!.id), parseLogoMap(edit.map));
+  // `parseLogoMap` degrades to an empty map for anything it cannot read, which
+  // is right for display -- a malformed historical row must not break the
+  // release page -- and wrong here: restoring a truncated or future-format row
+  // would write an empty map over the colly instead of failing. The stored
+  // `logo_count` says what the row is meant to contain, so a mismatch is a
+  // read failure, not an empty snapshot.
+  const map = parseLogoMap(edit.map);
+  if (!map.length && edit.logo_count > 0) {
+    return apiError("That snapshot could not be read, so nothing was restored.", 422);
+  }
+
+  const result = await writeLogoEdit(collyId, Number(session!.user!.id), map);
 
   const colly = await prisma.collys.findUnique({ where: { id: collyId }, select: { filename: true } });
   if (colly?.filename) revalidatePath("/release/" + colly.filename);

@@ -21,6 +21,14 @@ interface EditRow { id: number; nick: string; timestamp: number; logoCount: numb
 // when nobody has tagged the colly in the database yet.
 interface LogosGetBody { current: LogoMapEntry[] | null; history: EditRow[] }
 
+// A skipped save is neither success nor failure, so it gets the neutral tone
+// rather than a green "saved" or a red error.
+const MSG_CLASS: Record<"ok" | "info" | "error", string> = {
+  ok: "green",
+  info: "lightgrey",
+  error: "red",
+};
+
 function ago(unix: number): string {
   const secs = Math.max(0, Math.floor(Date.now() / 1000) - unix);
   if (secs < 60) return "just now";
@@ -32,8 +40,19 @@ function ago(unix: number): string {
 export default function LogoTagPanel({ collyId, filename, type, font, fg, bg, isAdmin, onDone }: LogoTagPanelProps) {
   const [report, setReport] = useState<PreviewReport | null>(null);
   const [logoMap, setLogoMap] = useState<LogoEntry[]>([]);
+  // True once the reader actually changes the map, as opposed to it merely
+  // being seeded (saved entries plus auto-detected bands). Only a dirty map is
+  // sent, mirroring the admin editor's `logosDirty` guard: without it, opening
+  // the panel on a hand-curated colly and clicking Save would freeze the
+  // auto-detected suggestions into that colly's map and overwrite the
+  // curation. See app/admin/collys/CollysClient.tsx.
+  const logosDirty = useRef(false);
+  const editLogoMap = useCallback((next: LogoEntry[]) => {
+    logosDirty.current = true;
+    setLogoMap(next);
+  }, []);
   const [history, setHistory] = useState<EditRow[]>([]);
-  const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
+  const [msg, setMsg] = useState<{ text: string; tone: "ok" | "info" | "error" } | null>(null);
   const [saving, setSaving] = useState(false);
   // Which fetch failed, so the error state can tell the truth: a failed
   // preview load just can't show anything, but a failed logos load means
@@ -105,11 +124,18 @@ export default function LogoTagPanel({ collyId, filename, type, font, fg, bg, is
         }))
         .filter(a => !overlapsSaved(a));
       setLogoMap([...saved, ...auto].sort((x, y) => x.line - y.line));
+      logosDirty.current = false; // seeding is not an edit
     });
     return () => { live = false; };
   }, [filename, collyId, retryTick]);
 
   const save = async () => {
+    // An untouched map is not the reader's work -- sending it would rewrite
+    // the colly with whatever this panel happened to seed and merge.
+    if (!logosDirty.current) {
+      setMsg({ text: "Nothing changed - the logo map was not saved.", tone: "info" });
+      return;
+    }
     setSaving(true);
     let res: Response;
     try {
@@ -120,15 +146,18 @@ export default function LogoTagPanel({ collyId, filename, type, font, fg, bg, is
       });
     } catch {
       setSaving(false);
-      setMsg({ text: "Save failed - network error", ok: false });
+      setMsg({ text: "Save failed - network error", tone: "error" });
       return;
     }
     setSaving(false);
     if (!res.ok) {
       const detail = await res.json().catch(() => null);
-      setMsg({ text: detail?.error ?? `Save failed (${res.status})`, ok: false });
+      setMsg({ text: detail?.error ?? `Save failed (${res.status})`, tone: "error" });
       return;
     }
+    // The saved map is now the colly's map, so a second click has nothing to
+    // send until the reader edits again.
+    logosDirty.current = false;
     const body = await res.json().catch(() => null);
     // rowCount < logoCount means captions were dropped as unsearchable.
     const dropped = body ? body.logoCount - body.rowCount : 0;
@@ -136,7 +165,7 @@ export default function LogoTagPanel({ collyId, filename, type, font, fg, bg, is
       text: dropped > 0
         ? `Saved. ${dropped} caption${dropped === 1 ? "" : "s"} are not searchable.`
         : "Saved!",
-      ok: true,
+      tone: "ok",
     });
     loadHistory();
   };
@@ -148,8 +177,12 @@ export default function LogoTagPanel({ collyId, filename, type, font, fg, bg, is
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ editId }),
     }).catch(() => null);
-    if (!res?.ok) { setMsg({ text: "Revert failed", ok: false }); return; }
-    setMsg({ text: "Reverted. Reload to see the restored map.", ok: true });
+    if (!res?.ok) {
+      const detail = res ? await res.json().catch(() => null) : null;
+      setMsg({ text: detail?.error ?? "Revert failed", tone: "error" });
+      return;
+    }
+    setMsg({ text: "Reverted. Reload to see the restored map.", tone: "ok" });
     loadHistory();
   };
 
@@ -175,7 +208,7 @@ export default function LogoTagPanel({ collyId, filename, type, font, fg, bg, is
       <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap", marginBottom: "16px" }}>
         <input type="button" className="btn-big" value={saving ? "Saving..." : "Save Logo Map"} disabled={saving} onClick={save} />
         <input type="button" className="btn-big" value="Done" onClick={onDone} />
-        {msg && <span className={msg.ok ? "green" : "red"}>{msg.text}</span>}
+        {msg && <span className={MSG_CLASS[msg.tone]}>{msg.text}</span>}
       </div>
 
       <CollyPreview
@@ -185,7 +218,7 @@ export default function LogoTagPanel({ collyId, filename, type, font, fg, bg, is
         fg={fg}
         bg={bg}
         logoMap={logoMap}
-        setLogoMap={setLogoMap}
+        setLogoMap={editLogoMap}
       />
 
       {history.length > 0 && (

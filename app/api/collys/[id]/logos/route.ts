@@ -7,6 +7,8 @@ import { broadcast } from "@/lib/live";
 import { logoMapSchema, type LogoMapEntry } from "@/lib/logoMapPayload";
 import { writeLogoEdit } from "@/lib/collyLogoWrite";
 import { parseLogoMap } from "@/lib/collyLogoSnapshot";
+import { readManualLogoMap } from "@/lib/collyLogoManualMap";
+import { secondsUntilNextLogoSave } from "@/lib/logoSaveRateLimit";
 
 const postSchema = z.object({ logos: logoMapSchema });
 
@@ -26,7 +28,23 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const colly = await prisma.collys.findUnique({ where: { id: collyId }, select: { id: true, filename: true } });
   if (!colly) return apiError("Not found", 404);
 
-  const result = await writeLogoEdit(collyId, Number(session.user.id), parsed.data.logos);
+  const userId = Number(session.user.id);
+
+  // Throttle: this endpoint is open to every logged-in user and each save
+  // appends a MEDIUMTEXT snapshot that is never pruned. The user's own newest
+  // snapshot on this colly is the only state the window needs, so the limit
+  // costs one indexed read and survives restarts.
+  const lastOwnEdit = await prisma.colly_logo_edits.findFirst({
+    where: { colly_id: collyId, user_id: userId },
+    orderBy: { id: "desc" },
+    select: { timestamp: true },
+  });
+  const wait = secondsUntilNextLogoSave(lastOwnEdit?.timestamp, Math.floor(Date.now() / 1000));
+  if (wait > 0) {
+    return apiError(`Saving too often. Wait ${wait} second${wait === 1 ? "" : "s"} and save again.`, 429);
+  }
+
+  const result = await writeLogoEdit(collyId, userId, parsed.data.logos);
 
   if (colly.filename) revalidatePath("/release/" + colly.filename);
   broadcast(`release:${collyId}:logos`, { type: "tagged", nick: session.user.name ?? "" });
@@ -55,18 +73,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   if (edits.length) {
     current = parseLogoMap(edits[0].map);
   } else {
-    const rows = await prisma.colly_logos.findMany({
-      where: { colly_id: collyId, manual: 1 },
-      orderBy: { position: "asc" },
-      select: { start_line: true, end_line: true, label: true },
-    });
-    current = rows.length
-      ? rows.map((r) => ({
-          line: r.start_line + 1,
-          end: r.end_line != null ? r.end_line + 1 : undefined,
-          caption: r.label,
-        }))
-      : null;
+    // Shared with the baseline snapshot the first public save takes, so the
+    // map preserved there is exactly the map shown here.
+    const manual = await readManualLogoMap(collyId);
+    current = manual.length ? manual : null;
   }
 
   if (!edits.length) return apiOk({ current, history: [] });
