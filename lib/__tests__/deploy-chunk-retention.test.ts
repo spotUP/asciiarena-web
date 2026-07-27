@@ -51,6 +51,20 @@ describe("deploy client-chunk retention", () => {
     expect(deploy).toMatch(/comm -23 .*aa-static-local.*aa-static-remote/);
   });
 
+  it("compares both file lists in the same collation", () => {
+    // macOS ships BSD sort, the server GNU sort, and their default locales
+    // order punctuation differently. comm assumes both inputs share a
+    // collation, so mismatched sorts report present files as missing — and
+    // Turbopack names chunks with exactly the punctuation they disagree on.
+    // This aborted two good deploys before it was understood.
+    const localSort = /find \. -type f \| LC_ALL=C sort.*aa-static-local/s;
+    const remoteSort = /find \. -type f \| LC_ALL=C sort.*aa-static-remote/s;
+    expect(deploy).toMatch(localSort);
+    expect(deploy).toMatch(remoteSort);
+    // Neither side may sort without pinning the collation.
+    expect(deploy).not.toMatch(/find \. -type f \| sort/);
+  });
+
   it("aborts before restarting rather than serving a build with missing assets", () => {
     const abort = deploy.slice(deploy.indexOf("STILL missing"));
     expect(abort).toMatch(/exit 1/);

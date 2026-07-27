@@ -69,12 +69,15 @@ rsync_resilient \
 # the thing that lazy-loads it. Trusting a single rsync is not good enough for
 # files the browser hard-depends on, so the deploy now checks its own work.
 echo "Verifying client assets..."
+# LC_ALL=C on BOTH sides is load-bearing, not decoration. macOS ships BSD sort
+# and the server GNU sort, and their default locales order punctuation
+# differently. `comm` assumes both inputs use the SAME collation, so without
+# this it reports chunks as missing that are sitting right there — and Turbopack
+# names chunks with exactly the punctuation the two disagree about (~ _ - .).
 verify_static() {
-  local missing
-  missing=$( (cd .next/static && find . -type f | sort) > /tmp/aa-static-local.txt
-    ssh spot@97.75.89.139 'cd /var/www/asciiarena.se/nextjs-current/.next/static && find . -type f | sort' > /tmp/aa-static-remote.txt
-    comm -23 /tmp/aa-static-local.txt /tmp/aa-static-remote.txt | wc -l | tr -d ' ' )
-  echo "$missing"
+  ( cd .next/static && find . -type f | LC_ALL=C sort ) > /tmp/aa-static-local.txt
+  ssh spot@97.75.89.139 'cd /var/www/asciiarena.se/nextjs-current/.next/static && find . -type f | LC_ALL=C sort' > /tmp/aa-static-remote.txt
+  comm -23 /tmp/aa-static-local.txt /tmp/aa-static-remote.txt | wc -l | tr -d ' '
 }
 MISSING=$(verify_static)
 if [ "$MISSING" != "0" ]; then
