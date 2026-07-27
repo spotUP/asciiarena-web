@@ -56,6 +56,9 @@ export default function MusicProvider({ children }: { children: React.ReactNode 
   const loadSeq = useRef(0);
   // Per-format catalog counts, fetched once and reused to weight random picks.
   const formatsRef = useRef<ModlandFormatCount[] | null>(null);
+  // A tune restored from a previous page load, shown in the player but not
+  // loaded into the engine. Loaded on the reader's first press of play.
+  const pendingResumeRef = useRef<ModlandFile | null>(null);
 
   const search = useCallback((q: string) => searchModland({ q, limit: 40 }), []);
 
@@ -137,12 +140,24 @@ export default function MusicProvider({ children }: { children: React.ReactNode 
     if (isPlaying) {
       player.pause();
       setIsPlaying(false);
-    } else if (track) {
+      return;
+    }
+    // A track restored from a previous page load is shown in the player but
+    // its module was never loaded into the engine, so player.play() would do
+    // nothing. Load it now — this is the reader pressing play, which is the
+    // only thing that may start sound.
+    const pending = pendingResumeRef.current;
+    if (pending) {
+      pendingResumeRef.current = null;
+      void playFile(pending);
+      return;
+    }
+    if (track) {
       void player.resume();
       player.play();
       setIsPlaying(true);
     }
-  }, [isPlaying, track]);
+  }, [isPlaying, track, playFile]);
 
   const stop = useCallback(() => {
     getUadePlayer().stop();
@@ -182,10 +197,15 @@ export default function MusicProvider({ children }: { children: React.ReactNode 
       id: 0, format: saved.format, author: "", filename: saved.title,
       full_path: saved.path, extension: saved.title.split(".").pop() || "",
     };
-    const onFirst = () => { document.removeEventListener("pointerdown", onFirst); void tryLoad(file); };
-    document.addEventListener("pointerdown", onFirst, { once: true });
-    return () => document.removeEventListener("pointerdown", onFirst);
-  }, [tryLoad]);
+    // Armed, NOT started. The reader gets the tune back in the player, and it
+    // begins only when they press play.
+    //
+    // This used to load and play on the first pointerdown anywhere in the
+    // document, so any click on any page resumed music the reader never asked
+    // for. A user gesture is what the browser's autoplay policy needs; it is
+    // not consent to hear something.
+    pendingResumeRef.current = file;
+  }, []);
 
   const value: MusicContextValue = {
     track, isPlaying, loading, error, volume,

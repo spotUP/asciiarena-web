@@ -381,15 +381,19 @@ export default function LogoMinimap({ containerRef, preRef, entries, spacers, fg
         <span
           style={{
             position: "absolute",
-            right: `${MINIMAP_WIDTH + 4}px`,
+            right: `${MINIMAP_WIDTH + 8}px`,
             top: `${hover.y}px`,
             transform: "translateY(-50%)",
             background: "rgba(0,0,0,0.9)",
             color: "#aaaaaa",
             border: "1px solid #333",
-            padding: "2px 6px",
-            fontFamily: "monospace",
-            fontSize: "12px",
+            // Site font and the 8x16 cell grid, like every other overlay.
+            // This was monospace/12px/2px-6px, which rendered the hint in the
+            // browser's default mono face instead of the site's.
+            padding: "0 8px",
+            fontFamily: "inherit",
+            fontSize: "16px",
+            lineHeight: "16px",
             whiteSpace: "nowrap",
             pointerEvents: "none",
             zIndex: 61,

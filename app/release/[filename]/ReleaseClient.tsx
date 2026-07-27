@@ -326,22 +326,14 @@ export default function ReleaseClient({
     });
   }, [soundtrack, playMusicFile]);
 
-  // Start the soundtrack on the viewer's FIRST gesture (browser autoplay policy
-  // needs one). One-shot — detaches after it fires.
-  useEffect(() => {
-    if (!soundtrack) return;
-    const start = () => {
-      document.removeEventListener("pointerdown", start);
-      document.removeEventListener("keydown", start);
-      playSoundtrack();
-    };
-    document.addEventListener("pointerdown", start);
-    document.addEventListener("keydown", start);
-    return () => {
-      document.removeEventListener("pointerdown", start);
-      document.removeEventListener("keydown", start);
-    };
-  }, [soundtrack, playSoundtrack]);
+  // The colly's soundtrack starts ONLY when the reader starts autoplay (see
+  // startAutoplay), never on its own.
+  //
+  // This used to hook the first pointerdown or keydown anywhere in the
+  // document, so clicking any link, button or the tagging panel started music
+  // the reader never asked for. Satisfying the browser's autoplay policy is not
+  // the same as the reader wanting sound: the page must stay silent until they
+  // press play or start a groove/autoplay run.
   const autoplayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoplayRafRef   = useRef<(() => void) | null>(null);
   const beatRafRef       = useRef<number | null>(null);
