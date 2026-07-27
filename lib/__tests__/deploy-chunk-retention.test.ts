@@ -37,6 +37,15 @@ describe("CI deploy client-chunk retention", () => {
     expect(ciRsyncFor("$SERVER:$DEST/")).toMatch(/--delete/);
   });
 
+  it("protects the static directory from the standalone sync's --delete", () => {
+    // The standalone sync targets $DEST (the ROOT) and the standalone output
+    // contains no .next/static, so without this exclude rsync deletes the
+    // server's whole static directory here -- a moment before the next step
+    // re-adds only the current build. Making the static sync additive is
+    // useless on its own; this is the step that was actually wiping chunks.
+    expect(ciRsyncFor("$SERVER:$DEST/")).toMatch(/--exclude=(['"]?)\/\.next\/static\1/);
+  });
+
   it("prunes retained chunks so they cannot accumulate forever", () => {
     const prune = /find \S*\.next\/static -type f -mtime \+(\d+) -delete/.exec(ci);
     expect(prune).not.toBeNull();

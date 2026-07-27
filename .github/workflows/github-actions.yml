@@ -40,9 +40,18 @@ jobs:
 
           # Sync the standalone build output (server.js + .next/server/ + node_modules/)
           # --exclude .env so the server's production secrets are never touched.
-          # Note: standalone intentionally omits .next/static/ — synced separately below.
+          #
+          # --exclude '/.next/static' is load-bearing. This syncs to $DEST (the
+          # ROOT) with --delete, and the standalone output deliberately contains
+          # no .next/static, so without the exclude rsync deletes the server's
+          # entire static directory here -- wiping the previous build's chunks a
+          # moment before the next step re-adds only the current build's. That
+          # is the real reason "Failed to load chunk" happened on every deploy;
+          # making the static sync additive on its own achieved nothing, because
+          # this step had already emptied the directory.
           rsync -az --delete \
             --exclude='.env' \
+            --exclude='/.next/static' \
             -e "ssh -i /tmp/deploy_key -o StrictHostKeyChecking=no" \
             .next/standalone/ "$SERVER:$DEST/"
 
