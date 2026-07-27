@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import { LOGO_SAVE_USER_WINDOW_MAX } from "@/lib/logoSaveRateLimit";
 
 // Tagging is open to any logged-in user, and every save must land as BOTH a
 // history snapshot and a catalog rebuild, atomically. A save that writes one
@@ -295,8 +296,8 @@ describe("POST /api/collys/[id]/logos -- rate limit", () => {
   // before. A cap that spans every colly is what bounds that.
   it("refuses a user who has hammered many DIFFERENT collys inside the window", async () => {
     const now = Math.floor(Date.now() / 1000);
-    // Twenty saves in the last five minutes, none of them on this colly.
-    recentOwnEdits = Array.from({ length: 20 }, (_, i) => ({ timestamp: now - 200 + i }));
+    // A full window's worth of saves, none of them on this colly.
+    recentOwnEdits = Array.from({ length: LOGO_SAVE_USER_WINDOW_MAX }, (_, i) => ({ timestamp: now - 200 + i }));
     lastOwnEdit = null;
     const res = await POST(req({ logos: [{ line: 1, caption: "x" }] }), { params });
     expect(res.status).toBe(429);

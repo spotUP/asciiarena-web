@@ -147,46 +147,85 @@ export default function LogoTagPanel({ collyId, filename, type, font, fg, bg, is
     return () => { live = false; };
   }, [filename, collyId, retryTick]);
 
-  const save = async () => {
+  // Latest map, readable from the autosave timer without making the timer
+  // effect depend on every keystroke.
+  const logoMapRef = useRef<LogoEntry[]>(logoMap);
+  useEffect(() => { logoMapRef.current = logoMap; }, [logoMap]);
+
+  const save = useCallback(async () => {
     // An untouched map is not the reader's work -- sending it would rewrite
     // the colly with whatever this panel happened to seed and merge.
-    if (!logosDirty.current) {
-      setMsg({ text: "Nothing changed - the logo map was not saved.", tone: "info" });
-      return;
-    }
+    if (!logosDirty.current) return;
+    // Clear BEFORE the request: an edit made while it is in flight must mark
+    // the map dirty again rather than be swallowed by this save's completion.
+    logosDirty.current = false;
     setSaving(true);
     let res: Response;
     try {
       res = await fetch(`/api/collys/${collyId}/logos`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ logos: logoMap.map(l => ({ line: l.line, end: l.end, caption: l.caption })) }),
+        body: JSON.stringify({ logos: logoMapRef.current.map(l => ({ line: l.line, end: l.end, caption: l.caption })) }),
       });
     } catch {
       setSaving(false);
-      setMsg({ text: "Save failed - network error", tone: "error" });
+      logosDirty.current = true; // let the next tick retry
+      setMsg({ text: "Not saved - network error. Retrying...", tone: "error" });
       return;
     }
     setSaving(false);
     if (!res.ok) {
       const detail = await res.json().catch(() => null);
-      setMsg({ text: detail?.error ?? `Save failed (${res.status})`, tone: "error" });
+      // 429 is the save throttle: the edit is safe locally and the next tick
+      // sends it, so say "not saved yet" rather than "failed".
+      logosDirty.current = true;
+      setMsg({
+        text: res.status === 429
+          ? "Waiting to save..."
+          : (detail?.error ?? `Not saved (${res.status})`),
+        tone: res.status === 429 ? "info" : "error",
+      });
       return;
     }
-    // The saved map is now the colly's map, so a second click has nothing to
-    // send until the reader edits again.
-    logosDirty.current = false;
     const body = await res.json().catch(() => null);
     // rowCount < logoCount means captions were dropped as unsearchable.
     const dropped = body ? body.logoCount - body.rowCount : 0;
     setMsg({
       text: dropped > 0
         ? `Saved. ${dropped} caption${dropped === 1 ? "" : "s"} are not searchable.`
-        : "Saved!",
+        : "Saved.",
       tone: "ok",
     });
     loadHistory();
-  };
+  }, [collyId, loadHistory]);
+
+  // Autosave. Every mapped logo is persisted on its own, so there is no Save
+  // button to forget to press.
+  //
+  // Coalesced rather than fired per edit: the server allows one save per colly
+  // per LOGO_SAVE_MIN_INTERVAL_SECONDS, so a tick that runs slightly slower
+  // than that turns a burst of edits into a single write and never trips the
+  // throttle. Edits made mid-flight re-dirty the map and go out on the next
+  // tick, so nothing is lost between ticks.
+  const AUTOSAVE_TICK_MS = 12_000;
+  useEffect(() => {
+    const id = setInterval(() => { void save(); }, AUTOSAVE_TICK_MS);
+    return () => clearInterval(id);
+  }, [save]);
+
+  // Leaving the panel must not strand the last edits, and the reader may close
+  // the tab straight after captioning a logo.
+  const flushAndClose = () => { void save(); onDone(); };
+  useEffect(() => {
+    const onHide = () => {
+      if (!logosDirty.current) return;
+      const body = JSON.stringify({ logos: logoMapRef.current.map(l => ({ line: l.line, end: l.end, caption: l.caption })) });
+      // sendBeacon survives the page going away, which fetch does not.
+      navigator.sendBeacon?.(`/api/collys/${collyId}/logos`, new Blob([body], { type: "application/json" }));
+    };
+    window.addEventListener("pagehide", onHide);
+    return () => { window.removeEventListener("pagehide", onHide); onHide(); };
+  }, [collyId]);
 
   const revert = async (editId: number) => {
     if (!confirm("Restore this version of the logo map?")) return;
@@ -224,9 +263,13 @@ export default function LogoTagPanel({ collyId, filename, type, font, fg, bg, is
   return (
     <div className="bg-secondary ap-1 amb-1">
       <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap", marginBottom: "16px" }}>
-        <input type="button" className="btn-big" value={saving ? "Saving..." : "Save Logo Map"} disabled={saving} onClick={save} />
-        <input type="button" className="btn-big" value="Done" onClick={onDone} />
-        {msg && <span className={MSG_CLASS[msg.tone]}>{msg.text}</span>}
+        {/* No Save button: every logo is saved as it is mapped. Done flushes
+            anything still pending on its way out. */}
+        <input type="button" className="btn-big" value="Done" onClick={flushAndClose} />
+        <span className="lightgrey">Changes save automatically.</span>
+        {saving
+          ? <span className="lightgrey">Saving...</span>
+          : msg && <span className={MSG_CLASS[msg.tone]}>{msg.text}</span>}
       </div>
 
       <CollyPreview

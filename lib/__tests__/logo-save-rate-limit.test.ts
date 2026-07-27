@@ -87,8 +87,12 @@ describe("secondsUntilUserQuotaFrees", () => {
   });
 
   it("stays far above genuine tagging and far below a useful attack rate", () => {
-    expect(LOGO_SAVE_USER_WINDOW_MAX).toBeGreaterThanOrEqual(10);
-    expect(LOGO_SAVE_USER_WINDOW_MAX).toBeLessThanOrEqual(30);
+    // The panel autosaves, so a real tagger working a big pack makes many more
+    // saves than the old manual button did. The per-colly gap already bounds
+    // one colly to 30 saves per window; this cap only has to stop a script
+    // walking the catalog.
+    expect(LOGO_SAVE_USER_WINDOW_MAX).toBeGreaterThanOrEqual(30);
+    expect(LOGO_SAVE_USER_WINDOW_MAX).toBeLessThanOrEqual(120);
     expect(LOGO_SAVE_USER_WINDOW_SECONDS).toBeGreaterThanOrEqual(60);
   });
 });

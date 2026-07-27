@@ -544,7 +544,11 @@ export default function ReleaseClient({
   // ANSI carries its own colours; CP437 is monochrome IBM-font art that we
   // recolour to the user's fg/bg, so this effect also re-fires on colour change.
   useEffect(() => {
-    if (!(type === "ANSI" || isCp437Art) || !collyVisible) return;
+    // viewerVisible, not collyVisible: entering tag mode unmounts the canvas.
+    // Gating on collyVisible left this effect's deps unchanged across the whole
+    // tag session, so on return it never re-rendered and the viewer sat on
+    // ".LOADiNG." forever (reported on an ANSI colly, G80-TT.TXT).
+    if (!(type === "ANSI" || isCp437Art) || !viewerVisible) return;
     let cancelled = false;
 
     const collyElOrNull = collyRef.current as HTMLElement | null;
@@ -583,7 +587,7 @@ export default function ReleaseClient({
     });
 
     return () => { cancelled = true; };
-  }, [type, isCp437Art, collyVisible, font, collyFileUrl, fgColor, bgColor]);
+  }, [type, isCp437Art, viewerVisible, font, collyFileUrl, fgColor, bgColor]);
 
   // List archive files when viewing an archive colly
   useEffect(() => {
@@ -635,10 +639,13 @@ export default function ReleaseClient({
     setIsFullscreen(true);
     setAutoplayIndex(0);
     setAutoplay(true);
-    // Play the colly's soundtrack if it has one; otherwise, in groove mode, start
-    // a random tune so beats can drive the slideshow.
+    // Music only in groove mode, where the beat drives the slideshow and sound
+    // is the point. Plain autoplay is a silent slideshow: starting the colly's
+    // soundtrack there gave people music they had not asked for. Groove uses
+    // the colly's own soundtrack when it has one, a random tune otherwise.
+    if (!musicGroove) return;
     if (soundtrack) playSoundtrack();
-    else if (musicGroove && !musicPlayingRef.current) void playRandomMusic();
+    else if (!musicPlayingRef.current) void playRandomMusic();
   }, [soundtrack, playSoundtrack, musicGroove, playRandomMusic]);
 
   // Deep-link: /release/<file>?autoplay=1 (or #autoplay) starts autoplay once the

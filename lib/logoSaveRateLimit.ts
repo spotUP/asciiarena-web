@@ -13,8 +13,16 @@ export const LOGO_SAVE_MIN_INTERVAL_SECONDS = 10;
 /** Rolling window for the per-user cap that spans every colly. */
 export const LOGO_SAVE_USER_WINDOW_SECONDS = 300;
 
-/** Saves one user may make across ALL collys inside that window. */
-export const LOGO_SAVE_USER_WINDOW_MAX = 20;
+/**
+ * Saves one user may make across ALL collys inside that window.
+ *
+ * The tagging panel autosaves, so a genuine tagger working through a big pack
+ * produces far more saves than a manual Save button did. The per-colly gap
+ * above already bounds one colly to 30 saves in this window; this cap exists to
+ * stop a script walking the whole catalog, and 60 does that without ever
+ * blocking real work.
+ */
+export const LOGO_SAVE_USER_WINDOW_MAX = 60;
 
 /**
  * Seconds the user must still wait before saving this colly again, or 0 when

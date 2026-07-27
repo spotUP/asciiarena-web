@@ -31,9 +31,11 @@ describe("logo tag panel dirty guard", () => {
     expect(source).toMatch(/logosDirty\.current = false/);
   });
 
-  it("makes Save a no-op when nothing changed, and says so", () => {
-    expect(source).toMatch(/if \(!logosDirty\.current\)/);
-    expect(source).toMatch(/[Nn]othing changed/);
+  it("makes a save a no-op when nothing changed", () => {
+    // Autosave replaced the Save button, so this is now silent: an idle panel
+    // ticks without writing, and there is no message to show because the
+    // reader never asked for anything.
+    expect(source).toMatch(/if \(!logosDirty\.current\) return;/);
     // The guard must come before the request is built, not after.
     const guardAt = source.indexOf("if (!logosDirty.current)");
     const fetchAt = source.indexOf(`fetch(\`/api/collys/\${collyId}/logos\`, {`);

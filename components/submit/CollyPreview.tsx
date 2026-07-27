@@ -137,9 +137,16 @@ export default function CollyPreview({
       fontFamily: "TopazPlus_a1200, monospace", fontSize: "13px",
     }}>
       <div className="magenta">Selected logo</div>
-      <input className="form-control" style={{ boxSizing: "border-box", width: "100%" }} placeholder="logo name" autoFocus value={fName} onChange={(e) => setFName(e.target.value)} />
+      {/* Enter commits the logo and closes the panel; Escape abandons it. The
+          author field is a Combobox and keeps its own Enter for picking a
+          suggestion, so it is not wired here. */}
+      <input className="form-control" style={{ boxSizing: "border-box", width: "100%" }} placeholder="logo name" autoFocus value={fName}
+        onChange={(e) => setFName(e.target.value)}
+        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); save(); } if (e.key === "Escape") { e.preventDefault(); close(); } }} />
       <Combobox value={fBy} options={artistOpts} onChange={setFBy} width={224} placeholder="author (who drew it)" createLabel="artist" />
-      <input className="form-control" style={{ boxSizing: "border-box", width: "100%" }} placeholder="for (requested by)" value={fFor} onChange={(e) => setFFor(e.target.value)} />
+      <input className="form-control" style={{ boxSizing: "border-box", width: "100%" }} placeholder="for (requested by)" value={fFor}
+        onChange={(e) => setFFor(e.target.value)}
+        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); save(); } if (e.key === "Escape") { e.preventDefault(); close(); } }} />
       <div style={{ display: "flex", gap: "6px" }}>
         <input type="button" className="btn-big bg-green white" value="Save" onClick={save} />
         <input type="button" className="btn-big" value="Cancel" onClick={close} />
