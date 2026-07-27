@@ -768,7 +768,7 @@ export default function ReleaseClient({
 
   // Keyboard shortcuts
   useEffect(() => {
-    if (!collyVisible || !(type === "ASCII" || type === "ANSI")) return; // text + canvas viewers
+    if (!viewerVisible || !(type === "ASCII" || type === "ANSI")) return; // text + canvas viewers
     const handler = (e: KeyboardEvent) => {
       // Never hijack browser/OS shortcuts (Cmd+F find, Ctrl+P print, etc.).
       if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -791,7 +791,7 @@ export default function ReleaseClient({
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [collyVisible, type, section, autoplay, stopAutoplay, startAutoplay, setIndexOpen]);
+  }, [viewerVisible, type, section, autoplay, stopAutoplay, startAutoplay, setIndexOpen]);
 
   // Step-and-centre autoplay (groove OFF). Groove mode centres each logo too,
   // but bounces it to the beat — handled by the effect below.
@@ -976,8 +976,8 @@ export default function ReleaseClient({
   }, [autoplay, stopAutoplay, isFullscreen]);
 
   useEffect(() => {
-    if (!collyVisible && autoplay) stopAutoplay();
-  }, [collyVisible, autoplay, stopAutoplay]);
+    if (!viewerVisible && autoplay) stopAutoplay();
+  }, [viewerVisible, autoplay, stopAutoplay]);
 
   // Autoplay runs in fullscreen; leaving fullscreen (button or `f` key) ends it.
   useEffect(() => {
@@ -1176,7 +1176,7 @@ export default function ReleaseClient({
               onClick={() => setTagging(t => !t)} />
           )}
 
-          {type === "ASCII" && collyVisible && (
+          {type === "ASCII" && viewerVisible && (
             <input type="button" className="btn-big" value={copyImageLabel} onClick={doCopyImage} />
           )}
 

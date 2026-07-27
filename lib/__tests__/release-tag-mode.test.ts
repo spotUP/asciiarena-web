@@ -13,8 +13,9 @@ const source = readFileSync(
 
 describe("release page tag mode", () => {
   it("suppresses both viewer branches while tagging", () => {
-    // Each viewer branch is gated on `collyVisible`; tagging must gate them too.
-    const branches = source.match(/collyVisible && \(/g) ?? [];
+    // Every viewer-only control and both viewer branches are gated on
+    // `viewerVisible` (collyVisible && !tagging), not `collyVisible` alone.
+    const branches = source.match(/viewerVisible && \(/g) ?? [];
     expect(branches.length).toBeGreaterThan(0);
     expect(source).toMatch(/const viewerVisible = collyVisible && !tagging/);
     expect(source).not.toMatch(/!useCanvasViewer && \(type === "ASCII" \|\| !!fileContent\) && collyVisible/);
@@ -31,5 +32,22 @@ describe("release page tag mode", () => {
 
   it("offers tagging only to logged-in users", () => {
     expect(source).toMatch(/userNick && [\s\S]*Tag Logos/);
+  });
+
+  it("suspends the keyboard-shortcut effect while tagging", () => {
+    // The shortcut effect must bail on the same flag that hides the viewer,
+    // or keys like `f` and `p` still fire (invisibly) while the tag panel is open.
+    expect(source).toMatch(
+      /\/\/ Keyboard shortcuts\s*\n\s*useEffect\(\(\) => \{\s*\n\s*if \(!viewerVisible \|\| !\(type === "ASCII" \|\| type === "ANSI"\)\) return;/,
+    );
+  });
+
+  it("stops a running autoplay when tag mode is entered, not just when the viewer is hidden", () => {
+    // This effect must react to `viewerVisible` (collyVisible && !tagging), not
+    // `collyVisible` alone, and must re-run when `tagging` flips — otherwise
+    // entering tag mode leaves autoplay (and any soundtrack it started) running
+    // behind the tag panel.
+    expect(source).toMatch(/if \(!viewerVisible && autoplay\) stopAutoplay\(\);/);
+    expect(source).toMatch(/\}, \[viewerVisible, autoplay, stopAutoplay\]\);/);
   });
 });
