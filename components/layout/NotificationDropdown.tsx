@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { NotifRow } from "./NotificationBell";
+import { describeNotification } from "@/lib/notificationLabel";
 
 interface Props {
   items: NotifRow[];
@@ -10,13 +11,6 @@ interface Props {
   onClose: () => void;
 }
 
-const KIND_VERB: Record<string, string> = {
-  "notif-comment": "commented on",
-  "notif-fav": "favourited",
-  "notif-reply": "replied to your request",
-  "notif-message": "sent you a message",
-  "notif-status": "changed status of your request",
-};
 
 function fmtAgo(unixSec: number): string {
   const diff = Math.max(0, Math.floor(Date.now() / 1000) - unixSec);
@@ -82,7 +76,7 @@ export default function NotificationDropdown({ items, unread, onMarkAll, onClose
         </div>
       ) : (
         items.map((n) => {
-          const verb = KIND_VERB[n.kind] ?? n.kind;
+          const label = describeNotification(n);
           const isUnread = n.readAt === null;
           const content = (
             <div
@@ -94,12 +88,12 @@ export default function NotificationDropdown({ items, unread, onMarkAll, onClose
               }}
             >
               <div style={{ lineHeight: "16px" }}>
-                <span className={isUnread ? "magenta" : "lightgrey"}>{n.actorNick ?? "someone"}</span>{" "}
-                <span className="lightgrey">{verb}</span>
-                {n.target && (
+                <span className={isUnread ? "magenta" : "lightgrey"}>{label.actor}</span>{" "}
+                <span className="lightgrey">{label.verb}</span>
+                {label.target && (
                   <>
                     {" "}
-                    <span className="cyan">{n.target}</span>
+                    <span className="cyan">{label.target}</span>
                   </>
                 )}
               </div>

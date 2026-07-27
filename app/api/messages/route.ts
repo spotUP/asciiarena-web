@@ -9,6 +9,10 @@ import { resolveDisplayTitle } from "@/lib/chatThread";
 import { addParticipant, getLeftThreads } from "@/lib/chatThreadDb";
 import { createNotification } from "@/lib/notifications";
 import { normalizeMessageText } from "@/lib/normalizeText";
+import { truncatePreview } from "@/lib/inboxRow";
+
+// One line in a 400px dropdown; longer subjects only wrap.
+const NOTIFICATION_PREVIEW_MAX = 60;
 
 // `receiver` (single) is the original contract; `receivers` (many) starts a
 // group thread from the composer. Exactly one of them must be present.
@@ -209,7 +213,13 @@ export async function POST(request: NextRequest) {
 
   for (const id of recipients) {
     broadcast(`user:${id}:messages`, { type: "message", fromId, fromNick, threadId });
-    await createNotification(id, "notif-message", { actorNick: fromNick, targetUrl: `/messages?thread=${threadId}` });
+    // Carry the subject so the bell says WHICH message arrived, not just that
+    // one did. notifications.target is VarChar(255).
+    await createNotification(id, "notif-message", {
+      actorNick: fromNick,
+      target: truncatePreview(subject, NOTIFICATION_PREVIEW_MAX),
+      targetUrl: `/messages?thread=${threadId}`,
+    });
   }
 
   return apiOk({ status: true, threadId });

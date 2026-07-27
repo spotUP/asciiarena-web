@@ -1,38 +1,22 @@
-// One-shot: apply prisma/polls_migration.sql via the existing Prisma client.
-// Idempotent (CREATE TABLE IF NOT EXISTS). Run once locally + on the server.
+// One-shot: apply prisma/polls_migration.sql.
+// Idempotent (CREATE TABLE IF NOT EXISTS). Run once locally and on the server:
 //   node scripts/apply-polls-migration.mjs
-import "dotenv/config";
-import { readFileSync } from "node:fs";
+//
+// Previously imported the generated Prisma client and had been broken since
+// Prisma 7 started emitting TypeScript — lib/generated/prisma/client.js does
+// not exist, so the script died with ERR_MODULE_NOT_FOUND before running a
+// single statement. It now shares the driver-direct runner with the other
+// migrations.
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
-import { PrismaClient } from "../lib/generated/prisma/client.js";
-import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import { runSqlFile } from "./lib/run-sql-file.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const sqlPath = resolve(__dirname, "../prisma/polls_migration.sql");
-const sql = readFileSync(sqlPath, "utf8");
 
-// Split on semicolons that end a statement (ignore those inside JSON defaults etc — none here).
-const statements = sql
-  .split(/;\s*\n/)
-  .map(s => s.trim())
-  .filter(s => s.length > 0 && !s.startsWith("--"));
-
-const adapter = new PrismaMariaDb({ connectionString: process.env.DATABASE_URL });
-const prisma = new PrismaClient({ adapter });
-
-for (const stmt of statements) {
-  // Strip leading -- comment lines but keep the rest of the statement.
-  const cleaned = stmt
-    .split("\n")
-    .filter(line => !line.trim().startsWith("--"))
-    .join("\n")
-    .trim();
-  if (!cleaned) continue;
-  process.stdout.write("· " + cleaned.slice(0, 60).replace(/\s+/g, " ") + " …\n");
-  await prisma.$executeRawUnsafe(cleaned);
-}
-
-const tables = await prisma.$queryRawUnsafe("SHOW TABLES LIKE 'poll%'");
-console.log("\nTables present:", tables);
-await prisma.$disconnect();
+await runSqlFile(
+  resolve(__dirname, "../prisma/polls_migration.sql"),
+  async (conn) => {
+    const tables = await conn.query("SHOW TABLES LIKE 'poll%'");
+    console.log("\nTables present:", tables.map(row => Object.values(row)[0]));
+  },
+);

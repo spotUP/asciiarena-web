@@ -5,6 +5,11 @@ import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { broadcast } from "@/lib/live";
 import { createNotification } from "@/lib/notifications";
+import { truncatePreview } from "@/lib/inboxRow";
+
+// The dropdown gives each notification one line; a chat preview longer than
+// this just gets clipped by the 400px panel anyway.
+const NOTIFICATION_PREVIEW_MAX = 60;
 import { addParticipant, getActiveParticipants } from "@/lib/chatThreadDb";
 import { normalizeMessageText } from "@/lib/normalizeText";
 
@@ -81,8 +86,12 @@ export async function POST(request: NextRequest) {
   broadcast(`thread:${threadId}`, { type: "message" });
   for (const rid of targets) {
     broadcast(`user:${rid}:messages`, { type: "message", fromId, fromNick, threadId });
+    // Chat messages have no subject (it is literally stored as "Chat"), so the
+    // notification carries a preview of the text instead — otherwise the bell
+    // says only that somebody said something.
     await createNotification(rid, "notif-message", {
       actorNick: fromNick,
+      target: truncatePreview(message, NOTIFICATION_PREVIEW_MAX),
       targetUrl: `/messages?thread=${threadId}`,
     });
   }
