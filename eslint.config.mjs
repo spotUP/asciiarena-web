@@ -23,6 +23,18 @@ const eslintConfig = defineConfig([
     ".playwright-mcp/**",
   ]),
   {
+    // The ANSI editor engine is text0wnz vendored verbatim (see the ANSI editor
+    // notes: engine/* is a straight copy except env.js and file.js). `new
+    // Array()` is upstream's style and rewriting it would fork us from upstream
+    // for zero behavioural gain. Scoped to this one rule in this one directory
+    // rather than ignoring the tree, so our local patches stay linted.
+    files: ["components/ui/AnsiEditor/engine/**"],
+    rules: {
+      "@typescript-eslint/no-array-constructor": "off",
+      "no-array-constructor": "off",
+    },
+  },
+  {
     // The eslint-config-next bump turned on the React Compiler rule set as
     // hard errors. This codebase (migrated from PHP) predates them and the
     // flagged patterns are intentional and runtime-correct (and `next build`

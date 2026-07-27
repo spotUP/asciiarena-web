@@ -83,11 +83,20 @@ async function rebuildDetectedLayers(
   syncContentText: boolean,
 ): Promise<IndexResult> {
   const d = dicts ?? (await getDicts());
-  // Auto-detected catalog rows (manual = 0). A colly that's been mapped in the
-  // editor has manual rows written by the upload route, which take precedence and
-  // are NOT overwritten here (this only refreshes the auto layer).
+  // A hand-mapped colly is authoritative: its manual rows ARE the map, and the
+  // auto layer must not be laid on top of them.
+  //
+  // This used to only delete `manual = 0` and then insert the detected rows
+  // regardless, so re-indexing a mapped colly left both layers in the catalog.
+  // Nothing downstream filters on `manual` (search, stats, the gallery), so
+  // every logo in that colly showed up twice. That was survivable when only a
+  // handful of collys were hand-mapped; public tagging makes manual rows the
+  // norm, so the duplication would grow with adoption.
+  const manualCount = await prisma.colly_logos.count({ where: { colly_id: collyId, manual: 1 } });
   const text = readCollyText(filename, storedType);
-  const rows = text == null ? [] : buildLogoRows(collyId, text, d);
+  const rows = manualCount > 0 || text == null ? [] : buildLogoRows(collyId, text, d);
+  // The stale auto layer is cleared either way — a colly that has since been
+  // mapped should not keep auto rows from before it was tagged.
   const ops: Promise<unknown>[] = [prisma.colly_logos.deleteMany({ where: { colly_id: collyId, manual: 0 } })];
   if (rows.length) ops.push(prisma.colly_logos.createMany({ data: rows }));
   // Keep the full-content search index in sync from the same decoded text, so a

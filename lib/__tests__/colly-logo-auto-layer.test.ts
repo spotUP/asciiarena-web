@@ -23,6 +23,10 @@ const prismaFake = {
   },
   $transaction: (ops: unknown[]) => { txOps.push(ops); return Promise.resolve([]); },
   colly_logos: {
+    // No manual rows: these cases all cover a colly nobody has hand-mapped, so
+    // the auto layer is the colly's only map and does get rebuilt. The
+    // hand-mapped case is covered in colly-logo-reindex.test.ts.
+    count: () => Promise.resolve(0),
     deleteMany: (args: unknown) => ({ op: "deleteMany", args }),
     createMany: (args: unknown) => ({ op: "createMany", args }),
   },
