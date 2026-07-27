@@ -109,9 +109,12 @@ export async function POST(request: NextRequest) {
 }
 
 // Same report for an EXISTING colly on disk (admin colly editor re-mapping).
+// Any logged-in user: this is a read-only dry run of a colly that is already
+// publicly downloadable, and the public logo tagger needs the same report the
+// admin editor does. Nothing it returns is privileged.
 export async function GET(request: NextRequest) {
   const session = await auth();
-  if ((session?.user as { rank?: string } | undefined)?.rank !== "Admin") return apiError("Forbidden", 403);
+  if (!session?.user?.id) return apiError("Unauthorized", 401);
 
   const filename = request.nextUrl.searchParams.get("filename")?.trim();
   if (!filename) return apiError("No filename", 400);
