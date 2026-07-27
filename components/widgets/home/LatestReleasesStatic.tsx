@@ -2,6 +2,7 @@ import Link from "next/link";
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { buildLatestReleaseRowsQuery } from "@/lib/home-latest-releases-query";
+import { pickRandomSubset, HERO_POOL_FACTOR } from "@/lib/home-hero-pick";
 import { readCollyDiz } from "@/lib/collyDiz";
 import { readFileSync, existsSync } from "fs";
 import path from "path";
@@ -32,8 +33,13 @@ function readDiz(filePath: string): string | null {
 // non-random variant still ran 20 fs.existsSync+readFileSync calls per
 // render. With cache, every visitor inside the 60s window gets the
 // pre-rendered hero in <1ms instead of paying the full I/O tax.
+//
+// `poolSize` is how many candidates to build, NOT how many to show. The
+// random hero asks for a pool and draws from it per request — caching the
+// draw itself is what made RANDOM RELEASES show the same two collys to
+// everyone until the entry expired.
 const getReleasesForHero = unstable_cache(
-  async (random: boolean, columns: number, collectionsPath: string, magsPath: string, appsPath: string) => {
+  async (random: boolean, poolSize: number, collectionsPath: string, magsPath: string, appsPath: string) => {
     let rows: ReleaseRow[] = [];
     try {
       rows = await prisma.$queryRaw<ReleaseRow[]>(buildLatestReleaseRowsQuery(random));
@@ -43,7 +49,7 @@ const getReleasesForHero = unstable_cache(
 
     const releases: { url: string; content: string }[] = [];
     for (const row of rows) {
-      if (releases.length >= columns) break;
+      if (releases.length >= poolSize) break;
       const filename = String(row.filename);
       const dirname = filename.replace(/\.[^.]+$/, "");
       let dizPath = "";
@@ -83,7 +89,12 @@ export default async function LatestReleasesStatic({ columns = 2, random = false
   const collectionsPath = process.env.COLLECTIONS_PATH ?? path.join(process.cwd(), "collections");
   const magsPath = process.env.MAGS_PATH ?? path.join(process.cwd(), "mags");
   const appsPath = process.env.APPS_PATH ?? path.join(process.cwd(), "apps");
-  const releases = await getReleasesForHero(random, columns, collectionsPath, magsPath, appsPath);
+  // LATEST needs exactly the columns it shows (they are ordered). RANDOM caches
+  // a wider pool and draws from it on every render, so the hero changes on
+  // refresh instead of freezing for the whole cache window.
+  const poolSize = random ? columns * HERO_POOL_FACTOR : columns;
+  const pool = await getReleasesForHero(random, poolSize, collectionsPath, magsPath, appsPath);
+  const releases = random ? pickRandomSubset(pool, columns) : pool.slice(0, columns);
 
   const colSize = Math.round(12 / columns);
 
