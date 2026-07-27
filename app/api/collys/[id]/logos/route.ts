@@ -8,7 +8,12 @@ import { logoMapSchema, type LogoMapEntry } from "@/lib/logoMapPayload";
 import { writeLogoEdit } from "@/lib/collyLogoWrite";
 import { parseLogoMap } from "@/lib/collyLogoSnapshot";
 import { readManualLogoMap } from "@/lib/collyLogoManualMap";
-import { secondsUntilNextLogoSave } from "@/lib/logoSaveRateLimit";
+import {
+  secondsUntilNextLogoSave,
+  secondsUntilUserQuotaFrees,
+  LOGO_SAVE_USER_WINDOW_MAX,
+  LOGO_SAVE_USER_WINDOW_SECONDS,
+} from "@/lib/logoSaveRateLimit";
 
 const postSchema = z.object({ logos: logoMapSchema });
 
@@ -34,14 +39,37 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   // appends a MEDIUMTEXT snapshot that is never pruned. The user's own newest
   // snapshot on this colly is the only state the window needs, so the limit
   // costs one indexed read and survives restarts.
+  const now = Math.floor(Date.now() / 1000);
   const lastOwnEdit = await prisma.colly_logo_edits.findFirst({
     where: { colly_id: collyId, user_id: userId },
     orderBy: { id: "desc" },
     select: { timestamp: true },
   });
-  const wait = secondsUntilNextLogoSave(lastOwnEdit?.timestamp, Math.floor(Date.now() / 1000));
+  const wait = secondsUntilNextLogoSave(lastOwnEdit?.timestamp, now);
   if (wait > 0) {
     return apiError(`Saving too often. Wait ${wait} second${wait === 1 ? "" : "s"} and save again.`, 429);
+  }
+
+  // Second throttle, spanning every colly. The gap above is per (user, colly),
+  // so a script walking a list of colly ids never trips it -- it can append one
+  // large snapshot per colly, on a loop, unthrottled. Both limits read
+  // `colly_logo_edits`, so they cost one indexed query each and survive a
+  // restart with no in-memory state to lose.
+  const recentOwnEdits = await prisma.colly_logo_edits.findMany({
+    where: { user_id: userId, timestamp: { gte: now - LOGO_SAVE_USER_WINDOW_SECONDS } },
+    orderBy: { timestamp: "asc" },
+    take: LOGO_SAVE_USER_WINDOW_MAX,
+    select: { timestamp: true },
+  });
+  const quotaWait = secondsUntilUserQuotaFrees(recentOwnEdits.map((e) => e.timestamp), now);
+  if (quotaWait > 0) {
+    const minutes = Math.ceil(quotaWait / 60);
+    const windowMinutes = LOGO_SAVE_USER_WINDOW_SECONDS / 60;
+    return apiError(
+      `Saving too often. You can save at most ${LOGO_SAVE_USER_WINDOW_MAX} logo maps every ${windowMinutes} minutes. `
+      + `Wait ${minutes} minute${minutes === 1 ? "" : "s"} and save again.`,
+      429,
+    );
   }
 
   const result = await writeLogoEdit(collyId, userId, parsed.data.logos);
