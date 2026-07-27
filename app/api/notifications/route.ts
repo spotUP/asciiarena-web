@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError } from "@/lib/utils";
+import { BELL_NOTIFICATION_TYPES } from "@/lib/notification-types";
 
 export const dynamic = "force-dynamic";
 
@@ -17,9 +18,12 @@ export async function GET(req: NextRequest) {
   const beforeRaw = req.nextUrl.searchParams.get("before");
   const before = beforeRaw ? parseInt(beforeRaw, 10) : null;
 
+  // The same type filter for the list and the badge — a badge counting rows
+  // the dropdown will not show is a permanently unclearable number.
   const rows = await prisma.notifications.findMany({
     where: {
       user_id: userId,
+      type: { in: BELL_NOTIFICATION_TYPES },
       ...(before ? { id: { lt: before } } : {}),
     },
     orderBy: { id: "desc" },
@@ -27,7 +31,7 @@ export async function GET(req: NextRequest) {
   });
 
   const unreadCount = await prisma.notifications.count({
-    where: { user_id: userId, read_at: null },
+    where: { user_id: userId, type: { in: BELL_NOTIFICATION_TYPES }, read_at: null },
   });
 
   return NextResponse.json({

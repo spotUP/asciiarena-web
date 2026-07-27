@@ -6,6 +6,7 @@ import SiteWall from "@/components/widgets/home/SiteWall";
 import GlobalWall from "@/components/widgets/home/GlobalWall";
 import RecentlyViewed from "@/components/widgets/RecentlyViewed";
 import PollHero from "@/components/widgets/PollHero";
+import ActivityFeed from "@/components/widgets/ActivityFeed";
 import { getSession as auth } from "@/lib/session";
 import { getHiddenWidgets } from "@/lib/widgets";
 
@@ -22,6 +23,10 @@ export default async function HomePage() {
 
   return (
     <SiteLayout title={["wELCOME tO aSCIIaRENA", "bY uP rOUGH and diViNE sTYLERS"]}>
+      {/* Top of the middle column: ambient "who is doing what" that used to
+          arrive as bell notifications. Live over SSE, and the /api/live route
+          backfills recent events on connect so it is never an empty box. */}
+      {!hidden.has("activity_feed")    && <ActivityFeed />}
       {!hidden.has("poll_hero")        && <Suspense fallback={null}><PollHero /></Suspense>}
       {!hidden.has("latest_releases")  && <Suspense fallback={null}><LatestReleases columns={2} header="LATEST RELEASES" /></Suspense>}
       {!hidden.has("random_releases")  && <Suspense fallback={null}><LatestReleases columns={2} random header="RANDOM RELEASES" /></Suspense>}

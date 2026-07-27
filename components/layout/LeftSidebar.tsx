@@ -5,7 +5,6 @@ import UsersOnlineLive from "@/components/widgets/UsersOnlineLive";
 import CedSessions from "@/components/widgets/CedSessions";
 import NowPlaying from "@/components/widgets/NowPlaying";
 import MusicPlayer from "@/components/widgets/MusicPlayer";
-import ActivityFeed from "@/components/widgets/ActivityFeed";
 import LastCallers from "@/components/widgets/LastCallers";
 import PollSidebarLatest from "@/components/widgets/PollSidebarLatest";
 import LatestCollys from "@/components/widgets/LatestCollys";
@@ -23,7 +22,6 @@ export default async function LeftSidebar() {
   return (
     <>
       {!hidden.has("users_online") && <UsersOnlineLive isLoggedIn={isLoggedIn} currentUserId={currentUserId} />}
-      {!hidden.has("activity_feed") && <ActivityFeed />}
       {!hidden.has("ced_sessions") && <CedSessions />}
       {!hidden.has("now_playing") && <NowPlaying />}
       {!hidden.has("music_player") && <MusicPlayer />}

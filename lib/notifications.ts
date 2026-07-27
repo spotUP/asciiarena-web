@@ -1,13 +1,8 @@
 import { prisma } from "@/lib/db";
 import { broadcast } from "@/lib/live";
 
-export type NotificationType =
-  | "notif-comment"
-  | "notif-fav"
-  | "notif-reply"
-  | "notif-message"
-  | "notif-status"
-  | "notif-poll";
+export { BELL_NOTIFICATION_TYPES, type NotificationType } from "@/lib/notification-types";
+import type { NotificationType } from "@/lib/notification-types";
 
 interface CreateArgs {
   actorNick?: string | null;
