@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import CollyPreview, { type PreviewReport, type LogoEntry } from "@/components/submit/CollyPreview";
+import type { LogoMapEntry } from "@/lib/logoMapPayload";
 
 export interface LogoTagPanelProps {
   collyId: number;
@@ -15,6 +16,10 @@ export interface LogoTagPanelProps {
 }
 
 interface EditRow { id: number; nick: string; timestamp: number; logoCount: number }
+// `current` is the colly's live database map (newest `colly_logo_edits`
+// snapshot, or a pre-feature admin map derived from `colly_logos`), or null
+// when nobody has tagged the colly in the database yet.
+interface LogosGetBody { current: LogoMapEntry[] | null; history: EditRow[] }
 
 function ago(unix: number): string {
   const secs = Math.max(0, Math.floor(Date.now() / 1000) - unix);
@@ -32,24 +37,44 @@ export default function LogoTagPanel({ collyId, filename, type, font, fg, bg, is
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
 
+  // Monotonic sequence guard: whichever loadHistory() call was issued LAST
+  // wins, no matter which order the responses come back in. Without this a
+  // save-then-revert race could let a stale (save-triggered) response
+  // overwrite the fresher (revert-triggered) one.
+  const historySeq = useRef(0);
   const loadHistory = useCallback(() => {
+    const seq = ++historySeq.current;
     fetch(`/api/collys/${collyId}/logos`)
       .then(r => r.json())
-      .then((rows: EditRow[]) => setHistory(Array.isArray(rows) ? rows : []))
-      .catch(() => setHistory([]));
+      .then((body: LogosGetBody) => {
+        if (historySeq.current !== seq) return;
+        setHistory(Array.isArray(body.history) ? body.history : []);
+      })
+      .catch(() => { if (historySeq.current === seq) setHistory([]); });
   }, [collyId]);
 
-  // Seed the editor from the colly's current map, exactly as the admin editor
-  // does: saved entries verbatim, auto-detected regions only where they do not
-  // overlap one (canvas collys have no text lines to detect against).
+  // Seed the editor from the colly's CURRENT database map -- the newest
+  // `colly_logo_edits` snapshot is the source of truth for a tagged colly;
+  // `report.meta.logos` (the trailer embedded in the file on disk) is only
+  // a fallback for a colly nobody has tagged in the database yet, since
+  // public tagging never writes to the file. Both requests must resolve
+  // before the editor seeds, so a slow logos fetch can never leave it
+  // seeded from the wrong source. Auto-detected regions fill in only where
+  // they do not overlap a seeded entry (canvas collys have no text lines to
+  // detect against).
   useEffect(() => {
     let live = true;
-    fetch(`/api/collys/preview?filename=${encodeURIComponent(filename)}`)
-      .then(r => r.ok ? r.json() : Promise.reject(new Error(String(r.status))))
-      .then((rep: PreviewReport) => {
+    Promise.all([
+      fetch(`/api/collys/preview?filename=${encodeURIComponent(filename)}`)
+        .then(r => r.ok ? (r.json() as Promise<PreviewReport>) : Promise.reject(new Error(String(r.status)))),
+      fetch(`/api/collys/${collyId}/logos`)
+        .then(r => r.ok ? (r.json() as Promise<LogosGetBody>) : Promise.reject(new Error(String(r.status)))),
+    ])
+      .then(([rep, logosBody]) => {
         if (!live) return;
         setReport(rep);
-        const saved: LogoEntry[] = (rep.meta.logos ?? []).map(m => ({ line: m.line, end: m.end, caption: m.caption, auto: false }));
+        setHistory(Array.isArray(logosBody.history) ? logosBody.history : []);
+        const saved: LogoEntry[] = (logosBody.current ?? rep.meta.logos ?? []).map(m => ({ line: m.line, end: m.end, caption: m.caption, auto: false }));
         const isCanvas = rep.type === "ANSI" || rep.type === "CP437";
         const overlapsSaved = (a: { line: number; end?: number }) =>
           saved.some(m => a.line <= (m.end ?? m.line) && (a.end ?? a.line) >= m.line);
@@ -65,9 +90,7 @@ export default function LogoTagPanel({ collyId, filename, type, font, fg, bg, is
       })
       .catch(() => { if (live) setFailed(true); });
     return () => { live = false; };
-  }, [filename]);
-
-  useEffect(() => { loadHistory(); }, [loadHistory]);
+  }, [filename, collyId]);
 
   const save = async () => {
     setSaving(true);

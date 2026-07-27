@@ -4,8 +4,9 @@ import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 import { broadcast } from "@/lib/live";
-import { logoMapSchema } from "@/lib/logoMapPayload";
+import { logoMapSchema, type LogoMapEntry } from "@/lib/logoMapPayload";
 import { writeLogoEdit } from "@/lib/collyLogoWrite";
+import { parseLogoMap } from "@/lib/collyLogoSnapshot";
 
 const postSchema = z.object({ logos: logoMapSchema });
 
@@ -38,13 +39,37 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const collyId = Number(id);
   if (!Number.isFinite(collyId) || collyId <= 0) return apiError("Invalid id", 400);
 
+  // History + "current" map both come from `colly_logo_edits`: the newest
+  // snapshot IS the current map (the design's central rule). Only a colly
+  // that predates this feature (admin-tagged, never snapshotted) has no
+  // edit rows at all -- for that case only, fall back to the manual
+  // `colly_logos` rows the old admin editor wrote directly.
   const edits = await prisma.colly_logo_edits.findMany({
     where: { colly_id: collyId },
     orderBy: { id: "desc" },
     take: 20,
-    select: { id: true, user_id: true, timestamp: true, logo_count: true },
+    select: { id: true, user_id: true, timestamp: true, logo_count: true, map: true },
   });
-  if (!edits.length) return apiOk([]);
+
+  let current: LogoMapEntry[] | null;
+  if (edits.length) {
+    current = parseLogoMap(edits[0].map);
+  } else {
+    const rows = await prisma.colly_logos.findMany({
+      where: { colly_id: collyId, manual: 1 },
+      orderBy: { position: "asc" },
+      select: { start_line: true, end_line: true, label: true },
+    });
+    current = rows.length
+      ? rows.map((r) => ({
+          line: r.start_line + 1,
+          end: r.end_line != null ? r.end_line + 1 : undefined,
+          caption: r.label,
+        }))
+      : null;
+  }
+
+  if (!edits.length) return apiOk({ current, history: [] });
 
   const users = await prisma.users.findMany({
     where: { id: { in: edits.map((e) => e.user_id) } },
@@ -52,10 +77,13 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   });
   const nick = new Map(users.map((u) => [u.id, u.nick]));
 
-  return apiOk(edits.map((e) => ({
-    id: e.id,
-    nick: nick.get(e.user_id) ?? "unknown",
-    timestamp: e.timestamp,
-    logoCount: e.logo_count,
-  })));
+  return apiOk({
+    current,
+    history: edits.map((e) => ({
+      id: e.id,
+      nick: nick.get(e.user_id) ?? "unknown",
+      timestamp: e.timestamp,
+      logoCount: e.logo_count,
+    })),
+  });
 }
