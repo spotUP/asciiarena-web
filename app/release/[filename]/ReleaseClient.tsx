@@ -23,6 +23,7 @@ import {
   type LogoSection,
 } from "@/lib/logoSections";
 import LogoMinimap, { MINIMAP_WIDTH } from "./LogoMinimap";
+import LogoIndex from "@/components/release/LogoIndex";
 import { shouldShowMinimap, useMinimapPreference, useViewportAllowsMinimap } from "@/lib/minimapVisibility";
 import { parseCollyIndex, sectionForIndexEntry, linkifyCollyIndex } from "@/lib/collyIndex";
 import { sectionsFromLogoMap } from "@/lib/collyTrailer";
@@ -373,6 +374,11 @@ export default function ReleaseClient({
     }
     return logoIndex.map((li) => ({ label: li.label, section: li.section }));
   }, [detectionText, logoIndex, sections]);
+  // A human made this map: `logoMap` is built from manual=1 catalog rows only,
+  // so these captions were written by a person rather than guessed by
+  // detection. That is what earns the index its place above the art.
+  const hasHumanMap = !!(logoMap && logoMap.length);
+
   // The colly HTML with its embedded "oN> NAME" index entries wrapped in
   // clickable spans (data-logo-line) — so the index in the art is clickable.
   const linkedContent = useMemo(
@@ -1196,7 +1202,9 @@ export default function ReleaseClient({
               {autoplay && (
                 <span className="lightgrey">{autoplayIndex + 1} / {sections.length}</span>
               )}
-              {sections.length > 2 && (
+              {/* Tagged collys show the index above the art instead, so the
+                  button would be a second copy of the same list. */}
+              {!hasHumanMap && sections.length > 2 && (
                 <input type="button" className="btn-big"
                   value={indexOpen ? "Close Index" : "Index"}
                   onClick={() => setIndexOpen(o => !o)} />
@@ -1297,6 +1305,16 @@ export default function ReleaseClient({
           <feDisplacementMap ref={warpDispRef} in="SourceGraphic" in2="n" scale={0} xChannelSelector="R" yChannelSelector="G" />
         </filter>
       </svg>
+      {/* Clickable index, above the art and always visible for a colly whose
+          logos a person tagged. Hidden while tagging, where the editor has its
+          own line-numbered gutter. */}
+      {hasHumanMap && !tagging && !isFullscreen && collyVisible && (
+        <LogoIndex
+          entries={displayIndex}
+          onJump={scrollToSection}
+          currentSection={autoplay ? sections[autoplayIndex] : null}
+        />
+      )}
       {tagging && (
         <LogoTagPanel
           collyId={collyId}
