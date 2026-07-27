@@ -64,6 +64,12 @@ describe("logo index component", () => {
     expect(component).toMatch(/currentSection === entry\.section/);
   });
 
+  it("has a hover state, which cannot be an inline style", () => {
+    expect(component).toMatch(/className=\{current \? undefined : "logo-index-entry"\}/);
+    const css = read("assets/css/site.css");
+    expect(css).toMatch(/\.logo-index-entry:hover \{/);
+  });
+
   it("renders nothing when there is nothing to index", () => {
     expect(component).toMatch(/if \(!entries\.length\) return null;/);
   });

@@ -2622,6 +2622,16 @@ input::file-selector-button {
   color: #ffffff !important;
 }
 
+/* Clickable logo index above a hand-tagged colly (components/release/LogoIndex).
+   Entries are <button>s, so the hover cannot live in an inline style. Matches
+   the day-cell treatment above, which is this site's pattern for an
+   interactive row that is not a link. The number stays dim on hover so the
+   name is what lights up. */
+.logo-index-entry:hover {
+  background: #333333;
+  color: #ffffff;
+}
+
 /* Colly submit preview: hover/click the whole line to map a logo (CollyPreview). */
 .colly-line { cursor: pointer; }
 .colly-line:hover { background: rgba(255,85,255,0.28) !important; }

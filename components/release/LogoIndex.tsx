@@ -50,6 +50,10 @@ export default function LogoIndex({ entries, onJump, currentSection }: LogoIndex
             <button
               key={`${entry.section.startLine}-${n}`}
               type="button"
+              // Hover lives in site.css: a :hover cannot be expressed inline.
+              // Skipped for the entry autoplay is on, whose magenta already
+              // marks it and would be overwritten by the hover colour.
+              className={current ? undefined : "logo-index-entry"}
               onClick={() => onJump(entry.section)}
               title={entry.label}
               style={{
