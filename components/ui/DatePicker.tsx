@@ -47,6 +47,18 @@ function parse(value: string): { y: number; m: number; d: number } | null {
   return { y: +m[1], m: +m[2], d: +m[3] };
 }
 
+/**
+ * True when `text` is a real calendar date in "YYYY-MM-DD" form. Typed input
+ * is committed only when this passes, so a half-finished "1994-0" never
+ * reaches the caller and "1994-02-30" is rejected outright.
+ */
+export function isValidDateString(text: string): boolean {
+  const p = parse(text);
+  if (!p) return false;
+  if (p.m < 1 || p.m > 12) return false;
+  return p.d >= 1 && p.d <= daysInMonth(p.y, p.m);
+}
+
 const daysInMonth = (y: number, m: number) => new Date(y, m, 0).getDate();
 // Monday-first weekday index (0=Mon..6=Sun) for the 1st of the month.
 const firstWeekday = (y: number, m: number) => (new Date(y, m - 1, 1).getDay() + 6) % 7;
@@ -55,6 +67,10 @@ export default function DatePicker({ value, onChange, minYear = 1980, placeholde
   const parsed = parse(value);
   const today = new Date();
   const [open, setOpen] = useState(false);
+  // Typed text, held locally until it parses as a real date. null = show the
+  // committed `value`. Without this the field could only be filled from the
+  // calendar, which is slow for the 30-year back-catalogue of release dates.
+  const [draft, setDraft] = useState<string | null>(null);
   const [viewY, setViewY] = useState(parsed?.y ?? today.getFullYear());
   const [viewM, setViewM] = useState(parsed?.m ?? today.getMonth() + 1); // 1-12
   const rootRef = useRef<HTMLDivElement>(null);
@@ -82,7 +98,20 @@ export default function DatePicker({ value, onChange, minYear = 1980, placeholde
   };
   const stepYear = (delta: number) => setViewY((y) => Math.max(minYear, y + delta));
 
-  const pick = (d: number) => { onChange(fmt(viewY, viewM, d)); setOpen(false); };
+  const pick = (d: number) => { setDraft(null); onChange(fmt(viewY, viewM, d)); setOpen(false); };
+
+  const typeDate = (text: string) => {
+    setDraft(text);
+    // Commit as soon as the text is a real date; clearing the field clears the
+    // value. Anything in between stays local so the form never sees a partial.
+    if (isValidDateString(text)) { onChange(text); setDraft(null); }
+    else if (text.trim() === "") onChange("");
+  };
+
+  // Leaving a half-typed field discards the draft and shows the committed
+  // value again, so the input can never display something the form does not
+  // actually hold.
+  const commitOrRevert = () => setDraft(null);
 
   const lead = firstWeekday(viewY, viewM);
   const total = daysInMonth(viewY, viewM);
@@ -100,12 +129,22 @@ export default function DatePicker({ value, onChange, minYear = 1980, placeholde
     <div ref={rootRef} className={className} style={{ position: "relative", display: "inline-block" }}>
       <input
         type="text"
-        readOnly
         className="form-control"
-        value={value || ""}
+        value={draft ?? value ?? ""}
         placeholder={placeholder}
-        onClick={() => setOpen((o) => !o)}
-        style={{ cursor: "pointer", width: "160px" }}
+        maxLength={10}
+        inputMode="numeric"
+        onChange={(e) => typeDate(e.target.value)}
+        onBlur={commitOrRevert}
+        // Opens on click but does not toggle shut again — a second click is
+        // usually the user placing the caret to edit the text, not asking to
+        // dismiss the calendar. Escape and an outside click still close it.
+        onClick={() => setOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") { setOpen(false); commitOrRevert(); }
+          if (e.key === "Enter") { setOpen(false); commitOrRevert(); }
+        }}
+        style={{ width: "160px" }}
       />
       {open && (
         <div
@@ -157,7 +196,7 @@ export default function DatePicker({ value, onChange, minYear = 1980, placeholde
           {/* Clear */}
           {value && (
             <div style={{ marginTop: "8px", textAlign: "right" }}>
-              <button type="button" style={{ ...nav, padding: 0 }} onClick={() => { onChange(""); setOpen(false); }}>clear</button>
+              <button type="button" style={{ ...nav, padding: 0 }} onClick={() => { setDraft(null); onChange(""); setOpen(false); }}>clear</button>
             </div>
           )}
         </div>
