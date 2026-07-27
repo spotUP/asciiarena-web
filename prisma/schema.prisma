@@ -215,6 +215,18 @@ enum logos_kind {
   ansi
 }
 
+model colly_logo_edits {
+  id         Int    @id @default(autoincrement()) @db.UnsignedInt
+  colly_id   Int    @db.UnsignedInt
+  user_id    Int    @db.UnsignedInt
+  timestamp  Int // unix seconds, matching `comments`
+  map        String @db.MediumText // JSON: [{line, end?, caption}, ...]
+  logo_count Int    @default(0) // entries in `map`, for the tagger leaderboard
+
+  @@index([colly_id, id], map: "ix_colly_newest")
+  @@index([user_id], map: "ix_user")
+}
+
 // One row per detected logo inside a colly, keyed by its extracted plaintext
 // label (from dividers / index sections). Stores labels only — NOT colly art.
 // Powers "search logos in collys", per-entity logo listings, and stats.
