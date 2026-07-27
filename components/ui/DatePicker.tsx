@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { isValidPartialDateString, isCompleteDateString, parsePartialDate, daysInMonth } from "@/lib/partialDate";
 
 // Terminal-styled date picker: Topaz font + 8x16 grid, matching the site. Native
 // <input type="date"> renders its text + calendar popup in the browser's own
@@ -13,6 +14,12 @@ export interface DatePickerProps {
   minYear?: number;
   placeholder?: string;
   className?: string;
+  /**
+   * Accept dates that are only known to the year or the month, typed with 00
+   * for the unknown parts ("1999-00-00", "1999-07-00"). Off by default: a
+   * partial date is meaningless for something like a poll's closing time.
+   */
+  allowPartial?: boolean;
 }
 
 // Date + time field (value "YYYY-MM-DDTHH:MM") — the date via the calendar
@@ -52,35 +59,37 @@ function parse(value: string): { y: number; m: number; d: number } | null {
  * is committed only when this passes, so a half-finished "1994-0" never
  * reaches the caller and "1994-02-30" is rejected outright.
  */
-export function isValidDateString(text: string): boolean {
-  const p = parse(text);
-  if (!p) return false;
-  if (p.m < 1 || p.m > 12) return false;
-  return p.d >= 1 && p.d <= daysInMonth(p.y, p.m);
-}
+export const isValidDateString = isCompleteDateString;
 
-const daysInMonth = (y: number, m: number) => new Date(y, m, 0).getDate();
 // Monday-first weekday index (0=Mon..6=Sun) for the 1st of the month.
 const firstWeekday = (y: number, m: number) => (new Date(y, m - 1, 1).getDay() + 6) % 7;
 
-export default function DatePicker({ value, onChange, minYear = 1980, placeholder = "YYYY-MM-DD", className }: DatePickerProps) {
+export default function DatePicker({ value, onChange, minYear = 1980, placeholder = "YYYY-MM-DD", className, allowPartial = false }: DatePickerProps) {
   const parsed = parse(value);
+  // A partial value ("1999-00-00") has no day to highlight, but its year is
+  // still the right place to open the calendar.
+  const partial = allowPartial ? parsePartialDate(value) : null;
   const today = new Date();
   const [open, setOpen] = useState(false);
   // Typed text, held locally until it parses as a real date. null = show the
   // committed `value`. Without this the field could only be filled from the
   // calendar, which is slow for the 30-year back-catalogue of release dates.
   const [draft, setDraft] = useState<string | null>(null);
-  const [viewY, setViewY] = useState(parsed?.y ?? today.getFullYear());
-  const [viewM, setViewM] = useState(parsed?.m ?? today.getMonth() + 1); // 1-12
+  const [viewY, setViewY] = useState(parsed?.y ?? partial?.y ?? today.getFullYear());
+  const [viewM, setViewM] = useState(parsed?.m ?? (partial?.m || today.getMonth() + 1)); // 1-12
   const rootRef = useRef<HTMLDivElement>(null);
 
   // Re-sync the visible month to the value whenever the picker is opened.
   useEffect(() => {
     if (!open) return;
     const p = parse(value);
-    if (p) { setViewY(p.y); setViewM(p.m); }
-  }, [open, value]);
+    if (p) { setViewY(p.y); setViewM(p.m); return; }
+    // Year-only value: open on that year rather than the current one.
+    if (allowPartial) {
+      const q = parsePartialDate(value);
+      if (q) { setViewY(q.y); if (q.m > 0) setViewM(q.m); }
+    }
+  }, [open, value, allowPartial]);
 
   useEffect(() => {
     if (!open) return;
@@ -102,9 +111,11 @@ export default function DatePicker({ value, onChange, minYear = 1980, placeholde
 
   const typeDate = (text: string) => {
     setDraft(text);
-    // Commit as soon as the text is a real date; clearing the field clears the
-    // value. Anything in between stays local so the form never sees a partial.
-    if (isValidDateString(text)) { onChange(text); setDraft(null); }
+    // Commit as soon as the text is a date this field accepts; clearing the
+    // field clears the value. Anything in between stays local so the form
+    // never sees a half-typed keystroke.
+    const accepts = allowPartial ? isValidPartialDateString : isCompleteDateString;
+    if (accepts(text)) { onChange(text); setDraft(null); }
     else if (text.trim() === "") onChange("");
   };
 

@@ -7,6 +7,7 @@ import { convertPcbColors, hasPcbCodes } from "@/lib/pcbColors";
 import { convertAnsiCodes, hasAnsiCodes, escapeHtmlText } from "@/lib/releaseText";
 import Cp437DizPreview from "@/components/release/Cp437DizPreview";
 import DatePicker from "@/components/ui/DatePicker";
+import { formatPartialDate, parsePartialDate } from "@/lib/partialDate";
 import DosSelect from "@/components/ui/DosSelect";
 import ColorSwatch from "@/components/ui/ColorSwatch";
 import SoundtrackPicker from "@/components/music/SoundtrackPicker";
@@ -377,19 +378,20 @@ export default function CollysClient() {
               <div className="col-12 lightgrey amb-1">RELEASE DATE</div>
               <div className="col-12">
                 <DatePicker
-                  value={(() => {
-                    const y = edits[selected.id]?.year ?? selected.year;
-                    const m = edits[selected.id]?.month ?? selected.month;
-                    const d = edits[selected.id]?.day ?? selected.day;
-                    if (!y || !m || !d) return "";
-                    return `${String(y).padStart(4, "0")}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-                  })()}
+                  allowPartial
+                  value={formatPartialDate(
+                    edits[selected.id]?.year ?? selected.year,
+                    edits[selected.id]?.month ?? selected.month,
+                    edits[selected.id]?.day ?? selected.day,
+                  )}
                   onChange={v => {
-                    if (!v) { edit(selected.id, "year", null); edit(selected.id, "month", null); edit(selected.id, "day", null); return; }
-                    const [y, m, d] = v.split("-");
-                    edit(selected.id, "year", parseInt(y) || null);
-                    edit(selected.id, "month", parseInt(m) || null);
-                    edit(selected.id, "day", parseInt(d) || null);
+                    // 0 (not null) is this schema's "unknown" sentinel — the
+                    // PATCH COALESCEs null away, so null would silently keep
+                    // the old month/day instead of clearing them.
+                    const p = v ? parsePartialDate(v) : null;
+                    edit(selected.id, "year", p ? p.y : null);
+                    edit(selected.id, "month", p ? p.m : null);
+                    edit(selected.id, "day", p ? p.d : null);
                   }}
                 />
               </div>
@@ -438,12 +440,25 @@ export default function CollysClient() {
                     className="btn-big"
                     value="Save DIZ"
                     onClick={async () => {
-                      await fetch("/api/admin/collys/diz", {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ filename: selected.filename, content: dizContent }),
-                      });
-                      flash("DIZ saved!", true);
+                      // Never flash success over a failed write: this button
+                      // reported "DIZ saved!" for every save the server had
+                      // rejected, which is how a permission error on the
+                      // collections directory stayed invisible.
+                      try {
+                        const res = await fetch("/api/admin/collys/diz", {
+                          method: "PUT",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ filename: selected.filename, content: dizContent }),
+                        });
+                        if (!res.ok) {
+                          const detail = await res.json().catch(() => null);
+                          flash(`DIZ save failed (${res.status}): ${detail?.error ?? "unknown error"}`, false);
+                          return;
+                        }
+                        flash("DIZ saved!", true);
+                      } catch (e) {
+                        flash(`DIZ save failed: ${String(e)}`, false);
+                      }
                     }}
                   />
                   <input

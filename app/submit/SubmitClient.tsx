@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Combobox from "@/components/ui/Combobox";
 import DosSelect from "@/components/ui/DosSelect";
 import DatePicker from "@/components/ui/DatePicker";
+import { formatPartialDate, parsePartialDate } from "@/lib/partialDate";
 import ColorSwatch from "@/components/ui/ColorSwatch";
 import SoundtrackPicker from "@/components/music/SoundtrackPicker";
 import { detectCollyType, COLLY_TYPES } from "@/lib/collyType";
@@ -640,13 +641,16 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
             </Field>
             <Field label="Released">
               <DatePicker
-                value={collyYear && collyMonth && collyDay
-                  ? `${String(collyYear).padStart(4, "0")}-${String(collyMonth).padStart(2, "0")}-${String(collyDay).padStart(2, "0")}`
-                  : ""}
+                allowPartial
+                value={formatPartialDate(
+                  parseInt(collyYear) || null,
+                  parseInt(collyMonth) || null,
+                  parseInt(collyDay) || null,
+                )}
                 onChange={v => {
-                  if (!v) { setCollyYear(""); setCollyMonth(""); setCollyDay(""); return; }
-                  const [y, m, d] = v.split("-");
-                  setCollyYear(String(parseInt(y))); setCollyMonth(String(parseInt(m))); setCollyDay(String(parseInt(d)));
+                  const p = v ? parsePartialDate(v) : null;
+                  if (!p) { setCollyYear(""); setCollyMonth(""); setCollyDay(""); return; }
+                  setCollyYear(String(p.y)); setCollyMonth(String(p.m)); setCollyDay(String(p.d));
                 }}
               />
             </Field>
