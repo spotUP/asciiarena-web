@@ -108,7 +108,7 @@ const AnsiEditorPanel = forwardRef<AnsiEditorPanelRef, AnsiEditorPanelProps>(
             width: "100%",
             height: panelHeight(rows),
             marginBottom: 16,
-            "--viewport-size": viewportSize(rows),
+            "--ansi-viewport-size": viewportSize(rows),
           } as React.CSSProperties
         }
       >

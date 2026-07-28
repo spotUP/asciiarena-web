@@ -2535,7 +2535,12 @@
    --tool-size: the single-row HORIZONTAL tool bar pinned under the canvas. */
 .ansi-editor-root {
   --palette-size: 64px;
-  --viewport-size: 176px;
+  /* Defaults to the 80x10 logo canvas. AnsiEditorPanel sets
+     --ansi-viewport-size for taller canvases; without the indirection this
+     definition on the root itself beat any value inherited from an ancestor,
+     so the canvas stayed 176px tall inside a box reserved for far more and
+     left the rest of the box blank. */
+  --viewport-size: var(--ansi-viewport-size, 176px);
   --tool-size: 40px;
   --content-top: calc(var(--header-size) + var(--palette-size));
 }
@@ -2763,8 +2768,12 @@
 }
 .ansi-editor-root #bodyContainer > aside .asciiIcon {
   height: 28px;
+  /* The tools spell their names out now, so a fixed 28px square made the words
+     spill over each other. Grow to the label; the flex row spaces them. */
   min-width: 28px;
-  width: 28px;
+  width: auto;
+  padding-inline: 6px;
+  white-space: nowrap;
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
