@@ -11,6 +11,23 @@
  * (components/chat/ChatBar.tsx); `message` events did not, so this is the same
  * rule in one testable place, used by both.
  */
+/**
+ * Whether a stored message was written by the viewer.
+ *
+ * 28 chat rows predate the group rewrite and carry no from_id at all -- the
+ * sender is only recorded as a nick in `postername`. Every place that asks
+ * "was this mine?" has to handle both, or those messages read as somebody
+ * else's: counted as unread, and prefixed with a nick instead of "you".
+ */
+export function isOwnMessage(
+  message: { fromId: number | null | undefined; postername: string | null | undefined },
+  viewerId: number,
+  viewerNick: string,
+): boolean {
+  if (message.fromId != null) return message.fromId === viewerId;
+  return !!viewerNick && message.postername === viewerNick;
+}
+
 export function shouldCountAsUnread(args: {
   /** Author of the event. null when an old broadcast omitted it. */
   fromId: number | null | undefined;

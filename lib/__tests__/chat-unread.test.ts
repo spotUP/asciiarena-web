@@ -1,7 +1,10 @@
+import { readFileSync } from "node:fs";
 import { describe, it, expect } from "vitest";
-import { shouldCountAsUnread } from "@/lib/chatUnread";
+import { isOwnMessage, shouldCountAsUnread } from "@/lib/chatUnread";
+import { unreadCountExpr } from "@/lib/chatUnreadSql";
 
 const ME = 7;
+const MY_NICK = "plur";
 
 describe("shouldCountAsUnread", () => {
   it("does not count a message the viewer wrote themselves", () => {
@@ -20,5 +23,60 @@ describe("shouldCountAsUnread", () => {
   it("never counts anything while the window is open -- it marks read instead", () => {
     expect(shouldCountAsUnread({ fromId: 42, viewerId: ME, minimized: false })).toBe(false);
     expect(shouldCountAsUnread({ fromId: ME, viewerId: ME, minimized: false })).toBe(false);
+  });
+});
+
+describe("isOwnMessage", () => {
+  it("recognises a legacy row that names the viewer in postername", () => {
+    expect(isOwnMessage({ fromId: null, postername: MY_NICK }, ME, MY_NICK)).toBe(true);
+  });
+
+  it("does not claim a legacy row written by somebody else", () => {
+    expect(isOwnMessage({ fromId: null, postername: "Xray2000" }, ME, MY_NICK)).toBe(false);
+    expect(isOwnMessage({ fromId: null, postername: null }, ME, MY_NICK)).toBe(false);
+  });
+
+  it("trusts from_id when it is present, whatever postername says", () => {
+    expect(isOwnMessage({ fromId: ME, postername: "someoneelse" }, ME, MY_NICK)).toBe(true);
+    expect(isOwnMessage({ fromId: 42, postername: MY_NICK }, ME, MY_NICK)).toBe(false);
+  });
+
+  it("claims nothing when the viewer has no nick, rather than matching empties", () => {
+    expect(isOwnMessage({ fromId: null, postername: "" }, ME, "")).toBe(false);
+  });
+});
+
+describe("unreadCountExpr", () => {
+  const sql = unreadCountExpr(ME, MY_NICK);
+
+  it("parameterises the viewer's id and nick -- no interpolated values", () => {
+    expect(sql.values).toEqual([ME, MY_NICK]);
+    expect(sql.sql).not.toContain(MY_NICK);
+  });
+
+  it("excludes the viewer's own legacy rows by nick, keeping everyone else's", () => {
+    const text = sql.sql.replace(/\s+/g, " ");
+    expect(text).toContain("um.from_id IS NOT NULL AND um.from_id <>");
+    expect(text).toContain("um.from_id IS NULL AND (um.postername IS NULL OR um.postername <>");
+  });
+
+  it("still honours the participant's join and read cursors", () => {
+    const text = sql.sql.replace(/\s+/g, " ");
+    expect(text).toContain("um.timestamp >= cp.joined_at");
+    expect(text).toContain("um.timestamp > cp.last_read_at");
+  });
+});
+
+/**
+ * The count is reported by two endpoints. They drifted apart once already, so
+ * this fails if either one grows its own copy of the predicate again.
+ */
+describe("the unread predicate is not re-inlined", () => {
+  const ROUTES = ["app/api/messages/route.ts", "app/api/messages/unread/route.ts"];
+
+  it.each(ROUTES)("%s uses unreadCountExpr and no hand-written variant", route => {
+    const src = readFileSync(route, "utf8");
+    expect(src).toContain("unreadCountExpr");
+    expect(src).not.toContain("um.from_id IS NULL OR um.from_id");
   });
 });

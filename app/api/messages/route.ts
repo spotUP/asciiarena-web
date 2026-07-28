@@ -10,6 +10,8 @@ import { addParticipant, getLeftThreads } from "@/lib/chatThreadDb";
 import { createNotification } from "@/lib/notifications";
 import { normalizeMessageText } from "@/lib/normalizeText";
 import { truncatePreview } from "@/lib/inboxRow";
+import { unreadCountExpr } from "@/lib/chatUnreadSql";
+import { isOwnMessage } from "@/lib/chatUnread";
 
 // One line in a 400px dropdown; longer subjects only wrap.
 const NOTIFICATION_PREVIEW_MAX = 60;
@@ -48,6 +50,8 @@ export async function GET(request: NextRequest) {
   const pagesize = Math.max(1, Math.min(200, parseInt(searchParams.get("pagesize") ?? "50") || 50));
   const offset = (page - 1) * pagesize;
   const me = parseInt(session.user.id);
+  // Legacy chat rows carry no from_id, only the sender's nick.
+  const myNick = session.user.name ?? "";
 
   // "Left chats" view: threads the user soft-left. History is preserved, so the
   // user can find, read, and rejoin them. Same title resolution as the active
@@ -103,9 +107,7 @@ export async function GET(request: NextRequest) {
   // so the count shown and the count filtered on cannot disagree. It goes in
   // WHERE rather than HAVING because this query has no GROUP BY and does use a
   // window function, where HAVING's behaviour is not something to rely on.
-  const unreadExpr = Prisma.sql`(SELECT COUNT(*) FROM messages um
-     WHERE um.thread = cp.thread_id AND um.timestamp >= cp.joined_at
-       AND um.timestamp > cp.last_read_at AND (um.from_id IS NULL OR um.from_id <> ${me}))`;
+  const unreadExpr = unreadCountExpr(me, myNick);
   const unreadOnly = searchParams.get("unread") === "1"
     ? Prisma.sql`AND ${unreadExpr} > 0`
     : Prisma.empty;
@@ -149,7 +151,7 @@ export async function GET(request: NextRequest) {
       thread: r.thread,
       id: r.id,
       from_id: r.from_id,
-      lastFromMe: r.from_id === me,
+      lastFromMe: isOwnMessage({ fromId: r.from_id, postername: r.postername }, me, myNick),
       preview: r.message,
       lastSenderNick: r.postername,
       timestamp: r.timestamp,

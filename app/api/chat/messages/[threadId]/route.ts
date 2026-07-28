@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { getMember } from "@/lib/chatThreadDb";
+import { isOwnMessage } from "@/lib/chatUnread";
 
 export const dynamic = "force-dynamic";
 
@@ -44,7 +45,7 @@ export async function GET(
           WHERE thread = ${thread} AND timestamp >= ${member.joinedAt} AND timestamp <= ${member.leftAt}
           ORDER BY id DESC LIMIT 30`;
     return apiOk(rows.map(r => {
-      const isOwn = r.from_id === userId || (r.from_id == null && r.postername === userNick);
+      const isOwn = isOwnMessage({ fromId: r.from_id, postername: r.postername }, userId, userNick);
       const unread = !isOwn && (r.timestamp ?? 0) > member.lastReadAt;
       return {
         id: r.id, thread: r.thread, from_id: r.from_id,
@@ -92,7 +93,7 @@ export async function GET(
         ORDER BY id DESC LIMIT 30`;
 
   return apiOk(rows.map(r => {
-    const isOwn = r.from_id === userId || (r.from_id == null && r.postername === userNick);
+    const isOwn = isOwnMessage({ fromId: r.from_id, postername: r.postername }, userId, userNick);
     return {
       id: r.id, thread: r.thread, from_id: r.from_id,
       postername: r.postername, postedto: r.postedto,
