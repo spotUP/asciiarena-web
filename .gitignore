@@ -55,3 +55,7 @@ collections/
 collys_bad_filenames/
 up-rough-amp/
 !.env.example
+
+# Personal scratchpad (contains account ids / mail addresses)
+thoughts/spot/
+thoughts/searchable/
