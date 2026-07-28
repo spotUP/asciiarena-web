@@ -351,6 +351,14 @@ export function bootstrapEditor(rootEl, opts = {}) {
 			State.menus.close();
 			State.modal.open('warning');
 		});
+		// The character brush registers its own click handler through
+		// Toolbar.addLazy, so clicking its element is exactly what picking it from
+		// the brush toolbar does -- it switches the tool and opens the glyph
+		// picker, whether or not the brush toolbar is showing.
+		onClick($('navChars'), () => {
+			State.menus.close();
+			$('characterBrush').click();
+		});
 		onClick($('navKeys'), () => {
 			State.menus.close();
 			State.modal.open('shortcuts');

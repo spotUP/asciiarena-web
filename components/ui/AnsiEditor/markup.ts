@@ -245,6 +245,14 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 				<div id="brushes" aria-label="Brushes">
 					<span class="asciiIcon" aria-hidden="true">BRUSH</span>
 				</div>
+				<!-- asciiarena: the character picker existed only as BRUSH ->
+				     Character, two clicks deep behind a tool whose name does not
+				     say "characters", so it read as missing. This selects the same
+				     character brush -- it delegates to #characterBrush rather than
+				     registering a second tool, so there is one implementation. -->
+				<div id="navChars" aria-label="Choose a character to draw with">
+					<span class="asciiIcon" aria-hidden="true">CHARS</span>
+				</div>
 				<div id="fill" aria-label="Fill (Alt+N)">
 					<span class="asciiIcon" aria-hidden="true">FILL</span>
 				</div>
