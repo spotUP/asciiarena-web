@@ -272,24 +272,6 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 					<span class="asciiIcon" aria-hidden="true">VIEW</span>
 				</div>
 			</aside>
-			<!-- asciiarena: row and column editing used to exist ONLY inside the
-			     Edit menu, so removing that menu would have taken it with it. These
-			     are the same actions, by the same ids the engine already wires, as
-			     buttons. It sits below the tool row rather than in the header,
-			     which is capped at one 43px strip and clips.
-
-			     Shown only while the TEXT tool is active: Toolbar marks the active
-			     tool button with .toolbarDisplayed, and this is a later sibling of
-			     #keyboard inside the same parent, so plain CSS can follow that
-			     state -- no engine changes, nothing to keep in sync. -->
-			<div id="rowColToolbar" aria-label="Rows and columns">
-				<button id="insertRow" class="toolButton">Insert Row</button>
-				<button id="deleteRow" class="toolButton">Delete Row</button>
-				<button id="eraseRow" class="toolButton">Erase Row</button>
-				<button id="insertColumn" class="toolButton">Insert Column</button>
-				<button id="deleteColumn" class="toolButton">Delete Column</button>
-				<button id="eraseColumn" class="toolButton">Erase Column</button>
-			</div>
 			<div id="paletteBar">
 				<div id="paletteSwatches" role="group" aria-label="Palette (left-click sets foreground, right-click sets background)"></div>
 				<div id="paletteCurrent">
@@ -352,18 +334,18 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 			<article id="navUndo" class="menuItem">Undo <kbd>Ctrl-Z</kbd></article>
 			<article id="navRedo" class="menuItem">Redo <kbd>Ctrl-Y</kbd></article>
 			<article class="separator"></article>
-			<!-- These six are buttons now (#rowColToolbar, under the tool row), so
-			     the ids live there and these rows are reference only. Without that
-			     the id would exist twice and getElementById would bind the wiring
-			     to whichever came first. -->
-			<article class="menuItem reference">Insert Row <kbd>Alt+Up</kbd></article>
-			<article class="menuItem reference">Delete Row <kbd>Alt+Down</kbd></article>
-			<article class="menuItem reference">Insert Column <kbd>Alt+Right</kbd></article>
-			<article class="menuItem reference">Delete Column <kbd>Alt+Left</kbd></article>
-			<article class="menuItem reference">Erase Row <kbd>Alt+E</kbd></article>
+			<!-- These six also appear as buttons under the editor (RowColumnBar in
+			     AnsiEditorPanel), which clicks these very elements. They keep their
+			     ids: the engine wires the action here, and the buttons are only a
+			     second way to reach it, so there is one implementation. -->
+			<article id="insertRow" class="menuItem">Insert Row <kbd>Alt+Up</kbd></article>
+			<article id="deleteRow" class="menuItem">Delete Row <kbd>Alt+Down</kbd></article>
+			<article id="insertColumn" class="menuItem">Insert Column <kbd>Alt+Right</kbd></article>
+			<article id="deleteColumn" class="menuItem">Delete Column <kbd>Alt+Left</kbd></article>
+			<article id="eraseRow" class="menuItem">Erase Row <kbd>Alt+E</kbd></article>
 			<article id="eraseRowStart" class="menuItem">Erase to Start of Row <kbd>Alt+Home</kbd></article>
 			<article id="eraseRowEnd" class="menuItem">Erase to End of Row <kbd>Alt+End</kbd></article>
-			<article class="menuItem reference">Erase Column <kbd>Alt+Shift+E</kbd></article>
+			<article id="eraseColumn" class="menuItem">Erase Column <kbd>Alt+Shift+E</kbd></article>
 			<article id="eraseColumnStart" class="menuItem">Erase to Start of Column <kbd>Alt+Page Up</kbd></article>
 			<article id="eraseColumnEnd" class="menuItem">Erase to End of Column <kbd>Alt+Page Down</kbd></article>
 			<article class="separator"></article>

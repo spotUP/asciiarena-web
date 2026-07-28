@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { forwardRef, useImperativeHandle, useRef } from "react";
+import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
 import AnsiEditor, { type AnsiEditorRef } from "@/components/ui/AnsiEditor/AnsiEditor";
 
 /**
@@ -44,6 +44,35 @@ const CHROME_HEIGHT = 24 + 43 + 64 + 40 + 16 + 1;
 const ROW_HEIGHT = 16;
 
 /**
+ * Height of the row/column button strip below the editor. It is reserved on top
+ * of CHROME_HEIGHT because it lives OUTSIDE the engine's box: #bodyContainer
+ * positions header, viewport and tool row absolutely with no gap between them
+ * (the viewport's bottom edge is exactly the tool row's top edge), so there is
+ * nowhere inside to put another row without moving --content-top and every
+ * absolutely positioned region with it.
+ */
+const ROW_COLUMN_BAR_HEIGHT = 40;
+
+/**
+ * Row and column editing, which the engine only ever exposed inside the Edit
+ * menu. That menu is now a shortcut dialog, so without these the actions would
+ * be keyboard-only.
+ *
+ * Each button clicks the engine's own menu entry by id rather than
+ * reimplementing anything: the engine already wires those elements, so there is
+ * exactly one implementation of each action and no second code path to drift.
+ * The entries stay in the dialog too, which is what those clicks land on.
+ */
+const ROW_COLUMN_ACTIONS: ReadonlyArray<{ id: string; label: string }> = [
+  { id: "insertRow", label: "Insert Row" },
+  { id: "deleteRow", label: "Delete Row" },
+  { id: "eraseRow", label: "Erase Row" },
+  { id: "insertColumn", label: "Insert Column" },
+  { id: "deleteColumn", label: "Delete Column" },
+  { id: "eraseColumn", label: "Erase Column" },
+];
+
+/**
  * editor.css sizes the canvas viewport from --viewport-size, which it hardcodes
  * to 176px: the 80x10 logo canvas plus its margins. Any taller canvas was
  * clipped inside that 176px (with a scrollbar) while the host box reserved the
@@ -63,7 +92,7 @@ export const LOGO_CANVAS = { columns: 80, rows: 10 } as const;
  * jumping when the editor appears.
  */
 export function panelHeight(rows: number): number {
-  return CHROME_HEIGHT + rows * ROW_HEIGHT;
+  return CHROME_HEIGHT + ROW_COLUMN_BAR_HEIGHT + rows * ROW_HEIGHT;
 }
 
 interface AnsiEditorPanelProps {
@@ -85,6 +114,23 @@ const AnsiEditorPanel = forwardRef<AnsiEditorPanelRef, AnsiEditorPanelProps>(
     ref,
   ) {
     const editorRef = useRef<AnsiEditorRef>(null);
+    const hostRef = useRef<HTMLDivElement>(null);
+
+    /**
+     * Trigger an engine action by clicking the element the engine wired.
+     *
+     * Scoped to this panel's own DOM rather than document-wide, so two editors
+     * on one page cannot drive each other. A missing element means the engine
+     * changed its markup, which is worth a console error rather than silence.
+     */
+    const runEngineAction = useCallback((id: string) => {
+      const el = hostRef.current?.querySelector<HTMLElement>(`#${id}`);
+      if (!el) {
+        console.error(`[AnsiEditorPanel] no engine element #${id} to click`);
+        return;
+      }
+      el.click();
+    }, []);
 
     useImperativeHandle(ref, () => ({
       isEmpty: () => editorRef.current?.isEmpty() ?? true,
@@ -111,6 +157,7 @@ const AnsiEditorPanel = forwardRef<AnsiEditorPanelRef, AnsiEditorPanelProps>(
 
     return (
       <div
+        ref={hostRef}
         style={
           {
             width: "100%",
@@ -127,6 +174,36 @@ const AnsiEditorPanel = forwardRef<AnsiEditorPanelRef, AnsiEditorPanelProps>(
           rows={rows}
           fileExport={fileExport}
         />
+        <div
+          role="group"
+          aria-label="Rows and columns"
+          style={{
+            height: ROW_COLUMN_BAR_HEIGHT,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            flexWrap: "wrap",
+          }}
+        >
+          {ROW_COLUMN_ACTIONS.map(action => (
+            <button
+              key={action.id}
+              type="button"
+              onClick={() => runEngineAction(action.id)}
+              style={{
+                height: 32,
+                minHeight: 0,
+                padding: "0 8px",
+                whiteSpace: "nowrap",
+                border: 0,
+                cursor: "pointer",
+              }}
+              className="bg-secondary lightgrey"
+            >
+              {action.label}
+            </button>
+          ))}
+        </div>
       </div>
     );
   },
