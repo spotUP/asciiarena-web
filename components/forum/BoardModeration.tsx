@@ -64,7 +64,7 @@ export default function BoardModeration({ boardId, locked, hidden, index, prevBo
   };
 
   return (
-    <span style={{ display: "inline-flex", gap: "8px" }}>
+    <span style={{ display: "inline-flex", gap: "8px", flexWrap: "wrap", rowGap: "0px" }}>
       <Link prefetch={false} href={`/admin/forum/${boardId}`} className="lightcyan">
         [edit]
       </Link>

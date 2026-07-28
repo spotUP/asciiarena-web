@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { resolveComboboxCommit } from "@/lib/combobox-commit";
 
 export interface ComboboxOption {
   value: string;
@@ -62,6 +63,28 @@ export default function Combobox({ value, options, onChange, width, placeholder,
 
   const showCreate = !!createLabel && typed.trim().length > 0 && !hasExactMatch;
 
+  /**
+   * Commit typed-but-unconfirmed text when the field loses focus.
+   *
+   * Without this, typing a name and going straight to Submit dropped it: the
+   * parent was only ever told about a value from pick(), i.e. clicking an
+   * option or pressing Enter. Collys were saved with no artist and no crew.
+   */
+  const commitTyped = () => {
+    const next = resolveComboboxCommit(
+      typed,
+      value,
+      options.map(o => o.value),
+      { allowCreate: !!createLabel },
+    );
+    if (next === null) {
+      setTyped(value); // discarded: put the field back to what it holds
+      return;
+    }
+    onChange(next);
+    setTyped(next);
+  };
+
   const pick = (v: string) => {
     onChange(v);
     setTyped(v);
@@ -76,6 +99,7 @@ export default function Combobox({ value, options, onChange, width, placeholder,
         value={typed}
         placeholder={placeholder}
         onFocus={() => setOpen(true)}
+        onBlur={commitTyped}
         onChange={e => {
           setTyped(e.target.value);
           setOpen(true);

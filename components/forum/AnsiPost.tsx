@@ -53,12 +53,18 @@ export default function AnsiPost({ ansiB64, font }: { ansiB64: string; font: str
     <img
       src={src}
       alt="ANSI art"
-      // Full width of the post, not the canvas's natural pixel size: a post
-      // drawn on a narrower screen used to sit in the middle of a wide post with
-      // dead space either side. height:auto keeps the aspect ratio, so the cells
-      // scale evenly rather than stretching, and pixelated keeps them crisp
-      // instead of blurring the 8x16 glyphs.
-      style={{ width: "100%", height: "auto", imageRendering: "pixelated", display: "block" }}
+      // Never scaled UP. These are 8x16 bitmap glyphs: stretching 808px of art
+      // across a 975px post is a 1.21x scale, which duplicates some pixel
+      // columns and not others, so stems come out uneven widths and the font
+      // reads as wrong. Art narrower than the post simply sits at its own size.
+      //
+      // max-width still shrinks art WIDER than the post, which is unavoidable --
+      // the alternative is cutting it off -- but that is the rarer case and
+      // losing detail beats losing the right-hand side.
+      //
+      // Posts drawn now are sized to the composer's width (columnsForPanel), so
+      // they fill it at 1:1 without any scaling at all.
+      style={{ maxWidth: "100%", height: "auto", imageRendering: "pixelated", display: "block" }}
     />
   );
 }

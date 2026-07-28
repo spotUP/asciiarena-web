@@ -75,7 +75,10 @@ export default function BoardRow({ board, moderation }: Props) {
       )}
 
       {moderation && (
-        <div className="row m-0" style={ROW}>
+        // Not ROW: these controls wrap in a narrow column, and a hard 16px
+        // height made the wrapped line overflow the row instead of flowing
+        // under it. Keep the 16px rhythm per LINE and let the block grow.
+        <div className="row m-0" style={{ minHeight: "16px", lineHeight: "16px" }}>
           <div className="col-1 p-0" />
           <div className="col-11 p-0">
             <BoardModeration
