@@ -1,7 +1,8 @@
 import Link from "next/link";
 import SiteLayout from "@/components/layout/SiteLayout";
 import BoardNewItemsPill from "@/components/forum/BoardNewItemsPill";
-import BoardCard from "@/components/forum/BoardCard";
+import BoardHeaders from "@/components/forum/BoardHeaders";
+import BoardRow from "@/components/forum/BoardRow";
 import ForumSectionTitle from "@/components/forum/ForumSectionTitle";
 import { getSession } from "@/lib/session";
 import { listBoards } from "@/lib/forum/db";
@@ -31,13 +32,16 @@ export default async function ForumIndexPage() {
       <BoardNewItemsPill channel="site:forum" />
       <ForumSectionTitle>BOARDS</ForumSectionTitle>
 
-      {boards.length === 0 ? (
-        <div className="container-fluid bg-secondary ap-1 lightgrey" style={{ marginBottom: "16px" }}>
-          No boards have been created yet.
-        </div>
-      ) : (
-        boards.map(b => <BoardCard key={b.id} board={b} />)
-      )}
+      <div className="container-fluid bg-secondary ap-1" style={{ marginBottom: "16px" }}>
+        <BoardHeaders />
+        {boards.length === 0 ? (
+          <div className="lightgrey" style={{ height: "16px", lineHeight: "16px" }}>
+            No boards have been created yet.
+          </div>
+        ) : (
+          boards.map(b => <BoardRow key={b.id} board={b} />)
+        )}
+      </div>
 
       {postable && (
         <div style={{ marginTop: "16px" }}>
