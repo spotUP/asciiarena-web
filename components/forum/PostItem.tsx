@@ -31,7 +31,11 @@ export default function PostItem({ post, seq, canEdit, canDelete, canReport }: P
   const metaClass = deleted ? "grey" : "lightgrey";
 
   return (
-    <div id={`p${post.id}`} className="col-lg-12 pl-0 apb-1 bg-secondary ap-1" style={{ marginBottom: "16px" }}>
+    // Black, not the usual grey panel: an ANSI post is black-backed art, and a
+    // grey frame around it read as a box the art was sitting in rather than as
+    // the post itself. Posts stay separated by the header line and the gap
+    // between them.
+    <div id={`p${post.id}`} className="col-lg-12 pl-0 apb-1 bg-black ap-1" style={{ marginBottom: "16px" }}>
       <div className="d-flex justify-content-between" style={{ height: "16px", lineHeight: "16px" }}>
         <span>
           <span className={metaClass}>#{seq}</span>{" "}

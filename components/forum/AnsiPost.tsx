@@ -53,7 +53,12 @@ export default function AnsiPost({ ansiB64, font }: { ansiB64: string; font: str
     <img
       src={src}
       alt="ANSI art"
-      style={{ maxWidth: "100%", height: "auto", imageRendering: "pixelated", display: "block" }}
+      // Full width of the post, not the canvas's natural pixel size: a post
+      // drawn on a narrower screen used to sit in the middle of a wide post with
+      // dead space either side. height:auto keeps the aspect ratio, so the cells
+      // scale evenly rather than stretching, and pixelated keeps them crisp
+      // instead of blurring the 8x16 glyphs.
+      style={{ width: "100%", height: "auto", imageRendering: "pixelated", display: "block" }}
     />
   );
 }
