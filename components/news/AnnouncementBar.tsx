@@ -80,11 +80,7 @@ export default function AnnouncementBar() {
   if (!item || !visible) return null;
 
   return (
-    <div
-      className="row m-0 p-0"
-      role="status"
-      style={{ background: "#000084", borderTop: "1px solid #5555ff", borderBottom: "1px solid #5555ff" }}
-    >
+    <div className="row m-0 p-0 bg-lightblue" role="status">
       <div
         className="col-12 d-flex align-items-center"
         style={{ gap: "16px", minHeight: "32px", lineHeight: "16px", padding: "8px 16px" }}
@@ -93,9 +89,11 @@ export default function AnnouncementBar() {
         <span className="white" style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {item.title}
         </span>
+        {/* White, not the usual lightgrey/lightcyan: those are low contrast
+            against the light blue band. */}
         <Link
           href="/news"
-          className="lightcyan"
+          className="white"
           style={{ flexShrink: 0 }}
           onClick={() => dismiss(item.id)}
         >
@@ -105,7 +103,7 @@ export default function AnnouncementBar() {
           type="button"
           onClick={() => dismiss(item.id)}
           title="Dismiss"
-          className="lightgrey"
+          className="white"
           style={{
             flexShrink: 0, background: "transparent", border: "none", cursor: "pointer",
             fontFamily: "inherit", fontSize: "inherit", lineHeight: "16px", padding: 0,
