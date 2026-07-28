@@ -10,7 +10,10 @@
 # Install on the server (as the user that owns the app):
 #
 #   crontab -e
-#   17 4 * * * /var/www/asciiarena.se/nextjs-current/deploy/purge_inactive_cron.sh >> /var/log/asciiarena-purge.log 2>&1
+#   17 4 * * * /var/www/asciiarena.se/nextjs-current/deploy/purge_inactive_cron.sh >> $HOME/asciiarena-purge.log 2>&1
+#
+# $HOME, not /var/log: the app user cannot create a file there, and cron would
+# fail on the redirect before the script ever ran.
 #
 # Run it with DRY=1 to see what WOULD go (a GET), which changes nothing.
 #
