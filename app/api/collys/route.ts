@@ -12,7 +12,8 @@ import {
   COLLY_SORT_COLS,
 } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
-import { writeFile, mkdir } from "fs/promises";
+import { mkdir } from "fs/promises";
+import { writeFileAtomic } from "@/lib/atomic-write";
 import path from "path";
 import { existsSync } from "fs";
 import { broadcast } from "@/lib/live";
@@ -207,7 +208,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
   // The colly file is stored as-is — the editor's logo map goes to the DB, not
   // into the file (no in-file tags).
-  await writeFile(filePath, buffer);
+  // Atomic write: replacing an existing colly in place hits the same EACCES
+  // the .diz editor did (www-data-owned files, no group write), and a partial
+  // write would corrupt an irreplaceable archive file.
+  await writeFileAtomic(filePath, buffer);
   let manualLogos: { line: number; end?: number; caption: string }[] = [];
   try {
     const parsed = JSON.parse(String(formData.get("logos") ?? "[]")) as { line: number; end?: number; caption: string }[];

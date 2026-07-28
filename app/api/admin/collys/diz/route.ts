@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
-import { existsSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, readFileSync } from "fs";
+import { writeFileAtomic } from "@/lib/atomic-write";
 import path from "path";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
@@ -47,7 +48,10 @@ export async function PUT(request: NextRequest) {
 
   const fp = dizPath(filename);
   try {
-    writeFileSync(fp, content, "utf-8");
+    // Atomic + permission-proof: the collections tree is owned by www-data with
+    // no group write bit, so writing in place failed with EACCES on every
+    // existing .diz. See lib/atomic-write.ts.
+    await writeFileAtomic(fp, content);
     return apiOk({ status: true });
   } catch (e) {
     return apiError("Failed to write diz file: " + String(e), 500);
