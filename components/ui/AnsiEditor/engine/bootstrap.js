@@ -156,16 +156,25 @@ export function bootstrapEditor(rootEl, opts = {}) {
 				bodyContainer.classList.remove('loading');
 
 				const applyData = () => {
-					State.textArtCanvas.setImageData(
-						cols,
-						rws,
-						imageData,
-						ice,
-						letterSpacing,
+					// asciiarena: import INTO the canvas the composer mounted rather
+					// than resizing to the dropped file. A forum post and a site logo
+					// are fixed sizes -- the post box reserves exactly the canvas
+					// height and the logo must stay 80x10 -- so setImageData's resize
+					// broke the layout and, for logos, produced an invalid size.
+					// setArea already clips to the canvas, so anything past the edges
+					// is dropped. startUndo makes the import undoable like any edit.
+					State.textArtCanvas.startUndo();
+					State.textArtCanvas.setArea(
+						{ width: cols, height: rws, data: imageData },
+						0,
+						0,
 					);
 					palettePicker.updatePalette();
 					openFile.value = '';
 					viewport.scrollLeft = viewport.scrollTop = 0;
+					// setImageData used to fire this; the listeners persist the canvas
+					// and redraw the glyph pickers, and still need to run.
+					document.dispatchEvent(new CustomEvent('onOpenedFile'));
 				};
 				const closeModal = () => {
 					if (State.modal.isOpen() && State.modal.current === 'loading') {
@@ -295,7 +304,6 @@ export function bootstrapEditor(rootEl, opts = {}) {
 				});
 			});
 		});
-		onClick($('open'), () => openFile.click());
 		onClick($('saveAnsi'), Save.ans);
 		onClick($('saveUtf8'), Save.utf8);
 		onClick($('savePlaintext'), Save.plainText);
@@ -315,7 +323,9 @@ export function bootstrapEditor(rootEl, opts = {}) {
 		onClick($('navUndo'), State.textArtCanvas.undo);
 		onClick($('navRedo'), State.textArtCanvas.redo);
 
-		onClick($('about'), () => State.modal.open('about'));
+		// asciiarena: the About / Help menu items are gone (see markup.ts), so
+		// nothing opens these any more. The modal markup stays because the modal
+		// registry in ui.js looks every dialog up by id at startup.
 		onClick($('aboutDl'), () => {
 			window.open(
 				'https://github.com/xero/text0wnz/releases/latest',
@@ -328,10 +338,6 @@ export function bootstrapEditor(rootEl, opts = {}) {
 				'_blank',
 			);
 		});
-		onClick($('help'), () => {
-			window.open('https://github.com/xero/text0wnz/wiki/manual', '_blank');
-		});
-
 		const palettePreview = createPalettePreview($('palettePreview'));
 		palettePicker = createPalettePicker($('palettePicker'));
 

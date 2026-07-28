@@ -281,10 +281,20 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 			<kbd>Drop your file<br/>anywhere to load</kbd>
 		</div>
 
+		<!-- asciiarena: this editor is always embedded in a form (a forum post, a
+		     site logo), never run as a standalone app, so the upstream desktop
+		     File menu was mostly meaningless or harmful here:
+		       Open           resized the canvas to the opened file, which breaks
+		                      the size the composer locked at mount. Importing now
+		                      happens by dropping a file, clipped to that canvas.
+		       Update Editor  a forced, non-dismissable PWA update prompt.
+		       About teXt0wnz advertised upstream on this site.
+		       Help/Tutorials pointed at upstream's wiki, or were never wired.
+		     "New" is kept as Clear canvas -- it already resets to the mounted
+		     columns and rows rather than the upstream defaults. -->
 		<div id="fileList" class="menuList hide">
-			<article id="new" class="menuItem excludedForWebsocket">New</article>
-			<article id="open" class="menuItem excludedForWebsocket">Open</article>
-			<article class="separator excludedForWebsocket"></article>
+			<article id="new" class="menuItem excludedForWebsocket">Clear canvas</article>
+			<article class="separator"></article>
 			<article id="saveAnsi" class="menuItem">Save as ANSi</article>
 			<article id="saveBin" class="menuItem">Save as Binary Text</article>
 			<article id="saveXbin" class="menuItem">Save as XBin</article>
@@ -292,11 +302,6 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 			<article id="savePng" class="menuItem">Export as PNG</article>
 			<article id="saveUtf8" class="menuItem">Export as UTF-8 Text</article>
 			<article id="savePlaintext" class="menuItem">Export as Plain Text</article>
-			<article class="separator"></article>
-			<article id="help" class="menuItem">Help!</article>
-			<article id="tutorials" class="menuItem">Tutorials</article>
-			<article id="update" class="menuItem">Update Editor</article>
-			<article id="about" class="menuItem">About teXt0wnz</article>
 		</div>
 		<div id="editList" class="menuList hide">
 			<article id="navCut" class="menuItem disabled">Cut <kbd>Ctrl-X</kbd></article>
