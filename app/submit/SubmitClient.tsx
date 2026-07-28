@@ -9,7 +9,7 @@ import ColorSwatch from "@/components/ui/ColorSwatch";
 import SoundtrackPicker from "@/components/music/SoundtrackPicker";
 import { detectCollyType, COLLY_TYPES } from "@/lib/collyType";
 import CollyPreview, { type PreviewReport, type LogoEntry } from "@/components/submit/CollyPreview";
-import AnsiEditor, { type AnsiEditorRef } from "@/components/ui/AnsiEditor/AnsiEditor";
+import AnsiEditorPanel, { type AnsiEditorPanelRef } from "@/components/ui/AnsiEditor/AnsiEditorPanel";
 import { FONTS } from "@/lib/ansilove";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -196,7 +196,7 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
   const [logoAuthor, setLogoAuthor] = useState("");
   const [logoAnsiFont, setLogoAnsiFont] = useState("");
   const logoAnsiRef = useRef<HTMLInputElement>(null);
-  const editorRef = useRef<AnsiEditorRef>(null);
+  const editorRef = useRef<AnsiEditorPanelRef>(null);
 
   // ── Hash sync ──────────────────────────────────────────────────────────────
 
@@ -461,29 +461,20 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
 
   async function handleLogoSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
-    const editor = editorRef.current;
-    if (!editor) {
+    // Size guard, blank-canvas guard and the ArrayBuffer copy all live in the
+    // shared panel, which the forum composer embeds too.
+    const got = await editorRef.current?.collect();
+    if (!got) {
       setStatus({ msg: "Editor is still loading — try again.", ok: false });
       return;
     }
-    // A blank 80x10 export is still ~960 bytes (spaces + SAUCE), so reject an
-    // all-blank canvas explicitly rather than relying on byte length.
-    if (editor.isEmpty()) {
-      setStatus({ msg: "Draw something before submitting.", ok: false });
-      return;
-    }
-    const bytes = await editor.getAnsiBytes();
-    if (!bytes || bytes.length === 0) {
-      setStatus({ msg: "Could not read the canvas — try again.", ok: false });
+    if ("error" in got) {
+      setStatus({ msg: got.error, ok: false });
       return;
     }
     // POST as multipart, same shape as the .ans upload form below.
-    // Copy into a fresh ArrayBuffer-backed view so the File constructor's
-    // BlobPart type is satisfied (getAnsiBytes returns a generic Uint8Array).
-    const ansBuffer = new Uint8Array(bytes.length);
-    ansBuffer.set(bytes);
     const fd = new FormData();
-    fd.append("ans", new File([ansBuffer], "logo.ans"));
+    fd.append("ans", new File([got.bytes], "logo.ans"));
     fd.append("author", logoAuthor);
     fd.append("font", "topaz+");
     const r = await fetch("/api/logos", { method: "POST", body: fd });
@@ -915,9 +906,7 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
                   min-height (323: header 43 + palette 64 + viewport 176 [640x160
                   canvas + 16px margins] + tool bar 40). marginBottom keeps the
                   green submit button clear of it. */}
-              <div style={{ width: "100%", height: 348, marginBottom: 16 }}>
-                <AnsiEditor ref={editorRef} />
-              </div>
+              <AnsiEditorPanel ref={editorRef} />
             </Field>
             <div className="amt-1">
               <input

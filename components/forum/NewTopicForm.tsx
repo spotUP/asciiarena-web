@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/ToastProvider";
 import { createTopic } from "@/app/actions/forum";
+import AnsiAttach, { type AnsiAttachRef } from "@/components/forum/AnsiAttach";
 import { MAX_BODY_LEN, MAX_TITLE_LEN } from "@/lib/forum/types";
 
 const LABEL = {
@@ -21,11 +22,18 @@ export default function NewTopicForm({ boardSlug, boardName }: { boardSlug: stri
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
+  const ansiRef = useRef<AnsiAttachRef>(null);
 
   const submit = async () => {
     if (busy) return;
     setBusy(true);
-    const r = await createTopic(boardSlug, title, body);
+    const art = await ansiRef.current?.collect();
+    if (art && "error" in art) {
+      setBusy(false);
+      toast(`[!] ${art.error}`, "danger");
+      return;
+    }
+    const r = await createTopic(boardSlug, title, body, art?.attachment ?? null);
     setBusy(false);
     if (r.success && r.topicSlug) {
       toast("[OK] Topic created.");
@@ -64,8 +72,10 @@ export default function NewTopicForm({ boardSlug, boardName }: { boardSlug: stri
         style={{ resize: "vertical" }}
       />
       <div className="lightgrey" style={{ height: "16px", lineHeight: "16px", marginTop: "8px" }}>
-        Plain text only. Line breaks are kept exactly as you type them.
+        Text is kept exactly as you type it, line breaks and all.
       </div>
+
+      <AnsiAttach ref={ansiRef} disabled={busy} />
 
       <div className="d-flex" style={{ gap: "16px", marginTop: "16px", alignItems: "center" }}>
         <input type="button" className="btn-big" value="CREATE TOPIC" onClick={submit} disabled={busy} />

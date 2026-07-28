@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/ToastProvider";
 import { postReply } from "@/app/actions/forum";
 import ForumSectionTitle from "@/components/forum/ForumSectionTitle";
+import AnsiAttach, { type AnsiAttachRef } from "@/components/forum/AnsiAttach";
 import { MAX_BODY_LEN } from "@/lib/forum/types";
 
 interface Props {
@@ -19,6 +20,7 @@ export default function ReplyComposer({ topicId, channel }: Props) {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const ansiRef = useRef<AnsiAttachRef>(null);
 
   // Same debounce-and-POST shape as the release and request pages: the draft
   // goes out on the channel the page already holds open.
@@ -34,10 +36,23 @@ export default function ReplyComposer({ topicId, channel }: Props) {
   };
 
   const submit = async () => {
+    if (busy) return;
     const body = text.trim();
-    if (!body || busy) return;
     setBusy(true);
-    const r = await postReply(topicId, body);
+    const art = await ansiRef.current?.collect();
+    if (art && "error" in art) {
+      setBusy(false);
+      toast(`[!] ${art.error}`, "danger");
+      return;
+    }
+    const attachment = art?.attachment ?? null;
+    // The server enforces this too; checking here saves a round trip.
+    if (!body && !attachment) {
+      setBusy(false);
+      toast("[!] Write something or draw something before you post.", "danger");
+      return;
+    }
+    const r = await postReply(topicId, body, attachment);
     setBusy(false);
     if (r.success) {
       setText("");
@@ -65,8 +80,10 @@ export default function ReplyComposer({ topicId, channel }: Props) {
         }}
       />
       <div className="lightgrey" style={{ height: "16px", lineHeight: "16px", marginTop: "8px" }}>
-        Plain text only. Line breaks are kept exactly as you type them.
+        Text is kept exactly as you type it, line breaks and all.
       </div>
+      <AnsiAttach ref={ansiRef} disabled={busy} />
+
       <div style={{ marginTop: "16px" }}>
         <input type="button" className="btn-big" value="POST REPLY" onClick={submit} disabled={busy} />
       </div>
