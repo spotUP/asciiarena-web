@@ -123,8 +123,13 @@ describe("deploy client-chunk retention", () => {
     const abort = deploy.slice(deploy.indexOf("STILL missing"));
     expect(abort).toMatch(/exit 1/);
     // The guard has to come before the service restart, or the broken build is
-    // already live by the time it fires.
-    expect(deploy.indexOf("STILL missing")).toBeLessThan(deploy.indexOf("Restarting service"));
+    // already live by the time it fires. deploy.sh no longer restarts inline:
+    // it delegates to deploy/deploy_asciiarena.sh, which reloads nginx, checks
+    // that the new chunks are servable and then restarts. Anchor on that call,
+    // since that is what makes the build live.
+    const restartTrigger = deploy.indexOf("bin/deploy_asciiarena.sh");
+    expect(restartTrigger).toBeGreaterThan(-1);
+    expect(deploy.indexOf("STILL missing")).toBeLessThan(restartTrigger);
   });
 
   it("prunes retained chunks on a window long enough to outlive a browsing session", () => {

@@ -5,6 +5,7 @@ import AnsiEditorPanel, {
   panelHeight,
   type AnsiEditorPanelRef,
 } from "@/components/ui/AnsiEditor/AnsiEditorPanel";
+import { MIN_COLUMNS, columnsForPanel } from "@/lib/post-canvas-layout";
 
 /**
  * The forum's composing surface: the same full ANSI editor the site-logo
@@ -24,24 +25,6 @@ import AnsiEditorPanel, {
  */
 
 const ROWS = 25;
-
-/**
- * Character cell width in the editor's 8xN bitmap fonts.
- */
-const CELL_WIDTH = 8;
-
-/**
- * A forum post is not a site logo, so the canvas is not pinned to 80 columns.
- * It takes whatever the composer column gives it, within reason: narrower than
- * 80 stops being usable for art, and past ~240 the export gets silly.
- */
-const MIN_COLUMNS = 80;
-const MAX_COLUMNS = 240;
-
-function columnsFor(pixelWidth: number): number {
-  const fits = Math.floor(pixelWidth / CELL_WIDTH);
-  return Math.max(MIN_COLUMNS, Math.min(MAX_COLUMNS, fits));
-}
 
 export interface PostCanvasRef {
   /**
@@ -104,7 +87,9 @@ const PostCanvas = forwardRef<PostCanvasRef, PostCanvasProps>(function PostCanva
         // the editor will take, so the canvas is sized before it is created.
         // The engine locks the canvas at mount, so this cannot be revised
         // later without discarding the drawing.
-        setColumns(columnsFor(el.getBoundingClientRect().width));
+        // columnsForPanel takes the canvas gutter off the panel width; passing
+        // the full width is what put scrollbars inside the canvas.
+        setColumns(columnsForPanel(el.getBoundingClientRect().width));
         setMounted(true);
       },
       { rootMargin: "600px" },
