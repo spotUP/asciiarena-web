@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { activeTabHref } from "@/lib/admin-nav";
 
-const TABS = [
+// Exported so the active-tab rules can be asserted against the real routes
+// rather than a copy that drifts.
+export const TABS = [
   { href: "/admin",          label: "DASHBOARD" },
   { href: "/admin/news",     label: "NEWS" },
   { href: "/admin/collys",   label: "COLLYS" },
@@ -38,10 +41,13 @@ export const NAV_CONTAINER_STYLE: React.CSSProperties = {
 
 export default function AdminNav() {
   const pathname = usePathname();
+  // Exactly one tab is current; see lib/admin-nav.ts for why a bare
+  // startsWith() is not enough.
+  const active = activeTabHref(pathname, TABS.map(t => t.href));
   return (
     <div style={NAV_CONTAINER_STYLE}>
       {TABS.map(t => {
-        const isActive = t.href === "/admin" ? pathname === "/admin" : pathname.startsWith(t.href);
+        const isActive = t.href === active;
         return (
           <Link
             key={t.href}
