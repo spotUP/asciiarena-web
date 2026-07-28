@@ -1,6 +1,7 @@
 import Link from "next/link";
 import AnsiPost from "@/components/forum/AnsiPost";
 import PostActions from "@/components/forum/PostActions";
+import { shouldRenderBodyText } from "@/lib/forum/rules";
 import type { PostView } from "@/lib/forum/types";
 
 function stamp(unix: number): string {
@@ -38,9 +39,10 @@ export default function PostItem({ post, seq, canEdit, canDelete, canReport }: P
           <AnsiPost ansiB64={post.ansiB64} font={post.ansiFont} />
         </div>
       )}
-      {post.body && (
-        // An ANSI post may still carry a text caption, so this is not an
-        // either/or with the art above it.
+      {shouldRenderBodyText(post) && (
+        // Only when there is no art. A post drawn in the editor stores the
+        // canvas text in `body` as well, so rendering both showed every post
+        // twice -- once in colour, once as raw text underneath.
         <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", marginTop: "16px" }}>{post.body}</div>
       )}
 

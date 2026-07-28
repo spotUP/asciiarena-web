@@ -113,3 +113,22 @@ export function compareTopics(a: TopicView, b: TopicView): number {
   if (a.lastPostAt !== b.lastPostAt) return b.lastPostAt - a.lastPostAt;
   return b.id - a.id;
 }
+
+/**
+ * Whether to render a post's plain-text body as its own block.
+ *
+ * A post drawn in the ANSI editor stores BOTH the art and, in `body`, the
+ * printable text extracted from that same canvas (mount.ts getText) so mentions
+ * and the fulltext index have something to read. Rendering both showed every
+ * post twice: once in colour, once as raw text underneath.
+ *
+ * So the body block is for posts with no art. The text is still stored and
+ * still searchable either way -- this only decides what is drawn.
+ */
+export function shouldRenderBodyText(post: {
+  body: string | null;
+  ansiB64: string | null;
+}): boolean {
+  if (post.ansiB64) return false;
+  return !!post.body && post.body.trim().length > 0;
+}

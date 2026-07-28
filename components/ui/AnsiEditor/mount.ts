@@ -184,12 +184,17 @@ export function initAnsiEditor(
   hide(fileExport ? "#navClear" : "#fileMenu");
 
   // asciiarena CHANGE 3: build the 2x8 HTML palette bar above the canvas and
-  // wire it to the engine palette. bootstrapEditor sets State.palette
-  // synchronously, so it is ready here. The engine's own canvas picker is
-  // hidden in CSS; this bar is the live colour control.
-  const paletteBar = State.palette
-    ? initPaletteBar(root, State.palette as PaletteApi)
-    : { destroy: () => {} };
+  // wire it to the engine palette. The engine's own canvas picker is hidden in
+  // CSS; this bar is the live colour control.
+  //
+  // Passed as a getter, not a value: "Clear canvas" replaces State.palette
+  // outright, so anything holding the object from mount would keep driving the
+  // discarded one -- the bar would still light up while the engine drew with a
+  // palette nobody was setting.
+  const paletteBar = initPaletteBar(
+    root,
+    () => (State.palette ?? null) as PaletteApi | null,
+  );
 
   // The curated font set: the `data-value` of every option in the injected
   // `#fontSelect` listbox. Read once at mount (the markup is now in the DOM)

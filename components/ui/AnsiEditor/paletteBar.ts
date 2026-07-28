@@ -40,8 +40,23 @@ const css = (rgba: Uint8Array | number[]): string =>
  */
 export function initPaletteBar(
   root: HTMLElement,
-  palette: PaletteApi
+  getPalette: () => PaletteApi | null
 ): PaletteBarHandle {
+  // Read the palette on every use, never capture it.
+  //
+  // "Clear canvas" (the engine's `new`) does `State.palette =
+  // createDefaultPalette()`, replacing the object outright. A captured
+  // reference keeps driving the DISCARDED palette after that: the swatches and
+  // chips still respond, so the bar looks fine, while the engine draws with a
+  // palette nobody is setting. That is what made picking a background colour
+  // silently stop working after a clear.
+  const palette: PaletteApi = {
+    getRGBAColor: i => getPalette()?.getRGBAColor(i) ?? [0, 0, 0, 255],
+    getForegroundColor: () => getPalette()?.getForegroundColor() ?? 7,
+    getBackgroundColor: () => getPalette()?.getBackgroundColor() ?? 0,
+    setForegroundColor: i => getPalette()?.setForegroundColor(i),
+    setBackgroundColor: i => getPalette()?.setBackgroundColor(i),
+  };
   const swatchHost = root.querySelector<HTMLElement>("#paletteSwatches");
   const fgChip = root.querySelector<HTMLElement>("#paletteFgChip");
   const bgChip = root.querySelector<HTMLElement>("#paletteBgChip");
