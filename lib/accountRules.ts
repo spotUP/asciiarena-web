@@ -42,3 +42,45 @@ export function canClaimHandle(userNick: string | null | undefined, artistNick: 
   const a = (artistNick ?? "").trim().toLowerCase();
   return u.length > 0 && u === a;
 }
+
+/**
+ * A registration is abandoned once it has sat unactivated for this long. The
+ * activation mail goes out immediately, so a week is a generous window for
+ * someone who actually wants the account -- and a spam signup never comes back
+ * at all.
+ */
+export const ABANDONED_REGISTRATION_DAYS = 7;
+
+/**
+ * When the email-activation flow went live (2026-07-20, commit 60016b9).
+ *
+ * Accounts registered BEFORE this were stamped "Inactive" by a registration
+ * that had no activation flow behind it -- no mail was ever sent, so there was
+ * never a link to click. They are unactivated through no fault of their own,
+ * and several turned out to be real people who had been using the site for
+ * months. Purging on "unactivated for a week" without this guard would delete
+ * them permanently.
+ *
+ * That backlog was dealt with by hand. This constant makes sure the automatic
+ * rule can never reach back into it.
+ */
+export const ACTIVATION_FLOW_EPOCH = 1784592000;
+
+/**
+ * Whether an account is an abandoned registration, safe to delete.
+ *
+ * Deliberately narrow: it only ever matches accounts that WERE sent an
+ * activation link, never activated it, and have had a week to. Anything
+ * outside that -- any other rank, anything older than the flow -- is left
+ * alone. Callers must still refuse to delete an account that has content;
+ * this predicate only knows about the account row.
+ */
+export function isAbandonedRegistration(
+  account: { rank: string | null | undefined; joined: number | null | undefined },
+  nowSec: number,
+): boolean {
+  if (account.rank !== INACTIVE_RANK) return false;
+  const joined = account.joined ?? 0;
+  if (joined < ACTIVATION_FLOW_EPOCH) return false;
+  return joined < nowSec - ABANDONED_REGISTRATION_DAYS * 24 * 3600;
+}
