@@ -37,8 +37,23 @@ export interface DecodedAnsi {
  */
 export declare function loadAnsi(bytes: Uint8Array, isUTF8?: boolean): DecodedAnsi;
 
-/** Full Load/Save namespace — not used by mount.ts but declared for completeness. */
-export declare const Load: unknown;
+/**
+ * The Load namespace. Only the members the embed actually calls are typed.
+ *
+ * The two font-name tables are the interesting part: a `.ans` file's SAUCE
+ * records the SAUCE name ("Amiga Topaz 2+") while the engine's font PNGs are
+ * named after the app font ("Topaz+ 1200 8x16"), so anything that loads a file
+ * has to translate before asking for the image.
+ */
+export interface LoadNamespace {
+  /** SAUCE font name -> app font name. Null when the name is not known. */
+  sauceToAppFont: (sauceFontName: string) => string | null;
+  /** App font name -> SAUCE font name. Null when there is no SAUCE equivalent. */
+  appToSauceFont: (appFontName: string) => string | null;
+  loadAnsi: typeof loadAnsi;
+}
+
+export declare const Load: LoadNamespace;
 export declare const Save: unknown;
 
 // Default export is the legacy { Load, Save } object; prefer the named exports (incl. encodeAnsBytes).

@@ -642,6 +642,11 @@ const loadModule = () => {
 				return 'FM-TOWNS 8x16';
 			case 'FM-TOWNSx':
 				return 'FM-TOWNS 8x8';
+			// asciiarena: appToSauceFont writes plain 'FM-TOWNS' for the 8x8, but
+			// only 'FM-TOWNSx' could be read back, so a file this editor saved in
+			// that font resolved to a name with no PNG and fell back to AnsiLove.
+			case 'FM-TOWNS':
+				return 'FM-TOWNS 8x8';
 			case 'Glitch':
 				return 'Glitch 8x20';
 			case 'GJSCI-X':
@@ -677,6 +682,10 @@ const loadModule = () => {
 			case 'Zoids_2x':
 				return 'Zoids 8x16';
 			case 'Zoids 8x8':
+				return 'Zoids 8x8';
+			// asciiarena: same gap as FM-TOWNS -- appToSauceFont writes plain
+			// 'Zoids' for the 8x8, which nothing here could read back.
+			case 'Zoids':
 				return 'Zoids 8x8';
 
 			// XBin embedded font

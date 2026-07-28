@@ -18,7 +18,7 @@
  * topic page showing twenty ANSI posts renders them one after another.
  */
 
-import { loadAnsi } from "./engine/file.js";
+import { Load, loadAnsi } from "./engine/file.js";
 import { loadFontFromImage } from "./engine/font.js";
 import { createDefaultPalette } from "./engine/palette.js";
 
@@ -88,8 +88,22 @@ async function draw(bytes: Uint8Array): Promise<RenderedAnsi> {
   if (!columns || !rows || !data) throw new Error("ANSI file has no content");
   if (columns * rows > MAX_CELLS) throw new Error("ANSI file is too large to render");
 
+  // A file's SAUCE carries the SAUCE font name ("Amiga Topaz 2+"), not the
+  // app's ("Topaz+ 1200 8x16"), and the loader builds its PNG path straight
+  // from whatever name it is given. Passing the SAUCE name through asked for
+  // /ansi-editor/fonts/Amiga Topaz 2plus.png, which 404s, so EVERY Amiga-font
+  // post fell back to AnsiLove -- which only covers nine fonts, so the art came
+  // out in the wrong one.
+  //
+  // sauceToAppFont is the engine's own table for this. It returns null for a
+  // name it does not know, which includes files whose SAUCE already holds an
+  // app name, so fall back to the raw name before the default.
+  const sauceName = parsed.fontName?.trim();
+  const fontName =
+    (sauceName ? Load.sauceToAppFont(sauceName) : null) || sauceName || DEFAULT_FONT;
+
   const font = (await loadFontFromImage(
-    parsed.fontName || DEFAULT_FONT,
+    fontName,
     parsed.letterSpacing ?? false,
     createDefaultPalette(),
     1,
