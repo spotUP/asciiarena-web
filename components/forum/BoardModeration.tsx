@@ -64,7 +64,7 @@ export default function BoardModeration({ boardId, locked, hidden, index, prevBo
   };
 
   return (
-    <span style={{ display: "inline-flex", gap: "8px", flexWrap: "wrap", rowGap: "0px" }}>
+    <span style={{ display: "inline-flex", gap: "8px", flexWrap: "wrap", rowGap: "0px", alignItems: "center" }}>
       <Link prefetch={false} href={`/admin/forum/${boardId}`} className="lightcyan">
         [edit]
       </Link>
@@ -114,12 +114,23 @@ export default function BoardModeration({ boardId, locked, hidden, index, prevBo
   );
 }
 
-/** Buttons that read as the site's bracket links, not as chrome. */
+/**
+ * Buttons that read as the site's bracket links, not as chrome.
+ *
+ * height and minHeight are load-bearing: site.css sets `button { min-height:
+ * 48px }` for its chunky terminal buttons, which inflated each of these to
+ * 48x48. The <a> and the <button>s then placed their text at different heights
+ * inside those boxes, so a single row of controls looked like it had wrapped
+ * into a staggered mess.
+ */
 const BARE: React.CSSProperties = {
   background: "none",
   border: 0,
   padding: 0,
   font: "inherit",
+  height: "16px",
+  minHeight: 0,
+  maxHeight: "16px",
   lineHeight: "16px",
   cursor: "pointer",
 };
