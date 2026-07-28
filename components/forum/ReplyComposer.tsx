@@ -23,6 +23,15 @@ export default function ReplyComposer({ topicId, channel }: Props) {
   const router = useRouter();
   const { toast } = useToast();
   const [busy, setBusy] = useState(false);
+  /**
+   * The editor is mounted only while the composer is open.
+   *
+   * That is also what clears it: the engine locks its canvas at mount and has
+   * no reset short of the Clear canvas dialog, so a posted reply used to sit
+   * there afterwards, ready to be posted a second time. Closing on success
+   * unmounts the editor, and the next REPLY mounts a fresh, empty one.
+   */
+  const [open, setOpen] = useState(false);
   const canvasRef = useRef<PostCanvasRef>(null);
 
   const submit = async () => {
@@ -45,6 +54,10 @@ export default function ReplyComposer({ topicId, channel }: Props) {
     setBusy(false);
     if (r.success) {
       canvasRef.current?.clearDraft();
+      // Closing unmounts the editor, so the reply cannot be posted twice and
+      // the next one starts blank. On failure the composer stays open with the
+      // work still in it.
+      setOpen(false);
       toast("[OK] Reply posted.");
       router.refresh();
     } else {
@@ -52,13 +65,35 @@ export default function ReplyComposer({ topicId, channel }: Props) {
     }
   };
 
+  if (!open) {
+    return (
+      <div className="apt-1">
+        <input
+          type="button"
+          className="btn-big"
+          value="REPLY"
+          onClick={() => setOpen(true)}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="apt-1">
       <ForumSectionTitle>REPLY</ForumSectionTitle>
       <PostCanvas ref={canvasRef} channel={channel} label="Write or draw your reply." />
 
-      <div style={{ marginTop: "16px" }}>
+      <div style={{ marginTop: "16px", display: "flex", gap: "16px" }}>
         <input type="button" className="btn-big" value="POST REPLY" onClick={submit} disabled={busy} />
+        {/* Without this, opening the composer is one-way: the editor covers the
+            thread until you post something or reload the page. */}
+        <input
+          type="button"
+          className="btn-big"
+          value="CANCEL"
+          onClick={() => setOpen(false)}
+          disabled={busy}
+        />
       </div>
     </div>
   );

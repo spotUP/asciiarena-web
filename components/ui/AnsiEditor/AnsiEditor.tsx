@@ -61,12 +61,18 @@ interface AnsiEditorProps {
    * The forum composer passes false -- a post is delivered by posting it.
    */
   fileExport?: boolean;
+  /**
+   * Called with the canvas's row count at mount and whenever it changes.
+   * Insert Row and Delete Row rebuild the canvas a row taller or shorter, so a
+   * host that reserved space for a fixed count has to follow it.
+   */
+  onCanvasRowsChange?: (rows: number) => void;
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
 const AnsiEditor = forwardRef<AnsiEditorRef, AnsiEditorProps>(
-  function AnsiEditor({ onReady, columns, rows, font, fileExport }, ref) {
+  function AnsiEditor({ onReady, columns, rows, font, fileExport, onCanvasRowsChange }, ref) {
     const hostRef = useRef<HTMLDivElement>(null);
     const handleRef = useRef<EditorHandle | null>(null);
     const [failed, setFailed] = useState(false);
@@ -85,7 +91,23 @@ const AnsiEditor = forwardRef<AnsiEditorRef, AnsiEditorProps>(
         setCurrentFont(handle.getCurrentFont());
       }
       onReady?.();
-    }, [onReady]);
+      onCanvasRowsChange?.(handle?.getRows() ?? 0);
+    }, [onReady, onCanvasRowsChange]);
+
+    // Insert Row / Delete Row rebuild the canvas a row taller or shorter. The
+    // engine re-renders itself, but the host reserved a box for the row count it
+    // asked for, so without this the canvas grows past its viewport and the
+    // scrollbars come back. setImageData dispatches onOpenedFile on every
+    // rebuild, which is the engine's own signal that the geometry moved.
+    useEffect(() => {
+      if (!onCanvasRowsChange) return;
+      const report = () => {
+        const handle = handleRef.current;
+        if (handle) onCanvasRowsChange(handle.getRows());
+      };
+      document.addEventListener("onOpenedFile", report);
+      return () => document.removeEventListener("onOpenedFile", report);
+    }, [onCanvasRowsChange]);
 
     useEffect(() => {
       // Cancelled flag guards the async-import race: if the component unmounts

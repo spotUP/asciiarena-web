@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
+import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react";
 import AnsiEditor, { type AnsiEditorRef } from "@/components/ui/AnsiEditor/AnsiEditor";
 
 /**
@@ -127,6 +127,20 @@ const AnsiEditorPanel = forwardRef<AnsiEditorPanelRef, AnsiEditorPanelProps>(
     const hostRef = useRef<HTMLDivElement>(null);
 
     /**
+     * The canvas's live row count. Seeded from the prop, then followed.
+     *
+     * Insert Row and Delete Row rebuild the canvas a row taller or shorter. The
+     * box reserved here has to move with it, or the canvas overflows its
+     * viewport and the scrollbars reappear until the canvas is cleared.
+     */
+    const [liveRows, setLiveRows] = useState(rows);
+    const handleRowsChange = useCallback((next: number) => {
+      // The engine reports 0 before its canvas exists; ignore that rather than
+      // collapsing the box to nothing.
+      if (next > 0) setLiveRows(next);
+    }, []);
+
+    /**
      * Trigger an engine action by clicking the element the engine wired.
      *
      * Scoped to this panel's own DOM rather than document-wide, so two editors
@@ -172,17 +186,18 @@ const AnsiEditorPanel = forwardRef<AnsiEditorPanelRef, AnsiEditorPanelProps>(
           {
             width: "100%",
             marginBottom: 16,
-            "--ansi-viewport-size": viewportSize(rows),
+            "--ansi-viewport-size": viewportSize(liveRows),
           } as React.CSSProperties
         }
       >
-        <div style={{ width: "100%", height: editorBoxHeight(rows) }}>
+        <div style={{ width: "100%", height: editorBoxHeight(liveRows) }}>
           <AnsiEditor
             ref={editorRef}
             onReady={onReady}
             columns={columns}
             rows={rows}
             fileExport={fileExport}
+            onCanvasRowsChange={handleRowsChange}
           />
         </div>
         <div

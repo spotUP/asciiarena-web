@@ -43,6 +43,14 @@ export interface EditorHandle {
   getFonts: () => string[];
   /** The font the canvas is currently rendering in (e.g. "CP437 8x16"). */
   getCurrentFont: () => string;
+  /**
+   * The canvas's current height in character rows.
+   *
+   * Not fixed at mount: Insert Row and Delete Row rebuild the canvas one row
+   * taller or shorter, so the host has to be able to ask rather than assume the
+   * count it passed in.
+   */
+  getRows: () => number;
   /** Switch the canvas to `name`; the engine re-renders in the new font. */
   setFont: (name: string) => void;
   /**
@@ -220,6 +228,12 @@ export function initAnsiEditor(
       const canvas = State.textArtCanvas;
       if (!canvas || typeof canvas.getCurrentFontName !== "function") return "";
       return canvas.getCurrentFontName();
+    },
+
+    getRows(): number {
+      const canvas = State.textArtCanvas;
+      if (!canvas || typeof canvas.getRows !== "function") return rows;
+      return canvas.getRows();
     },
 
     setFont(name: string): void {
