@@ -61,7 +61,7 @@ export const WIDGET_LABELS: Record<WidgetKey, string> = {
   latest_news: "Site News",
   latest_forum_posts: "Latest Forum Posts",
   ced_sessions: "Editing in CED",
-  now_playing: "Playing in HippoPlayer",
+  now_playing: "Playing now (site music player)",
   music_player: "Modland Music Player",
   last_callers: "Last Callers",
   latest_collys_released: "New Collys",

@@ -1,27 +1,39 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { parseNowPlaying, type NowPlayingEntry } from "@/lib/nowPlaying";
 import PrintLines from "@/components/ui/PrintLines";
 
-// Live "now playing in HippoPlayer" feed. Polls the cached proxy at
-// /api/now-playing every 30s (HippoPlayer heartbeats every 30s, so 30s polling
-// gives ~0-30s latency). The proxy collapses every visitor's polling into one
-// upstream hit per cache window, so this stays cheap regardless of traffic.
-//
-// There is no SSE channel for this feed — it originates on hippoplayer.se, not
-// in asciiarena's own realtime infra — so a plain interval is the right tool
-// rather than the EventSource pattern the in-house widgets use.
-const POLL_MS = 30_000;
+/**
+ * Who is listening to what, in the site's own music player.
+ *
+ * This used to mirror hippoplayer.se's now-playing feed. The site has its own
+ * player now, so the sidebar shows the people who are actually here instead of
+ * activity on another site.
+ *
+ * Presence lives in memory on the server with a 5 minute window, and the player
+ * reports a track change as it happens, so polling only has to be often enough
+ * to feel live. There is no SSE channel for it: one small poll is cheaper than
+ * holding another stream open per tab, and a logged-in page already holds
+ * several.
+ */
+const POLL_MS = 20_000;
 
-function load(set: (entries: NowPlayingEntry[]) => void) {
-  fetch("/api/now-playing")
+interface Listener {
+  userId: number;
+  nick: string;
+  track: string;
+  at: number;
+}
+
+function load(set: (entries: Listener[]) => void) {
+  fetch("/api/now-playing/site")
     .then(r => (r.ok ? r.json() : []))
-    .then((d: unknown) => set(parseNowPlaying(d)))
-    .catch(() => { /* keep last good data on a transient failure */ });
+    .then((d: unknown) => set(Array.isArray(d) ? (d as Listener[]) : []))
+    .catch(() => { /* keep the last good list on a transient failure */ });
 }
 
 export default function NowPlaying() {
-  const [entries, setEntries] = useState<NowPlayingEntry[]>([]);
+  const [entries, setEntries] = useState<Listener[]>([]);
 
   useEffect(() => {
     load(setEntries);
@@ -29,41 +41,38 @@ export default function NowPlaying() {
     return () => clearInterval(interval);
   }, []);
 
-  // Hide the whole section when nobody is playing anything.
+  // Nobody listening: no widget, rather than an empty box.
   if (entries.length === 0) return null;
 
   return (
     <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
       <div className="header col-lg-12 p-0">
-        <h2 className="ap-1 bg-header">PLAYING IN HIPPOPLAYER</h2>
+        <h2 className="ap-1 bg-header">PLAYING NOW</h2>
       </div>
       <div className="container col-12 apt-1 apb-1 m-0 p-0 bg-secondary">
         <PrintLines>
-        {entries.map(entry => {
-          const label = entry.title || entry.author || "Unknown track";
-          return (
-            <div key={entry.url} className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
-              <a
-                href={entry.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-truncate"
-                style={{ color: "#aaaaaa" }}
-                title={entry.author ? `${label} - ${entry.author}` : label}
+          {entries.map(entry => (
+            <div
+              key={entry.userId}
+              className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between"
+            >
+              <Link
+                prefetch={false}
+                href={`/member/${entry.nick}`}
+                className="yellow text-truncate"
+                style={{ flexShrink: 0 }}
               >
-                <span className="yellow">{label}</span>
-                {entry.title && entry.author && (
-                  <span style={{ color: "#aaaaaa" }}> - {entry.author}</span>
-                )}
-              </a>
-              {entry.listeners > 1 && (
-                <span className="text-truncate cyan" style={{ paddingLeft: "8px", flexShrink: 0 }}>
-                  ({entry.listeners} listeners)
-                </span>
-              )}
+                {entry.nick}
+              </Link>
+              <span
+                className="text-truncate"
+                style={{ color: "#aaaaaa", paddingLeft: "8px" }}
+                title={entry.track}
+              >
+                {entry.track}
+              </span>
             </div>
-          );
-        })}
+          ))}
         </PrintLines>
       </div>
     </div>

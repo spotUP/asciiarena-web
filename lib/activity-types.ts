@@ -22,6 +22,7 @@ export const ACTIVITY_TYPES = [
   "forum",
   "notif-forum-reply",
   "notif-mention",
+  "listening",
 ] as const;
 export type ActivityType = (typeof ACTIVITY_TYPES)[number];
 
@@ -44,4 +45,5 @@ export const ACTIVITY_LABELS: Record<ActivityType, string> = {
   forum: "Posting in the forum",
   "notif-forum-reply": "Notifications: replies to my topic",
   "notif-mention": "Notifications: someone mentions me",
+  listening: "Showing what I am playing in the music player",
 };

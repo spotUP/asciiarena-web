@@ -185,6 +185,23 @@ export default function MusicProvider({ children }: { children: React.ReactNode 
     } catch { /* storage unavailable */ }
   }, [track, isPlaying]);
 
+  // Tell the site what is playing, so the sidebar can show who is listening to
+  // what. Reports the track while playing and clears it when stopped or paused,
+  // so a paused tab does not sit in the list forever. The server takes the user
+  // from the session and honours the "listening" activity opt-out, so this is a
+  // report, not a claim, and a reader who opted out is never listed.
+  useEffect(() => {
+    const label = track && isPlaying ? `${track.title}${track.format ? ` (${track.format})` : ""}` : null;
+    const ctrl = new AbortController();
+    fetch("/api/now-playing/site", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ track: label }),
+      signal: ctrl.signal,
+    }).catch(() => { /* presence is best-effort; never disturb playback */ });
+    return () => ctrl.abort();
+  }, [track, isPlaying]);
+
   useEffect(() => {
     let saved: MusicTrack | null = null;
     try {
