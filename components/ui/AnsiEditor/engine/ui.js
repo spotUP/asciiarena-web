@@ -309,7 +309,14 @@ const createPaintShortcuts = keyPair => {
 
 	const keyDown = e => {
 		if (!ignored) {
-			if (!e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {
+			// asciiarena CHANGE: these shortcuts used to fire on a BARE key, so
+			// typing "k" switched to the keyboard tool and "3" changed colour
+			// instead of putting those characters on the canvas. The canvas is a
+			// text surface -- every printable character has to reach it -- so a
+			// tool shortcut must carry a qualifier. Alt, not Ctrl: Ctrl+digit is
+			// the browser's tab switcher. Ctrl-based bindings still work through
+			// keyDownWithCtrl below.
+			if (e.altKey && !e.ctrlKey && !e.metaKey) {
 				if (e.key >= '0' && e.key <= '7') {
 					// Number keys 0-7 for color shortcuts
 					const color = parseInt(e.key, 10);

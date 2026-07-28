@@ -224,13 +224,13 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 			<aside>
 				<canvas id="palettePreview" height="40" width="40"></canvas>
 				<canvas id="palettePicker" height="160" width="40"></canvas>
-				<div id="keyboard" aria-label="Keyboard (k)">
+				<div id="keyboard" aria-label="Text tool (Alt+K)">
 					<span class="asciiIcon" aria-hidden="true">TEXT</span>
 				</div>
 				<div id="brushes" aria-label="Brushes">
 					<span class="asciiIcon" aria-hidden="true">BRUSH</span>
 				</div>
-				<div id="fill" aria-label="Fill (n)">
+				<div id="fill" aria-label="Fill (Alt+N)">
 					<span class="asciiIcon" aria-hidden="true">FILL</span>
 				</div>
 				<div id="shapes" aria-label="Shapes">
@@ -240,7 +240,7 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 				<div id="selection" aria-label="Selection">
 					<span class="asciiIcon" aria-hidden="true">SELECT</span>
 				</div>
-				<div id="sample" aria-label="Sample (alt)">
+				<div id="sample" aria-label="Pick colour and character">
 					<span class="asciiIcon" aria-hidden="true">PICK</span>
 				</div>
 				<div id="mirror" aria-label="Mirror Mode (Ctrl+M)">
