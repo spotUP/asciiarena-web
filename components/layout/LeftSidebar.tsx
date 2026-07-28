@@ -3,6 +3,7 @@ import { getSession as auth } from "@/lib/session";
 import { getHiddenWidgets } from "@/lib/widgets";
 import Hideable from "@/components/widgets/Hideable";
 import LatestNews from "@/components/widgets/LatestNews";
+import LatestForumPosts from "@/components/widgets/LatestForumPosts";
 import UsersOnlineLive from "@/components/widgets/UsersOnlineLive";
 import CedSessions from "@/components/widgets/CedSessions";
 import NowPlaying from "@/components/widgets/NowPlaying";
@@ -24,6 +25,7 @@ export default async function LeftSidebar() {
   return (
     <>
       {!hidden.has("latest_news") && <Hideable widgetKey="latest_news" canHide={isLoggedIn}><Suspense fallback={null}><LatestNews limit={5} /></Suspense></Hideable>}
+      {!hidden.has("latest_forum_posts") && <Hideable widgetKey="latest_forum_posts" canHide={isLoggedIn}><Suspense fallback={null}><LatestForumPosts limit={5} /></Suspense></Hideable>}
       {!hidden.has("users_online") && <Hideable widgetKey="users_online" canHide={isLoggedIn}><UsersOnlineLive isLoggedIn={isLoggedIn} currentUserId={currentUserId} /></Hideable>}
       {!hidden.has("ced_sessions") && <Hideable widgetKey="ced_sessions" canHide={isLoggedIn}><CedSessions /></Hideable>}
       {!hidden.has("now_playing") && <Hideable widgetKey="now_playing" canHide={isLoggedIn}><NowPlaying /></Hideable>}

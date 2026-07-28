@@ -20,6 +20,7 @@ export const WIDGET_KEYS = [
   "global_wall",
   // Left sidebar
   "latest_news",
+  "latest_forum_posts",
   "users_online",
   "ced_sessions",
   "now_playing",
@@ -58,6 +59,7 @@ export const WIDGET_LABELS: Record<WidgetKey, string> = {
   users_online: "Users Online",
   activity_feed: "Live Feed",
   latest_news: "Site News",
+  latest_forum_posts: "Latest Forum Posts",
   ced_sessions: "Editing in CED",
   now_playing: "Playing in HippoPlayer",
   music_player: "Modland Music Player",
@@ -88,7 +90,7 @@ export const WIDGET_GROUPS: { label: string; keys: WidgetKey[] }[] = [
   {
     label: "Left sidebar",
     keys: [
-      "latest_news", "users_online", "ced_sessions", "now_playing", "music_player", "last_callers",
+      "latest_news", "latest_forum_posts", "users_online", "ced_sessions", "now_playing", "music_player", "last_callers",
       "poll_latest_closed",
       "latest_collys_released", "latest_collys_added", "latest_mags",
       "latest_apps", "new_users", "weektop",

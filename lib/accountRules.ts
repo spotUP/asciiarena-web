@@ -10,6 +10,22 @@ export const INACTIVE_RANK = "Inactive";
 // link. Matches the admin-facing ranks ladder in app/admin/users.
 export const ACTIVE_RANK = "Member";
 
+/**
+ * Every rank an account can hold, lowest first. This used to be a bare literal
+ * inside app/admin/users/UsersClient.tsx, where it was only ever the order of a
+ * select box. The forum needs it as an actual ladder (lib/forum/rules.ts gates
+ * reading and posting on it), so it lives here now and the admin select
+ * imports it.
+ *
+ * Note "Uploader" sitting above "Senior Member": that ordering is inherited
+ * from the select box and was never a considered decision. It is treated as
+ * the ladder because changing it would silently re-gate existing boards.
+ *
+ * The leading "" is the no-rank case that legacy imported accounts carry.
+ */
+export const RANKS = ["", "Inactive", "Member", "Senior Member", "Uploader", "Admin"] as const;
+export type Rank = (typeof RANKS)[number];
+
 // Whether an account with this rank is blocked from logging in. Only the
 // explicit "Inactive" rank is gated — NULL / "" / any other rank (legacy
 // imports, Member, Admin, ...) may log in, so we never lock out existing users.

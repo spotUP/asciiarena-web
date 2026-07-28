@@ -10,6 +10,8 @@ export const KIND_VERB: Record<string, string> = {
   "notif-message": "sent you a message",
   "notif-status": "changed status of your request",
   "notif-poll": "opened a poll",
+  "notif-forum-reply": "replied to your topic",
+  "notif-mention": "mentioned you in",
 };
 
 export interface NotificationLabel {

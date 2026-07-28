@@ -8,7 +8,9 @@ import { ACTIVITY_TYPES, type ActivityType } from "@/lib/activity";
 export const dynamic = "force-dynamic";
 
 const postSchema = z.object({
-  hidden: z.array(z.enum(ACTIVITY_TYPES as unknown as [ActivityType, ...ActivityType[]])).max(20),
+  // Bound by the list itself. A hardcoded number silently breaks "hide
+  // everything" the moment the list outgrows it.
+  hidden: z.array(z.enum(ACTIVITY_TYPES as unknown as [ActivityType, ...ActivityType[]])).max(ACTIVITY_TYPES.length),
 });
 
 export async function GET() {

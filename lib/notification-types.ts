@@ -8,7 +8,11 @@ export type NotificationType =
   | "notif-reply"
   | "notif-message"
   | "notif-status"
-  | "notif-poll";
+  | "notif-poll"
+  // Someone replied in a topic you started. Distinct from notif-reply, which
+  // lib/notificationLabel.ts hardcodes as "replied to your request".
+  | "notif-forum-reply"
+  | "notif-mention";
 
 /**
  * What the bell is allowed to show: things addressed to you personally that
@@ -30,4 +34,8 @@ export const BELL_NOTIFICATION_TYPES: NotificationType[] = [
   "notif-message",
   "notif-reply",
   "notif-status",
+  // Both are addressed to you by name and may want an answer, which is the
+  // criterion above — not the ambient drip that comments and favourites are.
+  "notif-forum-reply",
+  "notif-mention",
 ];

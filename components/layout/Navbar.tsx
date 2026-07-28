@@ -94,6 +94,10 @@ export default function Navbar({ session }: NavbarProps) {
             <li className="nav-item"><Link prefetch={false} className="nav-link ascii apr-1" href="/crews">CREWS</Link></li>
             <li className="nav-item"><Link prefetch={false} className="nav-link ascii apr-1" href="/logos">LOGOS</Link></li>
             <li className="nav-item"><Link prefetch={false} className="nav-link ascii apr-1" href="/bbs">BOARDS</Link></li>
+            {/* Sits with the other discussion destinations. Note /bbs is
+                already labelled BOARDS, so forum sections are never called
+                "boards" at nav level. */}
+            <li className="nav-item"><Link prefetch={false} className="nav-link ascii apr-1" href="/forum">FORUM</Link></li>
             <li className="nav-item"><Link prefetch={false} className="nav-link ascii apr-1" href="/requests">REQUESTS</Link></li>
             <li className="nav-item"><Link prefetch={false} className="nav-link ascii apr-1" href="/polls">POLLS</Link></li>
             <li className="nav-item"><Link prefetch={false} className="nav-link ascii apr-1" href="/timeline">TiMELINE</Link></li>
@@ -191,6 +195,7 @@ export default function Navbar({ session }: NavbarProps) {
                   <Link prefetch={false} className="dropdown-item ascii" href="/admin/content">Apps &amp; Mags</Link>
                   <Link prefetch={false} className="dropdown-item ascii" href="/admin/bbs">BBS</Link>
                   <Link prefetch={false} className="dropdown-item ascii" href="/admin/requests">Requests</Link>
+                  <Link prefetch={false} className="dropdown-item ascii" href="/admin/forum">Forum</Link>
                 </div>
               </li>
             )}

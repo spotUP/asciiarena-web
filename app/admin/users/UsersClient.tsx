@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import DosSelect from "@/components/ui/DosSelect";
+// Single source of truth for the rank ladder, shared with the forum's gates.
+import { RANKS } from "@/lib/accountRules";
 
 interface User {
   id: number;
@@ -13,7 +15,6 @@ interface User {
   mail: string | null;
 }
 
-const RANKS = ["", "Inactive", "Member", "Senior Member", "Uploader", "Admin"];
 
 function Msg({ msg }: { msg: { text: string; ok: boolean } | null }) {
   if (!msg) return null;

@@ -592,3 +592,103 @@ enum polls_result_layout {
   tail
   dual_row
 }
+
+// ---------------------------------------------------------------------------
+// Native forum: boards > topics > posts. Flat reply list per topic.
+//
+// Timestamps are unsigned unix seconds, matching polls / news / notifications /
+// chat_participants -- NOT the DateTime columns on the legacy wall tables.
+//
+// Author identity is stored as user_id only. A denormalized nick column would
+// become one more entry in lib/entityRename.ts's cascade list every time
+// someone renames themselves, which is exactly the class of bug that list
+// exists to track.
+// ---------------------------------------------------------------------------
+
+model forum_boards {
+  id            Int            @id @default(autoincrement()) @db.UnsignedInt
+  slug          String         @unique(map: "uq_forum_board_slug") @db.VarChar(96)
+  name          String         @db.VarChar(120)
+  description   String         @default("") @db.VarChar(255)
+  sort_order    Int            @default(0)
+  min_read_rank String?        @db.VarChar(16)
+  min_post_rank String         @default("Member") @db.VarChar(16)
+  locked        Boolean        @default(false)
+  hidden        Boolean        @default(false)
+  topic_count   Int            @default(0)
+  post_count    Int            @default(0)
+  last_topic_id Int?           @db.UnsignedInt
+  last_post_id  Int?           @db.UnsignedInt
+  last_post_at  Int?
+  last_user_id  Int?           @db.UnsignedInt
+  created_at    Int
+  updated_at    Int
+  topics        forum_topics[]
+
+  @@index([hidden, sort_order], map: "ix_visible_order")
+}
+
+model forum_topics {
+  id            Int           @id @default(autoincrement()) @db.UnsignedInt
+  board_id      Int           @db.UnsignedInt
+  slug          String        @db.VarChar(120)
+  title         String        @db.VarChar(200)
+  user_id       Int           @db.UnsignedInt
+  pinned        Boolean       @default(false)
+  locked        Boolean       @default(false)
+  post_count    Int           @default(1)
+  view_count    Int           @default(0)
+  first_post_id Int?          @db.UnsignedInt
+  last_post_id  Int?          @db.UnsignedInt
+  last_post_at  Int
+  last_user_id  Int?          @db.UnsignedInt
+  deleted_at    Int?
+  deleted_by_id Int?          @db.UnsignedInt
+  created_at    Int
+  updated_at    Int
+  board         forum_boards  @relation(fields: [board_id], references: [id], onDelete: Cascade, map: "forum_topics_ibfk_1")
+  posts         forum_posts[]
+
+  @@unique([board_id, slug], map: "uq_board_slug")
+  @@index([board_id, deleted_at, pinned, last_post_at], map: "ix_board_listing")
+  @@index([user_id, id], map: "ix_user_topics")
+  @@fulltext([title], map: "ft_forum_topic_title")
+}
+
+model forum_posts {
+  id            Int          @id @default(autoincrement()) @db.UnsignedInt
+  topic_id      Int          @db.UnsignedInt
+  board_id      Int          @db.UnsignedInt
+  user_id       Int          @db.UnsignedInt
+  body          String       @db.MediumText
+  ansi_b64      String?      @db.MediumText
+  ansi_font     String?      @db.VarChar(32)
+  edited_at     Int?
+  edited_by_id  Int?         @db.UnsignedInt
+  edit_count    Int          @default(0)
+  deleted_at    Int?
+  deleted_by_id Int?         @db.UnsignedInt
+  created_at    Int
+  topic         forum_topics @relation(fields: [topic_id], references: [id], onDelete: Cascade, map: "forum_posts_ibfk_1")
+
+  @@index([topic_id, deleted_at, id], map: "ix_topic_seq")
+  @@index([user_id, id], map: "ix_user_posts")
+  @@index([board_id, id], map: "ix_board_recent")
+  @@fulltext([body], map: "ft_forum_post_body")
+}
+
+model forum_reports {
+  id             Int     @id @default(autoincrement()) @db.UnsignedInt
+  post_id        Int     @db.UnsignedInt
+  topic_id       Int     @db.UnsignedInt
+  board_id       Int     @db.UnsignedInt
+  reporter_id    Int     @db.UnsignedInt
+  reason         String  @db.VarChar(255)
+  created_at     Int
+  resolved_at    Int?
+  resolved_by_id Int?    @db.UnsignedInt
+  resolution     String? @db.VarChar(16)
+
+  @@unique([post_id, reporter_id], map: "uq_post_reporter")
+  @@index([resolved_at, created_at], map: "ix_queue")
+}

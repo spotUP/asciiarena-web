@@ -19,6 +19,9 @@ export const ACTIVITY_TYPES = [
   "notif-message",
   "notif-status",
   "notif-poll",
+  "forum",
+  "notif-forum-reply",
+  "notif-mention",
 ] as const;
 export type ActivityType = (typeof ACTIVITY_TYPES)[number];
 
@@ -38,4 +41,7 @@ export const ACTIVITY_LABELS: Record<ActivityType, string> = {
   "notif-message": "Notifications: someone messages me",
   "notif-status": "Notifications: my request's status changes",
   "notif-poll": "Notifications: a new community poll has opened",
+  forum: "Posting in the forum",
+  "notif-forum-reply": "Notifications: replies to my topic",
+  "notif-mention": "Notifications: someone mentions me",
 };
