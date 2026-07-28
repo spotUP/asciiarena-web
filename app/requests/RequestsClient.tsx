@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import NewItemsPill from "@/components/ui/NewItemsPill";
 import SortHeader from "@/components/ui/SortHeader";
+import { subscribeRaw } from "@/lib/sse-pool";
 
 interface RequestRow {
   id: number;
@@ -98,16 +99,12 @@ export default function RequestsClient() {
 
   // Effect 2b: live status changes from any admin/owner action
   useEffect(() => {
-    const es = new EventSource("/api/live?channel=site:status");
-    es.onmessage = (e: MessageEvent<string>) => {
-      try {
-        const evt = JSON.parse(e.data) as { type?: string; id?: number; status?: number };
-        if (evt.type === "request-status" && typeof evt.id === "number" && typeof evt.status === "number") {
-          setAllRows(prev => prev.map(r => r.id === evt.id ? { ...r, status: evt.status ?? r.status } : r));
-        }
-      } catch {}
-    };
-    return () => es.close();
+    return subscribeRaw("site:status", (raw) => {
+      const evt = raw as { type?: string; id?: number; status?: number } | null;
+      if (evt?.type === "request-status" && typeof evt.id === "number" && typeof evt.status === "number") {
+        setAllRows(prev => prev.map(r => r.id === evt.id ? { ...r, status: evt.status ?? r.status } : r));
+      }
+    });
   }, []);
 
   // Effect 3: IntersectionObserver

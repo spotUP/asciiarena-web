@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { urlsafe } from "@/lib/utils";
 import type { CedDocument, CedSessionsData } from "@/app/api/ced-sessions/route";
 import PrintLines from "@/components/ui/PrintLines";
+import { subscribeRaw } from "@/lib/sse-pool";
 
 const SPECTATE_BASE = "https://hippoplayer.se/?spectate=";
 
@@ -32,16 +33,12 @@ export default function CedSessions() {
 
   useEffect(() => {
     loadInitial(setDocuments);
-    const es = new EventSource(`/api/live?channel=site:ced-sessions`);
-    es.onmessage = (e: MessageEvent<string>) => {
-      try {
-        const evt = JSON.parse(e.data) as CedSessionsEvent;
-        if (evt.type === "update" && Array.isArray(evt.documents)) {
-          setDocuments(evt.documents);
-        }
-      } catch { /* ignore */ }
-    };
-    return () => es.close();
+    return subscribeRaw("site:ced-sessions", (raw) => {
+      const evt = raw as CedSessionsEvent | null;
+      if (evt?.type === "update" && Array.isArray(evt.documents)) {
+        setDocuments(evt.documents);
+      }
+    });
   }, []);
 
   if (documents.length === 0) return null;

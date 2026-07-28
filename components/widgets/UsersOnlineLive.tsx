@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { urlsafe } from "@/lib/utils";
+import { subscribeRaw } from "@/lib/sse-pool";
 import ScrambleText from "@/components/ui/ScrambleText";
 import { useChatContext } from "@/components/chat/ChatContext";
 
@@ -96,15 +97,11 @@ export default function UsersOnlineLive({ isLoggedIn = false, currentUserId }: {
       prevAnonRef.current = d.anonymousOnline;
     });
 
-    const es = new EventSource("/api/live?channel=site:online");
-    es.onmessage = (e) => {
-      try {
-        const event = JSON.parse(e.data);
-        if (event.type === "update") {
-          applyUpdate(event.activeUsers as ActiveUser[], event.anonymousOnline as number);
-        }
-      } catch { /* ignore */ }
-    };
+    const unsubscribe = subscribeRaw("site:online", (event) => {
+      if (event?.type === "update") {
+        applyUpdate(event.activeUsers as ActiveUser[], event.anonymousOnline as number);
+      }
+    });
 
     function ping() {
       fetch("/api/ping", {
@@ -117,7 +114,7 @@ export default function UsersOnlineLive({ isLoggedIn = false, currentUserId }: {
     const interval = setInterval(ping, 60_000);
 
     return () => {
-      es.close();
+      unsubscribe();
       clearInterval(interval);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps

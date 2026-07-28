@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { subscribeRaw } from "@/lib/sse-pool";
 
 interface Props {
   channel: string;
@@ -9,23 +10,24 @@ interface Props {
 // Tiny "N viewing" chip for entity pages (release/artist/crew/bbs). The SSE
 // endpoint in app/api/live/route.ts broadcasts a { type: "watching", count }
 // event whenever any client subscribes or unsubscribes on the channel, so we
-// don't need a dedicated broadcast point — just opening an EventSource on a
+// don't need a dedicated broadcast point — just subscribing to a
 // unique-per-page channel name is enough to participate in the count.
+//
+// Sharing the connection via lib/sse-pool.ts is what makes the count honest: a
+// page that also mounts LiveRefresh on the same channel used to open two
+// streams and count itself twice.
 export default function WatchingPip({ channel }: Props) {
   const [count, setCount] = useState<number | null>(null);
 
-  useEffect(() => {
-    const es = new EventSource(`/api/live?channel=${encodeURIComponent(channel)}`);
-    es.onmessage = (e: MessageEvent<string>) => {
-      try {
-        const evt = JSON.parse(e.data) as { type?: string; count?: number };
-        if (evt.type === "watching" && typeof evt.count === "number") {
+  useEffect(
+    () =>
+      subscribeRaw(channel, (evt) => {
+        if (evt?.type === "watching" && typeof evt.count === "number") {
           setCount(evt.count);
         }
-      } catch { /* ignore */ }
-    };
-    return () => es.close();
-  }, [channel]);
+      }),
+    [channel],
+  );
 
   if (count == null || count < 1) return null;
 

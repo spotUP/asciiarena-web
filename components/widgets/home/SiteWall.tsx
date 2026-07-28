@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ansiToHtml } from "@/lib/ansi";
 import PrintLines from "@/components/ui/PrintLines";
+import { subscribeRaw } from "@/lib/sse-pool";
 
 interface WallPost { tag: string | null; nick: string | null }
 interface Draft { nick: string; text: string }
@@ -32,9 +33,9 @@ export default function SiteWall({ isLoggedIn }: { isLoggedIn: boolean }) {
   }, []);
 
   useEffect(() => {
-    const es = new EventSource(`/api/live?channel=${CHANNEL}`);
-    es.onmessage = (e: MessageEvent<string>) => {
-      const event = JSON.parse(e.data) as LiveEvent;
+    return subscribeRaw(CHANNEL, (raw) => {
+      if (!raw) return;
+      const event = raw as unknown as LiveEvent;
       if (event.type === "typing" && event.nick) {
         const nick = event.nick;
         setDrafts(prev => ({ ...prev, [nick]: { nick, text: event.draft ?? "" } }));
@@ -52,8 +53,7 @@ export default function SiteWall({ isLoggedIn }: { isLoggedIn: boolean }) {
           .then((d: unknown) => { if (Array.isArray(d)) setPosts(d as WallPost[]); })
           .catch(() => {});
       }
-    };
-    return () => es.close();
+    });
   }, []);
 
   const broadcastTyping = (text: string) => {

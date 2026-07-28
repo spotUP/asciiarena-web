@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { subscribeRaw } from "@/lib/sse-pool";
 
 function fetchUnread(set: (n: number) => void) {
   fetch("/api/messages/unread")
@@ -15,9 +16,9 @@ export default function UnreadBadge({ userId }: { userId?: string }) {
   useEffect(() => {
     fetchUnread(setCount);
     if (!userId) return;
-    const es = new EventSource(`/api/live?channel=user:${userId}:messages`);
-    es.onmessage = () => fetchUnread(setCount);
-    return () => es.close();
+    // Shares the connection with ChatBar, which is mounted on every page and
+    // listens to the same channel.
+    return subscribeRaw(`user:${userId}:messages`, () => fetchUnread(setCount));
   }, [userId]);
 
   if (count <= 0) return null;

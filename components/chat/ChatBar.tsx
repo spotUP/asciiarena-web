@@ -6,6 +6,7 @@ import ChatWindow from "./ChatWindow";
 import { resolveDisplayTitle } from "@/lib/chatThread";
 import { playChatAlert, unlockChatAudio } from "@/lib/chatSound";
 import { usePoppedOutPeers } from "./popoutRegistry";
+import { subscribeRaw } from "@/lib/sse-pool";
 
 interface Props {
   userId: string;
@@ -53,10 +54,9 @@ export default function ChatBar({ userId, userNick }: Props) {
   // expands (or opens) the relevant chat window. A yell also opens/expands
   // and plays the X-Copy alert sound so it reaches you even with no window open.
   useEffect(() => {
-    const es = new EventSource(`/api/live?channel=user:${userId}:messages`);
-    es.onmessage = (e) => {
-      try {
-        const event = JSON.parse(e.data) as IncomingMessage;
+    return subscribeRaw(`user:${userId}:messages`, (raw) => {
+      if (raw) {
+        const event = raw as unknown as IncomingMessage;
         if (event.type === "message" && event.fromId && event.fromNick) {
           const wins = windowsRef.current;
           const tid = event.threadId;
@@ -111,9 +111,8 @@ export default function ChatBar({ userId, userNick }: Props) {
             })
             .catch(() => {});
         }
-      } catch { /* ignore */ }
-    };
-    return () => es.close();
+      }
+    });
   }, [userId, minimizeChat, openChat, openThread]);
 
   const fetchSuggestions = useCallback((q: string) => {

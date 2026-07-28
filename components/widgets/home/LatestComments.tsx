@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { urlsafe } from "@/lib/utils";
 import PrintLines from "@/components/ui/PrintLines";
+import { subscribeRaw } from "@/lib/sse-pool";
 
 interface CommentRow { filename: string; nick: string; comment: string }
 
@@ -18,9 +19,7 @@ export default function LatestComments() {
 
   useEffect(() => {
     load(setRows);
-    const es = new EventSource("/api/live?channel=site:comments");
-    es.onmessage = () => load(setRows);
-    return () => es.close();
+    return subscribeRaw("site:comments", () => load(setRows));
   }, []);
 
   if (!rows.length) return null;

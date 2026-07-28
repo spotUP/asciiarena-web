@@ -6,6 +6,7 @@ import ChatWindow from "@/components/chat/ChatWindow";
 import UserPicker, { type PickableUser } from "@/components/chat/UserPicker";
 import RelativeTime from "@/components/widgets/RelativeTime";
 import { buildInboxRow } from "@/lib/inboxRow";
+import { subscribeRaw } from "@/lib/sse-pool";
 
 // One conversation as the inbox sees it. The API returns the raw parts
 // (subject, participants, preview) rather than one pre-formatted title, because
@@ -113,9 +114,9 @@ export default function MessagesClient({ userId, userNick, initialReceiverId, in
   // Live inbox: new message, read cursor moved, archived, rejoined.
   useEffect(() => {
     if (!userId) return;
-    const es = new EventSource(`/api/live?channel=user:${userId}:messages`);
-    es.onmessage = () => { void load(); };
-    return () => es.close();
+    // Same channel ChatBar and UnreadBadge already hold; the pool means this
+    // page adds no third connection.
+    return subscribeRaw(`user:${userId}:messages`, () => { void load(); });
   }, [userId, load]);
 
   // A deep-linked thread may not be in the current list at all — it can be

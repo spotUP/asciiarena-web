@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { subscribeRaw } from "@/lib/sse-pool";
 
 interface Counts { broken: number; total: number }
 
@@ -19,15 +20,10 @@ export default function ModerationBadge() {
 
   useEffect(() => {
     refresh();
-    const es = new EventSource(`/api/live?channel=site:moderation`);
-    es.onmessage = (e: MessageEvent<string>) => {
-      try {
-        const evt = JSON.parse(e.data) as { type?: string };
-        if (evt.type === "watching") return;
-        refresh();
-      } catch { /* ignore */ }
-    };
-    return () => es.close();
+    return subscribeRaw("site:moderation", (evt) => {
+      if (evt?.type === "watching") return;
+      refresh();
+    });
   }, []);
 
   if (counts.total === 0) return null;

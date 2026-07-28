@@ -30,6 +30,7 @@ import { sectionsFromLogoMap } from "@/lib/collyTrailer";
 import ColorSwatch from "@/components/ui/ColorSwatch";
 import { useMusic } from "@/components/music/MusicProvider";
 import { BeatDetector, lowBandEnergy } from "@/lib/uade/beatDetector";
+import { subscribeRaw } from "@/lib/sse-pool";
 
 // Loaded on first entry into tag mode only — readers who never tag do not
 // download the editor.
@@ -417,9 +418,9 @@ export default function ReleaseClient({
   const channel = `comments:${collyId}`;
 
   useEffect(() => {
-    const es = new EventSource(`/api/live?channel=${channel}`);
-    es.onmessage = (e: MessageEvent<string>) => {
-      const event = JSON.parse(e.data) as { type: string; nick?: string; draft?: string; count?: number };
+    return subscribeRaw(channel, (raw) => {
+      if (!raw) return;
+      const event = raw as { type: string; nick?: string; draft?: string; count?: number };
       if (event.type === "watching") {
         setWatching(event.count ?? 0);
       } else if (event.type === "typing" && event.nick) {
@@ -446,31 +447,24 @@ export default function ReleaseClient({
           setComments(prev => prev.filter(c => c.id !== ev.commentId));
         }
       }
-    };
-    return () => es.close();
+    });
   }, [channel, loadComments]);
 
   // Per-release favourite + download channels
   useEffect(() => {
-    const esFav = new EventSource(`/api/live?channel=release:${collyId}:fav`);
-    esFav.onmessage = (e: MessageEvent<string>) => {
-      try {
-        const ev = JSON.parse(e.data) as { type?: string; delta?: number; nick?: string };
-        // Skip events caused by this user — they've already been applied optimistically.
-        if (ev.nick && userNick && ev.nick === userNick) return;
-        if (ev.type === "changed" && typeof ev.delta === "number") {
-          setFavCount(c => Math.max(0, c + ev.delta!));
-        }
-      } catch {}
-    };
-    const esDl = new EventSource(`/api/live?channel=release:${collyId}:downloads`);
-    esDl.onmessage = (e: MessageEvent<string>) => {
-      try {
-        const ev = JSON.parse(e.data) as { type?: string };
-        if (ev.type === "downloaded") setDownloadCount(c => c + 1);
-      } catch {}
-    };
-    return () => { esFav.close(); esDl.close(); };
+    const unsubFav = subscribeRaw(`release:${collyId}:fav`, (raw) => {
+      const ev = raw as { type?: string; delta?: number; nick?: string } | null;
+      if (!ev) return;
+      // Skip events caused by this user — they've already been applied optimistically.
+      if (ev.nick && userNick && ev.nick === userNick) return;
+      if (ev.type === "changed" && typeof ev.delta === "number") {
+        setFavCount(c => Math.max(0, c + ev.delta!));
+      }
+    });
+    const unsubDl = subscribeRaw(`release:${collyId}:downloads`, (raw) => {
+      if (raw?.type === "downloaded") setDownloadCount(c => c + 1);
+    });
+    return () => { unsubFav(); unsubDl(); };
   }, [collyId, userNick]);
 
   const broadcastTyping = useCallback((text: string) => {
@@ -488,16 +482,12 @@ export default function ReleaseClient({
   // broadcasts the new absolute total each time someone opens this page;
   // we use the broadcast value (not local +1) so all viewers stay in sync.
   useEffect(() => {
-    const es = new EventSource(`/api/live?channel=release:${collyId}:views`);
-    es.onmessage = (e: MessageEvent<string>) => {
-      try {
-        const evt = JSON.parse(e.data) as { type?: string; total?: number };
-        if (evt.type === "viewed" && typeof evt.total === "number") {
-          setViewCount(evt.total);
-        }
-      } catch { /* ignore */ }
-    };
-    return () => es.close();
+    return subscribeRaw(`release:${collyId}:views`, (raw) => {
+      const evt = raw as { type?: string; total?: number } | null;
+      if (evt?.type === "viewed" && typeof evt.total === "number") {
+        setViewCount(evt.total);
+      }
+    });
   }, [collyId]);
 
   useEffect(() => {

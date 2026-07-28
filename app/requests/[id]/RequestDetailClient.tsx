@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { postRequestComment, updateRequestStatus } from "@/app/actions/requests";
+import { subscribeRaw } from "@/lib/sse-pool";
 
 interface Comment {
   id?: number;
@@ -56,9 +57,9 @@ export default function RequestDetailClient({ requestId, canChangeStatus, isLogg
   useEffect(() => { loadComments(); }, [loadComments]);
 
   useEffect(() => {
-    const es = new EventSource(`/api/live?channel=${channel}`);
-    es.onmessage = (e: MessageEvent<string>) => {
-      const event = JSON.parse(e.data) as LiveEvent;
+    return subscribeRaw(channel, (raw) => {
+      if (!raw) return;
+      const event = raw as unknown as LiveEvent;
       if (event.type === "watching") {
         setWatching((event as { count?: number }).count ?? 0);
       } else if (event.type === "typing" && event.nick) {
@@ -77,8 +78,7 @@ export default function RequestDetailClient({ requestId, canChangeStatus, isLogg
       } else if (event.type === "status") {
         router.refresh();
       }
-    };
-    return () => es.close();
+    });
   }, [channel, loadComments, router]);
 
   const broadcastTyping = (text: string) => {

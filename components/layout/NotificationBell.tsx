@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import NotificationDropdown from "./NotificationDropdown";
+import { subscribeRaw } from "@/lib/sse-pool";
 
 interface ListPayload {
   notifications: NotifRow[];
@@ -40,16 +41,9 @@ export default function NotificationBell({ userId }: Props) {
 
   useEffect(() => {
     reload();
-    const es = new EventSource(`/api/live?channel=user:${userId}:notifications`);
-    es.onmessage = (e: MessageEvent<string>) => {
-      try {
-        const evt = JSON.parse(e.data) as { type?: string };
-        if (evt.type === "new") {
-          reload();
-        }
-      } catch {}
-    };
-    return () => es.close();
+    return subscribeRaw(`user:${userId}:notifications`, (evt) => {
+      if (evt?.type === "new") reload();
+    });
   }, [userId]);
 
   useEffect(() => {

@@ -86,11 +86,27 @@ Build always happens on the GitHub Actions ubuntu runner.
 
 **Deploys only trigger on `modernize/typescript-nextjs`** — never on feature branch pushes.
 
-**HTTP/2 is mandatory on the 443 listen directive** (`listen 443 ssl http2;`). The site holds
-7 concurrent SSE channels per tab; on HTTP/1.1 browsers cap at 6 connections per host, so the
-SSE streams exhaust the pool and ALL clicks and fetches hang -- links appear dead, widgets never
-load, while curl reports the server healthy. Verify after any nginx change:
+**HTTP/2 is mandatory on the 443 listen directive** (`listen 443 ssl http2;`). A logged-in home
+page with all widgets visible subscribes to roughly 17 distinct SSE channels (18 for an admin) --
+`user:{id}:{widgets,profile,notifications,messages}`, `site:{online,ced-sessions,polls,releases,
+mags,apps,users,votes,comments,logos,activity,moderation}`, `poll:{id}`, `wall:1`. One connection
+each. On HTTP/1.1 browsers cap at 6 connections per host, so the streams exhaust the pool and ALL
+clicks and fetches hang -- links appear dead, widgets never load, while curl reports the server
+healthy. Verify after any nginx change:
 `curl -sI https://asciiarena.se/ | head -1` must print `HTTP/2 200`.
+
+**Subscribe through `lib/sse-pool.ts`, never `new EventSource` directly.** With ~17 channels
+already open, the headroom under HTTP/2's 128-stream ceiling is smaller than it looks, and the
+count must not grow with the page's content. The pool keeps one connection per channel per tab
+and closes it when the last subscriber unmounts, so N components wanting the same channel cost
+one stream. This is load-bearing for anything rendered once per row: `OnlineDot` used to open a
+`site:online` stream *per instance*, so a 25-row list meant 25 streams on one channel.
+Pooling also keeps the `[N viewing]` count honest, since `app/api/live/route.ts` derives it from
+`subscriberCount()` and a tab that opened one channel twice used to count itself twice.
+
+**Adding a new `site:*` channel is a real cost.** Prefer reusing an existing one (or a
+page-scoped `{entity}:{id}` channel that only exists while that page is open) over adding another
+always-on subscription to the sidebars.
 
 **nginx config** lives in `deploy/asciiarena.se-nginx.conf` (source of truth). CI copies it to
 `/tmp/asciiarena-nginx.conf` and the server-side script applies it if changed. If nginx ever

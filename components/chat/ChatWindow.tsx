@@ -6,6 +6,7 @@ import { playChatAlert, unlockChatAudio } from "@/lib/chatSound";
 import { resolveDisplayTitle } from "@/lib/chatThread";
 import { announcePopoutOpen } from "./popoutRegistry";
 import UserPicker from "./UserPicker";
+import { subscribeRaw } from "@/lib/sse-pool";
 
 interface ChatMessage {
   id: number;
@@ -73,8 +74,10 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
   const scrollRef = useRef<HTMLDivElement>(null);
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const typingDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const esMessagesRef = useRef<EventSource | null>(null);
-  const esTypingRef = useRef<EventSource | null>(null);
+  // Unsubscribe callbacks, not EventSources: the connections themselves belong
+  // to lib/sse-pool.ts and are shared with any other window on the same thread.
+  const esMessagesRef = useRef<(() => void) | null>(null);
+  const esTypingRef = useRef<(() => void) | null>(null);
   const threadIdRef = useRef<number | null>(threadId);
   const minimizedRef = useRef(minimized);
   const sysIdRef = useRef(0);
@@ -178,13 +181,11 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
   }, []);
 
   const subscribeToThread = useCallback((tid: number) => {
-    if (esMessagesRef.current) esMessagesRef.current.close();
-    if (esTypingRef.current) esTypingRef.current.close();
+    esMessagesRef.current?.();
+    esTypingRef.current?.();
 
-    const esMsg = new EventSource(`/api/live?channel=thread:${tid}`);
-    esMsg.onmessage = (e) => {
-      try {
-        const event = JSON.parse(e.data);
+    esMessagesRef.current = subscribeRaw(`thread:${tid}`, (event) => {
+      if (event) {
         if (event.type === "message") {
           loadMessages(tid);
           if (minimizedRef.current) {
@@ -206,14 +207,11 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
           pushSystemLine(`${event.nick || "a member"} left`);
           refreshParticipants(tid);
         }
-      } catch { /* ignore */ }
-    };
-    esMessagesRef.current = esMsg;
+      }
+    });
 
-    const esTyping = new EventSource(`/api/live?channel=thread:${tid}:typing`);
-    esTyping.onmessage = (e) => {
-      try {
-        const event = JSON.parse(e.data);
+    esTypingRef.current = subscribeRaw(`thread:${tid}:typing`, (event) => {
+      if (event) {
         if (event.type === "typing" && event.nick && event.nick !== userNick) {
           setPeerDraft({ nick: event.nick as string, text: (event.draft as string) ?? "" });
           if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
@@ -222,9 +220,8 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
           if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
           setPeerDraft(null);
         }
-      } catch { /* ignore */ }
-    };
-    esTypingRef.current = esTyping;
+      }
+    });
   }, [windowKey, userId, userNick, loadMessages, incrementUnread, markReadIfVisible, triggerFlash, pushSystemLine, refreshParticipants]);
 
   // Initialize: find or confirm thread, load messages
@@ -249,8 +246,8 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
     }
 
     return () => {
-      esMessagesRef.current?.close();
-      esTypingRef.current?.close();
+      esMessagesRef.current?.();
+      esTypingRef.current?.();
       if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
       if (typingDebounceRef.current) clearTimeout(typingDebounceRef.current);
       if (flashTimerRef.current) clearTimeout(flashTimerRef.current);

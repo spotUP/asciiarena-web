@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { subscribeRaw } from "@/lib/sse-pool";
 
 interface Release { url: string; content: string }
 
@@ -18,9 +19,7 @@ export default function LatestReleasesLive({ columns = 2, header = "LATEST RELEA
 
   useEffect(() => {
     load(setReleases);
-    const es = new EventSource("/api/live?channel=site:releases");
-    es.onmessage = () => load(setReleases);
-    return () => es.close();
+    return subscribeRaw("site:releases", () => load(setReleases));
   }, []);
 
   const colSize = Math.round(12 / columns);

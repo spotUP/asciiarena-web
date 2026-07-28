@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { ansiToHtml } from "@/lib/ansi";
 import { useScenewall } from "@/lib/useScenewall";
 import PrintLines from "@/components/ui/PrintLines";
+import { subscribeRaw } from "@/lib/sse-pool";
 
 interface WallPost { userName: string; comment: string; source: string }
 interface Draft { nick: string; text: string }
@@ -42,9 +43,9 @@ export default function GlobalWall({ isLoggedIn }: { isLoggedIn?: boolean }) {
   const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const es = new EventSource(`/api/live?channel=${CHANNEL}`);
-    es.onmessage = (e: MessageEvent<string>) => {
-      const event = JSON.parse(e.data) as LiveEvent;
+    return subscribeRaw(CHANNEL, (raw) => {
+      if (!raw) return;
+      const event = raw as unknown as LiveEvent;
       if (event.type === "typing" && event.nick) {
         const nick = event.nick;
         setDrafts(prev => ({ ...prev, [nick]: { nick, text: event.draft ?? "" } }));
@@ -57,8 +58,7 @@ export default function GlobalWall({ isLoggedIn }: { isLoggedIn?: boolean }) {
         clearTimeout(draftTimers.current[nick]);
         setDrafts(prev => { const next = { ...prev }; delete next[nick]; return next; });
       }
-    };
-    return () => es.close();
+    });
   }, []);
 
   const broadcastTyping = (text: string) => {

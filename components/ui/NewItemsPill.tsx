@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { subscribeRaw } from "@/lib/sse-pool";
 
 interface Props {
   channel: string;
@@ -11,23 +12,24 @@ interface Props {
 export default function NewItemsPill({ channel, onReset, label }: Props) {
   const [count, setCount] = useState(0);
 
-  useEffect(() => {
-    const es = new EventSource(`/api/live?channel=${encodeURIComponent(channel)}`);
-    es.onmessage = (e: MessageEvent<string>) => {
-      try {
-        const evt = JSON.parse(e.data) as { type?: string };
-        if (evt.type === "watching" || evt.type === "update") return;
+  useEffect(
+    () =>
+      subscribeRaw(channel, (evt) => {
+        // "watching" is the subscriber-count ping and "update" is a full-state
+        // push, neither of which is a new item. An unparseable event is not
+        // counted either -- an inflated "3 new" that resolves to nothing is
+        // worse than a missed one.
+        if (!evt || evt.type === "watching" || evt.type === "update") return;
         setCount((c) => c + 1);
-      } catch {}
-    };
-    return () => es.close();
-  }, [channel]);
+      }),
+    [channel],
+  );
 
   if (count === 0) return null;
 
   const text = label
     ? label(count)
-    : `^ ${count} new item${count === 1 ? "" : "s"} since you loaded — click to refresh`;
+    : `^ ${count} new item${count === 1 ? "" : "s"} since you loaded - click to refresh`;
 
   return (
     <div
