@@ -21,18 +21,35 @@ interface Props {
 }
 
 export default function PostItem({ post, seq, canEdit, canDelete, canReport }: Props) {
+  // A deleted post keeps its row so a moderated thread does not develop
+  // unexplained gaps in its numbering, but its content is stripped -- which
+  // left an empty row that read as a post that had refused to delete. Dimming
+  // the whole line to the site's disabled grey makes it read as what it is.
+  // Only moderators ever get here: everyone else is filtered out in listPosts.
+  const deleted = post.deletedAt != null;
+  const nickClass = deleted ? "grey" : "yellow";
+  const metaClass = deleted ? "grey" : "lightgrey";
+
   return (
     <div id={`p${post.id}`} className="col-lg-12 pl-0 apb-1 bg-secondary ap-1" style={{ marginBottom: "16px" }}>
       <div className="d-flex justify-content-between" style={{ height: "16px", lineHeight: "16px" }}>
         <span>
-          <span className="lightgrey">#{seq}</span>{" "}
-          <Link prefetch={false} href={`/member/${post.authorNick ?? ""}`} className="yellow">
+          <span className={metaClass}>#{seq}</span>{" "}
+          <Link prefetch={false} href={`/member/${post.authorNick ?? ""}`} className={nickClass}>
             {post.authorNick ?? "unknown"}
           </Link>
-          {post.deletedAt != null && <span className="lightred">{" [DELETED]"}</span>}
+          {deleted && <span className="grey">{" [DELETED]"}</span>}
         </span>
-        <span className="lightgrey">{stamp(post.createdAt)}</span>
+        <span className={metaClass}>{stamp(post.createdAt)}</span>
       </div>
+
+      {post.deletedAt != null && (
+        // Without this the row is a bare header over empty space. Say plainly
+        // that the content is gone, and when it went.
+        <div className="grey" style={{ height: "16px", lineHeight: "16px", marginTop: "16px" }}>
+          {`post deleted ${stamp(post.deletedAt)}`}
+        </div>
+      )}
 
       {post.ansiB64 && (
         <div style={{ marginTop: "16px" }}>
@@ -43,7 +60,16 @@ export default function PostItem({ post, seq, canEdit, canDelete, canReport }: P
         // Only when there is no art. A post drawn in the editor stores the
         // canvas text in `body` as well, so rendering both showed every post
         // twice -- once in colour, once as raw text underneath.
-        <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", marginTop: "16px" }}>{post.body}</div>
+        //
+        // softDeletePost only stamps deleted_at, it does not clear the content,
+        // so a deleted post still has its text here. Moderators keep seeing
+        // what was removed, but it reads as removed rather than as live.
+        <div
+          className={deleted ? "grey" : undefined}
+          style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", marginTop: "16px" }}
+        >
+          {post.body}
+        </div>
       )}
 
       {post.editedAt != null && (
