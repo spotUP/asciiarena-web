@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback, KeyboardEvent } from "react";
 import { useChatContext } from "./ChatContext";
 import { playChatAlert, unlockChatAudio } from "@/lib/chatSound";
 import { resolveDisplayTitle } from "@/lib/chatThread";
+import { shouldCountAsUnread } from "@/lib/chatUnread";
 import { announcePopoutOpen } from "./popoutRegistry";
 import UserPicker from "./UserPicker";
 import { subscribeRaw } from "@/lib/sse-pool";
@@ -188,9 +189,12 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
       if (event) {
         if (event.type === "message") {
           loadMessages(tid);
-          if (minimizedRef.current) {
+          // The thread channel echoes back to the author too, so a message sent
+          // from another window used to bump this window's own unread badge.
+          const author = typeof event.fromId === "number" ? event.fromId : null;
+          if (shouldCountAsUnread({ fromId: author, viewerId: parseInt(userId), minimized: minimizedRef.current })) {
             incrementUnread(windowKey);
-          } else {
+          } else if (!minimizedRef.current) {
             markReadIfVisible(tid);
           }
         } else if (event.type === "alert") {

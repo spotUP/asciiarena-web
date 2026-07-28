@@ -107,7 +107,9 @@ export async function POST(
               (SELECT nick FROM users WHERE id = ${fromId}), UNIX_TIMESTAMP(), ${subject}, ${msgtext}, 1, 1)`;
   }
 
-  broadcast(`thread:${thread}`, { type: "message" });
+  // fromId so a window belonging to the AUTHOR does not count their own
+  // message as unread -- lib/chatUnread.ts.
+  broadcast(`thread:${thread}`, { type: "message", fromId });
   const targets = others.length ? others : (body.receiver ? [body.receiver] : []);
   for (const rid of targets) {
     broadcast(`user:${rid}:messages`, { type: "message", fromId, fromNick, threadId: thread });

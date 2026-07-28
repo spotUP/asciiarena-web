@@ -83,7 +83,9 @@ export async function POST(request: NextRequest) {
   // Legacy fallback: if participants weren't created, deliver to the peer.
   const targets = recipients.length > 0 ? recipients : (peerId !== fromId ? [peerId] : []);
 
-  broadcast(`thread:${threadId}`, { type: "message" });
+  // fromId so a window belonging to the AUTHOR does not count their own
+  // message as unread -- lib/chatUnread.ts.
+  broadcast(`thread:${threadId}`, { type: "message", fromId });
   for (const rid of targets) {
     broadcast(`user:${rid}:messages`, { type: "message", fromId, fromNick, threadId });
     // Chat messages have no subject (it is literally stored as "Chat"), so the
