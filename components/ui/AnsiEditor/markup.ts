@@ -25,6 +25,21 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 							</button>
 						</div>
 					</div>
+					<!-- asciiarena: direct buttons rather than menus.
+					     #navClear replaces a File menu whose only entry was Clear
+					     canvas (the forum composer). #navKeys opens the shortcut
+					     reference that used to be the Edit menu -- that menu read as a
+					     list of shortcuts, so it is one now, and its entries stay
+					     clickable so nothing is lost. mount.ts hides whichever of
+					     these does not apply; nothing is ever REMOVED, because the
+					     engine wires all of them by id during an async boot and
+					     dereferences the element without a guard. -->
+					<button id="navClear" aria-label="Clear canvas">
+						<span class="asciiIcon" aria-hidden="true">Clear</span>
+					</button>
+					<button id="navKeys" aria-label="Keyboard shortcuts">
+						<span class="asciiIcon" aria-hidden="true">Keys</span>
+					</button>
 					<button id="navSauce" aria-label="Sauce Menu">
 						<span class="asciiIcon" aria-hidden="true">[i]</span>
 					</button>
@@ -257,6 +272,24 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 					<span class="asciiIcon" aria-hidden="true">VIEW</span>
 				</div>
 			</aside>
+			<!-- asciiarena: row and column editing used to exist ONLY inside the
+			     Edit menu, so removing that menu would have taken it with it. These
+			     are the same actions, by the same ids the engine already wires, as
+			     buttons. It sits below the tool row rather than in the header,
+			     which is capped at one 43px strip and clips.
+
+			     Shown only while the TEXT tool is active: Toolbar marks the active
+			     tool button with .toolbarDisplayed, and this is a later sibling of
+			     #keyboard inside the same parent, so plain CSS can follow that
+			     state -- no engine changes, nothing to keep in sync. -->
+			<div id="rowColToolbar" aria-label="Rows and columns">
+				<button id="insertRow" class="toolButton">Insert Row</button>
+				<button id="deleteRow" class="toolButton">Delete Row</button>
+				<button id="eraseRow" class="toolButton">Erase Row</button>
+				<button id="insertColumn" class="toolButton">Insert Column</button>
+				<button id="deleteColumn" class="toolButton">Delete Column</button>
+				<button id="eraseColumn" class="toolButton">Erase Column</button>
+			</div>
 			<div id="paletteBar">
 				<div id="paletteSwatches" role="group" aria-label="Palette (left-click sets foreground, right-click sets background)"></div>
 				<div id="paletteCurrent">
@@ -303,6 +336,12 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 			<article id="saveUtf8" class="menuItem">Export as UTF-8 Text</article>
 			<article id="savePlaintext" class="menuItem">Export as Plain Text</article>
 		</div>
+		<!-- asciiarena: this was the Edit MENU, and it read as a list of keyboard
+		     shortcuts, so it is now the body of the Keys dialog (#shortcutsModal
+		     below re-parents it at mount). Every entry keeps its id and stays
+		     clickable, so the row/column and erase operations -- which exist
+		     nowhere else in the UI -- are not lost, and the engine's wiring, which
+		     resolves all of these by id, is untouched. -->
 		<div id="editList" class="menuList hide">
 			<article id="navCut" class="menuItem disabled">Cut <kbd>Ctrl-X</kbd></article>
 			<article id="navCopy" class="menuItem disabled">Copy <kbd>Ctrl-C</kbd></article>
@@ -313,14 +352,18 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 			<article id="navUndo" class="menuItem">Undo <kbd>Ctrl-Z</kbd></article>
 			<article id="navRedo" class="menuItem">Redo <kbd>Ctrl-Y</kbd></article>
 			<article class="separator"></article>
-			<article id="insertRow" class="menuItem">Insert Row <kbd>Alt+Up</kbd></article>
-			<article id="deleteRow" class="menuItem">Delete Row <kbd>Alt+Down</kbd></article>
-			<article id="insertColumn" class="menuItem">Insert Column <kbd>Alt+Right</kbd></article>
-			<article id="deleteColumn" class="menuItem">Delete Column <kbd>Alt+Left</kbd></article>
-			<article id="eraseRow" class="menuItem">Erase Row <kbd>Alt+E</kbd></article>
+			<!-- These six are buttons now (#rowColToolbar, under the tool row), so
+			     the ids live there and these rows are reference only. Without that
+			     the id would exist twice and getElementById would bind the wiring
+			     to whichever came first. -->
+			<article class="menuItem reference">Insert Row <kbd>Alt+Up</kbd></article>
+			<article class="menuItem reference">Delete Row <kbd>Alt+Down</kbd></article>
+			<article class="menuItem reference">Insert Column <kbd>Alt+Right</kbd></article>
+			<article class="menuItem reference">Delete Column <kbd>Alt+Left</kbd></article>
+			<article class="menuItem reference">Erase Row <kbd>Alt+E</kbd></article>
 			<article id="eraseRowStart" class="menuItem">Erase to Start of Row <kbd>Alt+Home</kbd></article>
 			<article id="eraseRowEnd" class="menuItem">Erase to End of Row <kbd>Alt+End</kbd></article>
-			<article id="eraseColumn" class="menuItem">Erase Column <kbd>Alt+Shift+E</kbd></article>
+			<article class="menuItem reference">Erase Column <kbd>Alt+Shift+E</kbd></article>
 			<article id="eraseColumnStart" class="menuItem">Erase to Start of Column <kbd>Alt+Page Up</kbd></article>
 			<article id="eraseColumnEnd" class="menuItem">Erase to End of Column <kbd>Alt+Page Down</kbd></article>
 			<article class="separator"></article>
@@ -329,6 +372,18 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 			<article id="fullscreen" class="menuItem">Toggle Fullscreen Mode</article>
 		</div>
 		<dialog id="modal">
+			<!-- asciiarena: the Keys dialog. #editList above is moved in here at
+			     mount (mount.ts) rather than duplicated, so every id stays unique
+			     and every entry the engine wired stays clickable. -->
+			<section id="shortcutsModal">
+				<header>
+					<h2>Keyboard shortcuts</h2>
+				</header>
+				<section id="shortcutsBody"></section>
+				<footer>
+					<button id="shortcutsDone">Close</button>
+				</footer>
+			</section>
 			<section id="resizeModal">
 				<header>
 					<h2>Resolution</h2>

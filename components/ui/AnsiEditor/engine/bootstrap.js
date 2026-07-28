@@ -344,6 +344,19 @@ export function bootstrapEditor(rootEl, opts = {}) {
 		onFileChange(openFile, openHandler);
 		createDragDropController(openHandler, $('dragdrop'));
 
+		// asciiarena: the header's direct buttons. #navClear does what the File
+		// menu's only remaining entry did; #navKeys opens the shortcut reference
+		// that used to be the Edit menu.
+		onClick($('navClear'), () => {
+			State.menus.close();
+			State.modal.open('warning');
+		});
+		onClick($('navKeys'), () => {
+			State.menus.close();
+			State.modal.open('shortcuts');
+		});
+		onClick($('shortcutsDone'), () => State.modal.close());
+
 		onClick($('navSauce'), () => {
 			State.menus.close();
 			State.modal.open('sauce');

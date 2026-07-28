@@ -2850,3 +2850,64 @@
   display: flex;
   align-items: center;
 }
+
+/* Row and column editing, as buttons under the tool row.
+   These actions existed only inside the Edit menu, so replacing that menu with
+   a shortcut dialog would have taken them with it. They sit here rather than in
+   the header because the header is one 43px strip with overflow:hidden -- six
+   spelled-out labels do not fit and would be clipped, exactly as the File/Edit
+   titles were.
+
+   Visible only while the TEXT tool is active. Toolbar marks the active tool
+   button with .toolbarDisplayed, and this toolbar is the next sibling of the
+   <aside> holding those buttons, so the state is readable in CSS alone. No
+   engine changes, so nothing can fall out of sync. */
+.ansi-editor-root #rowColToolbar {
+  display: none;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 0;
+}
+.ansi-editor-root aside:has(#keyboard.toolbarDisplayed) + #rowColToolbar {
+  display: flex;
+  flex-wrap: wrap;
+}
+.ansi-editor-root #rowColToolbar .toolButton {
+  height: 32px;
+  min-height: 0;
+  padding-inline: 8px;
+  white-space: nowrap;
+  border: 0;
+  background-color: var(--color-menu);
+  color: var(--color-fg);
+  cursor: pointer;
+}
+.ansi-editor-root #rowColToolbar .toolButton:hover {
+  background-color: var(--color-hl);
+}
+
+/* The Keys dialog: the former Edit menu, re-parented here by mount.ts. It is a
+   reference first, so the rows read as a list rather than a menu, but the
+   entries the engine wired are still clickable -- erase-to-start/end and the
+   colour actions live nowhere else. */
+.ansi-editor-root #shortcutsModal #editList {
+  position: static;
+  width: auto;
+  height: auto;
+  z-index: auto;
+}
+.ansi-editor-root #shortcutsModal .menuItem {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 8px;
+  line-height: 16px;
+}
+/* Reference rows are not actions: no hover affordance, no pointer. */
+.ansi-editor-root #shortcutsModal .menuItem.reference {
+  cursor: default;
+  opacity: 0.7;
+}
+.ansi-editor-root #shortcutsModal .menuItem.reference:hover {
+  background-color: transparent;
+}

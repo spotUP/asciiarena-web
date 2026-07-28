@@ -157,6 +157,32 @@ export function initAnsiEditor(
       });
   }
 
+  // The header is buttons, not menus.
+  //
+  // MOVED, not copied: #editList is the shortcut list the Edit menu used to
+  // show, and the engine has already wired several of its entries by id. Moving
+  // the node keeps those listeners and keeps every id unique.
+  const shortcutsBody = root.querySelector("#shortcutsBody");
+  const editList = root.querySelector<HTMLElement>("#editList");
+  if (shortcutsBody && editList) {
+    editList.classList.remove("hide", "menuList");
+    editList.style.display = "block";
+    shortcutsBody.appendChild(editList);
+  }
+
+  // Hidden, never removed -- see the note above about the async boot. The Edit
+  // menu is replaced by the Keys button everywhere. [i] opened a SAUCE record
+  // that nothing on this site reads. The File menu title goes only where it
+  // would be a one-item menu; where it still holds the export items it stays,
+  // and there the Clear button would duplicate its Clear canvas entry.
+  const hide = (sel: string) => {
+    const el = root.querySelector<HTMLElement>(sel);
+    if (el) el.style.display = "none";
+  };
+  hide("#editMenu");
+  hide("#navSauce");
+  hide(fileExport ? "#navClear" : "#fileMenu");
+
   // asciiarena CHANGE 3: build the 2x8 HTML palette bar above the canvas and
   // wire it to the engine palette. bootstrapEditor sets State.palette
   // synchronously, so it is ready here. The engine's own canvas picker is

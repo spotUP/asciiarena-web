@@ -65,6 +65,7 @@ const toggleFullscreen = () => {
 // Modal
 const createModalController = modal => {
 	const modals = [
+		$('shortcutsModal'),
 		$('aboutModal'),
 		$('resizeModal'),
 		$('fontsModal'),
