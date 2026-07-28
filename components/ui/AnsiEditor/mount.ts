@@ -67,6 +67,14 @@ export interface EditorOpts {
   font?: string;
   /** Enable ice-colors (blinking suppressed, 16 background colours). Default: true */
   iceColors?: boolean;
+  /**
+   * Show the File menu's save and export items. Default: true.
+   *
+   * The forum composer passes false: a post is delivered by posting it, so
+   * "Save as XBin" and "Export as PNG" are noise there. The logo form keeps
+   * them -- a logo is a file you are submitting, so taking a copy makes sense.
+   */
+  fileExport?: boolean;
   /** Called once the engine is ready and the initial font has loaded. */
   onReady?: () => void;
 }
@@ -95,6 +103,7 @@ export function initAnsiEditor(
     rows = 10,
     font = "Topaz+ 1200 8x16",
     iceColors = true,
+    fileExport = true,
     onReady,
   } = opts;
 
@@ -123,6 +132,20 @@ export function initAnsiEditor(
     iceColors,
     onReady,
   });
+
+  // Strip the save/export items AFTER bootstrap, never before: the engine wires
+  // them with onClick(el, fn), which dereferences the element, so removing them
+  // first throws during boot. Removing them now takes their listeners with them.
+  // The separators go too, or the menu is left with dividers around one item.
+  if (!fileExport) {
+    root
+      .querySelectorAll(
+        "#fileList #saveAnsi, #fileList #saveBin, #fileList #saveXbin," +
+          "#fileList #savePng, #fileList #saveUtf8, #fileList #savePlaintext," +
+          "#fileList .separator",
+      )
+      .forEach(el => el.remove());
+  }
 
   // asciiarena CHANGE 3: build the 2x8 HTML palette bar above the canvas and
   // wire it to the engine palette. bootstrapEditor sets State.palette

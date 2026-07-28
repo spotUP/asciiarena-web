@@ -56,12 +56,17 @@ interface AnsiEditorProps {
   rows?: number;
   /** Starting font, as an engine font name. Default: "Topaz+ 1200 8x16". */
   font?: string;
+  /**
+   * Show the File menu's save and export items. Default: true.
+   * The forum composer passes false -- a post is delivered by posting it.
+   */
+  fileExport?: boolean;
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
 const AnsiEditor = forwardRef<AnsiEditorRef, AnsiEditorProps>(
-  function AnsiEditor({ onReady, columns, rows, font }, ref) {
+  function AnsiEditor({ onReady, columns, rows, font, fileExport }, ref) {
     const hostRef = useRef<HTMLDivElement>(null);
     const handleRef = useRef<EditorHandle | null>(null);
     const [failed, setFailed] = useState(false);
@@ -112,6 +117,9 @@ const AnsiEditor = forwardRef<AnsiEditorRef, AnsiEditorProps>(
             ...(columns ? { columns } : {}),
             ...(rows ? { rows } : {}),
             ...(font ? { font } : {}),
+            // Explicit false only: undefined must fall through to the mount
+            // default (true), so the logo form keeps its export items.
+            ...(fileExport === false ? { fileExport: false } : {}),
           });
         } catch (err) {
           if (cancelled) return;

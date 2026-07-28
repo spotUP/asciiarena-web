@@ -159,8 +159,12 @@ const PostCanvas = forwardRef<PostCanvasRef, PostCanvasProps>(function PostCanva
         {label ?? "Write or draw your post."}
       </div>
 
+      {/* fileExport={false}: no save/export in the forum, because a post is
+          delivered by posting it, so "Save as XBin" and "Export as PNG" are
+          noise here. The logo form keeps them -- there the artwork is a file
+          you are submitting. */}
       {mounted ? (
-        <AnsiEditorPanel ref={panelRef} columns={columns} rows={ROWS} />
+        <AnsiEditorPanel ref={panelRef} columns={columns} rows={ROWS} fileExport={false} />
       ) : (
         <div
           ref={slotRef}

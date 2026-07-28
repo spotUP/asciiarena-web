@@ -6,6 +6,7 @@ import ChatWindow from "@/components/chat/ChatWindow";
 import UserPicker, { type PickableUser } from "@/components/chat/UserPicker";
 import RelativeTime from "@/components/widgets/RelativeTime";
 import { buildInboxRow } from "@/lib/inboxRow";
+import { deepLinkThreadChange } from "@/lib/messages-deeplink";
 import { subscribeRaw } from "@/lib/sse-pool";
 
 // One conversation as the inbox sees it. The API returns the raw parts
@@ -58,6 +59,21 @@ export default function MessagesClient({ userId, userNick, initialReceiverId, in
   // The thread whose chat is expanded underneath its row. A notification links
   // straight to one (/messages?thread=123), which is the whole point.
   const [expanded, setExpanded] = useState<number | null>(initialThreadId ?? null);
+  // useState only reads its argument on the FIRST render. Clicking a bell
+  // notification while already on /messages is a same-route navigation: the
+  // query changes and this prop changes with it, but the component never
+  // remounts, so `expanded` kept whatever thread was already open and the
+  // notification appeared to do nothing. Measured: sitting on ?thread=2212 and
+  // clicking a notification for 1518 moved the URL and left 2212 expanded.
+  // This is React's "adjust state when a prop changes" pattern -- done during
+  // render rather than in an effect, so it takes effect in the same commit and
+  // does not trip the set-state-in-effect rule.
+  const [syncedThreadId, setSyncedThreadId] = useState<number | null | undefined>(initialThreadId);
+  const deepLink = deepLinkThreadChange(syncedThreadId, initialThreadId);
+  if (deepLink.changed) {
+    setSyncedThreadId(initialThreadId);
+    if (deepLink.openThread !== null) setExpanded(deepLink.openThread);
+  }
   const [composing, setComposing] = useState(!!initialReceiverId);
   const [status, setStatus] = useState("");
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);

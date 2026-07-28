@@ -72,10 +72,18 @@ interface AnsiEditorPanelProps {
   columns?: number;
   /** Canvas height in character rows. Default: the logo form's 10. */
   rows?: number;
+  /**
+   * Show the File menu's save and export items. Default: true.
+   * The forum composer passes false -- a post is delivered by posting it.
+   */
+  fileExport?: boolean;
 }
 
 const AnsiEditorPanel = forwardRef<AnsiEditorPanelRef, AnsiEditorPanelProps>(
-  function AnsiEditorPanel({ onReady, columns = LOGO_CANVAS.columns, rows = LOGO_CANVAS.rows }, ref) {
+  function AnsiEditorPanel(
+    { onReady, columns = LOGO_CANVAS.columns, rows = LOGO_CANVAS.rows, fileExport },
+    ref,
+  ) {
     const editorRef = useRef<AnsiEditorRef>(null);
 
     useImperativeHandle(ref, () => ({
@@ -112,7 +120,13 @@ const AnsiEditorPanel = forwardRef<AnsiEditorPanelRef, AnsiEditorPanelProps>(
           } as React.CSSProperties
         }
       >
-        <AnsiEditor ref={editorRef} onReady={onReady} columns={columns} rows={rows} />
+        <AnsiEditor
+          ref={editorRef}
+          onReady={onReady}
+          columns={columns}
+          rows={rows}
+          fileExport={fileExport}
+        />
       </div>
     );
   },
