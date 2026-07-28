@@ -18,6 +18,7 @@
  * topic page showing twenty ANSI posts renders them one after another.
  */
 
+import { visibleRows } from "@/lib/ansiTrim";
 import { Load, loadAnsi } from "./engine/file.js";
 import { loadFontFromImage } from "./engine/font.js";
 import { createDefaultPalette } from "./engine/palette.js";
@@ -109,15 +110,21 @@ async function draw(bytes: Uint8Array): Promise<RenderedAnsi> {
     1,
   )) as EngineFont;
 
+  // The composer's canvas is a fixed 25 rows, so a one-line reply carries 24
+  // blank rows of real stored content. They are dropped here rather than in the
+  // file, so the attachment stays exactly what was drawn and posts already in
+  // the database shrink too. lib/ansiTrim.ts defines "blank".
+  const drawnRows = visibleRows(data, columns, rows);
+
   const cellW = font.getWidth();
   const cellH = font.getHeight();
   const canvas = document.createElement("canvas");
   canvas.width = columns * cellW;
-  canvas.height = rows * cellH;
+  canvas.height = drawnRows * cellH;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Could not get a 2D context");
 
-  for (let index = 0; index < columns * rows; index++) {
+  for (let index = 0; index < columns * drawnRows; index++) {
     const at = index * 3;
     const charCode = data[at] ?? 0;
     const foreground = data[at + 1] ?? 7;
@@ -129,12 +136,14 @@ async function draw(bytes: Uint8Array): Promise<RenderedAnsi> {
     font.draw(charCode, foreground, background, ctx, index % columns, Math.floor(index / columns));
   }
 
+  // `rows` reports what was rendered, not what the file declared, so a caller
+  // sizing a box from it agrees with the image it gets.
   return {
     url: canvas.toDataURL("image/png"),
     width: canvas.width,
     height: canvas.height,
     columns,
-    rows,
+    rows: drawnRows,
   };
 }
 
