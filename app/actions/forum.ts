@@ -15,13 +15,34 @@ import {
   canPostInBoard,
   canReplyToTopic,
 } from "@/lib/forum/rules";
-import { MAX_BODY_LEN, MAX_TITLE_LEN, MIN_TITLE_LEN, type ForumViewer } from "@/lib/forum/types";
+import { MAX_ANSI_B64_LEN, MAX_BODY_LEN, MAX_TITLE_LEN, MIN_TITLE_LEN, type ForumViewer } from "@/lib/forum/types";
 
 type Result = { success: boolean; error?: string; topicSlug?: string; boardSlug?: string };
 
 const title = z.string().trim().min(MIN_TITLE_LEN).max(MAX_TITLE_LEN).transform(normalizeMessageText);
 const body = z.string().trim().min(1).max(MAX_BODY_LEN).transform(normalizeMessageText);
+/** A post carrying ANSI art may have an empty text body; the art is the post. */
+const optionalBody = z.string().trim().max(MAX_BODY_LEN).transform(normalizeMessageText);
 const id = z.number().int().positive();
+
+/** Optional ANSI attachment, as produced by the editor's getAnsiBytes(). */
+const ansi = z
+  .object({
+    b64: z.string().min(1).max(MAX_ANSI_B64_LEN).regex(/^[A-Za-z0-9+/=]+$/, "not base64"),
+    font: z.string().trim().max(32).nullable().default(null),
+  })
+  .nullable()
+  .default(null);
+
+export interface AnsiAttachment {
+  b64: string;
+  font: string | null;
+}
+
+/** A post must say something: text, art, or both. */
+function isEmptyPost(text: string, art: AnsiAttachment | null): boolean {
+  return text.trim().length === 0 && art == null;
+}
 
 async function viewer(): Promise<{ v: ForumViewer; nick: string } | null> {
   const session = await getSession();
@@ -32,12 +53,22 @@ async function viewer(): Promise<{ v: ForumViewer; nick: string } | null> {
   };
 }
 
-export async function createTopic(boardSlug: string, rawTitle: string, rawBody: string): Promise<Result> {
+export async function createTopic(
+  boardSlug: string,
+  rawTitle: string,
+  rawBody: string,
+  rawAnsi: AnsiAttachment | null = null,
+): Promise<Result> {
   const who = await viewer();
   if (!who) return { success: false, error: "You must be logged in to post." };
 
-  const parsed = z.object({ title, body }).safeParse({ title: rawTitle, body: rawBody });
+  const parsed = z
+    .object({ title, body: optionalBody, ansi })
+    .safeParse({ title: rawTitle, body: rawBody, ansi: rawAnsi });
   if (!parsed.success) return { success: false, error: "Give the topic a title and something to say." };
+  if (isEmptyPost(parsed.data.body, parsed.data.ansi)) {
+    return { success: false, error: "Write something or draw something before you post." };
+  }
 
   const board = await db.getBoardBySlug(boardSlug);
   if (!board) return { success: false, error: "That board does not exist." };
@@ -52,6 +83,8 @@ export async function createTopic(boardSlug: string, rawTitle: string, rawBody: 
     userId: who.v.userId!,
     title: parsed.data.title,
     body: parsed.data.body,
+    ansiB64: parsed.data.ansi?.b64 ?? null,
+    ansiFont: parsed.data.ansi?.font ?? null,
   });
 
   const topic = await db.getTopic(created.topicId);
@@ -70,12 +103,21 @@ export async function createTopic(boardSlug: string, rawTitle: string, rawBody: 
   return { success: true, topicSlug: created.slug, boardSlug: board.slug };
 }
 
-export async function postReply(topicId: number, rawBody: string): Promise<Result> {
+export async function postReply(
+  topicId: number,
+  rawBody: string,
+  rawAnsi: AnsiAttachment | null = null,
+): Promise<Result> {
   const who = await viewer();
   if (!who) return { success: false, error: "You must be logged in to reply." };
 
-  const parsed = z.object({ topicId: id, body }).safeParse({ topicId, body: rawBody });
+  const parsed = z
+    .object({ topicId: id, body: optionalBody, ansi })
+    .safeParse({ topicId, body: rawBody, ansi: rawAnsi });
   if (!parsed.success) return { success: false, error: "Write something before you post." };
+  if (isEmptyPost(parsed.data.body, parsed.data.ansi)) {
+    return { success: false, error: "Write something or draw something before you post." };
+  }
 
   const topic = await db.getTopic(parsed.data.topicId);
   if (!topic) return { success: false, error: "That topic does not exist." };
@@ -94,6 +136,8 @@ export async function postReply(topicId: number, rawBody: string): Promise<Resul
     boardId: board.id,
     userId: who.v.userId!,
     body: parsed.data.body,
+    ansiB64: parsed.data.ansi?.b64 ?? null,
+    ansiFont: parsed.data.ansi?.font ?? null,
   });
 
   await announceNewPost({

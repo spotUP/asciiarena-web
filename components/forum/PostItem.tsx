@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AnsiPost from "@/components/forum/AnsiPost";
 import PostActions from "@/components/forum/PostActions";
 import type { PostView } from "@/lib/forum/types";
 
@@ -31,14 +32,14 @@ export default function PostItem({ post, seq, canEdit, canDelete }: Props) {
         <span className="lightgrey">{stamp(post.createdAt)}</span>
       </div>
 
-      {post.ansiB64 ? (
-        // The ANSI-art attachment columns exist on forum_posts but nothing
-        // writes them yet. This is the single branch the ANSI phase replaces
-        // with the real renderer; the rest of the forum needs no change.
-        <div className="lightgrey" style={{ marginTop: "16px" }}>
-          [!] This post uses a format this page cannot show yet.
+      {post.ansiB64 && (
+        <div style={{ marginTop: "16px" }}>
+          <AnsiPost ansiB64={post.ansiB64} font={post.ansiFont} />
         </div>
-      ) : (
+      )}
+      {post.body && (
+        // An ANSI post may still carry a text caption, so this is not an
+        // either/or with the art above it.
         <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", marginTop: "16px" }}>{post.body}</div>
       )}
 

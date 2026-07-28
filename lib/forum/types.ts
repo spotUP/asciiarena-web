@@ -78,3 +78,12 @@ export const EDIT_WINDOW_SECONDS = 900;
 
 /** Ceiling on how many people one post can notify. */
 export const MAX_MENTIONS_PER_POST = 5;
+
+/**
+ * Ceiling on a post's ANSI attachment, as base64 characters. 256KB of raw
+ * bytes matches the site logo limit in lib/logoUpload.ts; base64 is 4/3 of
+ * that. The column is MEDIUMTEXT so this is a policy limit, not a storage one
+ * -- MEDIUMTEXT would happily accept 16MB per post on a box whose disk has
+ * already been filled once.
+ */
+export const MAX_ANSI_B64_LEN = Math.ceil((256 * 1024 * 4) / 3);

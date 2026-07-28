@@ -162,4 +162,27 @@ describe("ANSI editor .ans round-trip + 80x10 server-validator guard", () => {
       expect(decoded.data[idx + 2]).toBe(c.bg);
     }
   });
+
+  // The layout contract AnsiEditor/render.ts depends on. loadAnsi's output is
+  // easy to confuse with canvas.getImageData(), which packs a cell into one
+  // 16-bit int (charCode << 8 | bg << 4 | fg) -- reading loadAnsi that way
+  // renders garbage, silently. These assertions are the discriminator.
+  it("reports its size as width and height, not columns and rows", async () => {
+    const decoded = loadAnsi(await encodeAnsBytes({}));
+    expect(decoded.width).toBe(80);
+    expect(decoded.height).toBe(10);
+    expect((decoded as unknown as { columns?: number }).columns).toBeUndefined();
+    expect((decoded as unknown as { rows?: number }).rows).toBeUndefined();
+  });
+
+  it("stores three bytes per cell, so the buffer is width x height x 3", async () => {
+    const decoded = loadAnsi(await encodeAnsBytes({}));
+    expect(decoded.data.length).toBe(decoded.width * decoded.height * 3);
+  });
+
+  it("names the ice-colours flag noblink", async () => {
+    const decoded = loadAnsi(await encodeAnsBytes({}));
+    expect(typeof decoded.noblink).toBe("boolean");
+    expect((decoded as unknown as { iceColors?: boolean }).iceColors).toBeUndefined();
+  });
 });

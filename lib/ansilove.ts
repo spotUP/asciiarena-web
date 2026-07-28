@@ -83,6 +83,31 @@ export const FONTS = [
   { value: "TopazPlus_a1200", label: "A1200 Topaz+" },
 ];
 
+/**
+ * ANSI editor font name -> AnsiLove preset, for the FALLBACK render path only.
+ *
+ * Forum posts render through the editor's own engine
+ * (AnsiEditor/render.ts), which handles all ~90 of its fonts. AnsiLove can
+ * render nine of them, so it is only reached when the engine render fails.
+ * This map gets the closest preset in that case; an unmapped font falls
+ * through to null and lets AnsiLove pick from SAUCE.
+ *
+ * Keys are the engine's `data-value` strings from AnsiEditor/markup.ts.
+ */
+export const EDITOR_FONT_TO_ANSILOVE: Record<string, string> = {
+  "Topaz+ 1200 8x16": "topaz+",
+  "Topaz 1200 8x16": "topaz",
+  "Topaz+ 500 8x16": "topaz500+",
+  "Topaz 500 8x16": "topaz500",
+  "MicroKnight+ 8x16": "microknight+",
+  "MicroKnight 8x16": "microknight",
+  "P0t-NOoDLE 8x16": "pot-noodle",
+  "CP437 8x16": "80x25",
+};
+
+/** The editor's default face. */
+export const DEFAULT_EDITOR_FONT = "Topaz+ 1200 8x16";
+
 export const ANSI_FONT_MAP: Record<string, string> = {
   "MicroKnight": "microknight",
   "MicroKnightPlus": "microknight+",

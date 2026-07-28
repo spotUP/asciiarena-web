@@ -273,6 +273,8 @@ export async function createTopic(args: {
   userId: number;
   title: string;
   body: string;
+  ansiB64?: string | null;
+  ansiFont?: string | null;
 }): Promise<{ topicId: number; postId: number; slug: string }> {
   const now = nowSec();
   return prisma.$transaction(async tx => {
@@ -298,6 +300,8 @@ export async function createTopic(args: {
         board_id: args.boardId,
         user_id: args.userId,
         body: args.body,
+        ansi_b64: args.ansiB64 ?? null,
+        ansi_font: args.ansiFont ?? null,
         created_at: now,
       },
       select: { id: true },
@@ -327,6 +331,8 @@ export async function createPost(args: {
   boardId: number;
   userId: number;
   body: string;
+  ansiB64?: string | null;
+  ansiFont?: string | null;
 }): Promise<{ postId: number }> {
   const now = nowSec();
   return prisma.$transaction(async tx => {
@@ -336,6 +342,8 @@ export async function createPost(args: {
         board_id: args.boardId,
         user_id: args.userId,
         body: args.body,
+        ansi_b64: args.ansiB64 ?? null,
+        ansi_font: args.ansiFont ?? null,
         created_at: now,
       },
       select: { id: true },
