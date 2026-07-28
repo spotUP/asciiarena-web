@@ -2493,7 +2493,13 @@
    light icon colour the SVGs used (#efefef). */
 .ansi-editor-root aside .asciiIcon {
   color: #efefef;
-  width: 30px;
+  /* The tools spell their names out ("HISTORY", "SHAPES"), so a fixed 30px
+     square -- sized for the old single-character [x] tokens -- clipped them.
+     Grow to the word and keep the 30px floor for the short ones. */
+  width: auto;
+  min-width: 30px;
+  padding: 0 6px;
+  white-space: nowrap;
 }
 /* Header tokens follow the header foreground colour. */
 .ansi-editor-root header .asciiIcon {

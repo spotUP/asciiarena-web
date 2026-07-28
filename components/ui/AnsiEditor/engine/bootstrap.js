@@ -104,6 +104,7 @@ export function bootstrapEditor(rootEl, opts = {}) {
 		disposers.push(() => document.removeEventListener(type, wrapped));
 	};
 
+	// Kept for any hover-sensitive engine behaviour; no longer gates keyboard.
 	let hovered = false;
 	const onEnter = () => {
 		hovered = true;
@@ -117,9 +118,16 @@ export function bootstrapEditor(rootEl, opts = {}) {
 		rootEl.removeEventListener('pointerenter', onEnter);
 		rootEl.removeEventListener('pointerleave', onLeave);
 	});
+	// asciiarena CHANGE: focus decides who gets the keyboard, not hover.
+	//
+	// This used to return true whenever the pointer was merely over the editor,
+	// so resting the mouse on the canvas while typing in the page's own Title
+	// field sent those keystrokes into the drawing instead. Hovering is not a
+	// statement of intent; focus is. The root is focusable (see mount.ts) and
+	// takes focus on pointerdown, so clicking the canvas hands the keyboard over
+	// explicitly and clicking back into a form field hands it back.
 	const editorIsActive = () =>
-		hovered ||
-		(document.activeElement != null && rootEl.contains(document.activeElement));
+		document.activeElement != null && rootEl.contains(document.activeElement);
 
 	// --- begin boot --------------------------------------------------------
 	FontCache.preloadCommonFonts();

@@ -151,7 +151,7 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 					</div>
 					<div id="fontToolbar">
 						<div id="changeFont" class="toolButton">
-							<span class="asciiIcon" aria-hidden="true">[A]</span>
+							<span class="asciiIcon" aria-hidden="true">FONT</span>
 							<kbd>Change Font</kbd>
 						</div>
 						<div id="navICE" class="toolButton">
@@ -225,36 +225,36 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 				<canvas id="palettePreview" height="40" width="40"></canvas>
 				<canvas id="palettePicker" height="160" width="40"></canvas>
 				<div id="keyboard" aria-label="Keyboard (k)">
-					<span class="asciiIcon" aria-hidden="true">[K]</span>
+					<span class="asciiIcon" aria-hidden="true">TEXT</span>
 				</div>
 				<div id="brushes" aria-label="Brushes">
-					<span class="asciiIcon" aria-hidden="true">[/]</span>
+					<span class="asciiIcon" aria-hidden="true">BRUSH</span>
 				</div>
 				<div id="fill" aria-label="Fill (n)">
-					<span class="asciiIcon" aria-hidden="true">[F]</span>
+					<span class="asciiIcon" aria-hidden="true">FILL</span>
 				</div>
 				<div id="shapes" aria-label="Shapes">
-					<span class="asciiIcon" aria-hidden="true">[O]</span>
+					<span class="asciiIcon" aria-hidden="true">SHAPES</span>
 				</div>
 				<div class="separator"></div>
 				<div id="selection" aria-label="Selection">
-					<span class="asciiIcon" aria-hidden="true">[.]</span>
+					<span class="asciiIcon" aria-hidden="true">SELECT</span>
 				</div>
 				<div id="sample" aria-label="Sample (alt)">
-					<span class="asciiIcon" aria-hidden="true">[i]</span>
+					<span class="asciiIcon" aria-hidden="true">PICK</span>
 				</div>
 				<div id="mirror" aria-label="Mirror Mode (Ctrl+M)">
-					<span class="asciiIcon" aria-hidden="true">&lt;&gt;</span>
+					<span class="asciiIcon" aria-hidden="true">MIRROR</span>
 				</div>
 				<div class="separator"></div>
 				<div id="clipboard" aria-label="Undo History">
-					<span class="asciiIcon" aria-hidden="true">[H]</span>
+					<span class="asciiIcon" aria-hidden="true">HISTORY</span>
 				</div>
 				<div id="fonts" aria-label="Change Font">
-					<span class="asciiIcon" aria-hidden="true">[A]</span>
+					<span class="asciiIcon" aria-hidden="true">FONT</span>
 				</div>
 				<div id="navView" aria-label="Viewport Options">
-					<span class="asciiIcon" aria-hidden="true">[*]</span>
+					<span class="asciiIcon" aria-hidden="true">VIEW</span>
 				</div>
 			</aside>
 			<div id="paletteBar">

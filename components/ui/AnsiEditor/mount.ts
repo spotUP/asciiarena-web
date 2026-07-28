@@ -101,7 +101,19 @@ export function initAnsiEditor(
   // Inject the editor UI inside a scoped wrapper so editor.css only applies here.
   const root = document.createElement("div");
   root.className = "ansi-editor-root";
+  // Focusable so the editor can own the keyboard explicitly. Without this the
+  // canvas could never take focus away from a form field on the host page, so
+  // clicking the canvas left the caret in that field and typing went there --
+  // and the engine compensated by grabbing keys on hover, which hijacked the
+  // page's own inputs. -1 keeps it out of the tab order; the click is the
+  // deliberate act.
+  root.tabIndex = -1;
+  root.style.outline = "none";
   root.innerHTML = EDITOR_MARKUP;
+  const claimFocus = () => {
+    if (!root.contains(document.activeElement)) root.focus({ preventScroll: true });
+  };
+  root.addEventListener("pointerdown", claimFocus);
   container.appendChild(root);
 
   const boot = bootstrapEditor(root, {
@@ -199,6 +211,7 @@ export function initAnsiEditor(
     destroy(): void {
       if (destroyed) return;
       destroyed = true;
+      root.removeEventListener("pointerdown", claimFocus);
       paletteBar.destroy();
       boot.teardown();
       root.remove();

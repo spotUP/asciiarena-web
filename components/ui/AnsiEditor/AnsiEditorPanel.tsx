@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import { forwardRef, useImperativeHandle, useRef } from "react";
 import AnsiEditor, { type AnsiEditorRef } from "@/components/ui/AnsiEditor/AnsiEditor";
 
@@ -41,6 +42,17 @@ export interface AnsiEditorPanelRef {
  */
 const CHROME_HEIGHT = 24 + 43 + 64 + 40 + 16 + 1;
 const ROW_HEIGHT = 16;
+
+/**
+ * editor.css sizes the canvas viewport from --viewport-size, which it hardcodes
+ * to 176px: the 80x10 logo canvas plus its margins. Any taller canvas was
+ * clipped inside that 176px (with a scrollbar) while the host box reserved the
+ * full height, leaving a block of dead space underneath. The variable has to
+ * track the row count, so the panel sets it.
+ */
+function viewportSize(rows: number): string {
+  return `${rows * ROW_HEIGHT + 16}px`;
+}
 
 /** The site-logo header limit. Only the logo form is bound by it. */
 export const LOGO_CANVAS = { columns: 80, rows: 10 } as const;
@@ -90,7 +102,16 @@ const AnsiEditorPanel = forwardRef<AnsiEditorPanelRef, AnsiEditorPanelProps>(
     }));
 
     return (
-      <div style={{ width: "100%", height: panelHeight(rows), marginBottom: 16 }}>
+      <div
+        style={
+          {
+            width: "100%",
+            height: panelHeight(rows),
+            marginBottom: 16,
+            "--viewport-size": viewportSize(rows),
+          } as React.CSSProperties
+        }
+      >
         <AnsiEditor ref={editorRef} onReady={onReady} columns={columns} rows={rows} />
       </div>
     );
