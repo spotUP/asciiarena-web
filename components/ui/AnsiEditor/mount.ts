@@ -133,18 +133,28 @@ export function initAnsiEditor(
     onReady,
   });
 
-  // Strip the save/export items AFTER bootstrap, never before: the engine wires
-  // them with onClick(el, fn), which dereferences the element, so removing them
-  // first throws during boot. Removing them now takes their listeners with them.
-  // The separators go too, or the menu is left with dividers around one item.
+  // Hide the save/export items -- do NOT remove them.
+  //
+  // The engine wires every menu item by id with onClick(el, fn), which
+  // dereferences el immediately. bootstrapEditor RETURNS synchronously but goes
+  // on booting asynchronously, so anything removed here disappears before the
+  // boot reaches its wiring: `onClick($('saveAnsi'), Save.ans)` then threw
+  // "Cannot read properties of null (reading 'addEventListener')", which killed
+  // the rest of boot -- including Toolbar.add($('keyboard')). The editor came up
+  // with no active tool: nothing could be typed and no tool button responded.
+  // Hiding leaves every id resolvable, so boot completes and the items are
+  // simply unreachable. The separators go too, or the menu is left with
+  // dividers around a single item.
   if (!fileExport) {
     root
-      .querySelectorAll(
-        "#fileList #saveAnsi, #fileList #saveBin, #fileList #saveXbin," +
-          "#fileList #savePng, #fileList #saveUtf8, #fileList #savePlaintext," +
+      .querySelectorAll<HTMLElement>(
+        "#fileList #saveAnsi, #fileList #saveBin, #fileList #saveXbin, " +
+          "#fileList #savePng, #fileList #saveUtf8, #fileList #savePlaintext, " +
           "#fileList .separator",
       )
-      .forEach(el => el.remove());
+      .forEach(el => {
+        el.style.display = "none";
+      });
   }
 
   // asciiarena CHANGE 3: build the 2x8 HTML palette bar above the canvas and
