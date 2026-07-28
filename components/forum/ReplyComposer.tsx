@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/ToastProvider";
 import { postReply } from "@/app/actions/forum";
 import ForumSectionTitle from "@/components/forum/ForumSectionTitle";
-import AnsiAttach, { type AnsiAttachRef } from "@/components/forum/AnsiAttach";
+import PostCanvas, { type PostCanvasRef } from "@/components/forum/PostCanvas";
 import { MAX_BODY_LEN } from "@/lib/forum/types";
 
 interface Props {
@@ -20,7 +20,7 @@ export default function ReplyComposer({ topicId, channel }: Props) {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const ansiRef = useRef<AnsiAttachRef>(null);
+  const ansiRef = useRef<PostCanvasRef>(null);
 
   // Same debounce-and-POST shape as the release and request pages: the draft
   // goes out on the channel the page already holds open.
@@ -67,11 +67,16 @@ export default function ReplyComposer({ topicId, channel }: Props) {
   return (
     <div className="apt-1">
       <ForumSectionTitle>REPLY</ForumSectionTitle>
+      <PostCanvas
+        ref={ansiRef}
+        label="Draw your reply. Type straight into the canvas, or leave it blank and just write below."
+      />
+
       <textarea
         className="form-control"
-        rows={6}
+        rows={4}
         maxLength={MAX_BODY_LEN}
-        placeholder="Write your reply..."
+        placeholder="Add a note to go with it (optional)..."
         style={{ resize: "vertical" }}
         value={text}
         onChange={e => {
@@ -82,7 +87,6 @@ export default function ReplyComposer({ topicId, channel }: Props) {
       <div className="lightgrey" style={{ height: "16px", lineHeight: "16px", marginTop: "8px" }}>
         Text is kept exactly as you type it, line breaks and all.
       </div>
-      <AnsiAttach ref={ansiRef} disabled={busy} />
 
       <div style={{ marginTop: "16px" }}>
         <input type="button" className="btn-big" value="POST REPLY" onClick={submit} disabled={busy} />

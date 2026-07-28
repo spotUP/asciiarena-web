@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/ToastProvider";
 import { createTopic } from "@/app/actions/forum";
-import AnsiAttach, { type AnsiAttachRef } from "@/components/forum/AnsiAttach";
+import PostCanvas, { type PostCanvasRef } from "@/components/forum/PostCanvas";
 import { MAX_BODY_LEN, MAX_TITLE_LEN } from "@/lib/forum/types";
 
 const LABEL = {
@@ -22,7 +22,7 @@ export default function NewTopicForm({ boardSlug, boardName }: { boardSlug: stri
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
-  const ansiRef = useRef<AnsiAttachRef>(null);
+  const ansiRef = useRef<PostCanvasRef>(null);
 
   const submit = async () => {
     if (busy) return;
@@ -33,7 +33,13 @@ export default function NewTopicForm({ boardSlug, boardName }: { boardSlug: stri
       toast(`[!] ${art.error}`, "danger");
       return;
     }
-    const r = await createTopic(boardSlug, title, body, art?.attachment ?? null);
+    const attachment = art?.attachment ?? null;
+    if (!body.trim() && !attachment) {
+      setBusy(false);
+      toast("[!] Draw something or write something before you post.", "danger");
+      return;
+    }
+    const r = await createTopic(boardSlug, title, body, attachment);
     setBusy(false);
     if (r.success && r.topicSlug) {
       toast("[OK] Topic created.");
@@ -59,14 +65,20 @@ export default function NewTopicForm({ boardSlug, boardName }: { boardSlug: stri
         autoComplete="off"
       />
 
-      <label className="lightgrey" style={{ ...LABEL, marginTop: "16px" }} htmlFor="forum-body">
+      <label className="lightgrey" style={{ ...LABEL, marginTop: "16px" }}>
         Message
       </label>
+      <PostCanvas
+        ref={ansiRef}
+        label="Draw your post. Type straight into the canvas, or leave it blank and just write below."
+      />
+
       <textarea
         id="forum-body"
         className="form-control"
-        rows={12}
+        rows={4}
         maxLength={MAX_BODY_LEN}
+        placeholder="Add a note to go with it (optional)..."
         value={body}
         onChange={e => setBody(e.target.value)}
         style={{ resize: "vertical" }}
@@ -74,8 +86,6 @@ export default function NewTopicForm({ boardSlug, boardName }: { boardSlug: stri
       <div className="lightgrey" style={{ height: "16px", lineHeight: "16px", marginTop: "8px" }}>
         Text is kept exactly as you type it, line breaks and all.
       </div>
-
-      <AnsiAttach ref={ansiRef} disabled={busy} />
 
       <div className="d-flex" style={{ gap: "16px", marginTop: "16px", alignItems: "center" }}>
         <input type="button" className="btn-big" value="CREATE TOPIC" onClick={submit} disabled={busy} />
