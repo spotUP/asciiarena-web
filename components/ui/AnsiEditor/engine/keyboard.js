@@ -2,6 +2,9 @@ import State from './state.js';
 import Toolbar from './toolbar.js';
 import { $, createCanvas } from './ui.js';
 import magicNumbers from './magicNumbers.js';
+// asciiarena: click-vs-drag lives outside the vendored engine so it can be
+// tested without standing up the editor. See lib/__tests__/pointer-gesture.test.ts.
+import { createPointerGesture } from '@/lib/pointer-gesture';
 
 const createFKeys = () => {
 	// Stolen "savagely" from Moebius, who stole it "mercilessly" from PabloDraw, thanks Curtis! lol
@@ -1429,6 +1432,8 @@ const createSelectionTool = () => {
 	let selectionStartY = 0;
 	let selectionEndX = 0;
 	let selectionEndY = 0;
+	// A click that never moves is a deselect; only a drag makes a selection.
+	const gesture = createPointerGesture();
 	// Pending initial action when switching from keyboard mode
 	let pendingInitialAction = null;
 
@@ -1447,6 +1452,7 @@ const createSelectionTool = () => {
 				dragStartY = e.detail.y;
 			}
 		} else {
+			gesture.down(e.detail.x, e.detail.y);
 			State.selectionCursor.setStart(e.detail.x, e.detail.y);
 			State.selectionCursor.setEnd(e.detail.x, e.detail.y);
 		}
@@ -1460,6 +1466,7 @@ const createSelectionTool = () => {
 			dragStartX = e.detail.x;
 			dragStartY = e.detail.y;
 		} else if (!moveMode) {
+			gesture.move(e.detail.x, e.detail.y);
 			State.selectionCursor.setEnd(e.detail.x, e.detail.y);
 		}
 	};
@@ -1467,6 +1474,16 @@ const createSelectionTool = () => {
 	const canvasUp = _ => {
 		if (moveMode && isDragging) {
 			isDragging = false;
+		} else if (!moveMode && gesture.isClick()) {
+			// A click that never dragged clears the selection. canvasDown always
+			// opens a 1x1 selection so a drag has something to extend, so without
+			// this there is no way to deselect with the mouse: clicking away to
+			// drop a selection marked a single cell instead.
+			State.selectionCursor.hide();
+			selectionStartX = 0;
+			selectionStartY = 0;
+			selectionEndX = 0;
+			selectionEndY = 0;
 		} else {
 			// Sync selection expansion state after mouse selection
 			const selection = State.selectionCursor.getSelection();
