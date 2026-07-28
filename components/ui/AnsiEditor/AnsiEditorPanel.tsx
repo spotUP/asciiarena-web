@@ -91,8 +91,18 @@ export const LOGO_CANVAS = { columns: 80, rows: 10 } as const;
  * that defers mounting can reserve the space up front and avoid the page
  * jumping when the editor appears.
  */
+/**
+ * The engine's own box. It fills this exactly -- .ansi-editor-root is taken out
+ * of normal flow -- so anything rendered as a child of the same div lands on top
+ * of the editor instead of below it. The row/column bar is a sibling of this
+ * box, not a child.
+ */
+function editorBoxHeight(rows: number): number {
+  return CHROME_HEIGHT + rows * ROW_HEIGHT;
+}
+
 export function panelHeight(rows: number): number {
-  return CHROME_HEIGHT + ROW_COLUMN_BAR_HEIGHT + rows * ROW_HEIGHT;
+  return editorBoxHeight(rows) + ROW_COLUMN_BAR_HEIGHT;
 }
 
 interface AnsiEditorPanelProps {
@@ -161,19 +171,20 @@ const AnsiEditorPanel = forwardRef<AnsiEditorPanelRef, AnsiEditorPanelProps>(
         style={
           {
             width: "100%",
-            height: panelHeight(rows),
             marginBottom: 16,
             "--ansi-viewport-size": viewportSize(rows),
           } as React.CSSProperties
         }
       >
-        <AnsiEditor
-          ref={editorRef}
-          onReady={onReady}
-          columns={columns}
-          rows={rows}
-          fileExport={fileExport}
-        />
+        <div style={{ width: "100%", height: editorBoxHeight(rows) }}>
+          <AnsiEditor
+            ref={editorRef}
+            onReady={onReady}
+            columns={columns}
+            rows={rows}
+            fileExport={fileExport}
+          />
+        </div>
         <div
           role="group"
           aria-label="Rows and columns"
