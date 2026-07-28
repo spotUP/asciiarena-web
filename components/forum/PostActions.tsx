@@ -63,8 +63,8 @@ export default function PostActions({ postId, body, canEdit, canDelete }: Props)
           onChange={e => setDraft(e.target.value)}
           style={{ resize: "vertical" }}
         />
-        <div className="apt-1">
-          <button className="btn-secondary apr-1" style={{ marginRight: "8px" }} onClick={save} disabled={busy}>
+        <div className="apt-1 d-flex" style={{ gap: "8px" }}>
+          <button className="btn-secondary apr-1" onClick={save} disabled={busy}>
             SAVE
           </button>
           <button
@@ -82,8 +82,11 @@ export default function PostActions({ postId, body, canEdit, canDelete }: Props)
     );
   }
 
+  // No fixed height: site.css:543 pins every <button> to 48px, so a 16px row
+  // here overflows the post card and lands on top of the paginator below it.
+  // 48px is three grid rows, so the natural height is already on the grid.
   return (
-    <div className="apt-1 d-flex justify-content-end" style={{ gap: "8px", height: "16px", lineHeight: "16px" }}>
+    <div className="apt-1 d-flex justify-content-end" style={{ gap: "8px" }}>
       {canEdit && (
         <button className="btn-secondary apr-1" onClick={() => setEditing(true)}>
           EDIT

@@ -82,11 +82,15 @@ export default async function TopicPage({ params, searchParams }: PageProps) {
         ]}
       />
 
-      <div className="d-flex" style={{ gap: "16px", height: "16px", lineHeight: "16px", marginBottom: "16px" }}>
-        {topic.pinned && <span className="yellow">[PINNED]</span>}
-        {topic.locked && <span className="lightred">[LOCKED]</span>}
-        {topic.deletedAt != null && <span className="lightred">[DELETED]</span>}
-      </div>
+      {/* Rendered only when there is a badge: an always-present row costs 32px
+          of empty space under the breadcrumb on every ordinary topic. */}
+      {(topic.pinned || topic.locked || topic.deletedAt != null) && (
+        <div className="d-flex" style={{ gap: "16px", height: "16px", lineHeight: "16px", marginBottom: "16px" }}>
+          {topic.pinned && <span className="yellow">[PINNED]</span>}
+          {topic.locked && <span className="lightred">[LOCKED]</span>}
+          {topic.deletedAt != null && <span className="lightred">[DELETED]</span>}
+        </div>
+      )}
 
       {canModerate(viewer) && (
         <TopicModeration
@@ -116,7 +120,10 @@ export default async function TopicPage({ params, searchParams }: PageProps) {
         ))
       )}
 
-      <ForumPaginator page={page} maxPage={maxPage} basePath={`/forum/${board.slug}/${topic.slug}`} />
+      {/* A "1 of 1" pager on a topic that fits one page is pure furniture. */}
+      {maxPage > 1 && (
+        <ForumPaginator page={page} maxPage={maxPage} basePath={`/forum/${board.slug}/${topic.slug}`} />
+      )}
 
       {canReply ? (
         <ReplyComposer topicId={topic.id} channel={channel} />
