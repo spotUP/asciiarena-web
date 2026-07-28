@@ -1,6 +1,6 @@
 import Link from "next/link";
 import SiteLayout from "@/components/layout/SiteLayout";
-import LiveRefresh from "@/components/widgets/LiveRefresh";
+import BoardNewItemsPill from "@/components/forum/BoardNewItemsPill";
 import BoardCard from "@/components/forum/BoardCard";
 import ForumSectionTitle from "@/components/forum/ForumSectionTitle";
 import { getSession } from "@/lib/session";
@@ -25,8 +25,10 @@ export default async function ForumIndexPage() {
 
   return (
     <SiteLayout title={["FORUM", "tALK sHOP"]}>
-      {/* Board counters and last-post lines only; nothing to lose on refresh. */}
-      <LiveRefresh channel="site:forum" />
+      {/* A pill, not a LiveRefresh: every post anywhere on the forum lands on
+          this channel, so auto-reloading meant the board index reloaded
+          constantly while you were reading it. */}
+      <BoardNewItemsPill channel="site:forum" />
       <ForumSectionTitle>BOARDS</ForumSectionTitle>
 
       {boards.length === 0 ? (

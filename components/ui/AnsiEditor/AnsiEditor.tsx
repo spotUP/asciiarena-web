@@ -36,6 +36,8 @@ export interface AnsiEditorRef {
   getCurrentFont: () => string;
   /** Switch the canvas font (re-renders in the new font). */
   setFont: (name: string) => void;
+  /** The typed characters on the canvas, as plain text. */
+  getText: () => string;
 }
 
 /**
@@ -164,6 +166,7 @@ const AnsiEditor = forwardRef<AnsiEditorRef, AnsiEditorProps>(
           return handleRef.current.isEmpty();
         },
         getFonts: () => handleRef.current?.getFonts() ?? [],
+        getText: () => handleRef.current?.getText() ?? "",
         getCurrentFont: () => handleRef.current?.getCurrentFont() ?? "",
         setFont: (name: string) => {
           handleRef.current?.setFont(name);

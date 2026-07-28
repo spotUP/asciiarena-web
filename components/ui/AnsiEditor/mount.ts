@@ -45,6 +45,15 @@ export interface EditorHandle {
   getCurrentFont: () => string;
   /** Switch the canvas to `name`; the engine re-renders in the new font. */
   setFont: (name: string) => void;
+  /**
+   * The typed characters on the canvas, as plain text.
+   *
+   * The canvas is the composer, so this is what a post's searchable body and
+   * its @mentions are read from. Only printable ASCII survives: block glyphs
+   * and other CP437 art characters become spaces, because they are drawing,
+   * not words.
+   */
+  getText: () => string;
   /** Tear down the editor and remove its DOM nodes from the host container. */
   destroy: () => void;
 }
@@ -146,6 +155,30 @@ export function initAnsiEditor(
 
     loadAnsiBytes(bytes: Uint8Array): void {
       boot.load(bytes);
+    },
+
+    getText(): string {
+      const canvas = State.textArtCanvas;
+      if (!canvas || typeof canvas.getImageData !== "function") return "";
+      const cells = canvas.getImageData();
+      const columns = canvas.getColumns();
+      const rows = canvas.getRows();
+      if (!columns || !rows) return "";
+
+      const lines: string[] = [];
+      for (let y = 0; y < rows; y++) {
+        let line = "";
+        for (let x = 0; x < columns; x++) {
+          // Top byte is the character code; the rest is colour.
+          const code = cells[y * columns + x] >> 8;
+          line += code >= 32 && code < 127 ? String.fromCharCode(code) : " ";
+        }
+        lines.push(line.replace(/\s+$/, ""));
+      }
+      // Drop trailing blank rows so a mostly-empty canvas does not store a
+      // block of newlines.
+      while (lines.length > 0 && lines[lines.length - 1] === "") lines.pop();
+      return lines.join("\n");
     },
 
     isEmpty(): boolean {

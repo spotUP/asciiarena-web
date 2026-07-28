@@ -22,9 +22,11 @@ export interface AnsiEditorPanelRef {
    * wider type does not satisfy BlobPart, so callers could not build a File
    * from it without copying all over again.
    */
-  collect: () => Promise<{ bytes: Uint8Array<ArrayBuffer>; font: string } | { error: string }>;
+  collect: () => Promise<{ bytes: Uint8Array<ArrayBuffer>; font: string; text: string } | { error: string }>;
   /** True when the canvas is blank. Cheap; no export. */
   isEmpty: () => boolean;
+  /** The typed characters on the canvas, as plain text. Cheap; no export. */
+  getText: () => string;
 }
 
 /**
@@ -66,6 +68,7 @@ const AnsiEditorPanel = forwardRef<AnsiEditorPanelRef, AnsiEditorPanelProps>(
 
     useImperativeHandle(ref, () => ({
       isEmpty: () => editorRef.current?.isEmpty() ?? true,
+      getText: () => editorRef.current?.getText() ?? "",
 
       collect: async () => {
         const editor = editorRef.current;
@@ -82,7 +85,7 @@ const AnsiEditorPanel = forwardRef<AnsiEditorPanelRef, AnsiEditorPanelProps>(
         // build a File out of it.
         const copy = new Uint8Array(bytes.length);
         copy.set(bytes);
-        return { bytes: copy, font: editor.getCurrentFont() };
+        return { bytes: copy, font: editor.getCurrentFont(), text: editor.getText() };
       },
     }));
 

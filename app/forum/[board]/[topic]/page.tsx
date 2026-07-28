@@ -127,7 +127,7 @@ export default async function TopicPage({ params, searchParams }: PageProps) {
       )}
 
       {canReply ? (
-        <ReplyComposer topicId={topic.id} />
+        <ReplyComposer topicId={topic.id} channel={channel} />
       ) : (
         <div className="container-fluid bg-secondary ap-1" style={{ marginTop: "16px" }}>
           <div className="lightred" style={{ height: "16px", lineHeight: "16px" }}>

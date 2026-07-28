@@ -66,7 +66,10 @@ export async function POST(request: NextRequest) {
   const nick = session.user.name ?? "unknown";
 
   if (type === "typing") {
-    broadcast(channel, { type: "typing", nick, draft: (draft ?? "").slice(0, 120) });
+    // 120 was sized for a chat line. The forum composer is an 80x25 canvas,
+    // so a draft is up to a couple of thousand characters; still bounded, so a
+    // client cannot pump arbitrary payloads through the channel.
+    broadcast(channel, { type: "typing", nick, draft: (draft ?? "").slice(0, 4000) });
   } else if (type === "clear") {
     broadcast(channel, { type: "clear", nick });
   }

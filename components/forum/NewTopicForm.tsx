@@ -38,7 +38,7 @@ export default function NewTopicForm({ boardSlug, boardName }: { boardSlug: stri
       toast("[!] Write or draw something before you post.", "danger");
       return;
     }
-    const r = await createTopic(boardSlug, title, "", attachment);
+    const r = await createTopic(boardSlug, title, art?.text ?? "", attachment);
     setBusy(false);
     if (r.success && r.topicSlug) {
       toast("[OK] Topic created.");

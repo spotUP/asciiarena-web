@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import AnsiEditorPanel, {
   panelHeight,
   type AnsiEditorPanelRef,
@@ -45,11 +45,15 @@ function columnsFor(pixelWidth: number): number {
 
 export interface PostCanvasRef {
   /**
-   * The art to post, or null when the author never drew anything (a text-only
-   * post is perfectly valid). Errors only when the editor failed to load or
+   * The art to post plus the plain text typed into it, or nulls when the
+   * author never drew anything. Errors only when the editor failed to load or
    * its export could not be read, so a drawing is never silently dropped.
    */
-  collect: () => Promise<{ attachment: { b64: string; font: string } | null } | { error: string }>;
+  collect: () => Promise<
+    { attachment: { b64: string; font: string } | null; text: string } | { error: string }
+  >;
+  /** Tell other viewers the draft is finished. Called after a successful post. */
+  clearDraft: () => void;
 }
 
 /** Base64 in fixed chunks: String.fromCharCode(...bytes) blows the stack on a big canvas. */
@@ -62,7 +66,20 @@ function toBase64(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
-const PostCanvas = forwardRef<PostCanvasRef, { label?: string }>(function PostCanvas({ label }, ref) {
+interface PostCanvasProps {
+  label?: string;
+  /**
+   * Live channel to publish drafts on. The canvas broadcasts its text as it is
+   * typed, the same way the wall and the release page do, so other people
+   * watching the topic see it appear character by character.
+   */
+  channel?: string;
+}
+
+/** Debounce for draft broadcasts: fast enough to read as live, cheap enough not to flood. */
+const DRAFT_DEBOUNCE_MS = 150;
+
+const PostCanvas = forwardRef<PostCanvasRef, PostCanvasProps>(function PostCanvas({ label, channel }, ref) {
   const [mounted, setMounted] = useState(false);
   const [columns, setColumns] = useState(MIN_COLUMNS);
   const panelRef = useRef<AnsiEditorPanelRef>(null);
@@ -96,19 +113,58 @@ const PostCanvas = forwardRef<PostCanvasRef, { label?: string }>(function PostCa
     return () => io.disconnect();
   }, [mounted]);
 
+  const publish = useCallback(
+    (type: "typing" | "clear", draft: string) => {
+      if (!channel) return;
+      fetch("/api/live", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ channel, type, draft }),
+      }).catch(() => {});
+    },
+    [channel],
+  );
+
+  // The engine fires these on the document as the canvas changes: keypress for
+  // typing, onTextCanvasUp when a draw stroke finishes. Same events
+  // bootstrap.js already saves on, so this needs no engine change.
+  useEffect(() => {
+    if (!mounted || !channel) return;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const onChange = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        publish("typing", panelRef.current?.getText() ?? "");
+      }, DRAFT_DEBOUNCE_MS);
+    };
+    document.addEventListener("keypress", onChange);
+    document.addEventListener("onTextCanvasUp", onChange);
+    return () => {
+      if (timer) clearTimeout(timer);
+      document.removeEventListener("keypress", onChange);
+      document.removeEventListener("onTextCanvasUp", onChange);
+      // Leaving the page should not strand a draft on other people's screens.
+      publish("clear", "");
+    };
+  }, [mounted, channel, publish]);
+
   useImperativeHandle(ref, () => ({
+    clearDraft: () => publish("clear", ""),
+
     collect: async () => {
-      // The editor never loaded, so there is nothing drawn: a text post.
-      if (!mounted) return { attachment: null };
+      // The editor never loaded, so there is nothing drawn.
+      if (!mounted) return { attachment: null, text: "" };
 
       const panel = panelRef.current;
       if (!panel) return { error: "The editor is still loading. Try again." };
-      if (panel.isEmpty()) return { attachment: null };
+      if (panel.isEmpty()) return { attachment: null, text: "" };
 
       const got = await panel.collect();
       if (!got) return { error: "The editor is still loading. Try again." };
       if ("error" in got) return { error: got.error };
-      return { attachment: { b64: toBase64(got.bytes), font: got.font } };
+      // The text goes in alongside the art: it is what @mentions are scanned
+      // out of and what the fulltext index searches.
+      return { attachment: { b64: toBase64(got.bytes), font: got.font }, text: got.text };
     },
   }));
 

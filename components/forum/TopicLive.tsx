@@ -50,10 +50,6 @@ export default function TopicLive({ channel, userNick, onLastPage }: Props) {
         setWatching(typeof evt.count === "number" ? evt.count : 0);
         return;
       }
-      // Currently unreachable: the composer is a canvas, not a textarea, so
-      // nothing emits typing drafts on this channel any more. Kept because the
-      // channel is shared and the receiver costs nothing; delete it if text
-      // composing does not come back.
       if (evt.type === "typing" && nick) {
         const draft = typeof evt.draft === "string" ? evt.draft : "";
         setDrafts(prev => ({ ...prev, [nick]: { nick, text: draft } }));
@@ -86,9 +82,13 @@ export default function TopicLive({ channel, userNick, onLastPage }: Props) {
         }
         return;
       }
-      // edit / delete / moderated: the content changed in place, so re-render
-      // without any "new items" prompt.
-      router.refresh();
+      // Refresh ONLY for events that actually changed what is on the page. A
+      // catch-all here meant every unrecognised event -- and every future one
+      // -- reloaded the topic under the reader, which is what made the forum
+      // feel like it was constantly reloading.
+      if (evt.type === "edit" || evt.type === "delete" || evt.type === "moderated") {
+        router.refresh();
+      }
     });
 
     return () => {
