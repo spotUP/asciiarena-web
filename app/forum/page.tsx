@@ -6,7 +6,8 @@ import BoardRow from "@/components/forum/BoardRow";
 import ForumSectionTitle from "@/components/forum/ForumSectionTitle";
 import { getSession } from "@/lib/session";
 import { listBoards } from "@/lib/forum/db";
-import { canPostInBoard } from "@/lib/forum/rules";
+import { canModerate, canPostInBoard } from "@/lib/forum/rules";
+import { prisma } from "@/lib/db";
 import type { ForumViewer } from "@/lib/forum/types";
 
 export const dynamic = "force-dynamic";
@@ -21,6 +22,12 @@ export default async function ForumIndexPage() {
   };
 
   const boards = await listBoards(viewer);
+  const isModerator = canModerate(viewer);
+  // Reports the moderator has not dealt with. Shown on the button so a full
+  // queue is visible from the forum rather than only from /admin.
+  const openReports = isModerator
+    ? await prisma.forum_reports.count({ where: { resolved_at: null } })
+    : 0;
   // The button only makes sense if there is somewhere to post.
   const postable = boards.find(b => canPostInBoard(b, viewer));
 
@@ -39,17 +46,45 @@ export default async function ForumIndexPage() {
             No boards have been created yet.
           </div>
         ) : (
-          boards.map(b => <BoardRow key={b.id} board={b} />)
+          boards.map((b, i) => (
+            <BoardRow
+              key={b.id}
+              board={b}
+              moderation={
+                isModerator
+                  ? {
+                      index: i,
+                      prevBoard: i > 0 ? { id: boards[i - 1].id, index: i - 1 } : null,
+                      nextBoard: i < boards.length - 1 ? { id: boards[i + 1].id, index: i + 1 } : null,
+                    }
+                  : undefined
+              }
+            />
+          ))
         )}
       </div>
 
-      {postable && (
-        <div style={{ marginTop: "16px" }}>
+      <div style={{ marginTop: "16px", display: "flex", gap: "16px", flexWrap: "wrap" }}>
+        {postable && (
           <Link prefetch={false} href={`/forum/${postable.slug}/new`}>
             <input type="button" className="btn-big" value="NEW TOPIC" />
           </Link>
-        </div>
-      )}
+        )}
+        {isModerator && (
+          <>
+            <Link prefetch={false} href="/admin/forum/new">
+              <input type="button" className="btn-big" value="NEW BOARD" />
+            </Link>
+            <Link prefetch={false} href="/admin/forum/reports">
+              <input
+                type="button"
+                className="btn-big"
+                value={openReports > 0 ? `REPORTS (${openReports})` : "REPORTS"}
+              />
+            </Link>
+          </>
+        )}
+      </div>
     </SiteLayout>
   );
 }
