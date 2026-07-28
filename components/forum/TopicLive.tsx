@@ -50,6 +50,10 @@ export default function TopicLive({ channel, userNick, onLastPage }: Props) {
         setWatching(typeof evt.count === "number" ? evt.count : 0);
         return;
       }
+      // Currently unreachable: the composer is a canvas, not a textarea, so
+      // nothing emits typing drafts on this channel any more. Kept because the
+      // channel is shared and the receiver costs nothing; delete it if text
+      // composing does not come back.
       if (evt.type === "typing" && nick) {
         const draft = typeof evt.draft === "string" ? evt.draft : "";
         setDrafts(prev => ({ ...prev, [nick]: { nick, text: draft } }));

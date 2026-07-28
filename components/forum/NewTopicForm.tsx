@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/ToastProvider";
 import { createTopic } from "@/app/actions/forum";
 import PostCanvas, { type PostCanvasRef } from "@/components/forum/PostCanvas";
-import { MAX_BODY_LEN, MAX_TITLE_LEN } from "@/lib/forum/types";
+import { MAX_TITLE_LEN } from "@/lib/forum/types";
 
 const LABEL = {
   display: "block",
@@ -20,7 +20,6 @@ export default function NewTopicForm({ boardSlug, boardName }: { boardSlug: stri
   const router = useRouter();
   const { toast } = useToast();
   const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
   const ansiRef = useRef<PostCanvasRef>(null);
 
@@ -34,12 +33,12 @@ export default function NewTopicForm({ boardSlug, boardName }: { boardSlug: stri
       return;
     }
     const attachment = art?.attachment ?? null;
-    if (!body.trim() && !attachment) {
+    if (!attachment) {
       setBusy(false);
-      toast("[!] Draw something or write something before you post.", "danger");
+      toast("[!] Write or draw something before you post.", "danger");
       return;
     }
-    const r = await createTopic(boardSlug, title, body, attachment);
+    const r = await createTopic(boardSlug, title, "", attachment);
     setBusy(false);
     if (r.success && r.topicSlug) {
       toast("[OK] Topic created.");
@@ -68,24 +67,7 @@ export default function NewTopicForm({ boardSlug, boardName }: { boardSlug: stri
       <label className="lightgrey" style={{ ...LABEL, marginTop: "16px" }}>
         Message
       </label>
-      <PostCanvas
-        ref={ansiRef}
-        label="Draw your post in the ANSI editor, or leave it closed and just write below."
-      />
-
-      <textarea
-        id="forum-body"
-        className="form-control"
-        rows={4}
-        maxLength={MAX_BODY_LEN}
-        placeholder="Add a note to go with it (optional)..."
-        value={body}
-        onChange={e => setBody(e.target.value)}
-        style={{ resize: "vertical" }}
-      />
-      <div className="lightgrey" style={{ height: "16px", lineHeight: "16px", marginTop: "8px" }}>
-        Text is kept exactly as you type it, line breaks and all.
-      </div>
+      <PostCanvas ref={ansiRef} label="Write or draw your post." />
 
       <div className="d-flex" style={{ gap: "16px", marginTop: "16px", alignItems: "center" }}>
         <input type="button" className="btn-big" value="CREATE TOPIC" onClick={submit} disabled={busy} />

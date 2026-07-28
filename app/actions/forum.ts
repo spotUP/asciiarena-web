@@ -39,7 +39,15 @@ export interface AnsiAttachment {
   font: string | null;
 }
 
-/** A post must say something: text, art, or both. */
+/**
+ * A post must say something: text, art, or both.
+ *
+ * The forum composer currently sends art only -- it is an ANSI canvas you both
+ * write and draw in, with no separate text field -- so `body` arrives empty in
+ * practice. The text path is kept because the column, the mention scanner and
+ * the fulltext index all still depend on it, and because a text-only post is
+ * still valid input to this action.
+ */
 function isEmptyPost(text: string, art: AnsiAttachment | null): boolean {
   return text.trim().length === 0 && art == null;
 }

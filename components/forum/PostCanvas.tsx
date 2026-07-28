@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import AnsiEditorPanel, {
   panelHeight,
   type AnsiEditorPanelRef,
@@ -13,15 +13,35 @@ import AnsiEditorPanel, {
  *
  * Two differences from the logo form:
  *
- *   - A taller canvas. The logo editor's 80x10 is the site header's limit, and
- *     a forum post is not bound by it.
- *   - Deferred mount. The composer sits on every topic page, and the engine is
- *     ~200KB plus a canvas; loading that for every reader who never draws is
- *     wasteful. The editor mounts on first click, and the placeholder reserves
- *     the exact height it will take so nothing jumps.
+ *   - A canvas sized to the page, not to the site header. The logo editor's
+ *     80x10 is the header's limit; a forum post is bound by neither its width
+ *     nor its height, so the canvas takes the composer's full width.
+ *   - Deferred load. The composer sits on every topic page and the engine is
+ *     ~200KB plus a canvas, so it is not fetched until the composer comes into
+ *     view. That is a loading detail, not a UI gate: the editor is the default
+ *     surface and arrives on its own, with the placeholder holding its exact
+ *     height so nothing jumps. Nobody has to click to get an editor.
  */
 
-const CANVAS = { columns: 80, rows: 25 } as const;
+const ROWS = 25;
+
+/**
+ * Character cell width in the editor's 8xN bitmap fonts.
+ */
+const CELL_WIDTH = 8;
+
+/**
+ * A forum post is not a site logo, so the canvas is not pinned to 80 columns.
+ * It takes whatever the composer column gives it, within reason: narrower than
+ * 80 stops being usable for art, and past ~240 the export gets silly.
+ */
+const MIN_COLUMNS = 80;
+const MAX_COLUMNS = 240;
+
+function columnsFor(pixelWidth: number): number {
+  const fits = Math.floor(pixelWidth / CELL_WIDTH);
+  return Math.max(MIN_COLUMNS, Math.min(MAX_COLUMNS, fits));
+}
 
 export interface PostCanvasRef {
   /**
@@ -44,11 +64,41 @@ function toBase64(bytes: Uint8Array): string {
 
 const PostCanvas = forwardRef<PostCanvasRef, { label?: string }>(function PostCanvas({ label }, ref) {
   const [mounted, setMounted] = useState(false);
+  const [columns, setColumns] = useState(MIN_COLUMNS);
   const panelRef = useRef<AnsiEditorPanelRef>(null);
+  const slotRef = useRef<HTMLDivElement>(null);
+
+  // Mount as soon as the composer is anywhere near the viewport. rootMargin is
+  // generous so the editor is ready before it is scrolled to, and any browser
+  // without IntersectionObserver just gets it immediately -- the editor being
+  // present is the requirement; deferring is only an optimisation.
+  useEffect(() => {
+    if (mounted) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setMounted(true);
+      return;
+    }
+    const el = slotRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      entries => {
+        if (!entries.some(e => e.isIntersecting)) return;
+        // Measured off the placeholder, which already occupies the exact box
+        // the editor will take, so the canvas is sized before it is created.
+        // The engine locks the canvas at mount, so this cannot be revised
+        // later without discarding the drawing.
+        setColumns(columnsFor(el.getBoundingClientRect().width));
+        setMounted(true);
+      },
+      { rootMargin: "600px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [mounted]);
 
   useImperativeHandle(ref, () => ({
     collect: async () => {
-      // Never opened: this is a text post, not a failure.
+      // The editor never loaded, so there is nothing drawn: a text post.
       if (!mounted) return { attachment: null };
 
       const panel = panelRef.current;
@@ -65,35 +115,31 @@ const PostCanvas = forwardRef<PostCanvasRef, { label?: string }>(function PostCa
   return (
     <div>
       <div className="lightgrey" style={{ height: "16px", lineHeight: "16px", marginBottom: "16px" }}>
-        {label ?? "Draw your post, or leave the canvas closed and just write below."}
+        {label ?? "Write or draw your post."}
       </div>
 
       {mounted ? (
-        <AnsiEditorPanel ref={panelRef} columns={CANVAS.columns} rows={CANVAS.rows} />
+        <AnsiEditorPanel ref={panelRef} columns={columns} rows={ROWS} />
       ) : (
-        <button
-          type="button"
-          onClick={() => setMounted(true)}
-          title="Open the ANSI editor"
-          className="bg-secondary w-100"
+        <div
+          ref={slotRef}
+          className="bg-secondary lightgrey"
           style={{
-            // Reserves the editor's exact footprint, so opening it does not
+            // Reserves the editor's exact footprint so its arrival does not
             // shove the rest of the form down the page.
-            // All three: site.css pins every <button> to min/max-height 48px,
-            // and only an inline min-height overrides the min.
-            height: panelHeight(CANVAS.rows),
-            minHeight: panelHeight(CANVAS.rows),
-            maxHeight: panelHeight(CANVAS.rows),
+            height: panelHeight(ROWS),
             marginBottom: 16,
             border: "1px solid #555",
-            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             fontFamily: "TopazPlus_a1200, monospace",
             fontSize: "16px",
             lineHeight: "16px",
           }}
         >
-          {`[ CLICK TO DRAW - ${CANVAS.columns} x ${CANVAS.rows} ANSI CANVAS ]`}
-        </button>
+          {"[ loading the editor... ]"}
+        </div>
       )}
     </div>
   );
