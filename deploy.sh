@@ -137,6 +137,37 @@ ssh spot@97.75.89.139 "
   fi
 "
 
+# Regression guard for "Failed to load chunk" (2026-07-28).
+#
+# `verify_static` above proves the chunks are ON DISK. That is not the same as
+# SERVABLE, and the difference is what broke visitors: Next standalone resolves
+# /_next/static against a file set computed at process startup, so every chunk
+# rsynced after the last restart 404'd until the next one -- while the same
+# process was already rendering HTML that referenced those chunks.
+#
+# This runs at the exact moment that used to fail: new files synced, service
+# NOT yet restarted. It writes a probe into the static dir and fetches it over
+# https. Served from nginx (see deploy/asciiarena.se-nginx.conf) it is 200.
+# Proxied to the not-yet-restarted Next process it is 404 -- which is precisely
+# the visitor-facing bug, caught before the deploy reports success.
+echo "Verifying new chunks are servable before restart..."
+PROBE="deploy-probe-$$.js"
+ssh spot@97.75.89.139 "echo 'export const probe=1' > /var/www/asciiarena.se/nextjs-current/.next/static/chunks/$PROBE"
+probe_code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "https://asciiarena.se/_next/static/chunks/$PROBE" || echo 000)
+ssh spot@97.75.89.139 "rm -f /var/www/asciiarena.se/nextjs-current/.next/static/chunks/$PROBE"
+STATIC_SERVABLE=1
+if [ "$probe_code" != "200" ]; then
+  STATIC_SERVABLE=0
+  echo "  [ERROR] a freshly synced chunk returned $probe_code, not 200."
+  echo "          Visitors loading the site between the rsync and the restart get"
+  echo "          'Failed to load chunk' and a dead page until they hard-reload."
+  echo "          Check that location /_next/static/ exists in the nginx config."
+  echo "          Continuing to the restart anyway — restarting REPAIRS this state,"
+  echo "          aborting here would leave it broken for longer."
+else
+  echo "  new chunks servable pre-restart (probe 200)."
+fi
+
 echo "Restarting service..."
 ssh spot@97.75.89.139 "sudo systemctl restart asciiarena-next && sleep 4 && systemctl is-active asciiarena-next"
 
@@ -157,6 +188,12 @@ for attempt in $(seq 1 30); do
 done
 if [ "$warm" -ne 1 ]; then
   echo "  WARNING: home page still not 200 after 30s (last code: ${code}). Check the service."
+fi
+
+if [ "$STATIC_SERVABLE" -ne 1 ]; then
+  echo "Done, but FAILING the deploy: client chunks were not servable before the"
+  echo "restart, so anyone who loaded the site during this deploy hit a chunk error."
+  exit 1
 fi
 
 echo "Done."
