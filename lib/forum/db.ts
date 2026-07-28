@@ -188,7 +188,7 @@ export async function getBoardById(id: number): Promise<BoardView | null> {
 export async function listPosts(
   topicId: number,
   opts: { page: number; viewer: ForumViewer },
-): Promise<{ posts: PostView[]; total: number; firstIndex: number }> {
+): Promise<{ posts: PostView[]; total: number; firstIndex: number; asOf: number }> {
   const where = {
     topic_id: topicId,
     ...(canModerate(opts.viewer) ? {} : { deleted_at: null }),
@@ -207,6 +207,13 @@ export async function listPosts(
     posts: rows.map(r => toPost(r, nicks.get(r.user_id) ?? null)),
     total,
     firstIndex: (opts.page - 1) * POSTS_PER_PAGE + 1,
+    // The moment these posts were read, for evaluating the edit window against.
+    // It belongs here rather than in the page: reading the clock while
+    // rendering is an impure call, and the window should be measured against
+    // when the data was fetched anyway. The server action re-checks with a
+    // fresh clock before accepting an edit, so this only decides whether the
+    // control is offered.
+    asOf: Math.floor(Date.now() / 1000),
   };
 }
 

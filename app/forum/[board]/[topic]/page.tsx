@@ -63,10 +63,9 @@ export default async function TopicPage({ params, searchParams }: PageProps) {
   if (topic.deletedAt != null && !canModerate(viewer)) notFound();
 
   const page = Math.max(1, Number(sp.page) || 1);
-  const { posts, total, firstIndex } = await listPosts(topic.id, { page, viewer });
+  const { posts, total, firstIndex, asOf } = await listPosts(topic.id, { page, viewer });
   const maxPage = Math.max(1, Math.ceil(total / POSTS_PER_PAGE));
 
-  const now = Math.floor(Date.now() / 1000);
   const canReply = canReplyToTopic(topic, board, viewer);
   const channel = `forum:topic:${topic.id}`;
 
@@ -112,7 +111,7 @@ export default async function TopicPage({ params, searchParams }: PageProps) {
             key={p.id}
             post={p}
             seq={firstIndex + i}
-            canEdit={canEditPost(p, viewer, now)}
+            canEdit={canEditPost(p, viewer, asOf)}
             canDelete={canDeletePost(p, viewer)}
             canReport={viewer.userId != null && viewer.userId !== p.userId && p.deletedAt == null}
           />
