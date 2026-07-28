@@ -7,7 +7,7 @@ import ReplyComposer from "@/components/forum/ReplyComposer";
 import TopicLive from "@/components/forum/TopicLive";
 import TopicModeration from "@/components/forum/TopicModeration";
 import { getSession } from "@/lib/session";
-import { bumpViewCount, getBoardById, getTopic, listPosts } from "@/lib/forum/db";
+import { getBoardById, getTopic, listPosts } from "@/lib/forum/db";
 import { canDeletePost, canEditPost, canModerate, canReadBoard, canReplyToTopic } from "@/lib/forum/rules";
 import { parseTopicId } from "@/lib/forum/slug";
 import { POSTS_PER_PAGE, type ForumViewer } from "@/lib/forum/types";
@@ -66,8 +66,6 @@ export default async function TopicPage({ params, searchParams }: PageProps) {
   const { posts, total, firstIndex } = await listPosts(topic.id, { page, viewer });
   const maxPage = Math.max(1, Math.ceil(total / POSTS_PER_PAGE));
 
-  await bumpViewCount(topic.id);
-
   const now = Math.floor(Date.now() / 1000);
   const canReply = canReplyToTopic(topic, board, viewer);
   const channel = `forum:topic:${topic.id}`;
@@ -102,7 +100,7 @@ export default async function TopicPage({ params, searchParams }: PageProps) {
       )}
 
       {/* The page's one live connection: viewer count, typing drafts, replies. */}
-      <TopicLive channel={channel} userNick={session?.user?.name ?? null} onLastPage={page >= maxPage} />
+      <TopicLive channel={channel} topicId={topic.id} userNick={session?.user?.name ?? null} onLastPage={page >= maxPage} />
 
       {posts.length === 0 ? (
         <div className="container-fluid bg-secondary ap-1 lightgrey" style={{ marginBottom: "16px" }}>

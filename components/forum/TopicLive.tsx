@@ -3,9 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { subscribeRaw } from "@/lib/sse-pool";
+import { recordTopicView } from "@/app/actions/forum";
 
 interface Props {
   channel: string;
+  /** Counted once per navigation, from here rather than during render. */
+  topicId: number;
   /** Own nick, so your own typing draft is not echoed back at you. */
   userNick?: string | null;
   /** True when the reader is on the last page, where new replies can appear. */
@@ -31,7 +34,7 @@ const NEAR_BOTTOM_PX = 2000;
  * pill instead. router.refresh() preserves client state either way, so a
  * half-written reply survives.
  */
-export default function TopicLive({ channel, userNick, onLastPage }: Props) {
+export default function TopicLive({ channel, topicId, userNick, onLastPage }: Props) {
   const router = useRouter();
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
   const [watching, setWatching] = useState(0);
@@ -39,6 +42,12 @@ export default function TopicLive({ channel, userNick, onLastPage }: Props) {
   const draftTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const onLastPageRef = useRef(onLastPage);
   onLastPageRef.current = onLastPage;
+
+  // Once per mount. router.refresh() does not remount a client component, so
+  // live events no longer inflate the count.
+  useEffect(() => {
+    void recordTopicView(topicId);
+  }, [topicId]);
 
   useEffect(() => {
     const timers = draftTimers.current;

@@ -61,6 +61,21 @@ async function viewer(): Promise<{ v: ForumViewer; nick: string } | null> {
   };
 }
 
+/**
+ * Count one view of a topic.
+ *
+ * Called from the client on mount rather than during the server render: the
+ * topic page is force-dynamic and re-renders on every router.refresh(), so
+ * counting server-side made the number climb on its own every time a live
+ * event came in. A client effect fires once per navigation, which is what a
+ * "view" means. Same shape as trackView() for releases.
+ */
+export async function recordTopicView(topicId: number): Promise<void> {
+  const parsed = id.safeParse(topicId);
+  if (!parsed.success) return;
+  await db.bumpViewCount(parsed.data);
+}
+
 export async function createTopic(
   boardSlug: string,
   rawTitle: string,
