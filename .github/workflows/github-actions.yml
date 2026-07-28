@@ -98,7 +98,15 @@ jobs:
             deploy/asciiarena.se-nginx.conf \
             "$SERVER:/tmp/asciiarena-nginx.conf"
 
-          # Restart the service and reload nginx if config changed
-          $SSH "$SERVER" /home/${{ secrets.SSH_USER }}/bin/deploy_asciiarena.sh
+          # Sync the server-side deploy script too. It used to be maintained by
+          # hand on the server, so the repo copy could drift from the one that
+          # actually runs -- edits to it (like the pre-restart chunk-servability
+          # check) would look deployed while never executing.
+          scp -i /tmp/deploy_key -o StrictHostKeyChecking=no \
+            deploy/deploy_asciiarena.sh \
+            "$SERVER:/home/${{ secrets.SSH_USER }}/bin/deploy_asciiarena.sh"
+
+          # Reload nginx if config changed, verify chunks are servable, restart
+          $SSH "$SERVER" "chmod +x /home/${{ secrets.SSH_USER }}/bin/deploy_asciiarena.sh && /home/${{ secrets.SSH_USER }}/bin/deploy_asciiarena.sh"
 
           rm -f /tmp/deploy_key

@@ -119,68 +119,33 @@ echo "Deploying assets/ + fonts/..."
 rsync_resilient assets/ spot@97.75.89.139:/var/www/asciiarena.se/nextjs-current/assets/
 rsync_resilient fonts/ spot@97.75.89.139:/var/www/asciiarena.se/nextjs-current/fonts/
 
-echo "Syncing nginx config..."
-# Guard: if nginx config on server differs from repo, update + reload.
-# This prevents the old PHP config from silently reverting (it happened).
+# nginx config sync, the pre-restart chunk-servability check, the restart and
+# the warm-up all live in deploy/deploy_asciiarena.sh, which runs ON the server.
+# They used to be duplicated here as well, and GitHub Actions never ran this
+# file at all -- it inlines its own rsync steps and then calls the server script.
+# So a guard added here would silently never execute on the path that actually
+# deploys. One copy, both paths.
+echo "Syncing nginx config + server deploy script..."
 ssh spot@97.75.89.139 "sudo cp /etc/nginx/sites-available/asciiarena.se /etc/nginx/sites-available/asciiarena.se.pre-deploy-backup 2>/dev/null || true"
 rsync_resilient \
   deploy/asciiarena.se-nginx.conf \
-  spot@97.75.89.139:/tmp/asciiarena.se-nginx.conf
-ssh spot@97.75.89.139 "
-  if ! diff -q /tmp/asciiarena.se-nginx.conf /etc/nginx/sites-available/asciiarena.se > /dev/null 2>&1; then
-    echo '  nginx config changed, updating and reloading...'
-    sudo cp /tmp/asciiarena.se-nginx.conf /etc/nginx/sites-available/asciiarena.se
-    sudo nginx -t && sudo systemctl reload nginx
-    echo '  nginx reloaded.'
-  else
-    echo '  nginx config unchanged.'
-  fi
-"
+  spot@97.75.89.139:/tmp/asciiarena-nginx.conf
+rsync_resilient \
+  deploy/deploy_asciiarena.sh \
+  spot@97.75.89.139:/home/spot/bin/deploy_asciiarena.sh
 
-# Regression guard for "Failed to load chunk" (2026-07-28).
-#
-# `verify_static` above proves the chunks are ON DISK. That is not the same as
-# SERVABLE, and the difference is what broke visitors: Next standalone resolves
-# /_next/static against a file set computed at process startup, so every chunk
-# rsynced after the last restart 404'd until the next one -- while the same
-# process was already rendering HTML that referenced those chunks.
-#
-# This runs at the exact moment that used to fail: new files synced, service
-# NOT yet restarted. It writes a probe into the static dir and fetches it over
-# https. Served from nginx (see deploy/asciiarena.se-nginx.conf) it is 200.
-# Proxied to the not-yet-restarted Next process it is 404 -- which is precisely
-# the visitor-facing bug, caught before the deploy reports success.
-echo "Verifying new chunks are servable before restart..."
-PROBE="deploy-probe-$$.js"
-ssh spot@97.75.89.139 "echo 'export const probe=1' > /var/www/asciiarena.se/nextjs-current/.next/static/chunks/$PROBE"
-probe_code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "https://asciiarena.se/_next/static/chunks/$PROBE" || echo 000)
-ssh spot@97.75.89.139 "rm -f /var/www/asciiarena.se/nextjs-current/.next/static/chunks/$PROBE"
-STATIC_SERVABLE=1
-if [ "$probe_code" != "200" ]; then
-  STATIC_SERVABLE=0
-  echo "  [ERROR] a freshly synced chunk returned $probe_code, not 200."
-  echo "          Visitors loading the site between the rsync and the restart get"
-  echo "          'Failed to load chunk' and a dead page until they hard-reload."
-  echo "          Check that location /_next/static/ exists in the nginx config."
-  echo "          Continuing to the restart anyway — restarting REPAIRS this state,"
-  echo "          aborting here would leave it broken for longer."
-else
-  echo "  new chunks servable pre-restart (probe 200)."
-fi
+echo "Running server-side deploy (nginx reload, chunk check, restart)..."
+ssh spot@97.75.89.139 "chmod +x /home/spot/bin/deploy_asciiarena.sh && /home/spot/bin/deploy_asciiarena.sh"
 
-echo "Restarting service..."
-ssh spot@97.75.89.139 "sudo systemctl restart asciiarena-next && sleep 4 && systemctl is-active asciiarena-next"
-
-# Warm-up: after a restart the new Next process is up but its Prisma/MariaDB
-# pool hasn't connected yet, so the first requests in that window return a bare
-# 500. Poll the home page until it serves 200 so the deploy absorbs the
-# cold-start window instead of leaving it exposed to real visitors.
-echo "Warming up (waiting for home page to serve 200)..."
+# The server script already waits for the app to answer 200 on 127.0.0.1:3001,
+# absorbing the cold Prisma/MariaDB pool window. This re-checks through nginx
+# and TLS, which the server-local poll cannot see.
+echo "Verifying the public site responds..."
 warm=0
 for attempt in $(seq 1 30); do
   code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 https://asciiarena.se/ || echo 000)
   if [ "$code" = "200" ]; then
-    echo "  home page 200 after ${attempt}s — pool warm."
+    echo "  home page 200 after ${attempt}s."
     warm=1
     break
   fi
@@ -188,12 +153,6 @@ for attempt in $(seq 1 30); do
 done
 if [ "$warm" -ne 1 ]; then
   echo "  WARNING: home page still not 200 after 30s (last code: ${code}). Check the service."
-fi
-
-if [ "$STATIC_SERVABLE" -ne 1 ]; then
-  echo "Done, but FAILING the deploy: client chunks were not servable before the"
-  echo "restart, so anyone who loaded the site during this deploy hit a chunk error."
-  exit 1
 fi
 
 echo "Done."
