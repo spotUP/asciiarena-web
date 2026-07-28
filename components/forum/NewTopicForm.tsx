@@ -70,7 +70,7 @@ export default function NewTopicForm({ boardSlug, boardName }: { boardSlug: stri
       </label>
       <PostCanvas
         ref={ansiRef}
-        label="Draw your post. Type straight into the canvas, or leave it blank and just write below."
+        label="Draw your post in the ANSI editor, or leave it closed and just write below."
       />
 
       <textarea

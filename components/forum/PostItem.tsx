@@ -16,9 +16,10 @@ interface Props {
   seq: number;
   canEdit: boolean;
   canDelete: boolean;
+  canReport: boolean;
 }
 
-export default function PostItem({ post, seq, canEdit, canDelete }: Props) {
+export default function PostItem({ post, seq, canEdit, canDelete, canReport }: Props) {
   return (
     <div id={`p${post.id}`} className="col-lg-12 pl-0 apb-1 bg-secondary ap-1" style={{ marginBottom: "16px" }}>
       <div className="d-flex justify-content-between" style={{ height: "16px", lineHeight: "16px" }}>
@@ -49,7 +50,7 @@ export default function PostItem({ post, seq, canEdit, canDelete }: Props) {
         </div>
       )}
 
-      <PostActions postId={post.id} body={post.body} canEdit={canEdit} canDelete={canDelete} />
+      <PostActions postId={post.id} body={post.body} canEdit={canEdit} canDelete={canDelete} canReport={canReport} />
     </div>
   );
 }

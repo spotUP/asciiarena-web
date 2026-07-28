@@ -17,6 +17,9 @@ export default async function AdminForumList() {
           background: "#212121", color: "#ffff55", border: "1px solid #555",
           fontFamily: "TopazPlus_a1200, monospace", fontSize: "16px", textDecoration: "none",
         }}>+ NEW BOARD</Link>
+        <Link href="/admin/forum/reports" className="magenta" style={{ marginLeft: "16px" }}>
+          [ REPORTS ]
+        </Link>
       </div>
       <div className="container-fluid bg-secondary apb-1 ap-1">
         {boards.length === 0 && <div style={{ color: "#aaaaaa" }}>No boards yet.</div>}

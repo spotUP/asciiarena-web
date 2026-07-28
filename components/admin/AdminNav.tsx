@@ -17,6 +17,7 @@ const TABS = [
   { href: "/admin/bbs",      label: "BBS" },
   { href: "/admin/requests", label: "REQUESTS" },
   { href: "/admin/forum",    label: "FORUM" },
+  { href: "/admin/forum/reports", label: "FORUM REPORTS" },
 ];
 
 // Exported so the layout invariant can be asserted in a test: the tab strip

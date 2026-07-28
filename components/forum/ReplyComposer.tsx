@@ -69,7 +69,7 @@ export default function ReplyComposer({ topicId, channel }: Props) {
       <ForumSectionTitle>REPLY</ForumSectionTitle>
       <PostCanvas
         ref={ansiRef}
-        label="Draw your reply. Type straight into the canvas, or leave it blank and just write below."
+        label="Draw your reply in the ANSI editor, or leave it closed and just write below."
       />
 
       <textarea

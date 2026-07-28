@@ -48,12 +48,18 @@ function fontOption(name: string): { value: string; label: string } {
 
 interface AnsiEditorProps {
   onReady?: () => void;
+  /** Canvas width in character columns. Default: the engine's 80. */
+  columns?: number;
+  /** Canvas height in character rows. Default: the engine's 10. */
+  rows?: number;
+  /** Starting font, as an engine font name. Default: "Topaz+ 1200 8x16". */
+  font?: string;
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
 const AnsiEditor = forwardRef<AnsiEditorRef, AnsiEditorProps>(
-  function AnsiEditor({ onReady }, ref) {
+  function AnsiEditor({ onReady, columns, rows, font }, ref) {
     const hostRef = useRef<HTMLDivElement>(null);
     const handleRef = useRef<EditorHandle | null>(null);
     const [failed, setFailed] = useState(false);
@@ -99,7 +105,12 @@ const AnsiEditor = forwardRef<AnsiEditorRef, AnsiEditorProps>(
 
         let handle: EditorHandle;
         try {
-          handle = mod.initAnsiEditor(hostRef.current, { onReady: handleReady });
+          handle = mod.initAnsiEditor(hostRef.current, {
+            onReady: handleReady,
+            ...(columns ? { columns } : {}),
+            ...(rows ? { rows } : {}),
+            ...(font ? { font } : {}),
+          });
         } catch (err) {
           if (cancelled) return;
           console.error("[AnsiEditor] initAnsiEditor threw", err);
@@ -129,6 +140,8 @@ const AnsiEditor = forwardRef<AnsiEditorRef, AnsiEditorProps>(
           handleRef.current = null;
         }
       };
+      // columns/rows/font are read once at mount, for the same reason: resizing
+      // the canvas mid-edit would throw away the drawing.
       // handleReady (and the onReady it wraps) is intentionally excluded:
       // re-running the effect when a caller changes the callback would destroy
       // and re-create the canvas, which is almost never what's wanted. Callers

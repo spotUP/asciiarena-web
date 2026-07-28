@@ -31,16 +31,37 @@ export interface AnsiEditorPanelRef {
  * The editor's sections stack vertically and editor.css clips overflow, so the
  * host needs a definite height or the `height:100%` chain collapses to zero.
  *
- * 348 = DosSelect font row (24) + header (43) + palette strip (64) + viewport
- * (10 rows x 16px canvas + 16px margins = 176) + horizontal tool bar (40),
- * rounded up by one. Kept as an expression so the arithmetic is checkable
- * rather than a magic number.
+ * The chrome around the canvas is fixed: DosSelect font row (24) + header (43)
+ * + palette strip (64) + horizontal tool bar (40) + the viewport's 16px
+ * margins, plus one rounding pixel. Only the canvas itself scales with the row
+ * count. Written as the sum it was derived from rather than the literal 348
+ * the logo form used, so a different row count stays correct.
  */
-const CANVAS_ROWS = 10;
-const PANEL_HEIGHT = 24 + 43 + 64 + (CANVAS_ROWS * 16 + 16) + 40 + 1;
+const CHROME_HEIGHT = 24 + 43 + 64 + 40 + 16 + 1;
+const ROW_HEIGHT = 16;
 
-const AnsiEditorPanel = forwardRef<AnsiEditorPanelRef, { onReady?: () => void }>(
-  function AnsiEditorPanel({ onReady }, ref) {
+/** The site-logo header limit. Only the logo form is bound by it. */
+export const LOGO_CANVAS = { columns: 80, rows: 10 } as const;
+
+/**
+ * The box the editor will occupy at a given row count. Exported so a caller
+ * that defers mounting can reserve the space up front and avoid the page
+ * jumping when the editor appears.
+ */
+export function panelHeight(rows: number): number {
+  return CHROME_HEIGHT + rows * ROW_HEIGHT;
+}
+
+interface AnsiEditorPanelProps {
+  onReady?: () => void;
+  /** Canvas width in character columns. Default: 80. */
+  columns?: number;
+  /** Canvas height in character rows. Default: the logo form's 10. */
+  rows?: number;
+}
+
+const AnsiEditorPanel = forwardRef<AnsiEditorPanelRef, AnsiEditorPanelProps>(
+  function AnsiEditorPanel({ onReady, columns = LOGO_CANVAS.columns, rows = LOGO_CANVAS.rows }, ref) {
     const editorRef = useRef<AnsiEditorRef>(null);
 
     useImperativeHandle(ref, () => ({
@@ -49,7 +70,7 @@ const AnsiEditorPanel = forwardRef<AnsiEditorPanelRef, { onReady?: () => void }>
       collect: async () => {
         const editor = editorRef.current;
         if (!editor) return { error: "The editor is still loading. Try again." };
-        // A blank 80x10 export is still ~960 bytes of spaces plus a SAUCE
+        // A blank export is still hundreds of bytes of spaces plus a SAUCE
         // record, so byte length cannot tell you the canvas is empty.
         if (editor.isEmpty()) return { error: "Draw something before you post." };
 
@@ -66,8 +87,8 @@ const AnsiEditorPanel = forwardRef<AnsiEditorPanelRef, { onReady?: () => void }>
     }));
 
     return (
-      <div style={{ width: "100%", height: PANEL_HEIGHT, marginBottom: 16 }}>
-        <AnsiEditor ref={editorRef} onReady={onReady} />
+      <div style={{ width: "100%", height: panelHeight(rows), marginBottom: 16 }}>
+        <AnsiEditor ref={editorRef} onReady={onReady} columns={columns} rows={rows} />
       </div>
     );
   },

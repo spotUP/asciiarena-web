@@ -116,6 +116,7 @@ export default async function TopicPage({ params, searchParams }: PageProps) {
             seq={firstIndex + i}
             canEdit={canEditPost(p, viewer, now)}
             canDelete={canDeletePost(p, viewer)}
+            canReport={viewer.userId != null && viewer.userId !== p.userId && p.deletedAt == null}
           />
         ))
       )}

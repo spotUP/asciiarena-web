@@ -11,18 +11,20 @@ interface Props {
   body: string;
   canEdit: boolean;
   canDelete: boolean;
+  /** Anyone logged in who is not the author may report it. */
+  canReport: boolean;
 }
 
 // Inline edit + delete for a post. Split out of PostItem so the post itself
 // stays a server component.
-export default function PostActions({ postId, body, canEdit, canDelete }: Props) {
+export default function PostActions({ postId, body, canEdit, canDelete, canReport }: Props) {
   const router = useRouter();
   const { toast } = useToast();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(body);
   const [busy, setBusy] = useState(false);
 
-  if (!canEdit && !canDelete) return null;
+  if (!canEdit && !canDelete && !canReport) return null;
 
   const save = async () => {
     if (busy) return;
@@ -35,6 +37,29 @@ export default function PostActions({ postId, body, canEdit, canDelete }: Props)
       router.refresh();
     } else {
       toast(`[!] ${r.error ?? "Could not save your edit. Try again."}`, "danger");
+    }
+  };
+
+  const report = async () => {
+    if (busy) return;
+    const reason = prompt("What is wrong with this post? (a sentence is enough)");
+    if (reason == null) return;
+    if (reason.trim().length < 3) {
+      toast("[!] Say briefly what is wrong with the post.", "danger");
+      return;
+    }
+    setBusy(true);
+    const res = await fetch("/api/forum/reports", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ postId, reason }),
+    });
+    setBusy(false);
+    if (res.ok) {
+      toast("[OK] Reported. A moderator will look at it.");
+    } else {
+      const d = (await res.json().catch(() => ({}))) as { error?: string };
+      toast(`[!] ${d.error ?? "Could not send the report. Try again."}`, "danger");
     }
   };
 
@@ -95,6 +120,11 @@ export default function PostActions({ postId, body, canEdit, canDelete }: Props)
       {canDelete && (
         <button className="btn-secondary apr-1" onClick={remove} disabled={busy}>
           DELETE
+        </button>
+      )}
+      {canReport && (
+        <button className="btn-secondary apr-1" onClick={report} disabled={busy}>
+          REPORT
         </button>
       )}
     </div>
