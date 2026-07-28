@@ -366,7 +366,7 @@
   --color-hl: var(--dark-hl);
   --color-file: var(--dark-file);
   --color-thumb: var(--dark-tools);
-  .ansi-editor-root dialog::backdrop {
+  dialog::backdrop {
     background: radial-gradient(	circle,	rgba(0, 0, 0, 0.13) 0%,	rgba(0, 0, 0, 0.23) 50%,	rgba(0, 0, 0, 0.53) 100%	);
   }
 }
@@ -387,7 +387,7 @@
     font-weight: normal;
     font-style: normal;
     outline: none;
-    .ansi-editor-root &:focus {
+    &:focus {
       outline: none;
     }
   }
@@ -423,7 +423,7 @@
     width: 100%;
     overflow: hidden;
     background-color: var(--color-black);
-    .ansi-editor-root > div {
+    > div {
       margin: calc(var(--spacing) * 0);
       height: 100%;
       width: 100%;
@@ -442,7 +442,7 @@
   .ansi-editor-root a,	.ansi-editor-root a:visited {
     color: var(--color-cyan);
     text-decoration-thickness: 0px;
-    .ansi-editor-root &:hover {
+    &:hover {
       background-color: var(--color-cyan);
       color: var(--color-fg);
     }
@@ -473,42 +473,42 @@
     height: var(--header-size);
     width: 100%;
     justify-content: space-between;
-    .ansi-editor-root &.dynamic {
+    &.dynamic {
       -webkit-app-region: drag;
       app-region: drag;
       padding-left: calc(env(titlebar-area-x, 0px) + 2px);
       padding-right: calc(env(titlebar-area-x, 0px) + 25px);
     }
-    .ansi-editor-root * {
+    * {
       margin-block: auto;
     }
-    .ansi-editor-root nav {
+    nav {
       -webkit-app-region: no-drag;
       app-region: no-drag;
-      .ansi-editor-root div {
+      div {
         display: flex;
       }
     }
-    .ansi-editor-root svg {
+    svg {
       height: 30px;
       width: 30px;
       fill: var(--color-fg);
     }
-    .ansi-editor-root button,	.ansi-editor-root #resolution,	.ansi-editor-root #currentFontDisplay {
+    button,	#resolution,	#currentFontDisplay {
       height: var(--header-size);
     }
-    .ansi-editor-root button:hover {
+    button:hover {
       background-color: var(--color-hl);
     }
-    .ansi-editor-root #resolution kbd {
+    #resolution kbd {
       margin-right: calc(var(--spacing) * 0.5);
     }
-    .ansi-editor-root #currentFontDisplay kbd {
+    #currentFontDisplay kbd {
       margin-inline: calc(var(--spacing) * 1);
     }
-    .ansi-editor-root #resolution,	.ansi-editor-root #currentFontDisplay {
-      .ansi-editor-root &:hover {
-        .ansi-editor-root kbd {
+    #resolution,	#currentFontDisplay {
+      &:hover {
+        kbd {
           background-color: var(--color-purp);
         }
       }
@@ -520,17 +520,17 @@
     font-size: 10px;
     line-height: 19px;
     padding: 0px 8px;
-    .ansi-editor-root &.enabled,	.ansi-editor-root &.active {
+    &.enabled,	&.active {
       background-color: var(--color-indigo);
     }
-    .ansi-editor-root &.notification {
+    &.notification {
       background-color: var(--color-purp) !important;
     }
-    .ansi-editor-root &.active {
-      .ansi-editor-root #chatIconText {
+    &.active {
+      #chatIconText {
         display: none;
       }
-      .ansi-editor-root #chatIconCloseText {
+      #chatIconCloseText {
         display: block;
       }
     }
@@ -561,25 +561,25 @@
     opacity: 100%;
     transform-origin: top;
     transition: scale 0.7s ease-out,	opacity 0.7s ease-out,	transform 0.7s ease-out;
-    .ansi-editor-root &.hide {
+    &.hide {
       pointer-events: none;
       display: flex !important;
       --tw-scale-y: 0%;
       scale: var(--tw-scale-x) var(--tw-scale-y);
       opacity: 0%;
     }
-    .ansi-editor-root #chatRoom {
+    #chatRoom {
       display: flex;
       height: 100%;
       max-height: 50vh;
       min-height: calc(var(--spacing) * 0);
       width: 100%;
       flex-direction: column;
-      .ansi-editor-root header,	.ansi-editor-root section,	.ansi-editor-root nav,	.ansi-editor-root article {
+      header,	section,	nav,	article {
         width: 100%;
         flex-shrink: 0;
       }
-      .ansi-editor-root header {
+      header {
         display: flex;
         min-height: calc(var(--spacing) * 0);
         width: 100%;
@@ -592,7 +592,7 @@
         user-select: none;
         flex-wrap: balance;
         cursor: grab;
-        .ansi-editor-root h2 {
+        h2 {
           margin-top: calc(var(--spacing) * 1);
           display: flex;
           flex-grow: 1;
@@ -603,37 +603,37 @@
           user-select: none;
           cursor: grab;
         }
-        .ansi-editor-root button {
+        button {
           padding: calc(var(--spacing) * 0);
           padding-bottom: calc(var(--spacing) * 0.5);
-          .ansi-editor-root svg {
+          svg {
             color: var(--color-fg);
           }
         }
-        .ansi-editor-root #closeChat {
+        #closeChat {
           margin: auto;
           display: flex;
           flex-grow: 0;
           cursor: pointer;
           padding-inline: calc(var(--spacing) * 1.5);
           color: var(--color-fg);
-          .ansi-editor-root &:hover svg {
+          &:hover svg {
             fill: var(--color-cyan);
           }
         }
-        .ansi-editor-root #notificationSetting {
+        #notificationSetting {
           display: flex;
           height: 20px;
           flex-grow: 0;
           color: var(--color-fg);
-          .ansi-editor-root label {
+          label {
             margin-right: calc(var(--spacing) * 2.5);
             font-size: var(--text-base);
             line-height: var(--tw-leading, var(--text-base--line-height));
           }
-          .ansi-editor-root #notificationCheckbox {
+          #notificationCheckbox {
             margin-right: calc(var(--spacing) * 3);
-            .ansi-editor-root &:before {
+            &:before {
               position: relative;
               display: block;
               height: 17px;
@@ -641,7 +641,7 @@
               background-color: var(--color-midnight);
               content: '';
             }
-            .ansi-editor-root &:after {
+            &:after {
               position: relative;
               top: -15px;
               left: 2px;
@@ -651,20 +651,20 @@
               background-color: var(--color-midnight);
               content: '';
             }
-            .ansi-editor-root &:checked:after {
+            &:checked:after {
               background-color: var(--color-cyber);
               content: '';
             }
           }
         }
       }
-      .ansi-editor-root section {
+      section {
         display: flex;
         min-height: 284px;
         flex: 1;
         flex-direction: row;
         overflow-y: scroll;
-        .ansi-editor-root #userList,	.ansi-editor-root #messageWindow {
+        #userList,	#messageWindow {
           margin: calc(var(--spacing) * 0);
           display: flex;
           height: 100%;
@@ -673,67 +673,67 @@
           padding-top: calc(var(--spacing) * 2);
           word-break: break-all;
         }
-        .ansi-editor-root #userList {
+        #userList {
           width: calc(1 / 4 * 100%);
           overflow: auto;
           background-color: var(--color-menu);
           padding-left: calc(var(--spacing) * 3);
           color: var(--color-fg);
-          .ansi-editor-root .userName {
+          .userName {
             max-height: 25px;
           }
         }
-        .ansi-editor-root #messageWindow {
+        #messageWindow {
           width: calc(3 / 4 * 100%);
           overflow-y: scroll;
           background-color: var(--color-editor);
-          .ansi-editor-root div {
+          div {
             display: inline-table;
             padding-inline: calc(var(--spacing) * 2);
             color: var(--color-chat);
-            .ansi-editor-root .handle {
+            .handle {
               color: var(--color-white);
-              .ansi-editor-root &:after {
+              &:after {
                 content: ':';
               }
             }
           }
-          .ansi-editor-root .log {
+          .log {
             color: var(--color-header);
           }
         }
       }
-      .ansi-editor-root nav {
+      nav {
         flex-direction: row;
         border-top-style: var(--tw-border-style);
         border-top-width: 4px;
         border-color: var(--color-hl);
         background-color: var(--color-editor);
         padding-left: calc(var(--spacing) * 2);
-        .ansi-editor-root * {
+        * {
           margin: calc(var(--spacing) * 0);
           height: 25px;
         }
-        .ansi-editor-root #handleInput {
+        #handleInput {
           display: flex;
           width: calc(1 / 4 * 100%);
           color: var(--color-cyber);
         }
-        .ansi-editor-root .prompt {
+        .prompt {
           margin-right: calc(var(--spacing) * 1);
           display: flex;
           flex-grow: 1;
-          .ansi-editor-root &::before {
+          &::before {
             content: '>';
             color: var(--color-fg);
           }
         }
-        .ansi-editor-root #messageInput {
+        #messageInput {
           display: flex;
           flex-grow: 1;
           color: var(--color-fg);
         }
-        .ansi-editor-root button {
+        button {
           display: flex;
           background-color: var(--color-midnight);
           padding-inline: calc(var(--spacing) * 2);
@@ -746,7 +746,7 @@
     float: left;
     width: 40px;
     height: calc(100% - 40px);
-    .ansi-editor-root > canvas {
+    > canvas {
       vertical-align: bottom;
     }
   }
@@ -771,7 +771,7 @@
     width: auto;
     flex-direction: row;
     justify-content: flex-start;
-    .ansi-editor-root .enabled {
+    .enabled {
       background-color: var(--color-black);
     }
   }
@@ -782,7 +782,7 @@
     justify-content: flex-start;
   }
   .ansi-editor-root #viewportToolbar {
-    .ansi-editor-root .toolButton kbd {
+    .toolButton kbd {
       margin-inline: calc(var(--spacing) * 1);
     }
   }
@@ -797,16 +797,16 @@
     color: var(--color-white);
     line-height: 20px;
     padding-right: 5px;
-    .ansi-editor-root &:not(.toolbarDisplayed):hover {
+    &:not(.toolbarDisplayed):hover {
       background-color: var(--color-hl);
     }
-    .ansi-editor-root &.enabled {
+    &.enabled {
       background-color: var(--color-indigo);
     }
-    .ansi-editor-root svg {
+    svg {
       margin-inline-end: 5px;
     }
-    .ansi-editor-root kbd {
+    kbd {
       margin-block: auto;
     }
   }
@@ -814,7 +814,7 @@
     min-width: 378px;
   }
   .ansi-editor-root #clipboardToolbar,	.ansi-editor-root #fontToolbar {
-    .ansi-editor-root .toolButton {
+    .toolButton {
       margin-right: calc(var(--spacing) * 1);
     }
   }
@@ -825,24 +825,24 @@
     min-width: 370px;
   }
   .ansi-editor-root #selectionToolbar {
-    .ansi-editor-root .toolButton {
+    .toolButton {
       margin: calc(var(--spacing) * 0);
       display: flex;
       height: var(--header-size);
       flex-direction: column;
       padding-inline: 5px;
-      .ansi-editor-root kbd,	.ansi-editor-root svg {
+      kbd,	svg {
         margin-inline: auto;
         margin-block: calc(var(--spacing) * 0);
         display: flex;
       }
-      .ansi-editor-root kbd {
+      kbd {
         width: 100%;
         text-align: center;
         font-size: var(--text-xs);
         line-height: var(--tw-leading, var(--text-xs--line-height));
       }
-      .ansi-editor-root svg {
+      svg {
         width: 24px;
       }
     }
@@ -852,42 +852,42 @@
     font-size: var(--text-xs);
     line-height: var(--tw-leading, var(--text-xs--line-height));
     color: var(--color-fg);
-    .ansi-editor-root span {
+    span {
       margin-inline: calc(var(--spacing) * 1);
       margin-block: auto;
       display: flex;
       flex-direction: column;
-      .ansi-editor-root &:hover canvas {
+      &:hover canvas {
         outline: 1px solid var(--cyber);
       }
-      .ansi-editor-root canvas {
+      canvas {
         scale: 1 !important;
         margin: auto;
       }
     }
   }
   .ansi-editor-root #navDarkmode,	.ansi-editor-root #zoomControl {
-    .ansi-editor-root &:hover,	.ansi-editor-root &:focus,	.ansi-editor-root &:focus-within {
+    &:hover,	&:focus,	&:focus-within {
       background-color: transparent !important;
     }
   }
   .ansi-editor-root #zoomControl {
-    .ansi-editor-root #zoomSlider {
+    #zoomSlider {
       max-width: 70px;
       margin-inline: 4px;
     }
-    .ansi-editor-root input[type='range'] {
+    input[type='range'] {
       appearance: none;
       background-color: transparent;
     }
-    .ansi-editor-root input[type='range']::-webkit-slider-thumb {
+    input[type='range']::-webkit-slider-thumb {
       appearance: none;
       background-color: transparent;
     }
-    .ansi-editor-root input[type='range']:focus {
+    input[type='range']:focus {
       outline: none;
     }
-    .ansi-editor-root input[type='range']::-webkit-slider-thumb {
+    input[type='range']::-webkit-slider-thumb {
       cursor: ew-resize;
       appearance: none;
       border-bottom-left-radius: var(--radius-xs);
@@ -895,42 +895,42 @@
       height: 26px;
       width: 16px;
       margin-top: -9px;
-      .ansi-editor-root &:hover {
+      &:hover {
         background-color: var(--color-cyan);
       }
     }
-    .ansi-editor-root input[type='range']::-moz-range-thumb {
+    input[type='range']::-moz-range-thumb {
       cursor: ew-resize;
       border-bottom-left-radius: var(--radius-xs);
       background-color: var(--color-thumb);
       height: 25px;
       width: 16px;
-      .ansi-editor-root &:hover {
+      &:hover {
         background-color: var(--color-cyan);
       }
     }
-    .ansi-editor-root input[type='range']::-webkit-slider-runnable-track {
+    input[type='range']::-webkit-slider-runnable-track {
       width: 100%;
       cursor: ew-resize;
       background-color: var(--color-midnight);
       height: 8.4px;
     }
-    .ansi-editor-root input[type='range']:active:-webkit-slider-runnable-track {
+    input[type='range']:active:-webkit-slider-runnable-track {
       background-color: var(--color-tools);
     }
-    .ansi-editor-root input[type='range']::-moz-range-track {
+    input[type='range']::-moz-range-track {
       width: 100%;
       cursor: ew-resize;
       background-color: var(--color-midnight);
       height: 8.4px;
     }
-    .ansi-editor-root label {
+    label {
       padding: calc(var(--spacing) * 1);
       font-size: var(--text-sm);
       line-height: var(--tw-leading, var(--text-sm--line-height));
       color: var(--color-fg);
     }
-    .ansi-editor-root span {
+    span {
       margin-inline: calc(var(--spacing) * 0.5);
       font-size: var(--text-sm);
       line-height: var(--tw-leading, var(--text-sm--line-height));
@@ -939,16 +939,16 @@
   }
   .ansi-editor-root #fkeySetPrev,	.ansi-editor-root #fkeySetNext {
     height: calc(var(--header-size) - 8px);
-    .ansi-editor-root &:hover {
+    &:hover {
       background: transparent;
-      .ansi-editor-root svg {
+      svg {
         fill: var(--color-cyan);
       }
     }
-    .ansi-editor-root &:active svg {
+    &:active svg {
       fill: var(--color-cyber);
     }
-    .ansi-editor-root svg {
+    svg {
       width: 25px;
       height: 25px;
       margin-top: 5px;
@@ -956,7 +956,7 @@
   }
   .ansi-editor-root #aSize {
     flex-direction: column;
-    .ansi-editor-root label {
+    label {
       padding-top: 2px;
       padding-left: 4px;
       text-align: left;
@@ -964,7 +964,7 @@
       line-height: var(--tw-leading, var(--text-xs--line-height));
       color: var(--color-fg);
     }
-    .ansi-editor-root select {
+    select {
       border-style: var(--tw-border-style);
       border-width: 2px;
       --tw-border-style: solid;
@@ -986,7 +986,7 @@
     display: flex;
     flex-direction: row;
     line-height: 20px;
-    .ansi-editor-root svg {
+    svg {
       margin-top: 10px;
     }
   }
@@ -1018,7 +1018,7 @@
     margin: 16px auto;
     width: 640px;
     box-shadow: 0px 4px 32px rgba(0, 0, 0, 0.7);
-    .ansi-editor-root canvas {
+    canvas {
       display: block;
     }
   }
@@ -1028,7 +1028,7 @@
     left: calc(var(--spacing) * 0);
     z-index: 10;
     display: none;
-    .ansi-editor-root &.enabled {
+    &.enabled {
       display: block;
     }
   }
@@ -1052,7 +1052,7 @@
     box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.7);
   }
   .ansi-editor-root aside {
-    .ansi-editor-root > div {
+    > div {
       margin-inline: auto;
       display: flex;
       height: fit-content;
@@ -1060,16 +1060,16 @@
       justify-content: center;
       padding-block: calc(var(--spacing) * 1);
       text-align: center;
-      .ansi-editor-root &:hover {
+      &:hover {
         background-color: var(--color-hl);
       }
     }
-    .ansi-editor-root svg {
+    svg {
       width: 30px;
       height: 30px;
       fill: #efefef;
     }
-    .ansi-editor-root .separator {
+    .separator {
       height: 1px;
       padding: 0px;
       margin: 4px auto;
@@ -1081,7 +1081,7 @@
     background-color: var(--color-indigo);
   }
   .ansi-editor-root aside > div {
-    .ansi-editor-root &.enabledParent,	.ansi-editor-root &.enabled {
+    &.enabledParent,	&.enabled {
       background-color: var(--color-indigo);
     }
   }
@@ -1090,7 +1090,7 @@
     width: auto;
     background-color: var(--color-menu);
     color: var(--color-fg);
-    .ansi-editor-root button {
+    button {
       height: 40px;
       width: 40px;
       --tw-border-style: none;
@@ -1125,7 +1125,7 @@
     font-size: var(--text-sm);
     line-height: var(--tw-leading, var(--text-sm--line-height));
     color: var(--color-fg);
-    .ansi-editor-root kbd {
+    kbd {
       margin-left: calc(var(--spacing) * 2.5);
       background-color: var(--color-editor);
       padding: calc(var(--spacing) * 1);
@@ -1142,11 +1142,11 @@
     background-color: var(--color-menu);
   }
   .ansi-editor-root .menuItem {
-    .ansi-editor-root &:hover {
+    &:hover {
       background-color: var(--color-indigo);
       color: var(--color-white);
     }
-    .ansi-editor-root &.disabled {
+    &.disabled {
       color: var(--color-editor);
       cursor: default;
       background-color: inherit;
@@ -1172,7 +1172,7 @@
     transform: translateX(-50%) translateY(-50%);
     transform-origin: top;
     transition: opacity 0.7s ease-out,	transform 0.7s ease-out;
-    .ansi-editor-root &[open] {
+    &[open] {
       pointer-events: auto;
       z-index: 50;
       min-width: var(--container-3xs);
@@ -1182,14 +1182,14 @@
         opacity: 1%;
       }
     }
-    .ansi-editor-root &.closing {
+    &.closing {
       pointer-events: none;
       opacity: 1%;
-      .ansi-editor-root &::backdrop {
+      &::backdrop {
         opacity: 1%;
       }
     }
-    .ansi-editor-root &::backdrop {
+    &::backdrop {
       background-color: var(--color-black);
       opacity: 100%;
       background: #000000;
@@ -1199,7 +1199,7 @@
         opacity: 1%;
       }
     }
-    .ansi-editor-root section {
+    section {
       display: flex;
       height: fit-content;
       width: fit-content;
@@ -1208,20 +1208,20 @@
         font-size: var(--text-xl);
         line-height: var(--tw-leading, var(--text-xl--line-height));
       }
-      .ansi-editor-root .logo {
+      .logo {
         margin: auto;
         max-width: 350px;
       }
-      .ansi-editor-root img {
+      img {
         image-rendering: pixelated;
       }
-      .ansi-editor-root button:has(svg) {
+      button:has(svg) {
         padding-top: calc(var(--spacing) * 2);
         padding-right: calc(var(--spacing) * 2);
         padding-bottom: calc(var(--spacing) * 1);
         padding-left: calc(var(--spacing) * 1);
       }
-      .ansi-editor-root button {
+      button {
         margin-right: calc(var(--spacing) * 6);
         display: flex;
         align-items: center;
@@ -1236,7 +1236,7 @@
           font-size: var(--text-2xl);
           line-height: var(--tw-leading, var(--text-2xl--line-height));
         }
-        .ansi-editor-root svg {
+        svg {
           margin-right: calc(var(--spacing) * 2);
           display: inline-flex;
           height: 25px;
@@ -1246,11 +1246,11 @@
           fill: var(--color-fg);
         }
       }
-      .ansi-editor-root nav button:last-of-type {
+      nav button:last-of-type {
         margin-right: calc(var(--spacing) * 0) !important;
       }
     }
-    .ansi-editor-root .overlay {
+    .overlay {
       position: fixed;
       top: calc(var(--spacing) * 0);
       right: calc(var(--spacing) * 0);
@@ -1261,21 +1261,21 @@
       height: 100%;
       width: 100%;
       background: linear-gradient(	to bottom,	rgba(0, 0, 0, 0) 0px,	rgba(0, 0, 0, 0) 20px,	rgba(0, 0, 0, 0.8) 21px,	rgba(0, 0, 0, 0.2) 100%	);
-      .ansi-editor-root &.enabled {
+      &.enabled {
         display: block;
       }
     }
-    .ansi-editor-root section {
-      .ansi-editor-root p,	.ansi-editor-root h2,	.ansi-editor-root nav,	.ansi-editor-root article,	.ansi-editor-root blockquote {
+    section {
+      p,	h2,	nav,	article,	blockquote {
         display: flex;
         height: auto;
         width: 100%;
         flex-direction: row;
         padding: calc(var(--spacing) * 1);
       }
-      .ansi-editor-root nav {
+      nav {
         justify-content: flex-end;
-        .ansi-editor-root button:hover,	.ansi-editor-root button:focus {
+        button:hover,	button:focus {
           background-color: var(--color-purp);
         }
       }
@@ -1286,7 +1286,7 @@
       --tw-scale-y: 0%;
       scale: var(--tw-scale-x) var(--tw-scale-y);
       transition: scale 0.7s ease-out,	opacity 0.7s ease-out,	transform 0.7s ease-out;
-      .ansi-editor-root &[open] {
+      &[open] {
         --tw-scale-y: 100%;
         scale: var(--tw-scale-x) var(--tw-scale-y);
         @starting-style {
@@ -1294,7 +1294,7 @@
           scale: var(--tw-scale-x) var(--tw-scale-y);
         }
       }
-      .ansi-editor-root &.closing {
+      &.closing {
         --tw-scale-y: 0%;
         scale: var(--tw-scale-x) var(--tw-scale-y);
       }
@@ -1306,35 +1306,35 @@
     min-height: calc(var(--spacing) * 0);
     width: fit-content;
     flex-direction: column;
-    .ansi-editor-root h1,	.ansi-editor-root h2,	.ansi-editor-root p,	.ansi-editor-root nav,	.ansi-editor-root article,	.ansi-editor-root blockquote {
+    h1,	h2,	p,	nav,	article,	blockquote {
       display: flex;
       height: auto;
       width: 100%;
       flex-direction: row;
       padding: calc(var(--spacing) * 1);
     }
-    .ansi-editor-root p {
+    p {
       display: inline;
       max-width: 480px;
       padding: calc(var(--spacing) * 4.5);
       color: var(--color-fg);
     }
-    .ansi-editor-root nav {
+    nav {
       justify-content: flex-end;
       background-color: var(--color-editor);
-      .ansi-editor-root button:hover,	.ansi-editor-root button:focus {
+      button:hover,	button:focus {
         background-color: var(--color-purp);
       }
     }
-    .ansi-editor-root label {
+    label {
       color: var(--color-fg);
     }
-    .ansi-editor-root h1,	.ansi-editor-root h2 {
+    h1,	h2 {
       font-size: var(--text-2xl);
       line-height: var(--tw-leading, var(--text-2xl--line-height));
       color: var(--color-cyan);
     }
-    .ansi-editor-root input[type='text'],	.ansi-editor-root input[type='number'],	.ansi-editor-root textarea {
+    input[type='text'],	input[type='number'],	textarea {
       margin-block: calc(var(--spacing) * 2);
       margin-right: calc(var(--spacing) * 2);
       height: fit-content;
@@ -1345,29 +1345,29 @@
     }
   }
   .ansi-editor-root #resizeModal {
-    .ansi-editor-root header,	.ansi-editor-root section,	.ansi-editor-root nav,	.ansi-editor-root article {
+    header,	section,	nav,	article {
       width: 100%;
       flex-shrink: 0;
     }
-    .ansi-editor-root header {
+    header {
       margin-block: calc(var(--spacing) * 2.5);
       width: 100%;
       flex-direction: row;
       place-content: space-between;
       padding-left: calc(var(--spacing) * 2);
-      .ansi-editor-root button {
+      button {
         padding: calc(var(--spacing) * 0);
         padding-bottom: calc(var(--spacing) * 0.5);
-        .ansi-editor-root svg {
+        svg {
           color: var(--color-fg);
         }
       }
     }
-    .ansi-editor-root section {
+    section {
       display: flex;
       min-height: calc(var(--spacing) * 0);
       flex-direction: column;
-      .ansi-editor-root button {
+      button {
         margin-inline: auto;
         margin-bottom: calc(var(--spacing) * 2);
         width: calc(3 / 4 * 100%);
@@ -1378,7 +1378,7 @@
         text-align: left;
       }
     }
-    .ansi-editor-root article {
+    article {
       display: flex;
       min-height: calc(var(--spacing) * 0);
       width: 100%;
@@ -1386,14 +1386,14 @@
       justify-content: center;
       background-color: var(--color-editor);
       padding-block: calc(var(--spacing) * 6);
-      .ansi-editor-root label {
+      label {
         margin: calc(var(--spacing) * 2);
         height: fit-content;
         width: min-content;
         padding-inline: calc(var(--spacing) * 5);
         padding-block: calc(var(--spacing) * 0);
       }
-      .ansi-editor-root input[type='text'],	.ansi-editor-root input[type='number'],	.ansi-editor-root textarea {
+      input[type='text'],	input[type='number'],	textarea {
         margin-block: calc(var(--spacing) * 2);
         margin-right: calc(var(--spacing) * 2);
         height: fit-content;
@@ -1403,20 +1403,20 @@
         color: var(--color-fg);
       }
     }
-    .ansi-editor-root nav {
+    nav {
       margin-top: calc(var(--spacing) * 0.5);
       width: auto;
       justify-content: flex-end;
       border-style: var(--tw-border-style);
       border-width: 0px;
       background-color: var(--color-menu);
-      .ansi-editor-root button {
+      button {
         margin: calc(var(--spacing) * 2);
         display: flex;
         align-items: center;
         justify-content: center;
         background-color: var(--color-midnight);
-        .ansi-editor-root svg {
+        svg {
           margin-right: calc(var(--spacing) * 3.5);
           width: 37px;
           height: 37px;
@@ -1426,21 +1426,21 @@
   }
   .ansi-editor-root #fontsModal {
     padding: calc(var(--spacing) * 5);
-    .ansi-editor-root #fontMeta {
+    #fontMeta {
       padding-top: calc(var(--spacing) * 1.5);
       padding-left: calc(var(--spacing) * 4);
       font-size: var(--text-xl);
       line-height: var(--tw-leading, var(--text-xl--line-height));
       color: var(--color-subtitle);
     }
-    .ansi-editor-root article {
-      .ansi-editor-root aside {
+    article {
+      aside {
         display: flex;
         height: auto;
         width: fit-content;
         min-width: 107px;
         flex-direction: column;
-        .ansi-editor-root img {
+        img {
           border-style: var(--tw-border-style);
           border-width: 8px;
           --tw-border-style: solid;
@@ -1450,14 +1450,14 @@
           filter: brightness(1.5);
         }
       }
-      .ansi-editor-root aside:first-of-type {
+      aside:first-of-type {
         background-color: var(--color-black);
       }
-      .ansi-editor-root aside:last-of-type {
+      aside:last-of-type {
         padding-right: calc(var(--spacing) * 0);
       }
     }
-    .ansi-editor-root nav {
+    nav {
       margin-top: auto;
       background-color: var(--color-menu);
       padding-top: calc(var(--spacing) * 5);
@@ -1519,21 +1519,21 @@
   }
   .ansi-editor-root #sauceModal {
     justify-content: space-between;
-    .ansi-editor-root article {
+    article {
       flex-direction: row;
       padding-inline: calc(var(--spacing) * 12);
-      .ansi-editor-root label {
+      label {
         display: flex;
         width: calc(1 / 5 * 100%);
         justify-content: flex-end;
         padding: 11px 0 0 10px !important;
       }
-      .ansi-editor-root div {
+      div {
         display: flex;
         flex-grow: 1;
         justify-content: flex-start;
         padding-inline: calc(var(--spacing) * 3);
-        .ansi-editor-root input {
+        input {
           background-color: var(--color-midnight);
           padding: calc(var(--spacing) * 2);
           color: var(--color-fg);
@@ -1541,13 +1541,13 @@
         }
       }
     }
-    .ansi-editor-root .lil {
+    .lil {
       padding-top: calc(var(--spacing) * 0) !important;
     }
-    .ansi-editor-root nav {
+    nav {
       padding: calc(var(--spacing) * 3);
     }
-    .ansi-editor-root #sauceBytes {
+    #sauceBytes {
       margin: calc(var(--spacing) * 0);
       border-style: var(--tw-border-style);
       border-width: 0px;
@@ -1559,66 +1559,66 @@
     }
   }
   .ansi-editor-root #choiceModal {
-    .ansi-editor-root nav {
+    nav {
       padding: calc(var(--spacing) * 2);
-      .ansi-editor-root button {
+      button {
         margin-right: calc(var(--spacing) * 6) !important;
       }
     }
   }
   .ansi-editor-root #warningModal,	.ansi-editor-root #updateModal,	.ansi-editor-root #aboutModal {
-    .ansi-editor-root header {
+    header {
       height: fit-content;
       flex-direction: column;
       background-color: var(--color-editor);
-      .ansi-editor-root h1 {
+      h1 {
         margin-left: calc(var(--spacing) * 2);
       }
-      .ansi-editor-root h4 {
+      h4 {
         margin-left: calc(var(--spacing) * 3);
         color: var(--color-chat);
       }
     }
-    .ansi-editor-root p {
+    p {
       margin-bottom: calc(var(--spacing) * 2);
       padding-bottom: calc(var(--spacing) * 2);
     }
-    .ansi-editor-root nav {
+    nav {
       justify-content: space-evenly;
       padding: calc(var(--spacing) * 2);
     }
   }
   .ansi-editor-root #updateModal {
     justify-self: center;
-    .ansi-editor-root h4 {
+    h4 {
       margin-bottom: calc(var(--spacing) * 4);
       text-align: center;
       font-size: var(--text-xl);
       line-height: var(--tw-leading, var(--text-xl--line-height));
       color: var(--color-cyber);
     }
-    .ansi-editor-root p {
+    p {
       text-align: left;
     }
   }
   .ansi-editor-root #loadingModal {
-    .ansi-editor-root nav {
+    nav {
       background-color: transparent;
-      .ansi-editor-root button {
+      button {
         background-color: var(--color-tools);
         color: var(--color-midnight);
-        .ansi-editor-root &:focus {
+        &:focus {
           background-color: var(--color-tools);
           color: var(--color-midnight);
         }
-        .ansi-editor-root &:hover {
+        &:hover {
           background-color: var(--color-purp);
           color: var(--color-fg);
-          .ansi-editor-root svg {
+          svg {
             fill: var(--color-fg);
           }
         }
-        .ansi-editor-root svg {
+        svg {
           height: 25px;
           fill: var(--color-midnight);
         }
@@ -1627,38 +1627,38 @@
   }
   .ansi-editor-root #loadingModal {
     cursor: progress;
-    .ansi-editor-root nav {
+    nav {
       background-color: var(--color-editor);
     }
   }
   .ansi-editor-root #tutorialsModal {
     max-width: 756px;
     min-width: 65%;
-    .ansi-editor-root header {
+    header {
       height: fit-content;
       flex-direction: column;
       background-color: var(--color-editor);
       padding: calc(var(--spacing) * 4);
-      .ansi-editor-root h2 {
+      h2 {
         padding-left: 0;
       }
-      .ansi-editor-root h3 {
+      h3 {
         text-align: justify;
         color: var(--color-fg);
         color: var(--color-subtitle);
-        .ansi-editor-root em {
+        em {
           color: var(--color-fg);
         }
       }
     }
-    .ansi-editor-root article {
+    article {
       flex-direction: column;
-      .ansi-editor-root main {
+      main {
         position: relative;
         display: flex;
         flex-direction: column;
-        .ansi-editor-root &:hover {
-          .ansi-editor-root button {
+        &:hover {
+          button {
             position: relative;
             display: flex;
             width: 100%;
@@ -1667,43 +1667,43 @@
             padding-bottom: 10px;
           }
         }
-        .ansi-editor-root button {
+        button {
           display: none;
         }
-        .ansi-editor-root img {
+        img {
           display: flex;
           flex-grow: 1;
           cursor: pointer;
           image-rendering: pixelated;
         }
       }
-      .ansi-editor-root strong {
+      strong {
         text-align: justify;
         color: var(--color-fg);
       }
-      .ansi-editor-root ul {
+      ul {
         margin-block: calc(var(--spacing) * 4);
-        .ansi-editor-root li {
+        li {
           margin-left: calc(var(--spacing) * 2);
           color: var(--color-subtitle);
-          .ansi-editor-root i {
+          i {
             font-style: italic;
           }
-          .ansi-editor-root button:hover {
+          button:hover {
             background-color: var(--color-purp);
           }
         }
       }
-      .ansi-editor-root h2 {
+      h2 {
         padding-top: 6px;
       }
-      .ansi-editor-root h3 {
+      h3 {
         margin-block: calc(var(--spacing) * 3);
         display: flex;
         font-size: var(--text-xl);
         line-height: var(--tw-leading, var(--text-xl--line-height));
         color: var(--color-fg);
-        .ansi-editor-root &::before {
+        &::before {
           display: inline-flex;
           font-size: var(--text-lg);
           line-height: var(--tw-leading, var(--text-lg--line-height));
@@ -1733,14 +1733,14 @@
     padding-left: calc(var(--spacing) * 1);
     transition-property: none !important;
     box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.3);
-    .ansi-editor-root &.enabled {
+    &.enabled {
       display: block;
     }
-    .ansi-editor-root div {
+    div {
       position: relative;
       display: block;
     }
-    .ansi-editor-root .hidePanel {
+    .hidePanel {
       display: block;
       position: absolute;
       top: 0;
@@ -1749,11 +1749,11 @@
       padding: 2px 5px;
       font-size: 10px;
       cursor: pointer;
-      .ansi-editor-root &:hover {
+      &:hover {
         background: #000;
       }
     }
-    .ansi-editor-root canvas {
+    canvas {
       cursor: crosshair;
       vertical-align: bottom;
     }
@@ -1773,10 +1773,10 @@
     justify-content: center;
     background-color: var(--color-menu);
     padding: 2px;
-    .ansi-editor-root &.enabled {
+    &.enabled {
       background-color: var(--color-purp);
     }
-    .ansi-editor-root &.left {
+    &.left {
       border-top-style: var(--tw-border-style);
       border-top-width: 2px;
       border-right-style: var(--tw-border-style);
@@ -1787,7 +1787,7 @@
       border-left-width: 2px;
       border-color: var(--color-black);
     }
-    .ansi-editor-root &.right {
+    &.right {
       border-top-style: var(--tw-border-style);
       border-top-width: 2px;
       border-right-style: var(--tw-border-style);
@@ -1805,11 +1805,11 @@
     }
   }
   .ansi-editor-root canvas {
-    .ansi-editor-root &.cursor,	.ansi-editor-root &.selectionCursor {
+    &.cursor,	&.selectionCursor {
       position: absolute;
       z-index: 20;
     }
-    .ansi-editor-root &.cursor {
+    &.cursor {
       border: 1px solid #555;
       animation: blink 1.5s steps(1) infinite;
     }
@@ -1831,7 +1831,7 @@
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--color-menu) 90%, transparent);
     }
-    .ansi-editor-root kbd {
+    kbd {
       margin: auto;
       text-align: center;
       font-size: 4rem;
@@ -1857,36 +1857,36 @@
     display: none !important;
   }
   .ansi-editor-root .sunAndMoon {
-    .ansi-editor-root > :is(.moon, .sun, .sunBeams) {
+    > :is(.moon, .sun, .sunBeams) {
       transform-origin: center;
     }
-    .ansi-editor-root > :is(.moon, .sun) {
+    > :is(.moon, .sun) {
       fill: var(--color-icon);
     }
-    .ansi-editor-root > .sunBeams {
+    > .sunBeams {
       stroke: var(--color-icon);
       stroke-width: 0.125rem;
     }
     @media (hover: hover) and (pointer: fine) {
-      .ansi-editor-root > :is(.moon, .sun) {
-        .ansi-editor-root .darkmode:is(:hover, :focus-visible) > & {
+      > :is(.moon, .sun) {
+        .darkmode:is(:hover, :focus-visible) > & {
           fill: var(--color-icon-hover);
         }
       }
-      .ansi-editor-root > .sunBeams {
-        .ansi-editor-root .darkmode:is(:hover, :focus-visible) & {
+      > .sunBeams {
+        .darkmode:is(:hover, :focus-visible) & {
           stroke: var(--color-icon-hover);
         }
       }
     }
-    .ansi-editor-root .dark & {
-      .ansi-editor-root & > .sun {
+    .dark & {
+      & > .sun {
         transform: scale(1.75);
       }
-      .ansi-editor-root & > .sunBeams {
+      & > .sunBeams {
         opacity: 0%;
       }
-      .ansi-editor-root & > .moon > circle {
+      & > .moon > circle {
         transform: translateX(7px);
         @supports (cx: 1) {
           transform: translateX(0);
@@ -1895,29 +1895,29 @@
       }
     }
     @media (prefers-reduced-motion: no-preference) {
-      .ansi-editor-root > .sun {
+      > .sun {
         transition: transform 0.5s var(--ease-elastic-1);
       }
-      .ansi-editor-root > .sunBeams {
+      > .sunBeams {
         transition: transform 0.5s var(--ease-elastic-2),	opacity 0.5s var(--ease);
       }
-      .ansi-editor-root .moon > circle {
+      .moon > circle {
         transition: transform 0.25s var(--ease-out);
         @supports (cx: 1) {
           transition: cx 0.25s var(--ease-out);
         }
       }
-      .ansi-editor-root .dark & {
-        .ansi-editor-root > .sun {
+      .dark & {
+        > .sun {
           transform: scale(1.75);
           transition-timing-function: var(--ease);
           transition-duration: 0.25s;
         }
-        .ansi-editor-root > .sunBeams {
+        > .sunBeams {
           transform: rotateZ(-25deg);
           transition-duration: 0.15s;
         }
-        .ansi-editor-root > .moon > circle {
+        > .moon > circle {
           transition-delay: 0.25s;
           transition-duration: 0.5s;
         }
@@ -1931,7 +1931,7 @@
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
     transition: transform 1s linear !important;
-    .ansi-editor-root svg {
+    svg {
       stroke-linecap: round;
     }
   }
@@ -2817,4 +2817,36 @@
 .ansi-editor-root #viewportToolbar .toolButton kbd {
   margin-inline: 0;
   white-space: nowrap;
+}
+
+/* The site's global control chrome leaks into the vendored editor.
+   `assets/css/site.css` styles every button and select on the site:
+   `button, select { max-height: 48px; min-height: 48px; white-space: pre; ... }`
+   Two of those are actively destructive in here:
+
+   - `white-space: pre` makes the editor's INDENTED markup render its own
+     indentation. `<button>\n\t\t\t<span class="asciiIcon">[i]</span>\n\t\t</button>`
+     becomes a literal newline + tabs, which inflated #navSauce to 222px wide and
+     pushed its icon to y=699 -- outside the 43px header strip, which clips.
+     That is the "empty top bar full of invisible things I can click".
+   - `min-height`/`max-height: 48px` makes every control taller than the
+     43px strip, so it gets clipped even once the whitespace is gone.
+
+   The editor ships its own sizing for these controls; neutralize the inherited
+   chrome so those rules govern. Scoped to the editor, so the site's own buttons
+   are untouched. */
+.ansi-editor-root button,
+.ansi-editor-root select {
+  white-space: normal;
+  min-height: 0;
+  max-height: none;
+}
+
+/* #fileNav wraps the File and Edit menu titles and has no rule anywhere in this
+   file, so it defaulted to display:block and stacked the two 43px titles into an
+   86px column inside a 43px strip -- centred, so it bled ~21px above and below
+   and both titles were clipped to unreadable slivers. It is a row. */
+.ansi-editor-root #fileNav {
+  display: flex;
+  align-items: center;
 }
