@@ -2,8 +2,23 @@ import Link from "next/link";
 import RelativeTime from "@/components/widgets/RelativeTime";
 import type { TopicView } from "@/lib/forum/types";
 
-// One row in a board's topic list. The column widths match ForumSortHeaders.
-export default function TopicRow({ topic, boardSlug }: { topic: TopicView; boardSlug: string }) {
+/**
+ * One row in a topic list. The column widths match ForumSortHeaders.
+ *
+ * `boardName` switches the second column from the reply count to the board.
+ * The forum index lists topics from every board at once, where "which board"
+ * is the thing you cannot work out from the row and the reply count is noise;
+ * inside a board it is the other way round.
+ */
+export default function TopicRow({
+  topic,
+  boardSlug,
+  boardName,
+}: {
+  topic: TopicView;
+  boardSlug: string;
+  boardName?: string;
+}) {
   const replies = Math.max(0, topic.postCount - 1);
   return (
     <div className="row amb-1 m-0" style={{ height: "16px", lineHeight: "16px" }}>
@@ -17,8 +32,16 @@ export default function TopicRow({ topic, boardSlug }: { topic: TopicView; board
           {topic.title}
         </Link>
       </div>
-      <div className="col-2 p-0 lightgrey">
-        {replies} {replies === 1 ? "reply" : "replies"}
+      <div className="col-2 p-0 text-truncate">
+        {boardName ? (
+          <Link prefetch={false} href={`/forum/${boardSlug}`} className="lightcyan">
+            {boardName}
+          </Link>
+        ) : (
+          <span className="lightgrey">
+            {replies} {replies === 1 ? "reply" : "replies"}
+          </span>
+        )}
       </div>
       <div className="col-2 p-0 text-truncate">
         <Link prefetch={false} href={`/member/${topic.authorNick ?? ""}`} className="yellow">

@@ -257,6 +257,43 @@ export async function listRecentPosts(
   });
 }
 
+/**
+ * The most recently active live topics across every board the viewer may read,
+ * newest reply first. The forum index lists boards, which says where to post
+ * but not what is being talked about; this is that answer.
+ *
+ * Board permissions come from listBoards() rather than a second copy of the
+ * rules, so a private board never leaks a title here.
+ */
+export async function listRecentTopics(
+  viewer: ForumViewer,
+  limit: number,
+): Promise<Array<TopicView & { boardSlug: string; boardName: string }>> {
+  const boards = await listBoards(viewer);
+  if (boards.length === 0) return [];
+
+  const rows = await prisma.forum_topics.findMany({
+    where: { deleted_at: null, board_id: { in: boards.map(b => b.id) } },
+    orderBy: [{ last_post_at: "desc" }, { id: "desc" }],
+    take: limit,
+  });
+  if (rows.length === 0) return [];
+
+  const byId = new Map(boards.map(b => [b.id, b]));
+  const nicks = await nickMap(rows.flatMap(r => [r.user_id, r.last_user_id]));
+
+  return rows.flatMap(r => {
+    const board = byId.get(r.board_id);
+    if (!board) return [];
+    const topic = toTopic(
+      r,
+      nicks.get(r.user_id) ?? null,
+      r.last_user_id != null ? nicks.get(r.last_user_id) ?? null : null,
+    );
+    return [{ ...topic, boardSlug: board.slug, boardName: board.name }];
+  });
+}
+
 /** Nicks that actually exist, from the candidates lib/forum/mentions.ts found. */
 export async function resolveMentionNicks(candidates: string[]): Promise<Array<{ id: number; nick: string }>> {
   if (candidates.length === 0) return [];
