@@ -3,6 +3,12 @@ import { parseNowPlaying, type NowPlayingEntry } from "@/lib/nowPlaying";
 
 // Server-side cached proxy for the HippoPlayer "now playing" feed.
 //
+// NOT DEAD CODE, despite having no caller. The sidebar widget it was built for
+// now shows who is listening on the site's own player (/api/now-playing/site),
+// but this proxy is kept deliberately for future use -- it is the only thing
+// that solves the CORS problem described below, and rebuilding it later would
+// mean rediscovering that. Leave it be.
+//
 // The upstream (https://hippoplayer.se/cygnus/api/now-playing) only sets CORS
 // for the https://asciiarena.se origin, so a direct client-side fetch would
 // fail from localhost in dev and is hostage to that CORS config in prod.
