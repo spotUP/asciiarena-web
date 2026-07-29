@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { Prisma } from "@/lib/generated/prisma/client";
+import { buildMostDrawnArtistsQuery, buildMostDrawnCrewsQuery } from "@/lib/mostDrawnQueries";
 
 export interface DrawnStat {
   id: number;
@@ -24,39 +24,19 @@ const shape = (rows: RawRow[]): DrawnStat[] =>
 // catalog table doesn't exist yet.
 export async function mostDrawnArtists(n: number): Promise<DrawnStat[]> {
   try {
-    return shape(
-      await prisma.$queryRaw<RawRow[]>(Prisma.sql`
-        SELECT a.id AS id, a.nick AS name, a.artisturl AS url,
-               COUNT(*) AS logos, COUNT(DISTINCT cl.colly_id) AS collys
-        FROM colly_logos cl
-        JOIN artists a ON a.id = cl.artist_id
-        WHERE cl.artist_id IS NOT NULL
-        GROUP BY a.id, a.nick, a.artisturl
-        ORDER BY logos DESC
-        LIMIT ${n}
-      `),
-    );
+    return shape(await prisma.$queryRaw<RawRow[]>(buildMostDrawnArtistsQuery(n)));
   } catch {
     return [];
   }
 }
 
+
 // Crews with the most resolved logos in the catalog.
 export async function mostDrawnCrews(n: number): Promise<DrawnStat[]> {
   try {
-    return shape(
-      await prisma.$queryRaw<RawRow[]>(Prisma.sql`
-        SELECT w.id AS id, w.name AS name, w.name AS url,
-               COUNT(*) AS logos, COUNT(DISTINCT cl.colly_id) AS collys
-        FROM colly_logos cl
-        JOIN crews w ON w.id = cl.crew_id
-        WHERE cl.crew_id IS NOT NULL
-        GROUP BY w.id, w.name
-        ORDER BY logos DESC
-        LIMIT ${n}
-      `),
-    );
+    return shape(await prisma.$queryRaw<RawRow[]>(buildMostDrawnCrewsQuery(n)));
   } catch {
     return [];
   }
 }
+
