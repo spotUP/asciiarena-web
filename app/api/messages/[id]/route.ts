@@ -61,7 +61,13 @@ export async function DELETE(
   // "Delete" = leave the conversation (non-destructive; messages preserved for
   // others). The [id] param is the thread id (the client passes threadId here).
   await leaveThread(threadId, userId);
-  broadcast(`thread:${threadId}`, { type: "member-left", userId });
+  // Carry the nick. ChatWindow renders `${event.nick} left`, so without it an
+  // open window showed "a member left" -- while the other leave path
+  // (/api/chat/thread/[id]/members) had always sent it. The persistent notice
+  // comes from chat_participants.left_at via /api/chat/messages; this is only
+  // the live line for windows that are open right now.
+  const leaver = await prisma.users.findUnique({ where: { id: userId }, select: { nick: true } });
+  broadcast(`thread:${threadId}`, { type: "member-left", userId, nick: leaver?.nick ?? "" });
 
   return apiOk({ status: true });
 }

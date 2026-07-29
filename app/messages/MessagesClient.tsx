@@ -136,26 +136,31 @@ export default function MessagesClient({ userId, userNick, initialReceiverId, in
   }, [userId, load]);
 
   // A deep-linked thread may not be in the current list at all — it can be
-  // archived, or past the first page. Pull just that one so the link always
-  // lands on the conversation instead of a bare list.
+  // archived, LEFT, or past the first page. Pull just that one so the link
+  // always lands on the conversation instead of a bare list.
+  //
+  // This used to build the row here from the members endpoint, which cannot
+  // report membership, so it hardcoded `left: false` and `archived: false`. For
+  // a thread the user had left that was wrong in a way they could not get out
+  // of: the row rendered a ChatWindow rather than "You left this chat — Rejoin
+  // to read it", and /api/messages/thread clamps a left member's history to
+  // `timestamp <= left_at`. The result was a conversation missing everything
+  // said since, with no explanation and no Rejoin button.
+  //
+  // /api/messages?thread=N answers with the row the inbox itself would show,
+  // flags included, so there is nothing left to guess.
   useEffect(() => {
     if (expanded == null || loading) return;
     if (rows.some(r => r.thread === expanded)) return;
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`/api/chat/thread/${expanded}/members`);
+        const res = await fetch(`/api/messages?thread=${expanded}`);
         if (!res.ok) return;
-        const members = (await res.json()) as Array<{ userId: number; nick: string }>;
-        if (cancelled) return;
-        const others = members.filter(m => m.userId !== Number(userId)).map(m => ({ id: m.userId, nick: m.nick }));
-        setRows(prev => prev.some(r => r.thread === expanded) ? prev : [{
-          thread: expanded, id: expanded, from_id: null, lastFromMe: false,
-          preview: null, lastSenderNick: null, timestamp: null,
-          title: others.map(o => o.nick).join(", ") || "(empty)",
-          overrideTitle: null, subject: null, participants: others,
-          unread: 0, left: false, archived: false,
-        }, ...prev]);
+        const fetched = (await res.json()) as Conversation[];
+        const row = fetched[0];
+        if (cancelled || !row) return;
+        setRows(prev => prev.some(r => r.thread === expanded) ? prev : [row, ...prev]);
       } catch { /* the row simply stays absent */ }
     })();
     return () => { cancelled = true; };

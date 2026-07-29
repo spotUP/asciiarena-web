@@ -16,6 +16,11 @@ interface ChatMessage {
   message: string | null;
   timestamp: number | null;
   unread?: boolean;
+  // "X left the conversation", merged into the history by the server from
+  // chat_participants.left_at. Persistent, unlike the live-only systemLines
+  // below, which nobody sees unless the window happens to be open at the time.
+  kind?: "left";
+  nick?: string;
 }
 
 interface Props {
@@ -622,6 +627,16 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
           </div>
         )}
         {messages.map(msg => {
+          if (msg.kind === "left") {
+            return (
+              <div key={msg.id} className="lightgrey" style={{
+                textAlign: "center", fontSize: "11px", margin: "2px 0",
+                fontFamily: "TopazPlus_a1200, monospace",
+              }}>
+                — {msg.nick ?? "a member"} left the conversation {formatTime(msg.timestamp)} —
+              </div>
+            );
+          }
           // Legacy rows can have null from_id; in that case fall back to
           // comparing the stored sender nick against the viewer's nick.
           const isOwn =

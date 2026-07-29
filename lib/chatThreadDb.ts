@@ -19,6 +19,62 @@ export async function getActiveParticipants(threadId: number): Promise<ActivePar
   return rows.map(r => ({ userId: Number(r.user_id), nick: r.nick, joinedAt: Number(r.joined_at) }));
 }
 
+export interface LeaveEvent {
+  participantId: number;
+  userId: number;
+  nick: string;
+  leftAt: number;
+}
+
+/**
+ * Who has left a thread, and when.
+ *
+ * Departures were only ever announced live, over the `thread:<id>` channel, into
+ * an open ChatWindow's ephemeral system lines. Anyone who was not watching at
+ * that moment never found out. That is how one member kept writing to a thread
+ * for eight weeks after the only other member left, with nothing in the
+ * conversation to say so and their messages addressed to nobody.
+ *
+ * Derived from chat_participants rather than written as a message row when
+ * someone leaves: left_at already IS the record of who left and when, so there
+ * is no second copy to drift out of step, and it means past departures show up
+ * too instead of only ones that happen from now on.
+ */
+export async function getThreadLeaveEvents(threadId: number): Promise<LeaveEvent[]> {
+  const rows = await prisma.$queryRaw<Array<{ id: number; user_id: number; nick: string; left_at: number }>>`
+    SELECT cp.id, cp.user_id, u.nick, cp.left_at
+    FROM chat_participants cp
+    JOIN users u ON u.id = cp.user_id
+    WHERE cp.thread_id = ${threadId} AND cp.left_at IS NOT NULL
+    ORDER BY cp.left_at ASC
+  `;
+  return rows.map(r => ({
+    participantId: Number(r.id),
+    userId: Number(r.user_id),
+    nick: r.nick,
+    leftAt: Number(r.left_at),
+  }));
+}
+
+/**
+ * Whether a thread has any chat_participants rows at all.
+ *
+ * The distinction that matters is "membership is known and says nobody else is
+ * here" versus "this thread predates chat_participants and membership is
+ * unknown". Callers fanning out notifications need it: a client-supplied
+ * recipient id is a reasonable fallback in the second case and a way to notify
+ * someone who explicitly left in the first.
+ *
+ * Counts rows regardless of left_at -- a thread everyone has left is migrated,
+ * not legacy.
+ */
+export async function threadHasParticipants(threadId: number): Promise<boolean> {
+  const rows = await prisma.$queryRaw<Array<{ ok: number }>>`
+    SELECT 1 AS ok FROM chat_participants WHERE thread_id = ${threadId} LIMIT 1
+  `;
+  return rows.length > 0;
+}
+
 // The caller's membership row (active or not), or null.
 export async function getMember(threadId: number, userId: number): Promise<Member | null> {
   const rows = await prisma.$queryRaw<Array<{

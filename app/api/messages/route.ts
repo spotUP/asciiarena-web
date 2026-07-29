@@ -6,7 +6,7 @@ import { apiError, apiOk } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { broadcast } from "@/lib/live";
 import { resolveDisplayTitle } from "@/lib/chatThread";
-import { addParticipant, getLeftThreads } from "@/lib/chatThreadDb";
+import { addParticipant, getLeftThreads, getMember } from "@/lib/chatThreadDb";
 import { createNotification } from "@/lib/notifications";
 import { normalizeMessageText } from "@/lib/normalizeText";
 import { truncatePreview } from "@/lib/inboxRow";
@@ -41,61 +41,40 @@ function parseParticipants(concat: string | null): Array<{ id: number; nick: str
   });
 }
 
-export async function GET(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) return apiError("Unauthorized", 401);
+type InboxRawRow = {
+  thread: number; id: number; from_id: number | null; postername: string | null;
+  message: string | null; timestamp: number | null; total_count: bigint | number;
+  override_title: string | null; first_subject: string | null;
+  other_nicks: string | null; unread: bigint | number; archived_at: number | null;
+};
 
-  const { searchParams } = request.nextUrl;
-  const page = Math.max(1, parseInt(searchParams.get("page") ?? "1") || 1);
-  const pagesize = Math.max(1, Math.min(200, parseInt(searchParams.get("pagesize") ?? "50") || 50));
-  const offset = (page - 1) * pagesize;
-  const me = parseInt(session.user.id);
-  // Legacy chat rows carry no from_id, only the sender's nick.
-  const myNick = session.user.name ?? "";
+/**
+ * The inbox row query. One definition, used by the list views and by the
+ * single-thread deep-link lookup, so a deep-linked row cannot report different
+ * flags from the row the list would have shown for the same thread.
+ *
+ * `threadId` selects one thread and deliberately drops the archived/search/
+ * unread filters: a deep link must resolve whatever state the thread is in, and
+ * report that state truthfully rather than filtering the row away.
+ */
+function selectInboxRows(
+  me: number,
+  myNick: string,
+  opts: { threadId?: number; archived?: boolean; search?: string; unreadOnly?: boolean; pagesize: number; offset: number },
+): Promise<InboxRawRow[]> {
+  const unreadExpr = unreadCountExpr(me, myNick);
+  const single = opts.threadId != null;
 
-  // "Left chats" view: threads the user soft-left. History is preserved, so the
-  // user can find, read, and rejoin them. Same title resolution as the active
-  // inbox; no unread (a left member receives nothing until they rejoin).
-  if (searchParams.get("left") === "1") {
-    const left = await getLeftThreads(me);
-    return apiOk(left.map(r => {
-      const subject = r.firstSubject === "Chat" ? null : r.firstSubject;
-      const participants = parseParticipants(r.otherNicks);
-      return {
-        total_count: left.length,
-        thread: r.thread,
-        id: r.thread,
-        from_id: null,
-        lastFromMe: false,
-        preview: null,
-        lastSenderNick: null,
-        timestamp: r.lastTimestamp,
-        title: resolveDisplayTitle(r.overrideTitle, subject, participants.map(p => p.nick)),
-        overrideTitle: r.overrideTitle,
-        subject,
-        participants,
-        unread: 0,
-        left: true,
-        archived: false,
-      };
-    }));
-  }
+  const archivedCond = single
+    ? Prisma.empty
+    : opts.archived
+      ? Prisma.sql`AND (cp.archived_at IS NOT NULL AND lm.timestamp <= cp.archived_at)`
+      : Prisma.sql`AND (cp.archived_at IS NULL OR lm.timestamp > cp.archived_at)`;
 
-  // Active-participant threads, each with its latest message visible to me, the
-  // cursor-based unread count, and the raw inputs for title resolution. The
-  // GROUP_CONCAT SEPARATOR is 0x1f (unit separator) so commas in a nick don't
-  // break the split on the JS side.
-  // Archived threads are hidden from the default list until a message newer
-  // than archived_at arrives — the SQL mirror of isArchived() in
-  // lib/chatThread.ts. `?archived=1` shows exactly the complement.
-  const wantArchived = searchParams.get("archived") === "1";
-  const archivedCond = wantArchived
-    ? Prisma.sql`(cp.archived_at IS NOT NULL AND lm.timestamp <= cp.archived_at)`
-    : Prisma.sql`(cp.archived_at IS NULL OR lm.timestamp > cp.archived_at)`;
+  const threadCond = single ? Prisma.sql`AND cp.thread_id = ${opts.threadId}` : Prisma.empty;
 
-  // Free-text filter over the thread subject and the other participants' nicks.
-  const q = (searchParams.get("q") ?? "").trim();
-  const search = q
+  const q = (opts.search ?? "").trim();
+  const search = !single && q
     ? Prisma.sql`AND (
         EXISTS (SELECT 1 FROM messages sm WHERE sm.thread = cp.thread_id AND sm.subject LIKE ${"%" + q + "%"})
         OR EXISTS (SELECT 1 FROM chat_participants sp JOIN users su ON su.id = sp.user_id
@@ -103,21 +82,9 @@ export async function GET(request: NextRequest) {
       )`
     : Prisma.empty;
 
-  // Defined once and used both in the select list and (optionally) the filter,
-  // so the count shown and the count filtered on cannot disagree. It goes in
-  // WHERE rather than HAVING because this query has no GROUP BY and does use a
-  // window function, where HAVING's behaviour is not something to rely on.
-  const unreadExpr = unreadCountExpr(me, myNick);
-  const unreadOnly = searchParams.get("unread") === "1"
-    ? Prisma.sql`AND ${unreadExpr} > 0`
-    : Prisma.empty;
+  const unreadOnly = !single && opts.unreadOnly ? Prisma.sql`AND ${unreadExpr} > 0` : Prisma.empty;
 
-  const rows = await prisma.$queryRaw<Array<{
-    thread: number; id: number; from_id: number | null; postername: string | null;
-    message: string | null; timestamp: number | null; total_count: bigint | number;
-    override_title: string | null; first_subject: string | null;
-    other_nicks: string | null; unread: bigint | number; archived_at: number | null;
-  }>>`
+  return prisma.$queryRaw<InboxRawRow[]>`
     SELECT
       cp.thread_id AS thread,
       lm.id, lm.from_id, lm.postername, lm.message, lm.timestamp,
@@ -136,39 +103,133 @@ export async function GET(request: NextRequest) {
       ORDER BY m2.id DESC LIMIT 1
     )
     WHERE cp.user_id = ${me} AND cp.left_at IS NULL
-      AND ${archivedCond}
+      ${threadCond}
+      ${archivedCond}
       ${search}
       ${unreadOnly}
     ORDER BY lm.timestamp DESC
-    LIMIT ${Prisma.raw(String(pagesize))} OFFSET ${Prisma.raw(String(offset))}
+    LIMIT ${Prisma.raw(String(opts.pagesize))} OFFSET ${Prisma.raw(String(opts.offset))}
   `;
+}
 
-  const result = rows.map(r => {
-    const subject = r.first_subject === "Chat" ? null : r.first_subject;
-    const participants = parseParticipants(r.other_nicks);
-    return {
-      total_count: Number(r.total_count),
-      thread: r.thread,
-      id: r.id,
-      from_id: r.from_id,
-      lastFromMe: isOwnMessage({ fromId: r.from_id, postername: r.postername }, me, myNick),
-      preview: r.message,
-      lastSenderNick: r.postername,
-      timestamp: r.timestamp,
-      // Kept for the chat dock / ChatWindow, which still take one string.
-      title: resolveDisplayTitle(r.override_title, subject, participants.map(p => p.nick)),
-      // The parts the inbox list needs; a single pre-formatted title cannot
-      // express "subject AND who is in the thread".
-      overrideTitle: r.override_title,
-      subject,
-      participants,
-      unread: Number(r.unread),
-      left: false,
-      archived: r.archived_at != null,
-    };
+/** Row shape for a thread the caller is still in. */
+function activeRow(r: InboxRawRow, me: number, myNick: string) {
+  const subject = r.first_subject === "Chat" ? null : r.first_subject;
+  const participants = parseParticipants(r.other_nicks);
+  return {
+    total_count: Number(r.total_count),
+    thread: r.thread,
+    id: r.id,
+    from_id: r.from_id,
+    lastFromMe: isOwnMessage({ fromId: r.from_id, postername: r.postername }, me, myNick),
+    preview: r.message,
+    lastSenderNick: r.postername,
+    timestamp: r.timestamp,
+    // Kept for the chat dock / ChatWindow, which still take one string.
+    title: resolveDisplayTitle(r.override_title, subject, participants.map(p => p.nick)),
+    // The parts the inbox list needs; a single pre-formatted title cannot
+    // express "subject AND who is in the thread".
+    overrideTitle: r.override_title,
+    subject,
+    participants,
+    unread: Number(r.unread),
+    left: false,
+    archived: r.archived_at != null,
+  };
+}
+
+/** Row shape for a thread the caller has left. No unread: they receive nothing until they rejoin. */
+function leftRow(r: Awaited<ReturnType<typeof getLeftThreads>>[number], totalCount: number) {
+  const subject = r.firstSubject === "Chat" ? null : r.firstSubject;
+  const participants = parseParticipants(r.otherNicks);
+  return {
+    total_count: totalCount,
+    thread: r.thread,
+    id: r.thread,
+    from_id: null,
+    lastFromMe: false,
+    preview: null,
+    lastSenderNick: null,
+    timestamp: r.lastTimestamp,
+    title: resolveDisplayTitle(r.overrideTitle, subject, participants.map(p => p.nick)),
+    overrideTitle: r.overrideTitle,
+    subject,
+    participants,
+    unread: 0,
+    left: true,
+    archived: false,
+  };
+}
+
+export async function GET(request: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) return apiError("Unauthorized", 401);
+
+  const { searchParams } = request.nextUrl;
+  const page = Math.max(1, parseInt(searchParams.get("page") ?? "1") || 1);
+  const pagesize = Math.max(1, Math.min(200, parseInt(searchParams.get("pagesize") ?? "50") || 50));
+  const offset = (page - 1) * pagesize;
+  const me = parseInt(session.user.id);
+  // Legacy chat rows carry no from_id, only the sender's nick.
+  const myNick = session.user.name ?? "";
+
+  // Single-thread mode, for a deep link like /messages?thread=2269.
+  //
+  // The client used to synthesise this row from the members endpoint when the
+  // thread was absent from the current list, hardcoding `left: false` and
+  // `archived: false` because that endpoint cannot report them. For a thread the
+  // user had LEFT that was a lie with real consequences: the row rendered a
+  // ChatWindow instead of "You left this chat -- Rejoin to read it", and the
+  // messages endpoint then clamped the history to `timestamp <= left_at`. The
+  // user got a truncated conversation, no explanation, and no Rejoin button.
+  // That is how diNO could not read /messages?thread=2269.
+  //
+  // Membership state is knowable, so it is looked up rather than assumed, and it
+  // deliberately reuses the same two mappers as the list views so a deep-linked
+  // row cannot drift from the row the inbox would have shown.
+  const singleThread = searchParams.get("thread");
+  if (singleThread != null) {
+    const wanted = parseInt(singleThread);
+    if (!Number.isFinite(wanted)) return apiError("invalid thread", 400);
+    const member = await getMember(wanted, me);
+    // Not a participant at all: no row. The page falls back to the plain list,
+    // which is what it did before this mode existed.
+    if (!member) return apiOk([]);
+    if (member.leftAt != null) {
+      const left = await getLeftThreads(me);
+      const row = left.find(r => r.thread === wanted);
+      return apiOk(row ? [leftRow(row, 1)] : []);
+    }
+    const rows = await selectInboxRows(me, myNick, {
+      threadId: wanted,
+      pagesize: 1,
+      offset: 0,
+    });
+    return apiOk(rows.map(r => activeRow(r, me, myNick)));
+  }
+
+  // "Left chats" view: threads the user soft-left. History is preserved, so the
+  // user can find, read, and rejoin them. Same title resolution as the active
+  // inbox; no unread (a left member receives nothing until they rejoin).
+  if (searchParams.get("left") === "1") {
+    const left = await getLeftThreads(me);
+    return apiOk(left.map(r => leftRow(r, left.length)));
+  }
+
+  // Active-participant threads, each with its latest message visible to me, the
+  // cursor-based unread count, and the raw inputs for title resolution.
+  // Archived threads are hidden from the default list until a message newer
+  // than archived_at arrives — the SQL mirror of isArchived() in
+  // lib/chatThread.ts. `?archived=1` shows exactly the complement.
+  const rows = await selectInboxRows(me, myNick, {
+    archived: searchParams.get("archived") === "1",
+    search: searchParams.get("q") ?? "",
+    unreadOnly: searchParams.get("unread") === "1",
+    pagesize,
+    offset,
   });
 
-  return apiOk(result);
+  return apiOk(rows.map(r => activeRow(r, me, myNick)));
 }
 
 export async function POST(request: NextRequest) {

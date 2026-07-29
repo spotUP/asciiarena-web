@@ -4,9 +4,10 @@ import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { broadcast } from "@/lib/live";
-import { getMember, getActiveParticipants, markRead } from "@/lib/chatThreadDb";
+import { getMember, getActiveParticipants, markRead, threadHasParticipants } from "@/lib/chatThreadDb";
 import { createNotification } from "@/lib/notifications";
 import { normalizeMessageText } from "@/lib/normalizeText";
+import { notifyTargets } from "@/lib/chatFanout";
 
 interface ThreadMessageRow {
   id: number;
@@ -110,7 +111,26 @@ export async function POST(
   // fromId so a window belonging to the AUTHOR does not count their own
   // message as unread -- lib/chatUnread.ts.
   broadcast(`thread:${thread}`, { type: "message", fromId });
-  const targets = others.length ? others : (body.receiver ? [body.receiver] : []);
+
+  // Fan-out targets.
+  //
+  // `body.receiver` is a client-supplied id, and it exists for LEGACY threads
+  // that have no chat_participants rows at all -- without it those threads would
+  // notify nobody. But it used to be reached whenever `others` was empty, which
+  // includes the case where membership is perfectly well known and says the
+  // other person LEFT. The sender's chat window still holds them as its peer, so
+  // it posts their id and they were notified anyway: 29 such notifications had
+  // been delivered on prod, 4 of them on one thread, each linking to a
+  // conversation the recipient could no longer read.
+  //
+  // /api/messages already states the rule -- "a left member receives nothing
+  // until they rejoin" -- so the fallback now applies only when membership is
+  // genuinely unknown, never to override an explicit left_at.
+  const targets = notifyTargets({
+    activeOthers: others,
+    threadHasParticipants: await threadHasParticipants(thread),
+    clientReceiver: body.receiver ?? null,
+  });
   for (const rid of targets) {
     broadcast(`user:${rid}:messages`, { type: "message", fromId, fromNick, threadId: thread });
     await createNotification(rid, "notif-message", { actorNick: fromNick, targetUrl: `/messages?thread=${thread}` });

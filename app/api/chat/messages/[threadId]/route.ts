@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
-import { getMember } from "@/lib/chatThreadDb";
+import { getMember, getThreadLeaveEvents } from "@/lib/chatThreadDb";
+import { visibleLeaveNotices, mergeLeaveNotices } from "@/lib/chatTimeline";
 import { isOwnMessage } from "@/lib/chatUnread";
 
 export const dynamic = "force-dynamic";
@@ -44,7 +45,7 @@ export async function GET(
           FROM messages
           WHERE thread = ${thread} AND timestamp >= ${member.joinedAt} AND timestamp <= ${member.leftAt}
           ORDER BY id DESC LIMIT 30`;
-    return apiOk(rows.map(r => {
+    const mapped = rows.map(r => {
       const isOwn = isOwnMessage({ fromId: r.from_id, postername: r.postername }, userId, userNick);
       const unread = !isOwn && (r.timestamp ?? 0) > member.lastReadAt;
       return {
@@ -52,7 +53,20 @@ export async function GET(
         postername: r.postername, postedto: r.postedto,
         message: r.message, timestamp: r.timestamp, unread,
       };
-    }));
+    });
+
+    // Departures are part of the conversation, not just a live event. They were
+    // previously only broadcast into an open window's ephemeral system lines, so
+    // anyone who was not watching at that moment never learned that the person
+    // they were writing to had gone.
+    const notices = visibleLeaveNotices(await getThreadLeaveEvents(thread), {
+      viewerJoinedAt: member.joinedAt,
+      viewerLeftAt: member.leftAt,
+      oldestShownTimestamp: mapped.length
+        ? Math.min(...mapped.map(m => m.timestamp ?? 0))
+        : null,
+    });
+    return apiOk(mergeLeaveNotices(mapped, notices));
   }
 
   // --- Legacy fallback (no chat_participants row) ---------------------------
