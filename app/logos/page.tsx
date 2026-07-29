@@ -56,7 +56,7 @@ function Caption({ logo }: { logo: GalleryLogo }) {
       {logo.entity && (
         <>
           {" by "}
-          <Link className={logo.entity.kind === "artist" ? "green" : "magenta"} href={logo.entity.url}>{logo.entity.name}</Link>
+          <ContentLink className={logo.entity.kind === "artist" ? "green" : "magenta"} href={logo.entity.url}>{logo.entity.name}</ContentLink>
         </>
       )}
       {" — "}

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import NewItemsPill from "@/components/ui/NewItemsPill";
 import SortHeader from "@/components/ui/SortHeader";
 
@@ -125,10 +125,10 @@ export default function AppsClient({ initialSort, initialOrder }: AppsClientProp
           allRows.map((app) => (
             <div key={app.id} className="row">
               <div className="col-3 text-truncate">
-                <Link href={app.url}>{app.name}</Link>
+                <ContentLink href={app.url}>{app.name}</ContentLink>
               </div>
               <div className="col-3 text-truncate">
-                <Link href={app.url}>{app.filename}</Link>
+                <ContentLink href={app.url}>{app.filename}</ContentLink>
               </div>
               <div className="col-3 text-truncate">{app.author}</div>
               <div className="col-3 text-truncate">{app.timestamp}</div>

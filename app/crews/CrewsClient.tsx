@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import NewItemsPill from "@/components/ui/NewItemsPill";
 import SortHeader from "@/components/ui/SortHeader";
 
@@ -125,7 +125,7 @@ export default function CrewsClient({ initialSort, initialOrder }: CrewsClientPr
           allRows.map((crew) => (
             <div key={crew.id} className="row">
               <div className="col-4">
-                <Link href={crew.url}>{crew.name}</Link>{" "}
+                <ContentLink href={crew.url}>{crew.name}</ContentLink>{" "}
                 {crew.acronym && <span className="grey">({crew.acronym})</span>}
               </div>
               <div className="col-2">{crew.members_cnt}</div>

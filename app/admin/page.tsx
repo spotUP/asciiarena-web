@@ -49,7 +49,11 @@ function StatCard({ label, value, href, warn }: { label: string; value: number; 
       <div style={{ color, fontSize: "32px", lineHeight: "32px", fontFamily: "TopazPlus_a1200, monospace" }}>{value}</div>
     </div>
   );
-  return href ? <Link href={href} style={{ textDecoration: "none" }}>{content}</Link> : content;
+  // Admin navigation, not a content link. prefetch is off for the same reason
+  // it is off in Navbar: the target is a server render nobody has asked for
+  // yet. Stated explicitly because the href is computed, so no static check can
+  // tell where this one points.
+  return href ? <Link prefetch={false} href={href} style={{ textDecoration: "none" }}>{content}</Link> : content;
 }
 
 function formatTs(ts: number | null): string {

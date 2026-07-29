@@ -224,9 +224,9 @@ export default async function StatsPage({
               key={`${p.a.id}-${p.b.id}`}
               left={
                 <span className="text-truncate">
-                  <Link className="green" href={p.a.url}>{p.a.name}</Link>
+                  <ContentLink className="green" href={p.a.url}>{p.a.name}</ContentLink>
                   <span className="lightgrey"> + </span>
-                  <Link className="green" href={p.b.url}>{p.b.name}</Link>
+                  <ContentLink className="green" href={p.b.url}>{p.b.name}</ContentLink>
                 </span>
               }
               right={`${p.shared} collys`}

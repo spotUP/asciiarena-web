@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 
 interface Item {
   id: number;
@@ -103,7 +103,7 @@ function Section({ label, listApi, adminApi, detailPath }: { label: string; list
               return (
                 <div key={item.id} className="row amb-1 align-items-center">
                   <div className="col-2 text-truncate">
-                    <Link className="magenta" href={`${detailPath}/${item.filename}`}>{item.filename}</Link>
+                    <ContentLink className="magenta" href={`${detailPath}/${item.filename}`}>{item.filename}</ContentLink>
                   </div>
                   <div className="col-3">
                     <input type="text" className="form-control w-100" value={e.name ?? item.name ?? ""} onChange={ev => edit(item.id, "name", ev.target.value)} />

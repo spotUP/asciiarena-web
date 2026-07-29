@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import NewItemsPill from "@/components/ui/NewItemsPill";
 import SortHeader from "@/components/ui/SortHeader";
 import { subscribeRaw } from "@/lib/sse-pool";
@@ -191,9 +192,9 @@ export default function RequestsClient() {
           allRows.map((req) => (
             <div key={req.id} className="row amb-1">
               <div className="col-3 text-truncate">
-                <Link className="magenta" href={req.url}>
+                <ContentLink className="magenta" href={req.url}>
                   {req.title}
-                </Link>
+                </ContentLink>
               </div>
               <div className="col-3 text-truncate">
                 <span

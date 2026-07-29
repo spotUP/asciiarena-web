@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 import ContentLink from "@/components/ui/ContentLink";
 import { urlsafe } from "@/lib/utils";
 import SortHeader from "@/components/ui/SortHeader";
@@ -228,14 +227,14 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
             viewMode === 1 ? (
               <div key={colly.id} className="row mb-4 mb-sm-0">
                 <div className="col-md-7 text-truncate">
-                  <Link className="magenta" href={colly.url}>
+                  <ContentLink className="magenta" href={colly.url}>
                     {colly.name}
-                  </Link>
+                  </ContentLink>
                 </div>
                 <div className="col text-truncate">
-                  <Link className="magenta" href={colly.url}>
+                  <ContentLink className="magenta" href={colly.url}>
                     {colly.filename}
-                  </Link>
+                  </ContentLink>
                 </div>
                 <div className="col green text-truncate">
                   {(colly.artists ?? "").split(",").filter(Boolean).map((a, i) => (
@@ -252,9 +251,9 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
             ) : (
               <div key={colly.id} className="row apt-1 text-center text-md-start">
                 <span className="col-2">
-                  <Link className="cyan" href={colly.url}>
+                  <ContentLink className="cyan" href={colly.url}>
                     {colly.filename}
-                  </Link>
+                  </ContentLink>
                 </span>
                 <span className="col-1 green">PF--</span>
                 <span className="col-1 yellow">{colly.filesize}</span>

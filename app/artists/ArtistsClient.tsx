@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 import ContentLink from "@/components/ui/ContentLink";
 import { countrySlug } from "@/lib/countrySlug";
 import { urlsafe } from "@/lib/utils";
@@ -143,7 +142,7 @@ export default function ArtistsClient({ initialSort, initialOrder }: ArtistsClie
           allRows.map((artist) => (
             <div key={artist.id} className="row">
               <div className="forum_nick col-2">
-                <Link href={artist.url}>{artist.nick}</Link>
+                <ContentLink href={artist.url}>{artist.nick}</ContentLink>
               </div>
               <div className="artist_crew col-6">
                 {(artist.crews ?? "").split(",").filter(Boolean).map((crew, i) => (

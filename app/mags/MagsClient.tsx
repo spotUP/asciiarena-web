@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import NewItemsPill from "@/components/ui/NewItemsPill";
 import SortHeader from "@/components/ui/SortHeader";
 
@@ -125,10 +125,10 @@ export default function MagsClient({ initialSort, initialOrder }: MagsClientProp
           allRows.map((mag) => (
             <div key={mag.id} className="row">
               <div className="col-3 text-truncate">
-                <Link href={mag.url}>{mag.name}</Link>
+                <ContentLink href={mag.url}>{mag.name}</ContentLink>
               </div>
               <div className="col-3 text-truncate">
-                <Link href={mag.url}>{mag.filename}</Link>
+                <ContentLink href={mag.url}>{mag.filename}</ContentLink>
               </div>
               <div className="col-3 text-truncate">{mag.author}</div>
               <div className="col-3 text-truncate">{mag.timestamp}</div>

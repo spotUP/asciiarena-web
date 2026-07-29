@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 
 interface Req {
   id: number;
@@ -80,7 +81,7 @@ export default function RequestsClient() {
             {results.map(r => (
               <div key={r.id} className="row amb-1 align-items-center">
                 <div className="col-5 text-truncate">
-                  <Link className="magenta" href={`/requests/${r.id}`}>{r.title}</Link>
+                  <ContentLink className="magenta" href={`/requests/${r.id}`}>{r.title}</ContentLink>
                 </div>
                 <div className="col-3 lightgrey text-truncate">{r.user ?? ""}</div>
                 <div className="col-2 lightgrey">{r.time ?? ""}</div>

@@ -51,6 +51,9 @@ export default function AdminNav() {
         return (
           <Link
             key={t.href}
+            // Admin navigation, not a content link. Prefetching every admin tab
+            // on sight is a server render per tab for a page nobody opened.
+            prefetch={false}
             href={t.href}
             style={{
               background: isActive ? "#212121" : "transparent",

@@ -201,7 +201,7 @@ export default async function CrewPage({ params }: PageProps) {
           {boards.map((b, i) => (
             <div key={`${b.bbs_id ?? "x"}-${i}`} className="col-lg-12 pl-0 d-flex" style={{ gap: "12px" }}>
               {b.bbs_id ? (
-                <Link className="magenta" href={`/bbs/${b.bbs_id}`}>{b.bbs_name}</Link>
+                <ContentLink className="magenta" href={`/bbs/${b.bbs_id}`}>{b.bbs_name}</ContentLink>
               ) : (
                 <span>{b.bbs_name}</span>
               )}

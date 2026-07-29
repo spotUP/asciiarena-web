@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import Link from "next/link";
 import ContentLink from "@/components/ui/ContentLink";
 import { countrySlug } from "@/lib/countrySlug";
 import NewItemsPill from "@/components/ui/NewItemsPill";
@@ -126,7 +125,7 @@ export default function BBSClient({ initialSort, initialOrder }: BBSClientProps)
           allRows.map((bbs) => (
             <div key={bbs.id} className="row">
               <div className="col-4">
-                <Link href={bbs.url}>{bbs.name}</Link>
+                <ContentLink href={bbs.url}>{bbs.name}</ContentLink>
               </div>
               <div className="col-3">{bbs.sysop}</div>
               <div className="col-3 lightgrey">

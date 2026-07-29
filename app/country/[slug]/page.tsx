@@ -77,9 +77,9 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
           </div>
           {bbses.map(b => (
             <div key={b.id} className="col-lg-12 p-0 d-flex" style={row}>
-              <Link href={`/bbs/${b.id}`} className="magenta" style={{ minWidth: "240px", fontFamily: "TopazPlus_a1200, monospace" }}>
+              <ContentLink href={`/bbs/${b.id}`} className="magenta" style={{ minWidth: "240px", fontFamily: "TopazPlus_a1200, monospace" }}>
                 {b.name || "(unnamed)"}
-              </Link>
+              </ContentLink>
               <span className="lightgrey" style={{ minWidth: "144px" }}>{b.sysop || ""}</span>
               <span className={b.online ? "lightgreen" : "lightgrey"} style={{ minWidth: "96px" }}>
                 {b.online ? "online" : "offline"}
