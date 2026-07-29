@@ -19,14 +19,32 @@ export function isScenewallEndpoint(s: string | null): s is ScenewallEndpoint {
   return s === "weektop" || s === "bbs-weektop" || s === "globalwall";
 }
 
+export const SCENEWALL_TIMEOUT_MS = 30000;
+
+/**
+ * One-line description of why a scenewall fetch failed.
+ *
+ * Kept separate from the fetcher so the timeout case reads as what it is —
+ * a slow third-party widget source, not a fault in this application.
+ */
+export function describeFetchFailure(err: unknown): string {
+  if (err instanceof Error && err.name === "AbortError") {
+    return `no response within ${SCENEWALL_TIMEOUT_MS / 1000}s`;
+  }
+  if (err instanceof Error) return err.message;
+  return String(err);
+}
+
 export const fetchScenewall = unstable_cache(
   async (endpoint: ScenewallEndpoint) => {
     const ctrl = new AbortController();
-    // scenewall.bbs.io is genuinely slow — it consistently takes ~10-11s to
-    // respond. An earlier 8s cap aborted every request before the data arrived,
-    // so the widgets always rendered empty. 20s gives scenewall comfortable
-    // headroom while still capping a truly hung upstream.
-    const timer = setTimeout(() => ctrl.abort(), 20000);
+    // scenewall.bbs.io is genuinely slow. An earlier 8s cap aborted every
+    // request before the data arrived, so the widgets always rendered empty;
+    // 20s was chosen when the upstream measured ~10-11s. Measured again on
+    // 2026-07-29 it takes ~15.2s, which left so little headroom that requests
+    // were timing out several times a minute. 30s restores roughly the same
+    // margin the 20s cap originally had, while still capping a hung upstream.
+    const timer = setTimeout(() => ctrl.abort(), SCENEWALL_TIMEOUT_MS);
     try {
       const r = await fetch(ENDPOINT_URL[endpoint], {
         signal: ctrl.signal,
@@ -39,6 +57,14 @@ export const fetchScenewall = unstable_cache(
       // error is never cached, so the next request retries immediately.
       if (!r.ok) throw new Error(`scenewall ${endpoint}: HTTP ${r.status}`);
       return await r.json();
+    } catch (err) {
+      // Rethrow as a plain Error. An aborted fetch rejects with a DOMException,
+      // and Next logs a failed revalidation by dumping the thrown object — for
+      // a DOMException that is the error plus its 25 enumerable constants
+      // (INDEX_SIZE_ERR, DOMSTRING_SIZE_ERR, ...), 27 journal lines per
+      // timeout. That buried real errors in the log. The rethrow keeps the
+      // no-cache-on-failure behaviour above and costs one legible line.
+      throw new Error(`scenewall ${endpoint}: ${describeFetchFailure(err)}`);
     } finally {
       clearTimeout(timer);
     }
