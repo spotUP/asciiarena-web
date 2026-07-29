@@ -249,7 +249,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
       )}
       {isAdmin && (
         <div className="col-lg-12 pl-0 apt-1">
-          <Link className="btn-big" href={`/admin/artists?q=${encodeURIComponent(artist.nick ?? "")}`}>
+          <Link prefetch={false} className="btn-big" href={`/admin/artists?q=${encodeURIComponent(artist.nick ?? "")}`}>
             Edit Artist Profile
           </Link>
         </div>

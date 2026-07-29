@@ -1,4 +1,4 @@
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import { prisma } from "@/lib/db";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { POLL_TYPE_LABELS } from "@/lib/polls/types";
@@ -29,9 +29,9 @@ export default async function PollArchivePage({ searchParams }: { searchParams: 
         {polls.length === 0 && <div style={{ color: "#aaaaaa" }}>No closed polls yet.</div>}
         {polls.map(p => (
           <div key={p.id} className="col-lg-12 p-0 d-flex" style={{ gap: "16px", height: "16px", lineHeight: "16px", marginBottom: "8px" }}>
-            <Link href={`/polls/${p.slug}`} className="magenta" style={{ minWidth: "320px", fontFamily: "TopazPlus_a1200, monospace" }}>
+            <ContentLink href={`/polls/${p.slug}`} className="magenta" style={{ minWidth: "320px", fontFamily: "TopazPlus_a1200, monospace" }}>
               {p.title}
-            </Link>
+            </ContentLink>
             <span className="lightgrey" style={{ minWidth: "144px" }}>{POLL_TYPE_LABELS[p.type]}</span>
             <span className="lightgrey" style={{ minWidth: "96px" }}>{p._count.votes} votes</span>
             <span className="lightgrey" style={{ minWidth: "144px" }}>{new Date(p.updated_at * 1000).toISOString().slice(0, 10)}</span>
@@ -41,10 +41,10 @@ export default async function PollArchivePage({ searchParams }: { searchParams: 
       {pages > 1 && (
         <div style={{ display: "flex", gap: "16px", fontFamily: "TopazPlus_a1200, monospace" }}>
           {Array.from({ length: pages }, (_, i) => i + 1).map(n => (
-            <Link key={n} href={`/polls/archive?p=${n}`} style={{
+            <ContentLink key={n} href={`/polls/archive?p=${n}`} style={{
               color: n === page ? "#ffff55" : "#aaaaaa",
               textDecoration: n === page ? "none" : "underline",
-            }}>{n}</Link>
+            }}>{n}</ContentLink>
           ))}
         </div>
       )}

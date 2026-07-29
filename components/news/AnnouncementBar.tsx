@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import {
   pickBannerItem,
   rememberSeen,
@@ -91,14 +91,14 @@ export default function AnnouncementBar() {
         </span>
         {/* White, not the usual lightgrey/lightcyan: those are low contrast
             against the light blue band. */}
-        <Link
+        <ContentLink
           href="/news"
           className="white"
           style={{ flexShrink: 0 }}
           onClick={() => dismiss(item.id)}
         >
           [more]
-        </Link>
+        </ContentLink>
         <button
           type="button"
           onClick={() => dismiss(item.id)}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import SiteLayout from "@/components/layout/SiteLayout";
 
 export const metadata: Metadata = {
@@ -37,7 +37,7 @@ export default function GuidelinesPage() {
           <p className="lightgrey">
             <span className="cyan">2. You point at it.</span> If your art is unusual, or you
             want everything pixel-perfect, open the{" "}
-            <Link href="/submit" className="magenta">colly tester</Link>, drop your file,
+            <ContentLink href="/submit" className="magenta">colly tester</ContentLink>, drop your file,
             and click the line of each logo. That works no matter how wild the layout is — you
             are never forced into a format. The tester shows exactly what we detected and flags
             anything we missed. Nothing is uploaded.
@@ -84,8 +84,8 @@ export default function GuidelinesPage() {
 
           <p className="lightgrey amt-1">
             <a href="/example-arena-colly.txt" className="magenta" download>Download an example</a>{" "}
-            to poke at, <Link href="/submit" className="magenta">test your colly</Link>, or{" "}
-            <Link href="/submit" className="magenta">submit one</Link>.
+            to poke at, <ContentLink href="/submit" className="magenta">test your colly</ContentLink>, or{" "}
+            <ContentLink href="/submit" className="magenta">submit one</ContentLink>.
           </p>
         </div>
       </div>

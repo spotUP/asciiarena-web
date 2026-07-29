@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import type { SiteLogo } from "./SiteLayout";
 import AnsiLogo from "@/components/ui/AnsiLogo";
 
@@ -138,7 +138,7 @@ export default function LogoHeader({ logos }: LogoHeaderProps) {
                 className="logo nolink logo-slot"
                 style={{ whiteSpace: "pre" }}
               >
-                <Link href="/" className="logo ascii">
+                <ContentLink href="/" className="logo ascii">
                   {logo.kind === "ansi" ? (
                     <AnsiLogo ansiB64={logo.ansiB64} font={logo.font} maxHeight={ANSI_LOGO_PX} transparentBg />
                   ) : (
@@ -146,7 +146,7 @@ export default function LogoHeader({ logos }: LogoHeaderProps) {
                       {logo.ascii}
                     </pre>
                   )}
-                </Link>
+                </ContentLink>
               </div>
             );
           })}

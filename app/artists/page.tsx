@@ -1,4 +1,4 @@
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import SiteLayout from "@/components/layout/SiteLayout";
 import ArtistsClient from "./ArtistsClient";
 
@@ -13,9 +13,9 @@ export default async function ArtistsPage({
       {/* The country column is clickable per row; this is the way in for
           "which countries had the most artists" without hunting for one. */}
       <div style={{ height: "16px", lineHeight: "16px", marginBottom: "8px" }}>
-        <Link href="/countries" className="lightgrey" style={{ fontFamily: "TopazPlus_a1200, monospace" }}>
+        <ContentLink href="/countries" className="lightgrey" style={{ fontFamily: "TopazPlus_a1200, monospace" }}>
           {"[ browse artists by country -> ]"}
-        </Link>
+        </ContentLink>
       </div>
       <ArtistsClient initialSort={sort_by} initialOrder={sort_order} />
     </SiteLayout>

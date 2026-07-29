@@ -1,4 +1,4 @@
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import { prisma } from "@/lib/db";
 
 interface NewsRow { id: number; title: string; created_at: number }
@@ -32,14 +32,14 @@ export default async function LatestNews({ limit = 5 }: { limit?: number }) {
             style={{ gap: "8px", fontSize: "0.85em", paddingBottom: "3px" }}
           >
             <span className="lightgrey" style={{ flexShrink: 0 }}>{formatDate(row.created_at)}</span>
-            <Link
+            <ContentLink
               href="/news"
               className="lightcyan"
               style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
               title={row.title}
             >
               {row.title}
-            </Link>
+            </ContentLink>
           </div>
         ))}
       </div>

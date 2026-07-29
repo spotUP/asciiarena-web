@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import ContentLink from "@/components/ui/ContentLink";
 
 interface Req {
@@ -49,7 +48,7 @@ export default function RequestsClient() {
 
       <div className="container-fluid bg-secondary apb-1 ap-1 amb-2">
         <div className="amb-1">
-          <Link href="/requests" className="lightgrey">Browse all requests &gt;</Link>
+          <ContentLink href="/requests" className="lightgrey">Browse all requests &gt;</ContentLink>
         </div>
 
         <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }} className="amb-1">

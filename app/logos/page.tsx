@@ -1,4 +1,3 @@
-import Link from "next/link";
 import ContentLink from "@/components/ui/ContentLink";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { logoOfTheDay, galleryLogos, type GalleryLogo } from "@/lib/collyLogoGallery";
@@ -96,7 +95,7 @@ export default async function LogosPage({ searchParams }: { searchParams: Promis
 
           <div className="header col-lg-12 p-0 amb-1" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h2 className="ap-1 bg-header" style={{ margin: 0, flex: 1 }}>BROWSE LOGOS</h2>
-            <Link href={`/logos?seed=${seed + 1}`} className="btn-secondary ap-1">Shuffle</Link>
+            <ContentLink href={`/logos?seed=${seed + 1}`} className="btn-secondary ap-1">Shuffle</ContentLink>
           </div>
 
           <div className="row m-0 p-0">

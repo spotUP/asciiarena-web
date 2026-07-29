@@ -1,4 +1,4 @@
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import type { Metadata } from "next";
 import SiteLayout from "@/components/layout/SiteLayout";
 
@@ -46,7 +46,7 @@ export default async function ActivatePage({
         ))}
         <div className="row apt-1">
           <div className="col-12">
-            <Link className="magenta" href="/login">Go to login</Link>
+            <ContentLink className="magenta" href="/login">Go to login</ContentLink>
           </div>
         </div>
       </div>

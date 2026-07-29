@@ -12,12 +12,12 @@ export default async function AdminForumList() {
         <h2 className="ap-1 bg-header">FORUM</h2>
       </div>
       <div style={{ marginBottom: "16px" }}>
-        <Link href="/admin/forum/new" style={{
+        <Link prefetch={false} href="/admin/forum/new" style={{
           display: "inline-block", height: "32px", lineHeight: "32px", padding: "0 16px",
           background: "#212121", color: "#ffff55", border: "1px solid #555",
           fontFamily: "TopazPlus_a1200, monospace", fontSize: "16px", textDecoration: "none",
         }}>+ NEW BOARD</Link>
-        <Link href="/admin/forum/reports" className="magenta" style={{ marginLeft: "16px" }}>
+        <Link prefetch={false} href="/admin/forum/reports" className="magenta" style={{ marginLeft: "16px" }}>
           [ REPORTS ]
         </Link>
       </div>
@@ -26,7 +26,7 @@ export default async function AdminForumList() {
         {boards.map(b => (
           <div key={b.id} className="col-lg-12 p-0 d-flex" style={{ gap: "16px", height: "16px", lineHeight: "16px", marginBottom: "8px" }}>
             <span style={{ minWidth: "16px", color: "#5e5d5e" }}>{b.sort_order}</span>
-            <Link className="magenta" href={`/admin/forum/${b.id}`} style={{ minWidth: "256px", fontFamily: "TopazPlus_a1200, monospace" }}>
+            <Link prefetch={false} className="magenta" href={`/admin/forum/${b.id}`} style={{ minWidth: "256px", fontFamily: "TopazPlus_a1200, monospace" }}>
               {b.name}
             </Link>
             <span className="lightgrey" style={{ minWidth: "144px" }}>

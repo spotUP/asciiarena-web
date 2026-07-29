@@ -159,7 +159,7 @@ export default async function CrewPage({ params }: PageProps) {
       </div>
       {isAdmin && (
         <div className="col-lg-12 pl-0 apt-1 apb-1">
-          <Link className="btn-big" href={`/admin/crews?q=${encodeURIComponent(crew.name)}`}>
+          <Link prefetch={false} className="btn-big" href={`/admin/crews?q=${encodeURIComponent(crew.name)}`}>
             Edit Crew Profile
           </Link>
         </div>

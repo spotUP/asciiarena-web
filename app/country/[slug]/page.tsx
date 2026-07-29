@@ -1,4 +1,3 @@
-import Link from "next/link";
 import ContentLink from "@/components/ui/ContentLink";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
@@ -106,9 +105,9 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
       )}
 
       <div>
-        <Link href="/countries" className="lightgrey" style={{ fontFamily: "TopazPlus_a1200, monospace" }}>
+        <ContentLink href="/countries" className="lightgrey" style={{ fontFamily: "TopazPlus_a1200, monospace" }}>
           {"[ all countries -> ]"}
-        </Link>
+        </ContentLink>
       </div>
     </SiteLayout>
   );

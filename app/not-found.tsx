@@ -1,4 +1,4 @@
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 
 export default function NotFound() {
   return (
@@ -22,9 +22,9 @@ export default function NotFound() {
       <div style={{ color: "var(--color-grey)", marginBottom: "24px" }}>
         The page you are looking for does not exist.
       </div>
-      <Link href="/collys" style={{ color: "var(--color-cyan)", textDecoration: "none" }}>
+      <ContentLink href="/collys" style={{ color: "var(--color-cyan)", textDecoration: "none" }}>
         &lt; back to collys
-      </Link>
+      </ContentLink>
     </div>
   );
 }

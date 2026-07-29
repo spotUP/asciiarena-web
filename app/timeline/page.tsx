@@ -1,4 +1,3 @@
-import Link from "next/link";
 import ContentLink from "@/components/ui/ContentLink";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
@@ -39,7 +38,7 @@ export default async function TimelinePage({ searchParams }: { searchParams: Pro
     return (
       <SiteLayout title={`TIMELINE ${year}`}>
         <div className="col-12 amb-1">
-          <Link href="/timeline" className="magenta">&larr; all years</Link>
+          <ContentLink href="/timeline" className="magenta">&larr; all years</ContentLink>
           <span className="lightgrey apl-1">{collys.length} release{collys.length !== 1 ? "s" : ""} in {year}</span>
         </div>
         {collys.map((c) => (
@@ -76,7 +75,7 @@ export default async function TimelinePage({ searchParams }: { searchParams: Pro
           const bars = Math.max(1, Math.round((y.n / max) * BAR_WIDTH));
           return (
             <span key={y.year} style={{ display: "block" }}>
-              <Link href={`/timeline?year=${y.year}`} className="magenta">{y.year}</Link>
+              <ContentLink href={`/timeline?year=${y.year}`} className="magenta">{y.year}</ContentLink>
               <span className="green">{"  " + "█".repeat(bars)}</span>
               <span className="lightgrey">{"  " + y.n}</span>
             </span>

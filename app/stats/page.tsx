@@ -1,4 +1,3 @@
-import Link from "next/link";
 import ContentLink from "@/components/ui/ContentLink";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
@@ -146,14 +145,14 @@ export default async function StatsPage({
       <div className="col-lg-12 pl-0 apb-1">
         <span className="lightgrey">Entries: </span>
         {COUNTS.map(n => (
-          <Link
+          <ContentLink
             key={n}
             href={`/stats?count=${n}`}
             className={`btn-secondary apr-1${n === count ? " active" : ""}`}
             style={{ marginRight: "4px" }}
           >
             {n}
-          </Link>
+          </ContentLink>
         ))}
       </div>
 

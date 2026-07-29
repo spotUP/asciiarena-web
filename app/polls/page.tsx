@@ -1,4 +1,4 @@
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import { prisma } from "@/lib/db";
 import SiteLayout from "@/components/layout/SiteLayout";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
@@ -22,18 +22,18 @@ export default async function PollsListPage() {
         {polls.map(p => (
           <div key={p.id} className="col-lg-12 p-0 d-flex" style={{ gap: "16px", height: "16px", lineHeight: "16px", marginBottom: "8px" }}>
             <span style={{ minWidth: "16px", color: p.featured ? "#ffff55" : "#5e5d5e" }}>{p.featured ? "*" : " "}</span>
-            <Link href={`/polls/${p.slug}`} className="magenta" style={{ minWidth: "320px", fontFamily: "TopazPlus_a1200, monospace" }}>
+            <ContentLink href={`/polls/${p.slug}`} className="magenta" style={{ minWidth: "320px", fontFamily: "TopazPlus_a1200, monospace" }}>
               {p.title}
-            </Link>
+            </ContentLink>
             <span className="lightgrey" style={{ minWidth: "144px" }}>{POLL_TYPE_LABELS[p.type]}</span>
             <span className="lightgrey" style={{ minWidth: "96px" }}>{p._count.votes} votes</span>
           </div>
         ))}
       </div>
       <div style={{ marginTop: "16px" }}>
-        <Link href="/polls/archive" className="lightgrey" style={{ fontFamily: "TopazPlus_a1200, monospace" }}>
+        <ContentLink href="/polls/archive" className="lightgrey" style={{ fontFamily: "TopazPlus_a1200, monospace" }}>
           {"[ See all past polls -> ]"}
-        </Link>
+        </ContentLink>
       </div>
     </SiteLayout>
   );

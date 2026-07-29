@@ -15,43 +15,25 @@ import { describe, expect, it } from "vitest";
  * of pages nobody had navigated to. The page being viewed measured a healthy
  * 1.08s LCP the whole time -- the cost landed on everyone else.
  *
- * components/layout/Navbar.tsx had already been given prefetch={false} on every
- * link for exactly this reason. The content links never were, and there was
- * nothing to stop the next listing page from repeating it.
+ * This rule took three attempts, and the first two were too clever:
  *
- * The rule now lives in components/ui/ContentLink.tsx, and this test enforces
- * it: no `<Link>` may point at a heavy content route. Reach for ContentLink
- * instead, or set prefetch={false} deliberately.
+ *   1. Flag `<Link>`s whose href literally starts with a heavy route. Missed
+ *      every `href={colly.url}` entity link -- which is this codebase's normal
+ *      idiom, built in lib/sceneGraph.ts and the /api routes -- so /collys,
+ *      /artists, /crews, /mags and /apps kept prefetching. A trace still showed
+ *      24 prefetches of other artists' pages.
+ *   2. Also require computed hrefs to declare intent, and grow the heavy-route
+ *      list. Better, but the list needed /bbs and /requests added the moment it
+ *      was looked at, which is a list that will always be one page out of date.
  *
- * The first version of this test only matched hrefs written as literals, and
- * that let the worst offenders through. This codebase's idiom for an entity
- * link is a precomputed `url` field -- `href={colly.url}`, `href={l.url}` --
- * built in lib/sceneGraph.ts and the /api routes, and every one of those
- * resolves to a content route. So /collys, /artists, /crews, /mags, /apps and
- * the scene-links section kept prefetching after the first pass, and a trace
- * of /artist/boheme still showed 24 prefetches of other artists' pages.
- *
- * Hence the second rule below: a `<Link>` whose href is an expression cannot be
- * checked statically, so it has to say what it wants. Use ContentLink, or write
- * prefetch explicitly and say why.
+ * So the rule is now total, and needs no list: every `<Link>` states its
+ * prefetch, or is a ContentLink, which states it once for everybody. There is no
+ * page on this site that is cheap to prefetch -- they are all database-backed
+ * server renders -- so "off unless someone justifies it" is the honest default,
+ * and it is what components/layout/Navbar.tsx had already been doing by hand.
  */
 
-const HEAVY_ROUTES = [
-  "release",
-  "artist",
-  "crew",
-  "member",
-  "magazine",
-  "application",
-  "country",
-  "logos",
-  "collys",
-  "bbs",
-  "requests",
-];
-
 const SCAN_ROOTS = ["app", "components"];
-const HEAVY_HREF = new RegExp(`href=\\{?["'\`]/(${HEAVY_ROUTES.join("|")})/`);
 
 function tsxFilesUnder(dir: string): string[] {
   const out: string[] = [];
@@ -66,6 +48,19 @@ function tsxFilesUnder(dir: string): string[] {
   return out;
 }
 
+/**
+ * Blank out comments, preserving newlines so reported line numbers stay right.
+ * Several files discuss `<Link>` in prose -- ContentLink's own doc comment does
+ * -- and a scanner that cannot tell code from commentary reports those as
+ * offenders.
+ */
+function stripComments(source: string): string {
+  const blank = (m: string) => m.replace(/[^\n]/g, " ");
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, blank)
+    .replace(/(^|[^:])\/\/[^\n]*/g, (m, p1) => p1 + blank(m.slice(p1.length)));
+}
+
 /** Every `<Link ...>` opening tag in a file, with its 1-based line number. */
 function openingLinkTags(source: string): { tag: string; line: number }[] {
   const tags: { tag: string; line: number }[] = [];
@@ -77,23 +72,35 @@ function openingLinkTags(source: string): { tag: string; line: number }[] {
   return tags;
 }
 
-describe("content links never prefetch", () => {
+describe("links never prefetch unless asked to", () => {
   const files = SCAN_ROOTS.flatMap((root) =>
     tsxFilesUnder(path.join(process.cwd(), root)),
   );
 
   it("scans a plausible number of files", () => {
-    // Guards the guard: a broken walk that finds nothing would make every
-    // assertion below pass regardless of what the code does.
+    // Guards the guard: a broken walk that finds nothing would make the
+    // assertions below pass regardless of what the code does.
     expect(files.length).toBeGreaterThan(50);
   });
 
-  it("has no <Link> pointing at a heavy content route", () => {
+  it("finds the <Link> tags it is supposed to be checking", () => {
+    // Likewise: if comment-stripping or the tag regex broke, the offender list
+    // would be empty for the wrong reason.
+    const total = files.reduce(
+      (n, f) => n + openingLinkTags(stripComments(readFileSync(f, "utf8"))).length,
+      0,
+    );
+    expect(total).toBeGreaterThan(80);
+  });
+
+  it("has no <Link> that leaves prefetch unstated", () => {
+    // Fix by using ContentLink, or by writing prefetch explicitly and saying
+    // why -- as app/admin/page.tsx and components/admin/AdminNav.tsx do for
+    // admin navigation, which is not a content link.
     const offenders: string[] = [];
     for (const file of files) {
-      const source = readFileSync(file, "utf8");
+      const source = stripComments(readFileSync(file, "utf8"));
       for (const { tag, line } of openingLinkTags(source)) {
-        if (!HEAVY_HREF.test(tag)) continue;
         if (tag.includes("prefetch")) continue;
         offenders.push(`${path.relative(process.cwd(), file)}:${line}`);
       }
@@ -101,25 +108,7 @@ describe("content links never prefetch", () => {
     expect(offenders).toEqual([]);
   });
 
-  it("has no <Link> with a computed href that stays silent about prefetch", () => {
-    // `href={colly.url}` cannot be resolved by reading the file, and on this
-    // codebase those are exactly the entity links that hurt. So the choice has
-    // to be explicit: ContentLink, or a stated prefetch.
-    const offenders: string[] = [];
-    for (const file of files) {
-      const source = readFileSync(file, "utf8");
-      for (const { tag, line } of openingLinkTags(source)) {
-        if (tag.includes("prefetch")) continue;
-        const href = /href=\{([^}]*)\}/.exec(tag);
-        if (!href) continue; // href="/literal" — covered by the test above
-        if (/^\s*[`"']\//.test(href[1])) continue; // literal inside braces
-        offenders.push(`${path.relative(process.cwd(), file)}:${line}`);
-      }
-    }
-    expect(offenders).toEqual([]);
-  });
-
-  it("routes those links through ContentLink, which switches prefetch off", () => {
+  it("routes links through ContentLink, which switches prefetch off", () => {
     const source = readFileSync(
       path.join(process.cwd(), "components/ui/ContentLink.tsx"),
       "utf8",

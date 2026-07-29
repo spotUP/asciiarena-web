@@ -81,7 +81,7 @@ export default function UsersClient() {
 
       <div className="container-fluid bg-secondary apb-1 ap-1 amb-2">
         <div className="amb-1">
-          <Link href="/admin/users/inactive" className="lightgrey">
+          <Link prefetch={false} href="/admin/users/inactive" className="lightgrey">
             View inactive accounts &gt;
           </Link>
         </div>

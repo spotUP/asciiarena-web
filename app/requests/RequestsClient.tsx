@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 import ContentLink from "@/components/ui/ContentLink";
 import NewItemsPill from "@/components/ui/NewItemsPill";
 import SortHeader from "@/components/ui/SortHeader";
@@ -217,9 +216,9 @@ export default function RequestsClient() {
       </div>
 
       <div className="apt-1">
-        <Link href="/submit#request">
+        <ContentLink href="/submit#request">
           <input type="submit" className="btn-big" value="Add Request" readOnly />
-        </Link>
+        </ContentLink>
       </div>
     </>
   );

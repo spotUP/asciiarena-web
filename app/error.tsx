@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 
 export default function Error({
   error,
@@ -41,9 +41,9 @@ export default function Error({
         <div style={{ color: "var(--color-grey)", marginBottom: "24px" }}>
           The page you are looking for does not exist.
         </div>
-        <Link href="/collys" style={{ color: "var(--color-cyan)", textDecoration: "none" }}>
+        <ContentLink href="/collys" style={{ color: "var(--color-cyan)", textDecoration: "none" }}>
           &lt; back to collys
-        </Link>
+        </ContentLink>
       </div>
     );
   }
@@ -89,9 +89,9 @@ export default function Error({
         >
           TRY AGAIN
         </button>
-        <Link href="/" style={{ color: "var(--color-cyan)", textDecoration: "none" }}>
+        <ContentLink href="/" style={{ color: "var(--color-cyan)", textDecoration: "none" }}>
           go home
-        </Link>
+        </ContentLink>
       </div>
     </div>
   );

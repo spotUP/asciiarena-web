@@ -23,7 +23,7 @@ export default async function AdminPollsList() {
         <h2 className="ap-1 bg-header">POLLS</h2>
       </div>
       <div style={{ marginBottom: "16px" }}>
-        <Link href="/admin/polls/new" style={{
+        <Link prefetch={false} href="/admin/polls/new" style={{
           display: "inline-block", height: "32px", lineHeight: "32px", padding: "0 16px",
           background: "#212121", color: "#ffff55", border: "1px solid #555",
           fontFamily: "TopazPlus_a1200, monospace", fontSize: "16px", textDecoration: "none",
@@ -45,7 +45,7 @@ export default async function AdminPollsList() {
             <span style={{ minWidth: "112px", color: "#5e5d5e" }}>
               {isPollExpired(p, now) ? "-> ended" : isPollPending(p, now) ? "-> scheduled" : ""}
             </span>
-            <Link className="magenta" href={`/admin/polls/${p.id}`} style={{ minWidth: "320px", fontFamily: "TopazPlus_a1200, monospace" }}>
+            <Link prefetch={false} className="magenta" href={`/admin/polls/${p.id}`} style={{ minWidth: "320px", fontFamily: "TopazPlus_a1200, monospace" }}>
               {p.title}
             </Link>
             <span className="lightgrey" style={{ minWidth: "144px" }}>{POLL_TYPE_LABELS[p.type]}</span>
