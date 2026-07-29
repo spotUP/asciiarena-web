@@ -44,15 +44,12 @@ import {
 	undoAndRedo,
 	viewportTap,
 	createPaintShortcuts,
-	createViewportController,
 	createGenericController,
 	createResolutionController,
-	createGrid,
 	createToolPreview,
 	createMenuController,
 	enforceMaxBytes,
 	createFontSelect,
-	createZoomControl,
 } from './ui.js';
 import {
 	createDefaultPalette,
@@ -222,11 +219,6 @@ export function bootstrapEditor(rootEl, opts = {}) {
 			State.cursor = createCursor(canvasContainer);
 			State.selectionTool = createSelectionTool();
 
-			const zoomControlContainer = $('zoomControl');
-			if (zoomControlContainer) {
-				zoomControlContainer.appendChild(createZoomControl());
-			}
-
 			const initSecondaryTools = () => {
 				if (destroyed) return;
 				State.toolPreview = createToolPreview($('toolPreview'));
@@ -390,7 +382,6 @@ export function bootstrapEditor(rootEl, opts = {}) {
 			b: $('characterBrush'),
 			n: $('fill'),
 			a: $('attrib'),
-			g: $('navGrid'),
 			i: $('navICE'),
 			m: $('mirror'),
 		});
@@ -500,9 +491,6 @@ export function bootstrapEditor(rootEl, opts = {}) {
 			const selectedFont = fontSelect.getValue();
 			await State.textArtCanvas.setFont(selectedFont, () => State.modal.close());
 		});
-
-		const grid = createGrid($('grid'));
-		createSettingToggle($('navGrid'), grid.isShown, grid.show);
 
 		Toolbar.addLazy($('brushes'), async () => {
 			const { createBrushController } = await import('./freehandTools.js');
@@ -621,8 +609,6 @@ export function bootstrapEditor(rootEl, opts = {}) {
 			$('clipboardToolbar'),
 			$('clipboard'),
 		);
-		const view = createViewportController($('viewportToolbar'));
-		Toolbar.add($('navView'), view.enable, view.disable);
 		Toolbar.add($('clipboard'), clipboard.enable, clipboard.disable);
 
 		Toolbar.addLazy($('sample'), async () => {

@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 
 import { describe, expect, it } from "vitest";
@@ -23,10 +23,27 @@ import { EDITOR_MARKUP } from "@/components/ui/AnsiEditor/markup";
  * dropped, instead of the editor silently coming up dead.
  */
 
-const bootstrap = readFileSync(
-  path.join(process.cwd(), "components/ui/AnsiEditor/engine/bootstrap.js"),
-  "utf8",
-);
+const ENGINE_DIR = path.join(process.cwd(), "components/ui/AnsiEditor/engine");
+
+const bootstrap = readFileSync(path.join(ENGINE_DIR, "bootstrap.js"), "utf8");
+
+/**
+ * Lookups outside bootstrap.js run when a feature is used, not during boot, so
+ * a missing id there kills that one feature rather than the editor. Still worth
+ * pinning: the VIEW button and its viewport toolbar were deleted wholesale
+ * (markup, wiring and controllers together), and this is what catches a wire
+ * left dangling in engine code the bootstrap scan never reads.
+ */
+const LAZY_ENGINE_FILES = readdirSync(ENGINE_DIR)
+  .filter(f => f.endsWith(".js") && f !== "bootstrap.js")
+  .map(f => [f, readFileSync(path.join(ENGINE_DIR, f), "utf8")] as const);
+
+/**
+ * Ids looked up by code that is never reached. `modalError` is the only one:
+ * ui.js's modal.error() writes into it, this fork carries no error modal, and
+ * nothing calls modal.error(). Predates the VIEW removal.
+ */
+const UNREACHABLE_IDS = new Set<string>(["modalError"]);
 
 /**
  * Ids the engine creates at runtime rather than reading from the markup, so
@@ -58,6 +75,33 @@ describe("ANSI editor wiring", () => {
     const missing = ids.filter(id => !markupHasId(id));
 
     expect(missing).toEqual([]);
+  });
+
+  it.each(LAZY_ENGINE_FILES.map(([name]) => name))(
+    "%s looks up no id the markup dropped",
+    name => {
+      const [, source] = LAZY_ENGINE_FILES.find(([f]) => f === name)!;
+      const missing = idsLookedUpBy(source)
+        .filter(id => !UNREACHABLE_IDS.has(id))
+        .filter(id => !markupHasId(id));
+
+      expect(missing).toEqual([]);
+    },
+  );
+
+  it("has no wiring left for the removed VIEW button", () => {
+    // VIEW toggled #viewportToolbar (zoom, Night mode, Grid). All of it went:
+    // markup, the Toolbar entry, the shortcut, and the three ui.js controllers.
+    // A half-removal is the dangerous shape -- $('navView') returning null in
+    // bootstrap aborts the rest of boot.
+    const engine = [bootstrap, ...LAZY_ENGINE_FILES.map(([, src]) => src)].join("\n");
+
+    for (const id of ["navView", "viewportToolbar", "zoomControl", "navDarkmode", "navGrid", "grid"]) {
+      expect(markupHasId(id), `markup still declares #${id}`).toBe(false);
+    }
+    for (const symbol of ["createViewportController", "createZoomControl", "createGrid"]) {
+      expect(engine).not.toContain(symbol);
+    }
   });
 
   it("hides engine-wired menu items instead of removing them", () => {

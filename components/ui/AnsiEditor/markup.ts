@@ -178,19 +178,6 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 							<kbd>9pt Font</kbd>
 						</div>
 					</div>
-					<div id="viewportToolbar">
-						<div id="zoomControl" class="toolButton">
-							<span class="asciiIcon" aria-hidden="true">[Q]</span>
-						</div>
-						<div id="navDarkmode" class="toolButton">
-							<span class="asciiIcon" aria-hidden="true">[D]</span>
-							<kbd id="mode">Night</kbd>
-						</div>
-						<div id="navGrid" class="toolButton">
-							<span class="asciiIcon" aria-hidden="true">[#]</span>
-							<kbd>Grid</kbd>
-						</div>
-					</div>
 				</nav>
 				<nav>
 					<button id="networkButton" class="hide" aria-label="Join Collab">
@@ -276,9 +263,6 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 				<div id="fonts" aria-label="Change Font">
 					<span class="asciiIcon" aria-hidden="true">FONT</span>
 				</div>
-				<div id="navView" aria-label="Viewport Options">
-					<span class="asciiIcon" aria-hidden="true">VIEW</span>
-				</div>
 			</aside>
 			<div id="paletteBar">
 				<div id="paletteSwatches" role="group" aria-label="Palette (left-click sets foreground, right-click sets background)"></div>
@@ -290,7 +274,6 @@ export const EDITOR_MARKUP = `		<div id="bodyContainer" class="loading">
 			<div id="viewport">
 				<div id="canvasContainer">
 					<div id="toolPreview" class="canvasOverlay"></div>
-					<div id="grid" class="canvasOverlay"></div>
 				</div>
 			</div>
 		</div>

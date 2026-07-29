@@ -432,103 +432,6 @@ const createToggleButton = (
 	};
 };
 
-const createGrid = el => {
-	let canvases = [];
-	let enabled = false;
-
-	const createCanvases = () => {
-		const fontWidth = State.font.getWidth();
-		const fontHeight = State.font.getHeight();
-		const columns = State.textArtCanvas.getColumns();
-		const rows = State.textArtCanvas.getRows();
-		const canvasWidth = fontWidth * columns;
-		const canvasHeight = fontHeight * 25;
-		canvases = [];
-		for (let i = 0; i < Math.floor(rows / 25); i++) {
-			const canvas = createCanvas(canvasWidth, canvasHeight);
-			canvases.push(canvas);
-		}
-		if (rows % 25 !== 0) {
-			const canvas = createCanvas(canvasWidth, fontHeight * (rows % 25));
-			canvases.push(canvas);
-		}
-	};
-
-	const renderGrid = canvas => {
-		const columns = State.textArtCanvas.getColumns();
-		const rows = Math.min(State.textArtCanvas.getRows(), 25);
-		const fontWidth = canvas.width / columns;
-		const fontHeight = State.font.getHeight();
-		const ctx = canvas.getContext('2d');
-		const imageData = ctx.createImageData(canvas.width, canvas.height);
-		const byteWidth = canvas.width * 4;
-		const darkGray = new Uint8Array([63, 63, 63, 255]);
-		for (let y = 0; y < rows; y += 1) {
-			for (
-				let x = 0, i = y * fontHeight * byteWidth;
-				x < canvas.width;
-				x += 1, i += 4
-			) {
-				imageData.data.set(darkGray, i);
-			}
-		}
-		for (let x = 0; x < columns; x += 1) {
-			for (
-				let y = 0, i = x * fontWidth * 4;
-				y < canvas.height;
-				y += 1, i += byteWidth
-			) {
-				imageData.data.set(darkGray, i);
-			}
-		}
-		ctx.putImageData(imageData, 0, 0);
-	};
-
-	const createGrid = () => {
-		createCanvases();
-		renderGrid(canvases[0]);
-		el.appendChild(canvases[0]);
-		for (let i = 1; i < canvases.length; i++) {
-			canvases[i].getContext('2d').drawImage(canvases[0], 0, 0);
-			el.appendChild(canvases[i]);
-		}
-	};
-
-	const resize = () => {
-		canvases.forEach(canvas => {
-			el.removeChild(canvas);
-		});
-		createGrid();
-	};
-
-	createGrid();
-
-	document.addEventListener('onTextCanvasSizeChange', resize);
-	document.addEventListener('onLetterSpacingChange', resize);
-	document.addEventListener('onFontChange', resize);
-	document.addEventListener('onScaleFactorChange', resize);
-	document.addEventListener('onOpenedFile', resize);
-
-	const isShown = () => {
-		return enabled;
-	};
-
-	const show = turnOn => {
-		if (enabled && !turnOn) {
-			el.classList.remove('enabled');
-			enabled = false;
-		} else if (!enabled && turnOn) {
-			el.classList.add('enabled');
-			enabled = true;
-		}
-	};
-
-	return {
-		isShown: isShown,
-		show: show,
-	};
-};
-
 const createToolPreview = el => {
 	let canvases = [];
 	let ctxs = [];
@@ -626,20 +529,6 @@ const createGenericController = (panel, nav) => {
 	const disable = () => {
 		panel.style.display = 'none';
 		nav.classList.remove('enabledParent');
-	};
-	return {
-		enable: enable,
-		disable: disable,
-	};
-};
-
-const createViewportController = el => {
-	const panel = el;
-	const enable = () => {
-		panel.style.display = 'flex';
-	};
-	const disable = () => {
-		panel.style.display = 'none';
 	};
 	return {
 		enable: enable,
@@ -869,116 +758,6 @@ const createFontSelect = (el, lbl, img, btn) => {
 	};
 };
 
-const createZoomControl = () => {
-	const container = document.createElement('div');
-	container.className = 'zoomControl';
-	container.setAttribute('aria-label', 'Canvas Zoom Control');
-
-	const label = document.createElement('label');
-	label.textContent = 'Zoom';
-	label.htmlFor = 'zoomSlider';
-
-	const slider = document.createElement('input');
-	slider.type = 'range';
-	slider.id = 'zoomSlider';
-	slider.min = '0.5';
-	slider.max = '4';
-	slider.step = '0.5';
-	slider.value = '1';
-	slider.setAttribute('aria-valuemin', '0.5');
-	slider.setAttribute('aria-valuemax', '4');
-	slider.setAttribute('aria-valuenow', '1');
-	slider.setAttribute('aria-label', 'Canvas zoom level');
-
-	const display = document.createElement('span');
-	display.className = 'zoomDisplay';
-	display.textContent = '1.0x';
-	display.setAttribute('aria-live', 'polite');
-
-	const updateZoom = value => {
-		const scale = parseFloat(value);
-		display.textContent = `${scale.toFixed(1)}x`;
-		slider.setAttribute('aria-valuenow', value);
-
-		if (State.font && State.font.setScaleFactor) {
-			State.font.setScaleFactor(scale);
-		}
-	};
-
-	const updateSliderFromState = () => {
-		if (State.font && State.font.getScaleFactor) {
-			const currentScale = State.font.getScaleFactor();
-			slider.value = currentScale.toString();
-			display.textContent = `${currentScale.toFixed(1)}x`;
-			slider.setAttribute('aria-valuenow', currentScale.toString());
-		}
-	};
-
-	// Initialize from current font scale
-	State.waitFor('font', updateSliderFromState);
-
-	// Update slider UI when state is restored
-	document.addEventListener(
-		'onStateRestorationComplete',
-		updateSliderFromState,
-	);
-
-	// Event listeners
-	slider.addEventListener('input', e => {
-		// Update display during drag (preview)
-		const scale = parseFloat(e.target.value);
-		display.textContent = `${scale.toFixed(1)}x`;
-	});
-
-	slider.addEventListener('change', e => {
-		// Apply zoom on release
-		updateZoom(e.target.value);
-		// Save immediately to state (don't wait for debounced save)
-		if (State.saveToLocalStorage) {
-			State.saveToLocalStorage();
-		}
-	});
-
-	// Keyboard shortcuts
-	const handleKeyboardZoom = e => {
-		if ((e.ctrlKey || e.metaKey) && e.key === '=') {
-			// Ctrl/Cmd + Plus: Zoom in
-			e.preventDefault();
-			const currentValue = parseFloat(slider.value);
-			const newValue = Math.min(4, currentValue + 0.5);
-			slider.value = newValue.toString();
-			updateZoom(newValue.toString());
-			if (State.saveToLocalStorage) {
-				State.saveToLocalStorage();
-			}
-		} else if ((e.ctrlKey || e.metaKey) && e.key === '-') {
-			// Ctrl/Cmd + Minus: Zoom out
-			e.preventDefault();
-			const currentValue = parseFloat(slider.value);
-			const newValue = Math.max(0.5, currentValue - 0.5);
-			slider.value = newValue.toString();
-			updateZoom(newValue.toString());
-			if (State.saveToLocalStorage) {
-				State.saveToLocalStorage();
-			}
-		} else if ((e.ctrlKey || e.metaKey) && e.key === '0') {
-			// Ctrl/Cmd + 0: Reset to 1x
-			e.preventDefault();
-			slider.value = '1';
-			updateZoom('1');
-			if (State.saveToLocalStorage) {
-				State.saveToLocalStorage();
-			}
-		}
-	};
-
-	document.addEventListener('keydown', handleKeyboardZoom);
-	container.appendChild(label);
-	container.appendChild(display);
-	container.appendChild(slider);
-	return container;
-};
-
 const websocketUI = show => {
 	[
 		['excludedForWebsocket', !show],
@@ -1003,17 +782,14 @@ export {
 	createPositionInfo,
 	undoAndRedo,
 	viewportTap,
-	createViewportController,
 	createGenericController,
 	createPaintShortcuts,
 	createToggleButton,
-	createGrid,
 	createToolPreview,
 	enforceMaxBytes,
 	createResolutionController,
 	createDragDropController,
 	createMenuController,
 	createFontSelect,
-	createZoomControl,
 	websocketUI,
 };
