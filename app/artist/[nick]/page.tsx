@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import { countrySlug } from "@/lib/countrySlug";
 import { readFileSync, existsSync } from "fs";
 import path from "path";
@@ -195,7 +196,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
           ? memberships.map((m, i) => (
               <span key={m.id}>
                 {i > 0 && ", "}
-                <Link href={`/crew/${urlsafe(m.crew ?? "")}`}>{m.crew}</Link>
+                <ContentLink href={`/crew/${urlsafe(m.crew ?? "")}`}>{m.crew}</ContentLink>
               </span>
             ))
           : "-"}
@@ -211,7 +212,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
       {artist.country && (
         <div className="col-lg-12 pl-0">
           <span className="lightgrey">Country: </span>
-          <Link href={`/country/${countrySlug(artist.country)}`}>{artist.country}</Link>
+          <ContentLink href={`/country/${countrySlug(artist.country)}`}>{artist.country}</ContentLink>
         </div>
       )}
       <div className="col-lg-12 pl-0">
@@ -221,7 +222,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
       {artist.users && (
         <div className="col-lg-12 pl-0">
           <span className="lightgrey">Site profile: </span>
-          <Link href={`/member/${artist.users.nickurl}`}>{artist.users.nick}</Link>
+          <ContentLink href={`/member/${artist.users.nickurl}`}>{artist.users.nick}</ContentLink>
         </div>
       )}
       {artist.users?.joined && (
@@ -236,7 +237,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
           {otherHandles.map((h, i) => (
             <span key={h.artisturl}>
               {i > 0 && ", "}
-              <Link href={`/artist/${h.artisturl}`}>{h.nick}</Link>
+              <ContentLink href={`/artist/${h.artisturl}`}>{h.nick}</ContentLink>
             </span>
           ))}
         </div>
@@ -293,18 +294,18 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
                 <div className="col-lg-4 apb-1">
                   <div>
                     <span className="white">Artist: </span>
-                    <Link className="green" href={`/artist/${artist.artisturl}`}>{artist.nick}</Link>
+                    <ContentLink className="green" href={`/artist/${artist.artisturl}`}>{artist.nick}</ContentLink>
                   </div>
                   {latestRelease.crew && latestRelease.crewurl && (
                     <div>
                       <span className="white">Crew: </span>
-                      <Link href={`/crew/${latestRelease.crewurl}`}>{latestRelease.crew}</Link>
+                      <ContentLink href={`/crew/${latestRelease.crewurl}`}>{latestRelease.crew}</ContentLink>
                     </div>
                   )}
                   <div><span className="white">Name: </span>{latestRelease.name ?? "-"}</div>
                   <div>
                     <span className="white">Filename: </span>
-                    <Link className="magenta" href={`/release/${latestRelease.filename}`}>{latestRelease.filename}</Link>
+                    <ContentLink className="magenta" href={`/release/${latestRelease.filename}`}>{latestRelease.filename}</ContentLink>
                   </div>
                   <div><span className="white">Size: </span>{latestRelease.filesize != null ? formatBytes(Number(latestRelease.filesize)) : "-"}</div>
                   {lrShowDate && (
@@ -314,7 +315,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
                   {latestRelease.uploader && (
                     <div>
                       <span className="white">Added by: </span>
-                      <Link href={`/member/${urlsafe(latestRelease.uploader)}`}>{latestRelease.uploader}</Link>
+                      <ContentLink href={`/member/${urlsafe(latestRelease.uploader)}`}>{latestRelease.uploader}</ContentLink>
                     </div>
                   )}
                   <div><span className="white">Viewed: </span>{latestRelease.view_counter ?? 0} times</div>

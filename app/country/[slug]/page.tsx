@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import SiteLayout from "@/components/layout/SiteLayout";
@@ -59,9 +60,9 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
         {artists.length === 0 && <div className="lightgrey">No artists recorded from {name}.</div>}
         {artists.map(a => (
           <div key={a.artisturl} className="col-lg-12 p-0 d-flex" style={row}>
-            <Link href={`/artist/${a.artisturl}`} className="magenta" style={{ minWidth: "240px", fontFamily: "TopazPlus_a1200, monospace" }}>
+            <ContentLink href={`/artist/${a.artisturl}`} className="magenta" style={{ minWidth: "240px", fontFamily: "TopazPlus_a1200, monospace" }}>
               {a.nick}
-            </Link>
+            </ContentLink>
             <span className="lightgrey" style={{ minWidth: "144px" }}>{Number(a.collys)} collys</span>
             <span className="lightgrey" style={{ minWidth: "144px" }}>{a.active || ""}</span>
           </div>
@@ -96,9 +97,9 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
           </div>
           {members.map(m => (
             <div key={m.nick} className="col-lg-12 p-0 d-flex" style={row}>
-              <Link href={`/member/${urlsafe(m.nick)}`} className="magenta" style={{ fontFamily: "TopazPlus_a1200, monospace" }}>
+              <ContentLink href={`/member/${urlsafe(m.nick)}`} className="magenta" style={{ fontFamily: "TopazPlus_a1200, monospace" }}>
                 {m.nick}
-              </Link>
+              </ContentLink>
             </div>
           ))}
         </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import DosSelect from "@/components/ui/DosSelect";
 // Single source of truth for the rank ladder, shared with the forum's gates.
 import { RANKS } from "@/lib/accountRules";
@@ -113,7 +114,7 @@ export default function UsersClient() {
               return (
                 <div key={u.id} className="row amb-1 align-items-center">
                   <div className="col-3 text-truncate">
-                    <Link className="magenta" href={`/member/${u.nickurl}`}>{u.nick}</Link>
+                    <ContentLink className="magenta" href={`/member/${u.nickurl}`}>{u.nick}</ContentLink>
                   </div>
                   <div className="col-2">
                     <DosSelect

@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import { urlsafe } from "@/lib/utils";
 import SortHeader from "@/components/ui/SortHeader";
 import NewItemsPill from "@/components/ui/NewItemsPill";
@@ -238,12 +239,12 @@ export default function CollysClient({ initialSort, initialOrder }: CollysClient
                 </div>
                 <div className="col green text-truncate">
                   {(colly.artists ?? "").split(",").filter(Boolean).map((a, i) => (
-                    <span key={a}>{i > 0 && ","}<Link className="yellow" href={`/artist/${urlsafe(a.trim())}`}>{a.trim()}</Link></span>
+                    <span key={a}>{i > 0 && ","}<ContentLink className="yellow" href={`/artist/${urlsafe(a.trim())}`}>{a.trim()}</ContentLink></span>
                   ))}
                 </div>
                 <div className="col green text-truncate">
                   {(colly.crews ?? "").split(",").filter(Boolean).map((c, i) => (
-                    <span key={c}>{i > 0 && ","}<Link className="yellow" href={`/crew/${urlsafe(c.trim())}`}>{c.trim()}</Link></span>
+                    <span key={c}>{i > 0 && ","}<ContentLink className="yellow" href={`/crew/${urlsafe(c.trim())}`}>{c.trim()}</ContentLink></span>
                   ))}
                 </div>
                 <div className="col text-truncate d-none d-md-block">{colly.cdate}</div>

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import { countrySlug } from "@/lib/countrySlug";
 import NewItemsPill from "@/components/ui/NewItemsPill";
 import SortHeader from "@/components/ui/SortHeader";
@@ -130,7 +131,7 @@ export default function BBSClient({ initialSort, initialOrder }: BBSClientProps)
               <div className="col-3">{bbs.sysop}</div>
               <div className="col-3 lightgrey">
                 {bbs.country
-                  ? <Link href={`/country/${countrySlug(bbs.country)}`} className="lightgrey">{bbs.country}</Link>
+                  ? <ContentLink href={`/country/${countrySlug(bbs.country)}`} className="lightgrey">{bbs.country}</ContentLink>
                   : "-"}
               </div>
               <div className="col-2 lightgrey">{bbs.online ? "Yes" : "No"}</div>

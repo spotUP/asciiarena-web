@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import {
   computeSortHeaders,
   type SortColumn,
@@ -105,18 +105,18 @@ export default function ArtistReleases({
           className="col-lg-12 d-flex justify-content-between pl-0"
         >
           <div className="col-lg-3 pl-0">
-            <Link className="magenta" href={`/release/${r.filename}`}>
+            <ContentLink className="magenta" href={`/release/${r.filename}`}>
               {r.filename.slice(0, 12)}
-            </Link>
+            </ContentLink>
           </div>
           <div className="col-lg-3 pl-0">
-            <Link className="magenta" href={`/release/${r.filename}`}>
+            <ContentLink className="magenta" href={`/release/${r.filename}`}>
               {r.name?.slice(0, 35) ?? r.filename}
-            </Link>
+            </ContentLink>
           </div>
           <div className="col-lg-3 pl-0">
             {r.crew && r.crewurl ? (
-              <Link href={`/crew/${r.crewurl}`}>{r.crew}</Link>
+              <ContentLink href={`/crew/${r.crewurl}`}>{r.crew}</ContentLink>
             ) : (
               r.crew ?? "-"
             )}

@@ -1,6 +1,6 @@
 import SiteLayout from "@/components/layout/SiteLayout";
 import SearchForm from "@/components/layout/SearchForm";
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import { prisma } from "@/lib/db";
 import { searchLogos } from "@/lib/collyLogoSearch";
 import { searchCollyContent } from "@/lib/collyContentSearch";
@@ -92,7 +92,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           {collys.map((c) => (
             <div key={c.filename} className="row amb-1">
               <div className="col-12">
-                <Link className="magenta" href={`/release/${c.filename}`}>{c.name ?? c.filename}</Link>
+                <ContentLink className="magenta" href={`/release/${c.filename}`}>{c.name ?? c.filename}</ContentLink>
                 <span className="lightgrey apl-1">{c.filename}</span>
               </div>
             </div>
@@ -106,7 +106,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           {contentHits.map((h) => (
             <div key={h.filename} className="row amb-1">
               <div className="col-12">
-                <Link className="magenta" href={`/release/${h.filename}`}>{h.name ?? h.filename}</Link>
+                <ContentLink className="magenta" href={`/release/${h.filename}`}>{h.name ?? h.filename}</ContentLink>
                 {h.snippet && <div className="lightgrey" style={{ fontSize: "0.85em" }}>{h.snippet}</div>}
               </div>
             </div>
@@ -120,7 +120,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           {logoHits.map((h) => (
             <div key={h.filename} className="row amb-1">
               <div className="col-12">
-                <Link className="magenta" href={`/release/${h.filename}#logo-${h.start_line}`}>{h.name ?? h.filename}</Link>
+                <ContentLink className="magenta" href={`/release/${h.filename}#logo-${h.start_line}`}>{h.name ?? h.filename}</ContentLink>
                 {h.labels.length > 0 && (
                   <div className="lightgrey" style={{ fontSize: "0.85em" }}>{h.labels.join("  ·  ")}</div>
                 )}
@@ -135,7 +135,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           <h2 className="bg-header ap-1 amb-1 apt-1">Artists</h2>
           {artists.map((a) => (
             <div key={a.artisturl} className="row amb-1">
-              <div className="col-12"><Link className="magenta" href={`/artist/${a.artisturl}`}>{a.nick}</Link></div>
+              <div className="col-12"><ContentLink className="magenta" href={`/artist/${a.artisturl}`}>{a.nick}</ContentLink></div>
             </div>
           ))}
         </>
@@ -146,7 +146,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           <h2 className="bg-header ap-1 amb-1 apt-1">Crews</h2>
           {crews.map((c) => (
             <div key={c.crewurl} className="row amb-1">
-              <div className="col-12"><Link className="magenta" href={`/crew/${c.crewurl}`}>{c.name}</Link></div>
+              <div className="col-12"><ContentLink className="magenta" href={`/crew/${c.crewurl}`}>{c.name}</ContentLink></div>
             </div>
           ))}
         </>
@@ -157,7 +157,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           <h2 className="bg-header ap-1 amb-1 apt-1">Members</h2>
           {members.map((m) => (
             <div key={m.nickurl} className="row amb-1">
-              <div className="col-12"><Link className="magenta" href={`/member/${m.nickurl}`}>{m.nick}</Link></div>
+              <div className="col-12"><ContentLink className="magenta" href={`/member/${m.nickurl}`}>{m.nick}</ContentLink></div>
             </div>
           ))}
         </>

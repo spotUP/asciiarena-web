@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import { COUNTRIES } from "@/lib/countries";
 import { ACTIVE_STATUSES, normalizeActiveStatus } from "@/lib/activeStatus";
 
@@ -248,7 +248,7 @@ export default function ArtistsClient() {
                   <div className="col-3" style={{ display: "flex", gap: "8px" }}>
                     <input type="button" className="btn-big" value="Save" onClick={() => save(a)} />
                     <input type="button" className="btn-big" value="Delete" style={{ color: "#ff5555" }} onClick={() => del(a.id)} />
-                    <Link className="magenta" href={`/artist/${a.artisturl}`} style={{ lineHeight: "16px" }}>Profile</Link>
+                    <ContentLink className="magenta" href={`/artist/${a.artisturl}`} style={{ lineHeight: "16px" }}>Profile</ContentLink>
                   </div>
                   <div className="col-12 amt-1" style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
                     <span className="lightgrey">CREWS</span>

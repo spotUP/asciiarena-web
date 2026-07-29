@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 
 interface BrokenColly {
   id: number;
@@ -57,7 +57,7 @@ export default function BrokenCollysClient() {
             {broken.map(c => (
               <div key={c.id} className="row amb-1 align-items-center">
                 <div className="col-4 text-truncate">
-                  <Link className="magenta" href={`/release/${c.filename}`}>{c.filename}</Link>
+                  <ContentLink className="magenta" href={`/release/${c.filename}`}>{c.filename}</ContentLink>
                 </div>
                 <div className="col-4 lightgrey text-truncate">{c.broken_comment ?? ""}</div>
                 <div className="col-4" style={{ display: "flex", gap: "8px" }}>

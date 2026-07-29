@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/generated/prisma/client";
@@ -47,7 +48,7 @@ export default async function TimelinePage({ searchParams }: { searchParams: Pro
               <span className="lightgrey" style={{ display: "inline-block", width: "64px" }}>
                 {c.month ? MONTHS[c.month] : ""}{c.day ? ` ${c.day}` : ""}
               </span>
-              <Link className="magenta" href={`/release/${c.filename}`}>{c.name ?? c.filename}</Link>
+              <ContentLink className="magenta" href={`/release/${c.filename}`}>{c.name ?? c.filename}</ContentLink>
               <span className="lightgrey apl-1">{c.filename}</span>
             </div>
           </div>

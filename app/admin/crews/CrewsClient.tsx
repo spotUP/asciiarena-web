@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import { ACTIVE_STATUSES, normalizeActiveStatus } from "@/lib/activeStatus";
 
 interface Crew {
@@ -142,7 +142,7 @@ export default function CrewsClient() {
               return (
                 <div key={c.id} className="row amb-1 align-items-center">
                   <div className="col-2 text-truncate">
-                    <Link className="magenta" href={`/crew/${c.crewurl}`}>{c.name}</Link>
+                    <ContentLink className="magenta" href={`/crew/${c.crewurl}`}>{c.name}</ContentLink>
                   </div>
                   <div className="col-2">
                     <input type="text" className="form-control w-100" value={e.name ?? c.name} onChange={ev => edit(c.id, "name", ev.target.value)} />

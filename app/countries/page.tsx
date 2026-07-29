@@ -1,4 +1,4 @@
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import { prisma } from "@/lib/db";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { countrySlug, displayCountryName } from "@/lib/countrySlug";
@@ -49,9 +49,9 @@ export default async function CountriesPage() {
             className="col-lg-12 p-0 d-flex"
             style={{ gap: "16px", height: "16px", lineHeight: "16px", marginBottom: "8px" }}
           >
-            <Link href={`/country/${c.slug}`} className="magenta" style={{ minWidth: "320px", fontFamily: "TopazPlus_a1200, monospace" }}>
+            <ContentLink href={`/country/${c.slug}`} className="magenta" style={{ minWidth: "320px", fontFamily: "TopazPlus_a1200, monospace" }}>
               {c.name}
-            </Link>
+            </ContentLink>
             <span className="lightgrey" style={{ minWidth: "96px" }}>
               {c.artists} artist{c.artists === 1 ? "" : "s"}
             </span>

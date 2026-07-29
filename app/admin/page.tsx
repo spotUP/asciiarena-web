@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/generated/prisma/client";
 import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
 import LegacyHashRedirect from "./LegacyHashRedirect";
 
@@ -85,9 +86,9 @@ export default async function AdminDashboard() {
       <div className="container-fluid bg-secondary apb-1 ap-1">
         {stats.recentUploads.map((r, i) => (
           <div key={i} className="col-lg-12 p-0 d-flex" style={{ gap: "16px", height: "16px", lineHeight: "16px" }}>
-            <Link className="magenta" href={`/release/${r.filename}`} style={{ minWidth: "240px", fontFamily: "TopazPlus_a1200, monospace" }}>
+            <ContentLink className="magenta" href={`/release/${r.filename}`} style={{ minWidth: "240px", fontFamily: "TopazPlus_a1200, monospace" }}>
               {r.filename}
-            </Link>
+            </ContentLink>
             <span className="lightgrey" style={{ flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
               {r.name ?? "-"}
             </span>

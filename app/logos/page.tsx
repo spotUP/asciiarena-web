@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { logoOfTheDay, galleryLogos, type GalleryLogo } from "@/lib/collyLogoGallery";
 
@@ -29,7 +30,7 @@ function Snippet({ logo, height }: { logo: GalleryLogo; height: number }) {
     background: "#0a0a0a",
   };
   return (
-    <Link href={`/release/${logo.filename}#logo-${logo.line}`} style={{ display: "block", textDecoration: "none" }}>
+    <ContentLink href={`/release/${logo.filename}#logo-${logo.line}`} style={{ display: "block", textDecoration: "none" }}>
       <div style={artStyle}>
         <pre
           style={{
@@ -44,7 +45,7 @@ function Snippet({ logo, height }: { logo: GalleryLogo; height: number }) {
           {logo.snippet.join("\n")}
         </pre>
       </div>
-    </Link>
+    </ContentLink>
   );
 }
 
@@ -59,7 +60,7 @@ function Caption({ logo }: { logo: GalleryLogo }) {
         </>
       )}
       {" — "}
-      <Link className="magenta" href={`/release/${logo.filename}#logo-${logo.line}`}>{logo.collyName ?? logo.filename}</Link>
+      <ContentLink className="magenta" href={`/release/${logo.filename}#logo-${logo.line}`}>{logo.collyName ?? logo.filename}</ContentLink>
     </div>
   );
 }

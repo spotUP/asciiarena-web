@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import DosSelect from "@/components/ui/DosSelect";
 
 interface InactiveUser {
@@ -126,7 +126,7 @@ export default function InactiveClient() {
                   <input type="checkbox" checked={selected.has(u.id)} onChange={() => toggle(u.id)} />
                 </div>
                 <div className="col-2 text-truncate">
-                  <Link className="magenta" href={`/member/${u.nickurl}`}>{u.nick}</Link>
+                  <ContentLink className="magenta" href={`/member/${u.nickurl}`}>{u.nick}</ContentLink>
                 </div>
                 <div className="col-1 lightgrey">{u.rank ?? ""}</div>
                 <div className="col-2 lightgrey">{u.joined ?? "-"}</div>

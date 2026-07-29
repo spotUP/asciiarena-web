@@ -1,4 +1,4 @@
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import { countrySlug } from "@/lib/countrySlug";
 import type { Metadata } from "next";
 import SiteLayout from "@/components/layout/SiteLayout";
@@ -193,7 +193,7 @@ export default async function MemberPage({
             {member.country && (
               <div className="col-sm-8">
                 <span className="white">Country: </span>
-                <Link className="yellow" href={`/country/${countrySlug(member.country)}`}>{member.country}</Link>
+                <ContentLink className="yellow" href={`/country/${countrySlug(member.country)}`}>{member.country}</ContentLink>
               </div>
             )}
           </div>
@@ -213,7 +213,7 @@ export default async function MemberPage({
               {artists.map((a, i) => (
                 <span key={a.id}>
                   {i > 0 && ", "}
-                  <Link className="magenta" href={`/artist/${a.artisturl}`}>{a.nick}</Link>
+                  <ContentLink className="magenta" href={`/artist/${a.artisturl}`}>{a.nick}</ContentLink>
                 </span>
               ))}
             </div>
@@ -229,7 +229,7 @@ export default async function MemberPage({
                   <span key={crewName}>
                     {i > 0 && ", "}
                     {m.crewurl
-                      ? <Link href={`/crew/${m.crewurl}`}>{crewName}</Link>
+                      ? <ContentLink href={`/crew/${m.crewurl}`}>{crewName}</ContentLink>
                       : <span>{crewName}</span>}
                   </span>
                 );
@@ -273,9 +273,9 @@ export default async function MemberPage({
               <div key={i} className="row">
                 <div className="col-sm-10 amb-1 cyan">{c.comment}</div>
                 <div className="col-sm-2 amb-1 text-truncate">
-                  <Link className="magenta" href={`/release/${c.filename}`}>
+                  <ContentLink className="magenta" href={`/release/${c.filename}`}>
                     {c.filename}
-                  </Link>
+                  </ContentLink>
                 </div>
               </div>
             ))}
@@ -303,9 +303,9 @@ export default async function MemberPage({
             {collys.map((c, i) => (
               <div key={i} className="row">
                 <div className="col-12 col-sm-4 text-truncate">
-                  <Link className="magenta" href={`/release/${c.filename}`}>
+                  <ContentLink className="magenta" href={`/release/${c.filename}`}>
                     {c.name}
-                  </Link>
+                  </ContentLink>
                 </div>
                 <div className="col-12 d-block d-sm-none text-truncate apb-1">
                   by {c.artists ?? "-"} of {c.crews ?? "-"}
@@ -342,9 +342,9 @@ export default async function MemberPage({
             {faves.map((f, i) => (
               <div key={i} className="row amb-1">
                 <div className={`col-12 ${isOwnProfile ? "col-sm-3" : "col-sm-4"}`}>
-                  <Link className="magenta" href={`/release/${f.filename}`}>
+                  <ContentLink className="magenta" href={`/release/${f.filename}`}>
                     {f.name}
-                  </Link>
+                  </ContentLink>
                 </div>
                 <div className="col-sm-4 d-none d-sm-block">{f.artists ?? "-"}</div>
                 <div className="col-sm-4 d-none d-sm-block">{f.crews ?? "-"}</div>

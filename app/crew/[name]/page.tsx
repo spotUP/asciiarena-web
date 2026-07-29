@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { urlsafe, decodeParam } from "@/lib/utils";
@@ -180,10 +181,10 @@ export default async function CrewPage({ params }: PageProps) {
         members.map((m) => (
           <div key={m.id} className="col-lg-12 pl-0 d-flex" style={{ gap: "12px" }}>
             {m.artisturl
-              ? <Link href={`/artist/${m.artisturl}`}>{m.nick}</Link>
+              ? <ContentLink href={`/artist/${m.artisturl}`}>{m.nick}</ContentLink>
               : <span>{m.nick}</span>}
             {m.user_nickurl && (
-              <Link className="lightgrey" href={`/member/${m.user_nickurl}`}>[profile]</Link>
+              <ContentLink className="lightgrey" href={`/member/${m.user_nickurl}`}>[profile]</ContentLink>
             )}
           </div>
         ))
@@ -218,9 +219,9 @@ export default async function CrewPage({ params }: PageProps) {
         releases.map((r) => (
           <div key={r.colly_id} className="col-lg-12 d-flex justify-content-between pl-0">
             <div className="col-lg-6 pl-0">
-              <Link className="magenta" href={`/release/${r.filename}`}>
+              <ContentLink className="magenta" href={`/release/${r.filename}`}>
                 {r.filename}
-              </Link>
+              </ContentLink>
             </div>
             <div className="col-lg-3 pl-0 lightgrey">
               {r.name?.slice(0, 40) ?? ""}

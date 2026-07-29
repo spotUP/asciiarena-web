@@ -3,7 +3,7 @@ import path from "path";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { encodeReleaseText, releaseTextEncoding, releaseViewerType, stripFileIdDiz, convertAnsiCodes, hasAnsiCodes, looksLikeCp437Art } from "@/lib/releaseText";
@@ -311,7 +311,7 @@ export default async function ReleasePage({ params }: PageProps) {
                 ? artists.map((a, i) => (
                   <span key={a?.id ?? i}>
                     {i > 0 && " & "}
-                    <Link className="green" href={`/artist/${a?.artisturl ?? ""}`}>{a?.nick}</Link>
+                    <ContentLink className="green" href={`/artist/${a?.artisturl ?? ""}`}>{a?.nick}</ContentLink>
                   </span>
                 ))
                 : "-"}
@@ -322,7 +322,7 @@ export default async function ReleasePage({ params }: PageProps) {
                 {crews.map((c, i) => (
                   <span key={c?.id ?? i}>
                     {i > 0 && " & "}
-                    <Link href={`/crew/${urlsafe(c?.name ?? "")}`}>{c?.name}</Link>
+                    <ContentLink href={`/crew/${urlsafe(c?.name ?? "")}`}>{c?.name}</ContentLink>
                   </span>
                 ))}
               </div>
@@ -333,7 +333,7 @@ export default async function ReleasePage({ params }: PageProps) {
               <div><span className="white">Released: </span>{[day, month, year].filter(Boolean).join(" ")}</div>
             )}
             <div><span className="white">Rating: </span>{ratingDisplay}</div>
-            <div><span className="white">Added by: </span><Link href={`/member/${urlsafe(colly.uploader ?? "")}`}>{colly.uploader}</Link></div>
+            <div><span className="white">Added by: </span><ContentLink href={`/member/${urlsafe(colly.uploader ?? "")}`}>{colly.uploader}</ContentLink></div>
             <div><span className="white">Viewed: </span>{colly.view_counter ?? 0} times</div>
             <div><span className="white">Downloaded: </span>{downloads} Time{downloads !== 1 ? "s" : ""}</div>
           </div>
@@ -355,9 +355,9 @@ export default async function ReleasePage({ params }: PageProps) {
               <div className="row">
                 {moreByArtist.map(r => (
                   <div key={r.colly_id} className="col-12 col-sm-6 col-md-4 text-truncate apl-1 apb-1">
-                    <Link className="magenta" href={`/release/${r.collys?.filename}`}>
+                    <ContentLink className="magenta" href={`/release/${r.collys?.filename}`}>
                       {r.collys?.name ?? r.collys?.filename}
-                    </Link>
+                    </ContentLink>
                   </div>
                 ))}
               </div>
@@ -378,9 +378,9 @@ export default async function ReleasePage({ params }: PageProps) {
               <div className="row">
                 {moreFromCrew.map(r => (
                   <div key={r.colly_id} className="col-12 col-sm-6 col-md-4 text-truncate apl-1 apb-1">
-                    <Link className="magenta" href={`/release/${r.collys?.filename}`}>
+                    <ContentLink className="magenta" href={`/release/${r.collys?.filename}`}>
                       {r.collys?.name ?? r.collys?.filename}
-                    </Link>
+                    </ContentLink>
                   </div>
                 ))}
               </div>

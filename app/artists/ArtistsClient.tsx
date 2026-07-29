@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import { countrySlug } from "@/lib/countrySlug";
 import { urlsafe } from "@/lib/utils";
 import SortHeader from "@/components/ui/SortHeader";
@@ -146,13 +147,13 @@ export default function ArtistsClient({ initialSort, initialOrder }: ArtistsClie
               </div>
               <div className="artist_crew col-6">
                 {(artist.crews ?? "").split(",").filter(Boolean).map((crew, i) => (
-                  <span key={crew}>{i > 0 && ", "}<Link href={`/crew/${urlsafe(crew.trim())}`}>{crew.trim()}</Link></span>
+                  <span key={crew}>{i > 0 && ", "}<ContentLink href={`/crew/${urlsafe(crew.trim())}`}>{crew.trim()}</ContentLink></span>
                 ))}
               </div>
               <div className="col-2 lightgrey">{artist.rating != null ? artist.rating.toFixed(1) : "-"}</div>
               <div className="col-2 lightgrey">
                 {artist.country
-                  ? <Link href={`/country/${countrySlug(artist.country)}`} className="lightgrey">{artist.country}</Link>
+                  ? <ContentLink href={`/country/${countrySlug(artist.country)}`} className="lightgrey">{artist.country}</ContentLink>
                   : "-"}
               </div>
             </div>

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { countrySlug } from "@/lib/countrySlug";
@@ -73,7 +73,7 @@ export default async function BbsPage({ params }: PageProps) {
       {bbs.country && (
         <div className="col-lg-12 pl-0">
           <span className="lightgrey">Country: </span>
-          <Link href={`/country/${countrySlug(bbs.country)}`}>{bbs.country}</Link>
+          <ContentLink href={`/country/${countrySlug(bbs.country)}`}>{bbs.country}</ContentLink>
         </div>
       )}
       {bbs.software && (

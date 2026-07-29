@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { urlsafe, formatBytes } from "@/lib/utils";
@@ -170,7 +171,7 @@ export default async function StatsPage({
             {artists.map(row => (
               <Row
                 key={row.id}
-                left={<Link className="green text-truncate" href={`/artist/${row.artisturl}`}>{row.nick}</Link>}
+                left={<ContentLink className="green text-truncate" href={`/artist/${row.artisturl}`}>{row.nick}</ContentLink>}
                 right={`${Number(row.rating ?? 0).toFixed(1)} PTS`}
               />
             ))}
@@ -181,7 +182,7 @@ export default async function StatsPage({
             {crews.map(row => (
               <Row
                 key={row.id}
-                left={<Link className="text-truncate" href={`/crew/${urlsafe(row.name ?? "")}/`}>{row.name}</Link>}
+                left={<ContentLink className="text-truncate" href={`/crew/${urlsafe(row.name ?? "")}/`}>{row.name}</ContentLink>}
                 right={`${Number(row.rating ?? 0).toFixed(1)} PTS`}
               />
             ))}
@@ -196,7 +197,7 @@ export default async function StatsPage({
               {drawnArtists.map(row => (
                 <Row
                   key={row.id}
-                  left={<Link className="green text-truncate" href={`/artist/${row.url}`}>{row.name}</Link>}
+                  left={<ContentLink className="green text-truncate" href={`/artist/${row.url}`}>{row.name}</ContentLink>}
                   right={`${row.logos} logos / ${row.collys} collys`}
                 />
               ))}
@@ -207,7 +208,7 @@ export default async function StatsPage({
               {drawnCrews.map(row => (
                 <Row
                   key={row.id}
-                  left={<Link className="text-truncate" href={`/crew/${urlsafe(row.name)}`}>{row.name}</Link>}
+                  left={<ContentLink className="text-truncate" href={`/crew/${urlsafe(row.name)}`}>{row.name}</ContentLink>}
                   right={`${row.logos} logos / ${row.collys} collys`}
                 />
               ))}
@@ -240,7 +241,7 @@ export default async function StatsPage({
             {collys.map(row => (
               <Row
                 key={row.filename}
-                left={<Link className="magenta text-truncate" href={`/release/${row.filename}`}>{row.filename}</Link>}
+                left={<ContentLink className="magenta text-truncate" href={`/release/${row.filename}`}>{row.filename}</ContentLink>}
                 right={`${Number(row.rating).toFixed(1)} PTS`}
               />
             ))}
@@ -251,7 +252,7 @@ export default async function StatsPage({
             {viewed.map(row => (
               <Row
                 key={row.id}
-                left={<Link className="magenta text-truncate" href={`/release/${row.filename ?? ""}`}>{row.filename}</Link>}
+                left={<ContentLink className="magenta text-truncate" href={`/release/${row.filename ?? ""}`}>{row.filename}</ContentLink>}
                 right={row.view_counter}
               />
             ))}
@@ -265,7 +266,7 @@ export default async function StatsPage({
             {downloaded.map(row => (
               <Row
                 key={row.id}
-                left={<Link className="magenta text-truncate" href={`/release/${row.filename ?? ""}`}>{row.filename}</Link>}
+                left={<ContentLink className="magenta text-truncate" href={`/release/${row.filename ?? ""}`}>{row.filename}</ContentLink>}
                 right={row.downloads}
               />
             ))}
@@ -276,7 +277,7 @@ export default async function StatsPage({
             {uploaders.map(row => (
               <Row
                 key={row.id}
-                left={<Link className="text-truncate" href={`/member/${urlsafe(row.nick ?? "")}`}>{row.nick}</Link>}
+                left={<ContentLink className="text-truncate" href={`/member/${urlsafe(row.nick ?? "")}`}>{row.nick}</ContentLink>}
                 right={formatBytes(row.uploaded ?? 0)}
               />
             ))}
@@ -290,7 +291,7 @@ export default async function StatsPage({
             {commenters.map(row => (
               <Row
                 key={row.user_id}
-                left={<Link className="yellow text-truncate" href={`/member/${urlsafe(row.nick)}`}>{row.nick}</Link>}
+                left={<ContentLink className="yellow text-truncate" href={`/member/${urlsafe(row.nick)}`}>{row.nick}</ContentLink>}
                 right={row.count}
               />
             ))}

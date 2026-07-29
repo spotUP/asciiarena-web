@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState, useEffect, useMemo, useRef } from "react";
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import { useSearchParams } from "next/navigation";
 import { convertPcbColors, hasPcbCodes } from "@/lib/pcbColors";
 import { convertAnsiCodes, hasAnsiCodes, escapeHtmlText } from "@/lib/releaseText";
@@ -338,7 +338,7 @@ export default function CollysClient() {
             {results.map(c => (
               <div key={c.id} className="row amb-1 align-items-center">
                 <div className="col-3 text-truncate">
-                  <Link className="magenta" href={`/release/${c.filename}`}>{c.filename}</Link>
+                  <ContentLink className="magenta" href={`/release/${c.filename}`}>{c.filename}</ContentLink>
                 </div>
                 <div className="col-4 text-truncate lightgrey">{c.name ?? ""}</div>
                 <div className="col-2 lightgrey">

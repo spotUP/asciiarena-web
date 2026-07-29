@@ -1,4 +1,4 @@
-import Link from "next/link";
+import ContentLink from "@/components/ui/ContentLink";
 import type { CollyLogoHit } from "@/lib/collyLogoSearch";
 
 // Lists collys that contain a logo resolved to this entity (crew / artist /
@@ -21,7 +21,7 @@ export default function EntityLogosSection({
         {hits.map((h) => (
           <div key={h.filename} className="col-lg-12 p-0 pl-lg-2 pr-lg-2 amb-1">
             <div>
-              <Link className="magenta" href={`/release/${h.filename}#logo-${h.start_line}`}>{h.name ?? h.filename}</Link>
+              <ContentLink className="magenta" href={`/release/${h.filename}#logo-${h.start_line}`}>{h.name ?? h.filename}</ContentLink>
             </div>
             {h.labels.length > 0 && (
               <div className="lightgrey" style={{ fontSize: "0.85em" }}>{h.labels.join("  ·  ")}</div>
