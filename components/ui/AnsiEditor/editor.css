@@ -2882,3 +2882,212 @@
 .ansi-editor-root #bodyContainer > header > nav {
   gap: 8px;
 }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   asciiarena DIALOGS (2026-07-29). Three complaints, one root each.
+
+   1. OPENING A DIALOG SCROLLED THE PAGE TO THE TOP.
+      showModal() promotes the dialog to the TOP LAYER, and a top-layer
+      element's containing block is the INITIAL containing block -- not
+      .ansi-editor-root, whatever the re-anchoring rule further up says. So
+      `position:absolute; top:50%` resolved against the document, put the
+      dialog ~half a viewport from the document ORIGIN, and the browser
+      scrolled the page up to bring it into view. Measured: scrollY 917 -> 0.5
+      on open, with the editor 1224px down the page.
+      A modal wants viewport coordinates, so it is position:fixed here and
+      exempt from that rule. Menus, overlays and #dragdrop still re-anchor to
+      the editor box -- they are NOT in the top layer, so absolute is right
+      for them.
+
+   2. THEY ANIMATED. text0wnz fades and slides them over 0.7s, with
+      @starting-style for the entry. The site does not animate its panels.
+      Note the pairing: ui.js's close() waits 700ms before calling
+      modal.close() so the fade can finish. Killing the transition alone would
+      leave the dialog on screen, inert, for those 700ms -- so the wait is
+      gone too (createModalController in engine/ui.js).
+
+   3. THEY DID NOT LOOK LIKE THE SITE. Restyled to the terminal idiom: the
+      8x16 grid, square corners, #111 panel on a #444 header bar, TopazPlus at
+      16px/16px, magenta for the active control. No double borders, no radii,
+      no drop shadows.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+.ansi-editor-root dialog {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  /* No entry/exit animation, and no 1%-opacity resting state to fade from. */
+  transition: none !important;
+  opacity: 1 !important;
+  scale: none !important;
+
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 0 !important;
+  border: 2px solid #444444 !important;
+  border-radius: 0 !important;
+  background-color: #111111 !important;
+  color: #aaaaaa;
+  font-family: TopazPlus_a1200, TopazPlus, Monaco, Menlo, monospace;
+  font-size: 16px;
+  line-height: 16px;
+}
+
+/* .closing is the engine's fade-out hook. With no transition it must not make
+   the dialog invisible, or the box blinks out before close() runs. */
+.ansi-editor-root dialog.closing,
+.ansi-editor-root dialog.closing::backdrop {
+  opacity: 1 !important;
+  transition: none !important;
+}
+
+.ansi-editor-root dialog::backdrop {
+  background: rgba(0, 0, 0, 0.75) !important;
+  transition: none !important;
+  opacity: 1 !important;
+}
+
+/* Each modal is a <section> inside the one <dialog>. They come from text0wnz
+   as flex containers, which shrink-wraps the title bar to its text instead of
+   letting it span the dialog -- hence the explicit column + stretch. */
+.ansi-editor-root dialog > section {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  /* No padding on the section itself: the title bar is full-bleed and the rest
+     of the content is padded individually below. Negative margins cannot pull a
+     flex item out of its container's padding box, which is what a
+     -16px header margin tried and failed to do. */
+  padding: 0 0 16px 0;
+  min-width: 320px;
+}
+/* Everything except the title bar sits inside the 16px gutter. Padding, not
+   margin: these are stretched flex items, so side margins are added OUTSIDE
+   their full-width box and the dialog grows a horizontal scrollbar. */
+.ansi-editor-root dialog > section > *:not(header):not(h2) {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* Title bar: the site's bg-header strip, not a floating heading. */
+.ansi-editor-root dialog h2 {
+  display: block;
+  margin: 0 0 16px 0;
+  padding: 8px 16px;
+  background-color: #444444;
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 16px;
+  font-weight: normal;
+  /* One line on the 16px grid: a wrapped title overlaps itself at this
+     line-height. The dialog widens rather than the text stacking. */
+  white-space: nowrap;
+  /* site.css glows every h1-h3 on the page; a dialog title is chrome. */
+  animation: none !important;
+  text-shadow: none !important;
+}
+/* The dialog's own header, pulled out to the panel edges. `height: auto`
+   because the editor's chrome sets every <header> to --header-size (43px),
+   which is the editor's top strip, not a 16px-grid dialog title. */
+/* The dialog's own title bar, full-bleed. `height: auto` because the editor's
+   chrome sets every <header> to --header-size (43px), which is the editor's top
+   strip, not a 16px-grid dialog title. Some modals (Warning, Sauce) wrap the h2
+   in a <header>, others do not -- both are handled. */
+.ansi-editor-root dialog > section > header {
+  display: block;
+  height: auto;
+  min-height: 0;
+  margin: 0 0 16px 0;
+}
+.ansi-editor-root dialog > section > header h2,
+.ansi-editor-root dialog > section > h2 {
+  margin: 0 0 16px 0;
+}
+.ansi-editor-root dialog > section > header h2 {
+  margin-bottom: 0;
+}
+
+/* Footers come with their own panel tint upstream; here the dialog IS the
+   panel, so a second shade just looks like a seam. */
+.ansi-editor-root dialog > section > footer,
+.ansi-editor-root dialog > section > nav {
+  background-color: transparent !important;
+  border: 0 !important;
+}
+
+.ansi-editor-root dialog label {
+  display: block;
+  margin-bottom: 8px;
+  color: #aaaaaa;
+}
+
+.ansi-editor-root dialog input[type="text"],
+.ansi-editor-root dialog input[type="number"],
+.ansi-editor-root dialog textarea {
+  height: 32px;
+  padding: 0 8px;
+  border: 2px solid #444444 !important;
+  border-radius: 0 !important;
+  background-color: #212121;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 16px;
+}
+.ansi-editor-root dialog textarea {
+  height: auto;
+  padding: 8px;
+}
+
+/* Footer controls. site.css forces `white-space: pre` and a 48px min-height on
+   every button on the page, editor included -- pre renders the markup's own
+   indentation inside the label, which is what pushed the editor's header icons
+   out of their strip once already. Both are neutralised here. */
+.ansi-editor-root dialog button {
+  height: 48px;
+  min-height: 48px !important;
+  padding: 0 16px;
+  border: 2px solid #444444 !important;
+  border-radius: 0 !important;
+  background-color: #212121;
+  color: #aaaaaa !important;
+  white-space: normal;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 16px;
+  cursor: pointer;
+}
+.ansi-editor-root dialog button:hover {
+  border-color: #ff55ff !important;
+  color: #ff55ff !important;
+}
+
+.ansi-editor-root dialog > section > footer,
+.ansi-editor-root dialog > section > nav {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+/* The Keys dialog is a long reference list; it gets the panel background so the
+   rows read against it rather than floating on the dialog. */
+.ansi-editor-root #shortcutsBody {
+  background-color: #212121;
+  padding: 8px 0;
+}
+
+/* Shortcut chips came through as blue-on-white boxes from the upstream theme.
+   The site writes key names as plain yellow terminal text. */
+.ansi-editor-root dialog kbd {
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  color: #ffff55 !important;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 16px;
+}

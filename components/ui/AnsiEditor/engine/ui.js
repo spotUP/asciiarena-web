@@ -139,6 +139,11 @@ const createModalController = modal => {
 			cleanupHandler = null;
 		}
 		if (!queued()) {
+			// asciiarena: closes immediately. Upstream waited 700ms here for the
+			// fade-out transition to finish; that animation is gone (editor.css,
+			// "asciiarena DIALOGS"), so the wait only left a dead dialog on
+			// screen. The .closing class and the timeout handle are kept so
+			// open() can still cancel a close that is in flight.
 			classList(modal, 'closing');
 			closingTimeout = setTimeout(() => {
 				blur();
@@ -146,7 +151,7 @@ const createModalController = modal => {
 				modal.close();
 				current = false;
 				closingTimeout = null;
-			}, 700);
+			}, 0);
 		}
 	};
 

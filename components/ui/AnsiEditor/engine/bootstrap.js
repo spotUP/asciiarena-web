@@ -273,7 +273,10 @@ export function bootstrapEditor(rootEl, opts = {}) {
 		State.menus = createMenuController(
 			[
 				{ button: $('fileMenu'), menu: $('fileList') },
-				{ button: $('editMenu'), menu: $('editList') },
+				// asciiarena: #editList is NOT a menu here. mount.ts moves it into
+				// the Keys dialog, and the menu controller re-adds `hide` (which is
+				// display:none !important) on every close, so registering it left
+				// the dialog permanently empty -- 23 rows in the DOM, none visible.
 			],
 			canvasContainer,
 			viewport,
