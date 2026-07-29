@@ -12,6 +12,7 @@ import { encodeReleaseText } from "@/lib/releaseText";
 import { normalizeOrder } from "@/lib/sort-headers";
 import { activeStatusLabel } from "@/lib/activeStatus";
 import { type ReleaseSortKey } from "@/lib/release-sort";
+import { buildArtistReleasesQuery } from "@/lib/artistReleasesQuery";
 import ArtistReleases from "./ArtistReleases";
 import EntityLogosSection from "@/components/release/EntityLogosSection";
 import SceneLinksSection from "@/components/release/SceneLinksSection";
@@ -138,20 +139,7 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
   const [memberships, artistCollys, releasesRaw, otherHandles] = await Promise.all([
     prisma.member_of.findMany({ where: { nick: artist.nick } }),
     prisma.artists_collys.findMany({ where: { artist_id: artist.id }, select: { colly_id: true } }),
-    prisma.$queryRaw<ReleaseRow[]>`
-      SELECT ac.colly_id, c.filename, c.name, c.year, c.month, c.day,
-             c.filesize, c.uploader, c.view_counter, c.downloads, c.rating,
-             w.name AS crew, w.crewurl
-      FROM artists_collys ac
-      JOIN collys c ON c.id = ac.colly_id
-      LEFT JOIN collys_crews cc ON cc.colly_id = c.id AND cc.sortorder = (
-        SELECT MIN(sortorder) FROM collys_crews WHERE colly_id = c.id
-      )
-      LEFT JOIN crews w ON w.id = cc.crew_id
-      LEFT JOIN artists a ON a.id = ac.artist_id
-      WHERE ac.artist_id = ${artist.id}
-      ORDER BY c.filename ASC
-    `,
+    prisma.$queryRaw<ReleaseRow[]>(buildArtistReleasesQuery(artist.id)),
     artist.user_id !== null
       ? prisma.$queryRaw<HandleRow[]>`
           SELECT nick, artisturl FROM artists
