@@ -37,3 +37,20 @@ export function notifyTargets(input: FanoutInput): number[] {
   if (input.threadHasParticipants) return [];
   return input.clientReceiver != null ? [input.clientReceiver] : [];
 }
+
+/**
+ * `messages.to_id` for a message sent to these targets.
+ *
+ * That column is the legacy addressing field: a single recipient, or NULL when
+ * there isn't exactly one. It still drives the `new`/`unread` reset in
+ * /api/chat/read, the 1:1 thread lookup in /api/chat/thread, and the
+ * pre-participants authorisation fallbacks.
+ *
+ * Derived from the same targets as the notifications so the two cannot disagree
+ * about who a message is for. It used to be written straight from the client's
+ * `peerId`, which meant a message could be addressed to someone who had left the
+ * thread — a row claiming a recipient that membership denies.
+ */
+export function addressedTo(targets: readonly number[]): number | null {
+  return targets.length === 1 ? targets[0] : null;
+}

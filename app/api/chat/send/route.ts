@@ -8,7 +8,7 @@ import { createNotification } from "@/lib/notifications";
 import { truncatePreview } from "@/lib/inboxRow";
 
 import { addParticipant, getActiveParticipants, threadHasParticipants } from "@/lib/chatThreadDb";
-import { notifyTargets } from "@/lib/chatFanout";
+import { notifyTargets, addressedTo } from "@/lib/chatFanout";
 import { normalizeMessageText } from "@/lib/normalizeText";
 
 // The dropdown gives each notification one line; a chat preview longer than
@@ -35,12 +35,26 @@ export async function POST(request: NextRequest) {
 
   let threadId: number;
 
+  // Who the message is for. Resolved once, from membership, and used for both
+  // the row's addressing and the notification fan-out so the two cannot
+  // disagree. Previously membership was read twice and `to_id` came from the
+  // client's `peerId` regardless of it, so a message could be addressed to
+  // someone who had left the thread.
+  let targets: number[] = [];
+
   if (existingThreadId) {
     threadId = existingThreadId;
-    // to_id: the single peer for a 2-person thread, NULL for a group (3+ active).
-    // Two concrete branches because the group case also nulls `postedto`.
     const active = await getActiveParticipants(threadId);
-    if (active.length > 2) {
+    targets = notifyTargets({
+      activeOthers: active.map(p => p.userId).filter(id => id !== fromId),
+      threadHasParticipants: await threadHasParticipants(threadId),
+      clientReceiver: peerId !== fromId ? peerId : null,
+    });
+    // to_id: the sole recipient, or NULL when there is not exactly one — a
+    // group, or a thread everyone else has left. The NULL case also nulls
+    // `postedto`, hence two branches.
+    const toId = addressedTo(targets);
+    if (toId == null) {
       await prisma.$executeRaw`
         INSERT INTO messages (thread, from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
         VALUES (
@@ -52,8 +66,8 @@ export async function POST(request: NextRequest) {
       await prisma.$executeRaw`
         INSERT INTO messages (thread, from_id, to_id, postedto, postername, timestamp, subject, message, \`new\`, unread)
         VALUES (
-          ${threadId}, ${fromId}, ${peerId},
-          (SELECT nick FROM users WHERE id = ${peerId}),
+          ${threadId}, ${fromId}, ${toId},
+          (SELECT nick FROM users WHERE id = ${toId}),
           (SELECT nick FROM users WHERE id = ${fromId}),
           UNIX_TIMESTAMP(), 'Chat', ${message}, 1, 1
         )`;
@@ -77,29 +91,10 @@ export async function POST(request: NextRequest) {
     });
     await addParticipant(threadId, fromId);
     await addParticipant(threadId, peerId);
+    // A brand-new 1:1 thread: the peer is the recipient by definition, and the
+    // participant rows just written say so.
+    targets = [peerId];
   }
-
-  // Fan out to every active participant except the sender.
-  //
-  // `peerId` is the client's word for who it is talking to, and the fallback to
-  // it exists for pre-migration threads with no chat_participants rows, which
-  // would otherwise notify nobody. It used to be reached whenever there were no
-  // active recipients -- which includes the case where membership is known and
-  // says the peer LEFT. The sender's window still holds them as its peer, so it
-  // posts their id and they were notified anyway. That is what delivered 29
-  // notifications to someone for threads they had left, each linking to a
-  // conversation they could no longer read.
-  //
-  // So the fallback now applies only when membership is genuinely unknown. The
-  // rule lives in lib/chatFanout.ts, next to the invariant /api/messages
-  // already stated: a left member receives nothing until they rejoin.
-  const active = await getActiveParticipants(threadId);
-  const recipients = active.map(p => p.userId).filter(id => id !== fromId);
-  const targets = notifyTargets({
-    activeOthers: recipients,
-    threadHasParticipants: await threadHasParticipants(threadId),
-    clientReceiver: peerId !== fromId ? peerId : null,
-  });
 
   // fromId so a window belonging to the AUTHOR does not count their own
   // message as unread -- lib/chatUnread.ts.

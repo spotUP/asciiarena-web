@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { describe, it, expect } from "vitest";
-import { notifyTargets } from "../chatFanout";
+import { notifyTargets, addressedTo } from "../chatFanout";
 import { visibleLeaveNotices, mergeLeaveNotices, leaveNoticeId } from "../chatTimeline";
 import type { TimelineMessage } from "../chatTimeline";
 
@@ -62,6 +62,43 @@ describe("notifyTargets", () => {
       threadHasParticipants: false,
       clientReceiver: null,
     })).toEqual([]);
+  });
+});
+
+describe("addressedTo", () => {
+  /**
+   * `messages.to_id` used to be written straight from the client's `peerId`, so a
+   * message could claim a recipient that membership denied -- addressed to
+   * someone who had left. It is now derived from the same targets as the
+   * notifications, so the row and the bell cannot disagree.
+   *
+   * The column still drives the new/unread reset in /api/chat/read, the 1:1
+   * thread lookup in /api/chat/thread, and the pre-participants authorisation
+   * fallbacks, so the existing cases have to keep their old answers.
+   */
+  it("addresses a two-person thread to the other person", () => {
+    expect(addressedTo([22])).toBe(22);
+  });
+
+  it("addresses a group to nobody, as it always did", () => {
+    // Three or more in the thread: to_id was already NULL for these.
+    expect(addressedTo([7, 9])).toBeNull();
+  });
+
+  it("addresses a thread everyone else has left to nobody", () => {
+    // The case that changed. It used to write the departed peer's id.
+    expect(addressedTo([])).toBeNull();
+  });
+
+  it("agrees with the notification fan-out on a legacy thread", () => {
+    // No participant rows: the client's peer is still the recipient, so the row
+    // keeps its addressing rather than silently becoming unaddressed.
+    const targets = notifyTargets({
+      activeOthers: [],
+      threadHasParticipants: false,
+      clientReceiver: 22,
+    });
+    expect(addressedTo(targets)).toBe(22);
   });
 });
 

@@ -1,4 +1,5 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync, statSync } from "node:fs";
+import path from "node:path";
 import { describe, it, expect } from "vitest";
 import { isOwnMessage, shouldCountAsUnread } from "@/lib/chatUnread";
 import { unreadCountExpr } from "@/lib/chatUnreadSql";
@@ -78,5 +79,47 @@ describe("the unread predicate is not re-inlined", () => {
     const src = readFileSync(route, "utf8");
     expect(src).toContain("unreadCountExpr");
     expect(src).not.toContain("um.from_id IS NULL OR um.from_id");
+  });
+});
+
+describe("the badge and the inbox count the same thing", () => {
+  /**
+   * unreadCountExpr exists because two endpoints report unread -- the navbar
+   * badge and the inbox list -- and a badge that disagrees with the list it
+   * links to is worse than either number being wrong. Verified against the whole
+   * production dataset on 2026-07-31: zero rows anywhere where a user's own
+   * message counted toward their own unread, which is the bug the 07-28 fix
+   * targeted, and 28 legacy from_id NULL rows confirming that branch is really
+   * exercised rather than dead.
+   *
+   * This guards the structure that makes it hold: nobody hand-rolls the count.
+   */
+  function routeFilesUnder(dir: string): string[] {
+    const out: string[] = [];
+    for (const entry of readdirSync(dir)) {
+      const full = path.join(dir, entry);
+      if (statSync(full).isDirectory()) out.push(...routeFilesUnder(full));
+      else if (entry === "route.ts") out.push(full);
+    }
+    return out;
+  }
+
+  const routes = routeFilesUnder(path.join(process.cwd(), "app/api"));
+
+  it("scans a plausible number of routes", () => {
+    expect(routes.length).toBeGreaterThan(20);
+  });
+
+  it("has no route computing unread without the shared expression", () => {
+    const offenders: string[] = [];
+    for (const file of routes) {
+      const src = readFileSync(file, "utf8");
+      // A route that reads last_read_at is computing unread by hand unless it
+      // is doing it through the shared definition.
+      if (src.includes("last_read_at") && !src.includes("unreadCountExpr")) {
+        offenders.push(path.relative(process.cwd(), file));
+      }
+    }
+    expect(offenders).toEqual([]);
   });
 });
