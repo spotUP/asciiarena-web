@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { describe, it, expect } from "vitest";
-import { notifyTargets, addressedTo } from "../chatFanout";
+import { notifyTargets, addressedTo, isThreadReadOnly } from "../chatFanout";
 import { visibleLeaveNotices, mergeLeaveNotices, leaveNoticeId } from "../chatTimeline";
 import type { TimelineMessage } from "../chatTimeline";
 
@@ -33,7 +33,7 @@ describe("notifyTargets", () => {
     // still posts the departed peer's id as `receiver`.
     expect(notifyTargets({
       activeOthers: [],
-      threadHasParticipants: true,
+      otherParticipantsEver: 1,
       clientReceiver: 22,
     })).toEqual([]);
   });
@@ -43,7 +43,7 @@ describe("notifyTargets", () => {
     // nobody at all.
     expect(notifyTargets({
       activeOthers: [],
-      threadHasParticipants: false,
+      otherParticipantsEver: 0,
       clientReceiver: 22,
     })).toEqual([22]);
   });
@@ -51,7 +51,7 @@ describe("notifyTargets", () => {
   it("prefers actual membership over the client's word", () => {
     expect(notifyTargets({
       activeOthers: [7, 9],
-      threadHasParticipants: true,
+      otherParticipantsEver: 1,
       clientReceiver: 22,
     })).toEqual([7, 9]);
   });
@@ -59,9 +59,50 @@ describe("notifyTargets", () => {
   it("notifies nobody when membership is unknown and no receiver was supplied", () => {
     expect(notifyTargets({
       activeOthers: [],
-      threadHasParticipants: false,
+      otherParticipantsEver: 0,
       clientReceiver: null,
     })).toEqual([]);
+  });
+});
+
+describe("a half-migrated thread is not an abandoned one", () => {
+  /**
+   * 106 threads on prod carry exactly ONE participant row -- the sender's own --
+   * with the peer named only in messages.to_id. Nobody left them; the other side
+   * was simply never recorded.
+   *
+   * An earlier version of these rules asked "does this thread have participant
+   * rows?", which reads all 106 as abandoned. That silently stopped delivering
+   * to the peer, and would have frozen the conversations as read-only. The test
+   * is whether OTHERS were ever recorded, not whether any row exists.
+   */
+  const halfMigrated = { activeOthers: [], otherParticipantsEver: 0, clientReceiver: 22 };
+
+  it("still notifies the peer", () => {
+    expect(notifyTargets(halfMigrated)).toEqual([22]);
+  });
+
+  it("stays writable", () => {
+    expect(isThreadReadOnly(halfMigrated)).toBe(false);
+  });
+
+  it("still addresses the row to the peer", () => {
+    expect(addressedTo(notifyTargets(halfMigrated))).toBe(22);
+  });
+});
+
+describe("isThreadReadOnly", () => {
+  it("closes a thread whose other member left", () => {
+    // The one that prompted this: eight weeks of messages into an empty room.
+    expect(isThreadReadOnly({ activeOthers: [], otherParticipantsEver: 1 })).toBe(true);
+  });
+
+  it("leaves a live conversation open", () => {
+    expect(isThreadReadOnly({ activeOthers: [2293], otherParticipantsEver: 1 })).toBe(false);
+  });
+
+  it("leaves a group open while anyone remains", () => {
+    expect(isThreadReadOnly({ activeOthers: [7], otherParticipantsEver: 3 })).toBe(false);
   });
 });
 
@@ -95,7 +136,7 @@ describe("addressedTo", () => {
     // keeps its addressing rather than silently becoming unaddressed.
     const targets = notifyTargets({
       activeOthers: [],
-      threadHasParticipants: false,
+      otherParticipantsEver: 0,
       clientReceiver: 22,
     });
     expect(addressedTo(targets)).toBe(22);

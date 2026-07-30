@@ -7,12 +7,18 @@ export interface FanoutInput {
   /** Active participants other than the sender. Excludes anyone who left. */
   activeOthers: number[];
   /**
-   * Whether the thread has any chat_participants rows at all. False means the
-   * thread predates the participants table and its membership is unknown --
-   * NOT that everyone left.
+   * How many chat_participants rows exist for someone OTHER than the sender,
+   * regardless of left_at. Zero means nobody else was ever recorded on this
+   * thread, so its membership is unknown -- NOT that everyone left.
+   *
+   * Counting rows for the OTHER side specifically, rather than rows in general,
+   * matters: 106 threads on prod carry exactly one participant row, the
+   * sender's own, with the peer recorded only in messages.to_id. Treating "this
+   * thread has participant rows" as "membership is known" reads those as
+   * abandoned and silently stops delivering to the peer.
    */
-  threadHasParticipants: boolean;
-  /** Recipient id supplied by the client, for legacy threads. */
+  otherParticipantsEver: number;
+  /** Recipient id supplied by the client, for threads with unknown membership. */
   clientReceiver: number | null;
 }
 
@@ -34,7 +40,9 @@ export interface FanoutInput {
  */
 export function notifyTargets(input: FanoutInput): number[] {
   if (input.activeOthers.length > 0) return input.activeOthers;
-  if (input.threadHasParticipants) return [];
+  // Others were recorded and none are active: they left, so nobody is notified.
+  if (input.otherParticipantsEver > 0) return [];
+  // Nobody else was ever recorded: membership is unknown, so trust the client.
   return input.clientReceiver != null ? [input.clientReceiver] : [];
 }
 
@@ -53,4 +61,26 @@ export function notifyTargets(input: FanoutInput): number[] {
  */
 export function addressedTo(targets: readonly number[]): number | null {
   return targets.length === 1 ? targets[0] : null;
+}
+
+/**
+ * Whether a thread has nobody left to talk to, and is therefore read-only.
+ *
+ * A conversation whose other members have all left is over. Posting to it wrote
+ * a row addressed to nobody and notified nobody: hARRiSONbERGEROn sent eight
+ * weeks of messages into one, with no indication they were reaching no one. Once
+ * the sender is alone, the composer is closed rather than silently swallowing
+ * what they type. The history stays readable.
+ *
+ * Requires that others were once recorded. A thread where nobody else ever had a
+ * participant row has unknown membership, not absent membership -- 106 threads
+ * on prod look like that, with the peer named only in messages.to_id -- and
+ * freezing those would close conversations nobody left. Only a thread that
+ * positively records the others leaving is closed.
+ */
+export function isThreadReadOnly(input: {
+  activeOthers: readonly number[];
+  otherParticipantsEver: number;
+}): boolean {
+  return input.otherParticipantsEver > 0 && input.activeOthers.length === 0;
 }

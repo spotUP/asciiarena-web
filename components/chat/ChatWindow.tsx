@@ -69,6 +69,11 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
   const inputRef = useRef<HTMLInputElement>(null);
   const [peerDraft, setPeerDraft] = useState<{ nick: string; text: string } | null>(null);
   const [sending, setSending] = useState(false);
+  // Set when the server refuses a post because everyone else has left. The
+  // composer is normally hidden before it gets that far (see `readOnly`), but a
+  // departure older than the loaded history carries no notice to infer from, so
+  // the server stays the authority.
+  const [closedByServer, setClosedByServer] = useState(false);
   const [flashing, setFlashing] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
@@ -391,6 +396,7 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
+      if (res.status === 409) { setClosedByServer(true); return; }
       const data = await res.json() as { ok?: boolean; threadId?: number };
       if (data?.ok) {
         setInput("");
@@ -416,6 +422,25 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
       setSending(false);
     }
   };
+
+  /**
+   * A conversation everyone else has left is over: the history stays readable,
+   * the composer closes. Writing to one used to succeed silently -- the row was
+   * addressed to nobody and notified nobody, so one member sent eight weeks of
+   * replies into an empty room.
+   *
+   * Inferred from the leave notices the history now carries, because an empty
+   * participant list on its own does NOT mean abandoned: 106 threads on prod
+   * were never given a participant row for the other side, and closing those
+   * would freeze conversations nobody left. A notice means somebody actually
+   * left. Where the departure predates the loaded history there is no notice to
+   * read, and the server's 409 catches it instead.
+   */
+  const readOnly =
+    closedByServer ||
+    (threadId != null && threadId > 0
+      && participants.length === 0
+      && messages.some(m => m.kind === "left"));
 
   const sendAlert = () => {
     const tid = threadIdRef.current;
@@ -687,6 +712,20 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
       </div>
 
       {/* Input */}
+      {readOnly ? (
+        <div
+          className="lightgrey"
+          style={{
+            borderTop: "1px solid #333",
+            padding: "8px",
+            textAlign: "center",
+            fontSize: "11px",
+            fontFamily: "TopazPlus_a1200, monospace",
+          }}
+        >
+          — everyone else has left; this conversation is read-only —
+        </div>
+      ) : (
       <div style={{ display: "flex", borderTop: "1px solid #333" }}>
         <input
           ref={inputRef}
@@ -727,6 +766,7 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
           Send
         </button>
       </div>
+      )}
     </div>
   );
 }

@@ -57,22 +57,22 @@ export async function getThreadLeaveEvents(threadId: number): Promise<LeaveEvent
 }
 
 /**
- * Whether a thread has any chat_participants rows at all.
+ * How many participant rows a thread has for someone OTHER than `userId`,
+ * regardless of left_at.
  *
- * The distinction that matters is "membership is known and says nobody else is
- * here" versus "this thread predates chat_participants and membership is
- * unknown". Callers fanning out notifications need it: a client-supplied
- * recipient id is a reasonable fallback in the second case and a way to notify
- * someone who explicitly left in the first.
- *
- * Counts rows regardless of left_at -- a thread everyone has left is migrated,
- * not legacy.
+ * The distinction that matters is "the other side was recorded and is gone"
+ * versus "the other side was never recorded, so membership is unknown". An
+ * earlier version asked whether the thread had ANY participant rows, which gets
+ * that wrong for the 106 threads on prod carrying only the sender's own row,
+ * with the peer named just in messages.to_id: those read as abandoned when they
+ * are merely half-migrated.
  */
-export async function threadHasParticipants(threadId: number): Promise<boolean> {
-  const rows = await prisma.$queryRaw<Array<{ ok: number }>>`
-    SELECT 1 AS ok FROM chat_participants WHERE thread_id = ${threadId} LIMIT 1
+export async function otherParticipantsEver(threadId: number, userId: number): Promise<number> {
+  const rows = await prisma.$queryRaw<Array<{ n: bigint | number }>>`
+    SELECT COUNT(*) AS n FROM chat_participants
+    WHERE thread_id = ${threadId} AND user_id <> ${userId}
   `;
-  return rows.length > 0;
+  return Number(rows[0]?.n ?? 0);
 }
 
 // The caller's membership row (active or not), or null.

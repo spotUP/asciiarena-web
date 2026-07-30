@@ -7,8 +7,8 @@ import { broadcast } from "@/lib/live";
 import { createNotification } from "@/lib/notifications";
 import { truncatePreview } from "@/lib/inboxRow";
 
-import { addParticipant, getActiveParticipants, threadHasParticipants } from "@/lib/chatThreadDb";
-import { notifyTargets, addressedTo } from "@/lib/chatFanout";
+import { addParticipant, getActiveParticipants, otherParticipantsEver } from "@/lib/chatThreadDb";
+import { notifyTargets, addressedTo, isThreadReadOnly } from "@/lib/chatFanout";
 import { normalizeMessageText } from "@/lib/normalizeText";
 
 // The dropdown gives each notification one line; a chat preview longer than
@@ -45,9 +45,20 @@ export async function POST(request: NextRequest) {
   if (existingThreadId) {
     threadId = existingThreadId;
     const active = await getActiveParticipants(threadId);
+    const activeOthers = active.map(p => p.userId).filter(id => id !== fromId);
+    const othersEver = await otherParticipantsEver(threadId, fromId);
+
+    // A conversation everyone else has left is over. It used to accept messages
+    // and drop them: the row was addressed to nobody and notified nobody, so one
+    // member sent eight weeks of replies into a thread with no one in it. The
+    // history stays readable; only posting is closed.
+    if (isThreadReadOnly({ activeOthers, otherParticipantsEver: othersEver })) {
+      return apiError("Everyone else has left this conversation, so it is read-only.", 409);
+    }
+
     targets = notifyTargets({
-      activeOthers: active.map(p => p.userId).filter(id => id !== fromId),
-      threadHasParticipants: await threadHasParticipants(threadId),
+      activeOthers,
+      otherParticipantsEver: othersEver,
       clientReceiver: peerId !== fromId ? peerId : null,
     });
     // to_id: the sole recipient, or NULL when there is not exactly one — a
