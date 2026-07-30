@@ -1,3 +1,5 @@
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import path from "node:path";
 import { describe, it, expect } from "vitest";
 import { notifyTargets } from "../chatFanout";
 import { visibleLeaveNotices, mergeLeaveNotices, leaveNoticeId } from "../chatTimeline";
@@ -167,5 +169,46 @@ describe("mergeLeaveNotices", () => {
     );
     // Newest-first, so "after" means earlier in the array.
     expect(merged.map(m => m.id)).toEqual([leaveNoticeId(7), 500]);
+  });
+});
+
+describe("every notification fan-out uses the rule", () => {
+  /**
+   * Guards the mistake that shipped: the fan-out fix was applied to
+   * /api/messages/thread/[threadId], which turned out to have no caller at all,
+   * while the route the client actually uses -- /api/chat/send -- kept the bug
+   * for another deploy. The dead route has since been deleted.
+   *
+   * The invariant: a route that decides who to notify from thread membership has
+   * to decide it with notifyTargets, not by hand. Hand-rolling is how the
+   * client-supplied-recipient fallback got reached for a member who had left.
+   */
+  function routeFilesUnder(dir: string): string[] {
+    const out: string[] = [];
+    for (const entry of readdirSync(dir)) {
+      const full = path.join(dir, entry);
+      if (statSync(full).isDirectory()) out.push(...routeFilesUnder(full));
+      else if (entry === "route.ts") out.push(full);
+    }
+    return out;
+  }
+
+  const routes = routeFilesUnder(path.join(process.cwd(), "app/api"));
+
+  it("scans a plausible number of routes", () => {
+    expect(routes.length).toBeGreaterThan(20);
+  });
+
+  it("has no route fanning out notifications by hand", () => {
+    const offenders: string[] = [];
+    for (const file of routes) {
+      const src = readFileSync(file, "utf8");
+      const readsMembership = src.includes("getActiveParticipants");
+      const notifies = src.includes("createNotification");
+      if (readsMembership && notifies && !src.includes("notifyTargets")) {
+        offenders.push(path.relative(process.cwd(), file));
+      }
+    }
+    expect(offenders).toEqual([]);
   });
 });

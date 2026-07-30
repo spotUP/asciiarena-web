@@ -7,11 +7,13 @@ import { broadcast } from "@/lib/live";
 import { createNotification } from "@/lib/notifications";
 import { truncatePreview } from "@/lib/inboxRow";
 
+import { addParticipant, getActiveParticipants, threadHasParticipants } from "@/lib/chatThreadDb";
+import { notifyTargets } from "@/lib/chatFanout";
+import { normalizeMessageText } from "@/lib/normalizeText";
+
 // The dropdown gives each notification one line; a chat preview longer than
 // this just gets clipped by the 400px panel anyway.
 const NOTIFICATION_PREVIEW_MAX = 60;
-import { addParticipant, getActiveParticipants } from "@/lib/chatThreadDb";
-import { normalizeMessageText } from "@/lib/normalizeText";
 
 const schema = z.object({
   peerId: z.number().int().positive(),
@@ -78,10 +80,26 @@ export async function POST(request: NextRequest) {
   }
 
   // Fan out to every active participant except the sender.
+  //
+  // `peerId` is the client's word for who it is talking to, and the fallback to
+  // it exists for pre-migration threads with no chat_participants rows, which
+  // would otherwise notify nobody. It used to be reached whenever there were no
+  // active recipients -- which includes the case where membership is known and
+  // says the peer LEFT. The sender's window still holds them as its peer, so it
+  // posts their id and they were notified anyway. That is what delivered 29
+  // notifications to someone for threads they had left, each linking to a
+  // conversation they could no longer read.
+  //
+  // So the fallback now applies only when membership is genuinely unknown. The
+  // rule lives in lib/chatFanout.ts, next to the invariant /api/messages
+  // already stated: a left member receives nothing until they rejoin.
   const active = await getActiveParticipants(threadId);
   const recipients = active.map(p => p.userId).filter(id => id !== fromId);
-  // Legacy fallback: if participants weren't created, deliver to the peer.
-  const targets = recipients.length > 0 ? recipients : (peerId !== fromId ? [peerId] : []);
+  const targets = notifyTargets({
+    activeOthers: recipients,
+    threadHasParticipants: await threadHasParticipants(threadId),
+    clientReceiver: peerId !== fromId ? peerId : null,
+  });
 
   // fromId so a window belonging to the AUTHOR does not count their own
   // message as unread -- lib/chatUnread.ts.
