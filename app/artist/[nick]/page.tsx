@@ -13,7 +13,7 @@ import { encodeReleaseText } from "@/lib/releaseText";
 import { normalizeOrder } from "@/lib/sort-headers";
 import { activeStatusLabel } from "@/lib/activeStatus";
 import { type ReleaseSortKey } from "@/lib/release-sort";
-import { buildArtistReleasesQuery } from "@/lib/artistReleasesQuery";
+import { buildArtistReleasesQuery, parseReleaseCrews } from "@/lib/artistReleasesQuery";
 import ArtistReleases from "./ArtistReleases";
 import EntityLogosSection from "@/components/release/EntityLogosSection";
 import SceneLinksSection from "@/components/release/SceneLinksSection";
@@ -73,8 +73,7 @@ interface ReleaseRow {
   view_counter: number | null;
   downloads: number | null;
   rating: number | null;
-  crew: string | null;
-  crewurl: string | null;
+  crews: string | null;
 }
 
 interface HandleRow {
@@ -296,10 +295,19 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
                     <span className="white">Artist: </span>
                     <ContentLink className="green" href={`/artist/${artist.artisturl}`}>{artist.nick}</ContentLink>
                   </div>
-                  {latestRelease.crew && latestRelease.crewurl && (
+                  {parseReleaseCrews(latestRelease.crews).length > 0 && (
                     <div>
-                      <span className="white">Crew: </span>
-                      <ContentLink href={`/crew/${latestRelease.crewurl}`}>{latestRelease.crew}</ContentLink>
+                      {/* Plural: a colly is often a joint release. se-lapsi.txt
+                          is Style and Low Profile. */}
+                      <span className="white">
+                        {parseReleaseCrews(latestRelease.crews).length > 1 ? "Crews: " : "Crew: "}
+                      </span>
+                      {parseReleaseCrews(latestRelease.crews).map((w, i) => (
+                        <span key={w.url}>
+                          {i > 0 && ", "}
+                          <ContentLink href={`/crew/${w.url}`}>{w.name}</ContentLink>
+                        </span>
+                      ))}
                     </div>
                   )}
                   <div><span className="white">Name: </span>{latestRelease.name ?? "-"}</div>
@@ -331,7 +339,13 @@ export default async function ArtistPage({ params, searchParams }: PageProps) {
           The header bar, clickable sort headers, and rows all live in
           ArtistReleases so the whole list re-orders in the browser. */}
       <ArtistReleases
-        rows={releasesRaw}
+        rows={releasesRaw.map(r => {
+          const crews = parseReleaseCrews(r.crews);
+          // crew = the primary crew's name, which is all lib/release-sort needs
+          // to order the Crew column (and to keep blank crews last). The full
+          // list is what gets rendered.
+          return { ...r, crews, crew: crews[0]?.name ?? null };
+        })}
         acronym={acronym}
         initialSort={sortKey}
         initialOrder={sortOrder}

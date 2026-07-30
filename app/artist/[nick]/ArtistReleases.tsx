@@ -11,14 +11,20 @@ import {
   type ReleaseSortKey,
   type ReleaseSortOrder,
 } from "@/lib/release-sort";
+import type { ReleaseCrew } from "@/lib/artistReleasesQuery";
 
 export interface ArtistReleaseRow {
   colly_id: number;
   filename: string;
   name: string | null;
   year: number | null;
+  // Every crew credited on the release, primary first. A colly is often a joint
+  // release -- se-lapsi.txt is Style and Low Profile -- and /collys has always
+  // shown all of them, so this table does too.
+  crews: ReleaseCrew[];
+  // The primary crew's name, which is what the Crew column sorts on. Derived
+  // from crews[0] by the page so the comparator keeps taking one string.
   crew: string | null;
-  crewurl: string | null;
 }
 
 interface ArtistReleasesProps {
@@ -115,11 +121,14 @@ export default function ArtistReleases({
             </ContentLink>
           </div>
           <div className="col-lg-3 pl-0">
-            {r.crew && r.crewurl ? (
-              <ContentLink href={`/crew/${r.crewurl}`}>{r.crew}</ContentLink>
-            ) : (
-              r.crew ?? "-"
-            )}
+            {r.crews.length > 0
+              ? r.crews.map((w, i) => (
+                  <span key={w.url}>
+                    {i > 0 && ", "}
+                    <ContentLink href={`/crew/${w.url}`}>{w.name}</ContentLink>
+                  </span>
+                ))
+              : "-"}
           </div>
           <div className="col-lg-3 pl-0">
             <span className="lightgrey">{r.year ?? "-"}</span>
