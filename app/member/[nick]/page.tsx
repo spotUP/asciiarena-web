@@ -8,6 +8,7 @@ import OnlineDot from "@/components/ui/OnlineDot";
 import LiveRefresh from "@/components/widgets/LiveRefresh";
 import EntityLogosSection from "@/components/release/EntityLogosSection";
 import { logosForEntity } from "@/lib/collyLogoSearch";
+import { buildMemberCollyCountQuery } from "@/lib/member-colly-count-query";
 import { prisma } from "@/lib/db";
 import { getSession as auth } from "@/lib/session";
 import { decodeParam } from "@/lib/utils";
@@ -95,7 +96,7 @@ export default async function MemberPage({
   const member = members[0];
   if (!member) notFound();
 
-  const [artists, comments, commentCount, collys, faves] = await Promise.all([
+  const [artists, comments, commentCount, collyCount, collys, faves] = await Promise.all([
     prisma.$queryRaw<ArtistRow[]>`
       SELECT id, nick, artisturl
       FROM artists
@@ -112,6 +113,7 @@ export default async function MemberPage({
     prisma.$queryRaw<{ total: bigint }[]>`
       SELECT COUNT(*) AS total FROM comments WHERE user_id = ${member.id}
     `,
+    prisma.$queryRaw<{ total: bigint }[]>(buildMemberCollyCountQuery(member.id)),
     prisma.$queryRaw<CollyRow[]>`
       SELECT c.name, c.filename,
              GROUP_CONCAT(DISTINCT a.nick) AS artists,
@@ -142,6 +144,9 @@ export default async function MemberPage({
   ]);
 
   const totalComments = Number(commentCount[0]?.total ?? 0);
+  // The real upload total. The list below it is capped at 10, so its length is
+  // not a count of anything.
+  const totalCollys = Number(collyCount[0]?.total ?? 0);
 
   // Crew memberships via linked artist handles
   const crewMemberships = artists.length > 0
@@ -238,10 +243,10 @@ export default async function MemberPage({
           </div>
         )}
 
-        {collys.length > 0 && kb > 0 && (
+        {totalCollys > 0 && kb > 0 && (
           <div className="row apt-1">
             <div className="col-12">
-              {member.nick} has pumped up {collys.length} collys ({kb} kB)
+              {member.nick} has pumped up {totalCollys} collys ({kb} kB)
               {totalComments > 0 && ` and commented ${totalComments} collys`}.
             </div>
           </div>
