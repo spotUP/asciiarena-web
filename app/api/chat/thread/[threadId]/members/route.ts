@@ -8,6 +8,7 @@ import { prisma } from "@/lib/db";
 import {
   isParticipant, addParticipant, leaveThread, getActiveParticipants,
 } from "@/lib/chatThreadDb";
+import { isSelfDm } from "@/lib/chatPeer";
 
 const addSchema = z.object({ userId: z.number().int().positive() });
 
@@ -40,6 +41,12 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ threadId: 
   const parsed = addSchema.safeParse(body);
   if (!parsed.success) return apiError("Invalid request", 400);
   const newUserId = parsed.data.userId;
+
+  // You are already in this thread -- that is what `isParticipant` above just
+  // checked. Re-adding yourself would reset joined_at, announce "you joined" to
+  // everyone, and push a thread-added event back at your own client, which
+  // opens a second window on the conversation you are sitting in.
+  if (isSelfDm(newUserId, me)) return apiError("You are already in this conversation.", 400);
 
   const user = await prisma.users.findUnique({ where: { id: newUserId }, select: { nick: true } });
   if (!user) return apiError("No such user", 400);

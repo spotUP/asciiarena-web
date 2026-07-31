@@ -10,6 +10,7 @@ import { truncatePreview } from "@/lib/inboxRow";
 import { addParticipant, getActiveParticipants, otherParticipantsEver } from "@/lib/chatThreadDb";
 import { notifyTargets, addressedTo, isThreadReadOnly } from "@/lib/chatFanout";
 import { normalizeMessageText } from "@/lib/normalizeText";
+import { isSelfDm, SELF_DM_MESSAGE } from "@/lib/chatPeer";
 
 // The dropdown gives each notification one line; a chat preview longer than
 // this just gets clipped by the 400px panel anyway.
@@ -84,6 +85,14 @@ export async function POST(request: NextRequest) {
         )`;
     }
   } else {
+    // A new conversation needs two distinct people. Guarded here rather than on
+    // every send: for an EXISTING thread `peerId` is only a hint about the
+    // recipient (membership decides, see notifyTargets above) and the client
+    // legitimately posts the sender's own id as a group placeholder. It is
+    // thread CREATION that would mint a self-addressed row, and those rows are
+    // what made /api/chat/thread resolve a self peer to somebody else's thread.
+    if (isSelfDm(peerId, fromId)) return apiError(SELF_DM_MESSAGE, 400);
+
     // First message — create the thread, then its two participant rows.
     threadId = await prisma.$transaction(async (tx) => {
       await tx.$executeRaw`

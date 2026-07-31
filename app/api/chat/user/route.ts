@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
+import { isSelfDm, SELF_DM_MESSAGE } from "@/lib/chatPeer";
 
 export const dynamic = "force-dynamic";
 
@@ -28,5 +29,9 @@ export async function GET(request: NextRequest) {
   }
 
   if (!rows[0]) return apiError("User not found", 404);
+  // The composer resolves a nick or id here before opening a window, so this is
+  // where typing your own nick has to be refused -- suggestions alone are not a
+  // gate.
+  if (isSelfDm(rows[0].id, parseInt(session.user.id))) return apiError(SELF_DM_MESSAGE, 400);
   return apiOk({ id: rows[0].id, nick: rows[0].nick });
 }

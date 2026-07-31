@@ -142,7 +142,13 @@ export default function ChatBar({ userId, userNick }: Props) {
     setNewNickError("");
     try {
       const res = await fetch(`/api/chat/user?nick=${encodeURIComponent(nick)}`);
-      if (!res.ok) { setNewNickError("user not found"); return; }
+      if (!res.ok) {
+        // The server refuses your own nick with a reason of its own; showing
+        // "user not found" for it would say the account does not exist.
+        const err = await res.json().catch(() => ({})) as { error?: string };
+        setNewNickError(res.status === 404 ? "user not found" : (err.error ?? "error"));
+        return;
+      }
       const data = await res.json() as { id?: number; nick?: string };
       if (data?.id && data?.nick) {
         openChat(data.id, data.nick);
