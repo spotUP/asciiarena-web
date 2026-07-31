@@ -1,5 +1,5 @@
 import SiteLayout from "@/components/layout/SiteLayout";
-import BBSClient from "./BBSClient";
+import BBSClient from "../BBSClient";
 
 export default async function BBSPage({
   searchParams,
