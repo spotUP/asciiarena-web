@@ -34,6 +34,20 @@ describe("isSelfDm", () => {
     expect(isSelfDm(7, 9)).toBe(false);
   });
 
+  it("matches a database id against a session id", () => {
+    // The defect this test exists for: /api/chat/user compares a column read
+    // through prisma.$queryRaw, and MySQL's INT UNSIGNED comes back as a
+    // BigInt. `Number.isFinite(2395n)` is false, so the guard skipped and the
+    // endpoint handed the composer its own account -- while lib/db.ts's
+    // BigInt.prototype.toJSON patch serialised the id as a plain number, so the
+    // response looked correct. Verified against production before the fix:
+    // GET /api/chat/user?nick=claude-test returned 200 for the viewer.
+    expect(isSelfDm(BigInt(2395), 2395)).toBe(true);
+    expect(isSelfDm(BigInt(2395), 22)).toBe(false);
+    // Session ids arrive as strings from NextAuth in some call sites.
+    expect(isSelfDm(2395, "2395")).toBe(true);
+  });
+
   it("treats an unusable peer id as not a self-DM, so the id check owns that error", () => {
     // Callers validate the id separately; conflating "missing" with "myself"
     // would report the wrong reason to the user.

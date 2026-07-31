@@ -9,6 +9,22 @@
 
 export const SELF_DM_MESSAGE = "You cannot start a chat with yourself.";
 
+type UserId = number | bigint | string | null | undefined;
+
+// Ids reach this rule in three shapes and they must all compare equal:
+// `parseInt` of a session id or query param (number), a Zod-parsed body field
+// (number), and a column read back through Prisma's $queryRaw, which hands
+// MySQL's INT UNSIGNED back as a BigInt. The first version of this helper
+// tested `Number.isFinite(peerId)`, which is false for 2395n, so the guard in
+// /api/chat/user silently did nothing -- and lib/db.ts patches
+// BigInt.prototype.toJSON, so the response still looked like a plain number and
+// the hole was invisible from the outside.
+function toId(value: UserId): number | null {
+  if (value == null) return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
 /**
  * Whether this conversation would be the viewer talking to themselves.
  *
@@ -16,7 +32,8 @@ export const SELF_DM_MESSAGE = "You cannot start a chat with yourself.";
  * its own, and reporting "you cannot chat with yourself" for a malformed
  * request would name the wrong problem.
  */
-export function isSelfDm(peerId: number | null | undefined, selfId: number): boolean {
-  if (peerId == null || !Number.isFinite(peerId)) return false;
-  return peerId === selfId;
+export function isSelfDm(peerId: UserId, selfId: UserId): boolean {
+  const peer = toId(peerId);
+  const self = toId(selfId);
+  return peer != null && self != null && peer === self;
 }
