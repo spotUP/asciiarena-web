@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
+import { sameUserId } from "@/lib/userId";
 
 export async function DELETE(
   _request: NextRequest,
@@ -19,8 +20,11 @@ export async function DELETE(
   `;
   if (!rows[0]) return apiError("Group not found", 404);
 
-  const isOwner = rows[0].owner_id === currentUserId;
-  const isSelf = targetUserId === currentUserId;
+  // owner_id is INT UNSIGNED read through $queryRaw, so it arrives as a BigInt:
+  // a plain `===` against the parsed session id is never true and the group
+  // owner could remove nobody but themselves. See lib/userId.ts.
+  const isOwner = sameUserId(rows[0].owner_id, currentUserId);
+  const isSelf = sameUserId(targetUserId, currentUserId);
 
   if (!isOwner && !isSelf) return apiError("Forbidden", 403);
 

@@ -9,6 +9,7 @@ import LiveRefresh from "@/components/widgets/LiveRefresh";
 import EntityLogosSection from "@/components/release/EntityLogosSection";
 import { logosForEntity } from "@/lib/collyLogoSearch";
 import { buildMemberCollyCountQuery } from "@/lib/member-colly-count-query";
+import { sameUserId } from "@/lib/userId";
 import { prisma } from "@/lib/db";
 import { getSession as auth } from "@/lib/session";
 import { decodeParam } from "@/lib/utils";
@@ -161,7 +162,11 @@ export default async function MemberPage({
     : [];
 
   const kb = Math.round((member.uploaded ?? 0) / 1000);
-  const isOwnProfile = session?.user?.id ? Number(session.user.id) === member.id : false;
+  // `member.id` is a BigInt (INT UNSIGNED via $queryRaw) and the session id is a
+  // string, so the `Number(...) === member.id` this replaced was always false:
+  // the Chat button was offered on your own profile, and the Unfave buttons on
+  // your own favourites never appeared. See lib/userId.ts.
+  const isOwnProfile = sameUserId(session?.user?.id, member.id);
   const isAdmin = member.rank === "Admin";
   const isPumper = (member.uploaded ?? 0) >= 20_000_000;
   const isSupporter = totalComments >= 300;

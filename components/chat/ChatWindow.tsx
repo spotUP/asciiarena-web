@@ -397,6 +397,15 @@ export default function ChatWindow({ windowKey, threadId, isGroup, peerId, title
         body: JSON.stringify(body),
       });
       if (res.status === 409) { setClosedByServer(true); return; }
+      // Anything else the server refuses used to vanish: the text stayed in the
+      // box, nothing was sent, and no explanation appeared -- pressing Enter
+      // simply did nothing. Say what happened, in the transcript, where the
+      // user is already looking.
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({})) as { error?: string };
+        pushSystemLine(err.error ?? "message could not be sent");
+        return;
+      }
       const data = await res.json() as { ok?: boolean; threadId?: number };
       if (data?.ok) {
         setInput("");
