@@ -23,8 +23,9 @@ class FakeEventSource {
   close() {
     this.closed = true;
   }
-  emit(data: string) {
-    this.onmessage?.({ data } as MessageEvent<string>);
+  /** Deliver one multiplexed frame, as app/api/live/route.ts writes it. */
+  emit(channel: string, event: unknown) {
+    this.onmessage?.({ data: JSON.stringify({ c: channel, e: event }) } as MessageEvent<string>);
   }
 }
 
@@ -51,8 +52,10 @@ describe("live refreshes are coalesced across widgets", () => {
       }, 400);
     };
     for (let i = 0; i < 4; i++) subscribeRaw("site:votes", () => schedule());
+    // The pool connects on a microtask, so all four subscribers share one stream.
+    await Promise.resolve();
 
-    FakeEventSource.instances[0].emit(JSON.stringify({ type: "vote" }));
+    FakeEventSource.instances[0].emit("site:votes", { type: "vote" });
     vi.advanceTimersByTime(500);
 
     expect(refresh).toHaveBeenCalledTimes(1);

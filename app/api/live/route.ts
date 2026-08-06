@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { subscribe, broadcast, subscriberCount, getHistory } from "@/lib/live";
+import { subscribe, broadcast, subscriberCount, getHistory, frame } from "@/lib/live";
 import { auth } from "@/lib/auth";
 import { apiError } from "@/lib/utils";
 import { ensureCedPoller } from "@/lib/cedPoller";
@@ -13,23 +13,42 @@ export const dynamic = "force-dynamic";
 
 const encoder = new TextEncoder();
 
-export async function GET(request: NextRequest) {
-  const channel = request.nextUrl.searchParams.get("channel") ?? "";
-  if (!channel) return new Response("channel required", { status: 400 });
+// A tab subscribes to as many channels as the widgets on the page ask for --
+// around twenty on a logged-in release page. One connection each put every
+// request the tab makes behind a shared limit: the browser's per-host cap on
+// HTTP/1.1, and on HTTP/2 a single TCP connection whose death takes navigation
+// and data fetches down with the streams. So `channels=` carries the whole set
+// on one stream and each event names its channel; see lib/sse-pool.ts.
+//
+// `channel=` (one channel, bare events) stays supported: a tab loaded before a
+// deploy keeps its old bundle until it is reloaded.
+const MAX_CHANNELS = 64;
 
-  let unsubscribe: (() => void) | undefined;
+export async function GET(request: NextRequest) {
+  const params = request.nextUrl.searchParams;
+  const muxed = params.has("channels");
+  const requested = muxed ? params.get("channels")! : params.get("channel") ?? "";
+  const list = [...new Set(requested.split(",").map(c => c.trim()).filter(Boolean))];
+  if (list.length === 0) return new Response("channel required", { status: 400 });
+  if (list.length > MAX_CHANNELS) return new Response("too many channels", { status: 400 });
+
+  let unsubscribes: (() => void)[] = [];
   let pingInterval: ReturnType<typeof setInterval> | undefined;
 
   const stream = new ReadableStream<Uint8Array>({
     start(ctrl) {
       ctrl.enqueue(encoder.encode(": keepalive\n\n"));
-      unsubscribe = subscribe(channel, ctrl);
-      // Backfill recent events so a feed that connects (or reconnects after a
-      // navigation gap) immediately shows what it missed.
-      for (const ev of getHistory(channel)) {
-        ctrl.enqueue(encoder.encode(`data: ${JSON.stringify(ev)}\n\n`));
+      unsubscribes = list.map(channel => subscribe(channel, ctrl, muxed));
+      for (const channel of list) {
+        // Backfill recent events so a feed that connects (or reconnects after a
+        // navigation gap) immediately shows what it missed. The id travels with
+        // each event so a client that already showed it can skip it.
+        for (const { id, event } of getHistory(channel)) {
+          const payload = muxed ? frame(channel, event, id) : event;
+          ctrl.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
+        }
+        broadcast(channel, { type: "watching", count: subscriberCount(channel) });
       }
-      broadcast(channel, { type: "watching", count: subscriberCount(channel) });
       pingInterval = setInterval(() => {
         try {
           ctrl.enqueue(encoder.encode(": keepalive\n\n"));
@@ -40,8 +59,10 @@ export async function GET(request: NextRequest) {
     },
     cancel() {
       clearInterval(pingInterval);
-      unsubscribe?.();
-      broadcast(channel, { type: "watching", count: subscriberCount(channel) });
+      for (const unsubscribe of unsubscribes) unsubscribe();
+      for (const channel of list) {
+        broadcast(channel, { type: "watching", count: subscriberCount(channel) });
+      }
     },
   });
 
