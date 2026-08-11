@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { urlsafe } from "@/lib/utils";
+import { isValidPassword, PASSWORD_RULE_TEXT } from "@/lib/accountRules";
 import bcrypt from "bcryptjs";
 import { createHash } from "crypto";
 
@@ -42,15 +43,6 @@ interface UserRow {
   def_font: string | null;
   crt_effect: string | null;
   anim_effect: string | null;
-}
-
-function isValidPassword(pw: string): boolean {
-  return (
-    /[A-Z]/.test(pw) &&
-    /[a-z]/.test(pw) &&
-    /[0-9]/.test(pw) &&
-    /[^A-Za-z0-9]/.test(pw)
-  );
 }
 
 export async function getInitialSettings(): Promise<Settings | null> {
@@ -206,10 +198,7 @@ export async function changePassword(
   if (newpass !== repeatpass) return { success: false, error: "New passwords do not match." };
 
   if (!isValidPassword(newpass)) {
-    return {
-      success: false,
-      error: "Password must include uppercase, lowercase, a number, and a special character.",
-    };
+    return { success: false, error: PASSWORD_RULE_TEXT };
   }
 
   const hashRows = await prisma.$queryRaw<{ pwhash: string | null }[]>`

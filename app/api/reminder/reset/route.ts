@@ -4,8 +4,7 @@ import { prisma } from "@/lib/db";
 import { apiError, apiOk } from "@/lib/utils";
 import { hashResetToken } from "@/lib/resetToken";
 import { validateHmacToken } from "@/lib/hmacToken";
-
-const PASSWORD_RE = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+import { isValidPassword, PASSWORD_RULE_TEXT } from "@/lib/accountRules";
 
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as {
@@ -18,11 +17,8 @@ export async function POST(request: NextRequest) {
   if (!token) return apiError("Reset token is missing.", 400);
   if (!password || !repeatPassword) return apiError("Both password fields are required.", 400);
   if (password !== repeatPassword) return apiError("Passwords do not match.", 400);
-  if (!PASSWORD_RE.test(password)) {
-    return apiError(
-      "Password must be at least 8 characters and include uppercase, lowercase, a digit, and a special character.",
-      400
-    );
+  if (!isValidPassword(password)) {
+    return apiError(PASSWORD_RULE_TEXT, 400);
   }
 
   const verified = validateHmacToken(token);

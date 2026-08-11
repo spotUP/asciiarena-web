@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { apiError, apiOk, urlsafe } from "@/lib/utils";
 import bcrypt from "bcryptjs";
 import { createHash } from "crypto";
+import { isValidPassword, PASSWORD_RULE_TEXT } from "@/lib/accountRules";
 
 const patchSchema = z.object({
   nick: z.string().min(1).max(50).optional(),
@@ -45,15 +46,6 @@ interface UserRow {
   crt_effect: string | null;
   anim_effect: string | null;
   pwhash: string | null;
-}
-
-function isValidPassword(pw: string): boolean {
-  return (
-    /[A-Z]/.test(pw) &&
-    /[a-z]/.test(pw) &&
-    /[0-9]/.test(pw) &&
-    /[^A-Za-z0-9]/.test(pw)
-  );
 }
 
 export async function GET(_request: NextRequest) {
@@ -128,10 +120,7 @@ export async function PATCH(request: NextRequest) {
     if (!valid) return apiError("Old password is incorrect", 400);
 
     if (!isValidPassword(newpass)) {
-      return apiError(
-        "New password must contain uppercase, lowercase, a digit, and a special character",
-        400
-      );
+      return apiError(PASSWORD_RULE_TEXT, 400);
     }
 
     const newHash = await bcrypt.hash(newpass, 13);

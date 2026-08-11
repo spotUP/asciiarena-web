@@ -33,6 +33,26 @@ export function isRankLoginBlocked(rank: string | null | undefined): boolean {
   return rank === INACTIVE_RANK;
 }
 
+/**
+ * Password strength rule shared by registration, the settings password change,
+ * the emailed reset flow, and the admin set-password action. These used to be
+ * four private copies that had drifted: three checked character classes only,
+ * while the reset flow also required 8+ characters. The reset rule is the
+ * intended one, so everything now enforces the 8-character minimum too.
+ */
+export const PASSWORD_RULE_TEXT =
+  "Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.";
+
+export function isValidPassword(pw: string): boolean {
+  return (
+    pw.length >= 8 &&
+    /[A-Z]/.test(pw) &&
+    /[a-z]/.test(pw) &&
+    /[0-9]/.test(pw) &&
+    /[^A-Za-z0-9]/.test(pw)
+  );
+}
+
 // Whether `userNick` is allowed to claim the artist handle `artistNick`. A user
 // may only claim a handle that IS their site nick (case-insensitive). This is
 // the fix for the free-text claim hole that let one account grab an unrelated

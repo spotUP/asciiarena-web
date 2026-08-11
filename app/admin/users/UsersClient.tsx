@@ -63,6 +63,22 @@ export default function UsersClient() {
     flash("Saved!", true);
   };
 
+  const setPassword = async (user: User) => {
+    const password = prompt(`New password for ${user.nick}:`);
+    if (password === null || password === "") return;
+    const res = await fetch("/api/admin/users", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: user.id, password }),
+    });
+    if (res.ok) {
+      flash("Password changed!", true);
+    } else {
+      const data = await res.json().catch(() => null);
+      flash(data?.error ?? "Password change failed.", false);
+    }
+  };
+
   const del = async (id: number) => {
     if (!confirm("Delete this user account permanently?")) return;
     await fetch("/api/admin/users", {
@@ -134,8 +150,9 @@ export default function UsersClient() {
                     />
                   </div>
                   <div className="col-2 lightgrey text-truncate">{u.mail ?? ""}</div>
-                  <div className="col-2" style={{ display: "flex", gap: "8px" }}>
+                  <div className="col-2" style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                     <input type="button" className="btn-big" value="Save" onClick={() => save(u)} />
+                    <input type="button" className="btn-big" value="Set Password" onClick={() => setPassword(u)} />
                     <input type="button" className="btn-big" value="Del" style={{ color: "#ff5555" }} onClick={() => del(u.id)} />
                   </div>
                 </div>

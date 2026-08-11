@@ -8,6 +8,7 @@ import { ACTIVITY_TYPES, type ActivityType } from "@/lib/activity-types";
 import { broadcast } from "@/lib/live";
 import { revalidateTag } from "next/cache";
 import { buildHmacToken } from "@/lib/hmacToken";
+import { isValidPassword, PASSWORD_RULE_TEXT } from "@/lib/accountRules";
 
 // Activation links stay valid for 7 days so a user has a comfortable window to
 // click through from their welcome email.
@@ -58,15 +59,6 @@ async function sendWelcomeMail(nick: string, mail: string, activationLink: strin
   }
 }
 
-function isValidPassword(pw: string): boolean {
-  return (
-    /[A-Z]/.test(pw) &&
-    /[a-z]/.test(pw) &&
-    /[0-9]/.test(pw) &&
-    /[^A-Za-z0-9]/.test(pw)
-  );
-}
-
 export async function POST(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
   if (!checkRateLimit(`register:${ip}`, 3, 60 * 60 * 1000)) {
@@ -106,15 +98,8 @@ export async function POST(request: NextRequest) {
     return apiError("Passwords do not match.", 400);
   }
 
-  if (password.length < 6) {
-    return apiError("Password is too short (minimum 6 characters).", 400);
-  }
-
   if (!isValidPassword(password)) {
-    return apiError(
-      "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.",
-      400
-    );
+    return apiError(PASSWORD_RULE_TEXT, 400);
   }
 
   const nickurl = urlsafe(nick);

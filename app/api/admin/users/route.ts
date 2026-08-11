@@ -1,13 +1,16 @@
 import { z } from "zod";
 import { NextRequest } from "next/server";
+import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError, apiOk } from "@/lib/utils";
+import { isValidPassword, PASSWORD_RULE_TEXT } from "@/lib/accountRules";
 
 const patchSchema = z.object({
   id: z.number().int().positive(),
   rank: z.string().max(50).optional(),
   crew: z.string().max(100).optional(),
+  password: z.string().max(200).optional(),
 });
 
 const deleteSchema = z.object({
@@ -38,6 +41,17 @@ export async function PATCH(request: NextRequest) {
   const patchParsed = patchSchema.safeParse(rawPatchBody);
   if (!patchParsed.success) return apiError("Invalid request: " + patchParsed.error.issues[0]?.message, 400);
   const body = patchParsed.data;
+
+  if (body.password !== undefined) {
+    if (!isValidPassword(body.password)) return apiError(PASSWORD_RULE_TEXT, 400);
+    const pwhash = await bcrypt.hash(body.password, 13);
+    // temp_pw_hash is the one-time reset-link token; a stale link must not be
+    // able to overwrite the password the admin just set.
+    await prisma.$executeRaw`
+      UPDATE users SET pwhash = ${pwhash}, temp_pw_hash = NULL WHERE id = ${body.id}
+    `;
+    return apiOk({ status: true });
+  }
 
   await prisma.$executeRaw`
     UPDATE users SET
