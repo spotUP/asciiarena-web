@@ -21,12 +21,12 @@ export default async function TopArtists({ limit = 5 }: { limit?: number }) {
     const rows = await getTopArtists(limit);
 
     return (
-      <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
+      <div className="widget">
         <LiveRefresh channel="site:votes" />
-        <div className="header col-lg-12 p-0">
-          <h2 className="ap-1 bg-header">TOP {limit} ARTISTS</h2>
+        <div className="widget-head">
+          <h2 className="widget-title bg-header">TOP {limit} ARTISTS</h2>
         </div>
-        <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
+        <div className="widget-body bg-secondary">
           <PrintLines>
           {rows.map((row) => {
             const nick = row.nick ?? "";

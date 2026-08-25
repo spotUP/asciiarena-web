@@ -24,14 +24,14 @@ export default async function LatestApps({ limit = 5 }: LatestAppsProps) {
     const rows = await getLatestApps(limit);
 
     return (
-      <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
+      <div className="widget">
         <LiveRefresh channel="site:apps" />
-        <div className="header col-lg-12 p-0">
-          <h2 className="ap-1 bg-header text-truncate lightgreen">
+        <div className="widget-head">
+          <h2 className="widget-title bg-header text-truncate lightgreen">
             <Link prefetch={false} className="lightgreen" href="/apps?sort_by=timestamp&sort_order=D">LATEST ADDED APPS</Link>
           </h2>
         </div>
-        <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
+        <div className="widget-body bg-secondary">
           <PrintLines>
           {rows.map((row) => {
             const filename = row.filename ?? "";

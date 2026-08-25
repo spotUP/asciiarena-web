@@ -26,14 +26,14 @@ export default async function ArenaStats() {
   try {
     const { collysCount, bytes, usersCount, commentsCount } = await getArenaStats();
     return (
-      <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2" style={{ minHeight: "160px" }}>
+      <div className="widget">
         <LiveRefresh channel="site:releases" />
         <LiveRefresh channel="site:users" />
         <LiveRefresh channel="site:comments" />
-        <div className="header col-lg-12 p-0">
-          <h2 className="ap-1 bg-header">aSCIIaRENA STATS</h2>
+        <div className="widget-head">
+          <h2 className="widget-title bg-header">aSCIIaRENA STATS</h2>
         </div>
-        <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary" style={{ minHeight: "112px" }}>
+        <div className="widget-body bg-secondary" style={{ minHeight: "112px" }}>
           <PrintLines>
           <div className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
             <span className="white text-truncate">Collys Online:</span>

@@ -2617,17 +2617,56 @@ input::file-selector-button {
 /* Per-widget [X] (components/widgets/Hideable.tsx).
    The button sits over the widget's own header strip, which is always the
    first thing a widget renders. */
+/* One definition of a sidebar widget's box.
+   Every widget used to hand-roll its own: some opened with a bare div and an
+   inline margin, most with `container fluid col-12 p-0 pl-lg-2 pr-lg-2`, whose
+   .container gutter inset them ~12px more than the others. Their headers
+   varied too -- half set the 16px grid line-height on the h2 and half left it
+   at the 48px form-control default, so the header bands were different heights
+   as well as different widths. The [X] then landed wherever that widget's own
+   edge happened to be.
+   Widths, gaps and the header band all live here now; a widget supplies only
+   its title and its rows. */
+.widget {
+  margin-bottom: 16px;
+}
+/* 40px of side padding on the title band is the room the [X] needs -- 8px
+   edge gap, three 8px characters, 8px clearance -- kept on both sides so the
+   title stays optically centred and its ellipsis never touches the button. */
+.widget-title {
+  margin: 0 !important;
+  padding: 16px 40px !important;
+  font-size: 16px;
+  line-height: 16px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Rows bring their own 8px gutter (.pl-lg-2), so the body pads vertically
+   only -- padding it sideways too would double the inset. */
+.widget-body {
+  padding: 16px 0;
+}
+
 .widget-frame {
   position: relative;
 }
+/* Centred on the 48px title band, 8px in from the widget's edge -- the same
+   place on every widget now that every widget is the same box. Centred by the
+   flex box rather than by line-height: a glyph's position inside its line box
+   depends on the font, and this one has to sit on the title's row whether
+   Topaz has loaded yet or not. */
 .widget-hide-btn {
   position: absolute;
   top: 0;
-  right: 0;
+  right: 8px;
   z-index: 5;
-  height: 16px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
   line-height: 16px;
-  padding: 0 8px;
+  padding: 0;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -2645,7 +2684,7 @@ input::file-selector-button {
    returned null leaves the button as the only element child, so the selector
    does not match and the button stays hidden. */
 .widget-frame:has(> *:not(.widget-hide-btn)) .widget-hide-btn {
-  display: block;
+  display: flex;
 }
 
 /* Rotating logo header: a static-height box (sized server-side to the

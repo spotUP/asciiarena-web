@@ -37,22 +37,22 @@ export default async function LatestCollys({ type, limit = 8 }: LatestCollysProp
 
     const isReleased = type === "released";
     const headerClass = isReleased
-      ? "ap-1 bg-header text-truncate yellow"
-      : "ap-1 bg-header text-truncate lightgreen";
+      ? "widget-title bg-header text-truncate yellow"
+      : "widget-title bg-header text-truncate lightgreen";
     const headerHref = isReleased
       ? "/collys?sort_by=cdate&sort_order=D"
       : "/collys?sort_by=timestamp&sort_order=D";
     const headerText = isReleased ? "NEW COLLYS" : "LATEST ADDED COLLYS";
 
     return (
-      <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
+      <div className="widget">
         <LiveRefresh channel="site:releases" />
-        <div className="header col-lg-12 p-0">
+        <div className="widget-head">
           <h2 className={headerClass}>
             <Link prefetch={false} href={headerHref} className={isReleased ? undefined : "lightgreen"}>{headerText}</Link>
           </h2>
         </div>
-        <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
+        <div className="widget-body bg-secondary">
           <PrintLines>
           {collys.map((row) => {
             const filename = row.filename ?? "";

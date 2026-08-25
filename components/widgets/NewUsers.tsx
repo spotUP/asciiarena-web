@@ -20,12 +20,12 @@ export default async function NewUsers() {
     const rows = await getNewUsers();
 
     return (
-      <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
+      <div className="widget">
         <LiveRefresh channel="site:users" />
-        <div className="header col-lg-12 p-0">
-          <h2 className="ap-1 bg-header">NEW USERS</h2>
+        <div className="widget-head">
+          <h2 className="widget-title bg-header">NEW USERS</h2>
         </div>
-        <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
+        <div className="widget-body bg-secondary">
           <PrintLines>
           {rows.map((row) => {
             // users.joined is sometimes a unix timestamp (numeric string),

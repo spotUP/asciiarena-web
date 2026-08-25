@@ -12,9 +12,9 @@ export default async function PollSidebarLatest() {
   if (!loaded) return null;
 
   return (
-    <div style={{ marginBottom: "16px" }}>
-      <div className="header col-lg-12 p-0 amb-1">
-        <h2 className="ap-1 bg-header" style={{ fontSize: "16px", lineHeight: "16px" }}>LAST POLL</h2>
+    <div className="widget">
+      <div className="widget-head">
+        <h2 className="widget-title bg-header">LAST POLL</h2>
       </div>
       <PollCard
         poll={loaded.poll}

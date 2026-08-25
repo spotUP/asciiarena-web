@@ -121,11 +121,11 @@ export default function UsersOnlineLive({ isLoggedIn = false, currentUserId }: {
   }, []);
 
   return (
-    <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2" style={{ minHeight: "160px" }}>
-      <div className="header col-lg-12 p-0">
-        <h2 className="ap-1 bg-header">USERS ONLINE</h2>
+    <div className="widget">
+      <div className="widget-head">
+        <h2 className="widget-title bg-header">USERS ONLINE</h2>
       </div>
-      <div className="container col-12 p-0 m-0 apt-1 bg-secondary" style={{ minHeight: "112px" }}>
+      <div className="widget-body bg-secondary" style={{ minHeight: "112px" }}>
         {entries.map((entry) => (
           <div key={entry.nick} className="col-lg-12" style={{ paddingLeft: "8px", display: "flex", gap: "6px", alignItems: "center" }}>
             <a className="yellow" href={`/member/${urlsafe(entry.nick)}`}>

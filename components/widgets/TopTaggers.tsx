@@ -30,12 +30,12 @@ export default async function TopTaggers({ limit = 5 }: { limit?: number }) {
     if (!rows.length) return null;
 
     return (
-      <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2">
+      <div className="widget">
         <LiveRefresh channel="site:logos" />
-        <div className="header col-lg-12 p-0">
-          <h2 className="ap-1 bg-header">TOP TAGGERS</h2>
+        <div className="widget-head">
+          <h2 className="widget-title bg-header">TOP TAGGERS</h2>
         </div>
-        <div className="container col-12 m-0 p-0 apt-1 apb-1 bg-secondary">
+        <div className="widget-body bg-secondary">
           <PrintLines>
             {rows.map((row) => (
               <div

@@ -31,11 +31,11 @@ export default async function LatestForumPosts({ limit = 5 }: { limit?: number }
   if (posts.length === 0) return null;
 
   return (
-    <div style={{ marginBottom: "16px" }}>
-      <div className="header col-lg-12 p-0 amb-1">
-        <h2 className="ap-1 bg-header" style={{ fontSize: "16px", lineHeight: "16px" }}>FORUM</h2>
+    <div className="widget">
+      <div className="widget-head">
+        <h2 className="widget-title bg-header">FORUM</h2>
       </div>
-      <div className="container col-12 apt-1 apb-1 m-0 p-0 bg-secondary">
+      <div className="widget-body bg-secondary">
         {posts.map(p => (
           <div
             key={p.id}

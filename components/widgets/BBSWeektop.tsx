@@ -26,12 +26,12 @@ export default function BBSWeektop() {
   const items = useScenewall("bbs-weektop", parseStats);
 
   return (
-    <div className="container fluid col-12 p-0 pl-lg-2 pr-lg-2" style={{ paddingTop: "16px" }}>
-      <div className="header col-lg-12 p-0">
-        <h2 className="ap-1 bg-header">WEEKTOP - BBS:ES</h2>
+    <div className="widget">
+      <div className="widget-head">
+        <h2 className="widget-title bg-header">WEEKTOP - BBS:ES</h2>
       </div>
-      <div className="container-fluid p-0 pl-lg-2 pr-lg-2 bg-secondary">
-        <div className="row m-0 px-0 bg-secondary apb-1" style={{ paddingTop: "16px" }}>
+      <div className="widget-body bg-secondary">
+        <div className="row m-0 px-0 bg-secondary">
           <PrintLines reserveLines={EXPECTED_LINES}>
             {items?.map((item, i) => (
               <div key={i} className="col-lg-12 p-0 pl-lg-2 pr-lg-2 d-flex justify-content-between">
