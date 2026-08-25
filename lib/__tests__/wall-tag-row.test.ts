@@ -49,6 +49,21 @@ describe("the wall tag row", () => {
     it(`${file} keeps the fixed-width button class off it`, () => {
       expect(source, file).not.toContain("button btn-primary black");
     });
+
+    it(`${file} lines the box you type in up with the wall above it`, () => {
+      // Measured on the live page: the wall's text sat at 12px (the panel's
+      // 8px padding plus a 4px column gutter) while the input's text sat at
+      // 16px (an 8px wrapper padding plus the input's own 8px). Both off the
+      // grid, and 4px apart, which is what "it doesn't align" looked like.
+      //
+      // p-0 on the row columns drops the gutter, so the wall's text sits at
+      // the panel's own 8px; the tag row has no wrapper padding, so the
+      // input's own 8px is the only inset. Both land on 8px.
+      expect(source, file).toContain('<div className="col-10 d-flex p-0">');
+      expect(source, file).toContain('<div className="col-2 text-right p-0">');
+      expect(source, file).toContain('<div className="d-flex m-0">');
+      expect(source, file).not.toContain('className="d-flex m-0" style={{ paddingLeft: "8px" }}');
+    });
   }
 
   it("no longer has a class that forces a width on it", () => {

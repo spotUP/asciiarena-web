@@ -118,14 +118,14 @@ export default function GlobalWall({ isLoggedIn }: { isLoggedIn?: boolean }) {
           <PrintLines reserveLines={EXPECTED_LINES}>
             {posts.map((p, i) => (
               <div className="row m-0 p-0" key={i}>
-                <div className="col-10 d-flex">
+                <div className="col-10 d-flex p-0">
                   <span
                     className="text-truncate"
                     style={{ whiteSpace: "pre" }}
                     dangerouslySetInnerHTML={{ __html: ansiToHtml(p.comment) }}
                   />
                 </div>
-                <div className="col-2 text-right">
+                <div className="col-2 text-right p-0">
                   <span className="lightpink">{p.userName}</span>
                 </div>
               </div>
@@ -133,12 +133,12 @@ export default function GlobalWall({ isLoggedIn }: { isLoggedIn?: boolean }) {
           </PrintLines>
           {activeDrafts.map(d => (
             <div className="row m-0 p-0" key={d.nick}>
-              <div className="col-10 d-flex">
+              <div className="col-10 d-flex p-0">
                 <span className="text-truncate lightgrey" style={{ whiteSpace: "pre" }}>
                   {d.text}<span className="cursor-block" />
                 </span>
               </div>
-              <div className="col-2 text-right">
+              <div className="col-2 text-right p-0">
                 <span className="lightpink">{d.nick}</span>
               </div>
             </div>
@@ -148,7 +148,7 @@ export default function GlobalWall({ isLoggedIn }: { isLoggedIn?: boolean }) {
         {isLoggedIn && (
           <form onSubmit={handleSubmit} className="w-100">
             {/* Flex, not a 12-column grid -- see SiteWall for why. */}
-            <div className="d-flex m-0" style={{ paddingLeft: "8px" }}>
+            <div className="d-flex m-0">
               <input
                 ref={inputRef}
                 className="form-control"
