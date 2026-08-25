@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/ToastProvider";
 import { deletePost, editPost } from "@/app/actions/forum";
 import { MAX_BODY_LEN } from "@/lib/forum/types";
+import AnsiMenu from "@/components/ui/AnsiMenu";
 
 interface Props {
   postId: number;
@@ -107,26 +108,25 @@ export default function PostActions({ postId, body, canEdit, canDelete, canRepor
     );
   }
 
-  // No fixed height: site.css:543 pins every <button> to 48px, so a 16px row
-  // here overflows the post card and lands on top of the paginator below it.
-  // 48px is three grid rows, so the natural height is already on the grid.
+  // One menu rather than three buttons. Three is not many on its own, but they
+  // repeat under every post: a twenty-post thread carried sixty buttons, all
+  // of them shouting as loudly as the posts.
+  //
+  // Right-aligned, so the menu hangs from the trigger's right edge and stays
+  // inside the post card.
   return (
-    <div className="apt-1 d-flex justify-content-end" style={{ gap: "8px" }}>
-      {canEdit && (
-        <button className="btn-secondary apr-1" onClick={() => setEditing(true)}>
-          EDIT
-        </button>
-      )}
-      {canDelete && (
-        <button className="btn-secondary apr-1" onClick={remove} disabled={busy}>
-          DELETE
-        </button>
-      )}
-      {canReport && (
-        <button className="btn-secondary apr-1" onClick={report} disabled={busy}>
-          REPORT
-        </button>
-      )}
+    <div className="apt-1 d-flex justify-content-end">
+      <AnsiMenu
+        label="Actions"
+        width="144px"
+        menuWidth="176px"
+        align="right"
+        items={[
+          ...(canEdit ? [{ label: "Edit", onSelect: () => setEditing(true) }] : []),
+          ...(canDelete ? [{ label: "Delete", onSelect: remove }] : []),
+          ...(canReport ? [{ label: "Report", onSelect: report }] : []),
+        ]}
+      />
     </div>
   );
 }

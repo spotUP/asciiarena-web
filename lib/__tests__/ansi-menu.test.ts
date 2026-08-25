@@ -69,3 +69,33 @@ describe("AnsiMenu", () => {
     expect(menu).toMatch(/role="menuitem"/);
   });
 });
+
+describe("the forum's per-post actions", () => {
+  const actions = readFileSync(
+    path.join(process.cwd(), "components/forum/PostActions.tsx"),
+    "utf8",
+  );
+
+  it("is one menu rather than three buttons under every post", () => {
+    // Three is not many on its own, but they repeat: a twenty-post thread
+    // carried sixty buttons, all shouting as loudly as the posts.
+    expect(actions).toMatch(/<AnsiMenu\s*\n\s*label="Actions"/);
+    expect(actions).not.toMatch(/>\s*EDIT\s*</);
+    expect(actions).not.toMatch(/>\s*DELETE\s*</);
+    expect(actions).not.toMatch(/>\s*REPORT\s*</);
+  });
+
+  it("still gates each entry on its own permission", () => {
+    expect(actions).toMatch(/canEdit \? \[\{ label: "Edit"/);
+    expect(actions).toMatch(/canDelete \? \[\{ label: "Delete"/);
+    expect(actions).toMatch(/canReport \? \[\{ label: "Report"/);
+    // And renders nothing at all when the reader may do none of them.
+    expect(actions).toMatch(/if \(!canEdit && !canDelete && !canReport\) return null;/);
+  });
+
+  it("hangs the menu from the trigger's right edge", () => {
+    // The actions sit at the right of the post card; a left-hung menu would
+    // run off the side of it.
+    expect(actions).toMatch(/align="right"/);
+  });
+});

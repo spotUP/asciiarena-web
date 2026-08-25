@@ -50,6 +50,12 @@ interface Props {
   width?: string;
   /** Menu width; defaults to 264px (33 characters). */
   menuWidth?: string;
+  /**
+   * Which edge the menu hangs from. A trigger at the right of its row -- the
+   * per-post actions in a forum thread -- needs "right", or the menu runs off
+   * the side of the card.
+   */
+  align?: "left" | "right";
 }
 
 const ROW: React.CSSProperties = {
@@ -78,7 +84,7 @@ function marker(item: AnsiMenuItem): string {
   return "";
 }
 
-export default function AnsiMenu({ label, items, width, menuWidth = "264px" }: Props) {
+export default function AnsiMenu({ label, items, width, menuWidth = "264px", align = "left" }: Props) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -121,7 +127,7 @@ export default function AnsiMenu({ label, items, width, menuWidth = "264px" }: P
           style={{
             position: "absolute",
             top: "100%",
-            left: 0,
+            ...(align === "right" ? { right: 0 } : { left: 0 }),
             zIndex: 200,
             width: menuWidth,
             marginTop: "8px",
