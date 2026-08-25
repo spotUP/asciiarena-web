@@ -2617,6 +2617,32 @@ input::file-selector-button {
 /* Per-widget [X] (components/widgets/Hideable.tsx).
    The button sits over the widget's own header strip, which is always the
    first thing a widget renders. */
+/* ── Live feed: one line per event, flowed into columns ───────────────────
+   The feed sits in a full-width card, so a single column wasted most of every
+   row and made the card fifteen rows tall. `columns: 320px 4` asks for as many
+   320px columns as fit and never more than four, which is three on a laptop
+   and four on a wide screen, without a media query per breakpoint.
+
+   Column flow (down one column, then the next) is right for this list: it is
+   chronological, and reading it top-to-bottom per column keeps that order. */
+.live-feed {
+  columns: 320px 4;
+  column-gap: 16px;
+}
+.live-feed-row {
+  /* A row is one 16px line of the grid and never wraps: a long filename is
+     cut with an ellipsis rather than pushing the column out of step. */
+  height: 16px;
+  line-height: 16px;
+  padding: 0 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Without this a row can be split across a column break, leaving half a
+     line at the foot of one column and half at the head of the next. */
+  break-inside: avoid;
+}
+
 /* ── Controls that sit on one 16px text row ───────────────────────────────
    `input, optgroup` and `button, select` above pin every control to
    min-height/max-height 48px -- three rows of the 8x16 grid. That is right for

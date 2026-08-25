@@ -56,30 +56,30 @@ export default function ActivityFeed() {
   }, []);
 
   return (
-    <div className="col-lg-12 p-0">
-      <div className="header col-lg-12 p-0">
-        <h2 className="ap-1 bg-header">LIVE FEED</h2>
+    <div className="widget">
+      <div className="widget-head">
+        <h2 className="widget-title bg-header">LIVE FEED</h2>
       </div>
-      <div className="container col-12 apt-1 apb-1 m-0 p-0 bg-secondary">
+      {/* The feed is one line per event in a full-width card, so a single
+          column left most of the row empty and pushed the card fifteen rows
+          tall. .live-feed flows the same list into as many 320px columns as
+          fit, up to four. */}
+      <div className="widget-body bg-secondary live-feed">
         {entries.length === 0 && (
-          <div className="col-lg-12 p-0 pl-lg-2 pr-lg-2 lightgrey" style={{ fontSize: "0.85em", paddingBottom: "3px" }}>
+          <div className="live-feed-row lightgrey">
             watching...
           </div>
         )}
         {entries.map(entry => (
-          <div
-            key={entry.id}
-            className="col-lg-12 p-0 pl-lg-2 pr-lg-2"
-            style={{ fontSize: "0.85em", paddingBottom: "3px" }}
-          >
+          <div key={entry.id} className="live-feed-row">
             {entry.nick === "anon" ? (
-              <span className="lightgrey" style={{ marginRight: "4px" }}>anon</span>
+              <span className="lightgrey" style={{ marginRight: "8px" }}>anon</span>
             ) : (
-              <a href={`/member/${entry.nick}`} className="yellow" style={{ marginRight: "4px" }}>
+              <a href={`/member/${entry.nick}`} className="yellow" style={{ marginRight: "8px" }}>
                 {entry.nick}
               </a>
             )}
-            <span className="lightgrey" style={{ marginRight: "4px" }}>
+            <span className="lightgrey" style={{ marginRight: "8px" }}>
               {actionLabel(entry.type)}
             </span>
             <a href={entry.targetUrl} style={{ color: "#aaaaaa" }}>

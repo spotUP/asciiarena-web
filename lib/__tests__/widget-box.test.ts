@@ -22,6 +22,9 @@ import { describe, expect, it } from "vitest";
  */
 
 const WIDGETS = [
+  // ActivityFeed is a main-column card rather than a sidebar one, but it is
+  // the same box and holds to the same invariant.
+  "ActivityFeed",
   "ArenaStats", "BBSWeektop", "CedSessions", "LastCallers", "LatestApps",
   "LatestCollys", "LatestForumPosts", "LatestMags", "LatestNews",
   "MostViewedCollys", "MusicPlayer", "NewUsers", "NowPlaying",
