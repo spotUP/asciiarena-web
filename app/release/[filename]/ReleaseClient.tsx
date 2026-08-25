@@ -41,14 +41,26 @@ const LogoTagPanel = dynamic(() => import("@/components/release/LogoTagPanel"), 
 
 
 /**
- * One row of the release page's control bar.
+ * A row of buttons in the release page's control bar.
  *
- * 8px between controls, 8px between wrapped lines, 8px in from the panel edge
- * -- all on the 8x16 grid. The 16px between the sections themselves comes from
- * the bar's own gap, so a section reads as a group rather than as more of the
- * same line.
+ * A grid rather than a flex row, so every button is the same width: equal
+ * columns at least 176px wide (22 characters -- "View Comments (2)" is the
+ * longest label at 17 plus .btn-big's 2x16px of padding), stretching to share
+ * out whatever is left over. Buttons of a dozen different widths read as a
+ * jumble however they are grouped.
+ *
+ * 8px between controls, 8px in from the panel edge. The 16px between sections
+ * comes from the bar's own gap.
  */
 const CONTROL_ROW: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fill, minmax(176px, 1fr))",
+  gap: "8px",
+  padding: "0 8px",
+};
+
+/** Text, not controls: it should read as a line, not as equal columns. */
+const TEXT_ROW: React.CSSProperties = {
   display: "flex",
   flexWrap: "wrap",
   alignItems: "center",
@@ -56,6 +68,9 @@ const CONTROL_ROW: React.CSSProperties = {
   rowGap: "8px",
   padding: "0 8px",
 };
+
+/** The colour swatches sit next to the font button rather than in a column. */
+const SETTINGS_ROW: React.CSSProperties = { ...TEXT_ROW };
 
 interface Comment {
   id: number;
@@ -1227,8 +1242,11 @@ export default function ReleaseClient({
           be one long wrapping line, so buttons and figures interleaved
           wherever the line happened to break -- "63 views 3 watching" sat
           between Share and View Comments. */}
+      {/* No p-0 on the panel: Bootstrap sets it `padding: 0 !important`, which
+          beats an inline style, so the bar had no room above the first row or
+          below the last however the padding here was written. */}
       <div
-        className="bg-secondary amb-1 p-0"
+        className="bg-secondary amb-1"
         style={{ marginTop: "32px", display: "flex", flexDirection: "column", gap: "16px", padding: "16px 0" }}
       >
         {/* Viewing: everything that changes what you are looking at. */}
@@ -1277,28 +1295,6 @@ export default function ReleaseClient({
           </div>
         )}
 
-        {/* Appearance: how the art is drawn. */}
-        {hasInlineContent && (
-          <div style={CONTROL_ROW}>
-            <ColorSwatch current={bgColor} onChange={setBgColor} />
-            <ColorSwatch current={fgColor} onChange={setFgColor} />
-            <div ref={fontRef} style={{ position: "relative" }}>
-              <button className="btn-big bg-header grey-text" onClick={() => setFontOpen(o => !o)}>
-                {FONTS.find(f => f.value === font)?.label ?? font} v
-              </button>
-              {fontOpen && (
-                <div className="dropdown-menu ascii" style={{ display: "block", position: "absolute", zIndex: 200, top: "100%" }}>
-                  {FONTS.map(f => (
-                    <button key={f.value} className="dropdown-item ascii" onClick={() => { setFont(f.value); setFontOpen(false); }}>
-                      {f.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
         {/* The colly itself: what you do with it rather than to the view. */}
         <div style={CONTROL_ROW}>
           <input type="button" className="btn-big" value="Download" onClick={doDownload} />
@@ -1317,7 +1313,7 @@ export default function ReleaseClient({
 
           {/* Share dropdown */}
           <div ref={shareRef} style={{ position: "relative" }}>
-            <button className="btn-big bg-header grey-text" onClick={() => setShareOpen(o => !o)}>
+            <button className="btn-big bg-header grey-text" style={{ width: "100%" }} onClick={() => setShareOpen(o => !o)}>
               Share
             </button>
             {shareOpen && (
@@ -1356,7 +1352,7 @@ export default function ReleaseClient({
 
         {/* The counts, on their own line and never mixed in with the buttons. */}
         {(viewCount > 0 || watching > 1 || favCount > 0 || downloadCount > 0 || (commentsLoaded && comments.length > 0)) && (
-          <div style={CONTROL_ROW} className="lightgrey">
+          <div style={TEXT_ROW} className="lightgrey">
             {viewCount > 0 && (
               <span>{viewCount} {viewCount === 1 ? "view" : "views"}</span>
             )}
@@ -1372,6 +1368,30 @@ export default function ReleaseClient({
             {downloadCount > 0 && (
               <span>{downloadCount} {downloadCount === 1 ? "download" : "downloads"}</span>
             )}
+          </div>
+        )}
+
+        {/* Appearance, last: it is a setting you reach for once, not a control
+            you work with while reading. Its own row layout, because a colour
+            swatch stretched to a button's width would be a wall of colour. */}
+        {hasInlineContent && (
+          <div style={SETTINGS_ROW}>
+            <ColorSwatch current={bgColor} onChange={setBgColor} />
+            <ColorSwatch current={fgColor} onChange={setFgColor} />
+            <div ref={fontRef} style={{ position: "relative" }}>
+              <button className="btn-big bg-header grey-text" style={{ width: "176px" }} onClick={() => setFontOpen(o => !o)}>
+                {FONTS.find(f => f.value === font)?.label ?? font} v
+              </button>
+              {fontOpen && (
+                <div className="dropdown-menu ascii" style={{ display: "block", position: "absolute", zIndex: 200, top: "100%" }}>
+                  {FONTS.map(f => (
+                    <button key={f.value} className="dropdown-item ascii" onClick={() => { setFont(f.value); setFontOpen(false); }}>
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

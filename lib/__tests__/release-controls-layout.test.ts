@@ -33,14 +33,37 @@ describe("release control bar", () => {
     expect(bar).toMatch(/flexDirection: "column", gap: "16px"/);
   });
 
-  it("gives every section the same row style", () => {
+  it("makes every button in a control row the same width", () => {
+    // Equal grid columns, at least 176px: 22 characters, which is the longest
+    // label ("View Comments (2)", 17) plus .btn-big's 2x16px of padding.
+    // Buttons of a dozen widths read as a jumble however they are grouped.
+    expect(source).toMatch(/gridTemplateColumns: "repeat\(auto-fill, minmax\(176px, 1fr\)\)"/);
     const rows = bar.match(/style=\{CONTROL_ROW\}/g) ?? [];
-    expect(rows.length).toBe(4);
-    expect(source).toMatch(/const CONTROL_ROW: React\.CSSProperties = \{/);
+    expect(rows.length).toBe(2);
+  });
+
+  it("makes a wrapped control fill its cell", () => {
+    // Share sits in a positioned div so its menu can hang off it; without a
+    // width the button inside would size to its own label instead of the cell.
+    expect(bar).toMatch(/Share dropdown[\s\S]*?style=\{\{ width: "100%" \}\}/);
+  });
+
+  it("does not lay text out in equal columns", () => {
+    expect(source).toMatch(/const TEXT_ROW: React\.CSSProperties = \{[\s\S]*?display: "flex"/);
+    expect(bar).toMatch(/style=\{TEXT_ROW\} className="lightgrey"/);
+  });
+
+  it("gives the panel room above and below its content", () => {
+    // .p-0 is `padding: 0 !important`, which beats an inline style: with that
+    // class on the panel the bar had no room above the first row at all.
+    expect(bar).toMatch(/className="bg-secondary amb-1"/);
+    expect(bar).not.toMatch(/className="bg-secondary amb-1 p-0"/);
+    expect(bar).toMatch(/padding: "16px 0"/);
   });
 
   it("keeps the counts out of the button rows", () => {
-    const counts = bar.slice(bar.indexOf("{/* The counts"));
+    // Bounded by the appearance row, which now follows it.
+    const counts = bar.slice(bar.indexOf("{/* The counts"), bar.indexOf("{/* Appearance,"));
     // Every figure lives in the last section...
     for (const figure of ["view" + "s\"", "watching", "comment" + "s\"", "favourite" + "s\"", "download" + "s\""]) {
       expect(counts, figure).toContain(figure);
@@ -50,12 +73,21 @@ describe("release control bar", () => {
   });
 
   it("puts the view controls together", () => {
-    const viewing = bar.slice(bar.indexOf("{/* Viewing:"), bar.indexOf("{/* Appearance:"));
+    const viewing = bar.slice(bar.indexOf("{/* Viewing:"), bar.indexOf("{/* The colly itself"));
     for (const control of ["Hide Colly", "Fullscreen", "Fit to screen", "Index", "Minimap", "Autoplay", "Groove"]) {
       expect(viewing, control).toContain(control);
     }
     // Download belongs to the colly, not to the view.
     expect(viewing).not.toContain('value="Download"');
+  });
+
+  it("puts the colour and font settings last", () => {
+    // A setting you reach for once, not a control you work with while reading.
+    const appearance = bar.indexOf("{/* Appearance,");
+    const counts = bar.indexOf("{/* The counts");
+    const colly = bar.indexOf("{/* The colly itself");
+    expect(appearance).toBeGreaterThan(counts);
+    expect(counts).toBeGreaterThan(colly);
   });
 
   it("puts what you do with the colly together", () => {
@@ -69,7 +101,7 @@ describe("release control bar", () => {
   it("keeps the autoplay readout with the autoplay buttons", () => {
     // The one figure that is not a count: it is the position within the
     // playlist and it means nothing on its own line.
-    const viewing = bar.slice(bar.indexOf("{/* Viewing:"), bar.indexOf("{/* Appearance:"));
+    const viewing = bar.slice(bar.indexOf("{/* Viewing:"), bar.indexOf("{/* The colly itself"));
     expect(viewing).toMatch(/\{autoplayIndex \+ 1\} \/ \{sections\.length\}/);
   });
 
@@ -78,5 +110,14 @@ describe("release control bar", () => {
     // otherwise be two empty 16px gaps above the buttons.
     expect(bar).toMatch(/\{hasInlineContent && \(\s*\n\s*<div style=\{CONTROL_ROW\}>/);
     expect(bar).toMatch(/viewCount > 0 \|\| watching > 1/);
+  });
+});
+
+describe("the colour swatch", () => {
+  const swatch = readFileSync(path.join(process.cwd(), "components/ui/ColorSwatch.tsx"), "utf8");
+
+  it("is two characters wide, not one", () => {
+    // 8px was one character: hard to hit and hard to read as a colour.
+    expect(swatch).toMatch(/width: "16px", height: "16px", background: current/);
   });
 });

@@ -39,7 +39,9 @@ export default function ColorSwatch({ current, onChange }: { current: string; on
     <div ref={ref} style={{ position: "relative" }}>
       <button
         onClick={() => setOpen(o => !o)}
-        style={{ width: "8px", height: "16px", background: current, border: "none", padding: 0, cursor: "pointer", display: "block" }}
+        // One character wide was hard to hit and hard to see; two is still
+        // on the 8x16 grid.
+        style={{ width: "16px", height: "16px", background: current, border: "none", padding: 0, cursor: "pointer", display: "block" }}
       />
       {open && (
         <div style={{
