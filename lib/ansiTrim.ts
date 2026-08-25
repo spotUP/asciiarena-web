@@ -18,13 +18,36 @@
 /** The engine's flat [char, foreground, background] triplets, row-major. */
 export type AnsiCells = ArrayLike<number>;
 
+/**
+ * Is one cell blank -- nothing drawn there?
+ *
+ * The single definition of "blank" for the whole editor: the render side reads
+ * [char, fg, bg] triplets and the composer reads the engine's packed 16-bit
+ * cells, and the two had drifted. A post drawn only in background colour was
+ * rejected with "Draw something before you post" because the composer looked at
+ * the character alone and saw a canvas full of spaces.
+ *
+ * A NUL or a space on the default (black) background is blank. Any background
+ * colour is a drawing -- filled blocks are how half the art on the site is
+ * made. A foreground colour on a space is NOT: nothing of it is visible.
+ */
+export function isBlankCell(charCode: number, background: number): boolean {
+  if (background !== 0) return false;
+  return charCode === 0 || charCode === 32;
+}
+
+/**
+ * The same question for the engine's packed cell format, which is what
+ * canvas.getImageData() hands out: (charCode << 8) + (background << 4) + fg.
+ */
+export function isBlankPackedCell(cell: number): boolean {
+  return isBlankCell(cell >> 8, (cell >> 4) & 15);
+}
+
 function rowIsBlank(data: AnsiCells, columns: number, row: number): boolean {
   for (let col = 0; col < columns; col++) {
     const at = (row * columns + col) * 3;
-    const charCode = data[at] ?? 0;
-    const background = data[at + 2] ?? 0;
-    if (background !== 0) return false;
-    if (charCode !== 0 && charCode !== 32) return false;
+    if (!isBlankCell(data[at] ?? 0, data[at + 2] ?? 0)) return false;
   }
   return true;
 }

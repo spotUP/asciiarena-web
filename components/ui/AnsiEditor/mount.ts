@@ -14,6 +14,8 @@
  * rest of the asciiarena (Bootstrap) site.
  */
 
+import { isBlankPackedCell } from "@/lib/ansiTrim";
+
 import "./editor.css";
 import { bootstrapEditor } from "./engine/bootstrap.js";
 import { encodeAnsBytes } from "./engine/file.js";
@@ -279,9 +281,10 @@ export function initAnsiEditor(
       }
       const cells = canvas.getImageData();
       for (let i = 0; i < cells.length; i++) {
-        // Top byte is the char code; 0 (NUL) and 32 (space) are blank.
-        const charCode = cells[i] >> 8;
-        if (charCode !== 0 && charCode !== 32) return false;
+        // Blank is more than "no character": a space carrying a background
+        // colour is a filled block, and rejecting it as empty is what stopped
+        // background-only art from being posted at all.
+        if (!isBlankPackedCell(cells[i])) return false;
       }
       return true;
     },
