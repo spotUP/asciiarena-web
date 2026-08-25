@@ -127,7 +127,7 @@ export default function UsersOnlineLive({ isLoggedIn = false, currentUserId }: {
       </div>
       <div className="widget-body bg-secondary" style={{ minHeight: "112px" }}>
         {entries.map((entry) => (
-          <div key={entry.nick} className="col-lg-12" style={{ paddingLeft: "8px", display: "flex", gap: "6px", alignItems: "center" }}>
+          <div key={entry.nick} className="col-lg-12" style={{ paddingLeft: "8px", display: "flex", gap: "8px", alignItems: "center", height: "16px", lineHeight: "16px" }}>
             <a className="yellow" href={`/member/${urlsafe(entry.nick)}`}>
               <ScrambleText text={entry.nick} mode={entry.state} />
             </a>
@@ -135,7 +135,7 @@ export default function UsersOnlineLive({ isLoggedIn = false, currentUserId }: {
               <span
                 title={`${entry.nick} has chat open`}
                 className="cyan"
-                style={{ fontFamily: "inherit", fontSize: "inherit" }}
+                style={{ fontFamily: "inherit", fontSize: "inherit", lineHeight: "16px" }}
               >
                 [c]
               </span>
@@ -143,8 +143,10 @@ export default function UsersOnlineLive({ isLoggedIn = false, currentUserId }: {
             {isLoggedIn && entry.id > 0 && entry.id !== currentUserId && (
               <button
                 onClick={() => openChat(entry.id, entry.nick)}
-                className="lightgrey"
-                style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "inherit", fontSize: "inherit" }}
+                /* .text-btn keeps the button on the row's own 16px line: a
+                   plain <button> is pinned to 48px by the global rule, which
+                   put a blank line between every user in the list. */
+                className="lightgrey text-btn"
                 title={`Chat with ${entry.nick}`}
               >
                 [chat]

@@ -255,7 +255,7 @@ export default function MessagesClient({ userId, userNick, initialReceiverId, in
             <div className="col-12 d-flex" style={{ gap: "8px", alignItems: "center" }}>
               <input
                 type="text"
-                className="form-control"
+                className="form-control search-field"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 placeholder="Search subject or nick..."

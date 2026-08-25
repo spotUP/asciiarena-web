@@ -38,12 +38,12 @@ export default function SearchForm({ initial = "", compact = false }: { initial?
           name="q"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          className="form-control"
+          className="search-field"
           placeholder="Search releases, artists, crews..."
           autoFocus
           style={{ flex: 1 }}
         />
-        <input type="submit" className="btn-big" value="Search" />
+        <input type="submit" className="search-btn" value="Search" />
       </div>
     </form>
   );

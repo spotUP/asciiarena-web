@@ -44,14 +44,14 @@ export default function SoundtrackPicker({ value, onChange }: { value: string; o
       <div style={{ display: "flex", gap: "8px" }}>
         <input
           type="text"
-          className="form-control"
+          className="search-field"
           placeholder="search modland (artist / tune)..."
           value={q}
           onChange={(e) => setQ(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); doSearch(); } }}
           style={{ width: "260px" }}
         />
-        <input type="button" className="btn-big" value={loading ? "..." : "Search"} onClick={doSearch} />
+        <input type="button" className="search-btn" value={loading ? "..." : "Search"} onClick={doSearch} />
       </div>
       {open && results.length > 0 && (
         <div style={{

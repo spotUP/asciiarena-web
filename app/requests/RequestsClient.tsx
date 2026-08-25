@@ -142,7 +142,7 @@ export default function RequestsClient() {
               id="filter"
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="pl-1 w-100"
+              className="pl-1 w-100 search-field"
               placeholder="Search..."
               type="text"
               autoComplete="off"

@@ -105,15 +105,6 @@ export default function MusicPlayer() {
     }
   };
 
-  const btn: React.CSSProperties = {
-    background: "transparent", border: "1px solid #555", color: "#aaaaaa",
-    cursor: "pointer", fontFamily: "inherit", fontSize: "inherit",
-    padding: "0 8px", minHeight: 0, height: "auto", margin: 0, lineHeight: "24px",
-  };
-  const field: React.CSSProperties = {
-    background: "#111", border: "1px solid #555", color: "#aaaaaa",
-    fontFamily: "inherit", fontSize: "inherit", padding: "0 6px", lineHeight: "24px",
-  };
 
   return (
     <div className="widget">
@@ -126,13 +117,14 @@ export default function MusicPlayer() {
           <div style={{ display: "flex", gap: "4px", marginBottom: "8px" }}>
             <input
               type="text"
+              className="search-field"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") doSearch(); }}
               placeholder="search modland..."
-              style={{ ...field, flex: 1, minWidth: 0 }}
+              style={{ flex: 1, minWidth: 0 }}
             />
-            <button type="button" style={btn} onClick={doSearch}>{searching ? "..." : "Go"}</button>
+            <button type="button" className="search-btn" onClick={doSearch}>{searching ? "..." : "Go"}</button>
           </div>
 
           {/* Results — song name + extension only */}
@@ -168,9 +160,9 @@ export default function MusicPlayer() {
 
           {/* Transport */}
           <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-            <button type="button" style={btn} onClick={toggle} disabled={!track} title="Play/Pause">{isPlaying ? "Pause" : "Play"}</button>
-            <button type="button" style={btn} onClick={stop} disabled={!track} title="Stop">Stop</button>
-            <button type="button" style={btn} onClick={() => playRandom()} title="Random tune">Random</button>
+            <button type="button" className="search-btn" onClick={toggle} disabled={!track} title="Play/Pause">{isPlaying ? "Pause" : "Play"}</button>
+            <button type="button" className="search-btn" onClick={stop} disabled={!track} title="Stop">Stop</button>
+            <button type="button" className="search-btn" onClick={() => playRandom()} title="Random tune">Random</button>
             <VolumeBar value={volume} onChange={setVolume} />
           </div>
         </div>

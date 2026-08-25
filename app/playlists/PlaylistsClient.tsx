@@ -100,7 +100,7 @@ export default function PlaylistsClient() {
         <input type="button" className="btn-big" value=">|" onClick={() => setPage(maxPage)} />
         <input
           type="text"
-          className="form-control"
+          className="form-control search-field"
           style={{ width: "200px" }}
           placeholder="Search..."
           onChange={e => handleFilterChange(e.target.value)}

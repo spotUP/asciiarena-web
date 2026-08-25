@@ -2617,6 +2617,53 @@ input::file-selector-button {
 /* Per-widget [X] (components/widgets/Hideable.tsx).
    The button sits over the widget's own header strip, which is always the
    first thing a widget renders. */
+/* ── Controls that sit on one 16px text row ───────────────────────────────
+   `input, optgroup` and `button, select` above pin every control to
+   min-height/max-height 48px -- three rows of the 8x16 grid. That is right for
+   a stand-alone form field or a .btn-big, and wrong everywhere a control has
+   to read as part of a line of text: a search box in a sidebar came out three
+   rows tall, and the [chat] button next to a nick made every user in USERS
+   ONLINE 48px apart, which looked like a blank line between each of them.
+
+   Both classes are the same idea as the type-or-pick Combobox
+   (components/ui/Combobox.tsx), which has always drawn itself on one row. */
+.search-field,
+.search-btn,
+.text-btn {
+  height: 16px;
+  min-height: 0;
+  max-height: 16px;
+  line-height: 16px;
+  font-size: 16px;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
+  border: 0 !important;
+  border-radius: 0 !important;
+  /* The element rule sets padding-left and margin-left with !important. */
+  padding: 0 8px !important;
+  margin: 0 !important;
+  box-sizing: border-box;
+}
+.search-field {
+  background: #2a2a2a !important;
+  color: #ffffff !important;
+}
+.search-btn {
+  background: #444444 !important;
+  color: #cccccc !important;
+  cursor: pointer;
+}
+.search-btn:hover {
+  color: #ffffff !important;
+}
+/* A button that is only its label -- [chat], [c], [X] -- so it can sit inside
+   a line of text without setting that line's height. */
+.text-btn {
+  background: none !important;
+  color: inherit;
+  padding: 0 !important;
+  cursor: pointer;
+}
+
 /* One definition of a sidebar widget's box.
    Every widget used to hand-roll its own: some opened with a bare div and an
    inline margin, most with `container fluid col-12 p-0 pl-lg-2 pr-lg-2`, whose

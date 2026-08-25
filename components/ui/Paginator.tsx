@@ -98,7 +98,7 @@ export default function Paginator({
               id="filter"
               value={filterValue ?? ""}
               onChange={(e) => onFilter(e.target.value)}
-              className="pl-1 w-100"
+              className="pl-1 w-100 search-field"
               placeholder="Search..."
               type="text"
               autoComplete="off"

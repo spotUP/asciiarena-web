@@ -78,7 +78,7 @@ function Section({ label, listApi, adminApi, detailPath }: { label: string; list
         <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }} className="amb-1">
           <input
             type="text"
-            className="form-control"
+            className="form-control search-field"
             value={query}
             onChange={e => setQuery(e.target.value)}
             onKeyDown={e => e.key === "Enter" && search()}
