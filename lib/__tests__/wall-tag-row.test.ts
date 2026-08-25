@@ -51,9 +51,11 @@ describe("the wall tag row", () => {
     });
   }
 
-  it("btn-primary really is a fixed width, which is why it was wrong here", () => {
-    // Documenting the trap rather than changing it: nine other call sites want
-    // that flat width, and Paginator sets its own on top.
-    expect(cssRule(css, ".btn-primary {")).toMatch(/width:\s*132px;/);
+  it("no longer has a class that forces a width on it", () => {
+    // .btn-primary used to set a flat `width: 132px`. It is gone site-wide:
+    // a button is as wide as its label, and a call site that genuinely needs
+    // a set width (the paginator's arrows) says so itself.
+    expect(cssRule(css, ".btn-primary {")).not.toMatch(/width:\s*132px/);
+    expect(cssRule(css, ".btn-primary:hover {")).not.toMatch(/width:\s*132px/);
   });
 });

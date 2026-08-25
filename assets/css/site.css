@@ -640,12 +640,19 @@ input[type=button], input[type=submit], input[type=reset] {
   padding-top: 0px;
 }
 
+/* No fixed width. This class used to set `width: 132px`, so every button
+   wearing it held 132px of its row whatever its label said -- which is how the
+   wall's three-character Tag button ended up owning a slab of the row the
+   input needed. A button is as wide as its label plus .btn's 16px of side
+   padding; anything that genuinely needs a set width (the paginator's arrows)
+   says so at the call site.
+
+   The :hover twin has to agree, or the button would resize under the cursor. */
 .btn-primary {
   color: #bbbbbb !important;
   background-color: #444444;
   margin-left: 0px !important;
   margin-right: 0px !important; 
-  width: 132px; 
   text-align: center;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
 }
@@ -654,7 +661,6 @@ input[type=button], input[type=submit], input[type=reset] {
   color: #000000 !important;
   margin-left: 0px !important;
   margin-right: 0px !important; 
-  width: 132px; 
   text-align: center;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
   filter: brightness(170%);

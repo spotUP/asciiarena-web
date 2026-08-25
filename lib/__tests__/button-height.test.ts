@@ -88,6 +88,15 @@ describe("button height", () => {
     expect(file).toMatch(/max-height:\s*none !important;/);
   });
 
+  it("gives no button a width it did not ask for", () => {
+    // .btn-primary set a flat `width: 132px`, so every button wearing it held
+    // 132px of its row whatever its label said -- and a longer label than that
+    // (the paginator's "50 per page", which needs 138px) was clipped. Both the
+    // base rule and its :hover twin, or the button resizes under the cursor.
+    expect(cssRule(css, ".btn-primary {")).not.toMatch(/width:\s*\d+px/);
+    expect(cssRule(css, ".btn-primary:hover {")).not.toMatch(/width:\s*\d+px/);
+  });
+
   it("leaves the textarea stacking its lines", () => {
     // textarea is deliberately absent from the input selectors; it has its own
     // rule, added when the comment box was a line off.
