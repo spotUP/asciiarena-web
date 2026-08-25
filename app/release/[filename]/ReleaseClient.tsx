@@ -31,6 +31,7 @@ import ColorSwatch from "@/components/ui/ColorSwatch";
 import { useMusic } from "@/components/music/MusicProvider";
 import { BeatDetector, lowBandEnergy } from "@/lib/uade/beatDetector";
 import { subscribeRaw } from "@/lib/sse-pool";
+import { useToast } from "@/components/ui/ToastProvider";
 
 // Loaded on first entry into tag mode only — readers who never tag do not
 // download the editor.
@@ -44,6 +45,8 @@ interface Comment {
   time: string;
   comment: string | null;
   rating: number | null;
+  /** Set by the server with the same rule the edit action enforces. */
+  mine: boolean;
 }
 
 interface Props {
@@ -391,7 +394,10 @@ export default function ReleaseClient({
   const [commentText, setCommentText] = useState("");
   const [rating, setRating] = useState("");
   const [editId, setEditId] = useState<number | null>(null);
+  const editFormRef = useRef<HTMLDivElement>(null);
+  const editTextRef = useRef<HTMLTextAreaElement>(null);
   const [editText, setEditText] = useState("");
+  const { toast } = useToast();
   const [brokenText, setBrokenText] = useState("");
 
   interface Draft { nick: string; text: string }
@@ -1061,9 +1067,29 @@ export default function ReleaseClient({
     setCollyVisible(false);
   };
 
+  /**
+   * Bring the edit box to the reader.
+   *
+   * The form renders at the very bottom of the page, under every comment, while
+   * the Edit button that opens it can be a long way up -- and opening it also
+   * hides the art, which moves everything anyway. Clicking Edit looked like it
+   * did nothing at all.
+   */
+  useEffect(() => {
+    if (section !== "edit-comment") return;
+    editFormRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    editTextRef.current?.focus();
+  }, [section]);
+
   const saveEdit = async () => {
     if (editId === null) return;
-    await editCommentAction(collyId, editId, editText);
+    const r = await editCommentAction(collyId, editId, editText);
+    if (!r.success) {
+      // Leave the form open with the text still in it -- the reader's words are
+      // the one thing that must not disappear on a failed save.
+      toast(`[!] ${r.error ?? "Could not save your comment."}`, "danger");
+      return;
+    }
     setComments(cs => cs.map(c => c.id === editId ? { ...c, comment: editText } : c));
     cancelSection();
   };
@@ -1071,6 +1097,7 @@ export default function ReleaseClient({
   const deleteComment = async (id: number) => {
     const r = await deleteCommentAction(collyId, id);
     if (r.success) loadComments();
+    else toast(`[!] ${r.error ?? "Could not delete that comment."}`, "danger");
   };
 
   const sendComment = async () => {
@@ -1508,14 +1535,15 @@ export default function ReleaseClient({
                 {c.comment ?? `${c.nick} voted ${c.rating}`}
               </span>
               <div className="col-12 p-0 m-0 apt-1" style={{ display: "flex", gap: "8px" }}>
-                {isAdmin && (
-                  <>
-                    <input type="button" className="btn-big" value="Edit" onClick={() => startEdit(c)} />
-                    <input type="button" className="btn-big" value="Delete" onClick={() => deleteComment(c.id)} />
-                  </>
-                )}
-                {!isAdmin && userNick && c.nick === userNick && (
+                {/* `mine` comes from the server, decided by the rule the edit
+                    action enforces. Matching on nick instead put an Edit button
+                    on rows the server would refuse -- a legacy comment carrying
+                    a nick but no user_id -- where Save then did nothing. */}
+                {c.mine && (
                   <input type="button" className="btn-big" value="Edit" onClick={() => startEdit(c)} />
+                )}
+                {isAdmin && (
+                  <input type="button" className="btn-big" value="Delete" onClick={() => deleteComment(c.id)} />
                 )}
               </div>
             </div>
@@ -1540,13 +1568,13 @@ export default function ReleaseClient({
 
       {/* Edit comment form */}
       {section === "edit-comment" && (
-        <div>
+        <div ref={editFormRef}>
           <div className="row"><div className="col-12 apb-1"><span className="white">Edit Your Comment...</span></div></div>
           <div className="row">
             <div className="col-12">
-              <textarea rows={5} className="w-100" value={editText} onChange={e => setEditText(e.target.value)} />
+              <textarea ref={editTextRef} rows={5} className="w-100" value={editText} onChange={e => setEditText(e.target.value)} />
             </div>
-            <div className="col-12 apt-1">
+            <div className="col-12 apt-1" style={{ display: "flex", gap: "8px" }}>
               <input type="button" className="btn-big" value="Cancel" onClick={cancelSection} />
               <input type="button" className="btn-big" value="Save" onClick={saveEdit} />
             </div>
@@ -1562,7 +1590,7 @@ export default function ReleaseClient({
             <textarea className="w-100" style={{ height: "64px" }} value={brokenText} onChange={e => setBrokenText(e.target.value)} />
           </div></div>
           <div className="row">
-            <div className="col-12">
+            <div className="col-12" style={{ display: "flex", gap: "8px" }}>
               <input type="button" className="btn-big" value="Cancel" onClick={cancelSection} />
               <input type="button" className="btn-big" value="Report" onClick={sendBroken} />
             </div>

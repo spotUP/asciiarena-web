@@ -2,11 +2,11 @@
 
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/session";
-import { Prisma } from "@/lib/generated/prisma/client";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { broadcast } from "@/lib/live";
 import { broadcastActivityIfAllowed } from "@/lib/activity";
 import { createNotification } from "@/lib/notifications";
+import { canEditComment } from "@/lib/commentOwnership";
 
 export async function trackView(collyId: number) {
   try {
@@ -82,17 +82,38 @@ export async function reportBroken(collyId: number, comment: string): Promise<{ 
   return { success: true };
 }
 
-interface Comment { id: number; nick: string; time: string; comment: string | null; rating: number | null; }
+interface Comment {
+  id: number;
+  nick: string;
+  time: string;
+  comment: string | null;
+  rating: number | null;
+  /**
+   * Whether the reader may edit this row -- decided by the same rule the edit
+   * action enforces, so the button cannot appear on a comment the server will
+   * refuse to change. Admins get it on every row.
+   */
+  mine: boolean;
+}
+
+interface CommentRow extends Omit<Comment, "mine"> { userId: bigint | number | null }
 
 export async function getComments(collyId: number): Promise<Comment[]> {
-  return prisma.$queryRaw<Comment[]>`
+  const session = await getSession();
+  const viewerId = session?.user?.id ?? null;
+  const isAdmin = session?.user?.rank === "Admin";
+  const rows = await prisma.$queryRaw<CommentRow[]>`
     SELECT c.commentid AS id, u.nick, DATE_FORMAT(FROM_UNIXTIME(c.timestamp), '%Y-%m-%d') AS time,
-           c.comment, c.rating
+           c.comment, c.rating, c.user_id AS userId
     FROM comments c
     LEFT JOIN users u ON u.id = c.user_id
     WHERE c.colly_id = ${collyId}
     ORDER BY c.timestamp DESC
   `;
+  return rows.map(({ userId, ...rest }) => ({
+    ...rest,
+    mine: canEditComment(userId, viewerId, isAdmin),
+  }));
 }
 
 export async function postComment(
@@ -157,39 +178,57 @@ export async function postComment(
   return { success: true };
 }
 
+/**
+ * The comment a change is aimed at, and whether this reader may make it.
+ *
+ * Authorising with a WHERE clause and then ignoring the row count is how an
+ * edit came to report success while changing nothing: an UPDATE that matches
+ * no row is not an error in SQL. Reading the row first gives an answer to
+ * return, and MySQL's "0 rows changed when the text is identical" cannot be
+ * mistaken for a refusal.
+ */
+async function commentForChange(
+  collyId: number,
+  commentId: number,
+): Promise<{ allowed: boolean; error?: string }> {
+  const session = await getSession();
+  if (!session?.user?.id) return { allowed: false, error: "You are not logged in." };
+  const rows = await prisma.$queryRaw<{ userId: bigint | number | null }[]>`
+    SELECT user_id AS userId FROM comments WHERE commentid = ${commentId} AND colly_id = ${collyId}
+  `;
+  if (rows.length === 0) return { allowed: false, error: "That comment is no longer there." };
+  const isAdmin = session.user.rank === "Admin";
+  if (!canEditComment(rows[0].userId, session.user.id, isAdmin)) {
+    return { allowed: false, error: "That comment is not yours to change." };
+  }
+  return { allowed: true };
+}
+
 export async function editComment(
   collyId: number,
   commentId: number,
   comment: string,
-): Promise<{ success: boolean }> {
+): Promise<{ success: boolean; error?: string }> {
   const session = await getSession();
-  if (!session?.user?.id) return { success: false };
-  const userId = Number(session.user.id);
-  const isAdmin = session.user.rank === "Admin";
-  const where = isAdmin
-    ? Prisma.sql`WHERE commentid = ${commentId} AND colly_id = ${collyId}`
-    : Prisma.sql`WHERE commentid = ${commentId} AND colly_id = ${collyId} AND user_id = ${userId}`;
-  await prisma.$executeRaw`UPDATE comments SET comment = ${comment} ${where}`;
+  const may = await commentForChange(collyId, commentId);
+  if (!may.allowed) return { success: false, error: may.error };
+  await prisma.$executeRaw`UPDATE comments SET comment = ${comment} WHERE commentid = ${commentId} AND colly_id = ${collyId}`;
   const colly = await prisma.collys.findUnique({ where: { id: collyId }, select: { filename: true } });
   if (colly?.filename) revalidatePath('/release/' + colly.filename);
-  broadcast(`comments:${collyId}`, { type: "edited", commentId, comment, nick: session.user.name ?? "" });
+  broadcast(`comments:${collyId}`, { type: "edited", commentId, comment, nick: session?.user?.name ?? "" });
   return { success: true };
 }
 
 export async function deleteComment(
   collyId: number,
   commentId: number,
-): Promise<{ success: boolean }> {
+): Promise<{ success: boolean; error?: string }> {
   const session = await getSession();
-  if (!session?.user?.id) return { success: false };
-  const userId = Number(session.user.id);
-  const isAdmin = session.user.rank === "Admin";
-  const where = isAdmin
-    ? Prisma.sql`WHERE commentid = ${commentId} AND colly_id = ${collyId}`
-    : Prisma.sql`WHERE commentid = ${commentId} AND colly_id = ${collyId} AND user_id = ${userId}`;
-  await prisma.$executeRaw`DELETE FROM comments ${where}`;
+  const may = await commentForChange(collyId, commentId);
+  if (!may.allowed) return { success: false, error: may.error };
+  await prisma.$executeRaw`DELETE FROM comments WHERE commentid = ${commentId} AND colly_id = ${collyId}`;
   const colly = await prisma.collys.findUnique({ where: { id: collyId }, select: { filename: true } });
   if (colly?.filename) revalidatePath('/release/' + colly.filename);
-  broadcast(`comments:${collyId}`, { type: "deleted", commentId, nick: session.user.name ?? "" });
+  broadcast(`comments:${collyId}`, { type: "deleted", commentId, nick: session?.user?.name ?? "" });
   return { success: true };
 }
