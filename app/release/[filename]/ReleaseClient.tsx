@@ -1297,8 +1297,12 @@ export default function ReleaseClient({
             <span className="lightgrey">{downloadCount} {downloadCount === 1 ? "download" : "downloads"}</span>
           )}
 
+          {/* No apt-1/apb-1 on this link: they add 16px of padding top AND
+              bottom with !important, and padding cannot shrink below itself,
+              so it came out 32px tall with zero content height however short
+              .btn-big said it was. .btn-big is already a 16px row. */}
           {commentsLoaded && comments.length > 0 && (
-            <a href="#comments" className="btn-big bg-header apt-1 apb-1 grey-text" role="button">View Comments ({comments.length})</a>
+            <a href="#comments" className="btn-big bg-header grey-text" role="button">View Comments ({comments.length})</a>
           )}
 
           {userNick && (

@@ -105,3 +105,19 @@ describe("button height", () => {
     expect(inputs).not.toMatch(/textarea/);
   });
 });
+
+describe("buttons that are links", () => {
+  const release = readFileSync(
+    path.join(process.cwd(), "app/release/[filename]/ReleaseClient.tsx"),
+    "utf8",
+  );
+
+  it("does not pad a .btn-big vertically", () => {
+    // apt-1/apb-1 add 16px top AND bottom with !important. Padding cannot
+    // shrink below itself, so the View Comments link was 32px tall with zero
+    // content height -- .btn-big's own 16px could not win against it.
+    // Measured on the live page before the fix: height 32px, padding 16/16.
+    expect(release).not.toMatch(/className="btn-big[^"]*ap[tb]-1/);
+    expect(release).toContain('className="btn-big bg-header grey-text"');
+  });
+});
