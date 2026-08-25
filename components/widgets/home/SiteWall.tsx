@@ -142,24 +142,29 @@ export default function SiteWall({ isLoggedIn }: { isLoggedIn: boolean }) {
 
         {isLoggedIn && (
           <form onSubmit={handleSubmit} className="w-100">
-            <div className="row m-0">
-              <div className="col-10 col-lg-11 pr-0" style={{ paddingLeft: "8px" }}>
-                <input
-                  ref={inputRef}
-                  className="form-control w-100"
-                  type="text"
-                  maxLength={60}
-                  name="tagtext"
-                  placeholder="Tag the wall"
-                  required
-                  autoComplete="off"
-                  disabled={submitting}
-                  onChange={e => broadcastTyping(e.target.value)}
-                />
-              </div>
-              <div className="col-2 col-lg-1 bg-secondary m-0 p-0">
-                <button className="button w-100 btn-primary black bg-lightgrey" type="submit" disabled={submitting}>Tag</button>
-              </div>
+            {/* Flex, not a 12-column grid: the button used to hold a whole
+                col-lg-1 -- around 165px on a wide screen -- for a
+                three-character label, and the input stopped short of it.
+                Now the button is as wide as its own text and the input
+                takes everything else. */}
+            <div className="d-flex m-0" style={{ paddingLeft: "8px" }}>
+              <input
+                ref={inputRef}
+                className="form-control"
+                style={{ flex: 1, minWidth: 0 }}
+                type="text"
+                maxLength={60}
+                name="tagtext"
+                placeholder="Tag the wall"
+                required
+                autoComplete="off"
+                disabled={submitting}
+                onChange={e => broadcastTyping(e.target.value)}
+              />
+              {/* .btn-big, not .btn-primary: that class carries a fixed
+                  `width: 132px`, so the button held 132px of the row
+                  whatever its label said and the input got the rest. */}
+              <button className="btn-big black bg-lightgrey" style={{ flex: "0 0 auto" }} type="submit" disabled={submitting}>Tag</button>
             </div>
           </form>
         )}
