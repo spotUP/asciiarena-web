@@ -51,6 +51,13 @@ describe("textarea line-height", () => {
     expect(site).toMatch(/textarea,\s*textarea:focus\s*\{[\s\S]*?line-height:\s*16px;/);
   });
 
+  it("keeps Chrome's focus ring off a textarea", () => {
+    // The input:focus rule that kills the ring for every other control no
+    // longer covers textareas -- they were split out of it for the
+    // line-height, which handed them the default ring back.
+    expect(site).toMatch(/textarea,\s*textarea:focus\s*\{[\s\S]*?outline:\s*none\s*!important;/);
+  });
+
   it("restates it for .form-control, which outranks a bare element selector", () => {
     expect(overrides).toMatch(/textarea\.form-control\s*\{[\s\S]*?line-height:\s*16px\s*!important;/);
   });

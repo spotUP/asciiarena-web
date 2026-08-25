@@ -2369,6 +2369,10 @@ button, input, optgroup, select {
    and arrowing up parks it in the leading, where typing appears to do
    nothing. Text fields are on the 8x16 grid: one row is 16px. */
 textarea, textarea:focus {
+  /* Chrome's default focus ring, killed for every other control by the
+     input:focus rule above. Splitting textareas out of that selector for the
+     line-height put the ring back on them. */
+  outline: none !important;
   font-size: 16px !important;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
   font-weight: normal;
