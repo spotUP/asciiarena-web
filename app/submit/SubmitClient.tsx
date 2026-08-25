@@ -88,6 +88,62 @@ function Field({ label, required, children }: { label: string; required?: boolea
   );
 }
 
+// ── Multi-select renderer ─────────────────────────────────────────────────
+
+/**
+ * A row of comboboxes for a repeatable field: artists, crews, BBSes.
+ *
+ * Declared at module scope, NOT inside SubmitClient. A component defined in
+ * another component's body is a new function on every render, so React tears
+ * the whole subtree down and builds it again on any state change in the parent
+ * -- the status message dismissing itself after four seconds was enough. That
+ * blew away the focused input and the text typed into it before the combobox
+ * had committed it, so a colly went up with no artist and no crew and the
+ * names had to be added again by editing it afterwards.
+ */
+function MultiSelect({
+  label, values, options, placeholder, createLabel, onChange,
+}: {
+  label: string;
+  values: string[];
+  options: string[];
+  placeholder: string;
+  /** Singular noun for the "+ Create new <createLabel>" sentinel. */
+  createLabel?: string;
+  onChange: (next: string[]) => void;
+}) {
+  return (
+    <Field label={label}>
+      {values.map((val, i) => (
+        <div key={i} style={{ display: "flex", gap: "8px", alignItems: "center" }} className="amb-1">
+          <Combobox
+            width={240}
+            value={val}
+            placeholder={placeholder}
+            createLabel={createLabel}
+            options={options.map(o => ({ value: o, label: o }))}
+            onChange={v => onChange(updateField(values, i, v))}
+          />
+          {values.length > 1 && (
+            <input
+              type="button"
+              className="btn-big"
+              value="X"
+              onClick={() => onChange(removeField(values, i))}
+            />
+          )}
+        </div>
+      ))}
+      <input
+        type="button"
+        className="btn-big"
+        value={`+ Add ${label.replace(/\(s\)$/, "")}`}
+        onClick={() => onChange(addField(values))}
+      />
+    </Field>
+  );
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function SubmitClient({ artistList, crewList, bbsList }: SubmitClientProps) {
@@ -506,51 +562,6 @@ export default function SubmitClient({ artistList, crewList, bbsList }: SubmitCl
       const body = (await r.json().catch(() => ({}))) as { error?: string };
       setStatus({ msg: body.error ?? "Submit failed.", ok: false });
     }
-  }
-
-  // ── Multi-select renderer ─────────────────────────────────────────────────
-
-  function MultiSelect({
-    label, values, options, placeholder, createLabel, onChange,
-  }: {
-    label: string;
-    values: string[];
-    options: string[];
-    placeholder: string;
-    /** Singular noun for the "+ Create new <createLabel>" sentinel. */
-    createLabel?: string;
-    onChange: (next: string[]) => void;
-  }) {
-    return (
-      <Field label={label}>
-        {values.map((val, i) => (
-          <div key={i} style={{ display: "flex", gap: "8px", alignItems: "center" }} className="amb-1">
-            <Combobox
-              width={240}
-              value={val}
-              placeholder={placeholder}
-              createLabel={createLabel}
-              options={options.map(o => ({ value: o, label: o }))}
-              onChange={v => onChange(updateField(values, i, v))}
-            />
-            {values.length > 1 && (
-              <input
-                type="button"
-                className="btn-big"
-                value="X"
-                onClick={() => onChange(removeField(values, i))}
-              />
-            )}
-          </div>
-        ))}
-        <input
-          type="button"
-          className="btn-big"
-          value={`+ Add ${label.replace(/\(s\)$/, "")}`}
-          onClick={() => onChange(addField(values))}
-        />
-      </Field>
-    );
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
