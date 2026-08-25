@@ -2675,6 +2675,18 @@ input::file-selector-button {
 /* Per-widget [X] (components/widgets/Hideable.tsx).
    The button sits over the widget's own header strip, which is always the
    first thing a widget renders. */
+/* ── ANSI drop-down menu (components/ui/AnsiMenu.tsx) ─────────────────────
+   Highlight the row under the pointer the way a BBS menu does: swap the
+   colours rather than tint them. Hover lives here, not inline, because inline
+   styles cannot express :hover and the whole point is that it reads like the
+   rest of the site. */
+.ansi-menu-item:hover,
+.ansi-menu-item:focus {
+  background: #cccccc !important;
+  color: #111111 !important;
+  outline: none;
+}
+
 /* ── Live feed: one line per event, flowed into columns ───────────────────
    The feed sits in a full-width card, so a single column wasted most of every
    row and made the card fifteen rows tall. `columns: 320px 4` asks for as many

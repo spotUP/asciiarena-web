@@ -31,7 +31,9 @@ describe("release page tag mode", () => {
   });
 
   it("offers tagging only to logged-in users", () => {
-    expect(source).toMatch(/userNick && [\s\S]*Tag Logos/);
+    // Now an item in the More menu rather than a button of its own, gated on
+    // the same two conditions.
+    expect(source).toMatch(/hasInlineContent && userNick\s*\n?\s*\? \[\{ label: tagging \? "Stop tagging logos" : "Tag logos"/);
   });
 
   it("suspends the keyboard-shortcut effect while tagging", () => {

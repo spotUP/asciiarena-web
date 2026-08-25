@@ -4,17 +4,15 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 /**
- * The release page's control bar was one long wrapping line: every button and
- * every figure in a single flex row, breaking wherever the width ran out. So
- * "63 views 3 watching 2 comments 1 download" ended up sitting between Share
- * and View Comments, and nothing read as belonging to anything else.
+ * The release page's control bar was one long wrapping line of thirteen
+ * buttons, with the figures mixed in wherever the line happened to break --
+ * "63 views 3 watching" sat between Share and View Comments.
  *
- * It is four sections now, each its own row:
+ * It is three sections now:
  *
- *   1. Viewing     -- what changes what you are looking at
- *   2. Appearance  -- how the art is drawn (colours, font)
- *   3. The colly   -- what you do with it (download, favourite, share, report)
- *   4. The counts  -- text only, never mixed in with the buttons
+ *   1. The five controls you reach for while reading a colly
+ *   2. Two menus -- View (display settings) and More (rare actions, sharing)
+ *   3. The counts, text only, never mixed in with the buttons
  */
 
 const source = readFileSync(
@@ -33,6 +31,29 @@ describe("release control bar", () => {
     expect(bar).toMatch(/flexDirection: "column", gap: "16px"/);
   });
 
+  it("keeps only what you reach for while reading as a button", () => {
+    const primary = bar.slice(bar.indexOf("{/* What you reach for"), bar.indexOf("{/* The two menus"));
+    for (const control of ["Fullscreen", "Autoplay", "Download", "Favourite", "View Comments"]) {
+      expect(primary, control).toContain(control);
+    }
+    // Everything else moved into a menu.
+    for (const moved of ["Fit to screen", "Minimap", "Report broken", "Share on Reddit"]) {
+      expect(primary, moved).not.toContain(moved);
+    }
+  });
+
+  it("puts the display settings in the View menu and the rest in More", () => {
+    const menus = bar.slice(bar.indexOf("{/* The two menus"), bar.indexOf("{/* The counts"));
+    for (const item of ["Hide Colly", "Fit to screen", "Index", "Minimap", "Groove", "Background", "Text"]) {
+      expect(menus, item).toContain(item);
+    }
+    for (const item of ["Tag logos", "Report broken", "Share by mail", "Copy autoplay link"]) {
+      expect(menus, item).toContain(item);
+    }
+    // The font list is generated from the one source, not retyped.
+    expect(menus).toMatch(/\.\.\.FONTS\.map/);
+  });
+
   it("makes every button in a control row the same width", () => {
     // Equal grid columns, at least 176px: 22 characters, which is the longest
     // label ("View Comments (2)", 17) plus .btn-big's 2x16px of padding.
@@ -42,10 +63,11 @@ describe("release control bar", () => {
     expect(rows.length).toBe(2);
   });
 
-  it("makes a wrapped control fill its cell", () => {
-    // Share sits in a positioned div so its menu can hang off it; without a
-    // width the button inside would size to its own label instead of the cell.
-    expect(bar).toMatch(/Share dropdown[\s\S]*?style=\{\{ width: "100%" \}\}/);
+  it("makes a menu trigger fill its cell", () => {
+    // The trigger sits in a positioned div so the menu can hang off it;
+    // without a width it would size to its own label instead of the cell.
+    const menu = readFileSync(path.join(process.cwd(), "components/ui/AnsiMenu.tsx"), "utf8");
+    expect(menu).toMatch(/className="btn-big bg-header grey-text"\s*\n\s*style=\{\{ width: "100%" \}\}/);
   });
 
   it("does not lay text out in equal columns", () => {
@@ -63,7 +85,7 @@ describe("release control bar", () => {
 
   it("keeps the counts out of the button rows", () => {
     // Bounded by the appearance row, which now follows it.
-    const counts = bar.slice(bar.indexOf("{/* The counts"), bar.indexOf("{/* Appearance,"));
+    const counts = bar.slice(bar.indexOf("{/* The counts"));
     // Every figure lives in the last section...
     for (const figure of ["view" + "s\"", "watching", "comment" + "s\"", "favourite" + "s\"", "download" + "s\""]) {
       expect(counts, figure).toContain(figure);
@@ -72,43 +94,16 @@ describe("release control bar", () => {
     expect(counts).not.toContain("btn-big");
   });
 
-  it("puts the view controls together", () => {
-    const viewing = bar.slice(bar.indexOf("{/* Viewing:"), bar.indexOf("{/* The colly itself"));
-    for (const control of ["Hide Colly", "Fullscreen", "Fit to screen", "Index", "Minimap", "Autoplay", "Groove"]) {
-      expect(viewing, control).toContain(control);
-    }
-    // Download belongs to the colly, not to the view.
-    expect(viewing).not.toContain('value="Download"');
-  });
-
-  it("puts the colour and font settings last", () => {
-    // A setting you reach for once, not a control you work with while reading.
-    const appearance = bar.indexOf("{/* Appearance,");
-    const counts = bar.indexOf("{/* The counts");
-    const colly = bar.indexOf("{/* The colly itself");
-    expect(appearance).toBeGreaterThan(counts);
-    expect(counts).toBeGreaterThan(colly);
-  });
-
-  it("puts what you do with the colly together", () => {
-    const colly = bar.slice(bar.indexOf("{/* The colly itself"), bar.indexOf("{/* The counts"));
-    for (const control of ["Download", "Favourite", "Tag Logos", "Share", "View Comments", "Report Broken"]) {
-      expect(colly, control).toContain(control);
-    }
-    expect(colly).not.toContain("Fullscreen");
-  });
-
   it("keeps the autoplay readout with the autoplay buttons", () => {
     // The one figure that is not a count: it is the position within the
     // playlist and it means nothing on its own line.
-    const viewing = bar.slice(bar.indexOf("{/* Viewing:"), bar.indexOf("{/* The colly itself"));
-    expect(viewing).toMatch(/\{autoplayIndex \+ 1\} \/ \{sections\.length\}/);
+    const primary = bar.slice(bar.indexOf("{/* What you reach for"), bar.indexOf("{/* The two menus"));
+    expect(primary).toMatch(/\{autoplayIndex \+ 1\} \/ \{sections\.length\}/);
   });
 
-  it("does not render an empty section", () => {
-    // An archive has no inline art, so the viewing and appearance rows would
-    // otherwise be two empty 16px gaps above the buttons.
-    expect(bar).toMatch(/\{hasInlineContent && \(\s*\n\s*<div style=\{CONTROL_ROW\}>/);
+  it("does not offer a View menu for a colly with no inline art", () => {
+    // An archive has nothing to fullscreen, fit or recolour.
+    expect(bar).toMatch(/\{hasInlineContent && \(\s*\n\s*<AnsiMenu\s*\n\s*label="View"/);
     expect(bar).toMatch(/viewCount > 0 \|\| watching > 1/);
   });
 });

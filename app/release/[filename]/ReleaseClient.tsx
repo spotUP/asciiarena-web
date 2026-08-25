@@ -28,6 +28,7 @@ import { shouldShowMinimap, useMinimapPreference, useViewportAllowsMinimap } fro
 import { parseCollyIndex, sectionForIndexEntry, linkifyCollyIndex } from "@/lib/collyIndex";
 import { sectionsFromLogoMap } from "@/lib/collyTrailer";
 import ColorSwatch from "@/components/ui/ColorSwatch";
+import AnsiMenu from "@/components/ui/AnsiMenu";
 import { useMusic } from "@/components/music/MusicProvider";
 import { BeatDetector, lowBandEnergy } from "@/lib/uade/beatDetector";
 import { subscribeRaw } from "@/lib/sse-pool";
@@ -68,9 +69,6 @@ const TEXT_ROW: React.CSSProperties = {
   rowGap: "8px",
   padding: "0 8px",
 };
-
-/** The colour swatches sit next to the font button rather than in a column. */
-const SETTINGS_ROW: React.CSSProperties = { ...TEXT_ROW };
 
 interface Comment {
   id: number;
@@ -319,8 +317,6 @@ export default function ReleaseClient({
   const [section, setSection] = useState<Section>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentsLoaded, setCommentsLoaded] = useState(false);
-  const [shareOpen, setShareOpen] = useState(false);
-  const [fontOpen, setFontOpen] = useState(false);
   const [viewCount, setViewCount] = useState(initialViewCount);
   const [favCount, setFavCount] = useState(initialFavCount);
   const [downloadCount, setDownloadCount] = useState(initialDownloadCount);
@@ -441,8 +437,6 @@ export default function ReleaseClient({
 
   const collyRef = useRef<HTMLPreElement | HTMLDivElement | null>(null);
   const collyDivRef = useRef<HTMLDivElement>(null);
-  const shareRef = useRef<HTMLDivElement>(null);
-  const fontRef = useRef<HTMLDivElement>(null);
 
   const releaseUrl = `${siteUrl}/release/${filename}`;
 
@@ -544,20 +538,8 @@ export default function ReleaseClient({
   }, [collyId, loadComments, filename, collyTitle]);
 
   // Close share dropdown on outside click
-  useEffect(() => {
-    if (!shareOpen) return;
-    const h = (e: MouseEvent) => { if (shareRef.current && !shareRef.current.contains(e.target as Node)) setShareOpen(false); };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, [shareOpen]);
 
   // Close font dropdown on outside click
-  useEffect(() => {
-    if (!fontOpen) return;
-    const h = (e: MouseEvent) => { if (fontRef.current && !fontRef.current.contains(e.target as Node)) setFontOpen(false); };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, [fontOpen]);
 
   // Broadcast view activity — for everyone; anonymous viewers show as "anon".
   useEffect(() => {
@@ -1237,101 +1219,31 @@ export default function ReleaseClient({
 
       {/* Controls bar.
 
-          Four sections, each on its own row: what you do to the VIEW, how the
-          art is DRAWN, what you do with the COLLY, and the counts. It used to
-          be one long wrapping line, so buttons and figures interleaved
-          wherever the line happened to break -- "63 views 3 watching" sat
-          between Share and View Comments. */}
-      {/* No p-0 on the panel: Bootstrap sets it `padding: 0 !important`, which
-          beats an inline style, so the bar had no room above the first row or
-          below the last however the padding here was written. */}
+          Thirteen buttons was a wall. Five of them are what you reach for
+          while looking at a colly; the rest are set-once settings or rare
+          actions, and they live in two menus (components/ui/AnsiMenu).
+
+          No p-0 on the panel: Bootstrap sets it `padding: 0 !important`,
+          which beats an inline style, so the bar had no room above the first
+          row or below the last however the padding here was written. */}
       <div
         className="bg-secondary amb-1"
         style={{ marginTop: "32px", display: "flex", flexDirection: "column", gap: "16px", padding: "16px 0" }}
       >
-        {/* Viewing: everything that changes what you are looking at. */}
-        {hasInlineContent && (
-          <div style={CONTROL_ROW}>
-            <input type="button" className="btn-big" value={collyVisible ? "Hide Colly" : "View Colly"} onClick={toggleColly} />
-            {viewerVisible && (
-              <input type="button" className="btn-big" id="fsbutton" value={isFullscreen ? "Exit Fullscreen" : "Fullscreen"} onClick={toggleFullscreen} />
-            )}
-            {viewerVisible && (
-              <input type="button" className="btn-big" value={fitted ? "Reset size" : "Fit to screen"} onClick={fitColly} />
-            )}
-            {(type === "ASCII" || useCanvasViewer) && viewerVisible && (
-              <>
-                {/* Tagged collys show the index above the art instead, so the
-                    button would be a second copy of the same list. */}
-                {!hasHumanMap && sections.length > 2 && (
-                  <input type="button" className="btn-big"
-                    value={indexOpen ? "Close Index" : "Index"}
-                    onClick={() => setIndexOpen(o => !o)} />
-                )}
-                {/* Offered only where the minimap could actually appear -- on a
-                    narrow screen it is off regardless, so a toggle would lie. */}
-                {viewportWideEnough && logoIndex.length > 1 && (
-                  <input type="button" className="btn-big"
-                    value={minimapEnabled ? "Minimap: ON" : "Minimap: OFF"}
-                    title="Show the logo minimap beside the colly (it costs 120px of width)"
-                    style={minimapEnabled ? undefined : { color: "#777777" }}
-                    onClick={toggleMinimap} />
-                )}
-                <input type="button" className="btn-big"
-                  value={autoplay ? "Stop" : "Autoplay"}
-                  onClick={() => autoplay ? stopAutoplay() : (startAutoplay())} />
-                <input type="button" className="btn-big"
-                  value={musicGroove ? "Groove: ON" : "Groove: OFF"}
-                  title="Advance logos to the beat of the music (starts a random Modland tune if nothing is playing)"
-                  style={musicGroove ? { color: "#ff55ff", borderColor: "#ff55ff" } : undefined}
-                  onClick={() => setMusicGroove(g => !g)} />
-                {/* The one readout that stays with its buttons: it is the
-                    autoplay position, and it means nothing on its own. */}
-                {autoplay && (
-                  <span className="lightgrey">{autoplayIndex + 1} / {sections.length}</span>
-                )}
-              </>
-            )}
-          </div>
-        )}
-
-        {/* The colly itself: what you do with it rather than to the view. */}
+        {/* What you reach for while reading. */}
         <div style={CONTROL_ROW}>
-          <input type="button" className="btn-big" value="Download" onClick={doDownload} />
-          {type === "ASCII" && viewerVisible && (
-            <input type="button" className="btn-big" value={copyImageLabel} onClick={doCopyImage} />
+          {hasInlineContent && viewerVisible && (
+            <input type="button" className="btn-big" id="fsbutton" value={isFullscreen ? "Exit Fullscreen" : "Fullscreen"} onClick={toggleFullscreen} />
           )}
+          {hasInlineContent && (type === "ASCII" || useCanvasViewer) && viewerVisible && (
+            <input type="button" className="btn-big"
+              value={autoplay ? "Stop" : "Autoplay"}
+              onClick={() => autoplay ? stopAutoplay() : (startAutoplay())} />
+          )}
+          <input type="button" className="btn-big" value="Download" onClick={doDownload} />
           {userNick && (
             <input type="button" className="btn-big" value={fav ? "Remove favourite" : "Favourite"} onClick={toggleFav} />
           )}
-          {hasInlineContent && userNick && (
-            <input type="button" className="btn-big"
-              value={tagging ? "Stop Tagging" : "Tag Logos"}
-              title="Map the logos in this colly so they show up in search"
-              onClick={() => setTagging(t => !t)} />
-          )}
-
-          {/* Share dropdown */}
-          <div ref={shareRef} style={{ position: "relative" }}>
-            <button className="btn-big bg-header grey-text" style={{ width: "100%" }} onClick={() => setShareOpen(o => !o)}>
-              Share
-            </button>
-            {shareOpen && (
-              <div className="dropdown-menu" style={{ display: "block", position: "absolute", zIndex: 200, top: "100%" }}>
-                <a className="dropdown-item" href={`mailto:?Subject=Check out ${collyTitle} at asciiarena.se&Body=Check%20out%20${encodeURIComponent(collyTitle)}%20at%20aSCIIaRENA!%20${encodeURIComponent(releaseUrl)}`}>Mail</a>
-                <a className="dropdown-item" href={`http://www.facebook.com/sharer.php?u=${encodeURIComponent(releaseUrl)}`} target="_blank" rel="noreferrer">Facebook</a>
-                <a className="dropdown-item" href={`http://reddit.com/submit?url=${encodeURIComponent(releaseUrl)}&title=Check+out+${encodeURIComponent(collyTitle)}+at+asciiarena.se`} target="_blank" rel="noreferrer">Reddit</a>
-                <a className="dropdown-item" href={`https://twitter.com/share?url=${encodeURIComponent(releaseUrl)}&text=${encodeURIComponent(`Check out ${collyTitle} at asciiarena.se`)}`} target="_blank" rel="noreferrer">Twitter</a>
-                {sections.length > 1 && (
-                  <button className="dropdown-item" style={{ background: "none", border: "none", width: "100%", textAlign: "left", cursor: "pointer" }}
-                    onClick={() => { navigator.clipboard?.writeText(`${releaseUrl}?autoplay=1`); setShareOpen(false); }}>
-                    Copy autoplay link
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-
           {/* No apt-1/apb-1 on this link: they add 16px of padding top AND
               bottom with !important, and padding cannot shrink below itself,
               so it came out 32px tall with zero content height however short
@@ -1339,15 +1251,80 @@ export default function ReleaseClient({
           {commentsLoaded && comments.length > 0 && (
             <a href="#comments" className="btn-big bg-header grey-text" role="button">View Comments ({comments.length})</a>
           )}
-
-          {userNick && (
-            <>
-              <input type="button" className="btn-big" value="Report Broken" onClick={() => { setSection("broken"); setCollyVisible(false); }} />
-              {isAdmin && (
-                <input type="button" className="btn-big" value="Edit" onClick={() => { window.location.href = buildAdminCollyEditHref(filename); }} />
-              )}
-            </>
+          {/* The autoplay position: a readout of the button beside it, so it
+              stays with its buttons rather than going down to the counts. */}
+          {autoplay && (
+            <span className="lightgrey" style={{ lineHeight: "16px" }}>{autoplayIndex + 1} / {sections.length}</span>
           )}
+        </div>
+
+        {/* The two menus. */}
+        <div style={CONTROL_ROW}>
+          {hasInlineContent && (
+            <AnsiMenu
+              label="View"
+              items={[
+                { label: collyVisible ? "Hide Colly" : "View Colly", onSelect: toggleColly },
+                ...(viewerVisible
+                  ? [{ label: fitted ? "Reset size" : "Fit to screen", onSelect: fitColly }]
+                  : []),
+                ...(viewerVisible && (type === "ASCII" || useCanvasViewer) && !hasHumanMap && sections.length > 2
+                  ? [{ label: "Index", checked: indexOpen, keepOpen: true, onSelect: () => setIndexOpen(o => !o) }]
+                  : []),
+                ...(viewerVisible && (type === "ASCII" || useCanvasViewer) && viewportWideEnough && logoIndex.length > 1
+                  ? [{ label: "Minimap", checked: minimapEnabled, keepOpen: true, onSelect: toggleMinimap }]
+                  : []),
+                ...(viewerVisible && (type === "ASCII" || useCanvasViewer)
+                  ? [{ label: "Groove (advance to the beat)", checked: musicGroove, keepOpen: true, onSelect: () => setMusicGroove(g => !g) }]
+                  : []),
+                { separator: true, label: "" },
+                {
+                  label: "",
+                  render: (
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", height: "16px" }}>
+                      <span className="lightgrey" style={{ lineHeight: "16px" }}>Background</span>
+                      <ColorSwatch current={bgColor} onChange={setBgColor} />
+                      <span className="lightgrey" style={{ lineHeight: "16px" }}>Text</span>
+                      <ColorSwatch current={fgColor} onChange={setFgColor} />
+                    </div>
+                  ),
+                },
+                { separator: true, label: "" },
+                ...FONTS.map(f => ({
+                  label: f.label,
+                  current: f.value === font,
+                  keepOpen: true,
+                  onSelect: () => setFont(f.value),
+                })),
+              ]}
+            />
+          )}
+
+          <AnsiMenu
+            label="More"
+            items={[
+              ...(hasInlineContent && userNick
+                ? [{ label: tagging ? "Stop tagging logos" : "Tag logos", onSelect: () => setTagging(t => !t) }]
+                : []),
+              ...(type === "ASCII" && viewerVisible
+                ? [{ label: copyImageLabel, onSelect: doCopyImage }]
+                : []),
+              ...(userNick
+                ? [{ label: "Report broken", onSelect: () => { setSection("broken"); setCollyVisible(false); } }]
+                : []),
+              ...(userNick && isAdmin
+                ? [{ label: "Edit this colly", onSelect: () => { window.location.href = buildAdminCollyEditHref(filename); } }]
+                : []),
+              { separator: true, label: "" },
+              { label: "Share by mail", href: `mailto:?Subject=Check out ${collyTitle} at asciiarena.se&Body=Check%20out%20${encodeURIComponent(collyTitle)}%20at%20aSCIIaRENA!%20${encodeURIComponent(releaseUrl)}` },
+              { label: "Share on Facebook", href: `http://www.facebook.com/sharer.php?u=${encodeURIComponent(releaseUrl)}`, external: true },
+              { label: "Share on Reddit", href: `http://reddit.com/submit?url=${encodeURIComponent(releaseUrl)}&title=Check+out+${encodeURIComponent(collyTitle)}+at+asciiarena.se`, external: true },
+              { label: "Share on Twitter", href: `https://twitter.com/share?url=${encodeURIComponent(releaseUrl)}&text=${encodeURIComponent(`Check out ${collyTitle} at asciiarena.se`)}`, external: true },
+              ...(sections.length > 1
+                ? [{ label: "Copy autoplay link", onSelect: () => { navigator.clipboard?.writeText(`${releaseUrl}?autoplay=1`); } }]
+                : []),
+            ]}
+          />
         </div>
 
         {/* The counts, on their own line and never mixed in with the buttons. */}
@@ -1368,30 +1345,6 @@ export default function ReleaseClient({
             {downloadCount > 0 && (
               <span>{downloadCount} {downloadCount === 1 ? "download" : "downloads"}</span>
             )}
-          </div>
-        )}
-
-        {/* Appearance, last: it is a setting you reach for once, not a control
-            you work with while reading. Its own row layout, because a colour
-            swatch stretched to a button's width would be a wall of colour. */}
-        {hasInlineContent && (
-          <div style={SETTINGS_ROW}>
-            <ColorSwatch current={bgColor} onChange={setBgColor} />
-            <ColorSwatch current={fgColor} onChange={setFgColor} />
-            <div ref={fontRef} style={{ position: "relative" }}>
-              <button className="btn-big bg-header grey-text" style={{ width: "176px" }} onClick={() => setFontOpen(o => !o)}>
-                {FONTS.find(f => f.value === font)?.label ?? font} v
-              </button>
-              {fontOpen && (
-                <div className="dropdown-menu ascii" style={{ display: "block", position: "absolute", zIndex: 200, top: "100%" }}>
-                  {FONTS.map(f => (
-                    <button key={f.value} className="dropdown-item ascii" onClick={() => { setFont(f.value); setFontOpen(false); }}>
-                      {f.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
         )}
       </div>

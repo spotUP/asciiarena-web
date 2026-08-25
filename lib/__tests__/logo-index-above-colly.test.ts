@@ -23,14 +23,16 @@ describe("logo index visibility", () => {
     expect(release.indexOf("<LogoIndex")).toBeLessThan(release.indexOf("{!useCanvasViewer &&"));
   });
 
-  it("drops the redundant Index button on a tagged colly", () => {
-    expect(release).toMatch(/\{!hasHumanMap && sections\.length > 2 && \(/);
+  it("drops the redundant Index entry on a tagged colly", () => {
+    // The Index control is an item in the View menu now; the guard that keeps
+    // it off a tagged colly is unchanged.
+    expect(release).toMatch(/!hasHumanMap && sections\.length > 2/);
   });
 
-  it("keeps the button for untagged collys", () => {
+  it("keeps the entry for untagged collys", () => {
     // The guard is a negation of hasHumanMap, not a removal: an untagged colly
-    // still reaches the same button.
-    expect(release).toMatch(/value=\{indexOpen \? "Close Index" : "Index"\}/);
+    // still reaches the same control, which shows its state as [X] / [ ].
+    expect(release).toMatch(/\{ label: "Index", checked: indexOpen/);
   });
 
   it("stays out of the way while tagging and in fullscreen", () => {
