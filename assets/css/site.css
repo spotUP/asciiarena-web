@@ -2315,7 +2315,7 @@ input[type="number"],
   border-radius: 0 !important;
 }
 
-input:focus, textarea:focus, select:focus, button:focus, .btn-primary.focus, .btn-primary:focus{
+input:focus, select:focus, button:focus, .btn-primary.focus, .btn-primary:focus{
   outline: none !important;
   font-size: 16px !important;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
@@ -2353,12 +2353,26 @@ input:-internal-autofill {
   line-height: 48px;
 }
 
-button, input, optgroup, select, textarea {
+button, input, optgroup, select {
   font-size: 16px !important;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
   font-size: 16px;
   font-weight: normal;
   line-height: 48px;
+}
+
+/* Textareas are excluded from the 48px line-height above.
+   That 48px is the vertical-centring trick for 48px-tall single-line
+   controls: one line box filling the whole field. A textarea stacks its
+   line boxes, so 48px around a 16px glyph adds 16px of leading above and
+   below EVERY line -- the caret sits a line above where the text lands,
+   and arrowing up parks it in the leading, where typing appears to do
+   nothing. Text fields are on the 8x16 grid: one row is 16px. */
+textarea, textarea:focus {
+  font-size: 16px !important;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-weight: normal;
+  line-height: 16px;
 }
 
 &:-webkit-autofill::first-line,

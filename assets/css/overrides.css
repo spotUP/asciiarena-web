@@ -479,6 +479,9 @@ select.form-select option, select.form-control option {
    as the same input fabric as its single-line cousin. */
 textarea.form-control {
   height: auto !important;
+  /* .form-control outranks the bare `textarea` rule in site.css whatever the
+     load order, so the grid line-height has to be restated here. */
+  line-height: 16px !important;
   background-color: #2a2a2a !important;
   color: #fff !important;
   border: 0 !important;
