@@ -32,6 +32,7 @@ import { useMusic } from "@/components/music/MusicProvider";
 import { BeatDetector, lowBandEnergy } from "@/lib/uade/beatDetector";
 import { subscribeRaw } from "@/lib/sse-pool";
 import { useToast } from "@/components/ui/ToastProvider";
+import { actionErrorMessage } from "@/lib/staleDeployment";
 
 // Loaded on first entry into tag mode only — readers who never tag do not
 // download the editor.
@@ -1083,40 +1084,61 @@ export default function ReleaseClient({
 
   const saveEdit = async () => {
     if (editId === null) return;
-    const r = await editCommentAction(collyId, editId, editText);
-    if (!r.success) {
-      // Leave the form open with the text still in it -- the reader's words are
-      // the one thing that must not disappear on a failed save.
-      toast(`[!] ${r.error ?? "Could not save your comment."}`, "danger");
-      return;
+    try {
+      const r = await editCommentAction(collyId, editId, editText);
+      if (!r.success) {
+        // Leave the form open with the text still in it -- the reader's words
+        // are the one thing that must not disappear on a failed save.
+        toast(`[!] ${r.error ?? "Could not save your comment."}`, "danger");
+        return;
+      }
+      setComments(cs => cs.map(c => c.id === editId ? { ...c, comment: editText } : c));
+      cancelSection();
+    } catch (err) {
+      // A rejected action (most often a page that outlived its deployment)
+      // used to stop the handler dead: no save, no message, nothing.
+      console.error("[ReleaseClient] saving a comment threw", err);
+      toast(`[!] ${actionErrorMessage(err, "Could not save your comment.")}`, "danger");
     }
-    setComments(cs => cs.map(c => c.id === editId ? { ...c, comment: editText } : c));
-    cancelSection();
   };
 
   const deleteComment = async (id: number) => {
-    const r = await deleteCommentAction(collyId, id);
-    if (r.success) loadComments();
-    else toast(`[!] ${r.error ?? "Could not delete that comment."}`, "danger");
+    try {
+      const r = await deleteCommentAction(collyId, id);
+      if (r.success) loadComments();
+      else toast(`[!] ${r.error ?? "Could not delete that comment."}`, "danger");
+    } catch (err) {
+      console.error("[ReleaseClient] deleting a comment threw", err);
+      toast(`[!] ${actionErrorMessage(err, "Could not delete that comment.")}`, "danger");
+    }
   };
 
   const sendComment = async () => {
-    const r = await postCommentAction(collyId, commentText, rating || null);
-    if (r.success) {
-      setCommentText(""); setRating("");
-      loadComments();
-      fetch("/api/live", {
+    let r: { success: boolean; error?: string };
+    try {
+      r = await postCommentAction(collyId, commentText, rating || null);
+    } catch (err) {
+      console.error("[ReleaseClient] posting a comment threw", err);
+      toast(`[!] ${actionErrorMessage(err, "Could not post your comment.")}`, "danger");
+      return;
+    }
+    if (!r.success) {
+      toast(`[!] ${r.error ?? "Could not post your comment."}`, "danger");
+      return;
+    }
+    setCommentText(""); setRating("");
+    loadComments();
+    fetch("/api/live", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ channel, type: "clear" }),
+    }).catch(() => {});
+    if (userNick) {
+      fetch("/api/activity", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ channel, type: "clear" }),
+        body: JSON.stringify({ type: "comment", target: filename, targetUrl: `/release/${filename}` }),
       }).catch(() => {});
-      if (userNick) {
-        fetch("/api/activity", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: "comment", target: filename, targetUrl: `/release/${filename}` }),
-        }).catch(() => {});
-      }
     }
   };
 

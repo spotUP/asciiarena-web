@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/ToastProvider";
+import { actionErrorMessage } from "@/lib/staleDeployment";
 import { createTopic } from "@/app/actions/forum";
 import PostCanvas, { type PostCanvasRef } from "@/components/forum/PostCanvas";
 import { MAX_TITLE_LEN } from "@/lib/forum/types";
@@ -23,29 +24,39 @@ export default function NewTopicForm({ boardSlug, boardName }: { boardSlug: stri
   const [busy, setBusy] = useState(false);
   const ansiRef = useRef<PostCanvasRef>(null);
 
+  /**
+   * Anything thrown in here used to vanish: the await rejected, the handler
+   * stopped, no toast was shown and `busy` stayed true, which quietly disabled
+   * the button. From the reader's side, posting simply did nothing. A failure
+   * has to say what it was.
+   */
   const submit = async () => {
     if (busy) return;
     setBusy(true);
-    const art = await ansiRef.current?.collect();
-    if (art && "error" in art) {
+    try {
+      const art = await ansiRef.current?.collect();
+      if (art && "error" in art) {
+        toast(`[!] ${art.error}`, "danger");
+        return;
+      }
+      const attachment = art?.attachment ?? null;
+      if (!attachment) {
+        toast("[!] Write or draw something before you post.", "danger");
+        return;
+      }
+      const r = await createTopic(boardSlug, title, art?.text ?? "", attachment);
+      if (r.success && r.topicSlug) {
+        toast("[OK] Topic created.");
+        router.push(`/forum/${boardSlug}/${r.topicSlug}`);
+        router.refresh();
+      } else {
+        toast(`[!] ${r.error ?? "Could not create the topic. Try again."}`, "danger");
+      }
+    } catch (err) {
+      console.error("[NewTopicForm] posting threw", err);
+      toast(`[!] ${actionErrorMessage(err, "Could not create the topic. Try again.")}`, "danger");
+    } finally {
       setBusy(false);
-      toast(`[!] ${art.error}`, "danger");
-      return;
-    }
-    const attachment = art?.attachment ?? null;
-    if (!attachment) {
-      setBusy(false);
-      toast("[!] Write or draw something before you post.", "danger");
-      return;
-    }
-    const r = await createTopic(boardSlug, title, art?.text ?? "", attachment);
-    setBusy(false);
-    if (r.success && r.topicSlug) {
-      toast("[OK] Topic created.");
-      router.push(`/forum/${boardSlug}/${r.topicSlug}`);
-      router.refresh();
-    } else {
-      toast(`[!] ${r.error ?? "Could not create the topic. Try again."}`, "danger");
     }
   };
 

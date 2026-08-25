@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/ToastProvider";
+import { actionErrorMessage } from "@/lib/staleDeployment";
 import { postReply } from "@/app/actions/forum";
 import ForumSectionTitle from "@/components/forum/ForumSectionTitle";
 import PostCanvas, { type PostCanvasRef } from "@/components/forum/PostCanvas";
@@ -34,34 +35,44 @@ export default function ReplyComposer({ topicId, channel }: Props) {
   const [open, setOpen] = useState(false);
   const canvasRef = useRef<PostCanvasRef>(null);
 
+  /**
+   * Anything thrown in here used to vanish: the await rejected, the handler
+   * stopped, no toast was shown and `busy` stayed true, which quietly disabled
+   * the button. From the reader's side, posting simply did nothing. A failure
+   * has to say what it was.
+   */
   const submit = async () => {
     if (busy) return;
     setBusy(true);
-    const art = await canvasRef.current?.collect();
-    if (art && "error" in art) {
+    try {
+      const art = await canvasRef.current?.collect();
+      if (art && "error" in art) {
+        toast(`[!] ${art.error}`, "danger");
+        return;
+      }
+      const attachment = art?.attachment ?? null;
+      // The server enforces this too; checking here saves a round trip.
+      if (!attachment) {
+        toast("[!] Write or draw something before you post.", "danger");
+        return;
+      }
+      const r = await postReply(topicId, art?.text ?? "", attachment);
+      if (r.success) {
+        canvasRef.current?.clearDraft();
+        // Closing unmounts the editor, so the reply cannot be posted twice and
+        // the next one starts blank. On failure the composer stays open with
+        // the work still in it.
+        setOpen(false);
+        toast("[OK] Reply posted.");
+        router.refresh();
+      } else {
+        toast(`[!] ${r.error ?? "Could not post your reply. Try again."}`, "danger");
+      }
+    } catch (err) {
+      console.error("[ReplyComposer] posting threw", err);
+      toast(`[!] ${actionErrorMessage(err, "Could not post your reply. Try again.")}`, "danger");
+    } finally {
       setBusy(false);
-      toast(`[!] ${art.error}`, "danger");
-      return;
-    }
-    const attachment = art?.attachment ?? null;
-    // The server enforces this too; checking here saves a round trip.
-    if (!attachment) {
-      setBusy(false);
-      toast("[!] Write or draw something before you post.", "danger");
-      return;
-    }
-    const r = await postReply(topicId, art?.text ?? "", attachment);
-    setBusy(false);
-    if (r.success) {
-      canvasRef.current?.clearDraft();
-      // Closing unmounts the editor, so the reply cannot be posted twice and
-      // the next one starts blank. On failure the composer stays open with the
-      // work still in it.
-      setOpen(false);
-      toast("[OK] Reply posted.");
-      router.refresh();
-    } else {
-      toast(`[!] ${r.error ?? "Could not post your reply. Try again."}`, "danger");
     }
   };
 

@@ -24,7 +24,7 @@ describe("canEditComment", () => {
     // $queryRaw hands back INT UNSIGNED as BigInt and the session id is a
     // string: 42n === "42" is false, which is how ownership checks written
     // with a bare === deny every time.
-    expect(canEditComment(42n, "42", false)).toBe(true);
+    expect(canEditComment(BigInt(42), "42", false)).toBe(true);
   });
 
   it("refuses a comment belonging to somebody else", () => {
