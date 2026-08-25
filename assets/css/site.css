@@ -528,22 +528,22 @@ input, optgroup, textarea {
 
 button:active, select:active{
   border: 0;
-  max-height: 48px;
-  min-height: 48px;
+  max-height: 16px;
+  min-height: 16px;
   color: #999999 !important;
 }
 
 button:active, select:active{
   border: 0;
-  max-height: 48px;
-  min-height: 48px;
+  max-height: 16px;
+  min-height: 16px;
   color: #999999 !important;
 }
 
 button, select{
   border: 0;
-  max-height: 48px;
-  min-height: 48px;
+  max-height: 16px;
+  min-height: 16px;
   border: 0 !important;
   white-space: pre;
   color: #999999 !important;
@@ -1279,10 +1279,14 @@ button.btn.btn-primary{
 }
 
 
+/* One row tall, like every other control on the 8x16 grid. It was 48px --
+   three rows -- which read as clumsy next to 16px text. The horizontal 16px
+   padding stays: that is what makes a button look like a button here. */
 .btn-big{
-  height: 48px;
-  max-height: 48px !important;
-  min-height: 48px !important;
+  height: 16px;
+  max-height: 16px !important;
+  min-height: 16px !important;
+  line-height: 16px !important;
   padding-left: 16px !important;
   padding-right: 16px !important;
   margin-right: 0;
@@ -2315,12 +2319,21 @@ input[type="number"],
   border-radius: 0 !important;
 }
 
-input:focus, select:focus, button:focus, .btn-primary.focus, .btn-primary:focus{
+input:focus, .btn-primary.focus, .btn-primary:focus{
   outline: none !important;
   font-size: 16px !important;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
   font-weight: normal;
   line-height: 48px;
+}
+
+/* Focus must not resize a button back to three rows. */
+select:focus, button:focus {
+  outline: none !important;
+  font-size: 16px !important;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-weight: normal;
+  line-height: 16px;
 }
 
 input#password-form.control{
@@ -2353,12 +2366,31 @@ input:-internal-autofill {
   line-height: 48px;
 }
 
-button, input, optgroup, select {
+input, optgroup {
   font-size: 16px !important;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
   font-size: 16px;
   font-weight: normal;
   line-height: 48px;
+}
+
+/* Buttons are one row, so their line box is one row. Split out of the rule
+   above for the same reason textareas were: a 48px line box around a 16px
+   glyph puts the label off its own row. */
+button,
+select,
+input[type=button],
+input[type=submit],
+input[type=reset] {
+  font-size: 16px !important;
+  font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-weight: normal;
+  line-height: 16px;
+  height: 16px;
+  min-height: 16px;
+  max-height: 16px;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 /* Textareas are excluded from the 48px line-height above.
