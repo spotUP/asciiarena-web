@@ -3,6 +3,8 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { cssRule } from "./cssRule";
+
 /**
  * Every button is one 16px row of the grid.
  *
@@ -18,14 +20,10 @@ import { describe, expect, it } from "vitest";
 
 const css = readFileSync(path.join(process.cwd(), "assets/css/site.css"), "utf8");
 
-function rule(selector: string): string {
-  const re = new RegExp(`^${selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[^{]*\\{[^}]*\\}`, "m");
-  return css.match(re)?.[0] ?? "";
-}
 
 describe("button height", () => {
   it("puts the site's main button on one row", () => {
-    const btnBig = rule(".btn-big{");
+    const btnBig = cssRule(css, ".btn-big{");
     expect(btnBig).toMatch(/height:\s*16px;/);
     expect(btnBig).toMatch(/max-height:\s*16px !important;/);
     expect(btnBig).toMatch(/min-height:\s*16px !important;/);
@@ -35,15 +33,24 @@ describe("button height", () => {
   });
 
   it("puts a bare button and a select on one row", () => {
-    const el = rule("button, select{");
-    expect(el).toMatch(/max-height:\s*16px;/);
-    expect(el).toMatch(/min-height:\s*16px;/);
+    const el = cssRule(css, "button, select{");
+    expect(el).toMatch(/height:\s*16px;/);
   });
 
-  it("keeps them there while they are pressed", () => {
-    const active = rule("button:active, select:active{");
-    expect(active).toMatch(/max-height:\s*16px;/);
-    expect(active).toMatch(/min-height:\s*16px;/);
+  it("states that height as a default, not a ceiling", () => {
+    // min/max-height here beat any component that sets its own height: the
+    // 20px colour swatches went 20x16, the poll editor's 21px buttons shrank,
+    // and the [X] centred on a 48px widget band slid to the top of it.
+    for (const selector of ["button, select{", "button:active, select:active{", "input, optgroup {"]) {
+      const r = cssRule(css, selector);
+      expect(r, selector).not.toMatch(/max-height:\s*16px/);
+      expect(r, selector).not.toMatch(/min-height:\s*16px/);
+    }
+  });
+
+  it("lets the widget [X] keep the whole 48px band", () => {
+    const hide = cssRule(css, ".widget-hide-btn {");
+    expect(hide).toMatch(/height:\s*48px;/);
   });
 
   it("gives a button a one-row line box, not a three-row one", () => {
@@ -55,16 +62,37 @@ describe("button height", () => {
   });
 
   it("does not resize a button back to three rows on focus", () => {
-    const focus = rule("select:focus, button:focus {");
+    const focus = cssRule(css, "select:focus, button:focus {");
     expect(focus).toMatch(/line-height:\s*16px;/);
     // ...and the input rule it was split out of keeps its own line-height.
     expect(css).toMatch(/input:focus, \.btn-primary\.focus, \.btn-primary:focus\{/);
   });
 
-  it("leaves text inputs alone", () => {
-    // Only buttons were asked for. A plain text field is still 48px; the
-    // one-row exceptions are .search-field and the Combobox.
-    const inputs = rule("input, optgroup {");
-    expect(inputs).toMatch(/min-height:\s*48px;/);
+  it("puts text inputs on the same row", () => {
+    const inputs = cssRule(css, "input, optgroup {");
+    expect(inputs).toMatch(/height:\s*16px;/);
+    expect(inputs).toMatch(/line-height:\s*16px !important;/);
+  });
+
+  it("keeps a field one row while it is focused or being typed in", () => {
+    expect(css).toMatch(/input:focus, \.btn-primary\.focus[^{]*\{[^}]*line-height:\s*16px;/);
+    // The :active rule used to set an off-grid 14px line-height.
+    expect(cssRule(css, "input:active, optgroup:active {")).not.toMatch(/line-height:\s*14px/);
+  });
+
+  it("exempts the file input, which draws its own button", () => {
+    // Clamped to one row it clips its own "Choose file" label and there is
+    // nothing left to click.
+    const file = cssRule(css, "input[type=file] {");
+    expect(file).toMatch(/height:\s*auto !important;/);
+    expect(file).toMatch(/max-height:\s*none !important;/);
+  });
+
+  it("leaves the textarea stacking its lines", () => {
+    // textarea is deliberately absent from the input selectors; it has its own
+    // rule, added when the comment box was a line off.
+    expect(css).toMatch(/textarea, textarea:focus \{[\s\S]*?line-height:\s*16px;/);
+    const inputs = cssRule(css, "input, optgroup {");
+    expect(inputs).not.toMatch(/textarea/);
   });
 });

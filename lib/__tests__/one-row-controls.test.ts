@@ -3,36 +3,34 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { cssRule } from "./cssRule";
+
 /**
  * Regression: search boxes came out three rows tall, and USERS ONLINE looked
  * like it had a blank line between every user.
  *
- * Both are the same rule. site.css pins every control to a 48px box:
+ * Both were the same rule. site.css used to pin every control to a 48px box:
  *
  *   input, optgroup { min-height: 48px; max-height: 48px; ... }
  *   button, select  { min-height: 48px; max-height: 48px; ... }
  *
- * 48px is three rows of the 8x16 grid. Right for a stand-alone field or a
- * .btn-big; wrong for a control that has to read as part of a line of text.
- * The [chat] button next to a nick set its whole row to 48px, which is the
- * "empty row" between users, and the modland search box was three rows tall
- * with its inline border stripped by the same rule's `border: 0 !important`.
+ * 48px is three rows of the 8x16 grid. The [chat] button next to a nick set
+ * its whole row to 48px, which is the "empty row" between users, and the
+ * modland search box was three rows tall with its inline border stripped by
+ * the same rule's `border: 0 !important`.
  *
  * .search-field / .search-btn / .text-btn are that control on one 16px row.
+ * (The element rules themselves are one row now too -- see
+ * lib/__tests__/button-height.test.ts -- but these classes still carry the
+ * colours and the padding that beat the element rule's !important.)
  */
 
 const css = readFileSync(path.join(process.cwd(), "assets/css/site.css"), "utf8");
 
-/** The declarations of the rule whose selector list STARTS with `selector`. */
-function rule(selector: string): string {
-  const re = new RegExp(`^${selector.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&")}[^{]*\\{[^}]*\\}`, "m");
-  return css.match(re)?.[0] ?? "";
-}
-
 describe("one-row controls", () => {
   it("undoes the 48px box the element rules impose", () => {
     // All three share the sizing block, so this is one assertion for all.
-    const shared = rule(".search-field,");
+    const shared = cssRule(css, ".search-field,");
     expect(shared).toMatch(/height:\s*16px;/);
     expect(shared).toMatch(/min-height:\s*0;/);
     expect(shared).toMatch(/max-height:\s*16px;/);
@@ -42,7 +40,7 @@ describe("one-row controls", () => {
   it("beats the padding and margin the element rule sets with !important", () => {
     // `input, optgroup` sets padding-left and margin-left !important, so a
     // plain declaration here would lose and the text would sit off-grid.
-    const shared = rule(".search-field,");
+    const shared = cssRule(css, ".search-field,");
     expect(shared).toMatch(/padding:\s*0 8px !important;/);
     expect(shared).toMatch(/margin:\s*0 !important;/);
   });

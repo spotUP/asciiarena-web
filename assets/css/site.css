@@ -528,31 +528,51 @@ input, optgroup, textarea {
 
 button:active, select:active{
   border: 0;
-  max-height: 16px;
-  min-height: 16px;
+  min-height: 0;
+  max-height: none;
   color: #999999 !important;
 }
 
 button:active, select:active{
   border: 0;
-  max-height: 16px;
-  min-height: 16px;
+  min-height: 0;
+  max-height: none;
   color: #999999 !important;
 }
 
+/* One row by DEFAULT, not by force. min/max-height here would beat any
+   component that sets its own height -- the 20px colour swatches, the poll
+   editor's 21px buttons, the [X] centred on a 48px widget band -- so the
+   height is a plain declaration a more specific rule can win against. */
 button, select{
   border: 0;
-  max-height: 16px;
-  min-height: 16px;
+  height: 16px;
+  min-height: 0;
+  max-height: none;
   border: 0 !important;
   white-space: pre;
   color: #999999 !important;
 }
 
+/* A file input is a browser-drawn button with a filename beside it. Clamped
+   to one row it clips its own label and there is nothing left to click, so it
+   keeps whatever height the browser needs. */
+input[type=file] {
+  height: auto !important;
+  min-height: 16px !important;
+  max-height: none !important;
+  line-height: 16px;
+}
+
+/* One row, like the buttons and like the text beside them. It was 48px --
+   three rows of the 8x16 grid -- which left a field towering over its own
+   label and over the button next to it. textarea is NOT in this selector and
+   keeps stacking its lines normally. */
 input, optgroup {
   border: 0;
-  max-height: 48px;
-  min-height: 48px;
+  height: 16px;
+  min-height: 0;
+  max-height: none;
   border: 0 !important;
   white-space: pre;
   color: #bbbbbb !important;
@@ -563,10 +583,10 @@ input, optgroup {
 
 input:active, optgroup:active {
   border: 0;
-  max-height: 48px;
-  min-height: 48px;
+  min-height: 0;
+  max-height: none;
   color: #bbbbbb !important;
-  line-height: 14px !important;
+  line-height: 16px !important;
 }
 
 input:hover, optgroup:hover {
@@ -579,8 +599,8 @@ input:hover, optgroup:hover {
 
 input:active, optgroup:active {
   border: 0;
-  max-height: 48px;
-  min-height: 48px;
+  min-height: 0;
+  max-height: none;
   color: #bbbbbb !important;
 }
 
@@ -2324,7 +2344,7 @@ input:focus, .btn-primary.focus, .btn-primary:focus{
   font-size: 16px !important;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
   font-weight: normal;
-  line-height: 48px;
+  line-height: 16px;
 }
 
 /* Focus must not resize a button back to three rows. */
@@ -2340,14 +2360,14 @@ input#password-form.control{
   font-size: 16px !important;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
   font-weight: normal;
-  line-height: 48px;
+  line-height: 16px;
 }
 
 #password-form.control{
   font-size: 16px !important;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
   font-weight: normal;
-  line-height: 48px;
+  line-height: 16px;
 }
 
 input:-internal-autofill-selected {
@@ -2355,7 +2375,7 @@ input:-internal-autofill-selected {
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
   font-size: 16px;
   font-weight: normal;
-  line-height: 48px;
+  line-height: 16px;
 }
 
 input:-internal-autofill {
@@ -2363,7 +2383,7 @@ input:-internal-autofill {
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
   font-size: 16px;
   font-weight: normal;
-  line-height: 48px;
+  line-height: 16px;
 }
 
 input, optgroup {
@@ -2371,7 +2391,7 @@ input, optgroup {
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
   font-size: 16px;
   font-weight: normal;
-  line-height: 48px;
+  line-height: 16px;
 }
 
 /* Buttons are one row, so their line box is one row. Split out of the rule
@@ -2387,8 +2407,8 @@ input[type=reset] {
   font-weight: normal;
   line-height: 16px;
   height: 16px;
-  min-height: 16px;
-  max-height: 16px;
+  min-height: 0;
+  max-height: none;
   padding-top: 0;
   padding-bottom: 0;
 }
@@ -2767,6 +2787,8 @@ input::file-selector-button {
   top: 0;
   right: 8px;
   z-index: 5;
+  /* Not a button on a row: it is centred on the whole 48px title band. The
+     element rule's one-row height is a default, so this wins on specificity. */
   height: 48px;
   align-items: center;
   justify-content: center;
