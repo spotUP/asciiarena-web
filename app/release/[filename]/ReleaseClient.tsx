@@ -40,6 +40,23 @@ const LogoTagPanel = dynamic(() => import("@/components/release/LogoTagPanel"), 
 
 
 
+/**
+ * One row of the release page's control bar.
+ *
+ * 8px between controls, 8px between wrapped lines, 8px in from the panel edge
+ * -- all on the 8x16 grid. The 16px between the sections themselves comes from
+ * the bar's own gap, so a section reads as a group rather than as more of the
+ * same line.
+ */
+const CONTROL_ROW: React.CSSProperties = {
+  display: "flex",
+  flexWrap: "wrap",
+  alignItems: "center",
+  columnGap: "8px",
+  rowGap: "8px",
+  padding: "0 8px",
+};
+
 interface Comment {
   id: number;
   nick: string;
@@ -1203,61 +1220,99 @@ export default function ReleaseClient({
         </div>
       )}
 
-      {/* Controls bar */}
-      <div className="bg-secondary amb-1 p-0" style={{ marginTop: "32px" }}>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", columnGap: "8px", rowGap: "16px", padding: "16px 8px 0" }}>
-          {hasInlineContent && (
-            <input type="button" className="btn-big" value={collyVisible ? "Hide Colly" : "View Colly"} onClick={toggleColly} />
-          )}
-          {hasInlineContent && viewerVisible && (
-            <input type="button" className="btn-big" id="fsbutton" value={isFullscreen ? "Exit Fullscreen" : "Fullscreen"} onClick={toggleFullscreen} />
-          )}
-          {hasInlineContent && viewerVisible && (
-            <input type="button" className="btn-big" value={fitted ? "Reset size" : "Fit to screen"} onClick={fitColly} />
-          )}
-          <input type="button" className="btn-big" value="Download" onClick={doDownload} />
+      {/* Controls bar.
 
+          Four sections, each on its own row: what you do to the VIEW, how the
+          art is DRAWN, what you do with the COLLY, and the counts. It used to
+          be one long wrapping line, so buttons and figures interleaved
+          wherever the line happened to break -- "63 views 3 watching" sat
+          between Share and View Comments. */}
+      <div
+        className="bg-secondary amb-1 p-0"
+        style={{ marginTop: "32px", display: "flex", flexDirection: "column", gap: "16px", padding: "16px 0" }}
+      >
+        {/* Viewing: everything that changes what you are looking at. */}
+        {hasInlineContent && (
+          <div style={CONTROL_ROW}>
+            <input type="button" className="btn-big" value={collyVisible ? "Hide Colly" : "View Colly"} onClick={toggleColly} />
+            {viewerVisible && (
+              <input type="button" className="btn-big" id="fsbutton" value={isFullscreen ? "Exit Fullscreen" : "Fullscreen"} onClick={toggleFullscreen} />
+            )}
+            {viewerVisible && (
+              <input type="button" className="btn-big" value={fitted ? "Reset size" : "Fit to screen"} onClick={fitColly} />
+            )}
+            {(type === "ASCII" || useCanvasViewer) && viewerVisible && (
+              <>
+                {/* Tagged collys show the index above the art instead, so the
+                    button would be a second copy of the same list. */}
+                {!hasHumanMap && sections.length > 2 && (
+                  <input type="button" className="btn-big"
+                    value={indexOpen ? "Close Index" : "Index"}
+                    onClick={() => setIndexOpen(o => !o)} />
+                )}
+                {/* Offered only where the minimap could actually appear -- on a
+                    narrow screen it is off regardless, so a toggle would lie. */}
+                {viewportWideEnough && logoIndex.length > 1 && (
+                  <input type="button" className="btn-big"
+                    value={minimapEnabled ? "Minimap: ON" : "Minimap: OFF"}
+                    title="Show the logo minimap beside the colly (it costs 120px of width)"
+                    style={minimapEnabled ? undefined : { color: "#777777" }}
+                    onClick={toggleMinimap} />
+                )}
+                <input type="button" className="btn-big"
+                  value={autoplay ? "Stop" : "Autoplay"}
+                  onClick={() => autoplay ? stopAutoplay() : (startAutoplay())} />
+                <input type="button" className="btn-big"
+                  value={musicGroove ? "Groove: ON" : "Groove: OFF"}
+                  title="Advance logos to the beat of the music (starts a random Modland tune if nothing is playing)"
+                  style={musicGroove ? { color: "#ff55ff", borderColor: "#ff55ff" } : undefined}
+                  onClick={() => setMusicGroove(g => !g)} />
+                {/* The one readout that stays with its buttons: it is the
+                    autoplay position, and it means nothing on its own. */}
+                {autoplay && (
+                  <span className="lightgrey">{autoplayIndex + 1} / {sections.length}</span>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Appearance: how the art is drawn. */}
+        {hasInlineContent && (
+          <div style={CONTROL_ROW}>
+            <ColorSwatch current={bgColor} onChange={setBgColor} />
+            <ColorSwatch current={fgColor} onChange={setFgColor} />
+            <div ref={fontRef} style={{ position: "relative" }}>
+              <button className="btn-big bg-header grey-text" onClick={() => setFontOpen(o => !o)}>
+                {FONTS.find(f => f.value === font)?.label ?? font} v
+              </button>
+              {fontOpen && (
+                <div className="dropdown-menu ascii" style={{ display: "block", position: "absolute", zIndex: 200, top: "100%" }}>
+                  {FONTS.map(f => (
+                    <button key={f.value} className="dropdown-item ascii" onClick={() => { setFont(f.value); setFontOpen(false); }}>
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* The colly itself: what you do with it rather than to the view. */}
+        <div style={CONTROL_ROW}>
+          <input type="button" className="btn-big" value="Download" onClick={doDownload} />
+          {type === "ASCII" && viewerVisible && (
+            <input type="button" className="btn-big" value={copyImageLabel} onClick={doCopyImage} />
+          )}
+          {userNick && (
+            <input type="button" className="btn-big" value={fav ? "Remove favourite" : "Favourite"} onClick={toggleFav} />
+          )}
           {hasInlineContent && userNick && (
             <input type="button" className="btn-big"
               value={tagging ? "Stop Tagging" : "Tag Logos"}
               title="Map the logos in this colly so they show up in search"
               onClick={() => setTagging(t => !t)} />
-          )}
-
-          {type === "ASCII" && viewerVisible && (
-            <input type="button" className="btn-big" value={copyImageLabel} onClick={doCopyImage} />
-          )}
-
-          {hasInlineContent && (type === "ASCII" || useCanvasViewer) && viewerVisible && (
-            <>
-              <input type="button" className="btn-big"
-                value={autoplay ? "Stop" : "Autoplay"}
-                onClick={() => autoplay ? stopAutoplay() : (startAutoplay())} />
-              <input type="button" className="btn-big"
-                value={musicGroove ? "Groove: ON" : "Groove: OFF"}
-                title="Advance logos to the beat of the music (starts a random Modland tune if nothing is playing)"
-                style={musicGroove ? { color: "#ff55ff", borderColor: "#ff55ff" } : undefined}
-                onClick={() => setMusicGroove(g => !g)} />
-              {autoplay && (
-                <span className="lightgrey">{autoplayIndex + 1} / {sections.length}</span>
-              )}
-              {/* Tagged collys show the index above the art instead, so the
-                  button would be a second copy of the same list. */}
-              {!hasHumanMap && sections.length > 2 && (
-                <input type="button" className="btn-big"
-                  value={indexOpen ? "Close Index" : "Index"}
-                  onClick={() => setIndexOpen(o => !o)} />
-              )}
-              {/* Offered only where the minimap could actually appear — on a
-                  narrow screen it is off regardless, so a toggle would lie. */}
-              {viewportWideEnough && logoIndex.length > 1 && (
-                <input type="button" className="btn-big"
-                  value={minimapEnabled ? "Minimap: ON" : "Minimap: OFF"}
-                  title="Show the logo minimap beside the colly (it costs 120px of width)"
-                  style={minimapEnabled ? undefined : { color: "#777777" }}
-                  onClick={toggleMinimap} />
-              )}
-            </>
           )}
 
           {/* Share dropdown */}
@@ -1281,22 +1336,6 @@ export default function ReleaseClient({
             )}
           </div>
 
-          {viewCount > 0 && (
-            <span className="lightgrey">{viewCount} {viewCount === 1 ? "view" : "views"}</span>
-          )}
-          {watching > 1 && (
-            <span className="lightgrey">{watching} watching</span>
-          )}
-          {commentsLoaded && comments.length > 0 && (
-            <span className="lightgrey">{comments.length} {comments.length === 1 ? "comment" : "comments"}</span>
-          )}
-          {favCount > 0 && (
-            <span className="lightgrey">{favCount} {favCount === 1 ? "favourite" : "favourites"}</span>
-          )}
-          {downloadCount > 0 && (
-            <span className="lightgrey">{downloadCount} {downloadCount === 1 ? "download" : "downloads"}</span>
-          )}
-
           {/* No apt-1/apb-1 on this link: they add 16px of padding top AND
               bottom with !important, and padding cannot shrink below itself,
               so it came out 32px tall with zero content height however short
@@ -1307,7 +1346,6 @@ export default function ReleaseClient({
 
           {userNick && (
             <>
-              <input type="button" className="btn-big" value={fav ? "Remove favourite" : "Favourite"} onClick={toggleFav} />
               <input type="button" className="btn-big" value="Report Broken" onClick={() => { setSection("broken"); setCollyVisible(false); }} />
               {isAdmin && (
                 <input type="button" className="btn-big" value="Edit" onClick={() => { window.location.href = buildAdminCollyEditHref(filename); }} />
@@ -1316,25 +1354,24 @@ export default function ReleaseClient({
           )}
         </div>
 
-        {/* Color / font controls */}
-        {hasInlineContent && (
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", columnGap: "8px", rowGap: "16px", padding: "16px 8px 16px" }}>
-            <ColorSwatch current={bgColor} onChange={setBgColor} />
-            <ColorSwatch current={fgColor} onChange={setFgColor} />
-            <div ref={fontRef} style={{ position: "relative" }}>
-              <button className="btn-big bg-header grey-text" onClick={() => setFontOpen(o => !o)}>
-                {FONTS.find(f => f.value === font)?.label ?? font} v
-              </button>
-              {fontOpen && (
-                <div className="dropdown-menu ascii" style={{ display: "block", position: "absolute", zIndex: 200, top: "100%" }}>
-                  {FONTS.map(f => (
-                    <button key={f.value} className="dropdown-item ascii" onClick={() => { setFont(f.value); setFontOpen(false); }}>
-                      {f.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+        {/* The counts, on their own line and never mixed in with the buttons. */}
+        {(viewCount > 0 || watching > 1 || favCount > 0 || downloadCount > 0 || (commentsLoaded && comments.length > 0)) && (
+          <div style={CONTROL_ROW} className="lightgrey">
+            {viewCount > 0 && (
+              <span>{viewCount} {viewCount === 1 ? "view" : "views"}</span>
+            )}
+            {watching > 1 && (
+              <span>{watching} watching</span>
+            )}
+            {commentsLoaded && comments.length > 0 && (
+              <span>{comments.length} {comments.length === 1 ? "comment" : "comments"}</span>
+            )}
+            {favCount > 0 && (
+              <span>{favCount} {favCount === 1 ? "favourite" : "favourites"}</span>
+            )}
+            {downloadCount > 0 && (
+              <span>{downloadCount} {downloadCount === 1 ? "download" : "downloads"}</span>
+            )}
           </div>
         )}
       </div>
