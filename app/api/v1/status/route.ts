@@ -1,0 +1,48 @@
+import { NextRequest, NextResponse } from "next/server";
+import { V1_VERSION } from "@/lib/api-v1";
+import { checkV1RateLimit, clientIp, v1RateHeaders } from "@/lib/api-v1-rate-limit";
+
+// GET /api/v1/status — health + version + endpoint index. Bots start here.
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  const rl = checkV1RateLimit(clientIp(request));
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Rate limit exceeded. Try again soon." }, { status: 429 });
+  }
+  return NextResponse.json(
+    {
+      data: {
+        service: "asciiarena",
+        version: V1_VERSION,
+        docs_url: "/api-docs",
+        openapi_url: "/api/v1/openapi",
+        rate_limit: "120 requests/minute per IP (no key required)",
+        endpoints: [
+          "GET /api/v1/status",
+          "GET /api/v1/stats",
+          "GET /api/v1/search?q=",
+          "GET /api/v1/collys",
+          "GET /api/v1/collys/:id",
+          "GET /api/v1/collys/:id/logos",
+          "GET /api/v1/collys/:id/comments",
+          "GET /api/v1/collys/:id/text",
+          "GET /api/v1/logos",
+          "GET /api/v1/logos/:id",
+          "GET /api/v1/site-logos",
+          "GET /api/v1/site-logos/:id",
+          "GET /api/v1/artists",
+          "GET /api/v1/artists/:id",
+          "GET /api/v1/crews",
+          "GET /api/v1/crews/:id",
+          "GET /api/v1/mags",
+          "GET /api/v1/apps",
+          "GET /api/v1/bbs",
+          "GET /api/v1/requests",
+          "GET /api/v1/requests/:id",
+          "GET /api/v1/comments",
+          "GET /api/v1/openapi",
+        ],
+      },
+    },
+    { headers: { "Cache-Control": "public, max-age=300, stale-while-revalidate=600", ...v1RateHeaders(rl.remaining) } },
+  );
+}

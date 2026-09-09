@@ -15,6 +15,26 @@ const CORS_HEADERS: Record<string, string> = {
 export function middleware(request: NextRequest) {
   const origin = request.headers.get('origin') ?? '';
   const isAllowed = ALLOWED_ORIGINS.includes(origin);
+  const pathname = request.nextUrl.pathname;
+
+  // Public bot API: unauthenticated GETs, usable from any origin (chatbots,
+  // browser widgets, curl). Wide-open CORS with no credentials.
+  const isPublicV1 = pathname === '/api/v1/openapi' || pathname.startsWith('/api/v1/') || pathname === '/api/v1';
+  if (isPublicV1) {
+    if (request.method === 'OPTIONS') {
+      return new NextResponse(null, {
+        status: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        },
+      });
+    }
+    const res = NextResponse.next();
+    res.headers.set('Access-Control-Allow-Origin', '*');
+    return res;
+  }
 
   if (request.method === 'OPTIONS') {
     const res = new NextResponse(null, { status: 200 });
