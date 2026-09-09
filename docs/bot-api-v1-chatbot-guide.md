@@ -124,6 +124,34 @@ Artist/crew/colly detail responses embed cross-links (`logos_url`,
 `api_url`, `html_url`), so a bot can walk artist -> releases -> logos without
 guessing URL shapes. Prefer following those links over constructing URLs.
 
+## Leaderboards + widgets
+
+```bash
+# all three leaderboards in one call (limit default 5, max 25)
+curl "https://asciiarena.se/api/v1/tops?limit=10"
+
+# top-rated artists / crews (default sort is by name)
+curl "https://asciiarena.se/api/v1/artists?sort=rating&per_page=10"
+curl "https://asciiarena.se/api/v1/crews?sort=rating&per_page=10"
+
+curl "https://asciiarena.se/api/v1/news"                 # published news
+curl "https://asciiarena.se/api/v1/news/3"               # one item with body
+
+curl "https://asciiarena.se/api/v1/polls?status=open"    # open|closed, default all
+curl "https://asciiarena.se/api/v1/polls/summer-2026"    # options + results when public
+
+curl "https://asciiarena.se/api/v1/walls"                # wall boards
+curl "https://asciiarena.se/api/v1/walls/1"              # latest 13 tags
+
+curl "https://asciiarena.se/api/v1/online"               # nicks online + anon count
+curl "https://asciiarena.se/api/v1/new-users"            # newest members
+curl "https://asciiarena.se/api/v1/last-callers"         # recently active users
+curl "https://asciiarena.se/api/v1/forum?limit=10"       # latest public forum posts
+
+# BBS weektop via cached upstream proxy (source uploaders|bbs|globalwall)
+curl "https://asciiarena.se/api/v1/weektop?source=uploaders"
+```
+
 ## Suggested bot flows
 
 "Show me logos by X": `/api/v1/logos?artist=X&per_page=100`, page through

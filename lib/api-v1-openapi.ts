@@ -127,7 +127,7 @@ export function buildOpenApi(): Record<string, unknown> {
           responses: { "200": { description: "OK" } },
         },
       },
-      "/api/v1/artists": { get: { summary: "List artists", parameters: PAGE_PARAMS, responses: { "200": { description: "OK" } } } },
+      "/api/v1/artists": { get: { summary: "List artists (sort=nick|rating)", parameters: PAGE_PARAMS, responses: { "200": { description: "OK" } } } },
       "/api/v1/artists/{id}": {
         get: {
           summary: "Artist detail (id or nick)",
@@ -135,7 +135,7 @@ export function buildOpenApi(): Record<string, unknown> {
           responses: { "200": { description: "OK" } },
         },
       },
-      "/api/v1/crews": { get: { summary: "List crews", parameters: PAGE_PARAMS, responses: { "200": { description: "OK" } } } },
+      "/api/v1/crews": { get: { summary: "List crews (sort=name|rating)", parameters: PAGE_PARAMS, responses: { "200": { description: "OK" } } } },
       "/api/v1/crews/{id}": {
         get: {
           summary: "Crew detail (id or name)",
@@ -164,6 +164,54 @@ export function buildOpenApi(): Record<string, unknown> {
         get: {
           summary: "Latest colly comments",
           parameters: [...PAGE_PARAMS, { name: "colly_id", in: "query", schema: { type: "integer" } }],
+          responses: { "200": { description: "OK" } },
+        },
+      },
+      "/api/v1/tops": {
+        get: {
+          summary: "Leaderboards: top uploaders, commenters, taggers",
+          parameters: [{ name: "limit", in: "query", schema: { type: "integer", default: 5 } }],
+          responses: { "200": { description: "OK" } },
+        },
+      },
+      "/api/v1/news": { get: { summary: "Published site news", parameters: PAGE_PARAMS, responses: { "200": { description: "OK" } } } },
+      "/api/v1/news/{id}": {
+        get: {
+          summary: "One news item with body",
+          parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
+          responses: { "200": { description: "OK" } },
+        },
+      },
+      "/api/v1/polls": {
+        get: {
+          summary: "Open + closed polls",
+          parameters: [...PAGE_PARAMS, { name: "status", in: "query", schema: { type: "string", enum: ["open", "closed"] } }],
+          responses: { "200": { description: "OK" } },
+        },
+      },
+      "/api/v1/polls/{slug}": {
+        get: {
+          summary: "Poll with options + results (when public)",
+          parameters: [{ name: "slug", in: "path", required: true, schema: { type: "string" } }],
+          responses: { "200": { description: "OK" } },
+        },
+      },
+      "/api/v1/walls": { get: { summary: "Wall boards", parameters: PAGE_PARAMS, responses: { "200": { description: "OK" } } } },
+      "/api/v1/walls/{id}": {
+        get: {
+          summary: "Wall with latest tags",
+          parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
+          responses: { "200": { description: "OK" } },
+        },
+      },
+      "/api/v1/online": { get: { summary: "Users online now", responses: { "200": { description: "OK" } } } },
+      "/api/v1/new-users": { get: { summary: "Newest members", responses: { "200": { description: "OK" } } } },
+      "/api/v1/last-callers": { get: { summary: "Recently active users", responses: { "200": { description: "OK" } } } },
+      "/api/v1/forum": { get: { summary: "Latest public forum posts", responses: { "200": { description: "OK" } } } },
+      "/api/v1/weektop": {
+        get: {
+          summary: "BBS weektop via cached upstream proxy",
+          parameters: [{ name: "source", in: "query", schema: { type: "string", enum: ["uploaders", "bbs", "globalwall"] } }],
           responses: { "200": { description: "OK" } },
         },
       },

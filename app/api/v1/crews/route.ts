@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { v1Params, parsePagination, parseQuery, v1Ok, v1Error } from "@/lib/api-v1";
+import { v1Params, parsePagination, parseQuery, parseSort, v1Ok, v1Error } from "@/lib/api-v1";
 import { checkV1RateLimit, clientIp, v1RateHeaders } from "@/lib/api-v1-rate-limit";
 import { urlsafe } from "@/lib/utils";
 
@@ -25,6 +25,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const sp = v1Params(request);
   const { page, perPage, offset } = parsePagination(sp);
   const q = parseQuery(sp);
+  const { sort: sortRaw, order } = parseSort(sp, "name");
+  const sort = sortRaw === "rating" ? "rating" : "name";
+  const orderSql = sort === "rating" ? "c.rating DESC" : `c.name ${order}`;
   const whereSql = q ? `WHERE c.name LIKE ?` : "";
   const params: (string | number)[] = q ? [`%${q}%`] : [];
 
@@ -35,7 +38,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       (SELECT COUNT(*) FROM colly_logos cl WHERE cl.crew_id = c.id) AS logo_count`;
     const [rows, countRows] = await Promise.all([
       prisma.$queryRawUnsafe<CrewRow[]>(
-        `SELECT ${selectCols} FROM crews c ${whereSql} ORDER BY c.name ASC LIMIT ${perPage} OFFSET ${offset}`,
+        `SELECT ${selectCols} FROM crews c ${whereSql} ORDER BY ${orderSql} LIMIT ${perPage} OFFSET ${offset}`,
         ...params,
       ),
       prisma.$queryRawUnsafe<{ cnt: bigint | number }[]>(

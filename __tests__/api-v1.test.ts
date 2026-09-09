@@ -9,6 +9,7 @@ vi.mock("@/lib/db", () => ({
     comments: { count: vi.fn() },
     artists_collys: { findMany: vi.fn() },
     collys_crews: { findMany: vi.fn() },
+    users: { findMany: vi.fn() },
   },
 }));
 
@@ -30,6 +31,7 @@ import { buildOpenApi } from "@/lib/api-v1-openapi";
 import { GET as LogosGET } from "@/app/api/v1/logos/route";
 import { GET as StatusGET } from "@/app/api/v1/status/route";
 import { GET as SearchGET } from "@/app/api/v1/search/route";
+import { GET as TopsGET } from "@/app/api/v1/tops/route";
 import { prisma } from "@/lib/db";
 
 function req(url: string): Request {
@@ -122,10 +124,42 @@ describe("OpenAPI spec", () => {
       "/api/v1/crews",
       "/api/v1/search",
       "/api/v1/stats",
+      "/api/v1/tops",
+      "/api/v1/news",
+      "/api/v1/news/{id}",
+      "/api/v1/polls",
+      "/api/v1/polls/{slug}",
+      "/api/v1/walls",
+      "/api/v1/walls/{id}",
+      "/api/v1/online",
+      "/api/v1/new-users",
+      "/api/v1/last-callers",
+      "/api/v1/forum",
+      "/api/v1/weektop",
       "/api/v1/openapi",
     ]) {
       expect(spec.paths[p], p).toBeDefined();
     }
+  });
+});
+
+describe("GET /api/v1/tops", () => {
+  it("returns all three leaderboards in one call", async () => {
+    resetV1RateLimit();
+    vi.mocked(prisma.users.findMany).mockResolvedValueOnce([
+      { id: 1, nick: "spot", uploaded: 12345 },
+    ] as never);
+    vi.mocked(prisma.$queryRaw)
+      .mockResolvedValueOnce([{ topcommentators: BigInt(7), nick: "spot", user_id: 1 }])
+      .mockResolvedValueOnce([{ user_id: 1, nick: "spot", logos: BigInt(3), collys: BigInt(2) }]);
+    const res = await TopsGET(req("http://localhost/api/v1/tops?limit=5") as never);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      data: { top_uploaders: unknown[]; top_commenters: unknown[]; top_taggers: unknown[] };
+    };
+    expect(body.data.top_uploaders).toHaveLength(1);
+    expect(body.data.top_commenters).toHaveLength(1);
+    expect(body.data.top_taggers).toHaveLength(1);
   });
 });
 

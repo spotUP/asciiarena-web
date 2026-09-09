@@ -43,9 +43,9 @@ const GROUPS: { title: string; rows: { method: string; path: string; desc: strin
   {
     title: "SCENE DIRECTORY",
     rows: [
-      { method: "GET", path: "/api/v1/artists?q=", desc: "List artists with colly + logo counts" },
+      { method: "GET", path: "/api/v1/artists?q=&sort=nick|rating", desc: "List artists with colly + logo counts" },
       { method: "GET", path: "/api/v1/artists/:id", desc: "Artist by id OR nick, with releases" },
-      { method: "GET", path: "/api/v1/crews?q=", desc: "List crews with member + release counts" },
+      { method: "GET", path: "/api/v1/crews?q=&sort=name|rating", desc: "List crews with member + release counts" },
       { method: "GET", path: "/api/v1/crews/:id", desc: "Crew by id OR name, with members + releases" },
       { method: "GET", path: "/api/v1/mags?q=", desc: "List mags" },
       { method: "GET", path: "/api/v1/apps?q=", desc: "List apps" },
@@ -53,6 +53,23 @@ const GROUPS: { title: string; rows: { method: string; path: string; desc: strin
       { method: "GET", path: "/api/v1/requests?q=&status=", desc: "List requests (status 0 open, 1 filled, 2 denied)" },
       { method: "GET", path: "/api/v1/requests/:id", desc: "Request with comments" },
       { method: "GET", path: "/api/v1/comments?colly_id=", desc: "Latest comments, optional colly filter" },
+    ],
+  },
+  {
+    title: "LEADERBOARDS + WIDGETS",
+    rows: [
+      { method: "GET", path: "/api/v1/tops?limit=", desc: "Top uploaders, commenters, taggers in one call" },
+      { method: "GET", path: "/api/v1/news?q=", desc: "Published site news" },
+      { method: "GET", path: "/api/v1/news/:id", desc: "One news item with body" },
+      { method: "GET", path: "/api/v1/polls?status=", desc: "Open + closed polls (status open|closed)" },
+      { method: "GET", path: "/api/v1/polls/:slug", desc: "Poll with options + results when public" },
+      { method: "GET", path: "/api/v1/walls", desc: "Wall boards with post counts" },
+      { method: "GET", path: "/api/v1/walls/:id", desc: "Wall with latest 13 tags" },
+      { method: "GET", path: "/api/v1/online", desc: "Users online now + anonymous count" },
+      { method: "GET", path: "/api/v1/new-users?limit=", desc: "Newest members" },
+      { method: "GET", path: "/api/v1/last-callers?limit=", desc: "Recently active users" },
+      { method: "GET", path: "/api/v1/forum?limit=", desc: "Latest public forum posts" },
+      { method: "GET", path: "/api/v1/weektop?source=", desc: "BBS weektop (source uploaders|bbs|globalwall)" },
     ],
   },
 ];
