@@ -10,6 +10,7 @@ interface AdRow {
   bbs_name: string | null;
   filename: string | null;
   filesize: number | null;
+  content: string | null;
   is_ansi: number | boolean | null;
   nodes: number | null;
   total_count: number;
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const [rows, countRows] = await Promise.all([
     prisma.$queryRaw<AdRow[]>`
       SELECT a.id, a.bbs_id, b.name AS bbs_name, a.filename, a.filesize,
-             a.is_ansi, a.nodes, COUNT(*) OVER () AS total_count
+             a.content, a.is_ansi, a.nodes, COUNT(*) OVER () AS total_count
       FROM bbs_ads a JOIN bbses b ON b.id = a.bbs_id
       WHERE (a.filename LIKE ${likeParam} OR a.content LIKE ${likeParam})
       ${bbsFilter} ${crewFilter}
@@ -65,6 +66,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       bbs_name: row.bbs_name,
       filename: row.filename,
       filesize: row.filesize == null ? null : Number(row.filesize),
+      content: row.content ?? "",
       is_ansi: row.is_ansi ? 1 : 0,
       nodes: row.nodes == null ? null : Number(row.nodes),
       total_count,

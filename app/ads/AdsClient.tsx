@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import ContentLink from "@/components/ui/ContentLink";
+import AdArt from "@/components/ui/AdArt";
 
 interface AdRow {
   url: string;
@@ -10,6 +11,7 @@ interface AdRow {
   bbs_name: string | null;
   filename: string | null;
   filesize: number | null;
+  content: string | null;
   is_ansi: number | null;
   nodes: number | null;
   total_count: number;
@@ -22,7 +24,7 @@ interface AdsClientProps {
   crewList: string[];
 }
 
-const PAGE_SIZE = 60;
+const PAGE_SIZE = 20;
 
 export default function AdsClient({ initialQ, initialCrew, initialBbsId, crewList }: AdsClientProps) {
   const [q, setQ] = useState(initialQ);
@@ -118,31 +120,22 @@ export default function AdsClient({ initialQ, initialCrew, initialBbsId, crewLis
           </div>
         </div>
       </div>
-      {loading ? (
+      {loading && (
         <div className="row">
           <div className="col-12">Loading...</div>
-        </div>
-      ) : (
-        <div className="row amb-1">
-          <div className="col-5">FILE</div>
-          <div className="col-4">BBS</div>
-          <div className="col-1">SIZE</div>
-          <div className="col-2">INFO</div>
         </div>
       )}
       {!loading &&
         allRows.map((row) => (
-          <div className="row" key={row.id}>
-            <div className="col-5">
-              <ContentLink href={row.url}>{row.filename}</ContentLink>
-            </div>
-            <div className="col-4">
-              <ContentLink href={`/bbs/${row.bbs_id}`}>{row.bbs_name}</ContentLink>
-            </div>
-            <div className="col-1">{row.filesize ?? "-"}</div>
-            <div className="col-2">
-              {row.is_ansi ? "ANSI " : ""}
-              {row.nodes != null ? `${row.nodes} nodes` : ""}
+          <div className="row apb-1" key={row.id}>
+            <div className="col-lg-12">
+              <div className="apb-1">
+                <ContentLink href={row.url}>{row.filename}</ContentLink>
+                {" on "}
+                <ContentLink href={`/bbs/${row.bbs_id}`}>{row.bbs_name}</ContentLink>
+                {row.nodes != null ? ` - ${row.nodes} nodes` : ""}
+              </div>
+              <AdArt lines={(row.content ?? "").split("\n")} />
             </div>
           </div>
         ))}

@@ -23,13 +23,9 @@ interface AdDetail {  id: number;
   page_url: string | null;
 }
 
-// ANSI color codes ride along in ad bytes and are invisible in a terminal.
-// Strip them for display; the stored bytes stay untouched. React escapes
-// everything rendered inside <pre> by default - never use
-// dangerouslySetInnerHTML here.
-function displayText(content: string): string {
-  return content.replace(/\x1b\[[0-9;]*[A-Za-z]|\x1b/g, "");
-}
+// ANSI color codes are stripped inside AdArt; the stored bytes stay
+// untouched. React escapes everything rendered inside <pre> by default -
+// never use dangerouslySetInnerHTML here.
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   return { title: `BBS ad | aSCIIaRENA` };
@@ -108,7 +104,7 @@ export default async function AdPage({ params }: { params: Promise<{ id: string 
       </div>
       <div className="row">
         <div className="col-lg-12">
-          <AdArt lines={displayText(ad.content).split("\n")} />
+          <AdArt lines={ad.content.split("\n")} />
         </div>
       </div>
     </SiteLayout>

@@ -48,6 +48,7 @@ describe("GET /api/bbs-ads", () => {
           bbs_name: "The Yard",
           filename: "tHEYARd.bbS",
           filesize: 1334,
+          content: "tHe yARd!",
           is_ansi: 0,
           nodes: 8,
           total_count: 1,
@@ -58,6 +59,6 @@ describe("GET /api/bbs-ads", () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body).toHaveLength(1);
-    expect(body[0]).toMatchObject({ id: 1, bbs_name: "The Yard", filename: "tHEYARd.bbS" });
+    expect(body[0]).toMatchObject({ id: 1, bbs_name: "The Yard", filename: "tHEYARd.bbS", content: "tHe yARd!" });
   });
 });

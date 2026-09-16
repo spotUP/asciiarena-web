@@ -3,9 +3,15 @@ import React from "react";
 // BBS text-ad viewer: same presentation as the ASCII logo gallery
 // (app/logos): TopazPlus at native 16px, shrinking to fit wide art,
 // dark card, scroll-safe. Art is user data - React escapes it by default,
-// never render it as HTML.
+// never render it as HTML. ANSI color codes are stripped here so every
+// caller gets display-ready text; stored bytes stay untouched.
+function stripAnsi(s: string): string {
+  return s.replace(/\x1b\[[0-9;]*[A-Za-z]|\x1b/g, "");
+}
+
 export default function AdArt({ lines }: { lines: string[] }) {
-  const cols = lines.reduce((m, l) => Math.max(m, l.length), 1);
+  const clean = lines.map(stripAnsi);
+  const cols = clean.reduce((m, l) => Math.max(m, l.length), 1);
   const fs = `min(16px, calc(200cqw / ${cols}))`;
   return (
     <div
@@ -28,7 +34,7 @@ export default function AdArt({ lines }: { lines: string[] }) {
           color: "#cccccc",
         }}
       >
-        {lines.join("\n")}
+        {clean.join("\n")}
       </pre>
     </div>
   );
