@@ -44,7 +44,7 @@ export default async function BbsPage({ params }: PageProps) {
   // Table may not exist yet on instances that never ran the import migration.
   const session = await auth();
   let adCount = 0;
-  let bbsAds: { id: number; filename: string | null; content: string | null }[] = [];
+  let bbsAds: { id: number; filename: string | null; content: string | null; is_ansi: number | boolean | null }[] = [];
   if (session?.user) {
     try {
       const countRows = await prisma.$queryRaw<{ cnt: bigint | number }[]>`
@@ -52,8 +52,8 @@ export default async function BbsPage({ params }: PageProps) {
       `;
       adCount = Number(countRows[0]?.cnt ?? 0);
       if (adCount > 0) {
-        bbsAds = await prisma.$queryRaw<{ id: number; filename: string | null; content: string | null }[]>`
-          SELECT id, filename, content FROM bbs_ads WHERE bbs_id = ${id} ORDER BY id ASC
+        bbsAds = await prisma.$queryRaw<{ id: number; filename: string | null; content: string | null; is_ansi: number | boolean | null }[]>`
+          SELECT id, filename, content, is_ansi FROM bbs_ads WHERE bbs_id = ${id} ORDER BY id ASC
         `;
       }
     } catch {
@@ -137,7 +137,7 @@ export default async function BbsPage({ params }: PageProps) {
                 <div className="apb-1">
                   <ContentLink href={`/ads/${a.id}`}>{a.filename}</ContentLink>
                 </div>
-                <AdArt lines={(a.content ?? "").split("\n")} />
+                <AdArt lines={(a.content ?? "").split("\n")} isAnsi={a.is_ansi} />
               </div>
             </div>
           ))}

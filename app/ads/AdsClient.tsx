@@ -135,7 +135,7 @@ export default function AdsClient({ initialQ, initialCrew, initialBbsId, crewLis
                 <ContentLink href={`/bbs/${row.bbs_id}`}>{row.bbs_name}</ContentLink>
                 {row.nodes != null ? ` - ${row.nodes} nodes` : ""}
               </div>
-              <AdArt lines={(row.content ?? "").split("\n")} />
+              <AdArt lines={(row.content ?? "").split("\n")} isAnsi={row.is_ansi} />
             </div>
           </div>
         ))}

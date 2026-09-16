@@ -104,7 +104,7 @@ export default async function AdPage({ params }: { params: Promise<{ id: string 
       </div>
       <div className="row">
         <div className="col-lg-12">
-          <AdArt lines={ad.content.split("\n")} />
+          <AdArt lines={ad.content.split("\n")} isAnsi={ad.is_ansi} />
         </div>
       </div>
     </SiteLayout>
