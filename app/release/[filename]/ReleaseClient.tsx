@@ -1251,6 +1251,9 @@ export default function ReleaseClient({
           {commentsLoaded && comments.length > 0 && (
             <a href="#comments" className="btn-big bg-header grey-text" role="button">View Comments ({comments.length})</a>
           )}
+          {hasInlineContent && (
+            <input type="button" className="btn-big" value={collyVisible ? "Hide Colly" : "View Colly"} onClick={toggleColly} />
+          )}
           {/* The autoplay position: a readout of the button beside it, so it
               stays with its buttons rather than going down to the counts. */}
           {autoplay && (
@@ -1264,7 +1267,6 @@ export default function ReleaseClient({
             <AnsiMenu
               label="View"
               items={[
-                { label: collyVisible ? "Hide Colly" : "View Colly", onSelect: toggleColly },
                 ...(viewerVisible
                   ? [{ label: fitted ? "Reset size" : "Fit to screen", onSelect: fitColly }]
                   : []),
