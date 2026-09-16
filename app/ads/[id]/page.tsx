@@ -3,26 +3,12 @@ import { redirect, notFound } from "next/navigation";
 import type { Metadata } from "next";
 import SiteLayout from "@/components/layout/SiteLayout";
 import ContentLink from "@/components/ui/ContentLink";
+import AdArt from "@/components/ui/AdArt";
 import { prisma } from "@/lib/db";
+import { Prisma } from "@/lib/generated/prisma/client";
+import { AD_COLUMNS, parseJsonList, type AdRow } from "@/lib/bbsAdQueries";
 
-interface AdRow {
-  id: number;
-  bbs_id: number;
-  bbs_name: string | null;
-  filename: string | null;
-  filesize: number | null;
-  content: string | null;
-  encoding: string | null;
-  is_ansi: number | boolean | null;
-  phones: string | null;
-  nodes: number | null;
-  handles: string | null;
-  groups: string | null;
-  page_url: string | null;
-}
-
-interface AdDetail {
-  id: number;
+interface AdDetail {  id: number;
   bbs_id: number;
   bbs_name: string | null;
   filename: string | null;
@@ -57,24 +43,12 @@ export default async function AdPage({ params }: { params: Promise<{ id: string 
   if (!Number.isFinite(id) || id <= 0) notFound();
 
   const rows = await prisma.$queryRaw<AdRow[]>`
-    SELECT a.id, a.bbs_id, b.name AS bbs_name, a.filename, a.filesize,
-           a.content, a.encoding, a.is_ansi, a.phones_json AS phones,
-           a.nodes, a.handles_json AS handles, a.groups_json AS groups,
-           a.page_url
+    SELECT ${Prisma.raw(AD_COLUMNS)}
     FROM bbs_ads a JOIN bbses b ON b.id = a.bbs_id
     WHERE a.id = ${id}
   `;
   const found = rows[0];
   if (!found) notFound();
-  const parse = (s: unknown): string[] => {
-    if (typeof s !== "string") return [];
-    try {
-      const v: unknown = JSON.parse(s);
-      return Array.isArray(v) ? v.map(String) : [];
-    } catch {
-      return [];
-    }
-  };
   const ad: AdDetail = {
     ...found,
     id: Number(found.id),
@@ -83,9 +57,9 @@ export default async function AdPage({ params }: { params: Promise<{ id: string 
     content: found.content ?? "",
     is_ansi: found.is_ansi ? 1 : 0,
     nodes: found.nodes == null ? null : Number(found.nodes),
-    phones: parse(found.phones),
-    handles: parse(found.handles),
-    groups: parse(found.groups),
+    phones: parseJsonList(found.phones),
+    handles: parseJsonList(found.handles),
+    groups: parseJsonList(found.groups),
   };
 
   return (
@@ -134,7 +108,7 @@ export default async function AdPage({ params }: { params: Promise<{ id: string 
       </div>
       <div className="row">
         <div className="col-lg-12">
-          <pre>{displayText(ad.content)}</pre>
+          <AdArt lines={displayText(ad.content).split("\n")} />
         </div>
       </div>
     </SiteLayout>

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { apiError } from "@/lib/utils";
+import { Prisma } from "@/lib/generated/prisma/client";
+import { AD_COLUMNS, parseJsonList, type AdRow } from "@/lib/bbsAdQueries";
 
 // Members-only like the list route. Phones arrive pre-masked from the
 // import (doorserver masks country+area on, subscriber off); the raw text
@@ -16,40 +18,13 @@ export async function GET(
   const id = Number((await params).id);
   if (!Number.isFinite(id) || id <= 0) return apiError("Not found", 404);
 
-  const rows = await prisma.$queryRaw<
-    {
-      id: number;
-      bbs_id: number;
-      bbs_name: string | null;
-      filename: string | null;
-      filesize: number | null;
-      content: string | null;
-      encoding: string | null;
-      is_ansi: number | boolean | null;
-      phones_json: string | null;
-      nodes: number | null;
-      handles_json: string | null;
-      groups_json: string | null;
-      page_url: string | null;
-    }[]
-  >`
-    SELECT a.id, a.bbs_id, b.name AS bbs_name, a.filename, a.filesize,
-           a.content, a.encoding, a.is_ansi, a.phones_json, a.nodes,
-           a.handles_json, a.groups_json, a.page_url
+  const rows = await prisma.$queryRaw<AdRow[]>`
+    SELECT ${Prisma.raw(AD_COLUMNS)}
     FROM bbs_ads a JOIN bbses b ON b.id = a.bbs_id
     WHERE a.id = ${id}
   `;
   const row = rows[0];
   if (!row) return apiError("Not found", 404);
-
-  const parse = (s: string | null): string[] => {
-    try {
-      const v: unknown = JSON.parse(s ?? "[]");
-      return Array.isArray(v) ? v.map(String) : [];
-    } catch {
-      return [];
-    }
-  };
 
   return NextResponse.json({
     id: Number(row.id),
@@ -60,10 +35,10 @@ export async function GET(
     content: row.content ?? "",
     encoding: row.encoding,
     is_ansi: row.is_ansi ? 1 : 0,
-    phones: parse(row.phones_json),
+    phones: parseJsonList(row.phones),
     nodes: row.nodes == null ? null : Number(row.nodes),
-    handles: parse(row.handles_json),
-    groups: parse(row.groups_json),
+    handles: parseJsonList(row.handles),
+    groups: parseJsonList(row.groups),
     page_url: row.page_url,
   });
 }
