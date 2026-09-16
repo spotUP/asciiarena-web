@@ -6,6 +6,7 @@ import SiteLayout from "@/components/layout/SiteLayout";
 import { prisma } from "@/lib/db";
 import { urlsafe } from "@/lib/utils";
 import WatchingPip from "@/components/widgets/WatchingPip";
+import { getSession as auth } from "@/lib/session";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const id = Number((await params).id);
@@ -36,6 +37,28 @@ export default async function BbsPage({ params }: PageProps) {
     WHERE bo.name = ${bbs.name}
     ORDER BY bo.crew ASC
   `;
+
+  // Text ads are members-only (Demozoo hosts them login-walled; this mirror
+  // respects the boundary). The page stays public; only this section hides.
+  // Table may not exist yet on instances that never ran the import migration.
+  const session = await auth();
+  let adCount = 0;
+  let recentAds: { id: number; filename: string | null }[] = [];
+  if (session?.user) {
+    try {
+      const countRows = await prisma.$queryRaw<{ cnt: bigint | number }[]>`
+        SELECT COUNT(*) AS cnt FROM bbs_ads WHERE bbs_id = ${id}
+      `;
+      adCount = Number(countRows[0]?.cnt ?? 0);
+      if (adCount > 0) {
+        recentAds = await prisma.$queryRaw<{ id: number; filename: string | null }[]>`
+          SELECT id, filename FROM bbs_ads WHERE bbs_id = ${id} ORDER BY id ASC LIMIT 12
+        `;
+      }
+    } catch {
+      adCount = 0;
+    }
+  }
 
   return (
     <SiteLayout title="BBS iNFO">
@@ -99,6 +122,24 @@ export default async function BbsPage({ params }: PageProps) {
                 : <a href={`/crew/${urlsafe(c.crew)}`}>{c.crew}</a>}
             </div>
           ))}
+        </>
+      )}
+
+      {session?.user && adCount > 0 && (
+        <>
+          <div className="row apt-1 apb-1">
+            <h2 className="bg-header">Text Ads ({adCount})</h2>
+          </div>
+          {recentAds.map((a) => (
+            <div key={a.id} className="col-lg-12 pl-0">
+              <ContentLink href={`/ads/${a.id}`}>{a.filename}</ContentLink>
+            </div>
+          ))}
+          {adCount > recentAds.length && (
+            <div className="col-lg-12 pl-0">
+              <ContentLink href={`/ads?bbs_id=${bbs.id}`}>All {adCount} ads...</ContentLink>
+            </div>
+          )}
         </>
       )}
     </SiteLayout>

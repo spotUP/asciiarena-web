@@ -83,14 +83,36 @@ model bbs_of {
 }
 
 model bbses {
-  name     String? @db.Char(60)
-  sysop    String? @db.Char(60)
-  address  String? @db.Char(60)
-  number   String? @db.Char(24)
-  id       Int     @id @default(autoincrement()) @db.UnsignedInt
-  country  String? @db.VarChar(60)
-  online   Boolean @default(false)
-  software String? @db.VarChar(30)
+  name       String? @db.Char(60)
+  sysop      String? @db.Char(60)
+  address    String? @db.Char(60)
+  number     String? @db.Char(24)
+  id         Int     @id @default(autoincrement()) @db.UnsignedInt
+  country    String? @db.VarChar(60)
+  online     Boolean @default(false)
+  software   String? @db.VarChar(30)
+  demozoo_id Int?    @unique(map: "uq_bbses_demozoo") @db.UnsignedInt
+}
+
+// BBS text ads imported from Demozoo (see scripts/import-bbs-ads.ts).
+// Visible to logged-in users only - enforced in app/ads, never in SQL.
+model bbs_ads {
+  id            Int      @id @default(autoincrement()) @db.UnsignedInt
+  bbs_id        Int      @db.UnsignedInt
+  demozoo_ad_id Int      @unique(map: "uq_bbs_ads_demozoo") @db.UnsignedInt
+  filename      String   @db.VarChar(255)
+  filesize      Int?
+  content       String   @db.MediumText
+  encoding      String?  @db.VarChar(16)
+  is_ansi       Boolean  @default(false)
+  phones_json   String   @default("[]") @db.Text
+  nodes         Int?
+  handles_json  String   @default("[]") @db.Text
+  groups_json   String   @default("[]") @db.Text
+  page_url      String?  @db.VarChar(255)
+
+  @@index([bbs_id], map: "idx_bbs_ads_bbs")
+  @@fulltext([filename], map: "fts_bbs_ads_filename")
 }
 
 model collys {
