@@ -88,7 +88,7 @@ export default async function BbsPage({ params }: PageProps) {
           {bbs.address}
         </div>
       )}
-      {bbs.number && (
+      {bbs.number && session?.user && (
         <div className="col-lg-12 pl-0">
           <span className="lightgrey">Number: </span>
           {bbs.number}
