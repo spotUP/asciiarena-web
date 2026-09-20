@@ -59,3 +59,12 @@ up-rough-amp/
 # Personal scratchpad (contains account ids / mail addresses)
 thoughts/spot/
 thoughts/searchable/
+
+# Internal notes stay on disk, out of the public repo.
+#
+# thoughts/ (research, plans, handoffs) and the root handoff.md describe the
+# production hosts, paths and deploy procedure in detail -- an operational map,
+# not something to publish. The long-form record still lives in the private
+# spotUP/asciiarena repo and in ~/asciiarena-thoughts-backup.
+thoughts/
+handoff.md
