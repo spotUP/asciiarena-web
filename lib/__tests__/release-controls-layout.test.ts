@@ -33,7 +33,7 @@ describe("release control bar", () => {
 
   it("keeps only what you reach for while reading as a button", () => {
     const primary = bar.slice(bar.indexOf("{/* What you reach for"), bar.indexOf("{/* The two menus"));
-    for (const control of ["Fullscreen", "Autoplay", "Download", "Favourite", "View Comments"]) {
+    for (const control of ["Fullscreen", "Autoplay", "Download", "Favourite", "View Comments", "Hide Colly"]) {
       expect(primary, control).toContain(control);
     }
     // Everything else moved into a menu.
@@ -44,7 +44,8 @@ describe("release control bar", () => {
 
   it("puts the display settings in the View menu and the rest in More", () => {
     const menus = bar.slice(bar.indexOf("{/* The two menus"), bar.indexOf("{/* The counts"));
-    for (const item of ["Hide Colly", "Fit to screen", "Index", "Minimap", "Groove", "Background", "Text"]) {
+    // Hide Colly came back out of the menu in bf75fc2, next to View Comments.
+    for (const item of ["Fit to screen", "Index", "Minimap", "Groove", "Background", "Text"]) {
       expect(menus, item).toContain(item);
     }
     for (const item of ["Tag logos", "Report broken", "Share by mail", "Copy autoplay link"]) {
