@@ -1,6 +1,14 @@
 "use client";
 
+declare global {
+  interface Window {
+    /** Installed by Google's recaptcha/api.js once it has loaded. */
+    grecaptcha?: { getResponse: () => string; reset: () => void };
+  }
+}
+
 import React, { useState, FormEvent } from "react";
+import Script from "next/script";
 import {
   ACTIVITY_TYPES,
   ACTIVITY_LABELS,
@@ -46,6 +54,9 @@ export default function RegisterForm() {
           password,
           password2,
           activityOptIn: Array.from(activityOptIn),
+          // Google's widget writes the solved token here. The server refuses
+          // the registration without it -- see lib/recaptcha.ts.
+          recaptchaToken: window.grecaptcha?.getResponse() ?? "",
         }),
       });
       const data = (await res.json()) as { status?: boolean; error?: string };
@@ -53,6 +64,9 @@ export default function RegisterForm() {
         setSuccess(true);
       } else {
         setError(data.error ?? "Registration failed.");
+        // A token is single-use: without this the next attempt replays it and
+        // Google answers timeout-or-duplicate.
+        window.grecaptcha?.reset();
       }
     } catch {
       setError("An unexpected error occurred.");
@@ -199,9 +213,13 @@ export default function RegisterForm() {
         </div>
 
         <div className="row apb-1">
+          {/* The script was missing, so this div rendered nothing at all and
+              no token was ever produced. The site key is public by design; it
+              comes from env so a rotation is a config change, not a deploy. */}
+          <Script src="https://www.google.com/recaptcha/api.js" strategy="afterInteractive" />
           <div
             className="g-recaptcha"
-            data-sitekey="6Le5rpQrAAAAACR_OlbAuKMTlgHY6wnDqJYuBkVQ"
+            data-sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "6Le5rpQrAAAAACR_OlbAuKMTlgHY6wnDqJYuBkVQ"}
           />
         </div>
 

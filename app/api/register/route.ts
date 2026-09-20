@@ -9,6 +9,7 @@ import { broadcast } from "@/lib/live";
 import { revalidateTag } from "next/cache";
 import { buildHmacToken } from "@/lib/hmacToken";
 import { isValidPassword, PASSWORD_RULE_TEXT } from "@/lib/accountRules";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 // Activation links stay valid for 7 days so a user has a comfortable window to
 // click through from their welcome email.
@@ -71,9 +72,19 @@ export async function POST(request: NextRequest) {
     password?: string;
     password2?: string;
     activityOptIn?: string[];
+    recaptchaToken?: string;
   };
 
   const { nick, mail, password, password2 } = body;
+
+  // Before anything else, and before any database work: the form rendered a
+  // captcha widget that was never loaded and never checked, so the only thing
+  // standing between a script and an account was a 3-per-hour IP limit. That is
+  // where the spam accounts came from.
+  const captcha = await verifyRecaptcha(body.recaptchaToken, ip);
+  if (!captcha.ok) {
+    return apiError(captcha.error ?? "Captcha check failed.", 400);
+  }
 
   const optInSet = new Set(
     (body.activityOptIn ?? []).filter((t): t is ActivityType =>
