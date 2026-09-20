@@ -173,11 +173,42 @@ describe("stripFileIdDiz", () => {
     expect(result.dizText).toBe("embedded diz content");
   });
 
-  it("trims whitespace from extracted diz text", () => {
+  it("drops blank lines around the block but keeps the first line's indentation", () => {
+    // This test used to assert `.trim()`'s behaviour and expect "diz here" --
+    // codifying the bug. In a diz the leading spaces ARE the art: they place
+    // the first line of a logo over the one beneath it.
     const result = stripFileIdDiz(
       `${BEGIN_FILE_ID_DIZ}\n\n  diz here  \n\n${END_FILE_ID_DIZ}`
     );
-    expect(result.dizText).toBe("diz here");
+    expect(result.dizText).toBe("  diz here");
+  });
+
+  it("keeps a logo's first line aligned with the rest of it", () => {
+    // Reported 2026-09-19: "I have the spacing correct before the diz tags are
+    // removed but it still ignores the spacing on the first line." Only the
+    // first line moved, because only the first line's indentation touched the
+    // start of the string that was trimmed.
+    const logo = [
+      "      .  .    ascii by fuzion",
+      "   .----------------------------",
+      "   |  a colly for the scene",
+    ].join("\n");
+    const result = stripFileIdDiz(
+      `art above\n${BEGIN_FILE_ID_DIZ}\n${logo}\n${END_FILE_ID_DIZ}\nart below`
+    );
+    expect(result.dizText).toBe(logo);
+    // Each line keeps its own indentation, first one included.
+    expect(result.dizText!.split("\n").map(l => l.length - l.trimStart().length))
+      .toEqual([6, 3, 3]);
+  });
+
+  it("keeps indentation when the block uses CRLF line endings", () => {
+    // A diz written on Windows, or edited through a form that normalises to
+    // CRLF, must not lose the first line either.
+    const result = stripFileIdDiz(
+      `${BEGIN_FILE_ID_DIZ}\r\n    indented\r\nplain\r\n${END_FILE_ID_DIZ}`
+    );
+    expect(result.dizText).toBe("    indented\r\nplain");
   });
 
   it("returns null dizText for empty content between markers", () => {

@@ -39,6 +39,28 @@ export interface FileIdDizResult {
 
 /** Strip embedded file_id.diz markers and return the extracted content.
  *  Safe to call on HTML-escaped text — the markers contain no HTML special chars. */
+/**
+ * Trim the blank edges of an embedded diz block without touching the art.
+ *
+ * This was a plain `.trim()`, which also ate the leading SPACES of the first
+ * line -- and in a diz those spaces are the art: they are what positions the
+ * first line of a logo under the one below it. Every other line kept its
+ * indentation, so a diz rendered with exactly one line shoved to the left
+ * margin. Reported 2026-09-19: "I have the spacing correct before the diz tags
+ * are removed but it still ignores the spacing on the first line."
+ *
+ * What is safe to remove is whole blank lines -- the break that ends the
+ * @BEGIN tag's own line, and any empty lines before @END -- never the
+ * indentation of a line that has something on it.
+ */
+function trimDizEdges(raw: string): string {
+  // Leading: whole blank lines only. Stops at the first line with content, so
+  // that line keeps every space in front of it.
+  const withoutLeadingBlankLines = raw.replace(/^(?:[ \t]*\r?\n)+/, "");
+  // Trailing: whitespace is invisible at the end, so all of it can go.
+  return withoutLeadingBlankLines.replace(/\s+$/, "");
+}
+
 export function stripFileIdDiz(text: string): FileIdDizResult {
   const beginIdx = text.indexOf(BEGIN_FILE_ID_DIZ);
   const endIdx = text.indexOf(END_FILE_ID_DIZ);
@@ -46,7 +68,7 @@ export function stripFileIdDiz(text: string): FileIdDizResult {
     return { content: text, dizText: null };
   }
   const dizStart = beginIdx + BEGIN_FILE_ID_DIZ.length;
-  const dizText = text.substring(dizStart, endIdx).trim();
+  const dizText = trimDizEdges(text.substring(dizStart, endIdx));
   let endMarkerEnd = endIdx + END_FILE_ID_DIZ.length;
   // eat any trailing CR/LF so the surrounding text doesn't get a phantom blank line
   if (text[endMarkerEnd] === "\r") endMarkerEnd++;
