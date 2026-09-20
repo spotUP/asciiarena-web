@@ -32,10 +32,9 @@ echo "Building..."
 rm -rf .next
 npm run build
 
-echo "Deploying PHP site..."
-rsync_resilient --include='*.php' --include='.htaccess' --exclude='*' \
-  . \
-  spot@97.75.89.139:/var/www/asciiarena.se/nextjs-old/
+# The legacy PHP site is gone. Nothing in nginx routes to nextjs-old and no
+# site uses fastcgi_pass, so those files served nothing -- and register.php
+# carried a hardcoded reCAPTCHA secret straight into a public repo.
 
 # The server half of the build (server chunks, manifests, BUILD_ID) must match
 # the running process exactly, so it syncs with --delete. `static` is EXCLUDED
