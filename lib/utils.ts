@@ -42,15 +42,35 @@ export function combinize(names: string, base: string, fallback = ""): string {
   return pluralize(links);
 }
 
+/**
+ * Announce something in Discord. Never throws -- an upload must not fail
+ * because Discord is down -- but it no longer fails in silence.
+ *
+ * It used to `catch {}` everything, including the case that actually bit:
+ * DISCORD_UPLOAD_WEBHOOK was empty on the server, `fetch("")` threw, and the
+ * announcement vanished. Nobody noticed for months because nothing was ever
+ * written anywhere. A dropped announcement now says so in the journal:
+ *
+ *     journalctl -u asciiarena-next | grep discord
+ */
 export async function notifyDiscord(webhookUrl: string, message: string) {
+  if (!webhookUrl) {
+    console.warn(`[discord] no webhook configured, announcement dropped: ${message.slice(0, 120)}`);
+    return;
+  }
   try {
-    await fetch(webhookUrl, {
+    const res = await fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username: "ASCII ARENA", content: message }),
     });
-  } catch {
-    // webhook failures are non-fatal
+    // Discord answers 204 on success; a deleted or rotated webhook gives 401
+    // or 404, which is indistinguishable from working unless it is logged.
+    if (!res.ok) {
+      console.error(`[discord] webhook rejected the announcement: ${res.status} ${res.statusText}`);
+    }
+  } catch (err) {
+    console.error(`[discord] webhook request failed: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
 
