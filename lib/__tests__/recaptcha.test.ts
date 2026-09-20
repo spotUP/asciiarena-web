@@ -121,6 +121,9 @@ describe("the register endpoint", () => {
     );
     // The widget only exists if Google's script is on the page -- it was not.
     expect(form).toMatch(/recaptcha\/api\.js/);
+    // The leaked key pair must not come back; it belongs to an account we do
+    // not control and its secret is public.
+    expect(form).not.toMatch(/6Le5rpQr/);
     expect(form).toMatch(/recaptchaToken: window\.grecaptcha\?\.getResponse\(\)/);
     // A token is single-use; a failed attempt has to reset the widget.
     expect(form).toMatch(/window\.grecaptcha\?\.reset\(\)/);

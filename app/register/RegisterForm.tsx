@@ -214,12 +214,18 @@ export default function RegisterForm() {
 
         <div className="row apb-1">
           {/* The script was missing, so this div rendered nothing at all and
-              no token was ever produced. The site key is public by design; it
-              comes from env so a rotation is a config change, not a deploy. */}
+              no token was ever produced.
+
+              The site key is public by design -- it ships in this HTML -- and
+              it lives here rather than in env because NEXT_PUBLIC_* values are
+              inlined at BUILD time, so an env change alone would not reach the
+              page. Rotating the pair means editing this line and deploying,
+              and updating RECAPTCHA_SECRET on the server to match: a token
+              minted for one key pair fails verification against another. */}
           <Script src="https://www.google.com/recaptcha/api.js" strategy="afterInteractive" />
           <div
             className="g-recaptcha"
-            data-sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "6Le5rpQrAAAAACR_OlbAuKMTlgHY6wnDqJYuBkVQ"}
+            data-sitekey="6Lf8TMYtAAAAAAe68KE9THixQGWYvBqpGUB6iYNj"
           />
         </div>
 
