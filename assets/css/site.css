@@ -554,6 +554,27 @@ button, select{
   color: #999999 !important;
 }
 
+/* A field you TYPE in gets two rows, not one.
+   Buttons are one row and that is right: no caret, no editing, nothing to
+   place inside the box. A text field with a 16px font in a 16px box has no
+   room around the glyphs -- the caret reads as misaligned and the target is a
+   single grid row to hit with a mouse. 32px is still on the 8x16 grid, and the
+   text centres in it via line-height.
+   .search-field opts back down to one row deliberately: those sit in dense
+   sidebars and lists where compactness is the point. */
+input[type=text],
+input[type=email],
+input[type=password],
+input[type=search],
+input[type=url],
+input[type=tel],
+input[type=number],
+input[type=date],
+input:not([type]) {
+  height: 32px;
+  line-height: 32px;
+}
+
 /* A file input is a browser-drawn button with a filename beside it. Clamped
    to one row it clips its own label and there is nothing left to click, so it
    keeps whatever height the browser needs. */
@@ -2726,10 +2747,10 @@ input::file-selector-button {
 .search-field,
 .search-btn,
 .text-btn {
-  height: 16px;
+  height: 16px !important;
   min-height: 0;
   max-height: 16px;
-  line-height: 16px;
+  line-height: 16px !important;
   font-size: 16px;
   font-family: TopazPlus_a1200, Monaco, Menlo, Consolas, "Courier New", monospace;
   border: 0 !important;

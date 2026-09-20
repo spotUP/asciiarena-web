@@ -129,3 +129,21 @@ describe("the register endpoint", () => {
     expect(form).toMatch(/window\.grecaptcha\?\.reset\(\)/);
   });
 });
+
+describe("the registration rate limit", () => {
+  it("counts only attempts that already passed the captcha", async () => {
+    // It used to run first, at 3 an hour, counting every failure: two mistyped
+    // passwords locked a real person out for an hour, while a bot with no token
+    // burned the same budget for free. Reported 2026-09-21 by the person trying
+    // to test their own signup.
+    const { readFileSync } = await import("node:fs");
+    const path = await import("node:path");
+    const route = readFileSync(path.join(process.cwd(), "app/api/register/route.ts"), "utf8");
+    const captcha = route.indexOf("verifyRecaptcha(");
+    const limit = route.indexOf("checkRateLimit(");
+    expect(captcha).toBeGreaterThan(-1);
+    expect(limit).toBeGreaterThan(captcha);
+    // And it tells the reader when they can try again.
+    expect(route).toMatch(/Try again in an hour/);
+  });
+});

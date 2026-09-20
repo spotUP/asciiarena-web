@@ -121,3 +121,24 @@ describe("buttons that are links", () => {
     expect(release).toContain('className="btn-big bg-header grey-text"');
   });
 });
+
+describe("a field you type in", () => {
+  it("gets two rows, so the caret has room and the target is hittable", () => {
+    // Reported 2026-09-21: "i cant click this input and type, look at the
+    // cursor position". The field was 16px tall with a 16px font -- the text
+    // filled its own box exactly, leaving nothing around the glyphs, and the
+    // whole target was one grid row high.
+    const rule = cssRule(css, "input[type=text],");
+    expect(rule).toMatch(/height:\s*32px;/);
+    expect(rule).toMatch(/line-height:\s*32px;/);
+    // Every type a person types into, not just text.
+    for (const t of ["email", "password", "search", "url", "tel", "number", "date"]) {
+      expect(css, t).toContain(`input[type=${t}]`);
+    }
+  });
+
+  it("leaves buttons on one row", () => {
+    // A button has no caret and nothing to place inside the box.
+    expect(cssRule(css, "button, select{")).toMatch(/height:\s*16px;/);
+  });
+});

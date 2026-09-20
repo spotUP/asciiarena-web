@@ -62,9 +62,6 @@ async function sendWelcomeMail(nick: string, mail: string, activationLink: strin
 
 export async function POST(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
-  if (!checkRateLimit(`register:${ip}`, 3, 60 * 60 * 1000)) {
-    return apiError("Too many registration attempts. Try again later.", 429);
-  }
 
   const body = (await request.json()) as {
     nick?: string;
@@ -84,6 +81,16 @@ export async function POST(request: NextRequest) {
   const captcha = await verifyRecaptcha(body.recaptchaToken, ip);
   if (!captcha.ok) {
     return apiError(captcha.error ?? "Captcha check failed.", 400);
+  }
+
+  // The rate limit comes AFTER the captcha, and deliberately so. It used to run
+  // first, at 3 an hour, counting every failure: mistype a password twice and a
+  // real person was locked out for an hour, while a bot spent the same budget
+  // for free. Now a request without a solved captcha never reaches the counter,
+  // so the budget belongs to people who got that far -- enough for a few
+  // genuine retries, still a hard stop on someone farming accounts.
+  if (!checkRateLimit(`register:${ip}`, 5, 60 * 60 * 1000)) {
+    return apiError("Too many registration attempts from this address. Try again in an hour.", 429);
   }
 
   const optInSet = new Set(

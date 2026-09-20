@@ -31,10 +31,13 @@ describe("one-row controls", () => {
   it("undoes the 48px box the element rules impose", () => {
     // All three share the sizing block, so this is one assertion for all.
     const shared = cssRule(css, ".search-field,");
-    expect(shared).toMatch(/height:\s*16px;/);
+    // !important because a typed field is two rows by default now (a 16px box
+    // round a 16px font leaves no room for the caret); these three opt back
+    // down to one row on purpose, in dense sidebars and lists.
+    expect(shared).toMatch(/height:\s*16px !important;/);
     expect(shared).toMatch(/min-height:\s*0;/);
     expect(shared).toMatch(/max-height:\s*16px;/);
-    expect(shared).toMatch(/line-height:\s*16px;/);
+    expect(shared).toMatch(/line-height:\s*16px !important;/);
   });
 
   it("beats the padding and margin the element rule sets with !important", () => {
