@@ -14,7 +14,10 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    include: ["**/__tests__/**/*.test.ts"],
+    // .tsx too: a control that loses what you typed can only be caught by
+    // mounting it and driving real events at it. Source-shape assertions pass
+    // happily on a combobox that drops its value.
+    include: ["**/__tests__/**/*.test.{ts,tsx}"],
     server: {
       deps: {
         // Let Next.js and NextAuth be treated as external CJS modules

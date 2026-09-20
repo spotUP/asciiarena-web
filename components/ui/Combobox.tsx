@@ -64,11 +64,39 @@ export default function Combobox({ value, options, onChange, width, placeholder,
   const showCreate = !!createLabel && typed.trim().length > 0 && !hasExactMatch;
 
   /**
-   * Commit typed-but-unconfirmed text when the field loses focus.
+   * Tell the parent what is in the box, as it is typed.
    *
-   * Without this, typing a name and going straight to Submit dropped it: the
-   * parent was only ever told about a value from pick(), i.e. clicking an
-   * option or pressing Enter. Collys were saved with no artist and no crew.
+   * This field used to hold the text privately and hand it over only on an
+   * EVENT -- blur, Enter, or clicking an option. That is two sources of truth
+   * for one value, synchronised by something no specification promises: Chromium
+   * focuses a button on mousedown, so blur fires before the click that submits,
+   * while Safari and iOS deliberately do not focus buttons at all. On those the
+   * field kept focus, no blur was ever dispatched, and the form posted the state
+   * from before anything was typed -- a colly uploaded with no artist and no
+   * crew, reported in July, in August and again in September.
+   *
+   * Now the parent holds the value at every keystroke and the form can simply
+   * read its own state. The same rule decides what a keystroke means as decides
+   * what a blur means (lib/combobox-commit.ts), so a field that cannot create
+   * entries still refuses free text: it commits only an exact match, leaving the
+   * last valid value in place while the reader is mid-word.
+   */
+  const commitWhileTyping = (text: string) => {
+    const next = resolveComboboxCommit(
+      text,
+      value,
+      options.map(o => o.value),
+      { allowCreate: !!createLabel },
+    );
+    // null means "nothing to say yet" -- partial text in a pick-only field, or
+    // a value the parent already holds. Never rewrite what is being typed.
+    if (next !== null) onChange(next);
+  };
+
+  /**
+   * Blur still canonicalises: it puts the list's own spelling in the box once
+   * the reader leaves it, and puts back the last good value when free text was
+   * refused. It is no longer where the value is handed over.
    */
   const commitTyped = () => {
     const next = resolveComboboxCommit(
@@ -102,6 +130,7 @@ export default function Combobox({ value, options, onChange, width, placeholder,
         onBlur={commitTyped}
         onChange={e => {
           setTyped(e.target.value);
+          commitWhileTyping(e.target.value);
           setOpen(true);
         }}
         onKeyDown={e => {
