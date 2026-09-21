@@ -22,7 +22,14 @@ async function sendWelcomeMail(nick: string, mail: string, activationLink: strin
   const mailPass = process.env.MAILPASS;
   const mailRoot = process.env.MAILROOT ?? mailUser;
 
-  if (!mailHost || !mailUser || !mailPass) return;
+  if (!mailHost || !mailUser || !mailPass) {
+    // Silence here is how the Discord webhooks stayed dead for months: an
+    // unset env var made the send a no-op that nothing ever reported.
+    console.error(
+      `[register] MAILHOST/MAILUSER/MAILPASS not all set; no activation mail sent to ${mail}`,
+    );
+    return;
+  }
 
   const transporter = nodemailer.createTransport({
     host: mailHost,
@@ -158,8 +165,14 @@ export async function POST(request: NextRequest) {
     ? `${siteRoot}/api/activate?token=${buildHmacToken(created[0].id, mail, ACTIVATION_TTL_MS)}`
     : siteRoot;
 
-  // Fire-and-forget — don't fail registration if mail is misconfigured
-  sendWelcomeMail(nick, mail, activationLink).catch(() => {});
+  // Fire-and-forget — don't fail registration if mail is misconfigured, but
+  // say so in the log. A swallowed error here looks identical to a working
+  // signup while the user waits for a mail that was never sent.
+  sendWelcomeMail(nick, mail, activationLink).catch(err => {
+    console.error(
+      `[register] activation mail to ${mail} failed: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  });
 
   broadcast("site:users", { type: "joined", nick });
   revalidateTag("site:stats", "default");
