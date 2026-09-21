@@ -9,7 +9,13 @@
 | `npm start` | Start production server |
 | `npm run test:ci` | Run all tests (Vitest) |
 | `npx tsc --noEmit` | Type check |
-| `./deploy.sh` | Deploy to 97.75.89.139 |
+| `./deploy.sh` | Deploy to 97.75.89.139 (fallback; a push to `modernize/typescript-nextjs` deploys via CI) |
+
+| URL | Which |
+|---|---|
+| https://www.asciiarena.se | live |
+| https://dev.asciiarena.se | live, dev instance |
+| http://localhost:3000 | local dev server (human-owned, see below) |
 
 ### Dev server is user-owned
 
@@ -47,11 +53,13 @@ Code comments and TypeScript source may use Unicode freely.
 
 ## Stack
 
-- **Runtime**: Node 20, Next.js 16 App Router, TypeScript strict
-- **CSS**: BOOTSTRA.386 v5.3.1 (Bootstrap 5 retro theme, `/assets/css/bootstrap5.min.css`) + `site.css` + `overrides.css`
-- **JS**: Bootstrap 5 bundle (`/public/assets/js/bootstrap5.bundle.min.js`, NOT npm)
-- **DB**: MySQL 8 via Prisma 7 + `@prisma/adapter-mariadb`
-- **Auth**: NextAuth v5 with credentials provider (bcrypt, trustHost: true)
+Versions live in `package.json` -- read it. What that file will NOT tell you:
+
+- **CSS**: BOOTSTRA.386 v5.3.1 (Bootstrap 5 retro theme, `/assets/css/bootstrap5.min.css`)
+  + `site.css` + `overrides.css`
+- **JS**: Bootstrap 5 bundle from `/public/assets/js/bootstrap5.bundle.min.js`, **NOT npm** --
+  importing Bootstrap from npm breaks the theme
+- **Auth**: NextAuth v5, credentials provider, `trustHost: true`
 - **Deploy**: nginx reverse proxy -> Next.js on port 3001, systemd service `asciiarena-next`
 
 ## CSS load order (critical)
@@ -160,6 +168,7 @@ Only use h1/h2/h3 when the glowing header style is deliberately wanted (e.g., wi
 ## Key paths on server
 
 - Deploy dir: `/var/www/asciiarena.se/nextjs-current/`
-- PHP site (backup): `/var/www/asciiarena.se/` (still live at asciiarena.se)
+- Large binaries outside git: `/var/www/asciiarena.se/{collections,apps,mags}/`
 - Dev site: `https://dev.asciiarena.se` -> port 3001
-- Apache SSL backup: `asciiarena.se-le-ssl.conf.php-backup`
+- Web server is **nginx**, not Apache (`/etc/nginx/sites-available/asciiarena.se`).
+  The legacy PHP site was deleted in `260868d3`; nothing serves from it any more.
