@@ -31,6 +31,20 @@ async function sendWelcomeMail(nick: string, mail: string, activationLink: strin
     return;
   }
 
+  // MAILROOT defaults to MAILUSER, which only holds for a provider where the
+  // login IS the address (Gmail). On an SMTP relay the login is a fixed word
+  // -- Resend authenticates as the literal user "resend" -- so the fallback
+  // would put `"ASCII Arena" <resend>` in the From header and mail the admin
+  // copy to "resend". Both fail at the relay, well after the point where the
+  // cause is obvious.
+  if (!mailRoot || !mailRoot.includes("@")) {
+    console.error(
+      `[register] MAILROOT is "${mailRoot ?? ""}", not an email address; no activation mail sent to ${mail}. ` +
+        `MAILUSER is an SMTP login here, so MAILROOT must be set explicitly.`,
+    );
+    return;
+  }
+
   const transporter = nodemailer.createTransport({
     host: mailHost,
     port: mailPort,
@@ -57,14 +71,12 @@ async function sendWelcomeMail(nick: string, mail: string, activationLink: strin
   });
 
   // Notify admin
-  if (mailRoot) {
-    await transporter.sendMail({
-      from: `"ASCII Arena" <${mailRoot}>`,
-      to: mailRoot,
-      subject: `New registration: ${nick}`,
-      text: `New user registered: ${nick} (${mail}). Activation link emailed to the user.`,
-    });
-  }
+  await transporter.sendMail({
+    from: `"ASCII Arena" <${mailRoot}>`,
+    to: mailRoot,
+    subject: `New registration: ${nick}`,
+    text: `New user registered: ${nick} (${mail}). Activation link emailed to the user.`,
+  });
 }
 
 export async function POST(request: NextRequest) {
