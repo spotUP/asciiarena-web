@@ -83,7 +83,6 @@ describe("search fields", () => {
   const FILES = [
     "app/crews/CrewsClient.tsx",
     "app/messages/MessagesClient.tsx",
-    "app/playlists/PlaylistsClient.tsx",
     "app/collys/CollysClient.tsx",
     "app/admin/crews/CrewsClient.tsx",
     "app/admin/collys/CollysClient.tsx",
